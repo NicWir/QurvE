@@ -34,12 +34,8 @@ Imports:
     stats,
     tinytex,
     utils
-Suggests: 
-    
 VignetteBuilder: 
     knitr
-Remotes: 
-    
 biocViews: 
 Encoding: UTF-8
 GithubRepo: curvE

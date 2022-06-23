@@ -19,12 +19,12 @@ growth.gcFitLinear(
 \arguments{
 \item{time}{vector of independent variable.}
 
+\item{data}{vector of dependent variable (concentration of organisms).}
+
 \item{h}{width of the window (number of data).}
 
 \item{quota}{part of window fits considered for the overall linear fit
 (relative to max. growth rate)}
-
-\item{y}{vector of dependent variable (concentration of organisms).}
 }
 \value{
 object with parameters of the fit. The lag time is currently estimated
@@ -52,28 +52,6 @@ at least \eqn{quota \cdot b_{max}},
 e.g. all data sets that have at least 95\\% of the maximum slope.
 \item Fit a new linear model to the extended data window identified in step 2.
 }
-}
-\examples{
-data(bactgrowth)
-
-splitted.data <- multisplit(bactgrowth, c("strain", "conc", "replicate"))
-dat <- splitted.data[[1]]
-
-plot(value ~ time, data=dat)
-fit <- fit_easylinear(dat$time, dat$value)
-
-plot(fit)
-plot(fit, log="y")
-plot(fit, which="diagnostics")
-
-fitx <- fit_easylinear(dat$time, dat$value, h=8, quota=0.95)
-
-plot(fit, log="y")
-lines(fitx, pch="+", col="blue")
-
-plot(fit)
-lines(fitx, pch="+", col="blue")
-
 }
 \references{
 Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.

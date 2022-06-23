@@ -1,3 +1,40 @@
+#' Read growth data in table format
+#'
+#' Reads a table file or R dataframe object containing growth data and extracts sample information, samp
+#'
+#' The algorithm works as follows:
+#' \enumerate{
+#'   \item Fit linear regressions to all subsets of \code{h} consecutive data
+#'     points (sliding window). If for example \eqn{h=5}, fit a linear regression to points
+#'     1 \dots 5, 2 \dots 6, 3 \dots 7 and so on. The method seeks the highest
+#'     rate of exponential growth, so the dependent variable is of course
+#'     log-transformed.
+#'   \item Find the subset with the highest slope \eqn{b_{max}} and
+#'     include also the data points of adjacent subsets that have a slope of
+#'     at least \eqn{quota \cdot b_{max}},
+#'     e.g. all data sets that have at least 95\% of the maximum slope.
+#'   \item Fit a new linear model to the extended data window identified in step 2.
+#' }
+#'
+#' @param time vector of independent variable.
+#' @param data vector of dependent variable (concentration of organisms).
+#' @param h width of the window (number of data).
+#' @param quota part of window fits considered for the overall linear fit
+#'   (relative to max. growth rate)
+#'
+#' @return object with parameters of the fit. The lag time is currently estimated
+#' as the intersection between the fit and the horizontal line with \eqn{y=y_0},
+#' where \code{y0} is the first value of the dependent variable. The intersection
+#' of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
+#' These identifieres and their assumptions may change in future versions.
+#'
+#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
+#' Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
+#'
+#' @family fitting functions
+#'
+#' @export
+#'
 growth.read_data <- function(data, data.format = "col", csvsep = ";")
 {
   if (!is.character(data)) {
@@ -1073,7 +1110,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
 #' }
 #'
 #' @param time vector of independent variable.
-#' @param y vector of dependent variable (concentration of organisms).
+#' @param data vector of dependent variable (concentration of organisms).
 #' @param h width of the window (number of data).
 #' @param quota part of window fits considered for the overall linear fit
 #'   (relative to max. growth rate)
@@ -1088,27 +1125,6 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
 #' Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
 #'
 #' @family fitting functions
-#'
-#' @examples
-#' data(bactgrowth)
-#'
-#' splitted.data <- multisplit(bactgrowth, c("strain", "conc", "replicate"))
-#' dat <- splitted.data[[1]]
-#'
-#' plot(value ~ time, data=dat)
-#' fit <- fit_easylinear(dat$time, dat$value)
-#'
-#' plot(fit)
-#' plot(fit, log="y")
-#' plot(fit, which="diagnostics")
-#'
-#' fitx <- fit_easylinear(dat$time, dat$value, h=8, quota=0.95)
-#'
-#' plot(fit, log="y")
-#' lines(fitx, pch="+", col="blue")
-#'
-#' plot(fit)
-#' lines(fitx, pch="+", col="blue")
 #'
 #' @export
 #'
@@ -1158,8 +1174,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
     RSD <- 0.05
   }
   data.log <- log(data.in/data.in[1])
-  if(!is.null(control$min.density)){
-    if(!is.na(control$min.density) && control$min.density != 0){
+  if(!is.null(control$min.density) && !is.na(control$min.density)){
+    if(control$min.density != 0){
       min.density <- log(control$min.density / data[1])
     }
   } else {
@@ -1241,7 +1257,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
           if(any(ret.check[,5] >= R2 & ret.check[,6] <= RSD)){
             while (!success){
               index.max <- which.max(ret.check[, 3])
-              if(ret.check[index.max,5] >= R2 && ret.check[index.max,6] <= RSD && !is.na(ret.check[index.max,6]) && ret.check[, 8] >= min.density){ # prerequisites for suitable µmax candidate: R2 and RSD
+              if(ret.check[index.max,5] >= R2 && ret.check[index.max,6] <= RSD && !is.na(ret.check[index.max,6]) && ret.check[index.max, 8] >= min.density){ # prerequisites for suitable µmax candidate: R2 and RSD
                 slope.max <- ret.check[index.max,3]
                 success <- TRUE
               } else {
