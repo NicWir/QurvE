@@ -275,7 +275,7 @@ growth.control <-
 }
 
 growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
-                             mean.grp = NA, mean.conc = NA,
+                             mean.grp = "all", mean.conc = NA,
                         neg.nan.act = FALSE, clean.bootstrap = TRUE,
                         suppress.messages = FALSE, fit.opt = "b", min.density = NA,
                         log.x.gc = FALSE, log.y.gc = TRUE, log.y.model = FALSE,
@@ -356,6 +356,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
 
 growth.report <- function(grofit, report.dir = NULL, ...)
   {
+  require(ggplot2, quietly = T)
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit")
 
@@ -376,8 +377,13 @@ growth.report <- function(grofit, report.dir = NULL, ...)
                                             "%Y%m%d_%H%M%S"), sep = "")
   }
   dir.create(wd, showWarnings = F)
-  file <- paste("C:/Users/nicwir/Documents/DTU_Biosustain/Scripts_and_Modelling/fluctuator/220111/R_package/VisomX/Reports", "/Report_Growth.Rmd",
-                sep = "")
+  for(i in 1:length(.libPaths())){
+    curvE.ndx <- grep("curvE", list.files(.libPaths()[i]))
+    if(length(curvE.ndx)>0){
+      Report.wd <- paste0(.libPaths()[i], "/curvE")
+    }
+  }
+  file <- paste0(Report.wd, "/Report_Growth.Rmd")
   require(kableExtra)
   require(knitr)
   rmarkdown::render(file, output_format = "all", output_dir = wd,
@@ -429,8 +435,11 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
   # /// loop over all wells
   for (i in 1:dim(data)[1]){
     # /// conversion, to handle even data.frame inputs
-    acttime    <- as.numeric(as.matrix(time[i,]))
-    actwell <- as.numeric(as.matrix((data[i,-1:-3])))
+    acttime    <-
+      as.numeric(as.matrix(time[i, ]))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
+    actwell <-
+      as.numeric(as.matrix((data[i, -1:-3])))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
+
     gcID    <- as.matrix(data[i,1:3])
     wellname <- paste(as.character(data[i,1]), as.character(data[i,2]),as.character(data[i,3]), sep=" | ")
     if ((control$suppress.messages==FALSE)){
@@ -650,7 +659,6 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
     out.table       <- rbind(out.table, fitted)
 
   } # /// end of for (i in 1:dim(data)[1])
-  print("test")
   names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
 
   gcFit           <- list(raw.time = time, raw.data = data, gcTable = out.table, gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all, gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all, control=control)
@@ -1177,9 +1185,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
   if(!is.null(control$min.density) && !is.na(control$min.density)){
     if(control$min.density != 0){
       min.density <- log(control$min.density / data[1])
+    } else {
+      min.density <- log(min(data))
     }
   } else {
-    min.density <- 0
+    min.density <- log(min(data))
   }
   bad.values <- ((is.na(data.log))|(is.infinite(data.log))|(is.na(time))|(is.na(data.log)))
   # /// remove bad values or stop program
@@ -1268,15 +1278,15 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
             slope.quota <- quota * slope.max
             if(exists("min.density")){
               candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
-                                    ret[, 5] >= 0.95*R2 & # R2 criterion for candidates
-                                    ret[, 6] <= 1.05 * RSD & # RSD criterion for candidates
+                                    ret[, 5] >= 0.98*R2 & # R2 criterion for candidates
+                                    ret[, 6] <= 1.02 * RSD & # RSD criterion for candidates
                                     ret[, 7] >= t0 & # consider only slopes after defined t0
                                     ret[, 8] >= min.density # consider only slopes at densities higher than "min.density"
                                   )
             } else{
               candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
-                                    ret[, 5] >= 0.95*R2 & # R2 criterion for candidates
-                                    ret[, 6] <= 1.05 * RSD & # RSD criterion for candidates
+                                    ret[, 5] >= 0.98*R2 & # R2 criterion for candidates
+                                    ret[, 6] <= 1.02 * RSD & # RSD criterion for candidates
                                     ret[, 7] >= t0) # consider only slopes after defined t0
             }
             #consider only candidate windows next to index.max.ret
@@ -1557,7 +1567,7 @@ growth.drFit <- function (gcFitData, control = grofit.control())
     for (i in 1:length(distinct)) {
       conc <- (gcFitData[, 3])[which(gcFitData[, 1] ==
                                        distinct[i])]
-      test <- (gcFitData[, control$parameter])[grep(distinct[i], gcFitData[, 1])]
+      test <- (gcFitData[, control$parameter])[gcFitData[, 1] == distinct[i]]
       names(test) <- rep(names(gcFitData)[control$parameter], length(test))
       drID <- distinct[i]
       EC50[[i]] <- growth.drFitSpline(conc, test, drID, control)

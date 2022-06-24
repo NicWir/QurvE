@@ -411,7 +411,7 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
 `r if(ec50){"\\clearpage"}`
 
 ## `r if(ec50){"Dose-response analysis"}`
-```{r ec50_summary, echo=F, warning=F, message=F, results='asis', eval = ec50}
+```{r ec50_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0}
 cat(paste0("_", length(levels(grofit[["data"]][["condition"]])), "_ conditions were identified::\n",
            paste(colFmt(levels(grofit[["data"]][["condition"]]), 'NavyBlue'), collapse = ", ")))
 cat("  \n")
@@ -428,11 +428,11 @@ names(ec50.df)[3] <- paste0("Response (", grofit$drFit$drFittedSplines[[1]]$para
 knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 ```
 
-```{r ec50_spline_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50}
+```{r ec50_spline_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0}
 plot.drFit(grofit$drFit)
 ```
 
-```{r ec50.boot_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
+```{r ec50.boot_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
 boot.ec50.df <- data.frame()
   for (i in 1:length(grofit$drFit$drBootSplines)){
     boot.ec50.df <-
@@ -448,7 +448,7 @@ boot.ec50.df <- data.frame()
   knit_table(boot.ec50.df, caption = "Dose-Response Analysis - Bootstrapping")
 ```
 
-```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
+```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
 for(i in 1:length(grofit$drFit$drBootSplines)){
   if(grofit$drFit$drBootSplines[[i]]$ bootFlag == TRUE){
     plot.drBootSpline(grofit$drFit$drBootSplines[[i]])
@@ -459,14 +459,22 @@ for(i in 1:length(grofit$drFit$drBootSplines)){
 
 ## `r if(!all(is.na(mean.grp))){"Group average plots"}`
 ```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
-if(!all(is.na(mean.grp))){
-  for(i in 1:length(mean.grp)){
-    print(plot.grpFitSpline(grofit, names = unlist(mean.grp[i]), basesize = 15))
+if(mean.grp == "all"){
+  print(plot.grpFitSpline(grofit, basesize = 15))
+} else {
+  if(!all(is.na(mean.grp))){
+    for(i in 1:length(mean.grp)){
+      if(length(grep(mean.grp[i], as.character(names(grofit$gcFit$gcFittedSplines))))>0){
+        print(plot.grpFitSpline(grofit, names = unlist(mean.grp[i]), basesize = 15))
+      }
+    }
   }
 }
 if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
-    print(plot.grpFitSpline(grofit, conc = unlist(mean.conc[i]), basesize = 15))
+    if(length(grep(mean.conc[i], str_extract(names(grofit$gcFit$gcFittedSplines), "[:alnum:]+$")))>0){
+      print(plot.grpFitSpline(grofit, conc = unlist(mean.conc[i]), basesize = 15))
+    }
   }
 }
 ```

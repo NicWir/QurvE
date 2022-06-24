@@ -1,226 +1,267 @@
-plot.gcFitLinear <- function(x, y, log="", which=c("fit", "diagnostics"), ...)
-            {
-            which <- match.arg(which)
+plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics"), plot = TRUE, export = FALSE, ...)
+{
+  which <- match.arg(which)
 
-            switch(which,
-                   fit = {
+  p <- function(){
+    switch(which,
+           fit = {
 
-                     plot(x$"raw.data" ~ x$"raw.time", xlab="Time", ylab=ifelse(log == "y", "Density", "Density"),
-                          log=log, las=1, main = "Linear fit", ...)
-                     try(points(x$raw.data[x$ndx] ~ x$raw.time[x$ndx], pch=21, col="black", bg="red"))
+             par(cex.lab=1.5)
+             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab=ifelse(log == "y", "Density", "Density"),
+                  log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", ...)
+             axis(1,cex.axis=1.3)
+             axis(2,cex.axis=1.3, las=1)
+             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=21, col="black", bg="red"))
 
-                     ## lag phase
-                     lag <- x$par["lag"]
+             ## lag phase
+             lag <- gcFittedLinear$par["lag"]
 
-                     try(time <- seq(lag, max(x$"raw.time"), length=200), silent = T)
-                     coef_ <- x$par
-                     try(lines(time, x$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                     try(lines(c(min(x$"raw.time"[1]), lag), rep(x$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
-                   },
-                   diagnostics = {
-                     opar <- par(no.readonly = TRUE)
-                     on.exit(par(opar))
-                     par(mfrow=c(1,2))
+             try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
+             coef_ <- gcFittedLinear$par
+             try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+             try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+           },
+           diagnostics = {
+             opar <- par(no.readonly = TRUE)
+             on.exit(par(opar))
+             par(mfrow=c(1,2))
 
-                     ## residuals vs. fitted
-                     obs <- obs(x)
-                     sim <- x$FUN(x$"raw.time", x$par)
-                     plot(fit.linear[["fit"]][["residuals"]] ~ fitted(fit.linear[["fit"]]), xlab="fitted", ylab="residuals")
-                     abline(h=0, col="grey")
-                     ## normal q-q-plot
-                     qqnorm(fit.linear[["fit"]][["residuals"]])
-                     qqline(fit.linear[["fit"]][["residuals"]])
-                   }
-            )
-          }
+             ## residuals vs. fitted
+             obs <- gcFittedLinear$log.data
+             sim <- gcFittedLinear$FUN(gcFittedLinear$"raw.time", gcFittedLinear$par)
+             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals")
+             abline(h=0, col="grey")
+             ## normal q-q-plot
+             qqnorm(gcFittedLinear$fit[["residuals"]])
+             qqline(gcFittedLinear$fit[["residuals"]])
+           }
+    )
+  }
+  if (export == TRUE){
+    w <- ifelse(which=="fit", 9, 9)
+    h <- ifelse(which=="fit", 7, 5)
+    dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+    grDevices::png(paste0("Plots/", paste(gcFittedLinear$gcID, collapse = "_"), "_LinFitPlot.png"),
+                   width = w, height = h, units = 'in', res = 300)
+    p()
+    grDevices::dev.off()
+    grDevices::pdf(paste0("Plots/", paste(gcFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
+    p()
+    grDevices::dev.off()
+  }
+  if (plot == TRUE){
+    p()
+  }
+}
 
-plot.gcFitModel <- function(x, add=FALSE, raw=TRUE, slope=TRUE, pch=1, colData=1, colModel=1, colLag = 1, cex=1, ...)
-  {
-    # x an object of class gcFitModel
+plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
+                            colModel=ggplot2::alpha("forestgreen", 0.85), base_size=16, plot = TRUE, export = FALSE, ...)
+{
+  # x an object of class gcFitModel
 
-    # /// check input parameters
-    if (is.logical(add)==FALSE)   stop("Need logical value for: add")
-    if (is.logical(raw)==FALSE)   stop("Need logical value for: raw")
-    if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
-    if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-    if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
+  # /// check input parameters
+  if (is.logical(raw)==FALSE)   stop("Need logical value for: raw")
+  if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
+  if (is.logical(equation)==FALSE)   stop("Need logical value for: equation")
+  if (is.numeric(base_size)==FALSE)   stop("Need numeric value for: base_size")
+  if (!(class(base_size)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
 
 
-    # /// check if a data fit is available
-    if ((is.na(x$fitFlag)==TRUE)|(x$fitFlag==FALSE)){
-      warning("plot.gcFitModel: no data fit available!")
+  # /// check if a data fit is available
+  if (gcFittedModel$fitFlag==FALSE||is.na(gcFittedModel$fitFlag)){
+    warning("plot.gcFitModel: no data fit available!")
+  }
+  else{
+    coef <- gcFittedModel[["parameters"]]
+    lagtime <- coef["lambda"][[1]][1]
+    model <- as.character(gcFittedModel$model)
+    # assign(paste(model.vec), gcFittedModel[["fit.data"]])
+    df <- data.frame("time" = gcFittedModel[["raw.time"]],
+                     "data" = gcFittedModel[["raw.data"]],
+                     "fit.time" = gcFittedModel[["fit.time"]],
+                     "fit.data" = gcFittedModel[["fit.data"]])
+
+    p <-    ggplot(df, aes(x=time, y=data)) +
+      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
+      xlab("Time") +
+      ylab(label = ifelse(gcFittedModel$control$log.y.gc == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
+      theme_classic(base_size = 16) +
+      ggtitle(gsub(" \\| NA", "", paste(gcFittedModel$gcID, collapse=" | "))) +
+      scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+      scale_y_continuous(breaks = scales::pretty_breaks()) +
+      theme(plot.title = element_text(size=15),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
+    if(raw == TRUE){
+      p <- p + geom_point(shape=1, size = 2,alpha = 0.5, stroke=0.15)
     }
+    if(equation == TRUE){
+      if(gcFittedModel$model == "logistic"){
+        p <- p + annotate(
+          "text",
+          label = "y(t) == frac(A , 1+exp(frac(4 %.% mu, A) %.% (lambda - t) + 2))",
+          x = 1.08 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          angle = 90, parse = TRUE, size = 3.2) +
+          annotate("text",
+                   label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ),
+                   x = 1.13 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   angle = 90, parse = F, size = 2.5) +
+          scale_color_manual(name='Growth Model',
+                             breaks = "logistic",
+                             values=c("model" = colModel, "logistic" = colModel))
+      }
+      if(gcFittedModel$model == "richards"){
+        p <- p + annotate(
+          "text",
+          label = "y(t) == A%.%(1.0+nu%.%italic(e)^{1+nu}%.%exp(frac(mu,A)%.%(1+nu)^(1+frac(1,nu))%.%( lambda - t )))^(-1/nu)",
+          x = 1.17 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          angle = 90, parse = TRUE, size = 3.2) +
+          annotate("text",
+                   label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ~~~~ nu == .(round(as.numeric(gcFittedModel$parameters$fitpar$nu[1],3)))),
+                   x = 1.22 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   angle = 90, parse = F, size = 2.5) +
+          scale_color_manual(name='Growth Model',
+                             breaks = "richards",
+                             values=c("model" = colModel, "richards" = colModel))
+      }
+      if(gcFittedModel$model == "gompertz"){
+        p <- p + annotate(
+          "text",
+          label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1))",
+          x = 1.08 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          angle = 90, parse = TRUE, size = 3.4) +
+          annotate("text",
+                   label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ),
+                   x = 1.13 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   angle = 90, parse = F, size = 2.5) +
+          scale_color_manual(name='Growth Model',
+                             breaks = "gompertz",
+                             values=c("model" = colModel, "gompertz" = colModel))
+      }
+      if(gcFittedModel$model == "gompertz.exp"){
+        lagtime <- lagtime - gcFittedModel$parameters$A[1]*exp(gcFittedModel$parameters$fitpar$alpha[1]*(gcFittedModel$parameters$lambda[1]-gcFittedModel$parameters$fitpar$t_shift[1]))
+        p <- p + annotate(
+          "text",
+          label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1)) + A%.%exp(alpha%.%(t-t[shift]))",
+          x = 1.16 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          angle = 90, parse = TRUE, size = 3.2) +
+          annotate("text",
+                   label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ alpha == .(round(gcFittedModel$parameters$fitpar$alpha[1],3))  ~~~~
+                                    t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[1],2)) ),
+                   x = 1.21 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   angle = 90, parse = F, size = 2.5) +
+          scale_color_manual(name='Growth Model',
+                             breaks = "gompertz.exp",
+                             values=c("model" = colModel, "gompertz.exp" = colModel))
+      }
+    } # if(equation == TRUE)
     else{
-      if (raw==TRUE){
-        if (add==TRUE){
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==FALSE)){
-            try( points(x$raw.time, x$raw.data, sub=x$name.fit, col=colData, pch=pch,cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit,  col=colModel, type="l") )
-          }
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==TRUE)){
-            try( points(x$raw.time, x$raw.data, sub=x$name.fit, col=colData, pch=pch, cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit,  col=colModel, type="l") )
-          }
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==FALSE)){
-            try( points(x$raw.time, x$raw.data, sub=x$name.fit, col=colData, pch=pch, cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit,  col=colModel, type="l" ) )
-          }
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==TRUE)){
-            try( points(x$raw.time, x$raw.data, sub=x$name.fit, col=colData, pch=pch, cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit,  col=colModel, type="l") )
-          }
-        }
-        else{ # of if (add==TRUE){
-          par(mar=c(5.1, 4.1, 4.1, 5.1))
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==FALSE)){
-            try( plot(x$raw.time, x$raw.data, sub=x$name.fit, xlab="Time", ylab="Growth y(t)", col=colData, pch=pch, cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==TRUE)){
-            try( plot(x$raw.time, x$raw.data, sub=x$name.fit, xlab="Time", ylab="Growth [Ln(y(t)/y0)]", col=colData, pch=pch, cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==FALSE)){
-            try( plot(x$raw.time, x$raw.data, sub=x$name.fit, xlab="Ln(1+time)", ylab="Growth y(t)", col=colData, pch=pch, cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l" ) )
-          }
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==TRUE)){
-            try( plot(x$raw.time, x$raw.data, sub=x$name.fit, xlab="Ln(1+time)", ylab="Growth [Ln(y(t)/y0)]", col=colData, pch=pch, cex=cex) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-        }
+      if(gcFittedModel$model == "logistic"){
+        p <- p + scale_color_manual(name='Growth Model',
+                                    breaks = "logistic",
+                                    values=c("model" = colModel, "logistic" = colModel))
       }
-      else{ # of if (raw==TRUE)
-        if (add==TRUE){
-          # /// try to plot data fit
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==FALSE)){
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==TRUE)){
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==FALSE)){
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==TRUE)){
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-        }
-        else{ # of if (add==TRUE)
-          par(mar=c(5.1, 4.1, 4.1, 5.1))
-          # /// try to plot data fit
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==FALSE)){
-            try( plot(x$fit.time, x$fit.data, sub=x$name.fit, xlab="Time", ylab="Growth y(t)", col=0) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit,  col=colModel, type="l") )
-          }
-
-          if ((x$control$log.x.gc==FALSE) && (x$control$log.y.model==TRUE)){
-            try( plot(x$fit.time, x$fit.data, sub=x$name.fit, xlab="Time", ylab="Growth [Ln(y(t)/y0)]", col=0) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==FALSE)){
-            try( plot(x$fit.time, x$fit.data, sub=x$name.fit, xlab="Ln(1+time)", ylab="Growth y(t)", col=0 ) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l" ) )
-          }
-
-          if ((x$control$log.x.gc==TRUE)  && (x$control$log.y.model==TRUE)){
-            try( plot(x$fit.time, x$fit.data, sub=x$name.fit, xlab="Ln(1+time)", ylab="Growth [Ln(y(t)/y0)]", col=0) )
-            try( lines(x$fit.time, x$fit.data, sub=x$name.fit, col=colModel, type="l") )
-          }
-        }
+      if(gcFittedModel$model == "richards"){
+        p <- p + scale_color_manual(name='Growth Model',
+                                    breaks = "richards",
+                                    values=c("model" = colModel, "richards" = colModel))
       }
-        mu     <- as.numeric(x$parameters$mu[1])
-        lambda <- as.numeric(x$parameters$lambda[1])
-
-      # if(x$model == "logistic"){
-      #   text(x=44.45, par("usr")[4],
-      #        expression(y(t) == frac(A , 1+exp(frac(4 %.% mu, A) %.% (lambda - t) + 2))),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.4)
-      #
-      #   text(x=48.3, par("usr")[4],
-      #        bquote(A == .(round(x$parameters$A[1],3)) ~~~~ mu == .(round(x$parameters$mu[1],3)) ~~~~
-      #                 lambda == .(round(x$parameters$lambda[1],3)) ),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.2)
-      #
-      # }
-      # if(x$model == "richards"){
-      #   text(x=44.5, par("usr")[4],
-      #        expression(y(t) == A%.%(1.0+nu%.%italic(e)^{1+nu}%.%exp(frac(mu,A)%.%(1+nu)^(1+frac(1,nu))%.%( lambda - t )))^(-1/nu)),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.4)
-      #
-      #   text(x=47.5, par("usr")[4],
-      #        bquote(A == .(round(x$parameters$A[1],3)) ~~~~ mu == .(round(x$parameters$mu[1],3)) ~~~~
-      #                 lambda == .(round(x$parameters$lambda[1],3)) ~~~~ nu == .(round(as.numeric(x$parameters$fitpar$nu[1],3))) ),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.2)
-      # }
-      # if(x$model == "gompertz"){
-      #   text(x=44.5, par("usr")[4],
-      #        expression(y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1))),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.4)
-      #
-      #   text(x=48.3, par("usr")[4],
-      #        bquote(A == .(round(x$parameters$A[1],3)) ~~~~ mu == .(round(x$parameters$mu[1],3)) ~~~~
-      #                 lambda == .(round(x$parameters$lambda[1],3)) ),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.2)
-      # }
-      # if(x$model == "gompertz.exp"){
-      #   lambda <- lambda - x$parameters$A[1]*exp(x$parameters$fitpar$alpha[1]*(x$parameters$lambda[1]-x$parameters$fitpar$t_shift[1]))
-      #   text(x=44.5, par("usr")[4],
-      #        expression(y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1)) + A%.%exp(alpha%.%(t-t[shift]))),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.4)
-      #
-      #   text(x=47.8, par("usr")[4],
-      #        bquote(A == .(round(x$parameters$A[1],3)) ~~~~ mu == .(round(x$parameters$mu[1],3)) ~~~~
-      #                 lambda == .(round(x$parameters$lambda[1],2)) ~~~~ alpha == .(round(x$parameters$fitpar$alpha[1],3))  ~~~~
-      #                 t[shift] == .(round(x$parameters$fitpar$t_shift[1],2)) ),
-      #        srt = 90, xpd = TRUE, pos = 1, offset=20, cex=1.2)
-      # }
-        # /// add tangent at maximum slope
-        if (slope==TRUE){
-          bla    <- (x$fit.time)*mu
-          bla    <- bla+(-mu*lambda)
-          try(lines(x$fit.time, bla, lw=2, lty=2, col=colModel))
-        }
-
+      if(gcFittedModel$model == "gompertz"){
+        p <- p + scale_color_manual(name='Growth Model',
+                                    breaks = "gompertz",
+                                    values=c("model" = colModel, "gompertz" = colModel))
+      }
+      if(gcFittedModel$model == "gompertz.exp"){
+        p <- p + scale_color_manual(name='Growth Model',
+                                    breaks = "gompertz.exp",
+                                    values=c("model" = colModel, "gompertz.exp" = colModel))
+      }
+    }
+    p <- p + theme(legend.key = element_blank(),
+                   legend.background=element_blank(),
+                   legend.title = element_blank(),
+                   legend.position = c(0.92, 0.06),
+                   plot.margin = unit(c(1, 5, 1, 1), "lines")) +
+      coord_cartesian(
+        xlim = c(
+          ggplot_build(p)$layout$panel_params[[1]]$x.range[1],
+          ggplot_build(p)$layout$panel_params[[1]]$x.range[2]
+        ),
+        ylim = c(
+          ggplot_build(p)$layout$panel_params[[1]]$y.range[1],
+          ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+        ),
+        clip = "off",
+        expand = F
+      )
+    if(slope == T){
+      # /// add tangent at maximum slope
+      mu     <- as.numeric(coef$mu[1])
+      bla    <- (gcFittedModel$fit.time)*mu
+      bla    <- bla+(-mu*lagtime)
+      tangent.df <- data.frame("time" = gcFittedModel$fit.time,
+                               "y" = bla)
+      df.horizontal <- data.frame("time" = c(gcFittedModel$fit.time[1], lagtime),
+                                  "y" = gcFittedModel[["fit.data"]][1])
+      p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+      p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                xend = time[which.min(abs(y - p.yrange.end))],
+                                yend = y[which.min(abs(y - p.yrange.end))]),
+                            data = tangent.df, linetype = "dashed", color = colModel, size = 0.5) +
+        geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+                     linetype = "dashed", color = colModel, size = 0.5)
+    }
+    if (export == TRUE){
+      w <- 8
+      h <- 6
+      dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+      grDevices::png(paste0("Plots/", paste(gcFittedModel$gcID, collapse = "_"), "_ModelFitPlot.png"),
+                     width = w, height = h, units = 'in', res = 300)
+      suppress_warnings( {print(p)}, "is.na" )
+      grDevices::dev.off()
+      grDevices::pdf(paste0("Plots/", paste(gcFittedModel$gcID, collapse = "_"), "_ModelFitPlot.pdf"))
+      suppress_warnings( {print(p)}, "is.na" )
+      grDevices::dev.off()
+    }
+    if (plot == TRUE){
+      suppress_warnings( {print(p)}, "is.na" )
+    }
+    if(export == FALSE && plot == FALSE){
+      return(p)
     }
   }
+}
 
-plot.drBootSpline <- function (x,
+plot.drBootSpline <- function (drBootSpline,
                                pch = 1,
                                colData = 1,
                                colSpline = scales::alpha("black", 0.15),
-                               cex = 0.5,
+                               cex = 0.5, plot = TRUE, export = FALSE,
                                ...)
 {
-  # x an object of class drBootSpline
-  if(class(x) != "drBootSpline") stop("x needs to be an object created with growth.drBootSpline.")
+  # drBootSpline an object of class drBootSpline
+  if(class(drBootSpline) != "drBootSpline") stop("drBootSpline needs to be an object created with growth.drBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot  <- function(text = "Empty plot", main = "") {
-    plot(
-      c(0, 1, 0, 1, 0),
-      c(0, 1, 1, 0, 0),
-      type = "l",
-      axes = FALSE,
-      xlab = "",
-      ylab = "",
-      lwd = 1,
-      col = "gray",
-      main = main
-    )
-    lines(c(0, 0),
-          c(0, 1),
-          type = "l",
-          lwd = 1,
-          col = "gray")
-    lines(c(1, 1),
-          c(1, 0),
-          type = "l",
-          lwd = 1,
-          col = "gray")
+    plot(c(0, 1, 0, 1, 0), c(0, 1, 1, 0, 0),
+      type = "l", axes = FALSE, xlab = "", ylab = "", lwd = 1,
+      col = "gray", main = main)
+    lines(c(0, 0), c(0, 1),
+          type = "l", lwd = 1, col = "gray")
+    lines(c(1, 1), c(1, 0),
+          type = "l", lwd = 1, col = "gray")
     text(0.5, 0.1, text, col = "gray")
   }
 
@@ -232,140 +273,165 @@ plot.drBootSpline <- function (x,
   if (is.numeric(cex) == FALSE)
     stop("Need numeric value for: cex")
 
-  if (x$bootFlag == FALSE) {
+  if (drBootSpline$bootFlag == FALSE) {
     empty.plot()
   }
   else{
-    colSpline   <-
-      rep(colSpline, (x$control$nboot.dr %/% length(colSpline)) + 1)
-    conc.log    <- log(x$raw.conc + 1)
-    test.log    <- log(x$raw.test + 1)
-    conc        <- x$raw.conc
-    test        <- x$raw.test
+    p1 <- function(){
+      colSpline   <-
+        rep(colSpline, (drBootSpline$control$nboot.dr %/% length(colSpline)) + 1)
+      conc.log    <- log(drBootSpline$raw.conc + 1)
+      test.log    <- log(drBootSpline$raw.test + 1)
+      conc        <- drBootSpline$raw.conc
+      test        <- drBootSpline$raw.test
 
-    global.minx <- min(min(x$boot.conc))
-    global.maxx <- max(max(x$boot.conc))
-    global.miny <- min(min(x$boot.test))
-    global.maxy <- max(max(x$boot.test))
+      global.minx <- min(min(drBootSpline$boot.conc))
+      global.maxx <- max(max(drBootSpline$boot.conc))
+      global.miny <- min(min(drBootSpline$boot.test))
+      global.maxy <- max(max(drBootSpline$boot.test))
 
-    plot.new()
-    # initialize plot
-    if ((x$control$log.x.dr == TRUE) &&
-        (x$control$log.y.dr == FALSE)) {
-      plot(
-        c(global.minx, global.maxx),
-        c(global.miny, global.maxy),
-        type = "n",
-        xlab = "ln(1+concentration)",
-        ylab = "response"
-      )
-    }
-    else{
-      if ((x$control$log.x.dr == FALSE) &&
-          (x$control$log.y.dr == FALSE)) {
+      # initialize plot
+      if ((drBootSpline$control$log.x.dr == TRUE) &&
+          (drBootSpline$control$log.y.dr == FALSE)) {
         plot(
           c(global.minx, global.maxx),
           c(global.miny, global.maxy),
           type = "n",
-          xlab = "concentration",
-          ylab = "response"
+          xlab = "Ln(1+concentration)",
+          ylab = "Response"
         )
       }
       else{
-        if ((x$control$log.x.dr == TRUE) && (x$control$log.y.dr == TRUE)) {
+        if ((drBootSpline$control$log.x.dr == FALSE) &&
+            (drBootSpline$control$log.y.dr == FALSE)) {
           plot(
             c(global.minx, global.maxx),
             c(global.miny, global.maxy),
             type = "n",
-            xlab = "ln(1+concentration)",
-            ylab = "ln(1+response)"
+            xlab = "Concentration",
+            ylab = "Response"
           )
         }
         else{
-          if ((x$control$log.x.dr == FALSE) && (x$control$log.y.dr == TRUE)) {
+          if ((drBootSpline$control$log.x.dr == TRUE) && (drBootSpline$control$log.y.dr == TRUE)) {
             plot(
               c(global.minx, global.maxx),
               c(global.miny, global.maxy),
               type = "n",
-              xlab = "concentration",
-              ylab = "ln(1+response)"
+              xlab = "Ln(1+Concentration)",
+              ylab = "Ln(1+response)"
             )
+          }
+          else{
+            if ((drBootSpline$control$log.x.dr == FALSE) && (drBootSpline$control$log.y.dr == TRUE)) {
+              plot(
+                c(global.minx, global.maxx),
+                c(global.miny, global.maxy),
+                type = "n",
+                xlab = "Concentration",
+                ylab = "Ln(1+response)"
+              )
+            }
           }
         }
       }
-    }
 
-    # /// plot raw data
-    points(
-      x$raw.conc,
-      x$raw.test,
-      col = colData,
-      pch = pch,
-      cex = cex
-    )
-
-    # /// loop over all fitted splines and plot drFitSpline objects
-    for (i in 1:x$control$nboot.dr) {
-      plot(
-        x$boot.drSpline[[i]],
-        add = TRUE,
-        ec50line = FALSE,
-        pch = 0,
-        colSpline = colSpline[i],
-        colData = 0,
-        cex = cex,
-        lwd = 1
+      # /// plot raw data
+      points(
+        drBootSpline$raw.conc,
+        drBootSpline$raw.test,
+        col = colData,
+        pch = pch,
+        cex = cex
       )
+
+      # /// loop over all fitted splines and plot drFitSpline objects
+      for (i in 1:drBootSpline$control$nboot.dr) {
+        plot(
+          drBootSpline$boot.drSpline[[i]],
+          add = TRUE,
+          ec50line = FALSE,
+          pch = 0,
+          colSpline = colSpline[i],
+          colData = 0,
+          cex = cex,
+          lwd = 1
+        )
+      }
+    }
+    p2 <- function(){
+      if (sum(!is.na(drBootSpline$ec50.boot)) == length(drBootSpline$ec50.boot)) {
+        hist(
+          drBootSpline$ec50.boot,
+          col = "gray",
+          main = as.character(drBootSpline$drID),
+          xlab = "EC50"
+        )
+      }
+      else{
+        empty.plot()
+      }
+    } # p <- function()
+    if (export == TRUE){
+      w1 <- 9
+      h1 <- 7
+      dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+      grDevices::png(paste0("Plots/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplines.png"),
+                     width = w1, height = h1, units = 'in', res = 300)
+      p1()
+      grDevices::dev.off()
+      grDevices::pdf(paste0("Plots/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplines.pdf"))
+      p1()
+      grDevices::dev.off()
+
+      w2 <- 9
+      h2 <- 7
+      dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+      grDevices::png(paste0("Plots/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplinesEC50.png"),
+                     width = w2, height = h2, units = 'in', res = 300)
+      p2()
+      grDevices::dev.off()
+      grDevices::pdf(paste0("Plots/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplinesEC50.pdf"))
+      p2()
+      grDevices::dev.off()
     }
 
-    plot.new()
-    if (sum(!is.na(x$ec50.boot)) == length(x$ec50.boot)) {
-      hist(
-        x$ec50.boot,
-        col = "gray",
-        main = as.character(x$gcID),
-        xlab = "EC50"
-      )
+    if (plot == TRUE){
+      p1()
+      p2()
     }
-    else{
-      empty.plot()
-    }
-
-  } # /// of if (x$bootFlag==FALSE){
-
+  } # /// else of if (drBootSpline$bootFlag==FALSE){
 }
 
-plot.drFit <- function(x, ...)
+plot.drFit <- function(drFit, plot = TRUE, export = FALSE, ...)
 {
   # x an object of class drFit
 
-  n <- length(x$drFittedSplines)
+  n <- length(drFit$drFittedSplines)
 
   # /// plot all drFitSpline objects
   for (i in 1:n) {
     #x11()
-    try(plot(x$drFittedSplines[[i]]))
-    title(as.character(x$drFittedSplines[[i]]$drID))
+    try(plot(drFit$drFittedSplines[[i]], export = export, plot = plot))
+    title(as.character(drFit$drFittedSplines[[i]]$drID))
   }
 
 }
 
 plot.drFitSpline <-
-  function (x,
+  function (drFitSpline,
             add = FALSE,
             ec50line = TRUE,
             pch = 1,
             colSpline = 1,
             colData = 1,
             cex = 1,
-            lwd = 2,
+            lwd = 2, plot = TRUE, export = FALSE,
             ...)
   {
-    # x an object of class drFitSpline
-    if(class(x) != "drFitSpline") stop("x needs to be an object created with growth.drFitSpline.")
+    # drFitSpline an object of class drFitSpline
+    if(class(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
     # /// check input parameters
-    if (FALSE %in% (colData %in% c(colors(), 0:8)))
-      stop("colData needs to be numeric from 0:8 or a string from colors()")
     if (is.logical(add) == FALSE)
       stop("Need logical value for: add")
     if (is.logical(ec50line) == FALSE)
@@ -374,89 +440,77 @@ plot.drFitSpline <-
       stop("Need numeric value for: pch")
     if (is.numeric(cex) == FALSE)
       stop("Need numeric value for: cex")
-
-    if (add == FALSE) {
-      if ((x$control$log.x.dr == TRUE) && (x$control$log.y.dr == TRUE)) {
-        plot(
-          log(x$raw.conc + 1),
-          log(x$raw.test + 1),
-          pch = pch,
-          cex = cex,
-          col = colData,
-          xlab = "ln(1+concentration)",
-          ylab = "ln(1+response)"
-        )
-      }
-      else
-      {
-        if ((x$control$log.x.dr == FALSE) && (x$control$log.y.dr == TRUE)) {
+    p <- function(){
+      if (add == FALSE) {
+        if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == TRUE)) {
           plot(
-            x$raw.conc,
-            log(x$raw.test + 1),
+            log(drFitSpline$raw.conc + 1),
+            log(drFitSpline$raw.test + 1),
             pch = pch,
             cex = cex,
             col = colData,
-            xlab = "concentration",
+            xlab = "ln(1+concentration)",
             ylab = "ln(1+response)"
           )
         }
         else
         {
-          if ((x$control$log.x.dr == TRUE) && (x$control$log.y.dr == FALSE)) {
+          if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == TRUE)) {
             plot(
-              log(x$raw.conc + 1),
-              x$raw.test,
+              drFitSpline$raw.conc,
+              log(drFitSpline$raw.test + 1),
               pch = pch,
               cex = cex,
               col = colData,
-              xlab = "Ln(1+concentration)",
-              ylab = paste0("Response", ifelse(!is.na(x$parameters$test), paste0(" (", x$parameters$test, ")"), ""))
+              xlab = "concentration",
+              ylab = "ln(1+response)"
             )
           }
           else
           {
-            if ((x$control$log.x.dr == FALSE) && (x$control$log.y.dr == FALSE)) {
+            if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == FALSE)) {
               plot(
-                x$raw.conc,
-                x$raw.test,
+                log(drFitSpline$raw.conc + 1),
+                drFitSpline$raw.test,
                 pch = pch,
                 cex = cex,
                 col = colData,
-                xlab = "Concentration",
-                ylab = paste0("Response", ifelse(!is.na(x$parameters$test), paste0(" (", x$parameters$test, ")"), ""))
+                xlab = "Ln(1+concentration)",
+                ylab = paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""))
               )
+            }
+            else
+            {
+              if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == FALSE)) {
+                plot(
+                  drFitSpline$raw.conc,
+                  drFitSpline$raw.test,
+                  pch = pch,
+                  cex = cex,
+                  col = colData,
+                  xlab = "Concentration",
+                  ylab = paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""))
+                )
+              }
             }
           }
         }
       }
-    }
-    else{
-      if ((x$control$log.x.dr == TRUE) && (x$control$log.y.dr == TRUE)) {
-        points(
-          log(x$raw.conc + 1),
-          log(x$raw.test + 1),
-          pch = pch,
-          cex = cex,
-          col = colData
-        )
-      }
-      else
-      {
-        if ((x$control$log.x.dr == FALSE) && (x$control$log.y.dr == TRUE)) {
+      else{
+        if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == TRUE)) {
           points(
-            x$raw.conc,
-            log(x$raw.test + 1),
+            log(drFitSpline$raw.conc + 1),
+            log(drFitSpline$raw.test + 1),
             pch = pch,
             cex = cex,
             col = colData
           )
         }
-        else
-        {
-          if ((x$control$log.x.dr == TRUE) && (x$control$log.y.dr == FALSE)) {
+        else{
+          if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == TRUE)) {
             points(
-              log(x$raw.conc + 1),
-              x$raw.test,
+              drFitSpline$raw.conc,
+              log(drFitSpline$raw.test + 1),
               pch = pch,
               cex = cex,
               col = colData
@@ -464,46 +518,74 @@ plot.drFitSpline <-
           }
           else
           {
-            if ((x$control$log.x.dr == FALSE) && (x$control$log.y.dr == FALSE)) {
+            if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == FALSE)) {
               points(
-                x$raw.conc,
-                x$raw.test,
+                log(drFitSpline$raw.conc + 1),
+                drFitSpline$raw.test,
                 pch = pch,
                 cex = cex,
                 col = colData
               )
             }
+            else
+            {
+              if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == FALSE)) {
+                points(
+                  drFitSpline$raw.conc,
+                  drFitSpline$raw.test,
+                  pch = pch,
+                  cex = cex,
+                  col = colData
+                )
+              }
+            }
           }
         }
       }
+
+      try(lines(
+        drFitSpline$fit.conc,
+        drFitSpline$fit.test,
+        type = "l",
+        lwd = lwd,
+        col = colSpline
+      ))
+
+      if (ec50line == TRUE) {
+        #vertical lines
+        totmin = min(min(drFitSpline$fit.conc), min(drFitSpline$fit.test))
+        lines(c(drFitSpline$parameters$EC50, drFitSpline$parameters$EC50),
+              c(totmin - 1, drFitSpline$parameters$yEC50),
+              lty = 2)
+        #horizontal
+        lines(c(-1, drFitSpline$parameters$EC50),
+              c(drFitSpline$parameters$yEC50, drFitSpline$parameters$yEC50),
+              lty = 2)
+      }
+      title(drFitSpline$drID)
+    } # p <- function()
+    if (export == TRUE){
+      w <- 9
+      h <- 7
+      dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+      grDevices::png(paste0("Plots/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.png"),
+                     width = w, height = h, units = 'in', res = 300)
+      p()
+      grDevices::dev.off()
+      grDevices::pdf(paste0("Plots/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.pdf"))
+      p()
+      grDevices::dev.off()
     }
 
-    try(lines(
-      x$fit.conc,
-      x$fit.test,
-      type = "l",
-      lwd = lwd,
-      col = colSpline
-    ))
-
-    if (ec50line == TRUE) {
-      #vertical lines
-      totmin = min(min(x$fit.conc), min(x$fit.test))
-      lines(c(x$parameters$EC50, x$parameters$EC50),
-            c(totmin - 1, x$parameters$yEC50),
-            lty = 2)
-      #horizontal
-      lines(c(-1, x$parameters$EC50),
-            c(x$parameters$yEC50, x$parameters$yEC50),
-            lty = 2)
+    if (plot == TRUE){
+      p()
     }
-    title(x$drID)
   }
 
-plot.gcBootSpline <- function(x, pch=1, colData=1, colSpline=ggplot2::alpha("black", 0.1), cex=1, ...)
+plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, colSpline=ggplot2::alpha("black", 0.1), cex=1, plot = TRUE, export = FALSE, ...)
 {
-  # x an object of class gcBootSpline
-  if(class(x) != "gcBootSpline") stop("x needs to be an object created with growth.gcBootSpline.")
+  # gcBootSpline an object of class gcBootSpline
+  if(class(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot <- function(text="Empty plot",main=""){
     plot(c(0,1,0,1,0),c(0,1,1,0,0), type="l", axes=FALSE, xlab="", ylab="", lwd=1, col="gray",main=main)
@@ -515,177 +597,106 @@ plot.gcBootSpline <- function(x, pch=1, colData=1, colSpline=ggplot2::alpha("bla
   # /// check input parameters
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
-
-
-  if (x$bootFlag==FALSE){
+  if (gcBootSpline$bootFlag==FALSE){
     empty.plot()
   }
   else{
-    colSpline <- rep(colSpline, (x$control$nboot.gc%/%length(colSpline))+1)
+    p1 <- function(){
+      colSpline <- rep(colSpline, (gcBootSpline$control$nboot.gc%/%length(colSpline))+1)
 
-    lambda    <- x$lambda
-    mu        <- x$mu
-    A         <- x$A
-    integral  <- x$integral
+      log.x     <- gcBootSpline$control$log.x.gc
+      log.y     <- gcBootSpline$control$log.y.gc
 
-    log.x     <- x$control$log.x.gc
-    log.y     <- x$control$log.y.gc
+      global.minx <- min(min(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
+      global.maxx <- max(max(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
+      global.miny <- min(min(gcBootSpline$boot.data,na.rm=TRUE),na.rm=TRUE)
+      global.maxy <- max(max(gcBootSpline$boot.data,na.rm=TRUE),na.rm=TRUE)
 
-    global.minx <- min(min(x$boot.time,na.rm=TRUE),na.rm=TRUE)
-    global.maxx <- max(max(x$boot.time,na.rm=TRUE),na.rm=TRUE)
-    global.miny <- min(min(x$boot.data,na.rm=TRUE),na.rm=TRUE)
-    global.maxy <- max(max(x$boot.data,na.rm=TRUE),na.rm=TRUE)
-
-    # initialize plot
-    if ((log.x==TRUE)&&(log.y==FALSE)){
-      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="ln(1+time)",ylab="Growth y(t)")
-    }
-    else{
-      if ((log.x==FALSE)&&(log.y==FALSE)){
-        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="Time",ylab="Growth y(t)")
+      # initialize plot
+      if ((log.x==TRUE)&&(log.y==FALSE)){
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="ln(1+time)",ylab="Growth y(t)")
       }
       else{
-        if ((log.x==TRUE)&&(log.y==TRUE)){
-          plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="ln(1+time)",ylab="Growth [Ln(y(t)/y0)]")
+        if ((log.x==FALSE)&&(log.y==FALSE)){
+          plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="Time",ylab="Growth y(t)")
         }
         else{
-          if ((log.x==FALSE)&&(log.y==TRUE)){
-            plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="Time",ylab="Growth [Ln(y(t)/y0)]")
+          if ((log.x==TRUE)&&(log.y==TRUE)){
+            plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="ln(1+time)",ylab="Growth [Ln(y(t)/y0)]")
+          }
+          else{
+            if ((log.x==FALSE)&&(log.y==TRUE)){
+              plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="Time",ylab="Growth [Ln(y(t)/y0)]")
+            }
           }
         }
       }
-    }
 
-    # /// plot data
-    points(x$raw.time, x$raw.data, col=colData, pch=pch, cex=cex)
+      # /// plot data
+      points(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex)
 
-    # /// plot all gcFitSpline objects
-    for(i in 1:x$control$nboot.gc){
-      plot(x$boot.gcSpline[[i]],add=TRUE, raw=FALSE, slope=FALSE, pch=0, colSpline=colSpline[i], cex=cex)
-    }
+      # /// plot all gcFitSpline objects
+      for(i in 1:gcBootSpline$control$nboot.gc){
+        plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, raw=FALSE, slope = FALSE,
+                         deriv = F, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex)
+      }
+      title(paste(gcBootSpline$gcID, collapse = "_"))
+    } # p1 <- function()
+    p2 <- function(){
+      lambda    <- gcBootSpline$lambda
+      mu        <- gcBootSpline$mu
+      A         <- gcBootSpline$A
+      integral  <- gcBootSpline$integral
 
-    # /// plot histograms of growth parameters
-    dev.new()
-    par(mfrow=c(2,2))
+      # /// plot histograms of growth parameters
+      par(mfrow=c(2,2))
+      if (sum(!is.na(lambda))>1){
+        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda)))
+      }
+      else{
+        empty.plot("Empty plot!")
+      }
 
-    if (sum(!is.na(lambda))>1){
-      try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda)))
-    }
-    else{
-      empty.plot("Empty plot!")
-    }
-
-    if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu))) } else { empty.plot("Empty plot!", main=expression(mu)) }
-    if (sum(!is.na(A))>1){ try(hist(A, col="gray", xlab="A", main=expression(A))) } else { empty.plot("Empty plot!", main=expression(A)) }
-    if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral))) } else { empty.plot("Empty plot!", main=expression(Integral))}
+      if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu))) } else { empty.plot("Empty plot!", main=expression(mu)) }
+      if (sum(!is.na(A))>1){ try(hist(A, col="gray", xlab="A", main=expression(A))) } else { empty.plot("Empty plot!", main=expression(A)) }
+      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral))) } else { empty.plot("Empty plot!", main=expression(Integral))}
+      mtext(paste(gcBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
+      par(mfrow=c(1,1))
+    } # p2 <- function()
   }
-  par(mfrow=c(1,1))
+  if (export == TRUE){
+    w1 <- 9
+    h1 <- 7
+    dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+    grDevices::png(paste0("Plots/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSpline.png"),
+                   width = w1, height = h1, units = 'in', res = 300)
+    p1()
+    grDevices::dev.off()
+    grDevices::pdf(paste0("Plots/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSpline.pdf"))
+    p1()
+    grDevices::dev.off()
+
+    w2 <- 9
+    h2 <- 9
+    dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+    grDevices::png(paste0("Plots/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSplineParam.png"),
+                   width = w2, height = h2, units = 'in', res = 300)
+    p2()
+    grDevices::dev.off()
+    grDevices::pdf(paste0("Plots/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSplineParam.pdf"))
+    p2()
+    grDevices::dev.off()
+  }
+
+  if (plot == TRUE){
+    p1()
+    dev.new()
+    p2()
+  }
 }
 
-### revise!!!
-plot.gcFit <- function(x, opt="m",raw=TRUE, slope=FALSE, pch=1, colModel=1, colSpline=2, colData=1, cex=1, ...)
+plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=1, colData=1, colSpline="firebrick3", cex=1, lwd = 2, plot = TRUE, export = FALSE, ...)
 {
-  # x an object of class gcFit
-
-  # /// check input parameters
-  if ( FALSE%in%(colData%in%c(colors(),0:8))) stop("colData needs to be numeric from 0:8 or a string from colors()")
-  if ( FALSE%in%(colSpline%in%c(colors(),0:8))) stop("colSpline needs to be numeric from 0:8 or a string from colors()")
-  if (is.logical(raw)==FALSE)       stop("Need logical value for: raw")
-  if (is.logical(slope)==FALSE)     stop("Need logical value for: slope")
-  if (is.numeric(pch)==FALSE)       stop("Need numeric value for: pch")
-  if (is.numeric(cex)==FALSE)       stop("Need numeric value for: cex")
-  if (!(opt%in%c("m","s")))     stop("Need 'm' or 's' for: opt")
-
-  # /// recycle plot options
-  n         <- dim(x$gcTable)[1]
-  pch       <- rep(pch,       (n%/%length(pch))       +1)
-  colModel  <- rep(colModel,  (n%/%length(colModel))  +1)
-  colSpline <- rep(colSpline, (n%/%length(colSpline)) +1)
-  colData   <- rep(colData,   (n%/%length(colData))   +1)
-
-  # /// determine number of different tests
-  distinct <- summary(x$gcTable[,1])
-  k        <- length(distinct)
-
-  # /// loop over all different tests
-  for (j in 1:k){
-
-    # /// initialize plot
-    if(j>1){dev.new()}
-
-    ind <- which(x$raw.data[,1]==names(distinct)[j])
-    tspan <- x$raw.data
-
-    data <- as.matrix((x$raw.data[ind,])[-1:-3])
-    time <- as.matrix((x$raw.time[ind,]))
-
-    if (x$control$log.x.gc==TRUE) time <- log(time + 1)
-    if (x$control$log.y.gc==TRUE) data <- log(data + 1)
-
-    tspan <- c(min(time, na.rm=TRUE), max(time, na.rm=TRUE))
-    yspan <- c(min(data, na.rm=TRUE), max(data, na.rm=TRUE))
-
-    scale  <- 1.025
-    ts     <- ((scale-1)* diff(tspan))/2
-    ys     <- ((scale-1)* diff(yspan))/2
-
-    tspan0 <- tspan+c(-ts,ts)
-    yspan0 <- yspan+c(-ys,ys)
-
-    if ((x$control$log.x.gc==FALSE) && (x$control$log.y.gc==FALSE)){
-      plot(tspan0, yspan0, xlab="Time", ylab="Growth y(t)", type="n")
-    }
-    if ((x$control$log.x.gc==FALSE) && (x$control$log.y.gc==TRUE)){
-      plot(tspan0, yspan0, xlab="Time", ylab="Growth [Ln(y(t)/y0)]", type="n")
-    }
-    if ((x$control$log.x.gc==TRUE) && (x$control$log.y.gc==FALSE)){
-      plot(tspan0, yspan0, xlab="Ln(1+time)", ylab="Growth y(t)", type="n")
-    }
-    if ((x$control$log.x.gc==TRUE) && (x$control$log.y.gc==TRUE)){
-      plot(tspan0, yspan0, xlab="Ln(1+time)", ylab="Growth [Ln(y(t)/y0)]", type="n")
-    }
-
-    counter <- 0
-    id      <- 0
-    leg     <- rep("",distinct[j])
-
-    # plot parametric fit
-    if (opt=="m"){
-      for (i in 1:n){
-        if ((x$gcFittedModels[[i]]$gcID[1]==names(distinct)[j])&&( (x$gcFittedModels[[i]]$reliable==TRUE)||(is.null(x$gcFittedModels[[i]]$reliable)==TRUE) ) ){
-          counter     <- counter + 1
-          id[counter] <- i
-          for (m in 1:length(x$gcFittedModels[[i]]$gcID)){
-            leg[counter]=paste(leg[counter], as.character((x$gcFittedModels[[i]]$gcID[m])))
-          }
-          plot(x$gcFittedModels[[i]], add=TRUE, raw=raw, slope=slope, pch=pch[i], colData=colData[i], colModel=colModel[i], cex=cex)
-        }
-      }
-      legend(x="topleft", pch=pch[id], leg[1:counter], col=colData[id], cex=cex, bty="n")
-    }
-
-
-    # plot spline fit
-    if (opt=="s"){
-      for (i in 1:n){
-        if ((x$gcFittedSplines[[i]]$gcID[1]==names(distinct)[j])&&( (x$gcFittedSplines[[i]]$reliable==TRUE)||(is.null(x$gcFittedSplines[[i]]$reliable)==TRUE) ) ){
-          counter     <- counter + 1
-          id[counter] <- i
-          for (m in 1:length(x$gcFittedSplines[[i]]$gcID)){
-            leg[counter]=paste(leg[counter], as.character((x$gcFittedSplines[[i]]$gcID[m])))
-          }
-          plot(x$gcFittedSplines[[i]], add=TRUE, raw=raw, slope=slope, pch=pch[i], colData=colData[i], colSpline=colSpline[i], cex=cex)
-        }
-      }
-      legend(x="topleft", pch=pch[id], leg[1:counter], col=colData[id], cex=cex, bty="n")
-    }
-
-    title(sub=names(distinct)[j])
-  } # of for (j in 1:k){
-}
-
-plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=1, colData=1, colSpline="firebrick3", cex=1, lwd = 2, ...)
- {
 
   # x an object of class gcFitSpline
   if(class(x) != "gcFitSpline") stop("x needs to be an object created with growth.gcFitSpline.")
@@ -772,8 +783,8 @@ plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=
       else{ # of if (add==TRUE)
         if(deriv == TRUE){
           layout(mat = matrix(c(1, 2), nrow = 2, ncol = 1),
-                        heights = c(2, 1.3), # Heights of the two rows
-                        widths = c(1, 1)) # Widths of the two columns
+                 heights = c(2, 1.3), # Heights of the two rows
+                 widths = c(1, 1)) # Widths of the two columns
         }
         par(mar=c(2.1, 3.1, 3.1, 2.1), mgp=c(2, 1, 0))
         # /// try to plot data fit
@@ -815,10 +826,10 @@ plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=
     if (deriv  == TRUE){
       par(mar=c(3.1, 3.1, 1.1, 2.1), mgp=c(2, 1, 0))
       if ((x$control$log.x.gc==FALSE)){
-          try( plot(x$spline.deriv1$x, x$spline.deriv1$y, xlab="Time", ylab="Growth rate", type="l") )
+        try( plot(x$spline.deriv1$x, x$spline.deriv1$y, xlab="Time", ylab="Growth rate", type="l") )
       }
       if ((x$control$log.x.gc==TRUE)){
-          try( plot(x$spline.deriv1$x, x$spline.deriv1$y, xlab="Ln(1+time)", ylab="Growth rate", type="l") )
+        try( plot(x$spline.deriv1$x, x$spline.deriv1$y, xlab="Ln(1+time)", ylab="Growth rate", type="l") )
       }
     }
   }
@@ -826,11 +837,11 @@ plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=
   par(mfrow = c(1, 1))
 }
 
-plot.grpFitSpline <- function(x, names = NULL, conc = NULL, mean = TRUE, deriv = T, colors = NULL, basesize = 20, lwd = 1.1)
+plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, colors = NULL, basesize = 20, lwd = 1.1, plot = TRUE, export = FALSE)
 {
 
-  # x an object of class grofit
-  if(class(x) != "grofit") stop("x needs to be an object created with growth.fit")
+  # grofit an object of class grofit
+  if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit()")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
@@ -838,7 +849,7 @@ plot.grpFitSpline <- function(x, names = NULL, conc = NULL, mean = TRUE, deriv =
 
 
   # Get name of conditions with multiple replicates
-  sample.nm <- nm <- as.character(names(x$gcFit$gcFittedSplines))
+  sample.nm <- nm <- as.character(names(grofit$gcFit$gcFittedSplines))
   if(!is.null(names)){
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
@@ -846,85 +857,121 @@ plot.grpFitSpline <- function(x, names = NULL, conc = NULL, mean = TRUE, deriv =
   if(!is.null(conc)){
     nm <- nm[which(conc == str_extract(nm, "[:alnum:]+$"))]
   }
+  if(length(nm)==0){
+    stop("Please run plot.grpFitSpline() with valid 'names' or 'conc' argument.")
+  }
   # remove conditions with fitFlag = FALSE in all replicates
   ndx.filt <- unique(lapply(1:length(nm), function(i) grep(paste0("^",
                                                                   gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[i], " \\| "))[1])),
-                                                      ".+[[:space:]]",
-                                                      unlist(str_split(nm[i], " \\| "))[3],
-                                                      "$"), sample.nm)))
+                                                                  ".+[[:space:]]",
+                                                                  unlist(str_split(nm[i], " \\| "))[3],
+                                                                  "$"), sample.nm)))
   for(i in 1:length(ndx.filt)){
-    if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (x[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
+    if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
       nm <- intersect(nm, sample.nm[-ndx.filt[[i]]])
     }
   }
 
   if(mean == TRUE){
-      conditions <- str_replace_all(nm, "\\| . \\| ", "| ")
-      conditions_unique <- unique(conditions)
+    conditions <- str_replace_all(nm, "\\| . \\| ", "| ")
+    conditions_unique <- unique(conditions)
 
-      plotdata.ls <- list()
+    plotdata.ls <- list()
 
-      for(i in 1:length(conditions_unique)){
-        # find indexes of replicates
-          ndx <- grep(paste0("^",
-                             gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[i], " \\| "))[1])),
-                             ".+[[:space:]]",
-                             unlist(str_split(conditions_unique[i], " \\| "))[2],
-                             "$"), sample.nm)
-          name <- conditions_unique[i]
-          time <- x$gcFit$gcFittedSplines[[ndx[[1]]]]$fit.time
-          data <- sapply(1:length(ndx), function(i) cbind(x$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data))
-          mean <- rowMeans(data)
-          sd <- apply(data, 1, sd)
-          plotdata.ls[[i]] <- data.frame(name = name, time = time, mean = mean, upper = mean+sd, lower = mean-sd)
-      }
-      names(plotdata.ls) <- gsub(" \\| NA", "", conditions_unique)
-
-      plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
-      df <- do.call(rbind.data.frame, plotdata.ls)
-      df$name <- gsub(" \\| NA", "", df$name)
-
-      p <- ggplot(df, aes(x=time, y=mean, col = name)) +
-        geom_line(size=lwd) +
-        geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
-        theme_classic(base_size = basesize) +
-        xlab("Time") +
-        ylab(if(x$control$log.y.gc==TRUE){
-          "Growth [Ln(y(t)/y0)]"
-        } else {
-          "Growth [y(t)]"
-        }) +
-        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-        scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank())
-
-      if(is.null(colors)){
-        if (length(plotdata.ls) <= 8) {
-          p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else {
-          p <- p + scale_fill_manual(name = "Condition",
-                                     values = c(
-                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                     )
-          ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
-          )
+    for(n in 1:length(conditions_unique)){
+      # find indexes of replicates
+      ndx <- grep(paste0("^",
+                         gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1])),
+                         ".+[[:space:]]",
+                         unlist(str_split(conditions_unique[n], " \\| "))[2],
+                         "$"), sample.nm)
+      name <- conditions_unique[n]
+      time <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)) %>% as.list(.)
+      data <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)
+      if(log.y == FALSE){
+        for(k in 1:length(data)){
+          data[[k]] <- exp(data[[k]]) * grofit$gcFit$gcFittedSplines[[ndx[[k]]]]$data.in[1]
         }
       }
-      if(deriv){
-
+      # correct for unequal lengths of data series
+      for(i in 1:length(time)){
+        ndx.others <- seq(1:length(time))[-i]
+        for(j in 1:length(ndx.others)){
+          assign(paste0("time.missing_", j), setdiff(time[[ndx.others[j] ]], time[[i]]) )
+          if(length(get(paste0("time.missing_", j)))){
+            for(k in 1:length(get(paste0("time.missing_", j)))){
+              data[[i]] <- append(data[[i]],
+                                  values = NA,
+                                  after = grep(get(paste0("time.missing_", j))[k], time[[ndx.others[j]]]) - 1)
+              time[[i]] <-
+                append(time[[i]],
+                       values = get(paste0("time.missing_", j))[k],
+                       after = grep(get(paste0("time.missing_", j))[k], time[[ndx.others[j]]]) - 1)
+            }
+          }
+        }
       }
+      time <- time[[1]]
+      data <- do.call("cbind", data)
+      avg <- rowMeans(data, na.rm = F)
+      sd <- apply(data, 1, sd, na.rm = F)
+      plotdata.ls[[n]] <- data.frame(name = name, time = time, mean = avg, upper = avg+sd, lower = avg-sd)
+    }
+    names(plotdata.ls) <- gsub(" \\| NA", "", conditions_unique)
+
+    plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
+    df <- do.call(rbind.data.frame, plotdata.ls)
+    df$name <- gsub(" \\| NA", "", df$name)
+
+    p <- ggplot(df, aes(x=time, y=mean, col = name)) +
+      geom_line(size=lwd) +
+      geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
+      theme_classic(base_size = basesize) +
+      xlab("Time") +
+      ylab(if(log.y==TRUE){
+        "Growth [Ln(y(t)/y0)]"
+      } else {
+        "Growth [y(t)]"
+      }) +
+      scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+      scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+      theme(panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
+
+    if(is.null(colors)){
+      if (length(plotdata.ls) <= 8) {
+        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+      } else {
+        p <- p + scale_fill_manual(name = "Condition",
+                                   values = c(
+                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                   )
+        ) + scale_color_manual(name = "Condition",
+                               values = c(
+                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                               )
+        )
+      }
+    }
+    if(deriv){
+
+    }
   } # if(mean == TRUE)
   else {
     ndx <- grep(paste0(
@@ -932,14 +979,14 @@ plot.grpFitSpline <- function(x, names = NULL, conc = NULL, mean = TRUE, deriv =
     df <- data.frame()
     for(i in 1:length(ndx)){
       df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx[i]],
-                                      "time" = x$gcFit$gcFittedSplines[[ndx[i]]][["fit.time"]],
-                                      "y" = x$gcFit$gcFittedSplines[[ndx[i]]][["fit.data"]]))
+                                            "time" = grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.time"]],
+                                            "y" = grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.data"]]))
     }
     p <- ggplot(df, aes(x=time, y=y, col = name)) +
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
       xlab("Time") +
-      ylab(if(x$control$log.y.gc==TRUE){
+      ylab(if(grofit$control$log.y.gc==TRUE){
         "Growth [Ln(y(t)/y0)]"
       } else {
         "Growth [y(t)]"
@@ -975,7 +1022,24 @@ plot.grpFitSpline <- function(x, names = NULL, conc = NULL, mean = TRUE, deriv =
       }
     }
   }
-  p
+  if (export == TRUE){
+    w <- 15 + 3*ifelse(mean==TRUE,length(conditions_unique), length(conditions))/15
+    h <- 9
+    dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+    grDevices::png(paste0("Plots/", "grpSplineFit.png"),
+                   width = w, height = h, units = 'in', res = 300)
+    print(p)
+    grDevices::dev.off()
+    grDevices::pdf(paste0("Plots/", "grpSplineFit.pdf"), width = w, height = h)
+    print(p)
+    grDevices::dev.off()
+  }
+  if (plot == TRUE){
+    print(p)
+  }
+  if(export == FALSE && plot == FALSE){
+    return(p)
+  }
 }
 
 base_breaks <- function(n = 10){
@@ -983,3 +1047,5 @@ base_breaks <- function(n = 10){
     axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
   }
 }
+
+

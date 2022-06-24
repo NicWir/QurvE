@@ -151,7 +151,6 @@ summary.gcFit <- function(object,...)
   {
     # object of class gcFit
   summary.gcFit <- data.frame(object$gcTable)
-  class(summary.gcFit) <- "summary.gcFit"
   summary.gcFit
 }
 

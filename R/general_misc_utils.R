@@ -117,3 +117,14 @@ read_file <- function(filename, csvsep = ";"){
   return(dat)
 }
 
+suppress_warnings <- function(.expr, .f, ...) {
+  eval.parent(
+    substitute(
+      withCallingHandlers( .expr, warning = function (w) {
+        cm   <- conditionMessage(w)
+        cond <- if (is.character(.f)) grepl(.f, cm) else rlang::as_function(.f)(cm, ...)
+        if (cond) invokeRestart("muffleWarning")
+      })
+    )
+  )
+}
