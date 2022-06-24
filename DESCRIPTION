@@ -1,18 +1,18 @@
-Package: curvE
+Package: QurvE
 Title: Robust and user-friendly analysis of growth curves
 Version: 0.0.0.9000
 Authors@R: 
     person("Nicolas T.", "Wirth", , "mail.nicowirth@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0799-1321"))
-Description: With curvE, growth curves can be analyzed in high throughput
+Description: With QurvE, growth curves can be analyzed in high throughput
     with three methods: linear regression on ln-transformed data, fitting
     of growth models, smooth spline fit. A user-friendly wrapper function
     allows a complete data analysis workflow to be executed in a single
     step. The results of this workflow are summarized in a detailed report
     as well as in an R data container that can be intuitively navigated.
 License: GPL (>= 3)
-URL: https://github.com/NicWir/curvE
-BugReports: https://github.com/NicWir/curvE/issues
+URL: https://github.com/NicWir/QurvE
+BugReports: https://github.com/NicWir/QurvE/issues
 Depends:
     dplyr,
     magrittr,
@@ -38,7 +38,7 @@ VignetteBuilder:
     knitr
 biocViews: 
 Encoding: UTF-8
-GithubRepo: curvE
+GithubRepo: QurvE
 GithubUsername: NicWir
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)

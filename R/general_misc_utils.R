@@ -1,4 +1,4 @@
-#' Run upon attaching package VisomX
+#' Run upon attaching package QurvE
 #'
 #' Changes debug option for package \code{rgl} to avoid Rstudio crashing upon attaching it and prints welcome message
 #'
@@ -6,12 +6,12 @@
 #' @param pkgname package name
 .onAttach <- function (libname, pkgname){
   options(rgl.debug = TRUE)
-  k1 <- paste("curvE",utils::packageVersion( "curvE"),"initialized Successfully !")
+  k1 <- paste("QurvE",utils::packageVersion( "QurvE"),"initialized Successfully !")
   k0 <- "\n"
-  k2 <- paste("https://github.com/NicWir/curvE")
+  k2 <- paste("https://github.com/NicWir/QurvE")
   packageStartupMessage(c(k1,k0,k2))
   if(!tinytex::is_tinytex()){
-    packageStartupMessage("TinyTex was not found on your system. To ensure full functionality of Visomx, please execute tinytex::install_tinytex().")
+    packageStartupMessage("TinyTex was not found on your system. To ensure full functionality of QurvE, please execute tinytex::install_tinytex().")
   }
 }
 

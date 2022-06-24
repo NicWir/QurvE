@@ -171,6 +171,9 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";")
   invisible(dataset)
   }
 
+#'
+#' @export
+#'
 growth.control <-
   function (neg.nan.act = FALSE,
             clean.bootstrap = TRUE,
@@ -274,6 +277,9 @@ growth.control <-
   grofit.control
 }
 
+#'
+#' @export
+#'
 growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                              mean.grp = "all", mean.conc = NA,
                         neg.nan.act = FALSE, clean.bootstrap = TRUE,
@@ -354,6 +360,9 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
   grofit
 }
 
+#'
+#' @export
+#'
 growth.report <- function(grofit, report.dir = NULL, ...)
   {
   require(ggplot2, quietly = T)
@@ -393,6 +402,9 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   message(paste0("Files saved in: '", wd, "'"))
 }
 
+#'
+#' @export
+#'
 growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.05)
 {
   # /// check if start density values are above min.density in all samples
@@ -670,6 +682,9 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
 
 }
 
+#'
+#' @export
+#'
 growth.gcFitModel <- function(time, data, gcID ="undefined", control=grofit.control())
 {
   # /// check input parameters
@@ -891,6 +906,9 @@ grofit.param <- function(time, data, gcID = "undefined", control)
     invisible(gcFitModel)
   }
 
+#'
+#' @export
+#'
 growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit.control(), t0 = 0)
 {
   if(!is.null(t0) && !is.na(t0) && t0 != ""){
@@ -1405,6 +1423,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
   invisible(gcFitLinear)
 }
 
+#'
+#' @export
+#'
 growth.gcBootSpline <- function (time, data, gcID = "undefined", control = grofit.control())
 {
   if (is(control) != "grofit.control")
@@ -1527,6 +1548,9 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = grofi
   gcBootSpline
 }
 
+#'
+#' @export
+#'
 growth.drFit <- function (gcFitData, control = grofit.control())
 {
   if (is(control) != "grofit.control")
@@ -1595,6 +1619,9 @@ growth.drFit <- function (gcFitData, control = grofit.control())
   drFit
 }
 
+#'
+#' @export
+#'
 growth.drFitSpline <- function (conc, test, drID = "undefined", control = grofit.control())
 {
   if (is(control) != "grofit.control")
@@ -1740,6 +1767,9 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = grofit
   drFitSpline
 }
 
+#'
+#' @export
+#'
 growth.drBootSpline <- function (conc, test, drID = "undefined", control = grofit.control())
 {
   test <- as.vector(as.numeric(as.matrix(test)))

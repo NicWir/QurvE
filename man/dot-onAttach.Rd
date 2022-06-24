@@ -2,7 +2,7 @@
 % Please edit documentation in R/general_misc_utils.R
 \name{.onAttach}
 \alias{.onAttach}
-\title{Run upon attaching package VisomX}
+\title{Run upon attaching package QurvE}
 \usage{
 .onAttach(libname, pkgname)
 }
