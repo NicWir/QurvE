@@ -858,7 +858,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     nm <- nm[which(conc == str_extract(nm, "[:alnum:]+$"))]
   }
   if(length(nm)==0){
-    stop("Please run plot.grpFitSpline() with valid 'names' or 'conc' argument.")
+    stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
   }
   # remove conditions with fitFlag = FALSE in all replicates
   ndx.filt <- unique(lapply(1:length(nm), function(i) grep(paste0("^",
@@ -1046,6 +1046,70 @@ base_breaks <- function(n = 10){
   function(x) {
     axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
   }
+}
+
+plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
+                                               'mu.model', 'lambda.model', 'A.model',
+                                               'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
+                                               'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'),
+                            names = NULL, conc = NULL){
+  param <- match.arg(param)
+  # check class of object
+  if(!(any(class(object) %in% c("gcTable", "grofit", "gcFit")))) stop("object needs to be either a 'grofit', 'gcTable', or 'gcFit' object created with growth.workflow() or growth.gcFit().")
+  if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
+                                            'mu.model', 'lambda.model', 'A.model',
+                                            'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
+                                            'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt')))
+                                            stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'.")
+
+  #extract gcTable
+  if(class(object)=="gcTable"){
+    gcTable <- object
+  } else if (class(object)=="gcFit"){
+    gcTable <- object$gcTable
+  } else if (class(object)=="grofit"){
+    gcTable <- object$gcFit$gcTable
+  }
+  #check if param exists in gcTable and has a valid value
+  if(all(is.na(gcTable[[param]]))){
+    if(gsub(".+\\.", "", param)=="linfit") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'l' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'l' or 'a'."))
+    if(gsub(".+\\.", "", param)=="model") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'm' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'm' or 'a'."))
+  }
+  # Get name of conditions with multiple replicates
+  sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
+  if(!is.null(names)){
+    names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+    nm <- nm[grep(paste(names, collapse="|"), nm)]
+  }
+  if(!is.null(conc)){
+    nm <- nm[which(conc == str_extract(nm, "[:alnum:]+$"))]
+  }
+  if(length(nm)==0){
+    stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
+  }
+  # get indices of replicates
+  ndx.filt <- unique(lapply(1:length(nm), function(i) grep(paste0("^",
+                                                                  gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[i], " \\| "))[1])),
+                                                                  ".+[[:space:]]",
+                                                                  unlist(str_split(nm[i], " \\| "))[3],
+                                                                  "$"), nm)))
+  names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+  # calculate average param values
+  mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param])) ) )
+  sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param])) ) )
+
+  df <- data.frame(name = names(ndx.filt), mean = mean, sd = sd)
+  df <- df[match(as.factor(df$name[order(nchar(df$name), df$name)]), df$name), ]
+  df$name <- factor(df$name, levels = df$name)
+  df$group <- gsub(" \\|.+", "", df$name)
+  p <- ggplot(df, aes(x=name, y=mean, fill = group)) +
+    geom_bar(stat="identity", color = "black") +
+    geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, size = 1,
+                  position=position_dodge(.9)) +
+    labs(x = "Sample", y = param) +
+    theme_minimal(base_size = 15) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ print(p)
 }
 
 

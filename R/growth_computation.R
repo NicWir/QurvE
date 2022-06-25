@@ -164,10 +164,19 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";")
     } # end of for (i in 2:(length(time.ndx)))
   } # end of else {}
   colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
+
+  label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
+  condition <- dat.mat[, 1]
+  replicate <- dat.mat[, 2]
+  concentration <- dat.mat[, 3]
+
+  expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
+
   dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
 
   dataset <- list("time" = t.mat,
-                  "data" = dat.mat)
+                  "data" = dat.mat,
+                  "expdesign" = expdesign)
   invisible(dataset)
   }
 
@@ -283,7 +292,7 @@ growth.control <-
 growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                              mean.grp = "all", mean.conc = NA,
                         neg.nan.act = FALSE, clean.bootstrap = TRUE,
-                        suppress.messages = FALSE, fit.opt = "b", min.density = NA,
+                        suppress.messages = FALSE, fit.opt = "a", min.density = NA,
                         log.x.gc = FALSE, log.y.gc = TRUE, log.y.model = FALSE,
                         lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.10,
                         interactive = TRUE, nboot.gc = 100,
@@ -302,6 +311,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
   } else {
     time <- data$time
     data <- data$data
+    expdesign <- data$expdesign
   }
   control <- growth.control(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                             suppress.messages = suppress.messages, fit.opt = fit.opt, min.density = min.density,
@@ -326,7 +336,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
   }
   # ///
   grofit <- list(time = time, data = data, gcFit = out.gcFit,
-                 drFit = out.drFit, control = control)
+                 drFit = out.drFit, expdesign = expdesign, control = control)
   class(grofit) <- "grofit"
 
   if(!is.null(report.dir)){
@@ -342,13 +352,13 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
   utils::write.table(res.table.gc, paste(wd, "results.gc.txt",
                                   sep = "/"), row.names = FALSE, sep = "\t")
   cat(paste0("Results of growth fit analysis saved as tab-delimited text file in:\n",
-             getwd(), "/results.gc.txt\n"))
+             wd, "/results.gc.txt\n"))
   if (ec50 == TRUE) {
     res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
     utils::write.table(res.table.dr, paste(wd, "results.dr.txt",
                                            sep = "/"), row.names = FALSE, sep = "\t")
     cat(paste0("Results of EC50 analysis saved as tab-delimited in:\n",
-               getwd(), "/results.dr.txt\n"))
+               wd, "/results.dr.txt\n"))
   } else {
     res.table.dr <- NULL
   }
@@ -422,9 +432,9 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
   if ( (dim(time)[1])!=(dim(data)[1]) ) stop("gcFit: Different number of datasets in data and time")
 
   # /// check fitting options
-  if (!all(control$fit.opt %in% c("s","m","b","a", "l"))){
+  if (!all(control$fit.opt %in% c("s","m","a", "l"))){
     options(warn=1)
-    warning("fit.opt must be set to 's', 'm', 'l', 'b', or 'a'. Changed to 'a'!")
+    warning("fit.opt must contain 's', 'm', 'l', or 'a'. Changed to 'a' (all fit methods)!")
     fit.opt="a"
     options(warn=0)
   }
@@ -536,7 +546,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
       reliability_tag_linear <- TRUE
     }
     # /// Parametric fit
-    if (("m" %in% control$fit.opt) || ("b" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+    if (("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
       fitpara          <- growth.gcFitModel(acttime, actwell, gcID, control)
       fitpara.all[[i]] <- fitpara
     }
@@ -549,7 +559,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
     }
 
     # /// Non parametric fit
-    if (("s" %in% control$fit.opt) || ("b" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+    if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
       nonpara             <- growth.gcFitSpline(acttime, actwell, gcID, control, t0 = t0)
       fitnonpara.all[[i]] <- nonpara
     }
@@ -562,8 +572,8 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
     }
     # /// plotting parametric fit
     if ((control$interactive == TRUE)) {
-      if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt) || ("b"  %in% control$fit.opt)) &&
-          fitpara$fitFlag == TRUE) {
+      if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt))&&
+         fitpara$fitFlag == TRUE) {
         if (fitpara$fitFlag == TRUE) {
           plot.gcFitModel(fitpara, colData=1, colModel=2, colLag = 3, cex=1.0, raw=T)
           legend(x="bottomright", legend=fitpara$model, col="red", lty=1)
@@ -585,14 +595,14 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
           fitpara.all[[i]]$reliable    <- TRUE
           cat("Sample was (more ore less) o.k.\n")
         }
-      } # if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt) || ("b"  %in% control$fit.opt)) && fitpara$fitFlag == TRUE)
+      } # if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) && fitpara$fitFlag == TRUE)
       else {
         reliability_tag_param <- FALSE
         fitpara$reliable <- FALSE
         fitpara.all[[i]]$reliable    <- FALSE
       }
       # /// plotting nonparametric fit
-      if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) || ("b"  %in% control$fit.opt)) {
+      if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt)) {
         if (nonpara$fitFlag == TRUE) {
           answer_satisfied <- "n"
           reliability_tag_nonpara <- NA
@@ -641,14 +651,14 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
               } # end else
             } # end while ("n" %in% answer_satisfied)
           } # end if (nonpara$fitFlag == TRUE)
-        } # end if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) || ("b"  %in% control$fit.opt))
+        } # end if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) )
     } # end of if((control$interactive == TRUE))
     else{
       reliability_tag_param <- TRUE
       reliability_tag_nonpara <- TRUE
     }
     # /// Beginn Bootstrap
-    if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) || ("b"  %in% control$fit.opt)) &&
+    if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
         (control$nboot.gc > 0) && (reliability_tag_nonpara ==TRUE) && nonpara$fitFlag == TRUE){
       bt            <- growth.gcBootSpline(acttime, actwell, gcID, control)
       boot.all[[i]] <- bt
@@ -669,6 +679,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
     fitted          <- cbind(description, summary.gcFitLinear(fitlinear), summary.gcFitModel(fitpara), summary.gcFitSpline(nonpara), summary.gcBootSpline(bt))
 
     out.table       <- rbind(out.table, fitted)
+    class(out.table) <- c("data.frame", "gcTable")
 
   } # /// end of for (i in 1:dim(data)[1])
   names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
@@ -689,7 +700,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=grofit.cont
 {
   # /// check input parameters
   if (is(control)!="grofit.control") stop("control must be of class grofit.control!")
-  if (!any(c("m","b","a") %in% control$fit.opt)) stop("Fit option is not set for a model fit. See grofit.control()")
+  if (!any(c("m","a") %in% control$fit.opt)) stop("Fit option is not set for a model fit. See grofit.control()")
 
   # /// conversion to handle even data.frame inputs
   time <- as.vector(as.numeric(as.matrix(time)))
@@ -919,7 +930,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
 
   if (is(control) != "grofit.control")
     stop("control must be of class grofit.control!")
-  if (!any(control$fit.opt %in% c("s", "b", "a")))
+  if (!any(control$fit.opt %in% c("s","a")))
     stop("Fit option is not set for a spline fit. See grofit.control()")
   if(length(data[data<0]) > 0){
     data <- data + abs(min(data[data<0])) # add the absolute value of the minimum negative density to the data
