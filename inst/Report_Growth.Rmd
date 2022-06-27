@@ -83,9 +83,9 @@ if(any(c("a", "l") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
-plot.parameters(grofit, param = "mu.linfit", export = export)
-plot.parameters(grofit, param = "lambda.linfit", export = export)
-plot.parameters(grofit, param = "dY.linfit", export = export)
+plot.parameters(grofit, param = "mu.linfit", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameters(grofit, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameters(grofit, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots"))
 ```
 `r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_model, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -112,8 +112,8 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
-print(plot.parameters(grofit, param = "mu.model"))
-print(plot.parameters(grofit, param = "lambda.model"))
+print(plot.parameters(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots")))
+print(plot.parameters(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots")))
 ```
 `r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -138,9 +138,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
-print(plot.parameters(grofit, param = "mu.spline", export = export))
-print(plot.parameters(grofit, param = "lambda.spline", export = export))
-print(plot.parameters(grofit, param = "dY.spline", export = export))
+print(plot.parameters(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots")))
+print(plot.parameters(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
+print(plot.parameters(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
 ```
 \clearpage
 
@@ -226,7 +226,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
           }
         }
   }
-  Files_list <- list.files(path = paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots/"), 
+  Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotLinear_",
                                 full.names = TRUE)
 knitr::include_graphics(Files_list, dpi = 300, error = F)
@@ -378,7 +378,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
         }
   }
   
-  Files_list <- list.files(path = paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots/"), 
+  Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotModel_",
                                 full.names = TRUE)
 knitr::include_graphics(Files_list, dpi = 300, error = F)
@@ -460,11 +460,11 @@ if (knitr::is_latex_output()) {
     foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
         .packages = "ggplot2") %dopar% {
           if(grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotSpline_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i]), ".pdf"), ".pdf"));   plot.ggSpline();   invisible(dev.off())
+            pdf(file=paste0(plotdir, "/PlotSpline_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i]), ".pdf"));   plot.ggSpline();   invisible(dev.off())
           }
         }
   }
-  Files_list <- list.files(path = paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots/"), 
+  Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotSpline_",
                                 full.names = TRUE)
 knitr::include_graphics(Files_list, dpi = 300, error = F)
@@ -513,7 +513,7 @@ boot.ec50.df <- data.frame()
 ```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
 for(i in 1:length(grofit$drFit$drBootSplines)){
   if(grofit$drFit$drBootSplines[[i]]$ bootFlag == TRUE){
-    plot.drBootSpline(grofit$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export)
+    plot.drBootSpline(grofit$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = paste0(wd, "/Plots"))
   }
 }
 ```
@@ -523,19 +523,19 @@ for(i in 1:length(grofit$drFit$drBootSplines)){
 ```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if("all" %in% mean.grp){
   if(length(grofit$gcFit$gcFittedSplines[[1]]$spline)>1){
-    print(plot(grofit, basesize = 15, export = export, log.y = T, mean = T))
+    print(plot(grofit, basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots")))
   }
 } else if(!all(is.na(mean.grp))){
     for(i in 1:length(mean.grp)){
       if(length(grep(mean.grp[i], as.character(names(grofit$gcFit$gcFittedSplines))))>0){
-        print(plot(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T))
+        print(plot(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots")))
       }
     }
 }
 if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
     if(length(grep(mean.conc[i], str_extract(names(grofit$gcFit$gcFittedSplines), "[:alnum:]+$")))>0){
-      print(plot(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T))
+      print(plot(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots")))
     }
   }
 }

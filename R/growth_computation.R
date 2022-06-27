@@ -364,7 +364,8 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
   }
   if(report == TRUE){
     growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), res.table.gc=res.table.gc,
-                  res.table.dr=res.table.dr, ec50=ec50, t0 = t0, mean.grp = mean.grp, mean.conc = mean.conc, export = export)
+                  res.table.dr=res.table.dr, ec50=ec50, t0 = t0, mean.grp = mean.grp, mean.conc = mean.conc,
+                  export = export)
   }
 
   grofit
@@ -377,6 +378,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   {
   require(ggplot2, quietly = T)
   require(doParallel, quietly = T)
+  require(foreach)
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit")
 
