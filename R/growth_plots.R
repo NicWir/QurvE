@@ -871,12 +871,23 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     }
   }
 
+  #get indices of samples with selected names
+  ndx <- grep(paste0(
+    str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
+
+  # correct for log transformation
+  if(grofit$control$log.y.gc == TRUE){
+      for(i in 1:length(ndx)){
+        grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.data"]] <-
+          exp(grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx[i]]]$data.in[1]
+      }
+  }
+
   if(mean == TRUE){
     conditions <- str_replace_all(nm, "\\| . \\| ", "| ")
     conditions_unique <- unique(conditions)
 
     plotdata.ls <- list()
-
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- grep(paste0("^",
@@ -887,11 +898,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       name <- conditions_unique[n]
       time <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)) %>% as.list(.)
       data <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)
-      if(log.y == FALSE){
-        for(k in 1:length(data)){
-          data[[k]] <- exp(data[[k]]) * grofit$gcFit$gcFittedSplines[[ndx[[k]]]]$data.in[1]
-        }
-      }
+
       # correct for unequal lengths of data series
       for(i in 1:length(time)){
         ndx.others <- seq(1:length(time))[-i]
@@ -928,14 +935,19 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       theme_classic(base_size = basesize) +
       xlab("Time") +
       ylab(if(log.y==TRUE){
-        "Growth [Ln(y(t)/y0)]"
+        "Growth [Ln(y(t))]"
       } else {
         "Growth [y(t)]"
       }) +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-      scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(log.y == TRUE){
+      p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+    }
 
     if(is.null(colors)){
       if (length(plotdata.ls) <= 8) {
@@ -973,8 +985,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     }
   } # if(mean == TRUE)
   else {
-    ndx <- grep(paste0(
-      str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
+
     df <- data.frame()
     for(i in 1:length(ndx)){
       df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx[i]],
@@ -985,15 +996,19 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
       xlab("Time") +
-      ylab(if(grofit$control$log.y.gc==TRUE){
-        "Growth [Ln(y(t)/y0)]"
+      ylab(if(log.y==TRUE){
+        "Growth [Ln(y(t)]"
       } else {
         "Growth [y(t)]"
       }) +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-      scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+    if(log.y == TRUE){
+      p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+    }
 
     if(is.null(colors)){
       if (length(ndx) <= 8) {
@@ -1051,7 +1066,7 @@ plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.
                                                'mu.model', 'lambda.model', 'A.model',
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'),
-                            names = NULL, conc = NULL, plot = T, export = F, height = 9, width = 15 + 3*ifelse(mean==TRUE,length(conditions_unique), length(conditions))/15){
+                            names = NULL, conc = NULL, plot = T, export = F, height = 7, width = NULL){
   param <- match.arg(param)
   # check class of object
   if(!(any(class(object) %in% c("gcTable", "grofit", "gcFit")))) stop("object needs to be either a 'grofit', 'gcTable', or 'gcFit' object created with growth.workflow() or growth.gcFit().")
@@ -1062,7 +1077,7 @@ plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.
                                             stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'.")
 
   #extract gcTable
-  if(class(object)=="gcTable"){
+  if(any(class(object) %in% "gcTable")){
     gcTable <- object
   } else if (class(object)=="gcFit"){
     gcTable <- object$gcTable
@@ -1110,12 +1125,13 @@ plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.
                   position=position_dodge(.9)) +
     labs(x = "Sample", y = param) +
     theme_minimal(base_size = 15) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/10), "lines"))
   if(export == FALSE && plot == FALSE){
     return(p)
   }
   if (export == TRUE){
-    w <- width
+    w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
     h <- height
     dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
     grDevices::png(paste0("Plots/", "ParameterPlot.png"),
