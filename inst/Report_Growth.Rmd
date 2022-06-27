@@ -22,6 +22,13 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+dir.create(paste0(tempdir(),"/Plots"), showWarnings = F)
+wd.plots <- paste0(wd,"/Plots")
+if(export == T){
+ dir.create(wd.plots, showWarnings = F)
+}
+cl <- parallel::makeCluster(detectCores(all.tests = FALSE, logical = TRUE)-1)
+doParallel::registerDoParallel(cl)
 knitr::opts_chunk$set(dev = "pdf")
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
 knit_table <- function(df, ...){
@@ -76,9 +83,9 @@ if(any(c("a", "l") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
-print(plot.parameters(grofit, param = "mu.linfit"))
-print(plot.parameters(grofit, param = "lambda.linfit"))
-print(plot.parameters(grofit, param = "dY.linfit"))
+print(plot.parameters(grofit, param = "mu.linfit", export = export))
+print(plot.parameters(grofit, param = "lambda.linfit", export = export))
+print(plot.parameters(grofit, param = "dY.linfit", export = export))
 ```
 `r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_model, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -107,7 +114,6 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
 ```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
 print(plot.parameters(grofit, param = "mu.model"))
 print(plot.parameters(grofit, param = "lambda.model"))
-print(plot.parameters(grofit, param = "dY.model"))
 ```
 `r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -137,79 +143,93 @@ print(plot.parameters(grofit, param = "lambda.spline"))
 print(plot.parameters(grofit, param = "dY.spline"))
 ```
 \clearpage
+
 ## Plots
 ### `r if(any(c("a", "l") %in% control$fit.opt)){"Exponential Fits"}`
 ```{r figure_linear, out.width = "33%", fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if(any(c("a", "l") %in% control$fit.opt)){
-  for(i in 1:length(grofit[["gcFit"]][["gcFittedLinear"]])){
+  plot.ggLinear <- function(){
     if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-        x <- grofit[["gcFit"]][["gcFittedLinear"]][[i]]
-        coef <- x[["par"]]
-        lagtime <- coef["lag"]
-        tangent.time  <- seq(lagtime, max(x[["raw.time"]]), length=200)
-        tangent.df <- data.frame("time" = tangent.time,
-                                "y" = coef["y0_lm"] * exp(coef["mumax"]*tangent.time) )
-        fit_df <- data.frame("time" = x[["raw.time"]][x$ndx],
-                             "y" = x[["raw.data"]][x$ndx] )
-
-        df <- data.frame("time" = x[["raw.time"]],
-                         "data" = x[["raw.data"]])
-        
-        df.lagtime <- data.frame("time" = c(x[["raw.time"]][1], lagtime),
-                                 "y" = c(x[["raw.data"]][1], x[["raw.data"]][1]))
-          
-        p <-    ggplot(df, aes(x = time, y = data)) +
-          geom_point(shape = 1, size = 1.7, alpha = 0.25, stroke=0.15) +
-          xlab("Time") +
-          ylab("Growth (density)") +
-          theme_classic(base_size = 16) +
-          scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-          ggtitle(gsub(" \\| NA", "", paste(x$gcID, collapse=" | "))) +
-          theme(
-            plot.title = element_text(size = 20),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank()
-          )
-        
-        p <-
-          p + geom_point(
-            aes(x = time, y = y),
-            data = fit_df,
-            size = 2, shape = 21, stroke=0.25, fill = "firebrick", color = alpha("black", 0.7)) +
-          scale_y_continuous(trans = 'log',
-                             breaks = base_breaks(),
-                             expand = expansion(mult = c(0.05, 0.05)))
-        
-        p.yrange.end <- exp(ggplot_build(p)$layout$panel_params[[1]]$y.range[2])
-        p <- p + geom_segment(
-          aes(
-            x = time[1],
-            y = y[1],
-            xend = time[which.min(abs(exp(y) - exp(p.yrange.end)))],
-            yend = y[which.min(abs(exp(y) - exp(p.yrange.end)))]
-          ),
-          data = tangent.df,
-          linetype = "dashed",
-          color = ggplot2::alpha("firebrick3", 0.85),
-          size = 0.3
+      x <- grofit[["gcFit"]][["gcFittedLinear"]][[i]]
+      coef <- x[["par"]]
+      lagtime <- coef["lag"]
+      tangent.time  <- seq(lagtime, max(x[["raw.time"]]), length=200)
+      tangent.df <- data.frame("time" = tangent.time,
+                               "y" = coef["y0_lm"] * exp(coef["mumax"]*tangent.time) )
+      fit_df <- data.frame("time" = x[["raw.time"]][x$ndx],
+                           "y" = x[["raw.data"]][x$ndx] )
+      
+      df <- data.frame("time" = x[["raw.time"]],
+                       "data" = x[["raw.data"]])
+      
+      df.lagtime <- data.frame("time" = c(x[["raw.time"]][1], lagtime),
+                               "y" = c(x[["raw.data"]][1], x[["raw.data"]][1]))
+      
+      p <-    ggplot(df, aes(x = time, y = data)) +
+        geom_point(shape = 1, size = 1.7, alpha = 0.25, stroke=0.15) +
+        xlab("Time") +
+        ylab("Growth (density)") +
+        theme_classic(base_size = 16) +
+        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+        ggtitle(gsub(" \\| NA", "", paste(x$gcID, collapse=" | "))) +
+        theme(
+          plot.title = element_text(size = 20),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()
         )
-        
-        p <- p + geom_segment(
-          aes(
-            x = time[1],
-            y = y[1],
-            xend = time[2],
-            yend = y[2]
-          ),
-          data = df.lagtime,
-          linetype = "dashed",
-          color = ggplot2::alpha("firebrick3", 0.85),
-          size = 0.3
-        )
-        
-        print(p)
+      
+      p <-
+        p + geom_point(
+          aes(x = time, y = y),
+          data = fit_df,
+          size = 2, shape = 21, stroke=0.25, fill = "firebrick", color = alpha("black", 0.7)) +
+        scale_y_continuous(trans = 'log',
+                           breaks = base_breaks(),
+                           expand = expansion(mult = c(0.05, 0.05)))
+      
+      p.yrange.end <- exp(ggplot_build(p)$layout$panel_params[[1]]$y.range[2])
+      p <- p + geom_segment(
+        aes(
+          x = time[1],
+          y = y[1],
+          xend = time[which.min(abs(exp(y) - exp(p.yrange.end)))],
+          yend = y[which.min(abs(exp(y) - exp(p.yrange.end)))]
+        ),
+        data = tangent.df,
+        linetype = "dashed",
+        color = ggplot2::alpha("firebrick3", 0.85),
+        size = 0.3
+      )
+      
+      p <- p + geom_segment(
+        aes(
+          x = time[1],
+          y = y[1],
+          xend = time[2],
+          yend = y[2]
+        ),
+        data = df.lagtime,
+        linetype = "dashed",
+        color = ggplot2::alpha("firebrick3", 0.85),
+        size = 0.3
+      )
+      
+      print(p)
     }
   }
+  plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))
+  if (knitr::is_latex_output()) {
+    foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
+        .packages = "ggplot2") %dopar% {
+          if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+            pdf(file=paste0(plotdir, "/PlotLinear_",i,".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+          }
+        }
+  }
+  Files_list <- list.files(path = paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots/"), 
+                                pattern = "^PlotLinear_",
+                                full.names = TRUE)
+knitr::include_graphics(Files_list, dpi = 300, error = F)
 }
 ```
 `r if(any(c("a", "b", "m") %in% control$fit.opt)){"\\clearpage"}`
@@ -217,7 +237,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
 ### `r if(any(c("a", "b", "m") %in% control$fit.opt)){"Parametric Fits"}`
 ```{r figure_model, out.width = "33%", fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if(any(c("a", "b", "m") %in% control$fit.opt)){
-  for(i in 1:length(grofit[["gcFit"]][["gcFittedModels"]])){
+  plot.ggModel <- function(){
     if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
         x <- grofit[["gcFit"]][["gcFittedModels"]][[i]]
         coef <- x[["parameters"]]
@@ -348,6 +368,20 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
                        linetype = "dashed", color = ggplot2::alpha("forestgreen", 0.85), size = 0.5))
     }
   }
+  plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))
+  if (knitr::is_latex_output()) {
+    foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedModels"]]),
+        .packages = "ggplot2") %dopar% {
+          if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
+            pdf(file=paste0(plotdir, "/PlotModel_",i,".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+          }
+        }
+  }
+  
+  Files_list <- list.files(path = paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots/"), 
+                                pattern = "^PlotModel_",
+                                full.names = TRUE)
+knitr::include_graphics(Files_list, dpi = 300, error = F)
 }
 ```
 `r if(any(c("a", "b", "s") %in% control$fit.opt)){"\\clearpage"}`
@@ -355,8 +389,8 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
 ### `r if(any(c("a", "b", "s") %in% control$fit.opt)){"Nonparametric Fits"}`
 ```{r figure_spline, out.width = "33%", fig.asp=1.1, fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if(any(c("a", "b", "s") %in% control$fit.opt)){
- for(i in 1:length(grofit[["gcFit"]][["gcFittedSplines"]])){
-   if(grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE){
+plot.ggSpline   <- function(){
+  if(grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE){
        x <- grofit[["gcFit"]][["gcFittedSplines"]][[i]]
        coef <- x[["parameters"]]
        lagtime <- coef["lambda"][[1]][1]
@@ -420,7 +454,20 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
         
        print(ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.3)))
    }
- }
+}
+plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))
+if (knitr::is_latex_output()) {
+    foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
+        .packages = "ggplot2") %dopar% {
+          if(grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE){
+            pdf(file=paste0(plotdir, "/PlotSpline_",i,".pdf"));   plot.ggSpline();   invisible(dev.off())
+          }
+        }
+  }
+  Files_list <- list.files(path = paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots/"), 
+                                pattern = "^PlotSpline_",
+                                full.names = TRUE)
+knitr::include_graphics(Files_list, dpi = 300, error = F)
 }
 ```
 `r if(ec50){"\\clearpage"}`
@@ -466,7 +513,7 @@ boot.ec50.df <- data.frame()
 ```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
 for(i in 1:length(grofit$drFit$drBootSplines)){
   if(grofit$drFit$drBootSplines[[i]]$ bootFlag == TRUE){
-    plot.drBootSpline(grofit$drFit$drBootSplines[[i]])
+    plot.drBootSpline(grofit$drFit$drBootSplines[[i]], width = 6, height = 4.5)
   }
 }
 ```
@@ -475,18 +522,20 @@ for(i in 1:length(grofit$drFit$drBootSplines)){
 ## `r if(!all(is.na(mean.grp))){"Group average plots"}`
 ```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if("all" %in% mean.grp){
-  print(plot(grofit, basesize = 15))
+  if(length(grofit$gcFit$gcFittedSplines[[1]]$spline)>1){
+    print(plot(grofit, basesize = 15, export = export))
+  }
 } else if(!all(is.na(mean.grp))){
     for(i in 1:length(mean.grp)){
       if(length(grep(mean.grp[i], as.character(names(grofit$gcFit$gcFittedSplines))))>0){
-        print(plot(grofit, names = unlist(mean.grp[i]), basesize = 15))
+        print(plot(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export))
       }
     }
 }
 if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
     if(length(grep(mean.conc[i], str_extract(names(grofit$gcFit$gcFittedSplines), "[:alnum:]+$")))>0){
-      print(plot(grofit, conc = unlist(mean.conc[i]), basesize = 15))
+      print(plot(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export))
     }
   }
 }

@@ -299,7 +299,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                         smooth.gc= 0.55, model.type=c("logistic",
                                                       "richards","gompertz", "gompertz.exp"),
                         have.atleast = 6, parameter = 34, smooth.dr = NULL,
-                        log.x.dr = FALSE, log.y.dr = FALSE, nboot.dr = 0, report = TRUE, report.dir = NULL)
+                        log.x.dr = FALSE, log.y.dr = FALSE, nboot.dr = 0, report = TRUE, report.dir = NULL, export = FALSE)
 {
   if(!(class(data)=="list")){
     if (is.numeric(as.matrix(time)) == FALSE)
@@ -364,7 +364,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
   }
   if(report == TRUE){
     growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), res.table.gc=res.table.gc,
-                  res.table.dr=res.table.dr, ec50=ec50, t0 = t0, mean.grp = mean.grp, mean.conc = mean.conc)
+                  res.table.dr=res.table.dr, ec50=ec50, t0 = t0, mean.grp = mean.grp, mean.conc = mean.conc, export = export)
   }
 
   grofit
@@ -376,6 +376,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
 growth.report <- function(grofit, report.dir = NULL, ...)
   {
   require(ggplot2, quietly = T)
+  require(doParallel, quietly = T)
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit")
 
@@ -397,9 +398,9 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   }
   dir.create(wd, showWarnings = F)
   for(i in 1:length(.libPaths())){
-    curvE.ndx <- grep("curvE", list.files(.libPaths()[i]))
-    if(length(curvE.ndx)>0){
-      Report.wd <- paste0(.libPaths()[i], "/curvE")
+    QurvE.ndx <- grep("QurvE", list.files(.libPaths()[i]))
+    if(length(QurvE.ndx)>0){
+      Report.wd <- paste0(.libPaths()[i], "/QurvE")
     }
   }
   file <- paste0(Report.wd, "/Report_Growth.Rmd")
@@ -410,6 +411,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   message("Save RData object")
   save(grofit, file = paste(wd, "results.RData", sep = "/"))
   message(paste0("Files saved in: '", wd, "'"))
+  unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
 }
 
 #'
@@ -452,7 +454,6 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
   reliability_tag_linear <- NA
   reliability_tag_param <- NA
   reliability_tag_nonpara <- NA
-
 
   # /// loop over all wells
   for (i in 1:dim(data)[1]){
@@ -709,7 +710,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=grofit.cont
   # /// check length of input data
   if (length(time)!=length(data)) stop("gcFitModel: length of time and data input vectors differ!")
   if(max(data) < 1.5*data[1]){
-    message("No significant growth detected (with all values below 1.5 * start_value).")
+    if(control$suppress.messages==F) message("No significant growth detected (with all values below 1.5 * start_value).")
     gcFitModel   <- list(raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
                          fit.data = NA, parameters = list(A=NA, mu=0, lambda=NA, integral=NA),
                          model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
@@ -841,9 +842,10 @@ grofit.param <- function(time, data, gcID = "undefined", control)
       y.model <- NULL
     }
 
-    if (control$suppress.messages == FALSE)
+    if (control$suppress.messages == FALSE){
       cat("\n")
       cat(paste0("Best fitting model: ", sub("\\(.+", "", sub("data", "", paste(formula(best), collapse = "")))))
+    }
     # /// extract parameters from data fit
     if (is.null(best) == FALSE) {
       Abest      <- summary(best)$parameters["A", 1:2]
@@ -957,7 +959,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
     }
   }
   if(max(data) < 1.5*data[1]){
-    message("No significant growth detected (with all values below 1.5 * start_value).")
+    if(control$suppress.messages==F) message("No significant growth detected (with all values below 1.5 * start_value).")
     gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                         fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = 0, dY = NA,
                                                                                                               mu = 0, lambda = Inf, integral = NA), spline = NA,
@@ -1238,14 +1240,14 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
   obs$ylog <- data.log
 
   if(max(data.in) < 1.5*data.in[1]){
-    message("No significant growth detected (with all values below 1.5 * start_value).")
+    if(control$suppress.messages==F) message("No significant growth detected (with all values below 1.5 * start_value).")
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, dY = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
                         ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
     )
     class(gcFitLinear) <- "gcFitLinear"
-    message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
+    if(control$suppress.messages==F) message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
     return(gcFitLinear)
   }
   ## number of values
@@ -1269,7 +1271,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
           ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
         )
         class(gcFitLinear) <- "gcFitLinear"
-        message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
+        if(control$suppress.messages==F) message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
         return(gcFitLinear)
       }
       else{
@@ -1287,7 +1289,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
                                 ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
-            message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
+            if(control$suppress.messages==F) message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
             return(gcFitLinear)
           } else {
 

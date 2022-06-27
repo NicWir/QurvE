@@ -1,4 +1,4 @@
-plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics"), plot = TRUE, export = FALSE, ...)
+plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics"), plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5), width = ifelse(which=="fit", 9, 9),...)
 {
   which <- match.arg(which)
 
@@ -38,8 +38,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
     )
   }
   if (export == TRUE){
-    w <- ifelse(which=="fit", 9, 9)
-    h <- ifelse(which=="fit", 7, 5)
+    w <- width
+    h <- height
     dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
     grDevices::png(paste0("Plots/", paste(gcFittedLinear$gcID, collapse = "_"), "_LinFitPlot.png"),
                    width = w, height = h, units = 'in', res = 300)
@@ -55,7 +55,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 }
 
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
-                            colModel=ggplot2::alpha("forestgreen", 0.85), base_size=16, plot = TRUE, export = FALSE, ...)
+                            colModel=ggplot2::alpha("forestgreen", 0.85), base_size=16, plot = TRUE, export = FALSE, height = 8, width = 6,...)
 {
   # x an object of class gcFitModel
 
@@ -64,7 +64,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
   if (is.logical(equation)==FALSE)   stop("Need logical value for: equation")
   if (is.numeric(base_size)==FALSE)   stop("Need numeric value for: base_size")
-  if (!(class(base_size)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
+  if (!(class(gcFittedModel)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
 
 
   # /// check if a data fit is available
@@ -223,9 +223,12 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
         geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
                      linetype = "dashed", color = colModel, size = 0.5)
     }
+    if(export == FALSE && plot == FALSE){
+      return(p)
+    }
     if (export == TRUE){
-      w <- 8
-      h <- 6
+      w <- width
+      h <- height
       dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
       grDevices::png(paste0("Plots/", paste(gcFittedModel$gcID, collapse = "_"), "_ModelFitPlot.png"),
                      width = w, height = h, units = 'in', res = 300)
@@ -238,9 +241,6 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
     if (plot == TRUE){
       suppress_warnings( {print(p)}, "is.na" )
     }
-    if(export == FALSE && plot == FALSE){
-      return(p)
-    }
   }
 }
 
@@ -248,7 +248,7 @@ plot.drBootSpline <- function (drBootSpline,
                                pch = 1,
                                colData = 1,
                                colSpline = scales::alpha("black", 0.15),
-                               cex = 0.5, plot = TRUE, export = FALSE,
+                               cex = 0.5, plot = TRUE, export = FALSE, height = 7, width = 9,
                                ...)
 {
   # drBootSpline an object of class drBootSpline
@@ -373,8 +373,8 @@ plot.drBootSpline <- function (drBootSpline,
       }
     } # p <- function()
     if (export == TRUE){
-      w1 <- 9
-      h1 <- 7
+      w1 <- width
+      h1 <- height
       dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
       grDevices::png(paste0("Plots/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplines.png"),
                      width = w1, height = h1, units = 'in', res = 300)
@@ -384,8 +384,8 @@ plot.drBootSpline <- function (drBootSpline,
       p1()
       grDevices::dev.off()
 
-      w2 <- 9
-      h2 <- 7
+      w2 <- width
+      h2 <- height
       dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
       grDevices::png(paste0("Plots/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplinesEC50.png"),
                      width = w2, height = h2, units = 'in', res = 300)
@@ -411,7 +411,6 @@ plot.drFit <- function(drFit, plot = TRUE, export = FALSE, ...)
 
   # /// plot all drFitSpline objects
   for (i in 1:n) {
-    #x11()
     try(plot(drFit$drFittedSplines[[i]], export = export, plot = plot))
     title(as.character(drFit$drFittedSplines[[i]]$drID))
   }
@@ -426,7 +425,7 @@ plot.drFitSpline <-
             colSpline = 1,
             colData = 1,
             cex = 1,
-            lwd = 2, plot = TRUE, export = FALSE,
+            lwd = 2, plot = TRUE, export = FALSE, height = 7, width = 9,
             ...)
   {
     # drFitSpline an object of class drFitSpline
@@ -565,8 +564,8 @@ plot.drFitSpline <-
       title(drFitSpline$drID)
     } # p <- function()
     if (export == TRUE){
-      w <- 9
-      h <- 7
+      w <- width
+      h <- height
       dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
       grDevices::png(paste0("Plots/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.png"),
                      width = w, height = h, units = 'in', res = 300)
@@ -582,7 +581,7 @@ plot.drFitSpline <-
     }
   }
 
-plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, colSpline=ggplot2::alpha("black", 0.1), cex=1, plot = TRUE, export = FALSE, ...)
+plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, colSpline=ggplot2::alpha("black", 0.1), cex=1, plot = TRUE, export = FALSE, height = 7, width = 9,...)
 {
   # gcBootSpline an object of class gcBootSpline
   if(class(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
@@ -665,8 +664,8 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, colSpline=ggplot2:
     } # p2 <- function()
   }
   if (export == TRUE){
-    w1 <- 9
-    h1 <- 7
+    w1 <- width
+    h1 <- height
     dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
     grDevices::png(paste0("Plots/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSpline.png"),
                    width = w1, height = h1, units = 'in', res = 300)
@@ -676,8 +675,8 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, colSpline=ggplot2:
     p1()
     grDevices::dev.off()
 
-    w2 <- 9
-    h2 <- 9
+    w2 <- width
+    h2 <- width
     dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
     grDevices::png(paste0("Plots/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSplineParam.png"),
                    width = w2, height = h2, units = 'in', res = 300)
@@ -695,7 +694,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, colSpline=ggplot2:
   }
 }
 
-plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=1, colData=1, colSpline="firebrick3", cex=1, lwd = 2, plot = TRUE, export = FALSE, ...)
+plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=1, colData=1, colSpline="firebrick3", cex=1, lwd = 2, plot = TRUE, export = FALSE,...)
 {
 
   # x an object of class gcFitSpline
@@ -837,7 +836,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw=TRUE, slope=TRUE, deriv = T, pch=
   par(mfrow = c(1, 1))
 }
 
-plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, colors = NULL, basesize = 20, lwd = 1.1, plot = TRUE, export = FALSE)
+plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, colors = NULL, basesize = 20, lwd = 1.1, plot = TRUE, export = FALSE, height = 9, width = 15 + 3*ifelse(mean==TRUE,length(conditions_unique), length(conditions))/15)
 {
 
   # grofit an object of class grofit
@@ -1022,9 +1021,12 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       }
     }
   }
+  if(export == FALSE && plot == FALSE){
+    return(p)
+  }
   if (export == TRUE){
-    w <- 15 + 3*ifelse(mean==TRUE,length(conditions_unique), length(conditions))/15
-    h <- 9
+    w <- weight
+    h <- height
     dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
     grDevices::png(paste0("Plots/", "grpSplineFit.png"),
                    width = w, height = h, units = 'in', res = 300)
@@ -1036,9 +1038,6 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
   }
   if (plot == TRUE){
     print(p)
-  }
-  if(export == FALSE && plot == FALSE){
-    return(p)
   }
 }
 
@@ -1052,7 +1051,7 @@ plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.
                                                'mu.model', 'lambda.model', 'A.model',
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'),
-                            names = NULL, conc = NULL){
+                            names = NULL, conc = NULL, plot = T, export = F, height = 9, width = 15 + 3*ifelse(mean==TRUE,length(conditions_unique), length(conditions))/15){
   param <- match.arg(param)
   # check class of object
   if(!(any(class(object) %in% c("gcTable", "grofit", "gcFit")))) stop("object needs to be either a 'grofit', 'gcTable', or 'gcFit' object created with growth.workflow() or growth.gcFit().")
@@ -1074,6 +1073,7 @@ plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.
   if(all(is.na(gcTable[[param]]))){
     if(gsub(".+\\.", "", param)=="linfit") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'l' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'l' or 'a'."))
     if(gsub(".+\\.", "", param)=="model") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'm' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'm' or 'a'."))
+    if(gsub(".+\\.", "", param)=="spline") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 's' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 's' or 'a'."))
   }
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
@@ -1102,6 +1102,8 @@ plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.
   df <- df[match(as.factor(df$name[order(nchar(df$name), df$name)]), df$name), ]
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
+  df$mean[is.na(df$mean)] <- 0
+  df$sd[is.na(df$sd)] <- 0
   p <- ggplot(df, aes(x=name, y=mean, fill = group)) +
     geom_bar(stat="identity", color = "black") +
     geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, size = 1,
@@ -1109,7 +1111,24 @@ plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.
     labs(x = "Sample", y = param) +
     theme_minimal(base_size = 15) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
- print(p)
+  if(export == FALSE && plot == FALSE){
+    return(p)
+  }
+  if (export == TRUE){
+    w <- width
+    h <- height
+    dir.create(paste0(getwd(), "/Plots"), showWarnings = F)
+    grDevices::png(paste0("Plots/", "ParameterPlot.png"),
+                   width = w, height = h, units = 'in', res = 300)
+    print(p)
+    grDevices::dev.off()
+    grDevices::pdf(paste0("Plots/", "ParameterPlot.pdf"), width = w, height = h)
+    print(p)
+    grDevices::dev.off()
+  }
+  if (plot == TRUE){
+    print(p)
+  }
 }
 
 
