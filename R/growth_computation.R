@@ -498,7 +498,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
           reliability_tag_linear <- NA
           while ("n" %in% answer_satisfied) {
             try(plot(fitlinear, log = "y"))
-            mtext(side = 3, line = 0.5,
+            mtext(side = 3, line = 0, adj = 0,
                   outer = F,
                   cex = 1,
                   wellname)
@@ -1014,15 +1014,14 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
     } else {
       data
     }
-    # Implement t0 and min.density into dataset
+    # Implement min.density into dataset
     if(!is.null(control$min.density)) {
       if (!is.na(control$min.density) && control$min.density != 0) {
         if (control$log.y.gc == TRUE) {
+          # perfom log transformation on min.density (Ln(y/y0))
           min.density <- log(control$min.density / data[1])
-          time <-
-            time[max(which.min(abs(time - t0)), which.min(abs(data.log - min.density))):length(time)]
-          data.log <-
-            data.log[max(which.min(abs(time.raw - t0)), which.min(abs(data.log - min.density))):length(data.log)]
+          time <- time[max(which.min(abs(time - t0)), which.min(abs(data.log - min.density))):length(time)]
+          data.log <- data.log[max(which.min(abs(time.raw - t0)), which.min(abs(data.log - min.density))):length(data.log)]
         } else {
           min.density <- control$min.density
           time <-
@@ -1031,12 +1030,15 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
             data[max(which.min(abs(time.raw - t0)), which.min(abs(data - min.density))):length(data)]
         }
       }
-    } else {
+    }
+    # Implement t0 into dataset
+    if(is.numeric(t0) && t0 > 0){
       if (control$log.y.gc == TRUE) {
         data.log <- data.log[which.min(abs(time-t0)):length(data.log)]
+      } else{
+        data <- data[which.min(abs(time.raw-t0)):length(data)]
       }
       time <- time[which.min(abs(time.raw-t0)):length(time)]
-      data <- data[which.min(abs(time.raw-t0)):length(data)]
     }
     halftime <- (min(time) + max(time))/2
     try(y.spl <- smooth.spline(time, y = if(control$log.y.gc == TRUE){

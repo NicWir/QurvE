@@ -39,7 +39,7 @@ knit_table <- function(df, ...){
   } else {
      colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "µ~max~", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "t~start~", "$t_{start}$") %>% str_replace_all(., "t~D~", "$t_{D}$") %>% str_replace_all(., "t~end~", "$t_{end}$") %>% str_replace_all(., "R\\^2\\^", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "t~shift~", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$")
      colnames(df) <- linebreak(colnames(df), align = "c")
-     df[,1] <- str_replace_all(df[,1], "_", "\\char`_")
+     df[,1] <- str_replace_all(df[,1], "_", "\\\\char`_")
      df %>% kable("latex", align = "c", booktabs = T, escape = F, linesep = "",  ...) %>% kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = F, position = "center")
    }
 }
@@ -83,9 +83,9 @@ if(any(c("a", "l") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
-plot.parameters(grofit, param = "mu.linfit", export = export, out.dir = paste0(wd, "/Plots"))
-plot.parameters(grofit, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots"))
-plot.parameters(grofit, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "mu.linfit", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots"))
 ```
 `r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_model, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -108,12 +108,12 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     }
     table_model <- as.data.frame(apply(table_model, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_model[is.na(table_model)] <- ""
-    knit_table(table_model, caption = "Parametric Fit", longtable = TRUE) %>% column_spec(column=1, width = "3.1cm")
+    knit_table(table_model, caption = "Parametric Fit", longtable = TRUE) %>% column_spec(column=1, width = "4.0cm")
 }
 ```
 ```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
-plot.parameters(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots"))
-plot.parameters(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots"))
 ```
 `r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -138,9 +138,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
-plot.parameters(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots"))
-plot.parameters(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots"))
-plot.parameters(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameter(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots"))
 ```
 \clearpage
 
@@ -229,7 +229,10 @@ if(any(c("a", "l") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotLinear_",
                                 full.names = TRUE)
-knitr::include_graphics(Files_list, dpi = 300, error = F)
+  sort.ndx <- match(gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels)), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- sort.ndx[!is.na(sort.ndx)]
+  
+knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
 ```
 `r if(any(c("a", "b", "m") %in% control$fit.opt)){"\\clearpage"}`
@@ -381,7 +384,9 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotModel_",
                                 full.names = TRUE)
-knitr::include_graphics(Files_list, dpi = 300, error = F)
+  sort.ndx <- match(gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels)), gsub(".+PlotModel_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- sort.ndx[!is.na(sort.ndx)]
+knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
 ```
 `r if(any(c("a", "b", "s") %in% control$fit.opt)){"\\clearpage"}`
@@ -441,8 +446,12 @@ plot.ggSpline   <- function(){
                              data = tangent.df, linetype = "dashed", color = ggplot2::alpha("dodgerblue3", 0.85), size = 0.5) +
          geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
                       linetype = "dashed", color = ggplot2::alpha("dodgerblue3", 0.85), size = 0.5)
-       
+       # /// add panel with growth rate vs. time
        df.mu <- data.frame(spline(x$spline.deriv1$x, x$spline.deriv1$y))
+       #add missing time values due to min.density and t0
+        df.mu <-
+          bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
+                    df.mu)
        
        p.mu <- ggplot(df.mu, aes(x=x, y=y)) + 
           geom_line(color = "dodgerblue3") + 
@@ -467,7 +476,9 @@ if (knitr::is_latex_output()) {
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotSpline_",
                                 full.names = TRUE)
-knitr::include_graphics(Files_list, dpi = 300, error = F)
+    sort.ndx <- match(gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels)), gsub(".+PlotSpline_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- sort.ndx[!is.na(sort.ndx)]
+knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
 ```
 `r if(ec50){"\\clearpage"}`

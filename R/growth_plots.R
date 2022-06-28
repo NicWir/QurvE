@@ -827,11 +827,9 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
 
-      # if(gcFitSpline$control$log.y.gc == TRUE){
-      #   p.yrange.end <- exp(ggplot_build(p)$layout$panel_params[[1]]$y.range[2])
-      # } else {
+
         p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
-      # }
+
       if(log.y == TRUE){
       p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
       } else {
@@ -843,7 +841,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
       if(slope == TRUE && log.y == T){
         mu     <- as.numeric(coef$mu[1])
         # time values for tangent
-        time <- seq(lagtime, max(gcFitSpline$"fit.time"), length=200)
+        time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
         # y values for tangent
         bla <- ifelse(gcFitSpline$control$log.y.gc == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
         tangent.df <- data.frame("time" = time,
@@ -853,14 +851,20 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
         p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
                                   xend = time[which.min(abs(y - 1.1*p.yrange.end))],
                                   yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                              data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5) +
-          geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+                              data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+        if(!(lagtime <0)){
+        p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
                        linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+        }
       }
 
       # /// add panel with growth rate over time
       if(deriv == TRUE){
         df.mu <- data.frame(spline(gcFitSpline$spline.deriv1$x, gcFitSpline$spline.deriv1$y))
+        #add missing time values due to min.density and t0
+        df.mu <-
+          bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
+                    df.mu)
 
         p.mu <- ggplot(df.mu, aes(x=x, y=y)) +
           geom_line(color = colSpline) +
@@ -967,39 +971,37 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         data.deriv <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$y)) %>% as.list(.)
       }
       # correct for unequal lengths of data series
+      time.all <- Reduce(union, time)
       for(i in 1:length(time)){
-        ndx.others <- seq(1:length(time))[-i]
-        for(j in 1:length(ndx.others)){
-          assign(paste0("time.missing_", j), setdiff(time[[ndx.others[j] ]], time[[i]]) )
-          if(length(get(paste0("time.missing_", j)))){
-            for(k in 1:length(get(paste0("time.missing_", j)))){
-              data[[i]] <- append(data[[i]],
-                                  values = NA,
-                                  after = grep(get(paste0("time.missing_", j))[k], time[[ndx.others[j]]]) - 1)
-              time[[i]] <-
-                append(time[[i]],
-                       values = get(paste0("time.missing_", j))[k],
-                       after = grep(get(paste0("time.missing_", j))[k], time[[ndx.others[j]]]) - 1)
-            }
+        assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
+        if(length(get(paste0("time.missing_", i))) > 0){
+          for(j in 1:length(get(paste0("time.missing_", i)))){
+            data[[i]] <- append(data[[i]],
+                                values = NA,
+                                after = match(get(paste0("time.missing_", i))[j],
+                                              time.all) - 1)
+            time[[i]] <-
+              append(time[[i]],
+                     values = get(paste0("time.missing_", i))[j],
+                     after = match(get(paste0("time.missing_", i))[j], time.all) - 1)
           }
         }
       }
       if(deriv){
         # correct for unequal lengths of derivative series
+        time.all <- Reduce(union, time.deriv)
         for(i in 1:length(time.deriv)){
-          ndx.others <- seq(1:length(time.deriv))[-i]
-          for(j in 1:length(ndx.others)){
-            assign(paste0("time.missing_", j), setdiff(time.deriv[[ndx.others[j] ]], time.deriv[[i]]) )
-            if(length(get(paste0("time.missing_", j)))){
-              for(k in 1:length(get(paste0("time.missing_", j)))){
-                data.deriv[[i]] <- append(data[[i]],
-                                    values = NA,
-                                    after = grep(get(paste0("time.missing_", j))[k], time.deriv[[ndx.others[j]]]) - 1)
-                time.deriv[[i]] <-
-                  append(time[[i]],
-                         values = get(paste0("time.missing_", j))[k],
-                         after = grep(get(paste0("time.missing_", j))[k], time.deriv[[ndx.others[j]]]) - 1)
-              }
+          assign(paste0("time.missing_", i), setdiff(time.all, time.deriv[[i]]) )
+          if(length(get(paste0("time.missing_", i))) > 0){
+            for(j in 1:length(get(paste0("time.missing_", i)))){
+              data.deriv[[i]] <- append(data.deriv[[i]],
+                                  values = NA,
+                                  after = match(get(paste0("time.missing_", i))[j],
+                                                time.all) - 1)
+              time.deriv[[i]] <-
+                append(time.deriv[[i]],
+                       values = get(paste0("time.missing_", i))[j],
+                       after = match(get(paste0("time.missing_", i))[j], time.all) - 1)
             }
           }
         }
@@ -1262,7 +1264,7 @@ base_breaks <- function(n = 10){
   }
 }
 
-plot.parameters <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
+plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
                                                'mu.model', 'lambda.model', 'A.model',
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'),
