@@ -112,8 +112,8 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
-print(plot.parameters(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots")))
-print(plot.parameters(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots")))
+plot.parameters(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameters(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots"))
 ```
 `r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -138,9 +138,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
-print(plot.parameters(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots")))
-print(plot.parameters(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
-print(plot.parameters(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
+plot.parameters(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameters(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots"))
+plot.parameters(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots"))
 ```
 \clearpage
 
@@ -523,19 +523,19 @@ for(i in 1:length(grofit$drFit$drBootSplines)){
 ```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if("all" %in% mean.grp){
   if(length(grofit$gcFit$gcFittedSplines[[1]]$spline)>1){
-    print(plot(grofit, basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots")))
+    plot(grofit, basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
   }
 } else if(!all(is.na(mean.grp))){
     for(i in 1:length(mean.grp)){
       if(length(grep(mean.grp[i], as.character(names(grofit$gcFit$gcFittedSplines))))>0){
-        print(plot(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots")))
+        plot(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
       }
     }
 }
 if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
     if(length(grep(mean.conc[i], str_extract(names(grofit$gcFit$gcFittedSplines), "[:alnum:]+$")))>0){
-      print(plot(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots")))
+      plot(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
     }
   }
 }

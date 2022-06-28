@@ -22,6 +22,8 @@ Depends:
     tidyr
 Imports: 
     data.table,
+    doParallel,
+    foreach,
     ggplot2,
     ggpubr,
     kableExtra,
