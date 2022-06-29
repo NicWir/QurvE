@@ -35,7 +35,7 @@
 #'
 #' @export
 #'
-growth.read_data <- function(data, data.format = "col", csvsep = ";")
+growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NULL)
 {
   if (!is.character(data)) {
     dat <- data
@@ -57,7 +57,7 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";")
           )
       } else if (stringr::str_replace_all(data, ".{1,}\\.", "") == "xls" |
                  stringr::str_replace(data, ".{1,}\\.", "") == "xlsx") {
-        dat <- data.frame(readxl::read_excel(data, col_names = F))
+        dat <- data.frame(suppressMessages(readxl::read_excel(data, col_names = F, sheet = sheet)))
       } else if (stringr::str_replace_all(data, ".{1,}\\.", "") == "tsv") {
         dat <-
           utils::read.csv(
@@ -109,6 +109,9 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";")
       stop("Could not find 'time' in row 1 of dataset.")
     }
   }
+  # Combine technical replicates
+  # sample_names <- as.character(paste(dat[2:nrow(dat),1], dat[2:nrow(dat),2], dat[2:nrow(dat),3], sep = "___"))
+  # conditions <- unique(gsub("___.+___", ""))
   # Create time matrix
   time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
   if(length(time.ndx)==1){
@@ -540,7 +543,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
               reliability_tag_linear <- TRUE
               fitlinear$reliable <- TRUE
               fitlinear.all[[i]]$reliable <- TRUE
-              cat("Sample was (more ore less) o.k.\n")
+              cat("Sample was (more or less) o.k.\n")
             } # end else
           } # end while ("n" %in% answer_satisfied)
       } # end if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt))
@@ -575,8 +578,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
     }
     # /// plotting parametric fit
     if ((control$interactive == TRUE)) {
-      if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt))&&
-         fitpara$fitFlag == TRUE) {
+      if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt))) {
         if (fitpara$fitFlag == TRUE) {
           plot.gcFitModel(fitpara, colData=1, colModel=2, colLag = 3, cex=1.0, raw=T)
           legend(x="bottomright", legend=fitpara$model, col="red", lty=1)
@@ -596,7 +598,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
           reliability_tag_param <- TRUE
           fitpara$reliable <- TRUE
           fitpara.all[[i]]$reliable    <- TRUE
-          cat("Sample was (more ore less) o.k.\n")
+          cat("Sample was (more or less) o.k.\n")
         }
       } # if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) && fitpara$fitFlag == TRUE)
       else {
@@ -619,6 +621,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
                     reliability_tag_nonpara              <- FALSE
                     nonpara$reliable <- FALSE
                     fitnonpara.all[[i]]$reliable    <- FALSE
+                    fitnonpara.all[[i]]$FitFlag    <- FALSE
                     answer_satisfied <- "y"
                   } # end if ("n" %in% test_answer)
                   else{
@@ -650,7 +653,8 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
                 reliability_tag_nonpara <- TRUE
                 nonpara$reliable <- TRUE
                 fitnonpara.all[[i]]$reliable <- TRUE
-                cat("Sample was (more ore less) o.k.\n")
+                fitnonpara.all[[i]]$FitFlag <- TRUE
+                cat("Sample was (more or less) o.k.\n")
               } # end else
             } # end while ("n" %in% answer_satisfied)
           } # end if (nonpara$fitFlag == TRUE)
@@ -1048,9 +1052,9 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
     }, spar = control$smooth.gc))
     if (!exists("y.spl") || is.null(y.spl) == TRUE) {
       warning("Spline could not be fitted to data!")
-      if (is.null(control$smooth.gc) == TRUE) {
-        cat("This might be caused by usage of smoothing parameter NULL\n")
-      }
+      if (is.null(control$smooth.gc) == TRUE)
+        cat("This might be caused by usage of smoothing parameter 'smooth.gc = NULL'.\n")
+
       gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                           fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
                                                                     mu = NA, lambda = NA, integral = NA), spline = NA,
@@ -1707,10 +1711,10 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = grofit
   fitFlag <- TRUE
   try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr))
   if (is.null(spltest) == TRUE) {
-    cat("Spline could not be fitted to data!\n")
+    cat("Spline could not be fitted in dose-response analysis!\n")
     fitFlag <- FALSE
     if (is.null(control$smooth.dr) == TRUE) {
-      cat("This might be caused by usage of smoothing parameter NULL\n")
+      cat("This might be caused by usage of smoothing parameter 'smooth.dr = NULL'.\n")
     }
     stop("Error in drFitSpline")
   }
@@ -1864,9 +1868,9 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = grofi
     boot.x[b, 1:length(splinefit[[b]]$fit.conc)] <- splinefit[[b]]$fit.conc
     boot.y[b, 1:length(splinefit[[b]]$fit.test)] <- splinefit[[b]]$fit.test
     if (is.null(spltest) == TRUE) {
-      cat("Spline could not be fitted to data!\n")
+      cat("Spline could not be fitted in dose-response analysis!!\n")
       if (is.null(control$smooth.dr) == TRUE) {
-        cat("This might be caused by usage of smoothing parameter NULL\n")
+        cat("This might be caused by usage of smoothing parameter 'smooth.dr = NULL'.\n")
       }
       stop("Error in drBootSpline")
     }
