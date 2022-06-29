@@ -1040,11 +1040,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab("Time") +
-      ylab(if(log.y==TRUE){
-        "Growth [Ln(y(t))]"
-      } else {
-        "Growth [y(t)]"
-      }) +
+      ylab("Growth [y(t)]") +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
@@ -1093,11 +1089,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab("Time") +
-        ylab(if(log.y==TRUE){
-          "Growth [Ln(y(t))]"
-        } else {
-          "Growth [y(t)]"
-        }) +
+        ylab(label = bquote("Exp. growth rate µ "~(h^-1))) +
         scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank()) +
@@ -1148,11 +1140,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
       xlab("Time") +
-      ylab(if(log.y==TRUE){
-        "Growth [Ln(y(t)]"
-      } else {
-        "Growth [y(t)]"
-      }) +
+      ylab("Growth [y(t)]") +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
@@ -1198,11 +1186,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
         xlab("Time") +
-        ylab(if(log.y==TRUE){
-          "Growth [Ln(y(t)]"
-        } else {
-          "Growth [y(t)]"
-        }) +
+        ylab(label = bquote("Exp. growth rate µ "~(h^-1))) +
         scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank()) +
@@ -1240,10 +1224,10 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
   if(export == FALSE && plot == FALSE){
     return(p)
   }
+  out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
   if (export == TRUE){
     w <- width
     h <- height
-    out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
     dir.create(out.dir, showWarnings = F)
     grDevices::png(paste0(out.dir, "/", "grpSplineFit.png"),
                    width = w, height = h, units = 'in', res = 300)
@@ -1327,7 +1311,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                   position=position_dodge(.9)) +
     labs(x = "Sample", y = param) +
     theme_minimal(base_size = 15) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"))
   if(export == FALSE && plot == FALSE){
     return(p)

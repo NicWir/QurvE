@@ -1299,10 +1299,12 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
 
           ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
           success <- FALSE
-          if(any(ret.check[,5] >= R2 & ret.check[,6] <= RSD)){
+          # apply min.density to list of linear regressions
+          ret.check <- ret.check[ret.check[, 8] >= min.density, ]
+          if(any(ret.check[,5] >= R2 & abs(ret.check[,6]) <= RSD)){
             while (!success){
               index.max <- which.max(ret.check[, 3])
-              if(ret.check[index.max,5] >= R2 && ret.check[index.max,6] <= RSD && !is.na(ret.check[index.max,6]) && ret.check[index.max, 8] >= min.density){ # prerequisites for suitable µmax candidate: R2 and RSD
+              if(ret.check[index.max,5] >= R2 && abs(ret.check[index.max,6]) <= RSD && !is.na(ret.check[index.max,6]) ){ # prerequisites for suitable µmax candidate: R2 and RSD
                 slope.max <- ret.check[index.max,3]
                 success <- TRUE
               } else {
@@ -1314,14 +1316,14 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
             if(exists("min.density")){
               candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
                                     ret[, 5] >= 0.98*R2 & # R2 criterion for candidates
-                                    ret[, 6] <= 1.02 * RSD & # RSD criterion for candidates
+                                    abs(ret[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
                                     ret[, 7] >= t0 & # consider only slopes after defined t0
                                     ret[, 8] >= min.density # consider only slopes at densities higher than "min.density"
                                   )
             } else{
               candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
                                     ret[, 5] >= 0.98*R2 & # R2 criterion for candidates
-                                    ret[, 6] <= 1.02 * RSD & # RSD criterion for candidates
+                                    abs(ret[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
                                     ret[, 7] >= t0) # consider only slopes after defined t0
             }
             #consider only candidate windows next to index.max.ret
@@ -1379,9 +1381,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
                                   ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
               )
               class(gcFitLinear) <- "gcFitLinear"
-              message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", RSD, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
+              if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", RSD, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
               return(gcFitLinear)
-            } # if(N >= 6)
+            }
           } # if(any(ret.check[,5] >= R2 & ret.check[,6] <= RSD))
           else{
             gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
@@ -1390,7 +1392,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
                                 ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
-            message(paste0("No linear fit in accordance with the chosen parameters identified with an R2 value of >= ", RSD, " and an RSD of <= ", RSD, "."))
+            if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with an R2 value of >= ", RSD, " and an RSD of <= ", RSD, "."))
             return(gcFitLinear)
           }
         } # else of if(nrow(ret.check)<2)
