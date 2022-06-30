@@ -110,8 +110,27 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
     }
   }
   # Combine technical replicates
-  # sample_names <- as.character(paste(dat[2:nrow(dat),1], dat[2:nrow(dat),2], dat[2:nrow(dat),3], sep = "___"))
-  # conditions <- unique(gsub("___.+___", ""))
+  sample_names <- as.character(paste0(dat[2:nrow(dat),1], "...", dat[2:nrow(dat),2], "___", dat[2:nrow(dat),3]))
+  conditions <-
+    unique(gsub("\\.\\.\\..+___", "___", sample_names))
+  remove <- c()
+  for(i in 1:length(conditions)){
+    ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
+    name <- dat[ndx.cond[1]+1,1]
+    conc <- dat[ndx.cond[1]+1,3]
+    tech.rep <- suppressWarnings(as.numeric(unique(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
+    tech.rep <- tech.rep[!is.na(tech.rep)]
+
+    for(j in 1:length(tech.rep)){
+      ndx.rep <- which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j]) + (ndx.cond[1]-1)
+      values <- apply(dat[ndx.rep+1, 4:ncol(dat)], 1, as.numeric)
+      means <- rowMeans(values)
+      dat[ndx.rep[1]+1, 4:ncol(dat)] <- means
+      dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
+      remove <- c(remove, ndx.rep[-1]+1)
+    }
+  }
+  dat <- dat[-remove,]
   # Create time matrix
   time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
   if(length(time.ndx)==1){
