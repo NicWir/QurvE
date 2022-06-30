@@ -35,7 +35,7 @@
 #'
 #' @export
 #'
-growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NULL)
+growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NULL, subtract.blank  = T)
 {
   if (!is.character(data)) {
     dat <- data
@@ -98,9 +98,9 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
     dat <- t(dat)
   }
   if(data.format == "col"){
-    message("Sample data are stored in columns.")
+    message("Sample data are stored in columns. If they are stored in row format, please run growth.read_data() with data.format = 'row'.")
   } else {
-    message("Sample data are stored in rows")
+    message("Sample data are stored in rows. If they are stored in column format, please run growth.read_data() with data.format = 'col'.")
   }
   if(!(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))){
     if(data.format == "col"){
@@ -109,10 +109,64 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
       stop("Could not find 'time' in row 1 of dataset.")
     }
   }
-  # Combine technical replicates
+
+  # subtract blank
+  if(subtract.blank){
+    #test if more than one time entity is present
+    time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
+    if(length(time.ndx)==1){
+      blank.ndx <- grep("blank", dat[1:nrow(dat),1], ignore.case = T)
+      if(length(blank.ndx)>0){
+        blank <- rowMeans(apply(dat[blank.ndx, 4:ncol(dat)], 1, as.numeric))
+        dat[(2:nrow(dat))[!((2:nrow(dat)) %in% blank.ndx)], 4:ncol(dat)] <- apply(dat[(2:nrow(dat))[!((2:nrow(dat)) %in% blank.ndx)], 4:ncol(dat)], 1, as.numeric)-blank
+      }
+    } else { # identify different datasets based on the occurence of multiple 'time' entities
+      # identify additional time entities
+      blank.ndx <- grep("blank", dat[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
+      if(length(blank.ndx)>0){
+        blank <- rowMeans(apply(dat[blank.ndx, 4:ncol(dat)], 1, as.numeric))
+        dat[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(dat)] <-
+            t(apply(dat[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(dat)], 1, as.numeric) - blank)
+        for (i in 2:(length(time.ndx))){
+          blank.ndx <- grep("blank", dat[if (is.na(time.ndx[i + 1])) {
+              (time.ndx[i] + 1):nrow(dat)
+            } else {
+              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+            }, 1], ignore.case = T) + time.ndx[i]
+          if(length(blank.ndx)>0){
+            blank <- rowMeans(apply(dat[blank.ndx, 4:ncol(dat)], 1, as.numeric))
+
+            dat[if (is.na(time.ndx[i + 1])) {
+              ((time.ndx[i] + 1):nrow(dat))[!((time.ndx[i] + 1):nrow(dat) %in% blank.ndx)]
+            } else {
+              ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
+            }, 4:ncol(dat)] <-
+              t(apply(dat[if (is.na(time.ndx[i + 1])) {
+                ((time.ndx[i] + 1):nrow(dat))[!((time.ndx[i] + 1):nrow(dat) %in% blank.ndx)]
+              } else {
+                ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
+              }, 4:ncol(dat)], 1, as.numeric) - blank)
+          }
+        } # end of for (i in 2:(length(time.ndx)))
+      } # if(length(blank.ndx)>0){
+    } # end of else {}
+  }
+
+  ### Combine technical replicates
   sample_names <- as.character(paste0(dat[2:nrow(dat),1], "...", dat[2:nrow(dat),2], "___", dat[2:nrow(dat),3]))
   conditions <-
     unique(gsub("\\.\\.\\..+___", "___", sample_names))
+  # remove time from samples in case of several time entities
+  time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
+  if(length(time.ndx)>1){
+    conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = T)]
+  }
+  # remove blanks from conditions
+  blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
+  if(length(blankcond.ndx)>1){
+    conditions <- conditions[-blankcond.ndx]
+  }
+
   remove <- c()
   for(i in 1:length(conditions)){
     ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
@@ -131,6 +185,13 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
     }
   }
   dat <- dat[-remove,]
+
+  # remove blank columns from dataset
+  blank.ndx <- grep("blank", dat[1:nrow(dat),1], ignore.case = T)
+  if(length(blank.ndx)>1){
+    dat <- dat[-blank.ndx, ]
+  }
+
   # Create time matrix
   time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
   if(length(time.ndx)==1){
@@ -140,7 +201,7 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
       nrow = nrow(dat)-1,
       byrow = T
     )))
-  } else {
+  } else { # identify different datasets based on the occurence of multiple 'time' entities
     time <- list()
     time[[1]] <- as.numeric(unlist(dat[time.ndx[1],4:ncol(dat)]))
     t.mat <- data.matrix(data.frame(matrix(
@@ -173,7 +234,7 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
   # Create data matrix
   if(length(time.ndx)==1){
     dat.mat <- data.frame(dat[(time.ndx[1]+1):nrow(dat),])
-  } else {
+  } else { # identify different datasets based on the occurence of multiple 'time' entities
     dat.mat <- data.frame(dat[(time.ndx[1]+1) : (time.ndx[2]-1), ])
     for (i in 2:(length(time.ndx))){
       dat.mat <- rbind(dat.mat,
@@ -185,6 +246,11 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
       )
     } # end of for (i in 2:(length(time.ndx)))
   } # end of else {}
+
+
+
+
+
   colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
 
   label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
