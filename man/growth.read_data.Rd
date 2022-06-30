@@ -4,49 +4,42 @@
 \alias{growth.read_data}
 \title{Read growth data in table format}
 \usage{
-growth.read_data(data, data.format = "col", csvsep = ";")
+growth.read_data(
+  data,
+  data.format = "col",
+  csvsep = ";",
+  sheet = NULL,
+  subtract.blank = T
+)
 }
 \arguments{
-\item{data}{vector of dependent variable (concentration of organisms).}
+\item{data}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'.
+In column format, the first three table rows contain
+\enumerate {
+\item sample description
+\item replicate number (\emph{optional}: followed by a letter to indicate technical replicates)
+\item concentration value (\emph{optional})
+}}
 
-\item{time}{vector of independent variable.}
+\item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \link{"col"}}
 
-\item{h}{width of the window (number of data).}
+\item{csvsep}{(Character) separator used in CSV file (ignored for other file types).}
 
-\item{quota}{part of window fits considered for the overall linear fit
-(relative to max. growth rate)}
+\item{sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files (\emph{optional}). Default: \code{";"}}
+
+\item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 }
 \value{
-object with parameters of the fit. The lag time is currently estimated
-as the intersection between the fit and the horizontal line with \eqn{y=y_0},
-where \code{y0} is the first value of the dependent variable. The intersection
-of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
-These identifieres and their assumptions may change in future versions.
+An R list object of class code{grodata} containing a time matrix, a data matrix, and an experimental design table. The code{grodata} object can be directly used to run code{growth.workflow} or, together with a code{grofit.control} object in code{growth.gcFit}, code{growth.gcFitLinear}, code{growth.gcFitModel}, code{growth.gcFitSpline}, or code{growth.gcBootSpline}
 }
 \description{
-Reads a table file or R dataframe object containing growth data and extracts sample information, samp
+\link{growth.read_data} reads a table file or R dataframe object containing growth data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
 }
 \details{
-The algorithm works as follows:
-\enumerate{
-\item Fit linear regressions to all subsets of \code{h} consecutive data
-points (sliding window). If for example \eqn{h=5}, fit a linear regression to points
-1 \dots 5, 2 \dots 6, 3 \dots 7 and so on. The method seeks the highest
-rate of exponential growth, so the dependent variable is of course
-log-transformed.
-\item Find the subset with the highest slope \eqn{b_{max}} and
-include also the data points of adjacent subsets that have a slope of
-at least \eqn{quota \cdot b_{max}},
-e.g. all data sets that have at least 95\\% of the maximum slope.
-\item Fit a new linear model to the extended data window identified in step 2.
+\if{html}{A data table compatible with \code{growth.read_data} looks like this:
+  \out{<div style="text-align: center">}\figure{Data_layout.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
+}
+\if{latex}{A data table compatible with \code{growth.read_data} looks like this:
+  \out{\begin{center}}\figure{Data_layout.png}\out{\end{center}}
 }
 }
-\references{
-Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
-Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
-}
-\seealso{
-Other fitting functions: 
-\code{\link{growth.gcFitLinear}()}
-}
-\concept{fitting functions}

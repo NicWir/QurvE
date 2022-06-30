@@ -13,11 +13,11 @@ summary.gcFitSpline <- function(object,...)
                                  "smooth.spline")
 
     if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
-      table <- c(0, rep(NA,length(contents.fitted.spline)-3), object$fitFlag, as.numeric(object$control$smooth.gc))
+      table <- c(0, rep(NA,length(contents.fitted.spline)-3), object$fitFlag, ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
     }
     else{
       table <- c(object$parameters$mu, object$parameters$lambda,  object$parameters$A-object$parameters$dY, object$parameters$A, object$parameters$dY, object$parameters$integral, as.character(object$fitFlag),
-                 as.numeric(object$control$smooth.gc))
+                 ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
     }
 
     table               <- data.frame(t(table))

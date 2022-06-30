@@ -1,40 +1,29 @@
 #' Read growth data in table format
 #'
-#' Reads a table file or R dataframe object containing growth data and extracts sample information, samp
+#' [growth.read_data] reads a table file or R dataframe object containing growth data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
 #'
-#' The algorithm works as follows:
-#' \enumerate{
-#'   \item Fit linear regressions to all subsets of \code{h} consecutive data
-#'     points (sliding window). If for example \eqn{h=5}, fit a linear regression to points
-#'     1 \dots 5, 2 \dots 6, 3 \dots 7 and so on. The method seeks the highest
-#'     rate of exponential growth, so the dependent variable is of course
-#'     log-transformed.
-#'   \item Find the subset with the highest slope \eqn{b_{max}} and
-#'     include also the data points of adjacent subsets that have a slope of
-#'     at least \eqn{quota \cdot b_{max}},
-#'     e.g. all data sets that have at least 95\% of the maximum slope.
-#'   \item Fit a new linear model to the extended data window identified in step 2.
+#' @param data An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'.
+#' In column format, the first three table rows contain
+#' \enumerate {
+#'    \item sample description
+#'    \item replicate number (_optional_: followed by a letter to indicate technical replicates)
+#'    \item concentration value (_optional_)
+#' }
+#' @param data.format (Character) "col" for samples in columns, or "row" for samples in rows. Default: ["col"]
+#' @param csvsep (Character) separator used in CSV file (ignored for other file types).
+#' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
+#' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
+#' @details
+#' \if{html}{A data table compatible with \code{growth.read_data} looks like this:
+#'   \out{<div style="text-align: center">}\figure{Data_layout.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
+#' }
+#' \if{latex}{A data table compatible with \code{growth.read_data} looks like this:
+#'   \out{\begin{center}}\figure{Data_layout.png}\out{\end{center}}
 #' }
 #'
-#' @param time vector of independent variable.
-#' @param data vector of dependent variable (concentration of organisms).
-#' @param h width of the window (number of data).
-#' @param quota part of window fits considered for the overall linear fit
-#'   (relative to max. growth rate)
-#'
-#' @return object with parameters of the fit. The lag time is currently estimated
-#' as the intersection between the fit and the horizontal line with \eqn{y=y_0},
-#' where \code{y0} is the first value of the dependent variable. The intersection
-#' of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
-#' These identifieres and their assumptions may change in future versions.
-#'
-#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
-#' Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
-#'
-#' @family fitting functions
-#'
+#' @return An R list object of class code{grodata} containing a time matrix, a data matrix, and an experimental design table. The code{grodata} object can be directly used to run code{growth.workflow} or, together with a code{grofit.control} object in code{growth.gcFit}, code{growth.gcFitLinear}, code{growth.gcFitModel}, code{growth.gcFitSpline}, or code{growth.gcBootSpline}
 #' @export
-#'
+#' @md
 growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NULL, subtract.blank  = T)
 {
   if (!is.character(data)) {
@@ -247,10 +236,6 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
     } # end of for (i in 2:(length(time.ndx)))
   } # end of else {}
 
-
-
-
-
   colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
 
   label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
@@ -265,9 +250,33 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
   dataset <- list("time" = t.mat,
                   "data" = dat.mat,
                   "expdesign" = expdesign)
+
+  class(dataset) <- "grodata"
   invisible(dataset)
   }
 
+#' Create a \code{grofit.control} object.
+#'
+#' A code{grofit.control} object is required to perform various computations on code{grodata} objects created with \code{growth.read_data}. Such object is created automatically as part of \code{growth.workflow}.
+#'
+#' @param neg.nan.act (Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
+#' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
+#' @param suppress.messages (Logical) Indicates wether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.
+#' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"b"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default: \code{"a"}.
+#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
+#' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
+#' @param log.y.gc (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
+#' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
+#' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
+#' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
+#' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
+#' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
+#' @param have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
+#' @param parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
+#' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
+#' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
+#' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
+#' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
 #'
 #' @export
 #'
@@ -1316,6 +1325,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
     min.density <- log(min(data))
   }
   bad.values <- ((is.na(data.log))|(is.infinite(data.log))|(is.na(time))|(is.na(data.log)))
+
   # /// remove bad values or stop program
   if (TRUE%in%bad.values){
     if (control$neg.nan.act==FALSE){

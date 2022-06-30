@@ -57,8 +57,4 @@ e.g. all data sets that have at least 95\\% of the maximum slope.
 Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
 Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
 }
-\seealso{
-Other fitting functions: 
-\code{\link{growth.read_data}()}
-}
 \concept{fitting functions}
