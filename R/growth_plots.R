@@ -1,3 +1,6 @@
+#'
+#' @export
+#'
 plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics"),
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
@@ -57,6 +60,9 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
   }
 }
 
+#'
+#' @export
+#'
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
                             colModel=ggplot2::alpha("forestgreen", 0.85), base_size=16,
                             plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
@@ -249,6 +255,9 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
   }
 }
 
+#'
+#' @export
+#'
 plot.drBootSpline <- function (drBootSpline,
                                pch = 1,
                                colData = 1,
@@ -410,6 +419,9 @@ plot.drBootSpline <- function (drBootSpline,
   } # /// else of if (drBootSpline$bootFlag==FALSE){
 }
 
+#'
+#' @export
+#'
 plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
 {
   # x an object of class drFit
@@ -423,6 +435,9 @@ plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
 
 }
 
+#'
+#' @export
+#'
 plot.drFitSpline <-
   function (drFitSpline,
             add = FALSE,
@@ -589,6 +604,9 @@ plot.drFitSpline <-
     }
   }
 
+#'
+#' @export
+#'
 plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
                               colSpline=ggplot2::alpha("dodgerblue3", 0.2),
                               cex=1, plot = TRUE, export = FALSE,
@@ -736,6 +754,9 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
   par(mfrow = c(1, 1))
 }
 
+#'
+#' @export
+#'
 plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spline = T, width = 8, log.y = T,
                              height = ifelse(deriv == TRUE, 8, 6), pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
                              plot = TRUE, export = FALSE, out.dir = NULL, ...)
@@ -900,6 +921,9 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
   }
 }
 
+#'
+#' @export
+#'
 plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, n.ybreaks = 6,
                         colors = NULL, basesize = 20, lwd = 1.1, plot = TRUE, export = FALSE,
                         height = ifelse(deriv==T,9, 6), width = 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15,
@@ -1248,6 +1272,9 @@ base_breaks <- function(n = 10){
   }
 }
 
+#'
+#' @export
+#'
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
                                                'mu.model', 'lambda.model', 'A.model',
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
@@ -1296,10 +1323,10 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                                                   "$"), nm)))
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
   # calculate average param values
-  mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param])) ) )
-  sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param])) ) )
+  mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) )
+  sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T) ) )
 
-  df <- data.frame(name = names(ndx.filt), mean = mean, sd = sd)
+  df <- data.frame(name = gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt)), mean = mean, sd = sd)
   df <- df[match(as.factor(df$name[order(nchar(df$name), df$name)]), df$name), ]
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
