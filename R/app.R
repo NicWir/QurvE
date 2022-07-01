@@ -53,12 +53,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                            mainPanel(
                              h1("Custom data layout"),
-
                              img(src = 'data_instruction.png',
                                  heigt = '100%',
-                                 width = '100%'),
-
-                             h4("Output 1"),
+                                 width = '100%')
                            ) # main panel
 
                   ), # Navbar 1
@@ -66,7 +63,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   # display contents of infile
                   # tableOutput('contents'),
                   tabPanel("Visualize",  h1("under construction")),
-                  tabPanel("Report",  h1("under construction"))
+                  tabPanel("Report",  h1("under construction")),
+                  tabPanel("About Us",
+                           mainPanel(
+                             h1("Authors"),
+                             'Nicolas Wirth, Jonathan Funk, Stefano Donatino',
+                             h1("Publications"),
+                             'featuring publications which use this tool'
+                           )
+                  )
+
                 )
 
                 # show plots
