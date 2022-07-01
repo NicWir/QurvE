@@ -10,9 +10,27 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   # load input file
                   tabPanel('Data',
                            sidebarPanel(
-                             fileInput(inputId = 'file1',
-                                       label = 'Choose xlsx file',
-                                       accept = c(".xlsx"))
+                             # select file type
+                             selectInput(inputId = "input_file_type",
+                                         label = "Select file type:",
+                                         choices = c("Excel (.xlsx)" = "xlsx",
+                                                     "csv" = "csv")),
+
+                             # upload excel
+                             conditionalPanel(
+                               condition = "input.input_file_type == 'xlsx'",
+                               fileInput(inputId = 'excel_file',
+                                         label = 'Choose Excel file',
+                                         accept = c('.xlsx', '.xls'))
+                             ),
+
+                             # upload csv
+                             conditionalPanel(
+                               condition = "input.input_file_type == 'csv'",
+                               fileInput(inputId = 'csv_file',
+                                         label = 'Choose csv file',
+                                         accept = c('.csv'))
+                             )
                            ), # sidebar panel
 
                            mainPanel(
@@ -42,9 +60,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 server <- function(input, output){
   # load input file
   data <- reactive({
-    req(input$file1)
+    req(input$excel_file)
 
-    inFile <- input$file1
+    inFile <- input$excel_file
 
     if(is.null(inFile))
       return(NULL)
