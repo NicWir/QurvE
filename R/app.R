@@ -74,6 +74,19 @@ server <- function(input, output){
     return(df)
   })
 
+  data <- reactive({
+    req(input$csv_file)
+
+    inFile <- input$csv_file
+
+    if(is.null(inFile))
+      return(NULL)
+
+    df <- read.csv(inFile$datapath, ".xlsx", sep="")
+
+    return(df)
+  })
+
   # render input data
   output$contents <- renderTable({
     data()
