@@ -15,7 +15,7 @@ growth.read_data(
 \arguments{
 \item{data}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'.
 In column format, the first three table rows contain
-\enumerate {
+\enumerate{
 \item sample description
 \item replicate number (\emph{optional}: followed by a letter to indicate technical replicates)
 \item concentration value (\emph{optional})
@@ -37,9 +37,10 @@ An R list object of class code{grodata} containing a time matrix, a data matrix,
 }
 \details{
 \if{html}{A data table compatible with \code{growth.read_data} looks like this:
-  \out{<div style="text-align: center">}\figure{Data_layout.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
+  \out{<div style="text-align: center">}\figure{Data_layout2.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
 }
 \if{latex}{A data table compatible with \code{growth.read_data} looks like this:
-  \out{\begin{center}}\figure{Data_layout.png}\out{\end{center}}
+  \out{\begin{center}}\figure{Data_layout2.png}\out{\end{center}}
 }
+\figure{Data_layout2.png}
 }

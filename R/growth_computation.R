@@ -4,7 +4,7 @@
 #'
 #' @param data An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'.
 #' In column format, the first three table rows contain
-#' \enumerate {
+#' \enumerate{
 #'    \item sample description
 #'    \item replicate number (_optional_: followed by a letter to indicate technical replicates)
 #'    \item concentration value (_optional_)
@@ -15,12 +15,12 @@
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #' @details
 #' \if{html}{A data table compatible with \code{growth.read_data} looks like this:
-#'   \out{<div style="text-align: center">}\figure{Data_layout.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
+#'   \out{<div style="text-align: center">}\figure{Data_layout2.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
 #' }
 #' \if{latex}{A data table compatible with \code{growth.read_data} looks like this:
-#'   \out{\begin{center}}\figure{Data_layout.png}\out{\end{center}}
+#'   \out{\begin{center}}\figure{Data_layout2.png}\out{\end{center}}
 #' }
-#'
+#' ![](Data_layout2.png "")
 #' @return An R list object of class code{grodata} containing a time matrix, a data matrix, and an experimental design table. The code{grodata} object can be directly used to run code{growth.workflow} or, together with a code{grofit.control} object in code{growth.gcFit}, code{growth.gcFitLinear}, code{growth.gcFitModel}, code{growth.gcFitSpline}, or code{growth.gcBootSpline}
 #' @export
 #' @md
@@ -257,7 +257,7 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
 
 #' Create a \code{grofit.control} object.
 #'
-#' A code{grofit.control} object is required to perform various computations on code{grodata} objects created with \code{growth.read_data}. Such object is created automatically as part of \code{growth.workflow}.
+#' A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{growth.read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
 #'
 #' @param neg.nan.act (Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
@@ -398,7 +398,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                         have.atleast = 6, parameter = 34, smooth.dr = NULL,
                         log.x.dr = FALSE, log.y.dr = FALSE, nboot.dr = 0, report = TRUE, report.dir = NULL, export = FALSE)
 {
-  if(!(class(data)=="list")){
+  if(!(class(data)=="list") && !(class(data)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time'")
     if (is.numeric(as.matrix(data[-1:-3])) == FALSE)

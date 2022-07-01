@@ -63,5 +63,5 @@ growth.control(
 \item{nboot.dr}{(Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.}
 }
 \description{
-A code{grofit.control} object is required to perform various computations on code{grodata} objects created with \code{growth.read_data}. Such object is created automatically as part of \code{growth.workflow}.
+A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{growth.read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
 }
