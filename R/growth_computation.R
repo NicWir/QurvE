@@ -11,6 +11,7 @@
 #' }
 #' @param data.format (Character) "col" for samples in columns, or "row" for samples in rows. Default: ["col"]
 #' @param csvsep (Character) separator used in CSV file (ignored for other file types).
+#' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
 #' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #' @details
@@ -24,7 +25,7 @@
 #' @return An R list object of class code{grodata} containing a time matrix, a data matrix, and an experimental design table. The code{grodata} object can be directly used to run code{growth.workflow} or, together with a code{grofit.control} object in code{growth.gcFit}, code{growth.gcFitLinear}, code{growth.gcFitModel}, code{growth.gcFitSpline}, or code{growth.gcBootSpline}
 #' @export
 #' @md
-growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NULL, subtract.blank  = T)
+growth.read_data <- function(data, data.format = "col", csvsep = ";", dec = ".", sheet = NULL, subtract.blank  = T)
 {
   if (!is.character(data)) {
     dat <- data
@@ -35,6 +36,7 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
         dat <-
           utils::read.csv(
             data,
+            dec = dec,
             sep = csvsep,
             header = F,
             stringsAsFactors = F,
@@ -51,6 +53,7 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
         dat <-
           utils::read.csv(
             data,
+            dec = dec,
             sep = "\t",
             header = F,
             stringsAsFactors = F,
@@ -64,6 +67,7 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", sheet = NU
         dat <-
           utils::read.table(
             data,
+            dec = dec,
             sep = "\t",
             header = F,
             stringsAsFactors = F,
