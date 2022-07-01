@@ -167,17 +167,20 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", dec = ".",
     conc <- dat[ndx.cond[1]+1,3]
     tech.rep <- suppressWarnings(as.numeric(unique(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
     tech.rep <- tech.rep[!is.na(tech.rep)]
-
-    for(j in 1:length(tech.rep)){
-      ndx.rep <- which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j]) + (ndx.cond[1]-1)
-      values <- apply(dat[ndx.rep+1, 4:ncol(dat)], 1, as.numeric)
-      means <- rowMeans(values)
-      dat[ndx.rep[1]+1, 4:ncol(dat)] <- means
-      dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
-      remove <- c(remove, ndx.rep[-1]+1)
+  if(length(tech.rep)>1){
+      for(j in 1:length(tech.rep)){
+        ndx.rep <- which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j]) + (ndx.cond[1]-1)
+        values <- apply(dat[ndx.rep+1, 4:ncol(dat)], 1, as.numeric)
+        means <- rowMeans(values)
+        dat[ndx.rep[1]+1, 4:ncol(dat)] <- means
+        dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
+        remove <- c(remove, ndx.rep[-1]+1)
+      }
     }
   }
-  dat <- dat[-remove,]
+  if(length(remove)>1){
+    dat <- dat[-remove,]
+  }
 
   # remove blank columns from dataset
   blank.ndx <- grep("blank", dat[1:nrow(dat),1], ignore.case = T)
@@ -299,7 +302,7 @@ growth.control <-
             model.type = c("logistic",
                            "richards", "gompertz", "gompertz.exp"),
             have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
-            parameter = 34, # parameter used for creating dose response curve. # 34 is µ determined with spline fit
+            parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
             smooth.dr = NULL,
             log.x.dr = FALSE,
             log.y.dr = FALSE,
