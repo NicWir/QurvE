@@ -383,7 +383,37 @@ growth.control <-
   grofit.control
 }
 
+#' Run a complete growth curve analysis workflow.
 #'
+#' \code{grofit.workflow()} runs \code{grofit.control()} to create a \code{grofit.control} object and then performs all computational operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
+#'
+#' @param time (optional) A matrix containing time values for each sample.
+#' @param data Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix and a \code{"data"} dataframe, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
+#' @param ec50 (Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
+#' @param mean.grp (\code{"all"}, a string vector, or a list of string vectors) Define groups to combine into common plots in the final report based on sample identifiers (if \code{report == TRUE}). Partial matches with sample/group names are accepted.
+#' @param mean.conc (A numeric vector, or a list of numeric vectors) Define concentrations to combine into common plots in the final report (if \code{report == TRUE}).
+#' @param neg.nan.act (Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
+#' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
+#' @param suppress.messages (Logical) Indicates wether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.
+#' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"b"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default: \code{"a"}.
+#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
+#' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
+#' @param log.y.gc (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
+#' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
+#' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
+#' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
+#' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
+#' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
+#' @param have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
+#' @param parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
+#' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
+#' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
+#' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
+#' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
+#' @param report (Logical) Create a PDF and HTML report after running all computations (\code{TRUE}) or not (\code{FALSE}).
+#' @param report.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time
+#' @param export (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
+#' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package.
 #' @export
 #'
 growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
