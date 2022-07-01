@@ -59,7 +59,60 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                            ) # main panel
 
                   ), # Navbar 1
-                  tabPanel("Computation", h1("under construction")),
+                  tabPanel("Computation",
+                           fluidRow(
+                             column(4,
+                                    mainPanel(
+                                      h2('Growth fit'),
+                                      h4('Options'),
+                                      checkboxInput(inputId = 'linear_regression',
+                                                    label = 'linear regression'),
+                                      checkboxInput(inputId = 'parametric_fit',
+                                                    label = 'parametric fit'),
+                                      checkboxInput(inputId = 'nonparametric_fit',
+                                                    label = 'nonparametric fit'),
+                                      checkboxInput(inputId = 'run_interactive_mode',
+                                                    label = 'run interactive mode')
+                                    ), # Growth fit
+
+
+                                    mainPanel(
+                                      h2('Dose-response Analysis'),
+                                      checkboxInput(inputId = 'perform_ec50',
+                                                    label = 'perform EC50 Analysis'),
+
+                                      selectInput(inputId = "format",
+                                                  label = "Response Parameter",
+                                                  choices = c("mu.linfit" = "mu.linfit",
+                                                              "other.fit" = "other.fit")),
+
+                                      checkboxInput(inputId = 'log_transform_concentration',
+                                                    label = 'log transform concentration'),
+
+                                      checkboxInput(inputId = 'log_transform_response',
+                                                    label = 'log transform response'),
+
+                                      checkboxInput(inputId = 'run_interactive_mode',
+                                                    label = 'run interactive mode'),
+
+                                      selectInput(inputId = "smoothing_factor",
+                                                  label = "smoothing factor",
+                                                  choices = c("NULL" = "NULL",
+                                                              "other" = "other")),
+
+                                    )
+                                  ),
+
+                             column(4,
+                                    checkboxInput(inputId = 'subtract_blanc',
+                                                  label = 'Subtract blank')
+                             )
+                           ),
+
+
+
+
+                           ),
                   # display contents of infile
                   # tableOutput('contents'),
                   tabPanel("Visualize",  h1("under construction")),
