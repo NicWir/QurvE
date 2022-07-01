@@ -14,21 +14,39 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              selectInput(inputId = "input_file_type",
                                          label = "Select file type:",
                                          choices = c("Excel (.xlsx)" = "xlsx",
-                                                     "csv" = "csv")),
+                                                     "csv (under construction...)" = "csv")),
 
-                             # upload excel
+                             # upload excel: conditional
                              conditionalPanel(
                                condition = "input.input_file_type == 'xlsx'",
                                fileInput(inputId = 'excel_file',
                                          label = 'Choose Excel file',
-                                         accept = c('.xlsx', '.xls'))
+                                         accept = c('.xlsx', '.xls')),
+
+                               selectInput(inputId = "sheet",
+                                           label = "Select Sheet",
+                                           choices = c("Sheet 1" = "Sheet1",
+                                                       "Sheet 2" = "Sheet2",
+                                                       "Sheet 3" = "Sheet3")),
+
+                               selectInput(inputId = "format",
+                                           label = "Select Format",
+                                           choices = c("Data in columns" = "data_in_columns",
+                                                       "Data in rows" = "data_in_rows")),
+
+                               checkboxInput(inputId = 'subtract_blanc',
+                                             label = 'Subtract blank'),
+
+                               checkboxInput(inputId = 'calibration',
+                                             label = 'Calibration (under construction)')
+
                              ),
 
-                             # upload csv
+                             # upload csv: conditional
                              conditionalPanel(
                                condition = "input.input_file_type == 'csv'",
                                fileInput(inputId = 'csv_file',
-                                         label = 'Choose csv file',
+                                         label = 'Choose csv file (under construction...)',
                                          accept = c('.csv'))
                              )
                            ), # sidebar panel
@@ -44,11 +62,11 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                            ) # main panel
 
                   ), # Navbar 1
-                  tabPanel("Computation", "under construction"),
+                  tabPanel("Computation", h1("under construction")),
                   # display contents of infile
                   # tableOutput('contents'),
-                  tabPanel("Visualize", "under construction"),
-                  tabPanel("Report", "under construction")
+                  tabPanel("Visualize",  h1("under construction")),
+                  tabPanel("Report",  h1("under construction"))
                 )
 
                 # show plots
@@ -58,7 +76,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 )
 
 server <- function(input, output){
-  # load input file
+  # load excel file
   data <- reactive({
     req(input$excel_file)
 
@@ -74,6 +92,7 @@ server <- function(input, output){
     return(df)
   })
 
+  # load csv file TODO: untested
   data <- reactive({
     req(input$csv_file)
 
