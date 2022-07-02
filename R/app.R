@@ -104,9 +104,131 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                   ),
 
                              column(4,
-                                    checkboxInput(inputId = 'subtract_blanc',
-                                                  label = 'Subtract blank')
-                             )
+                                    mainPanel(
+                                      h2('Linear fit'),
+
+                                      checkboxInput(inputId = 'log_transform_data',
+                                                    label = 'log-transform data'),
+
+                                      checkboxInput(inputId = 'log_transform_time',
+                                                    label = 'log-transform time'),
+
+                                      numericInput(
+                                        inputId = 't0_linear_fit',
+                                        label = 't0',
+                                        value = 0,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                      numericInput(
+                                        inputId = 'minimum_density_linear_fit',
+                                        label = 'minimum density',
+                                        value = 0,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                      numericInput(
+                                        inputId = 'R2_threshold',
+                                        label = 'R2 threshold',
+                                        value = 0.95,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                      numericInput(
+                                        inputId = 'RSD_threshold',
+                                        label = 'RSD threshold',
+                                        value = 0.1,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                      checkboxInput(inputId = 'custom_sliding_window_size',
+                                                    label = 'custom sliding window size'),
+
+                                      numericInput(
+                                        inputId = 'custum_sliding_window_size_value',
+                                        label = '',
+                                        value = 0.1,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+                                    )
+
+                             ),
+
+                             column(4,
+                                    mainPanel(
+                                      h2('Parametric fit'),
+                                      h4('Models:'),
+
+                                      checkboxInput(inputId = 'logistic',
+                                                    label = 'logistic'),
+
+                                      checkboxInput(inputId = 'richards',
+                                                    label = 'Richards'),
+
+                                      checkboxInput(inputId = 'gompertz',
+                                                    label = 'Gompertz'),
+
+                                      checkboxInput(inputId = 'extended_gompertz',
+                                                    label = 'extended Gompertz')
+
+                                    ),
+
+                                    mainPanel(
+                                      checkboxInput(inputId = 'log_transform_data_parametric',
+                                                    label = 'Log-transform data'),
+
+                                      checkboxInput(inputId = 'log_transform_time_parametric',
+                                                    label = 'Log-transform time')
+                                    )
+                                    ),
+                             column(4,
+                                    mainPanel(
+                                      h2('Nonparametric fit'),
+
+                                      checkboxInput(inputId = 'log_transform_data_nonparametric',
+                                                    label = 'Log-transform data'),
+
+                                      checkboxInput(inputId = 'log_transform_time_nonparametric',
+                                                    label = 'Log-transform time'),
+
+                                      numericInput(
+                                        inputId = 't0_nonparametric_fit',
+                                        label = 't0',
+                                        value = 0,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                      numericInput(
+                                        inputId = 'minimum_density_nonparametric_fit',
+                                        label = 'minimum density',
+                                        value = 0,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                      numericInput(
+                                        inputId = 'smoothing_factor',
+                                        label = 'smoothing factor',
+                                        value = 0.55,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                      numericInput(
+                                        inputId = 'number_of_bootstrappings',
+                                        label = 'number of bootstrappings',
+                                        value = 0,
+                                        min = NA,
+                                        max = NA,
+                                      ),
+
+                                    ))
                            ),
 
 
