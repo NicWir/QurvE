@@ -429,7 +429,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                         suppress.messages = FALSE, fit.opt = "a", min.density = NA,
                         log.x.gc = FALSE, log.y.gc = TRUE, log.y.model = FALSE,
                         lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.10,
-                        interactive = TRUE, nboot.gc = 100,
+                        interactive = TRUE, nboot.gc = 0,
                         smooth.gc= 0.55, model.type=c("logistic",
                                                       "richards","gompertz", "gompertz.exp"),
                         have.atleast = 6, parameter = 34, smooth.dr = NULL,
@@ -525,6 +525,8 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   control <- grofit$control
   time <- grofit$gcFit$raw.time
   data <- grofit$gcFit$raw.data
+  message("Save RData object")
+  save(grofit, file = paste(wd, "results.RData", sep = "/"))
   message("Render reports...")
   if(!is.null(report.dir)){
     wd <- paste0(getwd(), "/", report.dir)
