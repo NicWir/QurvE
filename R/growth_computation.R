@@ -525,15 +525,16 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   control <- grofit$control
   time <- grofit$gcFit$raw.time
   data <- grofit$gcFit$raw.data
-  message("Save RData object")
-  save(grofit, file = paste(wd, "results.RData", sep = "/"))
-  message("Render reports...")
   if(!is.null(report.dir)){
     wd <- paste0(getwd(), "/", report.dir)
   } else {
     wd <- paste(getwd(), "/Report.growth_", format(Sys.time(),
-                                            "%Y%m%d_%H%M%S"), sep = "")
+                                                   "%Y%m%d_%H%M%S"), sep = "")
   }
+  message("Save RData object")
+  save(grofit, file = paste(wd, "results.RData", sep = "/"))
+  message("Render reports...")
+
   dir.create(wd, showWarnings = F)
   for(i in 1:length(.libPaths())){
     QurvE.ndx <- grep("QurvE", list.files(.libPaths()[i]))
