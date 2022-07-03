@@ -67,6 +67,7 @@ The following parameters were used to fit the data:
 ## Growth fit results
 ```{r table_linear, echo=F, warning=F, message=F, results='asis'}
 if(any(c("a", "l") %in% control$fit.opt)){
+    if(!all(is.na(res.table.gc$lambda.linfit))){
   table_linear <- data.frame("Sample|<br>Replicate|<br>Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                              "µ~max~" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", paste(round(as.numeric(res.table.gc$mu.linfit), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.linfit),3))),
                              "t~D~" = paste(ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", paste(round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.linfit))/(as.numeric(res.table.gc$mu.linfit))^2)^2), 2)))),
@@ -80,6 +81,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
   table_linear <- as.data.frame(apply(table_linear, 2, function(x) str_replace_all(x, "NA ± NA", "")))
   table_linear[is.na(table_linear)] <- ""
   knit_table(table_linear, caption = "Exponential Fit", longtable = TRUE) %>% column_spec(column=1, width = "4cm")
+    }
 }
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
@@ -90,6 +92,7 @@ try(plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = paste
 `r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_model, echo=F, warning=F, message=F, results='asis', fig.align='center'}
 if(any(c("a", "b", "m") %in% control$fit.opt)){
+    if(!all(is.na(res.table.gc$lambda.model))){
     table_model <- data.frame("Sample|<br>Replicate|<br>Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                               "Model" = res.table.gc$used.model,
                              "µ~max~" = ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(as.numeric(res.table.gc$mu.model), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.model),3))),
@@ -109,6 +112,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     table_model <- as.data.frame(apply(table_model, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_model[is.na(table_model)] <- ""
     knit_table(table_model, caption = "Parametric Fit", longtable = TRUE) %>% column_spec(column=1, width = "4.0cm")
+    }
 }
 ```
 ```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
@@ -118,6 +122,7 @@ try(plot.parameter(grofit, param = "lambda.model", export = export, out.dir = pa
 `r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
 if(any(c("a", "b", "s") %in% control$fit.opt)){
+  if(!all(is.na(res.table.gc$lambda.spline))){
     table_spline <- data.frame("Sample|<br>Replicate|<br>Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                              "µ~max~" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",round(as.numeric(res.table.gc$mu.spline), 3)),
                               "t~D~" = paste(ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", round(log(2)/as.numeric(res.table.gc$mu.spline), 3))),
@@ -135,6 +140,7 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
   table_spline <- as.data.frame(apply(table_spline, 2, function(x) str_replace_all(x, "NA ± NA", "")))
   table_spline[is.na(table_spline)] <- ""
   knit_table(table_spline, caption = "Smooth Spline Fit", longtable = TRUE) %>% column_spec(column=1, width = "4.0cm")
+  }
 }
 ```
 ```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
