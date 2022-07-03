@@ -547,8 +547,6 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   require(knitr)
   rmarkdown::render(file, output_format = "all", output_dir = wd,
                     quiet = TRUE)
-  message("Save RData object")
-  save(grofit, file = paste(wd, "results.RData", sep = "/"))
   message(paste0("Files saved in: '", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
 }
