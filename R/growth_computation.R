@@ -537,6 +537,11 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
 #' @import knitr
 growth.report <- function(grofit, report.dir = NULL, ...)
   {
+  require(ggplot2, quietly = T)
+  require(doParallel, quietly = T)
+  require(foreach, quietly = T)
+  require(kableExtra, quietly = T)
+  require(knitr, quietly = T)
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit")
 
