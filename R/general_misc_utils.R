@@ -60,14 +60,15 @@ fast.write.csv <- function(dat, file, row.names = TRUE) {
   )
 }
 
-read_file <- function(filename, csvsep = ";"){
+read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
   if (file.exists(filename)) {
-    if (str_replace_all(filename, ".{1,}\\.", "") == "csv") {
+    if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
       dat <-
         utils::read.csv(
           filename,
+          dec = dec,
           sep = csvsep,
-          header = T,
+          header = F,
           stringsAsFactors = F,
           fill = T,
           na.strings = "",
@@ -75,15 +76,16 @@ read_file <- function(filename, csvsep = ";"){
           comment.char = "",
           check.names = F
         )
-    } else if (str_replace_all(filename, ".{1,}\\.", "") == "xls" |
-               str_replace(filename, ".{1,}\\.", "") == "xlsx") {
-      dat <- readxl::read_excel(filename)
-    } else if (str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
+               stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
+      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = sheet)))
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
       dat <-
         utils::read.csv(
           filename,
+          dec = dec,
           sep = "\t",
-          header = T,
+          header = F,
           stringsAsFactors = F,
           fill = T,
           na.strings = "",
@@ -91,12 +93,13 @@ read_file <- function(filename, csvsep = ";"){
           comment.char = "",
           check.names = F
         )
-    } else if (str_replace_all(filename, ".{1,}\\.", "") == "txt") {
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
       dat <-
         utils::read.table(
           filename,
+          dec = dec,
           sep = "\t",
-          header = T,
+          header = F,
           stringsAsFactors = F,
           fill = T,
           na.strings = "",
@@ -110,8 +113,7 @@ read_file <- function(filename, csvsep = ";"){
              Supported formats are: \\.txt (tab delimited), \\.csv (delimiters can be specified with the argument \"csvsep = \", \\.tsv, \\.xls, and \\.xlsx"
       )
     }
-  } # if (file.exists(filename))
-  else {
+  } else {
     stop(paste0("File \"", filename, "\" does not exist."), call. = F)
   }
   return(dat)

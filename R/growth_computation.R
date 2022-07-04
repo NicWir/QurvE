@@ -25,67 +25,14 @@
 #' @return An R list object of class code{grodata} containing a time matrix, a data matrix, and an experimental design table. The code{grodata} object can be directly used to run code{growth.workflow} or, together with a code{grofit.control} object in code{growth.gcFit}, code{growth.gcFitLinear}, code{growth.gcFitModel}, code{growth.gcFitSpline}, or code{growth.gcBootSpline}
 #' @export
 #' @md
-growth.read_data <- function(data, data.format = "col", csvsep = ";", dec = ".", sheet = NULL, subtract.blank  = T)
+growth.read_data <- function(data.density, data.fluoro1 = NA, data.fluoro2 = NA, data.format = "col", csvsep = ";", dec = ".", sheet = 1, subtract.blank  = T)
 {
-  if (!is.character(data)) {
-    dat <- data
+  # Load density data
+  if (!is.character(data.density)) {
+    dat <- data.density
   } else {
     # Read table file
-    if (file.exists(data)) {
-      if (stringr::str_replace_all(data, ".{1,}\\.", "") == "csv") {
-        dat <-
-          utils::read.csv(
-            data,
-            dec = dec,
-            sep = csvsep,
-            header = F,
-            stringsAsFactors = F,
-            fill = T,
-            na.strings = "",
-            quote = "",
-            comment.char = "",
-            check.names = F
-          )
-      } else if (stringr::str_replace_all(data, ".{1,}\\.", "") == "xls" |
-                 stringr::str_replace(data, ".{1,}\\.", "") == "xlsx") {
-        dat <- data.frame(suppressMessages(readxl::read_excel(data, col_names = F, sheet = sheet)))
-      } else if (stringr::str_replace_all(data, ".{1,}\\.", "") == "tsv") {
-        dat <-
-          utils::read.csv(
-            data,
-            dec = dec,
-            sep = "\t",
-            header = F,
-            stringsAsFactors = F,
-            fill = T,
-            na.strings = "",
-            quote = "",
-            comment.char = "",
-            check.names = F
-          )
-      } else if (stringr::str_replace_all(data, ".{1,}\\.", "") == "txt") {
-        dat <-
-          utils::read.table(
-            data,
-            dec = dec,
-            sep = "\t",
-            header = F,
-            stringsAsFactors = F,
-            fill = T,
-            na.strings = "",
-            quote = "",
-            comment.char = "",
-            check.names = F
-          )
-      } else {
-        stop(
-          "No compatible file format provided.
-             Supported formats are: \\.txt (tab delimited), \\.csv (delimiters can be specified with the argument \"csvsep = \", \\.tsv, \\.xls, and \\.xlsx"
-        )
-      }
-    } else {
-      stop(paste0("File \"", data, "\" does not exist."), call. = F)
-    }
+    dat <- read_file(data.density, csvsep=csvsep, dec=dec, sheet=sheet)
   }
   if(data.format == "col"){
     dat <- t(dat)
@@ -97,96 +44,160 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", dec = ".",
   }
   if(!(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))){
     if(data.format == "col"){
-      stop("Could not find 'time' in column 1 of dataset.")
+      stop("Could not find 'time' in column 1 of data.density")
     } else {
-      stop("Could not find 'time' in row 1 of dataset.")
+      stop("Could not find 'time' in row 1 of data.density")
     }
+  }
+  # Load fluorescence 1 data
+  if(length(data.fluoro1)>1){
+    if (!is.character(data.fluoro1)) {
+      fluoro1 <- data.fluoro1
+    } else {
+      # Read table file
+      fluoro1 <- read_file(data.fluoro1, csvsep=csvsep, dec=dec, sheet=sheet)
+    }
+    if(data.format == "col"){
+      fluoro1 <- t(fluoro1)
+    }
+    if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
+      if(data.format == "col"){
+        stop("Could not find 'time' in column 1 of data.fluoro1")
+      } else {
+        stop("Could not find 'time' in row 1 of data.fluoro1")
+      }
+    }
+  } else {
+    fluoro1 <- NA
+  }
+  # Load fluorescence 2 data
+  if(length(data.fluoro2)>1){
+    if (!is.character(data.fluoro2)) {
+      fluoro2 <- data.fluoro2
+    } else {
+      # Read table file
+      fluoro2 <- read_file(data.fluoro2, csvsep=csvsep, dec=dec, sheet=sheet)
+    }
+    if(data.format == "col"){
+      fluoro2 <- t(fluoro2)
+    }
+    if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
+      if(data.format == "col"){
+        stop("Could not find 'time' in column 1 of data.fluoro2")
+      } else {
+        stop("Could not find 'time' in row 1 of data.fluoro2")
+      }
+    }
+  } else {
+    fluoro2 <- NA
   }
 
   # subtract blank
   if(subtract.blank){
-    #test if more than one time entity is present
-    time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
-    if(length(time.ndx)==1){
-      blank.ndx <- grep("blank", dat[1:nrow(dat),1], ignore.case = T)
-      if(length(blank.ndx)>0){
-        blank <- rowMeans(apply(dat[blank.ndx, 4:ncol(dat)], 1, as.numeric))
-        dat[(2:nrow(dat))[!((2:nrow(dat)) %in% blank.ndx)], 4:ncol(dat)] <- apply(dat[(2:nrow(dat))[!((2:nrow(dat)) %in% blank.ndx)], 4:ncol(dat)], 1, as.numeric)-blank
-      }
-    } else { # identify different datasets based on the occurence of multiple 'time' entities
-      # identify additional time entities
-      blank.ndx <- grep("blank", dat[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
-      if(length(blank.ndx)>0){
-        blank <- rowMeans(apply(dat[blank.ndx, 4:ncol(dat)], 1, as.numeric))
-        dat[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(dat)] <-
-            t(apply(dat[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(dat)], 1, as.numeric) - blank)
-        for (i in 2:(length(time.ndx))){
-          blank.ndx <- grep("blank", dat[if (is.na(time.ndx[i + 1])) {
-              (time.ndx[i] + 1):nrow(dat)
-            } else {
-              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
-            }, 1], ignore.case = T) + time.ndx[i]
-          if(length(blank.ndx)>0){
-            blank <- rowMeans(apply(dat[blank.ndx, 4:ncol(dat)], 1, as.numeric))
+    subtract_blank <- function(df){
+      #test if more than one time entity is present
+      time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
+      if(length(time.ndx)==1){
+        blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
+        if(length(blank.ndx)>0){
+          blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = T)
+          df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric)-blank
+        }
+      } else { # identify different datasets based on the occurence of multiple 'time' entities
+        # identify additional time entities
+        blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
+        if(length(blank.ndx)>0){
+          blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
+          df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)] <-
+              t(apply(df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric) - blank)
+          for (i in 2:(length(time.ndx))){
+            blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 1])) {
+                (time.ndx[i] + 1):nrow(df)
+              } else {
+                (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+              }, 1], ignore.case = T) + time.ndx[i]
+            if(length(blank.ndx)>0){
+              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
 
-            dat[if (is.na(time.ndx[i + 1])) {
-              ((time.ndx[i] + 1):nrow(dat))[!((time.ndx[i] + 1):nrow(dat) %in% blank.ndx)]
-            } else {
-              ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-            }, 4:ncol(dat)] <-
-              t(apply(dat[if (is.na(time.ndx[i + 1])) {
-                ((time.ndx[i] + 1):nrow(dat))[!((time.ndx[i] + 1):nrow(dat) %in% blank.ndx)]
+              df[if (is.na(time.ndx[i + 1])) {
+                ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
               } else {
                 ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-              }, 4:ncol(dat)], 1, as.numeric) - blank)
-          }
-        } # end of for (i in 2:(length(time.ndx)))
-      } # if(length(blank.ndx)>0){
-    } # end of else {}
+              }, 4:ncol(df)] <-
+                t(apply(df[if (is.na(time.ndx[i + 1])) {
+                  ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
+                } else {
+                  ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
+                }, 4:ncol(df)], 1, as.numeric) - blank)
+            }
+          } # end of for (i in 2:(length(time.ndx)))
+        } # if(length(blank.ndx)>0){
+      } # end of else {}
+      return(df)
+    }
+    dat <- subtract_blank(dat)
+    if(length(data.fluoro1)>1)     fluoro1 <- subtract_blank(df=fluoro1)
+    if(length(data.fluoro2)>1)     fluoro2 <- subtract_blank(df=fluoro2)
   }
 
   ### Combine technical replicates
-  sample_names <- as.character(paste0(dat[2:nrow(dat),1], "...", dat[2:nrow(dat),2], "___", dat[2:nrow(dat),3]))
-  conditions <-
-    unique(gsub("\\.\\.\\..+___", "___", sample_names))
-  # remove time from samples in case of several time entities
-  time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
-  if(length(time.ndx)>1){
-    conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = T)]
-  }
-  # remove blanks from conditions
-  blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
-  if(length(blankcond.ndx)>1){
-    conditions <- conditions[-blankcond.ndx]
-  }
+  combine_techrep <- function(dat){
+    sample_names <- as.character(paste0(dat[2:nrow(dat),1], "...", dat[2:nrow(dat),2], "___", dat[2:nrow(dat),3]))
+    conditions <-
+      unique(gsub("\\.\\.\\..+___", "___", sample_names))
+    # remove time from samples in case of several time entities
+    time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
+    if(length(time.ndx)>1){
+      conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = T)]
+    }
+    # remove blanks from conditions
+    blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
+    if(length(blankcond.ndx)>1){
+      conditions <- conditions[-blankcond.ndx]
+    }
 
-  remove <- c()
-  for(i in 1:length(conditions)){
-    ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
-    name <- dat[ndx.cond[1]+1,1]
-    conc <- dat[ndx.cond[1]+1,3]
-    tech.rep <- suppressWarnings(as.numeric(unique(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
-    tech.rep <- tech.rep[!is.na(tech.rep)]
-  if(length(tech.rep)>1){
-      for(j in 1:length(tech.rep)){
-        ndx.rep <- which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j]) + (ndx.cond[1]-1)
-        values <- apply(dat[ndx.rep+1, 4:ncol(dat)], 1, as.numeric)
-        means <- rowMeans(values)
-        dat[ndx.rep[1]+1, 4:ncol(dat)] <- means
-        dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
-        remove <- c(remove, ndx.rep[-1]+1)
+    remove <- c()
+    for(i in 1:length(conditions)){
+      ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
+      name <- dat[ndx.cond[1]+1,1]
+      conc <- dat[ndx.cond[1]+1,3]
+      tech.rep <- suppressWarnings(as.numeric(unique(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
+      tech.rep <- tech.rep[!is.na(tech.rep)]
+    if(length(tech.rep)>1){
+        for(j in 1:length(tech.rep)){
+          ndx.rep <- ndx.cond[which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j])]
+          if(length(ndx.rep)>1){
+            values <- apply(dat[ndx.rep+1, 4:ncol(dat)], 1, as.numeric)
+            means <- rowMeans(values)
+            dat[ndx.rep[1]+1, 4:ncol(dat)] <- means
+            dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
+            remove <- c(remove, ndx.rep[-1]+1)
+          } else {
+            dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
+          }
+        }
       }
     }
+    if(length(remove)>1){
+      dat <- dat[-remove,]
+    }
+    return(dat)
   }
-  if(length(remove)>1){
-    dat <- dat[-remove,]
-  }
+  dat <- combine_techrep(dat)
+  if(length(data.fluoro1)>1)     fluoro1 <- combine_techrep(dat=fluoro1)
+  if(length(data.fluoro2)>1)     fluoro2 <- combine_techrep(dat=fluoro2)
 
   # remove blank columns from dataset
-  blank.ndx <- grep("blank", dat[1:nrow(dat),1], ignore.case = T)
-  if(length(blank.ndx)>1){
-    dat <- dat[-blank.ndx, ]
+  remove_blank <- function(dat){
+    blank.ndx <- grep("blank", dat[1:nrow(dat),1], ignore.case = T)
+    if(length(blank.ndx)>1){
+      dat <- dat[-blank.ndx, ]
+    }
+    return(dat)
   }
+  dat <- remove_blank(dat)
+  if(length(data.fluoro1)>1)     fluoro1 <- remove_blank(dat=fluoro1)
+  if(length(data.fluoro2)>1)     fluoro2 <- remove_blank(dat=fluoro2)
 
   # Create time matrix
   time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
@@ -227,23 +238,31 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", dec = ".",
     } # end of for (i in 2:(length(time.ndx)))
   } # end of else {}
 
-  # Create data matrix
-  if(length(time.ndx)==1){
-    dat.mat <- data.frame(dat[(time.ndx[1]+1):nrow(dat),])
-  } else { # identify different datasets based on the occurence of multiple 'time' entities
-    dat.mat <- data.frame(dat[(time.ndx[1]+1) : (time.ndx[2]-1), ])
-    for (i in 2:(length(time.ndx))){
-      dat.mat <- rbind(dat.mat,
-                       data.frame(dat[ if (is.na(time.ndx[i + 1])) {
-                         (time.ndx[i]+1) : nrow(dat)
-                       } else {
-                         (time.ndx[i]+1) : (time.ndx[i+1] - 1)
-                       } , ])
-      )
-    } # end of for (i in 2:(length(time.ndx)))
-  } # end of else {}
+  # Create data matrix for density values
+  create_datmat <- function(dat, time.ndx){
+    if(length(time.ndx)==1){
+      dat.mat <- data.frame(dat[(time.ndx[1]+1):nrow(dat),])
+    } else { # identify different datasets based on the occurence of multiple 'time' entities
+      dat.mat <- data.frame(dat[(time.ndx[1]+1) : (time.ndx[2]-1), ])
+      for (i in 2:(length(time.ndx))){
+        dat.mat <- rbind(dat.mat,
+                         data.frame(dat[ if (is.na(time.ndx[i + 1])) {
+                           (time.ndx[i]+1) : nrow(dat)
+                         } else {
+                           (time.ndx[i]+1) : (time.ndx[i+1] - 1)
+                         } , ])
+        )
+      } # end of for (i in 2:(length(time.ndx)))
+    } # end of else {}
+    return(dat.mat)
+  }
+  dat.mat <- create_datmat(dat, time.ndx=time.ndx)
+  if(length(data.fluoro1)>1){fluoro1.mat <- create_datmat(dat=fluoro1, time.ndx=time.ndx)}else{fluoro1.mat <- NA}
+  if(length(data.fluoro2)>1){fluoro2.mat <- create_datmat(dat=fluoro2, time.ndx=time.ndx)}else{fluoro2.mat <- NA}
 
   colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(length(data.fluoro1)>1)     colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(length(data.fluoro2)>1)    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
 
   label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
   condition <- dat.mat[, 1]
@@ -255,7 +274,9 @@ growth.read_data <- function(data, data.format = "col", csvsep = ";", dec = ".",
   dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
 
   dataset <- list("time" = t.mat,
-                  "data" = dat.mat,
+                  "density" = dat.mat,
+                  "fluorescence1" = fluoro1.mat,
+                  "fluorescence2" = fluoro2.mat,
                   "expdesign" = expdesign)
 
   class(dataset) <- "grodata"
@@ -395,7 +416,7 @@ growth.control <-
 #' \code{grofit.workflow()} runs \code{grofit.control()} to create a \code{grofit.control} object and then performs all computational operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
 #'
 #' @param time (optional) A matrix containing time values for each sample.
-#' @param data Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix and a \code{"data"} dataframe, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
+#' @param data Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
 #' @param ec50 (Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
 #' @param mean.grp (\code{"all"}, a string vector, or a list of string vectors) Define groups to combine into common plots in the final report based on sample identifiers (if \code{report == TRUE}). Partial matches with sample/group names are accepted.
 #' @param mean.conc (A numeric vector, or a list of numeric vectors) Define concentrations to combine into common plots in the final report (if \code{report == TRUE}).
@@ -444,8 +465,10 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
       stop("Need a logical value for 'ec50'")
   } else {
     time <- data$time
-    data <- data$data
-    expdesign <- data$expdesign
+    if(!is.null(data$expdesign)) expdesign <- data$expdesign
+    if(!is.null(data$fluorescence1)) fluorescence1 <- data$fluorescence1
+    if(!is.null(data$fluorescence2)) fluorescence2 <- data$fluorescence2
+    data <- data$density
   }
   control <- growth.control(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                             suppress.messages = suppress.messages, fit.opt = fit.opt, min.density = min.density,
@@ -507,12 +530,13 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
 
 #'
 #' @export
-#'
+#' @import ggplot2
+#' @import doParallel
+#' @import foreach
+#' @import kableExtra
+#' @import knitr
 growth.report <- function(grofit, report.dir = NULL, ...)
   {
-  require(ggplot2, quietly = T)
-  require(doParallel, quietly = T)
-  require(foreach)
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit")
 
@@ -543,8 +567,6 @@ growth.report <- function(grofit, report.dir = NULL, ...)
     }
   }
   file <- paste0(Report.wd, "/Report_Growth.Rmd")
-  require(kableExtra)
-  require(knitr)
   rmarkdown::render(file, output_format = "all", output_dir = wd,
                     quiet = TRUE)
   message(paste0("Files saved in: '", wd, "'"))
@@ -744,7 +766,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
           answer_satisfied <- "n"
           reliability_tag_nonpara <- NA
           while ("n" %in% answer_satisfied) {
-            plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, colData=1, cex=1)
+            plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE,slope = T, colData=1, cex=1, plot=T, export=F)
             answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
             if ("n" %in% answer_satisfied) {
                   test_answer <- readline("Enter: smooth.gc, t0, min.density                                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.density (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
