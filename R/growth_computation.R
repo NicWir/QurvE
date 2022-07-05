@@ -443,7 +443,10 @@ growth.control <-
 #' @param export (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package.
 #' @export
-#' @import ggplot2
+#' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                              mean.grp = "all", mean.conc = NA,
                         neg.nan.act = FALSE, clean.bootstrap = TRUE,
