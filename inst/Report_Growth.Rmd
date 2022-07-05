@@ -190,7 +190,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
           data = fit_df,
           size = 2, shape = 21, stroke=0.25, fill = "firebrick", color = alpha("black", 0.7)) +
         scale_y_continuous(trans = 'log',
-                           breaks = base_breaks(),
+                           breaks = QurvE:::base_breaks(),
                            expand = expansion(mult = c(0.05, 0.05)))
       
       p.yrange.end <- exp(ggplot_build(p)$layout$panel_params[[1]]$y.range[2])
@@ -456,7 +456,7 @@ plot.ggSpline   <- function(){
        df.mu <- data.frame(spline(x$spline.deriv1$x, x$spline.deriv1$y))
        #add missing time values due to min.density and t0
         df.mu <-
-          bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
+          dplyr::bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
                     df.mu)
        
        p.mu <- ggplot(df.mu, aes(x=x, y=y)) + 

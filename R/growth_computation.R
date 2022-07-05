@@ -454,7 +454,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                         neg.nan.act = FALSE, clean.bootstrap = TRUE,
                         suppress.messages = FALSE, fit.opt = "a", min.density = NA,
                         log.x.gc = FALSE, log.y.gc = TRUE, log.y.model = FALSE,
-                        lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.10,
+                        lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.10, lin.dY = 0.05,
                         interactive = TRUE, nboot.gc = 0,
                         smooth.gc= 0.55, model.type=c("logistic",
                                                       "richards","gompertz", "gompertz.exp"),
@@ -488,7 +488,7 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
   out.drFit <- NA
 
   # /// fit of growth curves -----------------------------------
-  out.gcFit <- growth.gcFit(time, data, control, t0, lin.h, lin.R2, lin.RSD)
+  out.gcFit <- growth.gcFit(time, data, control, t0, lin.h, lin.R2, lin.RSD, lin.dY)
 
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
@@ -594,7 +594,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
 #'
 #' @export
 #'
-growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.05)
+growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.05, lin.dY = 0.05)
 {
   # /// check if start density values are above min.density in all samples
   max.density <- unlist(lapply(1:nrow(data), function (x) max(as.numeric(as.matrix(data[x,-1:-3]))[!is.na(as.numeric(as.matrix(data[x,-1:-3])))])))
@@ -649,7 +649,7 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
     }
     # /// Linear regression on log-transformed data
     if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
-      fitlinear          <- growth.gcFitLinear(acttime, actwell, gcID = gcID, h = lin.h, control = control, t0 = t0, R2 = lin.R2, RSD = lin.RSD)
+      fitlinear          <- growth.gcFitLinear(acttime, actwell, gcID = gcID, h = lin.h, control = control, t0 = t0, R2 = lin.R2, RSD = lin.RSD, fit.dY = lin.dY)
       fitlinear.all[[i]] <- fitlinear
     }
     else{
@@ -1358,6 +1358,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
 #' @param R2
 #' @param RSD
 #' @param control
+#' @param fit.dY (Numeric) Enter the minimum percentage of density increase that a linear regression should cover.
 #'
 #' @return object with parameters of the fit. The lag time is currently estimated
 #' as the intersection between the fit and the horizontal line with \eqn{y=y_0},
@@ -1372,7 +1373,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
 #'
 #' @export
 #'
-growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL, quota = 0.95, R2 = 0.95, RSD = 0.05, control)
+growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL, quota = 0.95, R2 = 0.95, RSD = 0.05, fit.dY = 0.05, control)
   {
   bad.values <- ((is.na(time))|(is.na(data)) | data < 0)
   data.in <- data <- data[!bad.values]
@@ -1442,8 +1443,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
   }
   if (any(duplicated(time))) stop("time variable must not contain duplicated values")
 
+  # store filtered and transformed data
   obs <- data.frame(time, data)
   obs$ylog <- data.log
+  max.density <- max(obs$data)
+  dY.total <- max.density - obs$data[1]
 
   if(max(data.in) < 1.5*data.in[1]){
     if(control$suppress.messages==F) message("No significant growth detected (with all values below 1.5 * start_value).")
@@ -1460,7 +1464,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
   N <- nrow(obs)
 
   if(N > h && N>3){
-      ## repeat for all windows and save results in 'ret'
+      # Perform linear regression for all N windows and save results in 'ret'
       ret <- matrix(0, nrow = N - h, ncol = 6)
       for(i in 1:(N - h)) {
         ret[i, ] <- c(i, with(obs, (lm_parms(lm_window(time, ylog, i0 = i, h = h)))))
@@ -1468,6 +1472,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
       colnames(ret) <- c("index", "y-intersect", "slope", "X4", "R2", "RSD")
       # add time and density values as columns in ret
       ret <- data.frame(ret, time = time[ret[,1]], data = obs$ylog[ret[,1]])
+      # add dY, i.e., the percentage of density that a regression window covers, to ret
+      ret <- data.frame(ret, dY = ((obs$data[match(ret[, "data"], obs$ylog)+(h-1)] - obs$data[match(ret[, "data"], obs$ylog)]) / dY.total))
+
       bad <- is.na(ret[,5]) | is.na(ret[,6])
       ret <- ret[!bad,]
       if(nrow(ret)<2){
@@ -1487,6 +1494,10 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
           } else{
             ret.check <- ret[which.min(abs(time-t0)):nrow(ret),] # consider only slopes from defined t0
           }
+
+        #Consider only slopes that span at least fit.dY
+        ret.check <- ret.check[ret.check[,"dY"]>=fit.dY, ]
+
 
           if(nrow(ret.check)<2){
             gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
