@@ -199,6 +199,8 @@ growth.read_data <- function(data.density, data.fluoro1 = NA, data.fluoro2 = NA,
   if(length(data.fluoro1)>1)     fluoro1 <- remove_blank(dat=fluoro1)
   if(length(data.fluoro2)>1)     fluoro2 <- remove_blank(dat=fluoro2)
 
+  # Remove columns with NA measurements in all samples
+  dat <- dat[, which(unlist(lapply(1:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
   # Create time matrix
   time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
   if(length(time.ndx)==1){
@@ -595,7 +597,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
 growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.05)
 {
   # /// check if start density values are above min.density in all samples
-  max.density <- unlist(lapply(1:nrow(data), function (x) max(as.numeric(as.matrix(data[x,-1:-3])))))
+  max.density <- unlist(lapply(1:nrow(data), function (x) max(as.numeric(as.matrix(data[x,-1:-3]))[!is.na(as.numeric(as.matrix(data[x,-1:-3])))])))
   if(is.numeric(control$min.density) && control$min.density != 0){
     if(!is.na(control$min.density) && all(as.numeric(max.density) < control$min.density)){
       stop(paste0("The chosen global start density value (min.density) is larger than every value in your dataset.\nThe maximum start value in your dataset is: ",
