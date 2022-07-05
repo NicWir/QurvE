@@ -451,7 +451,7 @@ growth.control <-
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
-#'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
+#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 growth.workflow <- function (time,
                              data,
                              t0 = 0,
@@ -579,7 +579,7 @@ growth.workflow <- function (time,
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
-#'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
+#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 #' @importFrom doParallel registerDoParallel
 #' @import foreach
 #' @import kableExtra
@@ -642,7 +642,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
-#'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
+#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 growth.gcFit <- function(time, data, control=growth.control(), t0 = 0, lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.05, lin.dY = 0.05)
 {
   # /// check if start density values are above min.density in all samples
@@ -1063,7 +1063,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
           }
           else{
             message(paste(rep(".", lmax + 3 - l[i])),
-                    " ERROR in nls(). For further information see help(gcFitModel)")
+                    " ERROR in nls(). For further information see help(growth.gcFitModel)")
           }
         }
         if (FALSE %in% is.null(AIC)) {
