@@ -448,7 +448,7 @@ growth.control <-
 #'
 #' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{growth.report()}.
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
@@ -576,7 +576,7 @@ growth.workflow <- function (time,
 #' }
 #'
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
@@ -639,7 +639,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
 #' @return A \code{gcFit} object that contains all growth fitting results, compatible with various plotting functions of the QurvE package.
 #'
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
