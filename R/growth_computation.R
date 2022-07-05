@@ -450,7 +450,7 @@ growth.control <-
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 growth.workflow <- function (time,
                              data,
@@ -578,7 +578,7 @@ growth.workflow <- function (time,
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 #' @importFrom doParallel registerDoParallel
 #' @import foreach
@@ -641,7 +641,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 growth.gcFit <- function(time, data, control=growth.control(), t0 = 0, lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.05, lin.dY = 0.05)
 {

@@ -91,7 +91,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
                             colModel=ggplot2::alpha("forestgreen", 0.85), base_size=16,
@@ -854,7 +854,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spline = T, log.y = T,
                              pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
@@ -1045,7 +1045,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, n.ybreaks = 6,
                         colors = NULL, basesize = 20, lwd = 1.1, plot = TRUE, export = FALSE,
@@ -1074,11 +1074,17 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
   }
   # remove conditions with fitFlag = FALSE in all replicates
-  ndx.filt <- unique(lapply(1:length(nm), function(i) grep(paste0("^",
-                                                                  gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[i], " \\| "))[1])),
-                                                                  ".+[[:space:]]",
-                                                                  unlist(str_split(nm[i], " \\| "))[3],
-                                                                  "$"), sample.nm)))
+  ndx.filt.nm <- unique(lapply(1:length(sample.nm), function(i)which(gsub(" \\| .+", "", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1])))))
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.nm)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.nm[[j]]), function(i) ndx.filt.nm[[j]][grep(paste0("^",
+                                                                                                         gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.nm[[j]][i]], " \\| "))[1])),
+                                                                                                         ".+[[:space:]]",
+                                                                                                         unlist(str_split(sample.nm[ndx.filt.nm[[j]][i]], " \\| "))[3],
+                                                                                                         "$"), sample.nm[ndx.filt.nm[[j]]])]))
+  }
+  ndx.filt <- unlist(filter.ls, recursive = F)
+
   for(i in 1:length(ndx.filt)){
     if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
       nm <- intersect(nm, sample.nm[-ndx.filt[[i]]])
@@ -1417,7 +1423,7 @@ base_breaks <- function(n = 10){
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
                                                'mu.model', 'lambda.model', 'A.model',
