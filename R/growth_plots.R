@@ -91,7 +91,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'
 #' @export plot.gcFitModel
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
@@ -124,7 +124,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
                      "fit.data" = gcFittedModel[["fit.data"]])
 
     p <-    ggplot(df, aes(x=time, y=data)) +
-      geom_line(aes(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
+      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
       xlab("Time") +
       ylab(label = ifelse(gcFittedModel$control$log.y.gc == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
       theme_classic(base_size = 16) +
@@ -859,7 +859,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'
 #' @export plot.gcFitSpline
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
@@ -1051,7 +1051,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 #'
 #' @export plot.grofit
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
@@ -1433,7 +1433,7 @@ base_breaks <- function(n = 10){
 #'
 #' @export plot.parameter
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
