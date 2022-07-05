@@ -526,8 +526,8 @@ growth.workflow <- function (time,
                  drFit = out.drFit, expdesign = expdesign, control = control)
   class(grofit) <- "grofit"
 
-  if(!is.null(report.dir)){
-    wd <- paste0(getwd(), "/", report.dir)
+  if(!is.null(out.dir)){
+    wd <- paste0(getwd(), "/", out.dir)
   } else {
     wd <- paste(getwd(), "/Report.growth_", format(Sys.time(),
                                             "%Y%m%d_%H%M%S"), sep = "")
