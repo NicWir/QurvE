@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_computation.R
 \name{grofit.param}
 \alias{grofit.param}
-\title{Title}
+\title{internal function called within \code{growth.gcFitModel()}.}
 \usage{
 grofit.param(time, data, gcID = "undefined", control)
 }
@@ -10,5 +10,5 @@ grofit.param(time, data, gcID = "undefined", control)
 \item{control}{}
 }
 \description{
-Title
+internal function called within \code{growth.gcFitModel()}.
 }

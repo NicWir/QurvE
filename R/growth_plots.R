@@ -1,13 +1,16 @@
+#' Plot the results of a linear regression on ln-transformed data
 #'
-#' @param gcFittedLinear
-#' @param log
-#' @param which
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
-#' @param ...
+#' \code{plot.gcFitLinear} shows the results of a linear regression on log-transformed data and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
+#'
+#' @param gcFittedLinear A \code{gcFittedLinear} object created with \code{growth.gcFitLinear()} or stored within a \code{grofit} or \code{gcFit} object created with \code{growth.workflow()} or \code{growth.gcFit()}, respectively.
+#' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
+#' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @export
 #'
@@ -71,19 +74,19 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 }
 
 #'
-#' @param gcFittedModel
-#' @param raw
-#' @param slope
-#' @param colData
-#' @param equation
-#' @param colModel
-#' @param base_size
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
-#' @param ...
+#' @param gcFittedModel A \code{gcFittedModel} object created with \code{growth.gcFitModel()} or stored within a \code{grofit} or \code{gcFit} object created with \code{growth.workflow()} or \code{growth.gcFit()}, respectively.
+#' @param raw (Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param slope (Logical) Show the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param colData (Numeric or Character) Color used to plot the raw data.
+#' @param equation (Logical) Show the equation of the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param colModel (Numeric or Character) Color used to plot the fitted model.
+#' @param base_size (Numeric) Base font size.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param ... Further arguments to refine the generated \code{ggplot2} plot.
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line
@@ -283,16 +286,16 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
 }
 
 #'
-#' @param drBootSpline
-#' @param pch
-#' @param colData
-#' @param colSpline
-#' @param cex
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' @param drBootSpline A \code{drBootSpline} object created with \code{growth.drBootSpline()} or stored within a \code{grofit} or \code{drFit} object created with \code{growth.workflow()} or \code{growth.drFit()}, respectively.
+#' @param pch (Numeric) Size of the raw data points.
+#' @param colData (Numeric or Character) Color used to plot the raw data.
+#' @param colSpline (Numeric or Character) Color used to plot the splines.
+#' @param cex (Numeric) Line width of the individual splines.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
 #' @export
@@ -460,9 +463,11 @@ plot.drBootSpline <- function (drBootSpline,
 
 #'
 #' @param drFit
-#' @param plot
-#' @param export
-#' @param out.dir
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
 #' @export
@@ -475,7 +480,7 @@ plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
 
   # /// plot all drFitSpline objects
   for (i in 1:n) {
-    try(plot(drFit$drFittedSplines[[i]], export = export, plot = plot, out.dir = out.dir))
+    try(plot(drFit$drFittedSplines[[i]], export = export, plot = plot, height = 7, width = 9, out.dir = out.dir))
   }
 
 }
@@ -489,11 +494,11 @@ plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
 #' @param colData
 #' @param cex
 #' @param lwd
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
 #' @export
@@ -671,11 +676,11 @@ plot.drFitSpline <-
 #' @param deriv
 #' @param colSpline
 #' @param cex
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
 #' @export
@@ -833,17 +838,17 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param slope
 #' @param deriv
 #' @param spline
-#' @param width
 #' @param log.y
-#' @param height
 #' @param pch
 #' @param colData
 #' @param colSpline
 #' @param cex
 #' @param lwd
-#' @param plot
-#' @param export
-#' @param out.dir
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
 #' @export
@@ -851,9 +856,10 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
 #'   scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
-plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spline = T, width = 8, log.y = T,
-                             height = ifelse(deriv == TRUE, 8, 6), pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
-                             plot = TRUE, export = FALSE, out.dir = NULL, ...)
+plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spline = T, log.y = T,
+                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
+                             plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
+                             out.dir = NULL, ...)
 {
 
   # x an object of class gcFitSpline
@@ -1015,22 +1021,26 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
   }
 }
 
+#' Combine different groups of samples into a single plot
 #'
-#' @param grofit
-#' @param names
-#' @param conc
-#' @param mean
-#' @param log.y
-#' @param deriv
-#' @param n.ybreaks
-#' @param colors
-#' @param basesize
-#' @param lwd
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' \code{plot.grofit} extracts the spline fits of a subset of samples in a \code{grofit} object calculates averages and standard deviations of conditions with replicates and combines them into a single plot.
+#'
+#'
+#' @param grofit A \code{grofit} object created with \code{growth.workflow()} containing spline fits.
+#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered.
+#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered.
+#' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
+#' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
+#' @param colors (String vector) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param basesize (Numeric) Base font size.
+#' @param lwd (Numeric) Line width of the individual plots.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line
@@ -1044,7 +1054,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
 {
 
   # grofit an object of class grofit
-  if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit()")
+  if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
@@ -1386,15 +1396,19 @@ base_breaks <- function(n = 10){
 }
 
 #'
-#' @param object
-#' @param param
-#' @param names
-#' @param conc
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' @param object A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{growth.workflow()} or \code{growth.gcFit}.
+#' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
+#' 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
+#' 'mu.model', 'lambda.model', 'A.model',
+#' 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
+#' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
+#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered.
+#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line

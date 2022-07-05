@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.read_data}
 \alias{growth.read_data}
-\title{Read growth data in table format}
+\title{Read growth and fluorescence data in table format}
 \usage{
 growth.read_data(
   data.density,
@@ -16,6 +16,18 @@ growth.read_data(
 )
 }
 \arguments{
+\item{data.density}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing density data.
+In column format, the first three table rows contain
+\enumerate{
+\item sample description
+\item replicate number (\emph{optional}: followed by a letter to indicate technical replicates)
+\item concentration value (\emph{optional})
+}}
+
+\item{data.fluoro1}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
+
+\item{data.fluoro2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
+
 \item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \link{"col"}}
 
 \item{csvsep}{(Character) separator used in CSV file (ignored for other file types).}
@@ -25,24 +37,17 @@ growth.read_data(
 \item{sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files (\emph{optional}). Default: \code{";"}}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
-
-\item{data}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'.
-In column format, the first three table rows contain
-\enumerate{
-\item sample description
-\item replicate number (\emph{optional}: followed by a letter to indicate technical replicates)
-\item concentration value (\emph{optional})
-}}
 }
 \value{
-An R list object of class code{grodata} containing a time matrix, a data matrix, and an experimental design table. The code{grodata} object can be directly used to run code{growth.workflow} or, together with a code{grofit.control} object in code{growth.gcFit}, code{growth.gcFitLinear}, code{growth.gcFitModel}, code{growth.gcFitSpline}, or code{growth.gcBootSpline}
+An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{growth.workflow} or, together with a \code{grofit.control} object in \code{growth.gcFit}, \code{growth.gcFitLinear}, \code{growth.gcFitModel}, \code{growth.gcFitSpline}, or \code{growth.gcBootSpline}
 }
 \description{
-\link{growth.read_data} reads a table file or R dataframe object containing growth data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
+\link{growth.read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
 }
 \details{
 \if{html}{A data table compatible with \code{growth.read_data} looks like this:
   \out{<div style="text-align: center">}\figure{Data_layout2.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
+
 }
 \if{latex}{A data table compatible with \code{growth.read_data} looks like this:
   \out{\begin{center}}\figure{Data_layout2.png}\out{\end{center}}

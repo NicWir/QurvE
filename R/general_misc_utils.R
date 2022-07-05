@@ -60,17 +60,16 @@ fast.write.csv <- function(dat, file, row.names = TRUE) {
   )
 }
 
-#' Title
+#' Call the appropriate function required to read a table file and return the table as a dataframe object.
 #'
-#' @param filename
-#' @param csvsep
-#' @param dec
-#' @param sheet
+#' @param filename (Character) Name or path of the table file to read. Can be of type CSV, XLS, XLSX, TSV, or TXT.
+#' @param csvsep (Character) separator used in CSV file (ignored for other file types).
+#' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
+#' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
 #'
-#' @return
+#' @return A dataframe object
 #' @export
 #'
-#' @examples
 read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
   if (file.exists(filename)) {
     if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {

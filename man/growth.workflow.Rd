@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.workflow}
 \alias{growth.workflow}
-\title{Run a complete growth curve analysis workflow.}
+\title{Run a complete growth curve analysis and dose-reponse analysis workflow.}
 \usage{
 growth.workflow(
   time,
@@ -21,7 +21,8 @@ growth.workflow(
   log.y.model = FALSE,
   lin.h = NULL,
   lin.R2 = 0.98,
-  lin.RSD = 0.1,
+  lin.RSD = 0.02,
+  lin.dY = 0.05,
   interactive = TRUE,
   nboot.gc = 0,
   smooth.gc = 0.55,
@@ -33,7 +34,7 @@ growth.workflow(
   log.y.dr = FALSE,
   nboot.dr = 0,
   report = TRUE,
-  report.dir = NULL,
+  out.dir = NULL,
   export = FALSE
 )
 }
@@ -41,6 +42,8 @@ growth.workflow(
 \item{time}{(optional) A matrix containing time values for each sample.}
 
 \item{data}{Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
+
+\item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 
 \item{ec50}{(Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -54,7 +57,7 @@ growth.workflow(
 
 \item{suppress.messages}{(Logical) Indicates wether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.}
 
-\item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"b"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default: \code{"a"}.}
+\item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default: \code{"a"}.}
 
 \item{min.density}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.}
 
@@ -63,6 +66,14 @@ growth.workflow(
 \item{log.y.gc}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and spline fits. Default: \code{TRUE}}
 
 \item{log.y.model}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{model} fits. Default: \code{TRUE}}
+
+\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{growth.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
+
+\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.}
+
+\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for \code{growth.gcFitLinear()}.}
+
+\item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
 
 \item{interactive}{(Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the \emph{Plots} pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.}
 
@@ -74,7 +85,7 @@ growth.workflow(
 
 \item{have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
-\item{parameter}{(Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
+\item{parameter}{(Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
 
 \item{smooth.dr}{(Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.}
 
@@ -86,13 +97,13 @@ growth.workflow(
 
 \item{report}{(Logical) Create a PDF and HTML report after running all computations (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{report.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time}
+\item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
 
 \item{export}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).}
 }
 \value{
-A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package.
+A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{growth.report()}.
 }
 \description{
-\code{grofit.workflow()} runs \code{grofit.control()} to create a \code{grofit.control} object and then performs all computational operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
+\code{grofit.workflow()} runs \code{growth.control()} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
 }

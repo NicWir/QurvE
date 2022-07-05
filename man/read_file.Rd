@@ -2,13 +2,22 @@
 % Please edit documentation in R/general_misc_utils.R
 \name{read_file}
 \alias{read_file}
-\title{Title}
+\title{Call the appropriate function required to read a table file and return the table as a dataframe object.}
 \usage{
 read_file(filename, csvsep = ";", dec = ".", sheet = 1)
 }
 \arguments{
-\item{sheet}{}
+\item{filename}{(Character) Name or path of the table file to read. Can be of type CSV, XLS, XLSX, TSV, or TXT.}
+
+\item{csvsep}{(Character) separator used in CSV file (ignored for other file types).}
+
+\item{dec}{(Character) decimal separator used in CSV, TSV and TXT files.}
+
+\item{sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files (\emph{optional}). Default: \code{";"}}
+}
+\value{
+A dataframe object
 }
 \description{
-Title
+Call the appropriate function required to read a table file and return the table as a dataframe object.
 }

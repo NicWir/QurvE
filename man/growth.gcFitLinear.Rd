@@ -13,6 +13,7 @@ growth.gcFitLinear(
   quota = 0.95,
   R2 = 0.95,
   RSD = 0.05,
+  fit.dY = 0.05,
   control
 )
 }
@@ -26,7 +27,7 @@ growth.gcFitLinear(
 \item{quota}{part of window fits considered for the overall linear fit
 (relative to max. growth rate)}
 
-\item{control}{}
+\item{fit.dY}{(Numeric) Enter the minimum percentage of density increase that a linear regression should cover.}
 }
 \value{
 object with parameters of the fit. The lag time is currently estimated
