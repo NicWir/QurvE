@@ -11,6 +11,7 @@
     "integral.spline", "mu.bt", "lambda.bt", "A.bt", "integral.bt"),
   names = NULL,
   conc = NULL,
+  basesize = 12,
   plot = T,
   export = F,
   height = 7,
@@ -30,6 +31,8 @@
 \item{names}{(String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered.}
 
 \item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered.}
+
+\item{basesize}{(Numeric) Base font size.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

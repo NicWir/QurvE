@@ -1407,6 +1407,7 @@ base_breaks <- function(n = 10){
 #' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
 #' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered.
+#' @param basesize (Numeric) Base font size.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -1422,7 +1423,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                                'mu.model', 'lambda.model', 'A.model',
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'),
-                            names = NULL, conc = NULL, plot = T, export = F, height = 7, width = NULL, out.dir = NULL){
+                            names = NULL, conc = NULL, basesize = 12, plot = T, export = F, height = 7, width = NULL, out.dir = NULL){
   param <- match.arg(param)
   # check class of object
   if(!(any(class(object) %in% c("gcTable", "grofit", "gcFit")))) stop("object needs to be either a 'grofit', 'gcTable', or 'gcFit' object created with growth.workflow() or growth.gcFit().")
@@ -1470,7 +1471,6 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T) ) )
 
   df <- data.frame(name = gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))), mean = mean, sd = sd)
-  df <- df[match(as.factor(df$name[order(nchar(df$name), df$name)]), df$name), ]
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
   df$mean[is.na(df$mean)] <- 0
@@ -1480,7 +1480,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, size = 1,
                   position=position_dodge(.9)) +
     ggplot2::labs(x = "Sample", y = param) +
-    theme_minimal(base_size = 15) +
+    theme_minimal(base_size = basesize) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"))
   if(export == FALSE && plot == FALSE){
