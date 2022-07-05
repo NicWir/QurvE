@@ -1460,11 +1460,16 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
   }
   # get indices of replicates
-  ndx.filt <- unique(lapply(1:length(nm), function(i) grep(paste0("^",
-                                                                  gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[i], " \\| "))[1])),
-                                                                  ".+[[:space:]]",
-                                                                  unlist(str_split(nm[i], " \\| "))[3],
-                                                                  "$"), nm)))
+  ndx.filt.nm <- unique(lapply(1:length(nm), function(i)which(gsub(" \\| .+", "", nm) %in% (paste0(unlist(str_split(nm[i], " \\| "))[1])))))
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.nm)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.nm[[j]]), function(i) ndx.filt.nm[[j]][grep(paste0("^",
+                                                                          gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[ndx.filt.nm[[j]][i]], " \\| "))[1])),
+                                                                          ".+[[:space:]]",
+                                                                          unlist(str_split(nm[ndx.filt.nm[[j]][i]], " \\| "))[3],
+                                                                          "$"), nm[ndx.filt.nm[[j]]])]))
+  }
+  ndx.filt <- unlist(filter.ls, recursive = F)
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
   # calculate average param values
   mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) )
