@@ -124,7 +124,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
                      "fit.data" = gcFittedModel[["fit.data"]])
 
     p <-    ggplot(df, aes(x=time, y=data)) +
-      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
+      geom_line(aes(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
       xlab("Time") +
       ylab(label = ifelse(gcFittedModel$control$log.y.gc == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
       theme_classic(base_size = 16) +
