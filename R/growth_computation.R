@@ -707,7 +707,7 @@ growth.gcFit <- function(time, data, control=growth.control(), t0 = 0, lin.h = N
                                  raw.data = actwell,
                                  gcID = gcID,
                                  FUN = NA, fit = NA,
-                                 par = c(y0 = NA, y0_lm = NA, mumax = NA, lag = NA, tmax_start = NA, tmax_end = NA),
+                                 par = c(y0 = NA, y0_lm = NA, mumax = 0, lag = NA, tmax_start = NA, tmax_end = NA),
                                  ndx = NA,
                                  rsquared = NA,
                                  control = control,
@@ -793,7 +793,7 @@ growth.gcFit <- function(time, data, control=growth.control(), t0 = 0, lin.h = N
     else{
       # /// generate empty object
       nonpara             <- list(raw.time = acttime, raw.data = actwell, gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A= NA, mu=NA, lambda=NA, integral=NA),
-                                  parametersLowess=list(A= NA, mu=NA, lambda=NA), spline = NA, reliable=NULL, fitFlag=FALSE, control = control)
+                                  parametersLowess=list(A= NA, mu=0, lambda=NA), spline = NA, reliable=NULL, fitFlag=FALSE, control = control)
       class(nonpara)      <- "gcFitSpline"
       fitnonpara.all[[i]] <- nonpara
     }

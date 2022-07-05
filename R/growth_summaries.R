@@ -166,11 +166,7 @@ summary.gcFitLinear <- function(object,...)
 
 
   if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
-    if(is.na(object$par[5])){
-      table<-rep(NA,length(contents.fitted.param))
-    } else {
-      table<-c(0, rep(NA,length(contents.fitted.param)-1))
-    }
+    table<-c(0, rep(NA,length(contents.fitted.param)-1))
   }
   else{
     table <- c(object$par[5], object$par[7],
