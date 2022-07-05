@@ -529,12 +529,17 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
 }
 
 #'
+#' @param grofit
+#' @param report.dir
+#' @param ...
+#'
 #' @export
 #' @import ggplot2
 #' @import doParallel
 #' @import foreach
 #' @import kableExtra
 #' @import knitr
+#' @include general_misc_utils.R
 growth.report <- function(grofit, report.dir = NULL, ...)
   {
   # results an object of class grofit
@@ -573,6 +578,14 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
 }
 
+#'
+#' @param time
+#' @param data
+#' @param control
+#' @param t0
+#' @param lin.h
+#' @param lin.R2
+#' @param lin.RSD
 #'
 #' @export
 #'
@@ -855,6 +868,11 @@ growth.gcFit <- function(time, data, control=grofit.control(), t0 = 0, lin.h = N
 }
 
 #'
+#' @param time
+#' @param data
+#' @param gcID
+#' @param control
+#'
 #' @export
 #'
 growth.gcFitModel <- function(time, data, gcID ="undefined", control=grofit.control())
@@ -892,7 +910,16 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=grofit.cont
   return(gcFitModel)
 }
 
-# internal #
+#' Title
+#'
+#' @param time
+#' @param data
+#' @param gcID
+#' @param control
+#'
+#' @return
+#'
+#' @examples
 grofit.param <- function(time, data, gcID = "undefined", control)
 {
     time.in <- time
@@ -1079,6 +1106,12 @@ grofit.param <- function(time, data, gcID = "undefined", control)
     invisible(gcFitModel)
   }
 
+#'
+#' @param time
+#' @param data
+#' @param gcID
+#' @param control
+#' @param t0
 #'
 #' @export
 #'
@@ -1315,6 +1348,11 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = grofit
 #' @param h width of the window (number of data).
 #' @param quota part of window fits considered for the overall linear fit
 #'   (relative to max. growth rate)
+#' @param gcID
+#' @param t0
+#' @param R2
+#' @param RSD
+#' @param control
 #'
 #' @return object with parameters of the fit. The lag time is currently estimated
 #' as the intersection between the fit and the horizontal line with \eqn{y=y_0},
@@ -1602,6 +1640,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
 }
 
 #'
+#' @param time
+#' @param data
+#' @param gcID
+#' @param control
+#'
 #' @export
 #'
 growth.gcBootSpline <- function (time, data, gcID = "undefined", control = grofit.control())
@@ -1727,6 +1770,9 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = grofi
 }
 
 #'
+#' @param gcFitData
+#' @param control
+#'
 #' @export
 #'
 growth.drFit <- function (gcFitData, control = grofit.control())
@@ -1797,6 +1843,11 @@ growth.drFit <- function (gcFitData, control = grofit.control())
   drFit
 }
 
+#'
+#' @param conc
+#' @param test
+#' @param drID
+#' @param control
 #'
 #' @export
 #'
@@ -1945,6 +1996,11 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = grofit
   drFitSpline
 }
 
+#'
+#' @param conc
+#' @param test
+#' @param drID
+#' @param control
 #'
 #' @export
 #'

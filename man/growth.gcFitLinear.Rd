@@ -25,6 +25,8 @@ growth.gcFitLinear(
 
 \item{quota}{part of window fits considered for the overall linear fit
 (relative to max. growth rate)}
+
+\item{control}{}
 }
 \value{
 object with parameters of the fit. The lag time is currently estimated

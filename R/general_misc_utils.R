@@ -60,6 +60,17 @@ fast.write.csv <- function(dat, file, row.names = TRUE) {
   )
 }
 
+#' Title
+#'
+#' @param filename
+#' @param csvsep
+#' @param dec
+#' @param sheet
+#'
+#' @return
+#' @export
+#'
+#' @examples
 read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
   if (file.exists(filename)) {
     if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
