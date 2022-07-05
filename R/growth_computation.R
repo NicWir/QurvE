@@ -443,7 +443,7 @@ growth.control <-
 #' @param export (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package.
 #' @export
-#'
+#' @import ggplot2
 growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
                              mean.grp = "all", mean.conc = NA,
                         neg.nan.act = FALSE, clean.bootstrap = TRUE,
@@ -537,11 +537,6 @@ growth.workflow <- function (time, data, t0 = 0, ec50 = FALSE,
 #' @import knitr
 growth.report <- function(grofit, report.dir = NULL, ...)
   {
-  require(ggplot2, quietly = T)
-  require(doParallel, quietly = T)
-  require(foreach, quietly = T)
-  require(kableExtra, quietly = T)
-  require(knitr, quietly = T)
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.fit")
 

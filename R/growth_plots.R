@@ -1,4 +1,14 @@
 #'
+#' @param gcFittedLinear
+#' @param log
+#' @param which
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param ...
+#'
 #' @export
 #'
 plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics"),
@@ -61,8 +71,22 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 }
 
 #'
-#' @export
+#' @param gcFittedModel
+#' @param raw
+#' @param slope
+#' @param colData
+#' @param equation
+#' @param colModel
+#' @param base_size
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param ...
 #'
+#' @export
+#' @import ggplot2
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
                             colModel=ggplot2::alpha("forestgreen", 0.85), base_size=16,
                             plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
@@ -256,6 +280,18 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
 }
 
 #'
+#' @param drBootSpline
+#' @param pch
+#' @param colData
+#' @param colSpline
+#' @param cex
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param ...
+#'
 #' @export
 #'
 plot.drBootSpline <- function (drBootSpline,
@@ -420,6 +456,12 @@ plot.drBootSpline <- function (drBootSpline,
 }
 
 #'
+#' @param drFit
+#' @param plot
+#' @param export
+#' @param out.dir
+#' @param ...
+#'
 #' @export
 #'
 plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
@@ -435,6 +477,21 @@ plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
 
 }
 
+#'
+#' @param drFitSpline
+#' @param add
+#' @param ec50line
+#' @param pch
+#' @param colSpline
+#' @param colData
+#' @param cex
+#' @param lwd
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param ...
 #'
 #' @export
 #'
@@ -605,6 +662,19 @@ plot.drFitSpline <-
   }
 
 #'
+#' @param gcBootSpline
+#' @param pch
+#' @param colData
+#' @param deriv
+#' @param colSpline
+#' @param cex
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param ...
+#'
 #' @export
 #'
 plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
@@ -686,7 +756,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
           plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex)
         }
-        title(ylab = bquote("Growth rate µ "~(h^-1)), line = 2.3, cex.lab = 1.2)
+        title(ylab = bquote("Growth rate \U00B5 "~(h^-1)), line = 2.3, cex.lab = 1.2)
       }
       if (log.x==TRUE){
         title(xlab = "Ln(1+time)", line = 2.3, cex.lab = 1.2)
@@ -755,8 +825,26 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 }
 
 #'
-#' @export
+#' @param gcFitSpline
+#' @param add
+#' @param slope
+#' @param deriv
+#' @param spline
+#' @param width
+#' @param log.y
+#' @param height
+#' @param pch
+#' @param colData
+#' @param colSpline
+#' @param cex
+#' @param lwd
+#' @param plot
+#' @param export
+#' @param out.dir
+#' @param ...
 #'
+#' @export
+#' @import ggplot2
 plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spline = T, width = 8, log.y = T,
                              height = ifelse(deriv == TRUE, 8, 6), pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
                              plot = TRUE, export = FALSE, out.dir = NULL, ...)
@@ -891,7 +979,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
           geom_line(color = colSpline) +
           theme_classic(base_size = 15) +
           xlab("Time") +
-          ylab(label = bquote("Exp. growth rate µ "~(h^-1))) +
+          ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1))) +
           scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
           scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
 
@@ -922,8 +1010,24 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 }
 
 #'
-#' @export
+#' @param grofit
+#' @param names
+#' @param conc
+#' @param mean
+#' @param log.y
+#' @param deriv
+#' @param n.ybreaks
+#' @param colors
+#' @param basesize
+#' @param lwd
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
 #'
+#' @export
+#' @import ggplot2
 plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, n.ybreaks = 6,
                         colors = NULL, basesize = 20, lwd = 1.1, plot = TRUE, export = FALSE,
                         height = ifelse(deriv==T,9, 6), width = 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15,
@@ -1113,7 +1217,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab("Time") +
-        ylab(label = bquote("Exp. growth rate µ "~(h^-1))) +
+        ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1))) +
         scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank()) +
@@ -1210,7 +1314,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
         xlab("Time") +
-        ylab(label = bquote("Exp. growth rate µ "~(h^-1))) +
+        ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1))) +
         scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank()) +
@@ -1273,8 +1377,18 @@ base_breaks <- function(n = 10){
 }
 
 #'
-#' @export
+#' @param object
+#' @param param
+#' @param names
+#' @param conc
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
 #'
+#' @export
+#' @import ggplot2
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
                                                'mu.model', 'lambda.model', 'A.model',
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',

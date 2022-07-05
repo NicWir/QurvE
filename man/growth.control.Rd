@@ -18,7 +18,7 @@ growth.control(
   smooth.gc = 0.55,
   model.type = c("logistic", "richards", "gompertz", "gompertz.exp"),
   have.atleast = 6,
-  parameter = 34,
+  parameter = "mu.linfit",
   smooth.dr = NULL,
   log.x.dr = FALSE,
   log.y.dr = FALSE,

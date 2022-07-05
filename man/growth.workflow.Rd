@@ -20,10 +20,10 @@ growth.workflow(
   log.y.gc = TRUE,
   log.y.model = FALSE,
   lin.h = NULL,
-  lin.R2 = 0.95,
+  lin.R2 = 0.98,
   lin.RSD = 0.1,
   interactive = TRUE,
-  nboot.gc = 100,
+  nboot.gc = 0,
   smooth.gc = 0.55,
   model.type = c("logistic", "richards", "gompertz", "gompertz.exp"),
   have.atleast = 6,
@@ -40,7 +40,7 @@ growth.workflow(
 \arguments{
 \item{time}{(optional) A matrix containing time values for each sample.}
 
-\item{data}{Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix and a \code{"data"} dataframe, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
+\item{data}{Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
 
 \item{ec50}{(Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
