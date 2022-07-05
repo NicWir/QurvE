@@ -90,7 +90,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
@@ -853,7 +853,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spline = T, log.y = T,
@@ -1044,7 +1044,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, n.ybreaks = 6,
@@ -1412,7 +1412,7 @@ base_breaks <- function(n = 10){
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',

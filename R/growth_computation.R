@@ -449,7 +449,7 @@ growth.control <-
 #' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{growth.report()}.
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 growth.workflow <- function (time,
@@ -577,7 +577,7 @@ growth.workflow <- function (time,
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 #' @importFrom doParallel registerDoParallel
@@ -640,7 +640,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
 #'
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
 growth.gcFit <- function(time, data, control=growth.control(), t0 = 0, lin.h = NULL, lin.R2 = 0.95, lin.RSD = 0.05, lin.dY = 0.05)
