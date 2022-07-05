@@ -1531,7 +1531,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
       if(nrow(ret)<2){
         gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
           log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
-            y0 = NA, dY = NA, y0_lm = NA, mumax = NA, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
+            y0 = NA, dY = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
           ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
         )
         class(gcFitLinear) <- "gcFitLinear"
@@ -1553,7 +1553,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
           if(nrow(ret.check)<2){
             gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                                 log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
-                                  y0 = NA, dY = NA, y0_lm = NA, mumax = NA, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
+                                  y0 = NA, dY = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
                                 ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
@@ -1641,7 +1641,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
             else { # of if(length(candidates) > 0)
               gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                                   log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
-                                    y0 = NA, dY = NA, y0_lm = NA, mumax = NA, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
+                                    y0 = NA, dY = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
                                   ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
               )
               class(gcFitLinear) <- "gcFitLinear"
@@ -1652,7 +1652,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
           else{
             gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                                 log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
-                                  y0 = NA, dY = NA, y0_lm = NA, mumax = NA, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
+                                  y0 = NA, dY = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
                                 ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
@@ -1666,7 +1666,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
     message("Not enough observations in the dataset to perform exponential fit. growth.gcFitLinear requires at least 3 data points between t0 and the time of maximum density.")
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
-                          y0 = NA, y0_lm = NA, mumax = NA, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
+                          y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
                         ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
     )
     class(gcFitLinear) <- "gcFitLinear"
