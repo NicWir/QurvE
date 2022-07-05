@@ -1395,6 +1395,9 @@ base_breaks <- function(n = 10){
   }
 }
 
+#' Compare growth parameters between samples or conditions
+#'
+#' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot.
 #'
 #' @param object A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{growth.workflow()} or \code{growth.gcFit}.
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
@@ -1466,7 +1469,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) )
   sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T) ) )
 
-  df <- data.frame(name = gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt)), mean = mean, sd = sd)
+  df <- data.frame(name = gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))), mean = mean, sd = sd)
   df <- df[match(as.factor(df$name[order(nchar(df$name), df$name)]), df$name), ]
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
