@@ -1476,7 +1476,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     geom_bar(stat="identity", color = "black") +
     geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, size = 1,
                   position=position_dodge(.9)) +
-    labs(x = "Sample", y = param) +
+    ggplot2::labs(x = "Sample", y = param) +
     theme_minimal(base_size = 15) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"))
