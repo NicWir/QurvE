@@ -1645,7 +1645,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
                                   ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
               )
               class(gcFitLinear) <- "gcFitLinear"
-              if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", RSD, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
+              if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", R2, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
               return(gcFitLinear)
             }
           } # if(any(ret.check[,5] >= R2 & ret.check[,6] <= RSD))
@@ -1656,7 +1656,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
                                 ndx = NA, rsquared = NA, control = control, fitFlag = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
-            if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with an R2 value of >= ", RSD, " and an RSD of <= ", RSD, "."))
+            if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with an R2 value of >= ", R2, " and an RSD of <= ", RSD, "."))
             return(gcFitLinear)
           }
         } # else of if(nrow(ret.check)<2)
