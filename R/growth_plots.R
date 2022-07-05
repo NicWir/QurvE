@@ -12,6 +12,7 @@
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
+#' @export plot.gcFitLinear
 #' @export
 #'
 plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics"),
@@ -88,6 +89,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated \code{ggplot2} plot.
 #'
+#' @export plot.gcFitModel
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
@@ -298,6 +300,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
+#' @export plot.drBootSpline
 #' @export
 #'
 plot.drBootSpline <- function (drBootSpline,
@@ -470,6 +473,7 @@ plot.drBootSpline <- function (drBootSpline,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
+#' @export plot.drFit
 #' @export
 #'
 plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
@@ -501,6 +505,7 @@ plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
+#' @export plot.drFitSpline
 #' @export
 #'
 plot.drFitSpline <-
@@ -683,6 +688,7 @@ plot.drFitSpline <-
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
+#' @export plot.gcBootSpline
 #' @export
 #'
 plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
@@ -851,6 +857,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ...
 #'
+#' @export plot.gcFitSpline
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
@@ -1042,6 +1049,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #'
+#' @export plot.grofit
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
@@ -1178,6 +1186,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       deriv.ls <- deriv.ls[!is.na(deriv.ls)]
       df.deriv <- do.call(rbind.data.frame, deriv.ls)
       df.deriv$name <- gsub(" \\| NA", "", df.deriv$name)
+      df.deriv$name <- factor(df.deriv$name, levels = unique(factor(df.deriv$name)))
     }
 
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
@@ -1422,6 +1431,7 @@ base_breaks <- function(n = 10){
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #'
+#' @export plot.parameter
 #' @export
 #' @importFrom ggplot2 aes annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
