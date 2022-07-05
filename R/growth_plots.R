@@ -1183,6 +1183,8 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
     df <- do.call(rbind.data.frame, plotdata.ls)
     df$name <- gsub(" \\| NA", "", df$name)
+    df$name <- factor(df$name, levels = unique(factor(df$name)))
+
     # replace negative lower ribbon boundaries with 0 for log10 transformation
     if(log.y==TRUE){
       df$lower[df$lower<0] <- 0
