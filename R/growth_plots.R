@@ -404,6 +404,7 @@ plot.drBootSpline <- function (drBootSpline,
         pch = pch,
         cex = cex
       )
+      title(drBootSpline$drID)
 
       # /// loop over all fitted splines and plot drFitSpline objects
       for (i in 1:drBootSpline$control$nboot.dr) {
@@ -653,7 +654,6 @@ plot.drFitSpline <-
               c(drFitSpline$parameters$yEC50, drFitSpline$parameters$yEC50),
               lty = 2)
       }
-      title(drFitSpline$drID)
     } # p <- function()
     if (export == TRUE){
       w <- width
@@ -870,7 +870,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 {
 
   # x an object of class gcFitSpline
-  if(class(gcFitSpline) != "gcFitSpline") stop("gcFitSpline needs to be an object created with growth.gcFitSpline.")
+  if(class(gcFitSpline) != "gcFitSpline") stop("gcFitSpline needs to be an object created with growth.gcFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -995,7 +995,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
                     df.mu)
 
         p.mu <- ggplot(df.mu, aes(x=x, y=y)) +
-          geom_line(color = colSpline) +
+          geom_line(color = colSpline, size = lwd) +
           theme_classic(base_size = 15) +
           xlab("Time") +
           ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1))) +
