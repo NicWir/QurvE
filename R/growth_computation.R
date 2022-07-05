@@ -197,7 +197,7 @@ growth.read_data <- function(data.density, data.fluoro1 = NA, data.fluoro2 = NA,
   if(length(data.fluoro2)>1)     fluoro2 <- remove_blank(dat=fluoro2)
 
   # Remove columns with NA measurements in all samples
-  dat <- dat[, which(unlist(lapply(1:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
+  dat <- dat[, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
   # Create time matrix
   time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
   if(length(time.ndx)==1){
