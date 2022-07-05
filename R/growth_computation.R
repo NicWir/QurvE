@@ -18,14 +18,7 @@
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #'
 #' @details
-#' \if{html}{A data table compatible with \code{growth.read_data} looks like this:
-#'   \out{<div style="text-align: center">}\figure{Data_layout2.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
-#'
-#' }
-#' \if{latex}{A data table compatible with \code{growth.read_data} looks like this:
-#'   \out{\begin{center}}\figure{Data_layout2.png}\out{\end{center}}
-#' }
-#' \figure{Data_layout2.png}
+#' \figure{Data_layout.png}
 #' @return An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{growth.workflow} or, together with a \code{grofit.control} object in \code{growth.gcFit}, \code{growth.gcFitLinear}, \code{growth.gcFitModel}, \code{growth.gcFitSpline}, or \code{growth.gcBootSpline}
 #' @export
 #' @md
