@@ -89,7 +89,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @param ... Further arguments to refine the generated \code{ggplot2} plot.
 #'
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
 #'   scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
@@ -852,7 +852,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param ...
 #'
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
 #'   scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
@@ -1043,7 +1043,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #'
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
 #'   scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
@@ -1411,7 +1411,7 @@ base_breaks <- function(n = 10){
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #'
 #' @export
-#' @importFrom ggplot2 aes annotate coord_cartesian geom_bar geom_errorbar geom_line
+#' @importFrom ggplot2 aes annotate coord_cartesian element_blank geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle
 #'   scale_color_manual scale_fill_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic xlab ylab
