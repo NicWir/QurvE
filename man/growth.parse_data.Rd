@@ -16,7 +16,24 @@ growth.parse_data(
 )
 }
 \arguments{
-\item{convert.time}{}
+\item{file}{(Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.}
+
+\item{map.file}{(Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.}
+
+\item{software}{(Character) The name of the software used to export the plate reader data.}
+
+\item{convert.time}{(Logical) Shall the time be converted from, e.g., 00:15:00 in Excel into hours (\code{TRUE}) or not (\code{FALSE})?}
+
+\item{sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files (\emph{optional}). Default: \code{";"}}
+
+\item{csvsep}{(Character) separator used in CSV file (ignored for other file types).}
+
+\item{dec}{(Character) decimal separator used in CSV, TSV and TXT files.}
+
+\item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
+}
+\value{
+A grodata object suitable to run \code{growth.workflow()}.
 }
 \description{
 \code{growth.parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{growth.workflow()}.

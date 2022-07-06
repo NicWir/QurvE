@@ -294,21 +294,18 @@ growth.read_data <-
 #'
 #' \code{growth.parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{growth.workflow()}.
 #'
-#' @param file
-#' @param density
-#' @param fluorescence1
-#' @param fluorescence2
-#' @param sheet
-#' @param csvsep
-#' @param dec
-#' @param map.file
-#' @param software
-#' @param convert.time
+#' @param file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
+#' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
+#' @param csvsep (Character) separator used in CSV file (ignored for other file types).
+#' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
+#' @param map.file (Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
+#' @param software (Character) The name of the software used to export the plate reader data.
+#' @param convert.time (Logical) Shall the time be converted from, e.g., 00:15:00 in Excel into hours (\code{TRUE}) or not (\code{FALSE})?
+#' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #'
-#' @return
+#' @return A grodata object suitable to run \code{growth.workflow()}.
 #' @export
 #'
-#' @examples
 growth.parse_data <-
   function(file = NULL,
            map.file = NULL,
@@ -526,7 +523,7 @@ growth.parse_data <-
       }
     }
     names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
-    grodata <- growth.read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]])
+    grodata <- growth.read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank)
     return(grodata)
   }
 
