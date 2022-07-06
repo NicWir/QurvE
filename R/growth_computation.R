@@ -22,8 +22,16 @@
 #' @return An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{growth.workflow} or, together with a \code{grofit.control} object in \code{growth.gcFit}, \code{growth.gcFitLinear}, \code{growth.gcFitModel}, \code{growth.gcFitSpline}, or \code{growth.gcBootSpline}
 #' @export
 #' @md
-growth.read_data <- function(data.density, data.fluoro1 = NA, data.fluoro2 = NA, data.format = "col", csvsep = ";", dec = ".", sheet = 1, subtract.blank  = T)
-{
+growth.read_data <-
+  function(data.density,
+           data.fluoro1 = NA,
+           data.fluoro2 = NA,
+           data.format = "col",
+           csvsep = ";",
+           dec = ".",
+           sheet = 1,
+           subtract.blank  = T)
+  {
   # Load density data
   if (!is.character(data.density)) {
     dat <- data.density
@@ -280,6 +288,246 @@ growth.read_data <- function(data.density, data.fluoro1 = NA, data.fluoro2 = NA,
 
   class(dataset) <- "grodata"
   invisible(dataset)
+  }
+
+#' Parse raw plate reader data and convert it to a format compatible with QurvE
+#'
+#' \code{growth.parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{growth.workflow()}.
+#'
+#' @param file
+#' @param density
+#' @param fluorescence1
+#' @param fluorescence2
+#' @param sheet
+#' @param csvsep
+#' @param dec
+#' @param map.file
+#' @param software
+#' @param convert.time
+#'
+#' @return
+#' @export
+#'
+#' @examples
+growth.parse_data <-
+  function(file = NULL,
+           map.file = NULL,
+           software = "Gen5",
+           convert.time = TRUE,
+           sheet = 1,
+           csvsep = ";",
+           dec = ".",
+           subtract.blank  = T
+  ) {
+    if(is.null(file)) stop("Please provide the name or path to a table file containing plate reader data.")
+    if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
+    if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by growth.parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
+    if("Gen5" %in% software){
+      # Read table file
+      if (file.exists(file)) {
+        if (stringr::str_replace_all(file, ".{1,}\\.", "") == "csv") {
+          input <-
+            utils::read.csv(
+              file,
+              dec = dec,
+              sep = csvsep,
+              header = F,
+              stringsAsFactors = F,
+              fill = T,
+              na.strings = "",
+              quote = "",
+              comment.char = "",
+              check.names = F
+            )
+        } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "xls" |
+                   stringr::str_replace(file, ".{1,}\\.", "") == "xlsx") {
+          input <- data.frame(suppressMessages(readxl::read_excel(file, col_names = F, sheet = sheet)))
+        } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "tsv") {
+          input <-
+            utils::read.csv(
+              file,
+              dec = dec,
+              sep = "\t",
+              header = F,
+              stringsAsFactors = F,
+              fill = T,
+              na.strings = "",
+              quote = "",
+              comment.char = "",
+              check.names = F
+            )
+        } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "txt") {
+          input <-
+            utils::read.table(
+              file,
+              dec = dec,
+              sep = "\t",
+              header = F,
+              stringsAsFactors = F,
+              fill = T,
+              na.strings = "",
+              quote = "",
+              comment.char = "",
+              check.names = F
+            )
+        } else {
+          stop(
+            "No compatible file format provided.
+                 Supported formats are: \\.txt (tab delimited), \\.csv (delimiters can be specified with the argument \"csvsep = \", \\.tsv, \\.xls, and \\.xlsx"
+          )
+        }
+      } else {
+        stop(paste0("File \"", file, "\" does not exist."), call. = F)
+      }
+      if(!is.null(map.file)){
+        if (file.exists(map.file)) {
+          if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "csv") {
+            mapping <-
+              utils::read.csv(
+                map.file,
+                dec = dec,
+                sep = csvsep,
+                header = F,
+                stringsAsFactors = F,
+                fill = T,
+                na.strings = "",
+                quote = "",
+                comment.char = "",
+                check.names = F
+              )
+          } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "xls" |
+                     stringr::str_replace(map.file, ".{1,}\\.", "") == "xlsx") {
+            mapping <- data.frame(suppressMessages(readxl::read_excel(map.file, col_names = F, sheet = sheet)))
+          } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "tsv") {
+            mapping <-
+              utils::read.csv(
+                map.file,
+                dec = dec,
+                sep = "\t",
+                header = F,
+                stringsAsFactors = F,
+                fill = T,
+                na.strings = "",
+                quote = "",
+                comment.char = "",
+                check.names = F
+              )
+          } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "txt") {
+            mapping <-
+              utils::read.table(
+                map.file,
+                dec = dec,
+                sep = "\t",
+                header = F,
+                stringsAsFactors = F,
+                fill = T,
+                na.strings = "",
+                quote = "",
+                comment.char = "",
+                check.names = F
+              )
+          } else {
+            stop(
+              "No compatible file format provided.
+                 Supported formats are: \\.txt (tab delimited), \\.csv (delimiters can be specified with the argument \"csvsep = \", \\.tsv, \\.xls, and \\.xlsx"
+            )
+          }
+        } else {
+          stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
+        }
+      }
+
+      # get row numbers for "time" in column 2
+      time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = T)
+      # extract
+      reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
+      read.ndx <- time.ndx[!is.na(reads)]
+      reads <- reads[!is.na(reads)]
+      read.data <- list()
+      ncol <- length(input[read.ndx[1],][!is.na(input[read.ndx[1],])])
+      # Extract all read tables except the last
+      read.data <- lapply(1:(length(read.ndx)-1), function(x) input[read.ndx[x]:(read.ndx[x+1]-3),2:(ncol)])
+      read.data <- lapply(1:length(read.data), function(x) as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]),])
+      #Extract last read table
+      read.data[[length(read.ndx)]] <- data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1),2:(ncol)])
+      read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
+
+      # give all reads the same time values as the first read
+      for(i in 2:length(read.data)){
+        read.data[[i]][[1]] <- read.data[[1]][[1]]
+      }
+      names(read.data) <- reads
+      data.ls <- list()
+      if(length(reads)>1){
+
+        answer <- readline(paste0("Indicate where the density data is stored?\n",
+                                  paste(unlist(lapply(1:length(reads), function (i)
+                                    paste0("[", i, "] ", reads[i]))),
+                                    collapse = "\n")))
+        density <- read.data[[as.numeric(answer)]]
+        answer <- readline(paste0("Indicate where the fluorescence 1 data is stored?\n",
+                                  paste(unlist(lapply(1:length(reads), function (i)
+                                    paste0("[", i, "] ", reads[i]))),
+                                    collapse = "\n")))
+        fluorescence1 <- read.data[[as.numeric(answer)]]
+        data.ls[[1]] <- density
+        data.ls[[2]] <- fluorescence1
+        if(length(reads)>2){
+          answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
+                                    paste(unlist(lapply(1:length(reads), function (i)
+                                      paste0("[", i, "] ", reads[i]))),
+                                      collapse = "\n")))
+          fluorescence2 <- read.data[[as.numeric(answer)]]
+          data.ls[[3]] <- fluorescence2
+        }
+      } else {
+        density <- read.data[[1]]
+        data.ls[[1]] <- density
+        data.ls[[2]] <- NA
+        data.ls[[3]] <- NA
+      }
+    } # if("Gen5" %in% software)
+    # Convert time values to hours
+    if(convert.time){
+      for(i in 1:length(data.ls[!is.na(data.ls)])){
+        data.ls[[i]][2:nrow(data.ls[[1]]),1] <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])*24
+        # add a value of 24 if time exceeds one day
+        day.ndx <- grep( data.ls[[i]][2,1],  data.ls[[i]][3:nrow(data.ls[[1]]),1])+2
+        for(j in length(day.ndx)){
+          data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1] <- as.numeric(data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1])+24
+        }
+      }
+    }
+    # Remove any columns between time and 'A1'
+    A1.ndx <- match("A1", data.ls[[1]][1,])
+    if(A1.ndx>2){
+      data.ls <- lapply(1:length(data.ls), function(x) data.ls[[x]][ ,c(1,A1.ndx:ncol(read.data[[x]]))])
+    }
+    # apply identifiers specified in mapping file
+    for(i in 1:length(data.ls)){
+      if(!is.null(mapping)){
+        # assign names to samples
+        map.ndx <- match(data.ls[[i]][1,1:ncol( data.ls[[i]])], mapping[2:nrow(mapping),1])+1
+        names <- mapping[map.ndx, 2]
+        names <- names[2:length(names)]
+        data.ls[[i]][1,2:ncol( data.ls[[i]])] <- names
+        # assign replicate numbers to samples
+        replicates <- mapping[map.ndx, 3]
+        replicates <- as.numeric(replicates[2:length(replicates)])
+        data.ls[[i]] <- rbind(data.ls[[i]][1,], c(NA,replicates), data.ls[[i]][-1,])
+        # assign concentrations to samples
+        # assign replicate numbers to samples
+        conc <- mapping[map.ndx, 4]
+        conc <- as.numeric(conc[2:length(conc)])
+        data.ls[[i]] <- rbind(data.ls[[i]][1:2,], c(NA,conc), data.ls[[i]][-(1:2),])
+      } else {
+        data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
+        data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
+      }
+    }
+    names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
+    grodata <- growth.read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]])
+    return(grodata)
   }
 
 #' Create a \code{grofit.control} object.
