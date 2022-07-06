@@ -1067,6 +1067,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
+  if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("Please run growth.workflow() with 'a' or 's' in fit.opt.")
 
 
   # Get name of conditions with multiple replicates
@@ -1095,19 +1096,20 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
 
   for(i in 1:length(ndx.filt)){
     if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
-      nm <- intersect(nm, sample.nm[-ndx.filt[[i]]])
+      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+      nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
     }
   }
 
   #get indices of samples with selected names
-  ndx <- grep(paste0(
+  ndx.keep <- grep(paste0(
     str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
 
   # correct for log transformation
   if(grofit$control$log.y.gc == TRUE){
-      for(i in 1:length(ndx)){
-        grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.data"]] <-
-          exp(grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx[i]]]$data.in[1]
+      for(i in 1:length(ndx.keep)){
+        grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
+          exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
       }
   }
 
@@ -1119,11 +1121,11 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     deriv.ls <- list()
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
-      ndx <- grep(paste0("^",
+      ndx <- intersect(ndx.keep, grep(paste0("^",
                          gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1])),
                          ".+[[:space:]]",
                          unlist(str_split(conditions_unique[n], " \\| "))[2],
-                         "$"), sample.nm)
+                         "$"), sample.nm))
       name <- conditions_unique[n]
       time <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)) %>% as.list(.)
       data <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)

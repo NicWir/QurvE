@@ -1794,6 +1794,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
         #Consider only slopes that span at least fit.dY
         ret.check <- ret.check[ret.check[,"dY"]>=fit.dY, ]
 
+        # Consider only positive slopes
+        ret.check <- ret.check[ret.check[,"slope"]>0, ]
 
           if(nrow(ret.check)<2){
             gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
