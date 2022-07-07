@@ -771,7 +771,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
           plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex)
         }
-        title(ylab = bquote("Growth rate \U00B5 "~(h^-1)), line = 2.3, cex.lab = 1.2)
+        title(ylab = "Growth rate", line = 2.3, cex.lab = 1.2)
       }
       if (log.x==TRUE){
         title(xlab = "Ln(1+time)", line = 2.3, cex.lab = 1.2)
@@ -999,7 +999,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
           geom_line(color = colSpline, size = lwd) +
           theme_classic(base_size = 15) +
           xlab("Time") +
-          ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1))) +
+          ylab(label = "Growth rate") +
           scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
           scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
 
@@ -1324,7 +1324,7 @@ plot.grofit <- function(grofit,
               panel.grid.minor = element_blank())
 
       if(is.null(y.title.deriv)){
-        p.deriv <- p.deriv + ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1)))
+        p.deriv <- p.deriv + ylab(label = "Growth rate")
       } else {
         p.deriv <- p.deriv + ylab(label = y.title.deriv)
       }
@@ -1458,7 +1458,7 @@ plot.grofit <- function(grofit,
               panel.grid.minor = element_blank())
 
       if(is.null(y.title.deriv)){
-        p.deriv <- p.deriv + ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1)))
+        p.deriv <- p.deriv + ylab(label = "Growth rate")
       } else {
         p.deriv <- p.deriv + ylab(label = y.title.deriv)
       }
@@ -1541,7 +1541,7 @@ base_breaks <- function(n = 10){
 
 #' Compare growth parameters between samples or conditions
 #'
-#' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot.
+#' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95% confidence interval. If no error bars are shown for a column, the number of replicates for the respective condition with valid fit data was smaller than 3.
 #'
 #' @param object A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{growth.workflow()} or \code{growth.gcFit}.
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
@@ -1618,10 +1618,24 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     }
   ndx.filt <- unlist(filter.ls, recursive = F)
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+  if(gsub(".+\\.", "", param)=="linfit") fit.type <- "linfit"
+  if(gsub(".+\\.", "", param)=="model") fit.type <- "model"
+  if(gsub(".+\\.", "", param)=="spline") fit.type <- "spline"
+
+  # Check FitFlag for each replicate, work per condition
+  for(i in 1:length(ndx.filt)){
+    if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["gcFit"]][[ifelse(fit.type=="linfit", "gcFittedLinear", ifelse(fit.type=="model", "gcFittedModels", "gcFittedSplines"))]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
+      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["gcFit"]][[ifelse(fit.type=="linfit", "gcFittedLinear", ifelse(fit.type=="model", "gcFittedModels", "gcFittedSplines"))]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+      nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+      ndx.filt[[i]] <- ndx.filt[[i]][fitflags]
+    }
+  }
+
   # calculate average param values
   mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) ) # mean
   sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) ) #standard deviation
   n <- unlist(lapply(1:length(ndx.filt), function (x) length(ndx.filt[[x]])) ) # number of replicates per condition
+  sd[n < 3] <- NA
   error <- stats::qnorm(0.975) * sd / sqrt(n) # standard error
   CI.L <- mean - error #left confidence interval
   CI.R <- mean + error #right confidence interval
