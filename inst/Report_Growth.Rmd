@@ -57,10 +57,16 @@ The following parameters were used to fit the data:
 
 * minimum density considered: `r colFmt(ifelse(!is.null(grofit$control$min.density), grofit$control$min.density, "none"), 'NavyBlue')`
 * minimum time considered for exponential and spline fits (t0): `r colFmt(t0, 'NavyBlue')`
-* log-transform density values for parametric and spline fits: `r colFmt(grofit$control$log.y.gc, 'NavyBlue')`
+* log-transform density values for spline fits: `r colFmt(grofit$control$log.y.spline, 'NavyBlue')`
+* log-transform density values for parametric fits: `r colFmt(grofit$control$log.y.model, 'NavyBlue')`
 * log-transform time values: `r colFmt(grofit$control$log.x.gc, 'NavyBlue')`
 * perform dose-response analysis: `r colFmt(ec50, 'NavyBlue')`
 * parameter used for dose-response analysis: `r if(ec50){colFmt(colnames(grofit$gcFit$gcTable)[grofit$control$parameter], 'NavyBlue')} else{"NA"}`
+* growth threshold: `r colFmt(grofit$control$growth.thresh, 'NavyBlue')` * start_density
+`r if(any(c("a", "l") %in% control$fit.opt)){paste0("* sliding window size in linear regression:")}` `r if(any(c("a", "l") %in% control$fit.opt)){colFmt(ifelse(!is.null(lin.h), lin.h, "automated calculation"), 'NavyBlue')}`
+`r if(any(c("a", "l") %in% control$fit.opt)){paste0("* R2 threshold for linear regression:")}` `r if(any(c("a", "l") %in% control$fit.opt)){colFmt(lin.R2, 'NavyBlue')}`
+`r if(any(c("a", "l") %in% control$fit.opt)){paste0("* RSD threshold for linear regression:")}` `r if(any(c("a", "l") %in% control$fit.opt)){colFmt(lin.RSD, 'NavyBlue')}`
+`r if(any(c("a", "l") %in% control$fit.opt)){paste0("* Relative ΔY threshold for linear regression:")}` `r if(any(c("a", "l") %in% control$fit.opt)){colFmt(lin.dY, 'NavyBlue')}`
 
 \pagebreak
 
@@ -262,7 +268,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
           geom_point(shape=1, size = 2,alpha = 0.5, stroke=0.15) + 
           geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
           xlab("Time") +
-          ylab(label = ifelse(x$control$log.y.gc == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
+          ylab(label = ifelse(x$control$log.y.model == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
           theme_classic(base_size = 16) +
           ggtitle(gsub(" \\| NA", "", paste(x$gcID, collapse=" | "))) +
           scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + 
@@ -429,7 +435,7 @@ plot.ggSpline   <- function(){
                        breaks = "Spline fit",
                        values=c("spline" = ggplot2::alpha("dodgerblue3", 0.85), "Spline fit" = ggplot2::alpha("dodgerblue3", 0.85)))
       
-      if(x$control$log.y.gc == TRUE){
+      if(x$control$log.y.spline == TRUE){
         p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
         p.yrange.end <- exp(ggplot_build(p)$layout$panel_params[[1]]$y.range[2])
       } else {
@@ -441,7 +447,7 @@ plot.ggSpline   <- function(){
        
        mu     <- as.numeric(coef$mu[1])
        time <- seq(lagtime, max(x$"fit.time"), length=200)
-       bla <- ifelse(x$control$log.y.gc == TRUE, exp(coef["b.tangent"][[1]])*x[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+       bla <- ifelse(x$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*x[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
        tangent.df <- data.frame("time" = time,
                                 "y" = bla)
        df.horizontal <- data.frame("time" = c(x[["raw.time"]][1], lagtime),

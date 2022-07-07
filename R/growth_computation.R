@@ -537,7 +537,7 @@ growth.parse_data <-
 #' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default: \code{"a"}.
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.gc (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
 #' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
@@ -549,6 +549,7 @@ growth.parse_data <-
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
 #' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
+#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #'
 #' @export
 #'
@@ -559,7 +560,7 @@ growth.control <-
             fit.opt = "a",
             min.density = NULL,
             log.x.gc = FALSE,
-            log.y.gc = TRUE,
+            log.y.spline = TRUE,
             log.y.model = FALSE,
             interactive = TRUE,
             nboot.gc = 0,
@@ -571,7 +572,8 @@ growth.control <-
             smooth.dr = NULL,
             log.x.dr = FALSE,
             log.y.dr = FALSE,
-            nboot.dr = 0)
+            nboot.dr = 0,
+            growth.thresh = 1.5)
 {
   if ((is.character(fit.opt) == FALSE))
     stop("value of fit.opt must be character and of one element")
@@ -589,9 +591,9 @@ growth.control <-
   if ((is.logical(log.x.gc) == FALSE) | (length(log.x.gc) !=
                                          1))
     stop("value of log.x.gc must be logical and of one element")
-  if ((is.logical(log.y.gc) == FALSE) | (length(log.y.gc) !=
+  if ((is.logical(log.y.spline) == FALSE) | (length(log.y.spline) !=
                                          1))
-    stop("value of log.y.gc must be logical and of one element")
+    stop("value of log.y.spline must be logical and of one element")
   if ((is.logical(interactive) == FALSE) | (length(interactive) !=
                                             1))
     stop("value of interactive must be logical and of one element")
@@ -646,11 +648,11 @@ growth.control <-
   }
   grofit.control <- list(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                          suppress.messages = suppress.messages, fit.opt = fit.opt, min.density = min.density,
-                         log.x.gc = log.x.gc, log.y.gc = log.y.gc, log.y.model=log.y.model, interactive = interactive,
+                         log.x.gc = log.x.gc, log.y.spline = log.y.spline, log.y.model=log.y.model, interactive = interactive,
                          nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
                          have.atleast = round(have.atleast), parameter = round(parameter),
                          log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
-                         model.type = model.type)
+                         model.type = model.type, growth.thresh = growth.thresh)
   class(grofit.control) <- "grofit.control"
   grofit.control
 }
@@ -671,7 +673,7 @@ growth.control <-
 #' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default: \code{"a"}.
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.gc (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{growth.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.
@@ -681,6 +683,7 @@ growth.control <-
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
+#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
@@ -709,7 +712,7 @@ growth.workflow <- function (time,
                              fit.opt = "a",
                              min.density = NA,
                              log.x.gc = FALSE,
-                             log.y.gc = TRUE,
+                             log.y.spline = TRUE,
                              log.y.model = FALSE,
                              lin.h = NULL,
                              lin.R2 = 0.98,
@@ -720,6 +723,7 @@ growth.workflow <- function (time,
                              smooth.gc = 0.55,
                              model.type = c("logistic",
                                             "richards", "gompertz", "gompertz.exp"),
+                             growth.thresh = 1.5,
                              have.atleast = 6,
                              parameter = 34,
                              smooth.dr = NULL,
@@ -747,11 +751,11 @@ growth.workflow <- function (time,
   }
   control <- growth.control(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                             suppress.messages = suppress.messages, fit.opt = fit.opt, min.density = min.density,
-                            log.x.gc = log.x.gc, log.y.gc = log.y.gc, log.y.model = log.y.model, interactive = interactive,
+                            log.x.gc = log.x.gc, log.y.spline = log.y.spline, log.y.model = log.y.model, interactive = interactive,
                             nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
                             have.atleast = round(have.atleast), parameter = parameter,
                             log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
-                            model.type = model.type)
+                            model.type = model.type, growth.thresh = growth.thresh)
   nboot.gc <- control$nboot.gc
   nboot.dr <- control$nboot.dr
   out.gcFit <- NA
@@ -795,9 +799,9 @@ growth.workflow <- function (time,
     res.table.dr <- NULL
   }
   if(report == TRUE){
-    growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), res.table.gc=res.table.gc,
+    try(growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), res.table.gc=res.table.gc,
                   res.table.dr=res.table.dr, ec50=ec50, t0 = t0, mean.grp = mean.grp, mean.conc = mean.conc,
-                  export = export)
+                  export = export, lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY))
   }
 
   grofit
@@ -1147,7 +1151,7 @@ growth.gcFit <- function(time, data, control=growth.control(), t0 = 0, lin.h = N
     # create output table
     description     <- data.frame(TestId=data[i,1], AddId=data[i,2],concentration=data[i,3],
                                   reliability_tag=reliability_tag, used.model=fitpara$model,
-                                  log.x=control$log.x.gc, log.y=control$log.y.gc, nboot.gc=control$nboot.gc)
+                                  log.x=control$log.x.gc, log.y=control$log.y.spline, nboot.gc=control$nboot.gc)
 
     fitted          <- cbind(description, summary.gcFitLinear(fitlinear), summary.gcFitModel(fitpara), summary.gcFitSpline(nonpara), summary.gcBootSpline(bt))
 
@@ -1187,8 +1191,8 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
 
   # /// check length of input data
   if (length(time)!=length(data)) stop("gcFitModel: length of time and data input vectors differ!")
-  if(max(data) < 1.5*data[1]){
-    if(control$suppress.messages==F) message("No significant growth detected (with all values below 1.5 * start_value).")
+  if(max(data) < control$growth.thresh * data[1]){
+    if(control$suppress.messages==F) message(paste0("Parametric fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
     gcFitModel   <- list(raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
                          fit.data = NA, parameters = list(A=NA, mu=0, lambda=NA, integral=NA),
                          model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
@@ -1436,7 +1440,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 
   if (length(time) != length(data))
     stop("gcFitSpline: length of input vectors differ!")
-  if(control$log.y.gc == TRUE){
+  if(control$log.y.spline == TRUE){
     bad.values <- (is.na(time)) | (is.na(data)) |
       (!is.numeric(time)) | (!is.numeric(data) )
   } else {
@@ -1452,8 +1456,8 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       stop("Bad values in gcFitSpline")
     }
   }
-  if(max(data) < 1.5*data[1]){
-    if(control$suppress.messages==F) message("No significant growth detected (with all values below 1.5 * start_value).")
+  if(max(data) < control$growth.thresh * data[1]){
+    if(control$suppress.messages==F) message(paste0("Nonparametric fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
     gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                         fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = 0, dY = NA,
                                                                                                               mu = 0, lambda = Inf, integral = NA), spline = NA,
@@ -1487,21 +1491,11 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       }
       time <- log(1 + time)
     }
-    if (control$log.y.gc == TRUE) {
+    if (control$log.y.spline == TRUE) {
       data.log <- log(data/data[1])
-      # bad.values <- (data.log < 0)
-      # if (TRUE %in% bad.values) {
-      #   if (control$neg.nan.act == FALSE) {
-      #     time <- time[!bad.values]
-      #     data.log <- data.log[!bad.values]
-      #   }
-      #   else {
-      #     stop("Bad values in gcFitSpline")
-      #   }
-      # }
     }
     time.raw <- time
-    data.raw <- if (control$log.y.gc == TRUE) {
+    data.raw <- if (control$log.y.spline == TRUE) {
       data.log
     } else {
       data
@@ -1509,7 +1503,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
     # Implement min.density into dataset
     if(!is.null(control$min.density)) {
       if (!is.na(control$min.density) && control$min.density != 0) {
-        if (control$log.y.gc == TRUE) {
+        if (control$log.y.spline == TRUE) {
           # perfom log transformation on min.density (Ln(y/y0))
           min.density <- log(control$min.density / data[1])
           time <- time[max(which.min(abs(time - t0)), which.min(abs(data.log - min.density))):length(time)]
@@ -1525,7 +1519,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
     }
     # Implement t0 into dataset
     if(is.numeric(t0) && t0 > 0){
-      if (control$log.y.gc == TRUE) {
+      if (control$log.y.spline == TRUE) {
         data.log <- data.log[which.min(abs(time-t0)):length(data.log)]
       } else{
         data <- data[which.min(abs(time.raw-t0)):length(data)]
@@ -1533,7 +1527,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       time <- time[which.min(abs(time.raw-t0)):length(time)]
     }
     halftime <- (min(time) + max(time))/2
-    try(y.spl <- smooth.spline(time, y = if(control$log.y.gc == TRUE){
+    try(y.spl <- smooth.spline(time, y = if(control$log.y.spline == TRUE){
       data.log
     } else {
       data
@@ -1563,7 +1557,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       b.spl <- y.max - mu.spl * t.max # the y-intercept of the tangent at µmax
       lambda.spl <- -b.spl/mu.spl  # lag time
       integral <- low.integrate(y.spl$x, y.spl$y)
-      low <- lowess(time, y = if(control$log.y.gc == TRUE){
+      low <- lowess(time, y = if(control$log.y.spline == TRUE){
         data.log
       } else {
         data
@@ -1589,13 +1583,13 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
         fit.time = y.spl$x,
         fit.data = y.spl$y,
         parameters = list(
-          A = if (control$log.y.gc == TRUE) {
+          A = if (control$log.y.spline == TRUE) {
             # Correct ln(N/N0) transformation for max density value
             data[1] * exp(max(y.spl$y))
           } else {
            max(y.spl$y)
           },
-          dY = if (control$log.y.gc == TRUE) {
+          dY = if (control$log.y.spline == TRUE) {
             data[1] * exp(max(y.spl$y)) -  data[1] * exp(y.spl$y[1])
           } else {
             max(y.spl$y) - y.spl$y[1]
@@ -1605,7 +1599,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
           b.tangent = b.spl,
           integral = integral),
         parametersLowess = list(
-          A = if (control$log.y.gc == TRUE) {
+          A = if (control$log.y.spline == TRUE) {
             # Correct ln(N/N0) transformation for max density value
             data[1] * exp(max(y.low))
           } else {
@@ -1745,8 +1739,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", t0 = 0, h = NULL,
   max.density <- max(obs$data)
   dY.total <- max.density - obs$data[1]
 
-  if(max(data.in) < 1.5*data.in[1]){
-    if(control$suppress.messages==F) message("No significant growth detected (with all values below 1.5 * start_value).")
+  if(max(data.in) < control$growth.thresh * data.in[1]){
+    if(control$suppress.messages==F) message(paste0("Linear fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, dY = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA ),
@@ -1971,7 +1965,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
   data <- as.vector(as.numeric(as.matrix(data)))
   if (length(time) != length(data))
     stop("gcBootSpline: length of input vectors differ!")
-  if(control$log.y.gc == TRUE){
+  if(control$log.y.spline == TRUE){
     bad.values <- (is.na(time)) | (is.na(data)) |
       (!is.numeric(time)) | (!is.numeric(data) | (data<=0))
   } else {
@@ -2048,7 +2042,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
     }
     time.log <- log(1 + time)
   }
-  if (control$log.y.gc == TRUE) {
+  if (control$log.y.spline == TRUE) {
     data.log <- log(data/data[1])
     bad.values <- (data.log < 0)
     if (TRUE %in% bad.values) {
@@ -2063,7 +2057,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
       time
     },
     time,
-    raw.data = if (control$log.y.gc == TRUE) {
+    raw.data = if (control$log.y.spline == TRUE) {
       data.log
     } else {
       data

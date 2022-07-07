@@ -17,7 +17,7 @@ growth.workflow(
   fit.opt = "a",
   min.density = NA,
   log.x.gc = FALSE,
-  log.y.gc = TRUE,
+  log.y.spline = TRUE,
   log.y.model = FALSE,
   lin.h = NULL,
   lin.R2 = 0.98,
@@ -27,6 +27,7 @@ growth.workflow(
   nboot.gc = 0,
   smooth.gc = 0.55,
   model.type = c("logistic", "richards", "gompertz", "gompertz.exp"),
+  growth.thresh = 1.5,
   have.atleast = 6,
   parameter = 34,
   smooth.dr = NULL,
@@ -63,7 +64,7 @@ growth.workflow(
 
 \item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
 
-\item{log.y.gc}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and spline fits. Default: \code{TRUE}}
+\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and spline fits. Default: \code{TRUE}}
 
 \item{log.y.model}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{model} fits. Default: \code{TRUE}}
 
@@ -82,6 +83,8 @@ growth.workflow(
 \item{smooth.gc}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}}
 
 \item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.}
+
+\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 
 \item{have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 

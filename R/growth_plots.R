@@ -126,7 +126,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
     p <-    ggplot(df, aes(x=time, y=data)) +
       geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
       xlab("Time") +
-      ylab(label = ifelse(gcFittedModel$control$log.y.gc == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
+      ylab(label = ifelse(gcFittedModel$control$log.y.spline == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
       theme_classic(base_size = 16) +
       ggtitle(gsub(" \\| NA", "", paste(gcFittedModel$gcID, collapse=" | "))) +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
@@ -654,6 +654,7 @@ plot.drFitSpline <-
               c(drFitSpline$parameters$yEC50, drFitSpline$parameters$yEC50),
               lty = 2)
       }
+      title(main = drFitSpline$drID)
     } # p <- function()
     if (export == TRUE){
       w <- width
@@ -719,7 +720,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       colSpline <- rep(colSpline, (gcBootSpline$control$nboot.gc%/%length(colSpline))+1)
 
       log.x     <- gcBootSpline$control$log.x.gc
-      log.y     <- gcBootSpline$control$log.y.gc
+      log.y     <- gcBootSpline$control$log.y.spline
 
       global.minx <- min(min(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
       global.maxx <- max(max(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
@@ -885,19 +886,19 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
     if (add==TRUE){
       if(spline == TRUE){
         # /// try to plot data fit
-        if ((gcFitSpline$control$log.x.gc==FALSE) && (gcFitSpline$control$log.y.gc==FALSE)){
+        if ((gcFitSpline$control$log.x.gc==FALSE) && (gcFitSpline$control$log.y.spline==FALSE)){
           try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
         }
 
-        if ((gcFitSpline$control$log.x.gc==FALSE) && (gcFitSpline$control$log.y.gc==TRUE)){
+        if ((gcFitSpline$control$log.x.gc==FALSE) && (gcFitSpline$control$log.y.spline==TRUE)){
           try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
         }
 
-        if ((gcFitSpline$control$log.x.gc==TRUE)  && (gcFitSpline$control$log.y.gc==FALSE)){
+        if ((gcFitSpline$control$log.x.gc==TRUE)  && (gcFitSpline$control$log.y.spline==FALSE)){
           try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
         }
 
-        if ((gcFitSpline$control$log.x.gc==TRUE)  && (gcFitSpline$control$log.y.gc==TRUE)){
+        if ((gcFitSpline$control$log.x.gc==TRUE)  && (gcFitSpline$control$log.y.spline==TRUE)){
           try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
         }
         # /// add tangent at maximum slope
@@ -924,7 +925,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
       coef <- gcFitSpline[["parameters"]]
       lagtime <- coef["lambda"][[1]][1]
       # correct for log transformation
-      if(gcFitSpline$control$log.y.gc == TRUE){
+      if(gcFitSpline$control$log.y.spline == TRUE){
         fit.data <-
           c(rep(NA, length(gcFitSpline[["raw.data"]]) - length(gcFitSpline[["fit.data"]])), exp(gcFitSpline[["fit.data"]]) *
               gcFitSpline[["data.in"]][1])
@@ -971,7 +972,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
         # time values for tangent
         time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
         # y values for tangent
-        bla <- ifelse(gcFitSpline$control$log.y.gc == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+        bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
         tangent.df <- data.frame("time" = time,
                                  "y" = bla)
         df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
@@ -1142,7 +1143,7 @@ plot.grofit <- function(grofit,
 
   if(data.type == "spline"){
     # correct for log transformation
-    if(grofit$control$log.y.gc == TRUE){
+    if(grofit$control$log.y.spline == TRUE){
         for(i in 1:length(ndx.keep)){
           grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
             exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
@@ -1618,19 +1619,23 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   ndx.filt <- unlist(filter.ls, recursive = F)
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
   # calculate average param values
-  mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) )
-  sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T) ) )
+  mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) ) # mean
+  sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) ) #standard deviation
+  n <- unlist(lapply(1:length(ndx.filt), function (x) length(ndx.filt[[x]])) ) # number of replicates per condition
+  error <- stats::qnorm(0.975) * sd / sqrt(n) # standard error
+  CI.L <- mean - error #left confidence interval
+  CI.R <- mean + error #right confidence interval
 
-  df <- data.frame(name = gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))), mean = mean, sd = sd)
+  df <- data.frame(name = gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))), mean = mean, CI.L = CI.L, CI.R = CI.R)
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
   df$mean[is.na(df$mean)] <- 0
-  df$sd[is.na(df$sd)] <- 0
+  df$CI.L[is.na(df$CI.L)] <- 0
+  df$CI.R[is.na(df$CI.R)] <- 0
   p <- ggplot(df, aes(x=name, y=mean, fill = group)) +
     geom_bar(stat="identity", color = "black") +
-    geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, size = 1,
-                  position=position_dodge(.9)) +
-    ggplot2::labs(x = "Sample", y = param) +
+    geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.2) +
+    ggplot2::labs(x = "Sample", y = paste0(param, " (\u00B1 95% CI)")) +
     theme_minimal(base_size = basesize) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"))

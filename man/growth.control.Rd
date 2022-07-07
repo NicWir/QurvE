@@ -11,7 +11,7 @@ growth.control(
   fit.opt = "a",
   min.density = NULL,
   log.x.gc = FALSE,
-  log.y.gc = TRUE,
+  log.y.spline = TRUE,
   log.y.model = FALSE,
   interactive = TRUE,
   nboot.gc = 0,
@@ -22,7 +22,8 @@ growth.control(
   smooth.dr = NULL,
   log.x.dr = FALSE,
   log.y.dr = FALSE,
-  nboot.dr = 0
+  nboot.dr = 0,
+  growth.thresh = 1.5
 )
 }
 \arguments{
@@ -38,7 +39,7 @@ growth.control(
 
 \item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
 
-\item{log.y.gc}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and spline fits. Default: \code{TRUE}}
+\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and spline fits. Default: \code{TRUE}}
 
 \item{log.y.model}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{model} fits. Default: \code{TRUE}}
 
@@ -61,6 +62,8 @@ growth.control(
 \item{log.y.dr}{(Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.}
 
 \item{nboot.dr}{(Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.}
+
+\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 }
 \description{
 A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{growth.read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
