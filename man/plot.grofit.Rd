@@ -6,6 +6,7 @@
 \usage{
 \method{plot}{grofit}(
   grofit,
+  data.type = c("spline", "raw"),
   names = NULL,
   conc = NULL,
   mean = TRUE,
@@ -14,20 +15,28 @@
   n.ybreaks = 6,
   colors = NULL,
   basesize = 20,
+  y.lim = NULL,
+  x.lim = NULL,
+  y.title = NULL,
+  x.title = NULL,
+  y.lim.deriv = NULL,
+  y.title.deriv = NULL,
   lwd = 1.1,
   plot = TRUE,
   export = FALSE,
-  height = ifelse(deriv == T, 9, 6),
-  width = 10 + 3 * ifelse(mean == TRUE, length(conditions_unique), length(nm))/15,
+  height = NULL,
+  width = NULL,
   out.dir = NULL
 )
 }
 \arguments{
 \item{grofit}{A \code{grofit} object created with \code{growth.workflow()} containing spline fits.}
 
-\item{names}{(String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered.}
+\item{data.type}{(Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results}
 
-\item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered.}
+\item{names}{(String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
+
+\item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.}
 
 \item{mean}{(Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?}
 
@@ -40,6 +49,18 @@
 \item{colors}{(String vector) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
 
 \item{basesize}{(Numeric) Base font size.}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.title}{(Character) Optional: Provide a title for the y-axis of the growth curve plot.}
+
+\item{x.title}{(Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.}
+
+\item{y.lim.deriv}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.title.deriv}{(Character) Optional: Provide a title for the y-axis of the derivative plot.}
 
 \item{lwd}{(Numeric) Line width of the individual plots.}
 

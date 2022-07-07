@@ -1034,8 +1034,9 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 #'
 #'
 #' @param grofit A \code{grofit} object created with \code{growth.workflow()} containing spline fits.
-#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered.
-#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered.
+#' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
+#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
 #' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
@@ -1048,18 +1049,49 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.title (Character) Optional: Provide a title for the y-axis of the growth curve plot.
+#' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
+#' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
 #'
 #' @export plot.grofit
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
-#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = T, deriv = T, n.ybreaks = 6,
-                        colors = NULL, basesize = 20, lwd = 1.1, plot = TRUE, export = FALSE,
-                        height = ifelse(deriv==T,9, 6), width = 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15,
-                        out.dir = NULL)
+#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab xlim ylim
+#'
+plot.grofit <- function(grofit,
+                        data.type = c("spline", "raw"),
+                        names = NULL,
+                        conc = NULL,
+                        mean = TRUE,
+                        log.y = T,
+                        deriv = T,
+                        n.ybreaks = 6,
+                        colors = NULL,
+                        basesize = 20,
+                        y.lim = NULL,
+                        x.lim = NULL,
+                        y.title = NULL,
+                        x.title = NULL,
+                        y.lim.deriv = NULL,
+                        y.title.deriv = NULL,
+                        lwd = 1.1,
+                        plot = TRUE,
+                        export = FALSE,
+                        height = NULL,
+                        width = NULL,
+                        out.dir = NULL
+)
 {
+  data.type <- match.arg(data.type)
+  if(data.type == "raw" && deriv ==TRUE){
+    warning("Derivatives cannot be calculated for 'raw' data. Only the density values will be shown.")
+    deriv = FALSE
+  }
 
   # grofit an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
@@ -1067,7 +1099,9 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
-  if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("Please run growth.workflow() with 'a' or 's' in fit.opt.")
+  if(data.type == "spline"){
+    if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("To plot spline fit results, please run growth.workflow() with 'a' or 's' in fit.opt.")
+  }
 
 
   # Get name of conditions with multiple replicates
@@ -1083,40 +1117,45 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
   }
   # remove conditions with fitFlag = FALSE in all replicates
-  ndx.filt.nm <- unique(lapply(1:length(sample.nm), function(i)which(gsub(" \\| .+", "", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1])))))
-  filter.ls <- list()
-  for(j in 1:length(ndx.filt.nm)){
-    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.nm[[j]]), function(i) ndx.filt.nm[[j]][grep(paste0("^",
-                                                                                                         gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.nm[[j]][i]], " \\| "))[1])),
-                                                                                                         ".+[[:space:]]",
-                                                                                                         unlist(str_split(sample.nm[ndx.filt.nm[[j]][i]], " \\| "))[3],
-                                                                                                         "$"), sample.nm[ndx.filt.nm[[j]]])]))
-  }
-  ndx.filt <- unlist(filter.ls, recursive = F)
-
-  for(i in 1:length(ndx.filt)){
-    if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
-      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
-      nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+    # Store each condition with its replicate indices in list filter.ls
+    ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i)which(gsub(" \\| .+", "", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1])))))
+    filter.ls <- list()
+    for(j in 1:length(ndx.filt.rep)){
+      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                           gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), sample.nm[ndx.filt.rep[[j]]])]))
     }
-  }
+    ndx.filt <- unlist(filter.ls, recursive = F)
+    # Check FitFlag for each replicate, work per condition
+    for(i in 1:length(ndx.filt)){
+      if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
+        fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+        nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+      }
+    }
 
-  #get indices of samples with selected names
+  # get indices of samples with selected names
   ndx.keep <- grep(paste0(
     str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
 
-  # correct for log transformation
-  if(grofit$control$log.y.gc == TRUE){
-      for(i in 1:length(ndx.keep)){
-        grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
-          exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
-      }
+  if(data.type == "spline"){
+    # correct for log transformation
+    if(grofit$control$log.y.gc == TRUE){
+        for(i in 1:length(ndx.keep)){
+          grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
+            exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
+        }
+    }
   }
 
   if(mean == TRUE){
+    # Combine replicates via their mean and standard deviation
     conditions <- str_replace_all(nm, "\\| . \\| ", "| ")
     conditions_unique <- unique(conditions)
 
+    # Create lists for each selected condition, with density values and derivatives, respectively. Each list item represents one condition with their average and SD
     plotdata.ls <- list()
     deriv.ls <- list()
     for(n in 1:length(conditions_unique)){
@@ -1127,8 +1166,18 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
                          unlist(str_split(conditions_unique[n], " \\| "))[2],
                          "$"), sample.nm))
       name <- conditions_unique[n]
-      time <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)) %>% as.list(.)
-      data <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)
+      # Create lists for density and time values for each sample
+      if(data.type == "spline"){
+        time <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)) %>% as.list(.)
+        data <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)
+      } else {
+        time <- lapply(1:length(ndx), function(i) cbind(grofit$time[ndx[[i]], ])) %>% as.list(.)
+        data <- grofit$data[ndx, 4:ncol(grofit$data)]
+        data <- split(as.matrix(data), 1:nrow(as.matrix(data)))
+        data <- lapply(1:length(data), function(i) as.numeric(data[[i]]))
+      }
+
+      # Create lists for derivatives and time values for each sample
       if(deriv){
         time.deriv <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$x)) %>% as.list(.)
         data.deriv <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$y)) %>% as.list(.)
@@ -1139,10 +1188,12 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
           for(j in 1:length(get(paste0("time.missing_", i)))){
+            # extract density values into a separate list
             data[[i]] <- append(data[[i]],
                                 values = NA,
                                 after = match(get(paste0("time.missing_", i))[j],
                                               time.all) - 1)
+            # extract time values into a separate list
             time[[i]] <-
               append(time[[i]],
                      values = get(paste0("time.missing_", i))[j],
@@ -1151,7 +1202,7 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         }
       }
       if(deriv){
-        # correct for unequal lengths of derivative series
+        # correct for unequal lengths of derivative series and harmonize the time values.
         time.all <- Reduce(union, time.deriv)
         for(i in 1:length(time.deriv)){
           assign(paste0("time.missing_", i), setdiff(time.all, time.deriv[[i]]) )
@@ -1205,16 +1256,29 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
       geom_line(size=lwd) +
       geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
-      xlab("Time") +
-      ylab("Growth [y(t)]") +
-      scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+      xlab(ifelse(is.null(x.title), "Time", x.title)) +
+      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
     if(log.y == TRUE){
-      p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      if(!is.null(y.lim)){
+        p <- p + scale_y_log10(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
     } else {
-      p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      if(!is.null(y.lim)){
+        p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+    }
+
+    if(!is.null(x.lim)){
+      p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
     }
 
     if(is.null(colors)){
@@ -1254,12 +1318,28 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
         geom_line(size=lwd) +
         geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
-        xlab("Time") +
-        ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1))) +
-        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+        xlab(ifelse(is.null(x.title), "Time", x.title)) +
         theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank()) +
-        scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+              panel.grid.minor = element_blank())
+
+      if(is.null(y.title.deriv)){
+        p.deriv <- p.deriv + ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1)))
+      } else {
+        p.deriv <- p.deriv + ylab(label = y.title.deriv)
+      }
+
+
+      if(!is.null(y.lim)){
+        p.deriv <- p.deriv + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p.deriv <- p.deriv + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+
+      if(!is.null(x.lim)){
+        p.deriv <- p.deriv + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p.deriv <- p.deriv + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
 
       if(is.null(colors)){
         if (length(plotdata.ls) <= 8) {
@@ -1297,29 +1377,50 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
   } # if(mean == TRUE)
   else {
     df <- data.frame()
-    for(i in 1:length(ndx)){
-      df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx[i]],
-                                            "time" = grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.time"]],
-                                            "y" = grofit$gcFit$gcFittedSplines[[ndx[i]]][["fit.data"]]))
+    for(i in 1:length(ndx.keep)){
+      if(data.type == "spline"){
+        df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
+                                              "time" = grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.time"]],
+                                              "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]))
+      } else {
+        df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
+                                              "time" = as.vector(grofit$time[ndx.keep[i], ]),
+                                              "y" = unlist(unname(type.convert(grofit$data[ndx.keep[i], 4:ncol(grofit$data)], as.is=T)))))
+      }
+
     }
     p <- ggplot(df, aes(x=time, y=y, col = name)) +
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
-      xlab("Time") +
-      ylab("Growth [y(t)]") +
-      scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+      xlab(ifelse(is.null(x.title), "Time", x.title)) +
+      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
     if(log.y == TRUE){
-      p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks))
+      if(!is.null(y.lim)){
+        p <- p + scale_y_log10(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
     } else {
-      p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
+      if(!is.null(y.lim)){
+        p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+    }
+
+    if(!is.null(x.lim)){
+      p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
     }
 
     if(is.null(colors)){
-      if (length(ndx) <= 8) {
+      if (length(ndx.keep) <= 8) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else if (length(ndx) <= 12) {
+      } else if (length(ndx.keep) <= 12) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
       } else {
         p <- p + scale_fill_manual(name = "Condition",
@@ -1343,25 +1444,40 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
     }
     if(deriv){
       df.deriv <- data.frame()
-      for(i in 1:length(ndx)){
-        df.deriv <- plyr::rbind.fill(df.deriv, data.frame("name" = sample.nm[ndx[i]],
-                                              "time" = grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$x,
-                                              "y" = grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$y))
+      for(i in 1:length(ndx.keep)){
+        df.deriv <- plyr::rbind.fill(df.deriv, data.frame("name" = sample.nm[ndx.keep[i]],
+                                              "time" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
+                                              "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
       }
       p.deriv <- ggplot(df.deriv, aes(x=time, y=y, col = name)) +
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
-        xlab("Time") +
-        ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1))) +
-        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+        xlab(ifelse(is.null(x.title), "Time", x.title)) +
         theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank()) +
-        scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+              panel.grid.minor = element_blank())
+
+      if(is.null(y.title.deriv)){
+        p.deriv <- p.deriv + ylab(label = bquote("Exp. growth rate \U00B5 "~(h^-1)))
+      } else {
+        p.deriv <- p.deriv + ylab(label = y.title.deriv)
+      }
+
+      if(!is.null(y.lim)){
+        p.deriv <- p.deriv + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 10, bounds = FALSE))
+      } else {
+        p.deriv <- p.deriv + scale_y_continuous(breaks = scales::pretty_breaks(n = 10, bounds = FALSE))
+      }
+
+      if(!is.null(x.lim)){
+        p.deriv <- p.deriv + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p.deriv <- p.deriv + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
 
       if(is.null(colors)){
-        if (length(ndx) <= 8) {
+        if (length(ndx.keep) <= 8) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else if (length(ndx) <= 12) {
+        } else if (length(ndx.keep) <= 12) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
         } else {
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
@@ -1392,8 +1508,16 @@ plot.grofit <- function(grofit, names = NULL, conc = NULL, mean = TRUE, log.y = 
   }
   out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
   if (export == TRUE){
-    w <- width
-    h <- height
+    if(is.null(width)){
+      w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
+    } else {
+      w <- width
+    }
+    if(is.null(height)){
+      h <- ifelse(deriv==T, 9, 6)
+    } else {
+      h <- height
+    }
     dir.create(out.dir, showWarnings = F)
     grDevices::png(paste0(out.dir, "/", "grpSplineFit.png"),
                    width = w, height = h, units = 'in', res = 300)
@@ -1424,8 +1548,8 @@ base_breaks <- function(n = 10){
 #' 'mu.model', 'lambda.model', 'A.model',
 #' 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
 #' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
-#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered.
-#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered.
+#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param basesize (Numeric) Base font size.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
@@ -1480,15 +1604,17 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
   }
   # get indices of replicates
-  ndx.filt.nm <- unique(lapply(1:length(nm), function(i)which(gsub(" \\| .+", "", nm) %in% (paste0(unlist(str_split(nm[i], " \\| "))[1])))))
-  filter.ls <- list()
-  for(j in 1:length(ndx.filt.nm)){
-    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.nm[[j]]), function(i) ndx.filt.nm[[j]][grep(paste0("^",
-                                                                          gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[ndx.filt.nm[[j]][i]], " \\| "))[1])),
-                                                                          ".+[[:space:]]",
-                                                                          unlist(str_split(nm[ndx.filt.nm[[j]][i]], " \\| "))[3],
-                                                                          "$"), nm[ndx.filt.nm[[j]]])]))
-  }
+  # remove conditions with fitFlag = FALSE in all replicates
+    # Store each condition with its replicate indices in list filter.ls
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub(" \\| .+", "", nm) %in% (paste0(unlist(str_split(nm[i], " \\| "))[1])))))
+    filter.ls <- list()
+    for(j in 1:length(ndx.filt.rep)){
+      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                            gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
+                                                                            ".+[[:space:]]",
+                                                                            unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                            "$"), nm[ndx.filt.rep[[j]]])]))
+    }
   ndx.filt <- unlist(filter.ls, recursive = F)
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
   # calculate average param values
