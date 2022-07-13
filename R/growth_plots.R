@@ -34,11 +34,31 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 
              ## lag phase
              lag <- gcFittedLinear$par["lag"]
-
-             try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
              coef_ <- gcFittedLinear$par
-             try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-             try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+
+
+             if(gcFittedLinear$fitflag2){
+               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               lag2 <- gcFittedLinear$par["lag2"]
+               if(lag2 < lag){
+                 try(time2 <- seq(lag2, max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(time <- seq(coef_["tmax_start"]-0.25*(coef_["tmax_end"]-coef_["tmax_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, c(y0=unname(coef_["y0_lm2"]), mumax=unname(coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag2), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
+                 try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               } else {
+                 try(time2 <- seq(coef_["tmax2_start"]-0.25*(coef_["tmax2_end"]-coef_["tmax2_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, c(y0=unname(coef_["y0_lm2"]), mumax=unname(coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+
+               }
+             } else {
+               try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
+               try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+             }
            },
            diagnostics = {
              opar <- par(no.readonly = TRUE)
@@ -957,10 +977,10 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
 
 
-        p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+      p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
 
       if(log.y == TRUE){
-      p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
       } else {
         p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
       }
@@ -969,23 +989,94 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
       # /// add tangent at maximum slope
       if(slope == TRUE && log.y == T){
         mu     <- as.numeric(coef$mu[1])
-        # time values for tangent
-        time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
-        # y values for tangent
-        bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
-        tangent.df <- data.frame("time" = time,
-                                 "y" = bla)
-        df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
-                                    "y" = gcFitSpline[["data.in"]][1])
-        p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                  xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                  yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                              data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-        if(!(lagtime <0)){
-        p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
-                       linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-        }
-      }
+        if(gcFitSpline$fitFlag2){
+          lagtime2 <- coef$lambda2
+          growth.time <- gcFitSpline$fit.time[which.max(gcFitSpline$fit.data)]
+          mu2 <- coef$mu2
+          if(lagtime2 < lagtime){
+            # time values for tangent at µmax
+            time_start.ndx <- which.min(abs(gcFitSpline$fit.time-(coef$t.max-0.15*growth.time)))
+            time_start <- gcFitSpline$fit.time[time_start.ndx]
+            time <- seq(time_start, max(gcFitSpline$fit.time), length=200)
+            # y values for tangent at µmax
+            bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+            # time values for tangent at µmax2
+            time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(gcFitSpline$"fit.time"), length=200)
+            # y values for tangent at µmax
+            bla2 <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent2"][[1]])*exp(mu2*time2)
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+            df.horizontal2 <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime2),
+                                         "y" = gcFitSpline[["data.in"]][1])
+
+            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+            p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+
+            if(!(lagtime2 <0)){
+              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal2,
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+            }
+          } # if(lagtime2 < lagtime)
+          else {
+            # time values for tangent at µmax
+            time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
+            # y values for tangent at µmax
+            bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+            df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
+                                        "y" = gcFitSpline[["data.in"]][1])
+            # time values for tangent at µmax2
+            time2_start.ndx <- which.min(abs(gcFitSpline$fit.time-(coef$t.max2-0.15*growth.time)))
+            time2_start <- gcFitSpline$fit.time[time2_start.ndx]
+            time2 <- seq(time2_start, max(gcFitSpline$"fit.time"), length=200)
+            # y values for tangent at µmax
+            bla2 <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent2"][[1]])*exp(mu2*time2)
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+
+            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+            p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+
+            if(!(lagtime <0)){
+              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+            }
+          }
+        } # if(gcFitSpline$fitFlag2)
+        else {
+          # time values for tangent
+          time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
+          # y values for tangent
+          bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+          tangent.df <- data.frame("time" = time,
+                                   "y" = bla)
+          df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
+                                      "y" = gcFitSpline[["data.in"]][1])
+          p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                    xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                    yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+          if(!(lagtime <0)){
+            p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+          }
+        } # else of if(gcFitSpline$fitFlag2)
+      } # if(slope == TRUE && log.y == T)
 
       # /// add panel with growth rate over time
       if(deriv == TRUE){
@@ -1026,7 +1117,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
         print(p)
       }
     } # else of if (add == TRUE)
-  }
+  } # else of if ((is.na(gcFitSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE))
 }
 
 #' Combine different groups of samples into a single plot

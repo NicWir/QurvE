@@ -7,7 +7,9 @@
 growth.gcFitModel(time, data, gcID = "undefined", control = growth.control())
 }
 \arguments{
-\item{control}{}
+\item{gcID}{(Character) The name of the analyzed sample.}
+
+\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
 }
 \description{
 Fit different growth models to density data

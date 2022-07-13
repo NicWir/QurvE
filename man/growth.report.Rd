@@ -10,6 +10,14 @@ growth.report(grofit, report.dir = NULL, ...)
 \item{grofit}{A \code{grofit} object created with \code{growth.workflow()}.}
 
 \item{report.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
+
+\item{...}{Further arguments passed to create a report. Currently required:
+\itemize{
+\item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{growth.workflow()} or \code{growth.gcFit()}.
+\item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{"all"}, a string vector, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
+\item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
+\item \code{export}: Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
+}}
 }
 \description{
 \code{growth.report()} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results obtained.

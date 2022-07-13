@@ -9,14 +9,18 @@ summary.gcFitSpline <- function(object,...)
 
     # object of class gcFitSpline
 
-    contents.fitted.spline  <- c("mu.spline", "lambda.spline", "y0.spline", "A.spline", "dY.spline", "integral.spline", "reliable_fit.spline",
+    contents.fitted.spline  <- c("mu.spline", "tD.spline", "tmax.spline", "lambda.spline",
+                                 "mu2.spline", "tD2.spline", "tmax2.spline", "lambda2.spline",
+                                 "y0.spline", "A.spline", "dY.spline", "integral.spline", "reliable_fit.spline", "reliable_fit2.spline",
                                  "smooth.spline")
 
     if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
-      table <- c(0, rep(NA,length(contents.fitted.spline)-3), object$fitFlag, ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
+      table <- c(0, rep(NA,length(contents.fitted.spline)-4), as.character(object$fitFlag), as.character(object$fitFlag2), ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
     }
     else{
-      table <- c(object$parameters$mu, object$parameters$lambda,  object$parameters$A-object$parameters$dY, object$parameters$A, object$parameters$dY, object$parameters$integral, as.character(object$fitFlag),
+      table <- c(object$parameters$mu, log(2)/object$parameters$mu, object$parameters$t.max, object$parameters$lambda,
+                 object$parameters$mu2, log(2)/object$parameters$mu2, object$parameters$t.max2, object$parameters$lambda2,
+                 object$parameters$A-object$parameters$dY, object$parameters$A, object$parameters$dY, object$parameters$integral, as.character(object$fitFlag), as.character(object$fitFlag2),
                  ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
     }
 
@@ -158,22 +162,30 @@ summary.gcFitLinear <- function(object,...)
   {
   # object of class gcFitLinear
 
-  contents.fitted.param     = c("mu.linfit", "lambda.linfit",
-                                "stdmu.linfit", "dY.linfit",
+  contents.fitted.param     = c("mu.linfit", "tD.linfit",
+                                "lambda.linfit",
+                                "dY.linfit",
                                 "A.linfit", "tmu.start.linfit",
                                 "tmu.end.linfit",
-                                "r2mu.linfit", "reliable_fit.linfit")
+                                "r2mu.linfit", "reliable_fit.linfit",
+                                "mu2.linfit", "tD.linfit",
+                                "tmu2.start.linfit", "tmu2.end.linfit",
+                                "r2mu2.linfit", "reliable_fit2.linfit")
 
 
   if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
     table<-c(0, rep(NA,length(contents.fitted.param)-1))
   }
   else{
-    table <- c(object$par[5], object$par[7],
-               object$par[6], object$par[2],
-               object$par[3], object$par[8],
-               object$par[9],
-               object$rsquared, as.character(object$fitFlag))
+    table <- c(object$par[5], log(2)/object$par[5],
+               ifelse(!is.na(object$par["lag2"]), ifelse(object$par["lag2"]<object$par["lag"], object$par["lag2"], object$par["lag"]), object$par["lag"]),
+               object$par[2],
+               object$par[3], object$par[9],
+               object$par[10],
+               object$rsquared, as.character(object$fitFlag),
+               object$par[12], object$par[13],
+               object$par[16], object$par[17],
+               object$rsquared2, as.character(object$fitflag2))
 
   }
   table <- data.frame(t(table))

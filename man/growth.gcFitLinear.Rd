@@ -8,33 +8,45 @@ growth.gcFitLinear(
   time,
   data,
   gcID = "undefined",
-  t0 = 0,
-  h = NULL,
   quota = 0.95,
-  R2 = 0.95,
-  RSD = 0.05,
-  fit.dY = 0.05,
-  control
+  control = growth.control(t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.97,
+    lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE)
 )
 }
 \arguments{
-\item{time}{vector of independent variable.}
+\item{time}{Vector of the independent variable (e.g., time).}
 
-\item{data}{vector of dependent variable (concentration of organisms).}
+\item{data}{Vector of dependent variable (e.g., density values).}
 
-\item{h}{width of the window (number of data).}
+\item{gcID}{(Character) The name of the analyzed sample.}
 
-\item{quota}{part of window fits considered for the overall linear fit
-(relative to max. growth rate)}
+\item{quota}{(Numeric, between 0 an 1) Define what fraction of \eqn{mu_{max}} the slope of regression windows adjacent to the window with highest slope should have to be included in the overall linear fit.}
 
-\item{fit.dY}{(Numeric) Enter the minimum percentage of density increase that a linear regression should cover.}
+\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+
+\item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
+
+\item{lin.h}{(Numeric) Manually define the size of the sliding window . If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
+
+\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.}
+
+\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{growth.gcFitLinear()}.}
+
+\item{lin.dY}{(Numeric) Enter the minimum percentage of density increase that a linear regression should cover.}
+
+\item{biphasic}{(Logical) Shall \code{growth.gcFitLinear} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
+If \code{TRUE}, the following steps are performed to define a second growth phase:
+\enumerate{
+\item Perform a smooth spline fit on the data with a smoothing factor of 0.5.
+\item Calculate the second derivative of the spline fit and in turn perform a smooth spline fit of the derivative with a smoothing factor of 0.4.
+\item Determine local maxima and minima in the second derivative.
+\item Find the local minimum following \eqn{mu_{max}} and repeat the heuristic linear method for later time values.
+\item Find the local maximum before \eqn{mu_{max}} and repeat the heuristic linear method for earlier time values.
+\item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
+}}
 }
 \value{
-object with parameters of the fit. The lag time is currently estimated
-as the intersection between the fit and the horizontal line with \eqn{y=y_0},
-where \code{y0} is the first value of the dependent variable. The intersection
-of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
-These identifieres and their assumptions may change in future versions.
+A \code{gcFitLinear} object with parameters of the fit. The lag time is  estimated as the intersection between the fit and the horizontal line with \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The intersection of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
 }
 \description{
 Determine maximum growth rates from the log-linear part of a growth curve using
@@ -44,16 +56,12 @@ Hall et al. (2013).
 \details{
 The algorithm works as follows:
 \enumerate{
-\item Fit linear regressions to all subsets of \code{h} consecutive data
-points (sliding window). If for example \eqn{h=5}, fit a linear regression to points
-1 \dots 5, 2 \dots 6, 3 \dots 7 and so on. The method seeks the highest
-rate of exponential growth, so the dependent variable is of course
-log-transformed.
-\item Find the subset with the highest slope \eqn{b_{max}} and
-include also the data points of adjacent subsets that have a slope of
-at least \eqn{quota \cdot b_{max}},
-e.g. all data sets that have at least 95\\% of the maximum slope.
-\item Fit a new linear model to the extended data window identified in step 2.
+\item Fit linear regressions to all subsets of \code{h} consecutive, log-transformed data
+points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear regression to points
+1 \dots 5, 2 \dots 6, 3 \dots 7 and so on.
+\item Find the subset with the highest slope \eqn{mu_{max}}. Does the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} value of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
+\item Include also the data points of adjacent subsets that have a slope of at least \eqn{quota \cdot mu{max}}, e.g., all regression windows that have at least 95\% of the maximum slope.
+\item Fit a new linear model to the extended data window identified in step 3.
 }
 }
 \references{

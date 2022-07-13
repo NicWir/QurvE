@@ -8,13 +8,31 @@ growth.gcFitSpline(
   time,
   data,
   gcID = "undefined",
-  control = growth.control(),
-  t0 = 0
+  control = growth.control(biphasic = FALSE)
 )
 }
 \arguments{
-\item{t0}{}
+\item{time}{Vector of the independent variable (e.g., time).}
+
+\item{data}{Vector of dependent variable (e.g., density values).}
+
+\item{gcID}{(Character) The name of the analyzed sample.}
+
+\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+
+\item{biphasic}{(Logical) Shall \code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
+If \code{TRUE}, the following steps are performed to define a second growth phase:
+\enumerate{
+\item Determine local minima within the first derivative of the smooth spline fit.
+\item Remove the 'peak' containing the highest value of the first derivative (i.e., \eqn{mu_{max}}) that is flanked by two local minima.
+\item Repeat the smooth spline fit and identification of maximum slope for later time values than the local minimum after \eqn{mu_{max}}.
+\item Repeat the smooth spline fit and identification of maximum slope for earlier time values than the local minimum before \eqn{mu_{max}}.
+\item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
+}}
+}
+\value{
+A \code{gcFitSpline} object containing the spline fit, its first derivative, and relevant parameters. The lag time is estimated as the intersection between the tangent at the maximum slope and the horizontal line with \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The intersection of the fit with the abscissa is indicated as \code{b.spl}.
 }
 \description{
-Model a smooth spline fit for density data.
+\code{growth.gcFitSpline()} performs a smooth spline fit on the dataset and determines the highest growth rate as the global maximum in the first derivative of the spline.
 }
