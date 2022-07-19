@@ -5,8 +5,9 @@
 \title{Run a complete growth curve analysis and dose-reponse analysis workflow.}
 \usage{
 growth.workflow(
-  time,
-  data,
+  grodata = NULL,
+  time = NULL,
+  data = NULL,
   ec50 = FALSE,
   mean.grp = NA,
   mean.conc = NA,
@@ -24,13 +25,13 @@ growth.workflow(
   lin.R2 = 0.97,
   lin.RSD = 0.1,
   lin.dY = 0.05,
-  interactive = TRUE,
+  interactive = FALSE,
   nboot.gc = 0,
   smooth.gc = 0.55,
   model.type = c("logistic", "richards", "gompertz", "gompertz.exp"),
   growth.thresh = 1.5,
-  have.atleast = 6,
-  parameter = 34,
+  dr.have.atleast = 6,
+  dr.parameter = 34,
   smooth.dr = NULL,
   log.x.dr = FALSE,
   log.y.dr = FALSE,
@@ -43,7 +44,7 @@ growth.workflow(
 \arguments{
 \item{time}{(optional) A matrix containing time values for each sample.}
 
-\item{data}{Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
+\item{data}{Either a \code{grodata} object created with \code{read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
 
 \item{ec50}{(Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -89,9 +90,9 @@ growth.workflow(
 
 \item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 
-\item{have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
+\item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
-\item{parameter}{(Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
 
 \item{smooth.dr}{(Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.}
 

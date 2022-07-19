@@ -9,7 +9,7 @@ growth.gcFit(time, data, control = growth.control())
 \arguments{
 \item{time}{(optional) A matrix containing time values for each sample.}
 
-\item{data}{Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
+\item{data}{Either a \code{grodata} object created with \code{read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
 
 \item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
 

@@ -34,16 +34,7 @@ growth.gcFitLinear(
 
 \item{lin.dY}{(Numeric) Enter the minimum percentage of density increase that a linear regression should cover.}
 
-\item{biphasic}{(Logical) Shall \code{growth.gcFitLinear} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
-If \code{TRUE}, the following steps are performed to define a second growth phase:
-\enumerate{
-\item Perform a smooth spline fit on the data with a smoothing factor of 0.5.
-\item Calculate the second derivative of the spline fit and in turn perform a smooth spline fit of the derivative with a smoothing factor of 0.4.
-\item Determine local maxima and minima in the second derivative.
-\item Find the local minimum following \eqn{mu_{max}} and repeat the heuristic linear method for later time values.
-\item Find the local maximum before \eqn{mu_{max}} and repeat the heuristic linear method for earlier time values.
-\item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
-}}
+\item{biphasic}{(Logical) Shall \code{growth.gcFitLinear} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
 }
 \value{
 A \code{gcFitLinear} object with parameters of the fit. The lag time is  estimated as the intersection between the fit and the horizontal line with \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The intersection of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
@@ -62,6 +53,15 @@ points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear
 \item Find the subset with the highest slope \eqn{mu_{max}}. Does the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} value of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
 \item Include also the data points of adjacent subsets that have a slope of at least \eqn{quota \cdot mu{max}}, e.g., all regression windows that have at least 95\% of the maximum slope.
 \item Fit a new linear model to the extended data window identified in step 3.
+}
+If \code{biphasic = TRUE}, the following steps are performed to define a second growth phase:
+\enumerate{
+\item Perform a smooth spline fit on the data with a smoothing factor of 0.5.
+\item Calculate the second derivative of the spline fit and in turn perform a smooth spline fit of the derivative with a smoothing factor of 0.4.
+\item Determine local maxima and minima in the second derivative.
+\item Find the local minimum following \eqn{mu_{max}} and repeat the heuristic linear method for later time values.
+\item Find the local maximum before \eqn{mu_{max}} and repeat the heuristic linear method for earlier time values.
+\item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
 }
 }
 \references{

@@ -1,6 +1,6 @@
 #' Read growth and fluorescence data in table format
 #'
-#' [growth.read_data] reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
+#' [read_data] reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
 #'
 #' @param data.density An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing density data.
 #' In column format, the first three table rows contain
@@ -22,7 +22,7 @@
 #' @return An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{growth.workflow} or, together with a \code{grofit.control} object in \code{growth.gcFit}, \code{growth.gcFitLinear}, \code{growth.gcFitModel}, \code{growth.gcFitSpline}, or \code{growth.gcBootSpline}
 #' @export
 #' @md
-growth.read_data <-
+read_data <-
   function(data.density,
            data.fluoro1 = NA,
            data.fluoro2 = NA,
@@ -32,183 +32,218 @@ growth.read_data <-
            sheet = 1,
            subtract.blank  = T)
   {
-  # Load density data
-  if (!is.character(data.density)) {
-    dat <- data.density
-  } else {
-    # Read table file
-    dat <- read_file(data.density, csvsep=csvsep, dec=dec, sheet=sheet)
-  }
-  if(data.format == "col"){
-    dat <- t(dat)
-  }
-  if(data.format == "col"){
-    message("Sample data are stored in columns. If they are stored in row format, please run growth.read_data() with data.format = 'row'.")
-  } else {
-    message("Sample data are stored in rows. If they are stored in column format, please run growth.read_data() with data.format = 'col'.")
-  }
-  if(!(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))){
-    if(data.format == "col"){
-      stop("Could not find 'time' in column 1 of data.density")
-    } else {
-      stop("Could not find 'time' in row 1 of data.density")
-    }
-  }
-  # Load fluorescence 1 data
-  if(length(data.fluoro1)>1){
-    if (!is.character(data.fluoro1)) {
-      fluoro1 <- data.fluoro1
+    # Load density data
+    if (!is.character(data.density)) {
+      dat <- data.density
     } else {
       # Read table file
-      fluoro1 <- read_file(data.fluoro1, csvsep=csvsep, dec=dec, sheet=sheet)
+      dat <- read_file(data.density, csvsep=csvsep, dec=dec, sheet=sheet)
     }
     if(data.format == "col"){
-      fluoro1 <- t(fluoro1)
+      dat <- t(dat)
     }
-    if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
-      if(data.format == "col"){
-        stop("Could not find 'time' in column 1 of data.fluoro1")
-      } else {
-        stop("Could not find 'time' in row 1 of data.fluoro1")
-      }
-    }
-  } else {
-    fluoro1 <- NA
-  }
-  # Load fluorescence 2 data
-  if(length(data.fluoro2)>1){
-    if (!is.character(data.fluoro2)) {
-      fluoro2 <- data.fluoro2
+    if(data.format == "col"){
+      message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
     } else {
-      # Read table file
-      fluoro2 <- read_file(data.fluoro2, csvsep=csvsep, dec=dec, sheet=sheet)
+      message("Sample data are stored in rows. If they are stored in column format, please run read_data() with data.format = 'col'.")
     }
-    if(data.format == "col"){
-      fluoro2 <- t(fluoro2)
-    }
-    if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
+    if(!(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))){
       if(data.format == "col"){
-        stop("Could not find 'time' in column 1 of data.fluoro2")
+        stop("Could not find 'time' in column 1 of data.density")
       } else {
-        stop("Could not find 'time' in row 1 of data.fluoro2")
+        stop("Could not find 'time' in row 1 of data.density")
       }
     }
-  } else {
-    fluoro2 <- NA
-  }
-
-  # subtract blank
-  if(subtract.blank){
-    subtract_blank <- function(df){
-      #test if more than one time entity is present
-      time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
-      if(length(time.ndx)==1){
-        blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
-        if(length(blank.ndx)>0){
-          blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = T)
-          df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric)-blank
+    # Load fluorescence 1 data
+    if(length(data.fluoro1)>1){
+      if (!is.character(data.fluoro1)) {
+        fluoro1 <- data.fluoro1
+      } else {
+        # Read table file
+        fluoro1 <- read_file(data.fluoro1, csvsep=csvsep, dec=dec, sheet=sheet)
+      }
+      if(data.format == "col"){
+        fluoro1 <- t(fluoro1)
+      }
+      if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
+        if(data.format == "col"){
+          stop("Could not find 'time' in column 1 of data.fluoro1")
+        } else {
+          stop("Could not find 'time' in row 1 of data.fluoro1")
         }
-      } else { # identify different datasets based on the occurence of multiple 'time' entities
-        # identify additional time entities
-        blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
-        if(length(blank.ndx)>0){
-          blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
-          df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)] <-
-              t(apply(df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric) - blank)
-          for (i in 2:(length(time.ndx))){
-            blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 1])) {
+      }
+      # add minimum negative value + 1 to all fluorescence data
+    } else {
+      fluoro1 <- NA
+    }
+    # Load fluorescence 2 data
+    if(length(data.fluoro2)>1){
+      if (!is.character(data.fluoro2)) {
+        fluoro2 <- data.fluoro2
+      } else {
+        # Read table file
+        fluoro2 <- read_file(data.fluoro2, csvsep=csvsep, dec=dec, sheet=sheet)
+      }
+      if(data.format == "col"){
+        fluoro2 <- t(fluoro2)
+      }
+      if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
+        if(data.format == "col"){
+          stop("Could not find 'time' in column 1 of data.fluoro2")
+        } else {
+          stop("Could not find 'time' in row 1 of data.fluoro2")
+        }
+      }
+    } else {
+      fluoro2 <- NA
+    }
+
+    # subtract blank
+    if(subtract.blank){
+      subtract_blank <- function(df){
+        #test if more than one time entity is present
+        time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
+        if(length(time.ndx)==1){
+          blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
+          if(length(blank.ndx)>0){
+            blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = T)
+            df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- t(sweep(apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
+          }
+        } else { # identify different datasets based on the occurence of multiple 'time' entities
+          # identify additional time entities
+          blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
+          if(length(blank.ndx)>0){
+            blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
+            df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)] <-
+              t(sweep(apply(df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
+            for (i in 2:(length(time.ndx))){
+              blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 1])) {
                 (time.ndx[i] + 1):nrow(df)
               } else {
                 (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
               }, 1], ignore.case = T) + time.ndx[i]
-            if(length(blank.ndx)>0){
-              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
+              if(length(blank.ndx)>0){
+                blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
 
-              df[if (is.na(time.ndx[i + 1])) {
-                ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
-              } else {
-                ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-              }, 4:ncol(df)] <-
-                t(apply(df[if (is.na(time.ndx[i + 1])) {
+                df[if (is.na(time.ndx[i + 1])) {
                   ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
                 } else {
                   ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-                }, 4:ncol(df)], 1, as.numeric) - blank)
+                }, 4:ncol(df)] <-
+                  t(sweep(apply(df[if (is.na(time.ndx[i + 1])) {
+                    ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
+                  } else {
+                    ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
+                  }, 4:ncol(df)], 1, as.numeric), 1, blank))
+              }
+            } # end of for (i in 2:(length(time.ndx)))
+          } # if(length(blank.ndx)>0){
+        } # end of else {}
+        return(df)
+      }
+      if(length(dat)>1)             dat <- subtract_blank(dat)
+      if(length(data.fluoro1)>1)    fluoro1 <- subtract_blank(df=fluoro1)
+      if(length(data.fluoro2)>1)    fluoro2 <- subtract_blank(df=fluoro2)
+    }
+
+    ### Combine technical replicates
+    combine_techrep <- function(df){
+      sample_names <- as.character(paste0(df[2:nrow(df),1], "...", df[2:nrow(df),2], "___", df[2:nrow(df),3]))
+      conditions <-
+        unique(gsub("\\.\\.\\..+___", "___", sample_names))
+      # remove "time" from samples in case of several time entities
+      time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
+      if(length(time.ndx)>1){
+        conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = T)]
+      }
+      # remove blanks from conditions
+      blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
+      if(length(blankcond.ndx)>1){
+        conditions <- conditions[-blankcond.ndx]
+      }
+
+      remove <- c()
+      for(i in 1:length(conditions)){
+        ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
+        name <- df[ndx.cond[1]+1,1]
+        conc <- df[ndx.cond[1]+1,3]
+        tech.rep <- suppressWarnings(as.numeric(unique(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
+        tech.rep <- tech.rep[!is.na(tech.rep)]
+        if(length(tech.rep)>1){
+          for(j in 1:length(tech.rep)){
+            ndx.rep <- ndx.cond[which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j])]
+            if(length(ndx.rep)>1){
+              values <- apply(df[ndx.rep+1, 4:ncol(df)], 1, as.numeric)
+              means <- rowMeans(values)
+              df[ndx.rep[1]+1, 4:ncol(df)] <- means
+              df[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
+              remove <- c(remove, ndx.rep[-1]+1)
+            } else {
+              df[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
             }
-          } # end of for (i in 2:(length(time.ndx)))
-        } # if(length(blank.ndx)>0){
-      } # end of else {}
-      return(df)
-    }
-    dat <- subtract_blank(dat)
-    if(length(data.fluoro1)>1)     fluoro1 <- subtract_blank(df=fluoro1)
-    if(length(data.fluoro2)>1)     fluoro2 <- subtract_blank(df=fluoro2)
-  }
-
-  ### Combine technical replicates
-  combine_techrep <- function(dat){
-    sample_names <- as.character(paste0(dat[2:nrow(dat),1], "...", dat[2:nrow(dat),2], "___", dat[2:nrow(dat),3]))
-    conditions <-
-      unique(gsub("\\.\\.\\..+___", "___", sample_names))
-    # remove "time" from samples in case of several time entities
-    time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
-    if(length(time.ndx)>1){
-      conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = T)]
-    }
-    # remove blanks from conditions
-    blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
-    if(length(blankcond.ndx)>1){
-      conditions <- conditions[-blankcond.ndx]
-    }
-
-    remove <- c()
-    for(i in 1:length(conditions)){
-      ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
-      name <- dat[ndx.cond[1]+1,1]
-      conc <- dat[ndx.cond[1]+1,3]
-      tech.rep <- suppressWarnings(as.numeric(unique(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
-      tech.rep <- tech.rep[!is.na(tech.rep)]
-      if(length(tech.rep)>1){
-        for(j in 1:length(tech.rep)){
-          ndx.rep <- ndx.cond[which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j])]
-          if(length(ndx.rep)>1){
-            values <- apply(dat[ndx.rep+1, 4:ncol(dat)], 1, as.numeric)
-            means <- rowMeans(values)
-            dat[ndx.rep[1]+1, 4:ncol(dat)] <- means
-            dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
-            remove <- c(remove, ndx.rep[-1]+1)
-          } else {
-            dat[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
           }
         }
+        else{
+          df[1+ndx.cond, 2] <- gsub("[[:alpha:]]", "", df[1+ndx.cond, 2])
+        }
       }
-      else{
-        dat[1+ndx.cond, 2] <- gsub("[[:alpha:]]", "", dat[1+ndx.cond, 2])
+      if(length(remove)>1){
+        df <- df[-remove,]
+      }
+      return(df)
+    }
+    if(length(dat)>1)              dat <- combine_techrep(dat)
+    if(length(data.fluoro1)>1)     fluoro1 <- combine_techrep(df=fluoro1)
+    if(length(data.fluoro2)>1)     fluoro2 <- combine_techrep(df=fluoro2)
+
+
+    # remove blank columns from dataset
+    remove_blank <- function(df){
+      blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
+      if(length(blank.ndx)>1){
+        df <- df[-blank.ndx, ]
+      }
+      return(df)
+    }
+    if(length(dat)>1)              dat <- remove_blank(dat)
+    if(length(data.fluoro1)>1)     fluoro1 <- remove_blank(df=fluoro1)
+    if(length(data.fluoro2)>1)     fluoro2 <- remove_blank(df=fluoro2)
+
+    # Remove columns with NA measurements in all samples
+    if(length(dat)>1)              dat <- dat[, which(unlist(lapply(1:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
+    if(length(data.fluoro1)>1)     fluoro1 <- fluoro1[, which(unlist(lapply(1:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))]
+    if(length(data.fluoro2)>1)     fluoro2 <- fluoro2[, which(unlist(lapply(1:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))]
+
+    # add minimum negative value + 1 to all fluorescence data
+    if(length(data.fluoro1)>1){
+      num.fluoro1 <- t(apply(fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)], 1, as.numeric))
+      min.F1 <- unique(num.fluoro1[which(num.fluoro1 == min(num.fluoro1, na.rm = TRUE), arr.ind = TRUE)])
+      if(min.F1 <=0){
+        fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)] <- num.fluoro1+(-min.F1)+1
       }
     }
-    if(length(remove)>1){
-      dat <- dat[-remove,]
+    if(length(data.fluoro2)>1){
+      num.fluoro2 <- t(apply(fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)], 1, as.numeric))
+      min.F2 <- unique(num.fluoro2[which(num.fluoro2 == min(num.fluoro2, na.rm = TRUE), arr.ind = TRUE)])
+      if(min.F2 <=0){
+        fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)] <- num.fluoro2+(-min.F2)+1
+      }
     }
-    return(dat)
-  }
-  dat <- combine_techrep(dat)
-  if(length(data.fluoro1)>1)     fluoro1 <- combine_techrep(dat=fluoro1)
-  if(length(data.fluoro2)>1)     fluoro2 <- combine_techrep(dat=fluoro2)
 
-  # remove blank columns from dataset
-  remove_blank <- function(dat){
-    blank.ndx <- grep("blank", dat[1:nrow(dat),1], ignore.case = T)
-    if(length(blank.ndx)>1){
-      dat <- dat[-blank.ndx, ]
+    # normalize fluorescence
+    if(length(data.fluoro1)>1 && length(dat)>1){
+      fluoro1.norm <- fluoro1
+      time.ndx <- grep("time", unlist(fluoro1.norm[,1]), ignore.case = TRUE)
+      fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)] <-
+        t(apply(fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
     }
-    return(dat)
-  }
-  dat <- remove_blank(dat)
-  if(length(data.fluoro1)>1)     fluoro1 <- remove_blank(dat=fluoro1)
-  if(length(data.fluoro2)>1)     fluoro2 <- remove_blank(dat=fluoro2)
+    if(length(data.fluoro2)>1 && length(dat)>1){
+      fluoro2.norm <- fluoro1
+      time.ndx <- grep("time", unlist(fluoro2.norm[,1]), ignore.case = TRUE)
+      fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)] <-
+        t(apply(fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
+    }
 
-  # Remove columns with NA measurements in all samples
-  dat <- dat[, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
   # Create time matrix
   time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
   if(length(time.ndx)==1){
@@ -248,31 +283,35 @@ growth.read_data <-
     } # end of for (i in 2:(length(time.ndx)))
   } # end of else {}
 
-  # Create data matrix for density values
-  create_datmat <- function(dat, time.ndx){
+  # Create data matrix for density and fluorescence values
+  create_datmat <- function(df, time.ndx){
     if(length(time.ndx)==1){
-      dat.mat <- data.frame(dat[(time.ndx[1]+1):nrow(dat),])
+      df.mat <- data.frame(df[(time.ndx[1]+1):nrow(df),])
     } else { # identify different datasets based on the occurence of multiple 'time' entities
-      dat.mat <- data.frame(dat[(time.ndx[1]+1) : (time.ndx[2]-1), ])
+      df.mat <- data.frame(df[(time.ndx[1]+1) : (time.ndx[2]-1), ])
       for (i in 2:(length(time.ndx))){
-        dat.mat <- rbind(dat.mat,
-                         data.frame(dat[ if (is.na(time.ndx[i + 1])) {
-                           (time.ndx[i]+1) : nrow(dat)
+        df.mat <- rbind(df.mat,
+                         data.frame(df[ if (is.na(time.ndx[i + 1])) {
+                           (time.ndx[i]+1) : nrow(df)
                          } else {
                            (time.ndx[i]+1) : (time.ndx[i+1] - 1)
                          } , ])
         )
       } # end of for (i in 2:(length(time.ndx)))
     } # end of else {}
-    return(dat.mat)
+    return(df.mat)
   }
-  dat.mat <- create_datmat(dat, time.ndx=time.ndx)
-  if(length(data.fluoro1)>1){fluoro1.mat <- create_datmat(dat=fluoro1, time.ndx=time.ndx)}else{fluoro1.mat <- NA}
-  if(length(data.fluoro2)>1){fluoro2.mat <- create_datmat(dat=fluoro2, time.ndx=time.ndx)}else{fluoro2.mat <- NA}
+  if(length(dat)>1){dat.mat <- create_datmat(dat, time.ndx=time.ndx)}else{dat.mat <- NA}
+  if(length(data.fluoro1)>1){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx)}else{fluoro1.mat <- NA}
+  if(length(data.fluoro2)>1){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx)}else{fluoro2.mat <- NA}
+  if(length(data.fluoro1)>1 && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx)}else{fluoro1.norm.mat <- NA}
+  if(length(data.fluoro2)>1 && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx)}else{fluoro2.norm.mat <- NA}
 
-  colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if(length(data.fluoro1)>1)     colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(length(dat)>1)             colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(length(data.fluoro1)>1)    colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
   if(length(data.fluoro2)>1)    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(length(data.fluoro1)>1 && length(dat)>1)  colnames(fluoro1.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+    if(length(data.fluoro2)>1 && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
 
   label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
   condition <- dat.mat[, 1]
@@ -281,12 +320,25 @@ growth.read_data <-
 
   expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
 
-  dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
+  if(length(dat)>1)             dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
+  if(length(data.fluoro1)>1)    fluoro1.mat <- as.data.frame(unclass(fluoro1.mat), stringsAsFactors = TRUE)
+  if(length(data.fluoro2)>1)    fluoro2.mat <- as.data.frame(unclass(fluoro2.mat), stringsAsFactors = TRUE)
+  if(length(data.fluoro1)>1 && length(dat)>1)  fluoro1.norm.mat <- as.data.frame(unclass(fluoro1.norm.mat), stringsAsFactors = TRUE)
+  if(length(data.fluoro2)>1 && length(dat)>1)  fluoro2.norm.mat <- as.data.frame(unclass(fluoro2.norm.mat), stringsAsFactors = TRUE)
+  #convert values from factor to numeric
+  if(length(dat)>1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
+  if(length(data.fluoro1)>1)    fluoro1.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.mat[, -(1:3)]))
+  if(length(data.fluoro2)>1)    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
+  if(length(data.fluoro1)>1 && length(dat)>1)  fluoro1.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.norm.mat[, -(1:3)]))
+  if(length(data.fluoro2)>1 && length(dat)>1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
+
 
   dataset <- list("time" = t.mat,
                   "density" = dat.mat,
                   "fluorescence1" = fluoro1.mat,
                   "fluorescence2" = fluoro2.mat,
+                  "norm.fluorescence1" = fluoro1.norm.mat,
+                  "norm.fluorescence2" = fluoro2.norm.mat,
                   "expdesign" = expdesign)
 
   class(dataset) <- "grodata"
@@ -295,7 +347,7 @@ growth.read_data <-
 
 #' Parse raw plate reader data and convert it to a format compatible with QurvE
 #'
-#' \code{growth.parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{growth.workflow()}.
+#' \code{parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{growth.workflow()}.
 #'
 #' @param file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
 #' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
@@ -309,7 +361,7 @@ growth.read_data <-
 #' @return A grodata object suitable to run \code{growth.workflow()}.
 #' @export
 #'
-growth.parse_data <-
+parse_data <-
   function(file = NULL,
            map.file = NULL,
            software = "Gen5",
@@ -321,7 +373,7 @@ growth.parse_data <-
   ) {
     if(is.null(file)) stop("Please provide the name or path to a table file containing plate reader data.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
-    if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by growth.parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
+    if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
     if("Gen5" %in% software){
       # Read table file
       if (file.exists(file)) {
@@ -337,11 +389,12 @@ growth.parse_data <-
               na.strings = "",
               quote = "",
               comment.char = "",
-              check.names = F
+              check.names = F,
+              na.strings = c("NA", "OVRFLW")
             )
         } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "xls" |
                    stringr::str_replace(file, ".{1,}\\.", "") == "xlsx") {
-          input <- data.frame(suppressMessages(readxl::read_excel(file, col_names = F, sheet = sheet)))
+          input <- data.frame(suppressMessages(readxl::read_excel(file, col_names = F, sheet = sheet, na = c("NA", "OVRFLW"))))
         } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "tsv") {
           input <-
             utils::read.csv(
@@ -354,7 +407,8 @@ growth.parse_data <-
               na.strings = "",
               quote = "",
               comment.char = "",
-              check.names = F
+              check.names = F,
+              na.strings = c("NA", "OVRFLW")
             )
         } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "txt") {
           input <-
@@ -368,7 +422,8 @@ growth.parse_data <-
               na.strings = "",
               quote = "",
               comment.char = "",
-              check.names = F
+              check.names = F,
+              na.strings = c("NA", "OVRFLW")
             )
         } else {
           stop(
@@ -439,7 +494,7 @@ growth.parse_data <-
 
       # get row numbers for "time" in column 2
       time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = T)
-      # extract
+      # extract different read data in dataset
       reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
       read.ndx <- time.ndx[!is.na(reads)]
       reads <- reads[!is.na(reads)]
@@ -448,10 +503,13 @@ growth.parse_data <-
       # Extract all read tables except the last
       read.data <- lapply(1:(length(read.ndx)-1), function(x) input[read.ndx[x]:(read.ndx[x+1]-3),2:(ncol)])
       read.data <- lapply(1:length(read.data), function(x) as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]),])
-      #Extract last read table
+      # Extract last read table
       read.data[[length(read.ndx)]] <- data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1),2:(ncol)])
       read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
-
+      # Remove time points with NA in all samples
+      for(i in 1:length(read.data))
+        read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
+                                read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ])
       # give all reads the same time values as the first read
       for(i in 2:length(read.data)){
         read.data[[i]][[1]] <- read.data[[1]][[1]]
@@ -463,21 +521,35 @@ growth.parse_data <-
         answer <- readline(paste0("Indicate where the density data is stored?\n",
                                   paste(unlist(lapply(1:length(reads), function (i)
                                     paste0("[", i, "] ", reads[i]))),
-                                    collapse = "\n")))
-        density <- read.data[[as.numeric(answer)]]
+                                    collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+        if(as.numeric(answer) == length(reads)+1){
+          density <- NA
+        } else {
+          density <- read.data[[as.numeric(answer)]]
+        }
+
         answer <- readline(paste0("Indicate where the fluorescence 1 data is stored?\n",
                                   paste(unlist(lapply(1:length(reads), function (i)
                                     paste0("[", i, "] ", reads[i]))),
-                                    collapse = "\n")))
-        fluorescence1 <- read.data[[as.numeric(answer)]]
+                                    collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 1 data\n"))
+        if(as.numeric(answer) == length(reads)+1){
+          fluorescence1 <- NA
+        } else {
+          fluorescence1 <- read.data[[as.numeric(answer)]]
+        }
         data.ls[[1]] <- density
         data.ls[[2]] <- fluorescence1
+
         if(length(reads)>2){
           answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
                                     paste(unlist(lapply(1:length(reads), function (i)
                                       paste0("[", i, "] ", reads[i]))),
-                                      collapse = "\n")))
-          fluorescence2 <- read.data[[as.numeric(answer)]]
+                                      collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
+          if(as.numeric(answer) == length(reads)+1){
+            fluorescence2 <- NA
+          } else {
+            fluorescence2 <- read.data[[as.numeric(answer)]]
+          }
           data.ls[[3]] <- fluorescence2
         }
       } else {
@@ -493,18 +565,22 @@ growth.parse_data <-
         data.ls[[i]][2:nrow(data.ls[[1]]),1] <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])*24
         # add a value of 24 if time exceeds one day
         day.ndx <- grep( data.ls[[i]][2,1],  data.ls[[i]][3:nrow(data.ls[[1]]),1])+2
-        for(j in length(day.ndx)){
-          data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1] <- as.numeric(data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1])+24
+        if(length(day.ndx) > 0){
+          for(j in length(day.ndx)){
+            data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1] <- as.numeric(data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1])+24
+          }
         }
       }
     }
+    noNA.ndx <- which(!is.na(data.ls))
+
     # Remove any columns between time and 'A1'
     A1.ndx <- match("A1", data.ls[[1]][1,])
     if(A1.ndx>2){
-      data.ls <- lapply(1:length(data.ls), function(x) data.ls[[x]][ ,c(1,A1.ndx:ncol(read.data[[x]]))])
+      data.ls <- lapply(noNA.ndx, function(x) data.ls[[x]][ ,c(1,A1.ndx:ncol(read.data[[x]]))])
     }
     # apply identifiers specified in mapping file
-    for(i in 1:length(data.ls)){
+    for(i in noNA.ndx){
       if(!is.null(mapping)){
         # assign names to samples
         map.ndx <- match(data.ls[[i]][1,1:ncol( data.ls[[i]])], mapping[2:nrow(mapping),1])+1
@@ -525,14 +601,22 @@ growth.parse_data <-
         data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
       }
     }
-    names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
-    grodata <- growth.read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank)
+    if(length(data.ls)==1){
+      names(data.ls) <- "density"
+      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = NA, data.fluoro2 = NA, subtract.blank = subtract.blank)
+    } else if(length(data.ls)==2){
+      names(data.ls) <- c("density", "fluorescence1")
+      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = NA, subtract.blank = subtract.blank)
+    } else {
+      names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
+      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank)
+    }
     return(grodata)
   }
 
 #' Create a \code{grofit.control} object.
 #'
-#' A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{growth.read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
+#' A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
 #'
 #' @param neg.nan.act (Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
@@ -552,8 +636,8 @@ growth.parse_data <-
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
-#' @param have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
-#' @param parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
+#' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
+#' @param dr.parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
@@ -562,36 +646,35 @@ growth.parse_data <-
 #'
 #' @export
 #'
-growth.control <-
-  function (neg.nan.act = FALSE,
-            clean.bootstrap = TRUE,
-            suppress.messages = FALSE,
-            fit.opt = c("l", "s"),
-            t0 = 0,
-            min.density = NA,
-            log.x.gc = FALSE,
-            log.y.spline = TRUE,
-            log.y.model = TRUE,
-            lin.h = NULL,
-            lin.R2 = 0.97,
-            lin.RSD = 0.1,
-            lin.dY = 0.05,
-            biphasic = FALSE,
-            interactive = TRUE,
-            nboot.gc = 0,
-            smooth.gc = 0.55,
-            model.type = c("logistic",
-                           "richards", "gompertz", "gompertz.exp"),
-            have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
-            parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
-            smooth.dr = NULL,
-            log.x.dr = FALSE,
-            log.y.dr = FALSE,
-            nboot.dr = 0,
-            growth.thresh = 1.5)
+growth.control <- function (neg.nan.act = FALSE,
+                            clean.bootstrap = TRUE,
+                            suppress.messages = FALSE,
+                            fit.opt = c("l", "s"),
+                            t0 = 0,
+                            min.density = NA,
+                            log.x.gc = FALSE,
+                            log.y.spline = TRUE,
+                            log.y.model = TRUE,
+                            lin.h = NULL,
+                            lin.R2 = 0.97,
+                            lin.RSD = 0.1,
+                            lin.dY = 0.05,
+                            biphasic = FALSE,
+                            interactive = FALSE,
+                            nboot.gc = 0,
+                            smooth.gc = 0.55,
+                            model.type = c("logistic",
+                                           "richards", "gompertz", "gompertz.exp"),
+                            dr.have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
+                            dr.parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
+                            smooth.dr = NULL,
+                            log.x.dr = FALSE,
+                            log.y.dr = FALSE,
+                            nboot.dr = 0,
+                            growth.thresh = 1.5)
 {
-  if ((is.character(fit.opt) == FALSE))
-    stop("value of fit.opt must be character and of one element")
+  if ((is.character(fit.opt) == FALSE) | !any(fit.opt %in% c("l", "s", "m", "a")))
+    stop("value of fit.opt must be character and contain one or more of 'l', 's', or 'm', or be 'a' (for all).")
   if (is.character(model.type) == FALSE)
     stop("value of model.type must be character")
   if ((is.logical(neg.nan.act) == FALSE) | (length(neg.nan.act) != 1))
@@ -612,40 +695,51 @@ growth.control <-
     stop("value of log.y.dr must be logical and of one element")
   if ((is.numeric(nboot.gc) == FALSE) | (length(nboot.gc) !=1) | (nboot.gc < 0))
     stop("value of nboot.gc must be numeric (>=0) and of one element")
-  if ((is.numeric(have.atleast) == FALSE) | (length(have.atleast) != 1) | (have.atleast < 6))
-    stop("value of have.atleast must be numeric (>=6) and of one element")
-  if (((is.character(parameter) == FALSE) && (is.numeric(parameter) == FALSE)) | (length(parameter) !=1))
-    stop("value of parameter must be a string or numeric and of one element")
+  if ((is.numeric(dr.have.atleast) == FALSE) | (length(dr.have.atleast) != 1) | (dr.have.atleast < 6))
+    stop("value of dr.have.atleast must be numeric (>=6) and of one element")
+  if (((is.character(dr.parameter) == FALSE) && (is.numeric(dr.parameter) == FALSE)) | (length(dr.parameter) !=1))
+    stop("value of dr.parameter must be a string or numeric and of one element")
   if ((is.numeric(nboot.dr) == FALSE) | (length(nboot.dr) != 1) | (nboot.dr < 0))
     stop("value of nboot.dr must be numeric (>=0) and of one element")
-  if (((is.numeric(smooth.gc) == FALSE) && (is.null(smooth.gc) == FALSE)))
-    stop("value of smooth.gc must be numeric or NULL")
+  if (((is.numeric(smooth.gc) == FALSE)))
+    stop("value of smooth.gc must be numeric")
   if (((is.numeric(smooth.dr) == FALSE) && (is.null(smooth.dr) == FALSE)))
     stop("value of smooth.dr must be numeric or NULL")
   if ((is.logical(biphasic) == FALSE) | (length(biphasic) != 1))
-    stop("value of biphasuc must be logical and of one element")
+    stop("value of biphasic must be logical and of one element")
+  if ((is.numeric(lin.dY) == FALSE) | (length(lin.dY) != 1) | (lin.dY < 0))
+    stop("value of lin.dY must be numeric (>=0) and of one element")
+  if (((is.numeric(lin.R2) == FALSE) |  (length(lin.R2) != 1) | !(0 < lin.R2 && lin.R2 < 1) ))
+    stop("value of lin.R2 must be numeric (0 < lin.R2 < 1) and of one element")
+  if (((is.numeric(lin.RSD) == FALSE) |  (length(lin.RSD) != 1) | !(0 < lin.RSD) ))
+    stop("value of lin.RSD must be numeric (0 < lin.RSD) and of one element")
+  if (((is.numeric(lin.h) == FALSE) && (is.null(lin.h) == FALSE)))
+    stop("value of lin.h must be numeric (> 0) and of one element")
+  if (((is.numeric(growth.thresh) == FALSE) && (is.na(growth.thresh) == FALSE)))
+    stop("value of growth.thresh must be numeric (one element) or NA")
+  if ((is.numeric(t0) == FALSE) | (length(t0) != 1) | (t0 < 0))
+    stop("value of t0 must be numeric (>=0) and of one element")
 
-  parameters.opt <- c('TestId', 'AddId', 'concentration', 'reliability_tag', 'used.model', 'log.x',
-    'log.y', 'nboot.gc', 'mu.linfit', 'lambda.linfit', 'stdmu.linfit', 'dY.linfit',
-    'A.linfit', 'tmu.start.linfit', 'tmu.end.linfit', 'r2mu.linfit',
-    'reliable_fit.linfit', 'mu.model', 'lambda.model', 'A.model', 'integral.model',
-    'parameter_nu.model', 'parameter_alpha.model', 'parameter_t_shift.model',
-    'stdmu.model', 'stdlambda.model', 'stdA.model', 'reliable_fit.model',
-    'ci90.mu.model.lo', 'ci90.mu.model.up', 'ci90.lambda.model.lo',
-    'ci90.lambda.model.up', 'ci90.A.model.lo', 'ci90.A.model.up', 'ci95.mu.model.lo',
-    'ci95.mu.model.up', 'ci95.lambda.model.lo', 'ci95.lambda.model.up',
-    'ci95.A.model.lo', 'ci95.A.model.up', 'mu.spline', 'lambda.spline', 'y0.spline',
-    'A.spline', 'dY.spline', 'integral.spline', 'reliable_fit.spline', 'smooth.spline',
-    'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'stdmu.bt', 'stdlambda.bt', 'stdA.bt',
-    'stdintegral.bt', 'reliable_fit.bt', 'ci90.mu.bt.lo', 'ci90.mu.bt.up',
-    'ci90.lambda.bt.lo', 'ci90.lambda.bt.up', 'ci90.A.bt.lo', 'ci90.A.bt.up',
-    'ci90.integral.bt.lo', 'ci90.integral.bt.up', 'ci95.mu.bt.lo', 'ci95.mu.bt.up',
-    'ci95.lambda.bt.lo', 'ci95.lambda.bt.up', 'ci95.A.bt.lo', 'ci95.A.bt.up',
-    'ci95.integral.bt.lo', 'ci95.integral.bt.up')
-  parameter.in <- parameter
-  if(is.character(parameter)){
-    parameter <- match(parameter, parameters.opt)
-    if(is.na(parameter)){
+  dr.parameters.opt <- c('TestId', 'AddId', 'concentration', 'reliability_tag', 'used.model', 'log.x',
+                      'log.y', 'nboot.gc', 'mu.linfit', 'lambda.linfit', 'stdmu.linfit', 'dY.linfit',
+                      'A.linfit', 'tmu.start.linfit', 'tmu.end.linfit', 'r2mu.linfit',
+                      'reliable_fit.linfit', 'mu.model', 'lambda.model', 'A.model', 'integral.model',
+                      'parameter_nu.model', 'parameter_alpha.model', 'parameter_t_shift.model',
+                      'stdmu.model', 'stdlambda.model', 'stdA.model', 'reliable_fit.model',
+                      'ci90.mu.model.lo', 'ci90.mu.model.up', 'ci90.lambda.model.lo',
+                      'ci90.lambda.model.up', 'ci90.A.model.lo', 'ci90.A.model.up', 'ci95.mu.model.lo',
+                      'ci95.mu.model.up', 'ci95.lambda.model.lo', 'ci95.lambda.model.up',
+                      'ci95.A.model.lo', 'ci95.A.model.up', 'mu.spline', 'lambda.spline', 'y0.spline',
+                      'A.spline', 'dY.spline', 'integral.spline', 'reliable_fit.spline', 'smooth.spline',
+                      'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'stdmu.bt', 'stdlambda.bt', 'stdA.bt',
+                      'stdintegral.bt', 'reliable_fit.bt', 'ci90.mu.bt.lo', 'ci90.mu.bt.up',
+                      'ci90.lambda.bt.lo', 'ci90.lambda.bt.up', 'ci90.A.bt.lo', 'ci90.A.bt.up',
+                      'ci90.integral.bt.lo', 'ci90.integral.bt.up', 'ci95.mu.bt.lo', 'ci95.mu.bt.up',
+                      'ci95.lambda.bt.lo', 'ci95.lambda.bt.up', 'ci95.A.bt.lo', 'ci95.A.bt.up',
+                      'ci95.integral.bt.lo', 'ci95.integral.bt.up')
+  parameter.in <- dr.parameter
+  if(is.character(dr.parameter)){
+    if(is.na(dr.parameter)){
       stop(paste0(parameter.in, " is not a valid parameter for the dose-response analysis. See ?growth.drFit for possible options"))
     }
   }
@@ -654,7 +748,7 @@ growth.control <-
                          log.x.gc = log.x.gc, log.y.spline = log.y.spline, log.y.model=log.y.model, biphasic = biphasic,
                          lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, interactive = interactive,
                          nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
-                         have.atleast = round(have.atleast), parameter = round(parameter),
+                         dr.have.atleast = round(dr.have.atleast), dr.parameter = dr.parameter,
                          log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
                          model.type = model.type, growth.thresh = growth.thresh)
   class(grofit.control) <- "grofit.control"
@@ -666,7 +760,7 @@ growth.control <-
 #' \code{grofit.workflow()} runs \code{growth.control()} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
 #'
 #' @param time (optional) A matrix containing time values for each sample.
-#' @param data Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
+#' @param data Either a \code{grodata} object created with \code{read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param ec50 (Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
 #' @param mean.grp (\code{"all"}, a string vector, or a list of string vectors) Define groups to combine into common plots in the final report based on sample identifiers (if \code{report == TRUE}). Partial matches with sample/group names are accepted. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
@@ -689,8 +783,8 @@ growth.control <-
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
-#' @param have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
-#' @param parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
+#' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
+#' @param dr.parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
@@ -705,8 +799,10 @@ growth.control <-
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-growth.workflow <- function (time,
-                             data,
+growth.workflow <- function (grodata = NULL,
+                             time = NULL,
+                             data = NULL,
+
                              ec50 = FALSE,
                              mean.grp = NA,
                              mean.conc = NA,
@@ -724,14 +820,14 @@ growth.workflow <- function (time,
                              lin.R2 = 0.97,
                              lin.RSD = 0.1,
                              lin.dY = 0.05,
-                             interactive = TRUE,
+                             interactive = FALSE,
                              nboot.gc = 0,
                              smooth.gc = 0.55,
                              model.type = c("logistic",
                                             "richards", "gompertz", "gompertz.exp"),
                              growth.thresh = 1.5,
-                             have.atleast = 6,
-                             parameter = 34,
+                             dr.have.atleast = 6,
+                             dr.parameter = 34,
                              smooth.dr = NULL,
                              log.x.dr = FALSE,
                              log.y.dr = FALSE,
@@ -741,26 +837,24 @@ growth.workflow <- function (time,
                              export = FALSE
 )
 {
-  if(!(class(data)=="list") && !(class(data)=="grodata")){
+  if(!(class(grodata)=="list") && !(class(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
-      stop("Need a numeric matrix for 'time'")
+      stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
     if (is.numeric(as.matrix(data[-1:-3])) == FALSE)
-      stop("Need a numeric matrix for 'data'")
+      stop("Need a numeric matrix for 'data' or a grodata object created with read_data() or parse_data().")
     if (is.logical(ec50) == FALSE)
       stop("Need a logical value for 'ec50'")
   } else {
-    time <- data$time
-    if(!is.null(data$expdesign)) expdesign <- data$expdesign
-    if(!is.null(data$fluorescence1)) fluorescence1 <- data$fluorescence1
-    if(!is.null(data$fluorescence2)) fluorescence2 <- data$fluorescence2
-    data <- data$density
+    time <- grodata$time
+    if(!is.null(grodata$expdesign)) expdesign <- grodata$expdesign
+    data <- grodata$density
   }
   control <- growth.control(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                             suppress.messages = suppress.messages, fit.opt = fit.opt, t0 = t0, min.density = min.density,
                             log.x.gc = log.x.gc, log.y.spline = log.y.spline, log.y.model = log.y.model, biphasic = biphasic,
                             lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, interactive = interactive,
                             nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
-                            have.atleast = round(have.atleast), parameter = parameter,
+                            dr.have.atleast = round(dr.have.atleast), dr.parameter = dr.parameter,
                             log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
                             model.type = model.type, growth.thresh = growth.thresh)
   nboot.gc <- control$nboot.gc
@@ -886,7 +980,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
 #' \code{growth.gcFit} performs all computational growth fitting operations based on the user input.
 #'
 #' @param time (optional) A matrix containing time values for each sample.
-#' @param data Either a \code{grodata} object created with \code{growth.read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
+#' @param data Either a \code{grodata} object created with \code{read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
 #'
@@ -903,7 +997,7 @@ growth.gcFit <- function(time, data, control= growth.control())
   max.density <- unlist(lapply(1:nrow(data), function (x) max(as.numeric(as.matrix(data[x,-1:-3]))[!is.na(as.numeric(as.matrix(data[x,-1:-3])))])))
   if(is.numeric(control$min.density) && control$min.density != 0){
     if(!is.na(control$min.density) && all(as.numeric(max.density) < control$min.density)){
-      stop(paste0("The chosen global start density value (min.density) is larger than every value in your dataset.\nThe maximum start value in your dataset is: ",
+      stop(paste0("The chosen global start density value (min.density) is larger than every value in your dataset.\nThe maximum value in your dataset is: ",
                   max(as.numeric(max.density))))
     }
   }
@@ -1172,9 +1266,6 @@ growth.gcFit <- function(time, data, control= growth.control())
 
   class(gcFit)    <- "gcFit"
   gcFit
-
-
-
 }
 
 #' Fit different growth models to density data
@@ -1360,7 +1451,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
       fitFlag    <- TRUE
       lambdabest <- summary(best)$parameters["lambda", 1:2]
 
-      best.spline <- stats::smooth.spline(time, fitted.values(best), spar = 0)
+      best.spline <- stats::smooth.spline(time, fitted.values(best), spar = 0, keep.data = FALSE)
       best.deriv1 <-  stats::predict(best.spline, deriv=1)
       mumax.index <- which.max(best.deriv1$y)
 
@@ -1459,13 +1550,8 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 
   if (length(time) != length(data))
     stop("gcFitSpline: length of input vectors differ!")
-  if(control$log.y.spline == TRUE){
-    bad.values <- (is.na(time)) | (is.na(data)) |
-      (!is.numeric(time)) | (!is.numeric(data) )
-  } else {
   bad.values <- (is.na(time)) | (is.na(data)) |
-    (!is.numeric(time)) | (!is.numeric(data))
-  }
+      (!is.numeric(time)) | (!is.numeric(data) )
   if (TRUE %in% bad.values) {
     if (control$neg.nan.act == FALSE) {
       time <- time[!bad.values]
@@ -1476,11 +1562,11 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
     }
   }
   if(max(data) < control$growth.thresh * data[1]){
-    if(control$suppress.messages==F) message(paste0("Nonparametric fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
+    if(control$suppress.messages==F) message(paste0("gcFitSpline: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
     gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                         fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
                                                                                                                     mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                                                                                    lambda2 = NA, b.tangent2 = NA, integral = NA), spline = NA,
+                                                                                                                    lambda2 = NA, b.tangent2 = NA, integral = NA),
                         parametersLowess = list(A = NA, mu = NA, lambda = NA),
                         spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
                         control = control)
@@ -1492,7 +1578,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
     gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                         gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A = NA, dY = NA,
                                                                                      mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                                                     lambda2 = NA, b.tangent2 = NA, integral = NA), spline = NA,
+                                                                                     lambda2 = NA, b.tangent2 = NA, integral = NA),
                         parametersLowess = list(A = NA, mu = NA, lambda = NA),
                         spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
                         control = control)
@@ -1501,7 +1587,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
   }
   else {
     if (control$log.x.gc == TRUE) {
-      # bad.values <- (time < 0)
+      bad.values <- (time <= 0)
       if (TRUE %in% bad.values) {
         if (control$neg.nan.act == FALSE) {
           time <- time[!bad.values]
@@ -1548,21 +1634,18 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       }
       time <- time[which.min(abs(time.raw-t0)):length(time)]
     }
-    halftime <- (min(time) + max(time))/2
     try(spline <- smooth.spline(time, y = if(control$log.y.spline == TRUE){
       data.log
     } else {
       data
-    }, spar = control$smooth.gc))
+    }, spar = control$smooth.gc, cv = NA, keep.data = FALSE))
     if (!exists("spline") || is.null(spline) == TRUE) {
-      warning("Spline could not be fitted to data!")
-      if (is.null(control$smooth.gc) == TRUE)
-        cat("This might be caused by usage of smoothing parameter 'smooth.gc = NULL'.\n")
+      warning("gcFitSpline: Spline could not be fitted to data!")
 
       gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                           fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
                                                                     mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                                    lambda2 = NA, b.tangent2 = NA, integral = NA), spline = NA,
+                                                                    lambda2 = NA, b.tangent2 = NA, integral = NA),
                           parametersLowess = list(A = NA, mu = NA, lambda = NA),
                           spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
                           control = control)
@@ -1853,7 +1936,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #'
 growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                                control = growth.control(t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE))
-  {
+{
   R2 <- control$lin.R2
   RSD <- control$lin.RSD
   h <- control$lin.h
@@ -1914,10 +1997,10 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     if(control$min.density != 0){
       min.density <- log(control$min.density / data[1])
     } else {
-      min.density <- log(min(data))
+      min.density <- 0
     }
   } else {
-    min.density <- log(min(data))
+    min.density <- 0
   }
   bad.values <- ((is.na(data.log))|(is.infinite(data.log))|(is.na(time))|(is.na(data.log)))
 
@@ -2096,9 +2179,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             return(gcFitLinear)
           }
           if(control$biphasic) {
-            spline <- stats::smooth.spline(obs$time, obs$ylog, spar = 0.5)
+            spline <- stats::smooth.spline(obs$time, obs$ylog, spar = 0.5, cv = NA, keep.data = FALSE)
             deriv2 <- stats::predict(spline, deriv = 2)
-            deriv2_spline <- stats::smooth.spline(deriv2$x, deriv2$y, spar = 0.4)
+            deriv2_spline <- stats::smooth.spline(deriv2$x, deriv2$y, spar = 0.4, cv = NA, keep.data = FALSE)
             # extract local minima and maxima of deriv2
             n = h/2
             minima <- inflect(deriv2_spline$y, threshold = n)$minima
@@ -2463,7 +2546,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     } # else of if(nrow(ret)<2)
   } # if(N >= 3)
   else {
-    message("Not enough observations in the dataset to perform exponential fit. growth.gcFitLinear requires at least 3 data points between t0 and the time of maximum density.")
+    message("Not enough observations in the dataset to perform linear fit. growth.gcFitLinear requires at least 3 data points between t0 and the time of maximum density.")
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
@@ -2627,7 +2710,6 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
     } else {
       time
     },
-    time,
     raw.data = if (control$log.y.spline == TRUE) {
       data.log
     } else {
@@ -2649,19 +2731,23 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
 }
 
 #'
-#' @param gcFitData
+#' @param FitData
 #' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
 #'
 #' @export
 #'
-growth.drFit <- function (gcFitData, control = growth.control())
+growth.drFit <- function (FitData, control = growth.control())
 {
-  if (is(control) != "grofit.control")
-    stop("control must be of class grofit.control!")
+  if (is(control) != "grofit.control" && is(control) != "fl.control")
+    stop("control must be of class grofit.control or fl.control!")
   EC50.table <- NULL
   all.EC50 <- NA
-  table.tests <- table((gcFitData[, 1])[which((gcFitData[,
-                                                         4] == TRUE) & (is.na(gcFitData[, control$parameter]) ==
+  if(is.character(control$dr.parameter)){
+    dr.parameter <- match(control$dr.parameter, colnames(FitData))
+  }
+  FitData <- FitData[!is.na(FitData[,1]), ]
+  table.tests <- table((FitData[, 1])[which((FitData[,
+                                                         4] == TRUE) & (is.na(FitData[, dr.parameter]) ==
                                                                           FALSE))])
   distinct <- names(table.tests)
   EC50 <- list()
@@ -2679,23 +2765,29 @@ growth.drFit <- function (gcFitData, control = growth.control())
     cat("--> Valid datasets per test: \n")
     print(validdata, quote = FALSE)
   }
-  if (TRUE %in% (table.tests < control$have.atleast)) {
+  if (TRUE %in% (table.tests < control$dr.have.atleast)) {
     cat(paste("Warning: following tests have not enough ( <",
-              as.character(control$have.atleast - 1), ") datasets:\n"))
-    cat(distinct[(table.tests < control$have.atleast)])
+              as.character(control$dr.have.atleast - 1), ") datasets:\n"))
+    cat(distinct[(table.tests < control$dr.have.atleast)])
     cat("These tests will not be regarded\n")
-    distinct <- distinct[table.tests >= control$have.atleast]
+    distinct <- distinct[table.tests >= control$dr.have.atleast]
   }
   if ((length(distinct)) == 0) {
-    cat(paste("There are no tests having enough ( >", as.character(control$have.atleast -
+    cat(paste("There are no tests having enough ( >", as.character(control$dr.have.atleast -
                                                                      1), ") datasets!\n"))
   }
   else {
+    skip <- c()
     for (i in 1:length(distinct)) {
-      conc <- (gcFitData[, 3])[which(gcFitData[, 1] ==
-                                       distinct[i])]
-      test <- (gcFitData[, control$parameter])[gcFitData[, 1] == distinct[i]]
-      names(test) <- rep(names(gcFitData)[control$parameter], length(test))
+      conc <- factor((FitData[, 3])[which(FitData[, 1] ==
+                                       distinct[i])])
+      if(length(levels(conc)) <4){
+        message(paste0(distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."))
+        skip <- c(skip, i)
+        next
+      }
+      test <- (as.numeric(FitData[, dr.parameter]))[FitData[, 1] == distinct[i]]
+      names(test) <- rep(names(FitData)[dr.parameter], length(test))
       drID <- distinct[i]
       EC50[[i]] <- growth.drFitSpline(conc, test, drID, control)
       if (control$nboot.dr > 0) {
@@ -2715,8 +2807,11 @@ growth.drFit <- function (gcFitData, control = growth.control())
       EC50.table <- rbind(EC50.table, out.row)
     }
   }
+  distinct <- distinct[-skip]
+  EC50 <- EC50[-skip]
+  EC50.boot <- EC50.boot[-skip]
   names(EC50) <- names(EC50.boot) <- distinct
-  drFit <- list(raw.data = gcFitData, drTable = EC50.table,
+  drFit <- list(raw.data = FitData, drTable = EC50.table,
                 drBootSplines = EC50.boot, drFittedSplines = EC50, control = control)
   class(drFit) <- "drFit"
   drFit
@@ -2732,8 +2827,8 @@ growth.drFit <- function (gcFitData, control = growth.control())
 #'
 growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth.control())
 {
-  if (is(control) != "grofit.control")
-    stop("control must be of class grofit.control!")
+  if (is(control) != "grofit.control" && is(control) != "fl.control")
+    stop("control must be of class grofit.control or fl.control!")
   test.nm <- names(test)[1]
   test <- as.vector(as.numeric(as.matrix(test)))
   conc <- as.vector(as.numeric(as.matrix(conc)))
@@ -2766,8 +2861,8 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
     class(drFitSpline) <- "drFitSpline"
     return(drFitSpline)
   }
-  if (length(test) < control$have.atleast) {
-    warning("drFitSpline: number of valid data points is below the number specified in 'have.atleast'. See growth.control().")
+  if (length(test) < control$dr.have.atleast) {
+    warning("drFitSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
     drFitSpline <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
@@ -2794,7 +2889,11 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
   }
   spltest <- NULL
   fitFlag <- TRUE
-  try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr))
+  if(class(control) == "growth.control"){
+    try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE))
+  } else {
+    try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE, w = ifelse(conc.fit == 0, 1, 0.05) ))
+  }
   if (is.null(spltest) == TRUE) {
     cat("Spline could not be fitted in dose-response analysis!\n")
     fitFlag <- FALSE
@@ -2889,10 +2988,10 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
   conc <- as.vector(as.numeric(as.matrix(conc)))
   if (is.vector(conc) == FALSE || is.vector(test) == FALSE)
     stop("Need concentration and treatment !")
-  if (is(control) != "grofit.control")
-    stop("control must be of class grofit.control!")
+  if (is(control) != "grofit.control" && is(control) != "fl.control")
+    stop("control must be of class grofit.control or fl.control!")
   if (control$nboot.dr == 0)
-    stop("Number of bootstrap samples is zero! See growth.control()")
+    stop("Number of bootstrap samples is zero! See ?growth.control or ?fl.control.")
   if (control$neg.nan.act == FALSE) {
     missings <- is.na(conc) | is.na(test) | !is.numeric(conc) |
       !is.numeric(test)
@@ -2918,8 +3017,8 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     class(drBootSpline) <- "drBootSpline"
     return(drBootSpline)
   }
-  if (length(test) < control$have.atleast) {
-    warning("drBootSpline: number of valid data points is below the number specified in 'have.atleast'. See growth.control().")
+  if (length(test) < control$dr.have.atleast) {
+    warning("drBootSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
     drBootSpline <- list(raw.conc = conc, raw.test = test,
                          drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
                          ec50.boot = NA, bootFlag = FALSE, control = control)
@@ -3032,13 +3131,27 @@ grow_exponential <- function (time, parms)
 {
   if (is.null(names(parms))) {
     y0 <- parms[1]
-    mumax <- parms[2]
+    mumax <- parms[5]
   }
   else {
-    y0 <- parms["y0"]
-    mumax <- parms["mumax"]
+    y0 <- parms["y0_lm"]
+    mumax <- ifelse(!is.na(parms["max_slope"]), parms["max_slope"], parms["mumax"])
   }
   y <- y0 * exp(mumax * time)
+  return(as.matrix(data.frame(time = time, y = y)))
+}
+
+grow_linear <- function(time, parms)
+{
+  if (length(parms)>2) {
+    y0 <- parms[4]
+    mumax <- parms[5]
+  }
+  else {
+    y0 <- parms[1]
+    mumax <- parms[2]
+  }
+  y <- y0 + mumax * time
   return(as.matrix(data.frame(time = time, y = y)))
 }
 
@@ -3049,7 +3162,7 @@ low.integrate <- function (x, y)
   if (length(x) != length(y))
     stop("low.integrate: x and y have to be of same length !")
   spline <- NULL
-  try(spline <- smooth.spline(x, y))
+  try(spline <- smooth.spline(x, y, keep.data = FALSE))
   if (is.null(spline) == TRUE) {
     warning("Spline could not be fitted to data!")
     stop("Error in low.integrate")

@@ -19,12 +19,12 @@ growth.control(
   lin.RSD = 0.1,
   lin.dY = 0.05,
   biphasic = FALSE,
-  interactive = TRUE,
+  interactive = FALSE,
   nboot.gc = 0,
   smooth.gc = 0.55,
   model.type = c("logistic", "richards", "gompertz", "gompertz.exp"),
-  have.atleast = 6,
-  parameter = "mu.linfit",
+  dr.have.atleast = 6,
+  dr.parameter = "mu.linfit",
   smooth.dr = NULL,
   log.x.dr = FALSE,
   log.y.dr = FALSE,
@@ -69,9 +69,9 @@ growth.control(
 
 \item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.}
 
-\item{have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
+\item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
-\item{parameter}{(Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
 
 \item{smooth.dr}{(Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.}
 
@@ -84,5 +84,5 @@ growth.control(
 \item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 }
 \description{
-A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{growth.read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
+A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
 }

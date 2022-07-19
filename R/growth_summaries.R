@@ -168,7 +168,7 @@ summary.gcFitLinear <- function(object,...)
                                 "A.linfit", "tmu.start.linfit",
                                 "tmu.end.linfit",
                                 "r2mu.linfit", "reliable_fit.linfit",
-                                "mu2.linfit", "tD.linfit",
+                                "mu2.linfit", "tD2.linfit",
                                 "tmu2.start.linfit", "tmu2.end.linfit",
                                 "r2mu2.linfit", "reliable_fit2.linfit")
 

@@ -378,7 +378,7 @@ plot.drBootSpline <- function (drBootSpline,
           c(global.miny, global.maxy),
           type = "n",
           xlab = "Ln(1+concentration)",
-          ylab = "Response"
+          ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
         )
       }
       else{
@@ -389,7 +389,7 @@ plot.drBootSpline <- function (drBootSpline,
             c(global.miny, global.maxy),
             type = "n",
             xlab = "Concentration",
-            ylab = "Response"
+            ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
           )
         }
         else{
@@ -399,7 +399,7 @@ plot.drBootSpline <- function (drBootSpline,
               c(global.miny, global.maxy),
               type = "n",
               xlab = "Ln(1+Concentration)",
-              ylab = "Ln(1+response)"
+              ylab = "Ln(1+Response)"
             )
           }
           else{
@@ -409,7 +409,7 @@ plot.drBootSpline <- function (drBootSpline,
                 c(global.miny, global.maxy),
                 type = "n",
                 xlab = "Concentration",
-                ylab = "Ln(1+response)"
+                ylab = "Ln(1+Response)"
               )
             }
           }
@@ -862,6 +862,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'
 #' @param gcFitSpline
 #' @param add
+#' @param raw
 #' @param slope
 #' @param deriv
 #' @param spline
@@ -884,7 +885,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spline = T, log.y = T,
+plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
                              pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
@@ -952,10 +953,18 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
       } else {
         fit.data <- c(rep(NA, length(gcFitSpline[["raw.data"]]) - length(gcFitSpline[["fit.data"]])), gcFitSpline[["fit.data"]])
       }
-      df <- data.frame("time" = gcFitSpline[["raw.time"]],
-                       "data" = exp(gcFitSpline[["raw.data"]])*gcFitSpline[["data.in"]][1],
-                       "fit.time" = c(rep(NA, length(gcFitSpline[["raw.time"]])-length(gcFitSpline[["fit.time"]])), gcFitSpline[["fit.time"]]),
-                       "fit.data" = fit.data)
+      if(flFitSpline$control$log.y.spline == TRUE){
+        df <- data.frame("time" = gcFitSpline[["raw.time"]],
+                         "data" = exp(gcFitSpline[["raw.data"]])*gcFitSpline[["data.in"]][1],
+                         "fit.time" = c(rep(NA, length(gcFitSpline[["raw.time"]])-length(gcFitSpline[["fit.time"]])), gcFitSpline[["fit.time"]]),
+                         "fit.data" = fit.data)
+      } else{
+        df <- data.frame("time" = gcFitSpline[["raw.time"]],
+                         "data" = gcFitSpline[["raw.data"]],
+                         "fit.time" = c(rep(NA, length(gcFitSpline[["raw.time"]])-length(gcFitSpline[["fit.time"]])), gcFitSpline[["fit.time"]]),
+                         "fit.data" = fit.data)
+      }
+
 
       p <- ggplot(df, aes(x=time, y=data)) +
         geom_point(shape=1, size = 2,alpha = 0.6, stroke=0.15) +
@@ -999,13 +1008,22 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
             time_start <- gcFitSpline$fit.time[time_start.ndx]
             time <- seq(time_start, max(gcFitSpline$fit.time), length=200)
             # y values for tangent at µmax
-            bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+            if(flFitSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (mu*time)
+            }
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
             # time values for tangent at µmax2
             time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(gcFitSpline$"fit.time"), length=200)
             # y values for tangent at µmax
-            bla2 <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent2"][[1]])*exp(mu2*time2)
+            if(flFitSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
+            }
+
             tangent.df2 <- data.frame("time" = time2,
                                       "y" = bla2)
             df.horizontal2 <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime2),
@@ -1029,7 +1047,11 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
             # time values for tangent at µmax
             time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
             # y values for tangent at µmax
-            bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+            if(flFitSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (mu*time)
+            }
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
             df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
@@ -1039,7 +1061,11 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
             time2_start <- gcFitSpline$fit.time[time2_start.ndx]
             time2 <- seq(time2_start, max(gcFitSpline$"fit.time"), length=200)
             # y values for tangent at µmax
-            bla2 <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent2"][[1]])*exp(mu2*time2)
+            if(flFitSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
+            }
             tangent.df2 <- data.frame("time" = time2,
                                       "y" = bla2)
 
@@ -1062,7 +1088,11 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, slope=TRUE, deriv = T, spli
           # time values for tangent
           time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
           # y values for tangent
-          bla <- ifelse(gcFitSpline$control$log.y.spline == TRUE, exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1], coef["b.tangent"][[1]])*exp(mu*time)
+          if(flFitSpline$control$log.y.spline){
+            bla <- (exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu*time)
+          } else {
+            bla <- coef["b.tangent"][[1]] + (mu*time)
+          }
           tangent.df <- data.frame("time" = time,
                                    "y" = bla)
           df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
@@ -1658,16 +1688,18 @@ base_breaks <- function(n = 10){
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
                                                'mu.model', 'lambda.model', 'A.model',
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
-                                               'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'),
-                            names = NULL, conc = NULL, basesize = 12, plot = T, export = F, height = 7, width = NULL, out.dir = NULL){
+                                               'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
+                                             'max_slope.linfit', 'max_slope.spline'),
+                            names = NULL, conc = NULL, basesize = 12, reference.nm = NULL, reference.conc = NULL,
+                           plot = T, export = F, height = 7, width = NULL, out.dir = NULL){
   param <- match.arg(param)
   # check class of object
-  if(!(any(class(object) %in% c("gcTable", "grofit", "gcFit")))) stop("object needs to be either a 'grofit', 'gcTable', or 'gcFit' object created with growth.workflow() or growth.gcFit().")
+  if(!(any(class(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
   if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
                                             'mu.model', 'lambda.model', 'A.model',
                                             'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
-                                            'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt')))
-                                            stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'.")
+                                            'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')))
+                                            stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
 
   #extract gcTable
   if(any(class(object) %in% "gcTable")){
@@ -1676,6 +1708,12 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     gcTable <- object$gcTable
   } else if (class(object)=="grofit"){
     gcTable <- object$gcFit$gcTable
+  } else if (class(object)=="flFitRes"){
+    gcTable <- object$flFit$flTable
+  } else if (any(class(object) %in% "gcTable")){
+    gcTable <- object
+  } else if (class(object)=="flFit"){
+    gcTable <- object$flTable
   }
   #check if param exists in gcTable and has a valid value
   if(all(is.na(gcTable[[param]]))){
@@ -1695,10 +1733,11 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   if(length(nm)==0){
     stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
   }
+  gcTable <- gcTable[match(nm, paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | ")), ]
   # get indices of replicates
   # remove conditions with fitFlag = FALSE in all replicates
     # Store each condition with its replicate indices in list filter.ls
-    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub(" \\| .+", "", nm) %in% (paste0(unlist(str_split(nm[i], " \\| "))[1])))))
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub(" ([[:punct:]]|[[:digit:]])+ \\|", "", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
@@ -1726,12 +1765,33 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   mean <- unlist(lapply(1:length(ndx.filt), function (x) mean(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) ) # mean
   sd <- unlist(lapply(1:length(ndx.filt), function (x) sd(as.numeric(gcTable[ndx.filt[[x]], param]), na.rm = T)) ) #standard deviation
   n <- unlist(lapply(1:length(ndx.filt), function (x) length(ndx.filt[[x]])) ) # number of replicates per condition
+  labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
+
+  # apply normalization to reference condition
+  if(!is.null(reference.nm)){
+    ref.ndx <- grep(reference.nm, labels)
+    if (length(ref.ndx) > 1){
+      if(!is.null(reference.conc)){
+        refconc.ndx <- which(reference.conc == str_extract(labels, "[:alnum:]+$"))
+        ref.ndx <- intersect(refconc.ndx, ref.ndx)
+      } else {
+        ref.ndx <- ref.ndx[1]
+      }
+    }
+    if(length(ref.ndx) > 1){
+      message("The provided combination of reference.nm = '", reference.nm, "' and reference.conc = ", reference.conc, " did not allow for the unique identification of a reference condition. The first match will be returned.")
+      ref.ndx <- ref.ndx[1]
+    }
+    mean.ref <- mean[ref.ndx]
+    mean <- mean/mean.ref
+    sd <- sd/mean.ref
+  }
   sd[n < 3] <- NA
   error <- stats::qnorm(0.975) * sd / sqrt(n) # standard error
   CI.L <- mean - error #left confidence interval
   CI.R <- mean + error #right confidence interval
 
-  df <- data.frame(name = gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))), mean = mean, CI.L = CI.L, CI.R = CI.R)
+  df <- data.frame(name = labels, mean = mean, CI.L = CI.L, CI.R = CI.R)
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
   df$mean[is.na(df$mean)] <- 0
@@ -1743,7 +1803,12 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     ggplot2::labs(x = "Sample", y = paste0(param, " (\u00B1 95% CI)")) +
     theme_minimal(base_size = basesize) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
-          plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"))
+          plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"),
+          # remove the vertical grid lines
+          panel.grid.major.x = element_blank() ,
+          # explicitly set the horizontal lines (or they will disappear too)
+          ) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
   if(export == FALSE && plot == FALSE){
     return(p)
   }
