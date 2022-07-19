@@ -2,7 +2,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
   {
-  if(class(flFittedLinear) != "flFitLinear") stop("flFitLinear needs to be an object created with flFitLinear().")
+  if(is(flFittedLinear) != "flFitLinear") stop("flFitLinear needs to be an object created with flFitLinear().")
   which <- match.arg(which)
 
   p <- function(){
@@ -109,7 +109,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
   {
-  if(class(flFitSpline) != "flFitSpline") stop("flFitSpline needs to be an object created with flFitSpline().")
+  if(is(flFitSpline) != "flFitSpline") stop("flFitSpline needs to be an object created with flFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -219,11 +219,11 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         mu     <- as.numeric(coef$max_slope[1])
         if(flFitSpline$fitFlag2){
           lag2 <- coef$lambda2
-          growth.x <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
+          fl.x <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
           mu2 <- coef$max_slope2
           if(lag2 < lag){
             # x values for tangent at µmax
-            x_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*growth.x)))
+            x_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*fl.x)))
             x_start <- flFitSpline$fit.x[x_start.ndx]
             x <- seq(x_start, max(flFitSpline$fit.x), length=200)
             # y values for tangent at µmax
@@ -275,7 +275,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
             df.horizontal <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag),
                                         "y" = flFitSpline[["raw.fl"]][1])
             # x values for tangent at µmax2
-            x2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*growth.x)))
+            x2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*fl.x)))
             x2_start <- flFitSpline$fit.x[x2_start.ndx]
             x2 <- seq(x2_start, max(flFitSpline$"fit.x"), length=200)
             # y values for tangent at µmax
@@ -398,7 +398,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
                               height = 7, width = 9, out.dir = NULL, ...)
 {
   # flBootSpline an object of class flBootSpline
-  if(class(flBootSpline) != "flBootSpline") stop("flBootSpline needs to be an object created with flBootSpline().")
+  if(is(flBootSpline) != "flBootSpline") stop("flBootSpline needs to be an object created with flBootSpline().")
   # /// initialize "Empty Plot" function
   empty.plot <- function(text="Empty plot",main=""){
     plot(c(0,1,0,1,0),c(0,1,1,0,0), type="l", axes=FALSE, xlab="", ylab="", lwd=1, col="gray",main=main)
@@ -549,13 +549,13 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
   par(mfrow = c(1, 1))
 }
 
-plot.flFit <- plot.flFitRes <-  function(object,
-                        data.type = c("spline", "raw", "norm.fl"),
+plot.flFitRes <-  function(object,
+                        data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
                         names = NULL,
                         conc = NULL,
                         mean = TRUE,
-                        log.y = T,
-                        deriv = T,
+                        log.y = F,
+                        deriv = F,
                         n.ybreaks = 6,
                         colors = NULL,
                         basesize = 20,
@@ -573,32 +573,51 @@ plot.flFit <- plot.flFitRes <-  function(object,
                         out.dir = NULL
 )
 {
-  if(!any(class(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
-  if(class(object) == "grodata" && !any(class(data.type) %in% c("raw","norm.fl"))) stop("Raw input data can only be used to visualize data.type 'raw' and 'norm.fl'.")
+  if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
+  if(is(object) == "grodata" && !any(data.type %in% c("raw1", "raw2", "norm.fl1", "norm.fl2"))) stop("Raw input data can only be used to visualize data.type 'raw1', 'raw2', 'norm.fl1', or 'norm.fl2'.")
 
   data.type <- match.arg(data.type)
-  if(data.type == "raw" && deriv ==TRUE){
-    warning("Derivatives cannot be calculated for 'raw' data. Only the density values will be shown.")
+  if(data.type == "raw1" || data.type == "raw2" || data.type == "norm.fl1" || data.type == "norm.fl2" && deriv ==TRUE){
+    warning("Derivatives cannot be calculated for 'raw' or 'norm.fl' data. Only the fluorescence values will be shown.")
     deriv = FALSE
   }
-
+  if(is(object) == "flFitRes") object <- object$flFit
 
   # /// check input parameters
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
-  if(data.type == "spline"){
-    if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("To plot spline fit results, please run growth.workflow() with 'a' or 's' in fit.opt.")
+  if(data.type == "spline1" || data.type == "spline2"){
+    if (!("s" %in% object$control$fit.opt | "a" %in% object$control$fit.opt)) stop("To plot spline fit results, please run fl.workflow() with 's' in fit.opt.")
   }
 
 
   # Get name of conditions with multiple replicates
-  sample.nm <- nm <- as.character(names(grofit$flFit$flFittedSplines))
+  if(any(is(object) %in% c("flFit","flFitRes"))){
+    sample.nm <- nm <- as.character(names(object$flFittedSplines))
+  } else {
+    if(data.type == "norm.fl1"){
+      sample.nm <- nm <- paste(object$norm.fluorescence1[,1], object$norm.fluorescence1[,2], object$norm.fluorescence1[,3], sep = " | ")
+      data.nm = "norm.fluorescence1"
+    }
+    if(data.type == "norm.fl2"){
+      sample.nm <- nm <- paste(object$norm.fluorescence2[,1], object$norm.fluorescence2[,2], object$norm.fluorescence2[,3], sep = " | ")
+      data.nm = "norm.fluorescence2"
+    }
+    if(data.type == "raw1"){
+      sample.nm <- nm <- paste(object$fluorescence1[,1], object$fluorescence1[,2], object$fluorescence1[,3], sep = " | ")
+      data.nm = "fluorescence1"
+    }
+    if(data.type == "raw2"){
+      sample.nm <- nm <- paste(object$fluorescence2[,1], object$fluorescence2[,2], object$fluorescence2[,3], sep = " | ")
+      data.nm = "fluorescence2"
+    }
+  }
   if(!is.null(names)){
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
   if(!is.null(conc)){
-    nm <- nm[which(str_extract(nm, "[:alnum:]+$") %in% conc)]
+    nm <- nm[which(str_extract(nm, "(?<![:punct:])[:alnum:]+$") %in% conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
@@ -616,10 +635,12 @@ plot.flFit <- plot.flFitRes <-  function(object,
   }
   ndx.filt <- unlist(filter.ls, recursive = F)
   # Check FitFlag for each replicate, work per condition
-  for(i in 1:length(ndx.filt)){
-    if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["flFit"]][["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
-      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["flFit"]][["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
-      nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+  if(data.type == "spline1" || data.type == "spline2"){
+    for(i in 1:length(ndx.filt)){
+      if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
+        fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+        nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+      }
     }
   }
 
@@ -627,16 +648,19 @@ plot.flFit <- plot.flFitRes <-  function(object,
   ndx.keep <- grep(paste0(
     str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
 
-  if(data.type == "spline"){
+  if(data.type == "spline1"  || data.type == "spline2"){
     # correct for log transformation
-    if(grofit$control$log.y.spline == TRUE){
+    if(object$control$log.y.spline == TRUE){
       for(i in 1:length(ndx.keep)){
-        grofit$flFit$flFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
-          exp(grofit$flFit$flFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$flFit$flFittedSplines[[ndx.keep[i]]]$data.in[1]
+        object$flFittedSplines[[ndx.keep[i]]][["fit.fl"]] <-
+          exp(object$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]) * object$flFittedSplines[[ndx.keep[i]]]$data.in[1]
       }
     }
   }
-
+if(data.type == "spline1" || data.type == "spline2" && object$control$x_type == "density" && mean == TRUE){
+  message("Grouped of replicates is not supported for spline fits with x_type = 'density'. Argument changed to mean = FALSE.")
+  mean <- FALSE
+}
   if(mean == TRUE){
     # Combine replicates via their mean and standard deviation
     conditions <- str_replace_all(nm, "\\| . \\| ", "| ")
@@ -654,20 +678,20 @@ plot.flFit <- plot.flFitRes <-  function(object,
                                              "$"), sample.nm))
       name <- conditions_unique[n]
       # Create lists for density and time values for each sample
-      if(data.type == "spline"){
-        time <- lapply(1:length(ndx), function(i) cbind(grofit$flFit$flFittedSplines[[ndx[[i]]]]$fit.time)) %>% as.list(.)
-        data <- lapply(1:length(ndx), function(i) cbind(grofit$flFit$flFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)
+      if(data.type == "spline1"  || data.type == "spline2"){
+        time <- lapply(1:length(ndx), function(i) cbind(object$flFittedSplines[[ndx[[i]]]]$fit.x)) %>% as.list(.)
+        data <- lapply(1:length(ndx), function(i) cbind(object$flFittedSplines[[ndx[[i]]]]$fit.fl)) %>% as.list(.)
       } else {
-        time <- lapply(1:length(ndx), function(i) cbind(grofit$time[ndx[[i]], ])) %>% as.list(.)
-        data <- grofit$data[ndx, 4:ncol(grofit$data)]
+        time <- lapply(1:length(ndx), function(i) cbind(object$time[ndx[[i]], ])) %>% as.list(.)
+        data <- object[[data.nm]][ndx, 4:ncol(object[[data.nm]])]
         data <- split(as.matrix(data), 1:nrow(as.matrix(data)))
         data <- lapply(1:length(data), function(i) as.numeric(data[[i]]))
       }
 
       # Create lists for derivatives and time values for each sample
       if(deriv){
-        time.deriv <- lapply(1:length(ndx), function(i) cbind(grofit$flFit$flFittedSplines[[ndx[[i]]]]$spline.deriv1$x)) %>% as.list(.)
-        data.deriv <- lapply(1:length(ndx), function(i) cbind(grofit$flFit$flFittedSplines[[ndx[[i]]]]$spline.deriv1$y)) %>% as.list(.)
+        time.deriv <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$spline.deriv1$x)) %>% as.list(.)
+        data.deriv <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$spline.deriv1$y)) %>% as.list(.)
       }
       # correct for unequal lengths of data series
       time.all <- Reduce(union, time)
@@ -706,7 +730,7 @@ plot.flFit <- plot.flFitRes <-  function(object,
             }
           }
         }
-      }
+      } # if(deriv)
       time <- time[[1]]
       data <- do.call("cbind", data)
       avg <- rowMeans(data, na.rm = F)
@@ -717,9 +741,9 @@ plot.flFit <- plot.flFitRes <-  function(object,
         data.deriv <- do.call("cbind", data.deriv)
         avg.deriv <- rowMeans(data.deriv, na.rm = F)
         sd.deriv <- apply(data.deriv, 1, sd, na.rm = F)
-        deriv.ls[[n]] <- data.frame(name = name, time = time.deriv, mean = avg.deriv, upper = avg.deriv+sd.deriv, lower = avg.deriv-sd.deriv)
+       deriv.ls[[n]] <- data.frame(name = name, time = time.deriv, mean = avg.deriv, upper = avg.deriv+sd.deriv, lower = avg.deriv-sd.deriv)
       }
-    }
+    } # for(n in 1:length(conditions_unique))
     names(plotdata.ls) <- gsub(" \\| NA", "", conditions_unique)
     if(deriv){
       names(deriv.ls) <- gsub(" \\| NA", "", conditions_unique)
@@ -733,18 +757,35 @@ plot.flFit <- plot.flFitRes <-  function(object,
     df <- do.call(rbind.data.frame, plotdata.ls)
     df$name <- gsub(" \\| NA", "", df$name)
     df$name <- factor(df$name, levels = unique(factor(df$name)))
+    df <- df[df[["mean"]]>0, ]
+    if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
 
     # replace negative lower ribbon boundaries with 0 for log10 transformation
     if(log.y==TRUE){
       df$lower[df$lower<0] <- 0
     }
-
+    xlab.title <- if(data.type == "norm.fl1" || data.type == "norm.fl2" || data.type == "raw1" || data.type == "raw2"){
+      "Time"
+    } else if (object$control$x_type == "density"){
+      "Density"
+    } else {
+      "Time"
+    }
+    ylab.title <- if(data.type == "norm.fl1"){
+      "Normalized fluorescence 1"
+    } else if(data.type == "norm.fl2"){
+      "Normalized fluorescence 2"
+    } else if(data.type == "raw1" || data.type == "spline1"){
+      "Fluorescence 1"
+    } else if(data.type == "raw2" || data.type == "spline2"){
+      "Fluorescence 2"
+    }
     p <- ggplot(df, aes(x=time, y=mean, col = name)) +
       geom_line(size=lwd) +
       geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), "Time", x.title)) +
-      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
+      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
@@ -799,90 +840,52 @@ plot.flFit <- plot.flFitRes <-  function(object,
         )
       }
     }
-    if(deriv){
-      # /// add panel with growth rate over time
-      p.deriv <- ggplot(df.deriv, aes(x=time, y=mean, col = name)) +
-        geom_line(size=lwd) +
-        geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
-        theme_classic(base_size = basesize) +
-        xlab(ifelse(is.null(x.title), "Time", x.title)) +
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank())
-
-      if(is.null(y.title.deriv)){
-        p.deriv <- p.deriv + ylab(label = "Growth rate")
-      } else {
-        p.deriv <- p.deriv + ylab(label = y.title.deriv)
-      }
-
-
-      if(!is.null(y.lim)){
-        p.deriv <- p.deriv + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-      } else {
-        p.deriv <- p.deriv + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-      }
-
-      if(!is.null(x.lim)){
-        p.deriv <- p.deriv + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
-      } else {
-        p.deriv <- p.deriv + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
-      }
-
-      if(is.null(colors)){
-        if (length(plotdata.ls) <= 8) {
-          p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else {
-          p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                                 values = c(
-                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                                 )
-          ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
-          )
-        }
-      }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
-    }
   } # if(mean == TRUE)
   else {
     df <- data.frame()
     for(i in 1:length(ndx.keep)){
-      if(data.type == "spline"){
+      if(data.type == "spline1"  || data.type == "spline2"){
         df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
-                                              "time" = grofit$flFit$flFittedSplines[[ndx.keep[i]]][["fit.time"]],
-                                              "y" = grofit$flFit$flFittedSplines[[ndx.keep[i]]][["fit.data"]]))
+                                              "time" = object$flFittedSplines[[ndx.keep[i]]][["fit.x"]],
+                                              "y" = object$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]))
       } else {
         df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
-                                              "time" = as.vector(grofit$time[ndx.keep[i], ]),
-                                              "y" = unlist(unname(type.convert(grofit$data[ndx.keep[i], 4:ncol(grofit$data)], as.is=T)))))
+                                              "time" = as.vector(object$time[ndx.keep[i], ]),
+                                              "y" = unlist(unname(type.convert(object[[data.nm]][ndx.keep[i], 4:ncol(object[[data.nm]])], as.is=T)))))
       }
 
+    }
+    df <- df[df[["y"]]>0, ]
+    if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
+    xlab.title <- if(data.type == "norm.fl1" || data.type == "norm.fl2" || data.type == "raw1" || data.type == "raw2"){
+      "Time"
+    } else if (object$control$x_type == "density"){
+      "Density"
+    } else {
+      "Time"
+    }
+    ylab.title <- if(data.type == "norm.fl1"){
+      "Normalized fluorescence 1"
+    } else if(data.type == "norm.fl2"){
+      "Normalized fluorescence 2"
+    } else if(data.type == "raw1" || data.type == "spline1"){
+      "Fluorescence 1"
+    } else if(data.type == "raw2" || data.type == "spline2"){
+      "Fluorescence 2"
     }
     p <- ggplot(df, aes(x=time, y=y, col = name)) +
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), "Time", x.title)) +
-      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
+      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(!is.null(x.lim)){
+      p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+    }
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -896,12 +899,6 @@ plot.flFit <- plot.flFitRes <-  function(object,
       } else {
         p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
-    }
-
-    if(!is.null(x.lim)){
-      p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
-    } else {
-      p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
     }
 
     if(is.null(colors)){
@@ -933,8 +930,8 @@ plot.flFit <- plot.flFitRes <-  function(object,
       df.deriv <- data.frame()
       for(i in 1:length(ndx.keep)){
         df.deriv <- plyr::rbind.fill(df.deriv, data.frame("name" = sample.nm[ndx.keep[i]],
-                                                          "time" = grofit$flFit$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
-                                                          "y" = grofit$flFit$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
+                                                          "time" = object$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
+                                                          "y" = object$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
       }
       p.deriv <- ggplot(df.deriv, aes(x=time, y=y, col = name)) +
         geom_line(size=lwd) +
@@ -1018,3 +1015,5 @@ plot.flFit <- plot.flFitRes <-  function(object,
     print(p)
   }
 }
+
+plot.flFit <- plot.flFitRes

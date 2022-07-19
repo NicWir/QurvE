@@ -759,8 +759,9 @@ growth.control <- function (neg.nan.act = FALSE,
 #'
 #' \code{grofit.workflow()} runs \code{growth.control()} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
 #'
+#' @param grodata A \code{grodata} object created with \code{read_data()} or \code{parse_data()}, or a list containing a \code{'time'} matrix as well as a \code{'density'} dataframe.
 #' @param time (optional) A matrix containing time values for each sample.
-#' @param data Either a \code{grodata} object created with \code{read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
+#' @param data (optional) A dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param ec50 (Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
 #' @param mean.grp (\code{"all"}, a string vector, or a list of string vectors) Define groups to combine into common plots in the final report based on sample identifiers (if \code{report == TRUE}). Partial matches with sample/group names are accepted. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
@@ -802,7 +803,6 @@ growth.control <- function (neg.nan.act = FALSE,
 growth.workflow <- function (grodata = NULL,
                              time = NULL,
                              data = NULL,
-
                              ec50 = FALSE,
                              mean.grp = NA,
                              mean.conc = NA,
@@ -837,7 +837,7 @@ growth.workflow <- function (grodata = NULL,
                              export = FALSE
 )
 {
-  if(!(class(grodata)=="list") && !(class(grodata)=="grodata")){
+  if(is.null(grodata) || !(class(grodata)=="list") && !(class(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
     if (is.numeric(as.matrix(data[-1:-3])) == FALSE)

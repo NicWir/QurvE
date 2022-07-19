@@ -267,7 +267,20 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   else {
     # Perform spline fit and extract parameters
     deriv1 <- predict(spline, x, deriv = 1)
-    max_slope.index <- which.max(deriv1$y) # index of data point with maximum growth rate in first derivative fit
+    # find maximum in deriv1, exclude maxima at beginning of fit
+    success <- FALSE
+    while (!success){
+      max_slope.index <- which.max(deriv1$y)
+      if(!(max_slope.index %in% (length(deriv1$y)-2):length(deriv1$y))){
+        max_slope.index <- max_slope.index
+        success <- TRUE
+      } else {
+        deriv1 <- lapply(1:length(deriv1), function(x) deriv1[[x]][-max_slope.index])
+        names(deriv1) <- c("x", "y")
+        spline$x <- spline$x[-max_slope.index]
+        spline$y <- spline$y[-max_slope.index]
+      }
+    }
     max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index]) # index of data point with maximum growth rate in spline fit
     x.max <- deriv1$x[max_slope.index] # x of maximum growth rate
     max_slope <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
@@ -1717,7 +1730,7 @@ fl.workflow <- function(grodata = NULL,
                         out.dir = NULL,
                         export = FALSE)
 {
-  if(!(class(grodata)=="list") && !(class(grodata)=="grodata")){
+  if(!is.null(grodata) && !(class(grodata)=="list") && !(class(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
     if (is.numeric(as.matrix(data[-1:-3])) == FALSE)
@@ -1732,7 +1745,10 @@ fl.workflow <- function(grodata = NULL,
     if(!is.null(grodata$fluorescence2)) fluorescence2 <- grodata$fluorescence2
     if(!is.null(grodata$norm.fluorescence1)) norm.fluorescence1 <- grodata$norm.fluorescence1
     if(!is.null(grodata$norm.fluorescence2)) norm.fluorescence2 <- grodata$norm.fluorescence2
-    data <- grodata$density
+
+    if(!is.null(time)) time <- time
+    if(!is.null(density)) density <- density
+    if(!is.null(fl_data)) fluorescence1 <- fl_data
   }
   control <- fl.control(fit.opt = fit.opt, norm_fl = norm_fl, x_type = x_type, t0 = t0, min.density = min.density, log.x.lin = log.x.lin,
                         log.x.spline = log.x.spline, log.y.lin = log.y.lin, log.y.spline = log.y.spline,

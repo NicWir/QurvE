@@ -126,7 +126,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
   if (is.logical(equation)==FALSE)   stop("Need logical value for: equation")
   if (is.numeric(base_size)==FALSE)   stop("Need numeric value for: base_size")
-  if (!(class(gcFittedModel)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
+  if (!(is(gcFittedModel)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
 
 
   # /// check if a data fit is available
@@ -332,7 +332,7 @@ plot.drBootSpline <- function (drBootSpline,
                                ...)
 {
   # drBootSpline an object of class drBootSpline
-  if(class(drBootSpline) != "drBootSpline") stop("drBootSpline needs to be an object created with growth.drBootSpline.")
+  if(is(drBootSpline) != "drBootSpline") stop("drBootSpline needs to be an object created with growth.drBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot  <- function(text = "Empty plot", main = "") {
     plot(c(0, 1, 0, 1, 0), c(0, 1, 1, 0, 0),
@@ -542,7 +542,7 @@ plot.drFitSpline <-
             ...)
   {
     # drFitSpline an object of class drFitSpline
-    if(class(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
+    if(is(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
     # /// check input parameters
     if (is.logical(add) == FALSE)
       stop("Need logical value for: add")
@@ -718,7 +718,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
                               height = 7, width = 9, out.dir = NULL, ...)
 {
   # gcBootSpline an object of class gcBootSpline
-  if(class(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
+  if(is(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot <- function(text="Empty plot",main=""){
     plot(c(0,1,0,1,0),c(0,1,1,0,0), type="l", axes=FALSE, xlab="", ylab="", lwd=1, col="gray",main=main)
@@ -892,7 +892,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 {
 
   # x an object of class gcFitSpline
-  if(class(gcFitSpline) != "gcFitSpline") stop("gcFitSpline needs to be an object created with growth.gcFitSpline().")
+  if(is(gcFitSpline) != "gcFitSpline") stop("gcFitSpline needs to be an object created with growth.gcFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -1216,7 +1216,7 @@ plot.grofit <- function(grofit,
   }
 
   # grofit an object of class grofit
-  if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
+  if(is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
@@ -1239,24 +1239,26 @@ plot.grofit <- function(grofit,
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
   }
   # remove conditions with fitFlag = FALSE in all replicates
-    # Store each condition with its replicate indices in list filter.ls
-    ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i)which(gsub(" \\| .+", "", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1])))))
-    filter.ls <- list()
-    for(j in 1:length(ndx.filt.rep)){
-      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+  # Store each condition with its replicate indices in list filter.ls
+  ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i)which(gsub(" \\| .+", "", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1])))))
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.rep)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
                                                                                                            gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
                                                                                                            ".+[[:space:]]",
                                                                                                            unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), sample.nm[ndx.filt.rep[[j]]])]))
-    }
-    ndx.filt <- unlist(filter.ls, recursive = F)
-    # Check FitFlag for each replicate, work per condition
+  }
+  ndx.filt <- unlist(filter.ls, recursive = F)
+  # Check FitFlag for each replicate, work per condition
+  if(data.type == "spline"){
     for(i in 1:length(ndx.filt)){
       if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
         fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
         nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
       }
     }
+  }
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0(
@@ -1265,10 +1267,10 @@ plot.grofit <- function(grofit,
   if(data.type == "spline"){
     # correct for log transformation
     if(grofit$control$log.y.spline == TRUE){
-        for(i in 1:length(ndx.keep)){
-          grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
-            exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
-        }
+      for(i in 1:length(ndx.keep)){
+        grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
+          exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
+      }
     }
   }
 
@@ -1283,10 +1285,10 @@ plot.grofit <- function(grofit,
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                         gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1])),
-                         ".+[[:space:]]",
-                         unlist(str_split(conditions_unique[n], " \\| "))[2],
-                         "$"), sample.nm))
+                                             gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1])),
+                                             ".+[[:space:]]",
+                                             unlist(str_split(conditions_unique[n], " \\| "))[2],
+                                             "$"), sample.nm))
       name <- conditions_unique[n]
       # Create lists for density and time values for each sample
       if(data.type == "spline"){
@@ -1331,9 +1333,9 @@ plot.grofit <- function(grofit,
           if(length(get(paste0("time.missing_", i))) > 0){
             for(j in 1:length(get(paste0("time.missing_", i)))){
               data.deriv[[i]] <- append(data.deriv[[i]],
-                                  values = NA,
-                                  after = match(get(paste0("time.missing_", i))[j],
-                                                time.all) - 1)
+                                        values = NA,
+                                        after = match(get(paste0("time.missing_", i))[j],
+                                                      time.all) - 1)
               time.deriv[[i]] <-
                 append(time.deriv[[i]],
                        values = get(paste0("time.missing_", i))[j],
@@ -1468,17 +1470,17 @@ plot.grofit <- function(grofit,
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else {
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                     values = c(
-                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                       "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                     )
+                                                 values = c(
+                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                                 )
           ) + scale_color_manual(name = "Condition",
                                  values = c(
                                    "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1494,7 +1496,7 @@ plot.grofit <- function(grofit,
           )
         }
       }
-        p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
     }
   } # if(mean == TRUE)
   else {
@@ -1694,7 +1696,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                            plot = T, export = F, height = 7, width = NULL, out.dir = NULL){
   param <- match.arg(param)
   # check class of object
-  if(!(any(class(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
+  if(!(any(is(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
   if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
                                             'mu.model', 'lambda.model', 'A.model',
                                             'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
@@ -1702,17 +1704,17 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                             stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
 
   #extract gcTable
-  if(any(class(object) %in% "gcTable")){
+  if(any(is(object) %in% "gcTable")){
     gcTable <- object
-  } else if (class(object)=="gcFit"){
+  } else if (is(object)=="gcFit"){
     gcTable <- object$gcTable
-  } else if (class(object)=="grofit"){
+  } else if (is(object)=="grofit"){
     gcTable <- object$gcFit$gcTable
-  } else if (class(object)=="flFitRes"){
+  } else if (is(object)=="flFitRes"){
     gcTable <- object$flFit$flTable
-  } else if (any(class(object) %in% "gcTable")){
+  } else if (any(is(object) %in% "gcTable")){
     gcTable <- object
-  } else if (class(object)=="flFit"){
+  } else if (is(object)=="flFit"){
     gcTable <- object$flTable
   }
   #check if param exists in gcTable and has a valid value
