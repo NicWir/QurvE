@@ -930,6 +930,7 @@ growth.workflow <- function (grodata = NULL,
 #' @import foreach
 #' @import kableExtra
 #' @import knitr
+#' @import plyr
 #' @include general_misc_utils.R
 growth.report <- function(grofit, report.dir = NULL, ...)
   {

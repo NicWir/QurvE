@@ -29,6 +29,7 @@ Imports:
     kableExtra,
     knitr,
     markdown,
+    plyr,
     RColorBrewer,
     readxl,
     rmarkdown,
