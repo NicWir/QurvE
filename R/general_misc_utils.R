@@ -154,3 +154,41 @@ inflect <- function(x, threshold = 1){
   list(minima = which(apply(a, 1, min) == a[,1]), maxima = which(apply(a, 1, max) == a[,1]))
 }
 
+#Function from plyr package
+rbind.fill <- function (...)
+{
+  dfs <- list(...)
+  if (length(dfs) == 0)
+    return()
+  if (is.list(dfs[[1]]) && !is.data.frame(dfs[[1]])) {
+    dfs <- dfs[[1]]
+  }
+  dfs <- compact(dfs)
+  if (length(dfs) == 0)
+    return()
+  if (length(dfs) == 1)
+    return(dfs[[1]])
+  is_df <- vapply(dfs, is.data.frame, logical(1))
+  if (any(!is_df)) {
+    stop("All inputs to rbind.fill must be data.frames",
+         call. = FALSE)
+  }
+  rows <- unlist(lapply(dfs, .row_names_info, 2L))
+  nrows <- sum(rows)
+  ot <- output_template(dfs, nrows)
+  setters <- ot$setters
+  getters <- ot$getters
+  if (length(setters) == 0) {
+    return(as.data.frame(matrix(nrow = nrows, ncol = 0)))
+  }
+  pos <- matrix(c(cumsum(rows) - rows + 1, rows), ncol = 2)
+  for (i in seq_along(rows)) {
+    rng <- seq(pos[i, 1], length.out = pos[i, 2])
+    df <- dfs[[i]]
+    for (var in names(df)) {
+      setters[[var]](rng, df[[var]])
+    }
+  }
+  quickdf(lapply(getters, function(x) x()))
+}
+
