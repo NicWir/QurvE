@@ -1780,7 +1780,7 @@ fl.workflow <- function(grodata = NULL,
     boot.ec <- out.drFit$boot.ec
   }
   # ///
-  flFitRes <- list(time = time, data = data, flFit = out.flFit1, flFit2 = ifelse(exists("out.flFit2"), get("out.flFit2"), NA),
+  flFitRes <- list(time = time, data = grodata, flFit = out.flFit1, flFit2 = ifelse(exists("out.flFit2"), get("out.flFit2"), NA),
                  drFit = out.drFit, expdesign = expdesign, control = control)
   class(flFitRes) <- "flFitRes"
 

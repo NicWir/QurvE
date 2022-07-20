@@ -198,6 +198,9 @@ if(any(c("a", "l") %in% control$fit.opt)){
       fit_df <- data.frame("time" = x[["raw.time"]][x$ndx],
                            "y" = x[["raw.data"]][x$ndx] )
       
+       tangent.df <- data.frame("time" = tangent.time,
+                                   "y" = coef["y0_lm"] * exp(coef["mumax"]*tangent.time) )
+      
       df <- data.frame("time" = x[["raw.time"]],
                        "data" = x[["raw.data"]])
       

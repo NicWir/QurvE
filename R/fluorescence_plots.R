@@ -10,7 +10,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
            fit = {
 
              par(cex.lab=1.5)
-             plot(flFittedLinear$"filt.fl" ~ flFittedLinear$"filt.x", xlab="Time", ylab=ifelse(log == "y", "Density", "Density"),
+             plot(flFittedLinear$"filt.fl" ~ flFittedLinear$"filt.x", xlab="OD", ylab=ifelse(log == "y", "FL", "FL"),
                   log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", ...)
              axis(1,cex.axis=1.3)
              axis(2,cex.axis=1.3, las=1)
@@ -581,37 +581,45 @@ plot.flFitRes <-  function(object,
     warning("Derivatives cannot be calculated for 'raw' or 'norm.fl' data. Only the fluorescence values will be shown.")
     deriv = FALSE
   }
-  if(is(object) == "flFitRes") object <- object$flFit
+  if(is(object) == "grodata"){
+    raw_data <- object
+  }
+  if(is(object) == "flFitRes"){
+    flFit <- object$flFit
+    raw_data <- object$data
+  } else {
+    flFit <- object
+  }
 
   # /// check input parameters
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
   if(data.type == "spline1" || data.type == "spline2"){
-    if (!("s" %in% object$control$fit.opt | "a" %in% object$control$fit.opt)) stop("To plot spline fit results, please run fl.workflow() with 's' in fit.opt.")
+    if (!("s" %in% flFit$control$fit.opt | "a" %in% flFit$control$fit.opt)) stop("To plot spline fit results, please run fl.workflow() with 's' in fit.opt.")
   }
 
 
   # Get name of conditions with multiple replicates
   if(any(is(object) %in% c("flFit","flFitRes"))){
-    sample.nm <- nm <- as.character(names(object$flFittedSplines))
+    sample.nm <- nm <- as.character(names(flFit$flFittedSplines))
   } else {
     if(data.type == "norm.fl1"){
       sample.nm <- nm <- paste(object$norm.fluorescence1[,1], object$norm.fluorescence1[,2], object$norm.fluorescence1[,3], sep = " | ")
-      data.nm = "norm.fluorescence1"
     }
     if(data.type == "norm.fl2"){
       sample.nm <- nm <- paste(object$norm.fluorescence2[,1], object$norm.fluorescence2[,2], object$norm.fluorescence2[,3], sep = " | ")
-      data.nm = "norm.fluorescence2"
     }
     if(data.type == "raw1"){
       sample.nm <- nm <- paste(object$fluorescence1[,1], object$fluorescence1[,2], object$fluorescence1[,3], sep = " | ")
-      data.nm = "fluorescence1"
     }
     if(data.type == "raw2"){
       sample.nm <- nm <- paste(object$fluorescence2[,1], object$fluorescence2[,2], object$fluorescence2[,3], sep = " | ")
-      data.nm = "fluorescence2"
     }
   }
+  if(data.type == "norm.fl1") data.nm = "norm.fluorescence1"
+  if(data.type == "norm.fl2") data.nm = "norm.fluorescence2"
+  if(data.type == "raw1") data.nm = "fluorescence1"
+  if(data.type == "raw2") data.nm = "fluorescence2"
   if(!is.null(names)){
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
@@ -637,8 +645,8 @@ plot.flFitRes <-  function(object,
   # Check FitFlag for each replicate, work per condition
   if(data.type == "spline1" || data.type == "spline2"){
     for(i in 1:length(ndx.filt)){
-      if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
-        fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+      if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (flFit[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
+        fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (flFit[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
         nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
       }
     }
@@ -650,14 +658,14 @@ plot.flFitRes <-  function(object,
 
   if(data.type == "spline1"  || data.type == "spline2"){
     # correct for log transformation
-    if(object$control$log.y.spline == TRUE){
+    if(flFit$control$log.y.spline == TRUE){
       for(i in 1:length(ndx.keep)){
-        object$flFittedSplines[[ndx.keep[i]]][["fit.fl"]] <-
-          exp(object$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]) * object$flFittedSplines[[ndx.keep[i]]]$data.in[1]
+        flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]] <-
+          exp(flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]) * flFit$flFittedSplines[[ndx.keep[i]]]$data.in[1]
       }
     }
   }
-if(data.type == "spline1" || data.type == "spline2" && object$control$x_type == "density" && mean == TRUE){
+if(data.type == "spline1" || data.type == "spline2" && flFit$control$x_type == "density" && mean == TRUE){
   message("Grouped of replicates is not supported for spline fits with x_type = 'density'. Argument changed to mean = FALSE.")
   mean <- FALSE
 }
@@ -679,11 +687,16 @@ if(data.type == "spline1" || data.type == "spline2" && object$control$x_type == 
       name <- conditions_unique[n]
       # Create lists for density and time values for each sample
       if(data.type == "spline1"  || data.type == "spline2"){
-        time <- lapply(1:length(ndx), function(i) cbind(object$flFittedSplines[[ndx[[i]]]]$fit.x)) %>% as.list(.)
-        data <- lapply(1:length(ndx), function(i) cbind(object$flFittedSplines[[ndx[[i]]]]$fit.fl)) %>% as.list(.)
+        time <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.x)) %>% as.list(.)
+        data <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.fl)) %>% as.list(.)
       } else {
-        time <- lapply(1:length(ndx), function(i) cbind(object$time[ndx[[i]], ])) %>% as.list(.)
-        data <- object[[data.nm]][ndx, 4:ncol(object[[data.nm]])]
+        if(is(object) %in% "flFitRes"){
+            time <- lapply(1:length(ndx), function(i) raw_data$time[ndx[i], ])
+            data <- raw_data[[data.nm]][ndx, 4:ncol(raw_data[[data.nm]])]
+        } else {
+          time <- lapply(1:length(ndx), function(i) cbind(raw_data$time[ndx[[i]], ])) %>% as.list(.)
+          data <- raw_data[[data.nm]][ndx, 4:ncol(raw_data[[data.nm]])]
+        }
         data <- split(as.matrix(data), 1:nrow(as.matrix(data)))
         data <- lapply(1:length(data), function(i) as.numeric(data[[i]]))
       }
@@ -766,7 +779,7 @@ if(data.type == "spline1" || data.type == "spline2" && object$control$x_type == 
     }
     xlab.title <- if(data.type == "norm.fl1" || data.type == "norm.fl2" || data.type == "raw1" || data.type == "raw2"){
       "Time"
-    } else if (object$control$x_type == "density"){
+    } else if (flFit$control$x_type == "density"){
       "Density"
     } else {
       "Time"
@@ -846,15 +859,20 @@ if(data.type == "spline1" || data.type == "spline2" && object$control$x_type == 
     for(i in 1:length(ndx.keep)){
       if(data.type == "spline1"  || data.type == "spline2"){
         df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
-                                              "time" = object$flFittedSplines[[ndx.keep[i]]][["fit.x"]],
-                                              "y" = object$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]))
+                                              "time" = flFit$flFittedSplines[[ndx.keep[i]]][["fit.x"]],
+                                              "y" = flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]))
       } else {
-        df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
-                                              "time" = as.vector(object$time[ndx.keep[i], ]),
-                                              "y" = unlist(unname(type.convert(object[[data.nm]][ndx.keep[i], 4:ncol(object[[data.nm]])], as.is=T)))))
+        if(any(is(object) %in% c("flFit","flFitRes"))){
+          df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
+                                                "time" = as.vector(raw_data$time[ndx.keep[i], ]),
+                                                "y" = unlist(unname(type.convert(raw_data[[data.nm]][ndx.keep[i], 4:ncol(raw_data[[data.nm]])], as.is=T)))))
+        } else {
+          df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
+                                                "time" = as.vector(object$time[ndx.keep[i], ]),
+                                                "y" = unlist(unname(type.convert(object[[data.nm]][ndx.keep[i], 4:ncol(object[[data.nm]])], as.is=T)))))
+        }
       }
-
-    }
+    } # if(data.type == "spline1"  || data.type == "spline2")
     df <- df[df[["y"]]>0, ]
     if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
     xlab.title <- if(data.type == "norm.fl1" || data.type == "norm.fl2" || data.type == "raw1" || data.type == "raw2"){
@@ -930,8 +948,8 @@ if(data.type == "spline1" || data.type == "spline2" && object$control$x_type == 
       df.deriv <- data.frame()
       for(i in 1:length(ndx.keep)){
         df.deriv <- plyr::rbind.fill(df.deriv, data.frame("name" = sample.nm[ndx.keep[i]],
-                                                          "time" = object$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
-                                                          "y" = object$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
+                                                          "time" = flFit$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
+                                                          "y" = flFit$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
       }
       p.deriv <- ggplot(df.deriv, aes(x=time, y=y, col = name)) +
         geom_line(size=lwd) +

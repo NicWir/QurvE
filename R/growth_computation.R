@@ -2807,9 +2807,11 @@ growth.drFit <- function (FitData, control = growth.control())
       EC50.table <- rbind(EC50.table, out.row)
     }
   }
-  distinct <- distinct[-skip]
-  EC50 <- EC50[-skip]
-  EC50.boot <- EC50.boot[-skip]
+  if(!is.null(skip)){
+    distinct <- distinct[-skip]
+    EC50 <- EC50[-skip]
+    EC50.boot <- EC50.boot[-skip]
+  }
   names(EC50) <- names(EC50.boot) <- distinct
   drFit <- list(raw.data = FitData, drTable = EC50.table,
                 drBootSplines = EC50.boot, drFittedSplines = EC50, control = control)
