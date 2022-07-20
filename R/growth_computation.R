@@ -2028,7 +2028,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
-                          t_turn = NA, mumax2 = NA, y0_lm2 = y0_2, lag2 = NA, tmax2_start = NA,
+                          t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
                           tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
     )
     class(gcFitLinear) <- "gcFitLinear"
@@ -2058,7 +2058,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
       gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                           log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
-                            t_turn = NA, mumax2 = NA, y0_lm2 = y0_2, lag2 = NA, tmax2_start = NA,
+                            t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
                             tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
       )
       class(gcFitLinear) <- "gcFitLinear"
@@ -2083,7 +2083,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
         gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                             log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                               y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
-                              t_turn = NA, mumax2 = NA, y0_lm2 = y0_2, lag2 = NA, tmax2_start = NA,
+                              t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
                               tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
         )
         class(gcFitLinear) <- "gcFitLinear"
@@ -2171,7 +2171,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                                 log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                                   y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
-                                  t_turn = NA, mumax2 = NA, y0_lm2 = y0_2, lag2 = NA, tmax2_start = NA,
+                                  t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
                                   tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
@@ -2550,7 +2550,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
-                          t_turn = NA, mumax2 = NA, y0_lm2 = y0_2, lag2 = NA, tmax2_start = NA,
+                          t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
                           tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
     )
     class(gcFitLinear) <- "gcFitLinear"
