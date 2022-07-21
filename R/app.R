@@ -1,7 +1,19 @@
+list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
 library(shiny)
 library(readxl)
 library(tidyverse)
 library(shinythemes)
+
+source("general_misc_utils.R")
+source("growth_computation.R")
+source("growth_plots.R")
+source("growth_summaries.R")
+source("fluorescence_computation.R")
+source("fluorescence_plots.R")
+source("fluorescence_summaries.R")
 
 ui <- fluidPage(theme = shinytheme('sandstone'),
                 navbarPage(
@@ -288,9 +300,7 @@ server <- function(input, output){
   })
 
   # render input data
-  output$contents <- renderTable({
-    data()
-  })
+
 
 
 }
