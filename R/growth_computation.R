@@ -3004,6 +3004,15 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     conc <- conc[!negs]
     test <- test[!negs]
   }
+  # Test if there are enough unique x-values (conc) to perform spline fit
+  if (length(unique(conc)) < 4){
+    warning("drBootSpline: There are not enough concentration values. Must have at least 4 unique values!")
+    drBootSpline <- list(raw.conc = conc, raw.test = test,
+                         drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
+                         ec50.boot = NA, bootFlag = FALSE, control = control)
+    class(drBootSpline) <- "drBootSpline"
+    return(drBootSpline)
+  }
   else {
     if (sum(is.na(conc) | is.na(test)))
       stop("NA values encountered. Program terminated")
@@ -3028,6 +3037,8 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     class(drBootSpline) <- "drBootSpline"
     return(drBootSpline)
   }
+
+  # /// transformation of data...
   if (control$log.x.dr == TRUE)
     conc.log <- log(conc + 1)
   if (control$log.y.dr == TRUE)
@@ -3038,16 +3049,20 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
   if (control$log.y.dr == TRUE)
     test.boot <- log(test + 1)
   else test.boot <- test
+
+  # /// Initialize some variables
   boot.x <- array(NA, c(control$nboot.dr, 1000))
   boot.y <- array(NA, c(control$nboot.dr, 1000))
   ECtest.boot <- seq(0, 0, length.out = control$nboot.dr)
   y.EC50.boot <- seq(0, 0, length.out = control$nboot.dr)
   splinefit <- list()
   sa <- seq(1, length(conc.boot))
+
+  # /// begin bootstrapping
   for (b in 1:control$nboot.dr) {
     s <- sample(sa, length(conc.boot), replace = TRUE)
     s.conc <- conc.boot[s]
-    while (length(unique(s.conc)) < 5) {
+    while (length(unique(s.conc)) < 4) {
       s <- sample(sa, length(conc.boot), replace = TRUE)
       s.conc <- conc.boot[s]
     }
