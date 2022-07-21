@@ -34,6 +34,8 @@ Imports:
     readxl,
     rmarkdown,
     scales,
+    shiny,
+    shinythemes,
     stats,
     tinytex,
     utils
@@ -47,6 +49,7 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
 Collate: 
+    'app.R'
     'fluorescence_computation.R'
     'fluorescence_plots.R'
     'fluorescence_summaries.R'
