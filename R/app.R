@@ -118,7 +118,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                    label = "Run computation")
 
                                     )
-                                  ),
+                             ),
 
                              column(4,
                                     mainPanel(
@@ -202,7 +202,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       checkboxInput(inputId = 'log_transform_time_parametric',
                                                     label = 'Log-transform time')
                                     )
-                                    ),
+                             ),
                              column(4,
                                     mainPanel(
                                       h2('Nonparametric fit'),
@@ -248,7 +248,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                     ))
                            ),
 
-                           ),
+                  ),
                   # display contents of infile
                   # tableOutput('contents'),
                   tabPanel("Visualize",
@@ -319,8 +319,6 @@ server <- function(input, output){
       # to create alert message
     })
   })
-
-
 
 }
 
