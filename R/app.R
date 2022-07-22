@@ -253,7 +253,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   # tableOutput('contents'),
                   tabPanel("Visualize",
                            h1("under construction"),
-                           verbatimTextOutput("console")),
+                           plotOutput("console")),
+
                   tabPanel("Report",  h1("under construction")),
                   tabPanel("About Us",
                            mainPanel(
@@ -286,23 +287,7 @@ server <- function(input, output){
     read_excel(paste(inFile$datapath, ".xlsx", sep=""))
   })
 
-  grodata <- reactive({
-    req(input$excel_file)
-
-    inFile <- input$excel_file
-
-    if(is.null(inFile))
-      return(NULL)
-    file.rename(inFile$datapath,
-                paste(inFile$datapath, ".xlsx", sep=""))
-
-    grodata <- read_data(paste(inFile$datapath, ".xlsx", sep=""))
-
-    return(grodata)
-  })
-
-  observeEvent(input$run,{
-    output$console <- renderPrint({
+  results <- eventReactive(input$run,{
       inFile <- input$excel_file
 
       if(is.null(inFile))
@@ -312,13 +297,13 @@ server <- function(input, output){
 
       grodata <- read_data(paste(inFile$datapath, ".xlsx", sep=""))
 
-      results <- growth.workflow(grodata = grodata)
-
-      return(print(results))
-      # You could also use grep("Warning", values[["log"]]) to get warning messages and use shinyBS package
-      # to create alert message
-    })
+      growth.workflow(grodata = grodata)
   })
+
+  output$console <- renderPlot({
+    results <- results()
+    plot.parameter(results)
+    })
 
 }
 
