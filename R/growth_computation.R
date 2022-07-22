@@ -349,38 +349,41 @@ read_data <-
 #'
 #' \code{parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{growth.workflow()}.
 #'
-#' @param file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
-#' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
-#' @param csvsep (Character) separator used in CSV file (ignored for other file types).
-#' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
-#' @param map.file (Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
+#' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
+#' @param map.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
 #' @param software (Character) The name of the software used to export the plate reader data.
 #' @param convert.time (Logical) Shall the time be converted from, e.g., 00:15:00 in Excel into hours (\code{TRUE}) or not (\code{FALSE})?
+#' @param data.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
+#' @param map.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
+#' @param csvsep (Character) separator used in CSV file (ignored for other file types).  Default: \code{";"}
+#' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
+#' @param map.file (Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #'
 #' @return A grodata object suitable to run \code{growth.workflow()}.
 #' @export
 #'
 parse_data <-
-  function(file = NULL,
+  function(data.file = NULL,
            map.file = NULL,
            software = "Gen5",
            convert.time = TRUE,
-           sheet = 1,
+           data.sheet = 1,
+           map.sheet = 1,
            csvsep = ";",
            dec = ".",
            subtract.blank  = T
   ) {
-    if(is.null(file)) stop("Please provide the name or path to a table file containing plate reader data.")
+    if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
     if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
     if("Gen5" %in% software){
       # Read table file
-      if (file.exists(file)) {
-        if (stringr::str_replace_all(file, ".{1,}\\.", "") == "csv") {
+      if (file.exists(data.file)) {
+        if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "csv") {
           input <-
             utils::read.csv(
-              file,
+              data.file,
               dec = dec,
               sep = csvsep,
               header = F,
@@ -392,13 +395,13 @@ parse_data <-
               check.names = F,
               na.strings = c("NA", "OVRFLW")
             )
-        } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "xls" |
-                   stringr::str_replace(file, ".{1,}\\.", "") == "xlsx") {
-          input <- data.frame(suppressMessages(readxl::read_excel(file, col_names = F, sheet = sheet, na = c("NA", "OVRFLW"))))
-        } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "tsv") {
+        } else if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "xls" |
+                   stringr::str_replace(data.file, ".{1,}\\.", "") == "xlsx") {
+          input <- data.frame(suppressMessages(readxl::read_excel(data.file, col_names = F, sheet = data.sheet, na = c("NA", "OVRFLW"))))
+        } else if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "tsv") {
           input <-
             utils::read.csv(
-              file,
+              data.file,
               dec = dec,
               sep = "\t",
               header = F,
@@ -410,10 +413,10 @@ parse_data <-
               check.names = F,
               na.strings = c("NA", "OVRFLW")
             )
-        } else if (stringr::str_replace_all(file, ".{1,}\\.", "") == "txt") {
+        } else if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "txt") {
           input <-
             utils::read.table(
-              file,
+              data.file,
               dec = dec,
               sep = "\t",
               header = F,
@@ -432,7 +435,7 @@ parse_data <-
           )
         }
       } else {
-        stop(paste0("File \"", file, "\" does not exist."), call. = F)
+        stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
       }
       if(!is.null(map.file)){
         if (file.exists(map.file)) {
@@ -452,7 +455,7 @@ parse_data <-
               )
           } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "xls" |
                      stringr::str_replace(map.file, ".{1,}\\.", "") == "xlsx") {
-            mapping <- data.frame(suppressMessages(readxl::read_excel(map.file, col_names = F, sheet = sheet)))
+            mapping <- data.frame(suppressMessages(readxl::read_excel(map.file, col_names = F, sheet = map.sheet)))
           } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "tsv") {
             mapping <-
               utils::read.csv(
@@ -563,13 +566,6 @@ parse_data <-
     if(convert.time){
       for(i in 1:length(data.ls[!is.na(data.ls)])){
         data.ls[[i]][2:nrow(data.ls[[1]]),1] <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])*24
-        # add a value of 24 if time exceeds one day
-        day.ndx <- grep( data.ls[[i]][2,1],  data.ls[[i]][3:nrow(data.ls[[1]]),1])+2
-        if(length(day.ndx) > 0){
-          for(j in length(day.ndx)){
-            data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1] <- as.numeric(data.ls[[i]][day.ndx[j]:nrow(data.ls[[i]]), 1])+24
-          }
-        }
       }
     }
     noNA.ndx <- which(!is.na(data.ls))
@@ -627,7 +623,7 @@ parse_data <-
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
-#' @param biphasic (Logical) Shall \code{growth.gcFitLinear} and code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
+#' @param biphasic (Logical) Shall \code{growth.gcFitLinear} and \code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{growth.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.
 #' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{growth.gcFitLinear()}.
@@ -900,7 +896,7 @@ growth.workflow <- function (grodata = NULL,
     res.table.dr <- NULL
   }
   if(report == TRUE){
-    try(growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), ec50=ec50, mean.grp = mean.grp, mean.conc = mean.conc,
+    try(growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc,
                   export = export))
   }
 
@@ -946,6 +942,7 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   control <- grofit$control
   time <- grofit$gcFit$raw.time
   data <- grofit$gcFit$raw.data
+  ec50 <- control$ec50
   if(!exists("res.table.gc")){
     res.table.gc <- grofit$gcFit$gcTable
   }
@@ -2253,8 +2250,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               postmin.ndx <- minima[which.min(abs(minima - tp.ext[length(tp.ext)]))]
             # extract linear regression results after post-mumax turning point
             ret.postmin <- ret[ret$time >= obs$time[postmin.ndx],]
-            # remove indices included in mumax regression
-            ret.postmin <- ret.postmin[!(ret.postmin[,1] %in% tp),]
+            # remove indices included in extended mumax regression
+            ret.postmin <- ret.postmin[!(ret.postmin[,1] %in% tp.ext),]
             #Consider only slopes that span at least fit.dY
             ret.postmin <- ret.postmin[ret.postmin[, "dY"] >= fit.dY, ]
             # Consider only positive slopes
@@ -2363,8 +2360,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             ret.premin <- ret[ret$time <= obs$time[premin.ndx-h],]
             #Consider only slopes that span at least fit.dY
             ret.premin <- ret.premin[ret.premin[, "dY"] >= fit.dY, ]
-            # remove indices included in mumax regression
-            ret.premin <- ret.premin[!(ret.premin[,1] %in% tp),]
+            # remove indices included in extended mumax regression
+            ret.premin <- ret.premin[!(ret.premin[,1] %in% tp.ext),]
             # Consider only positive slopes
             ret.premin <- ret.premin[ret.premin[, "slope"] > 0, ]
             ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
@@ -2808,7 +2805,7 @@ growth.drFit <- function (FitData, control = growth.control())
       EC50.table <- rbind(EC50.table, out.row)
     }
   }
-  if(!is.null(skip)){
+  if(exists("skip")){
     distinct <- distinct[-skip]
     EC50 <- EC50[-skip]
     EC50.boot <- EC50.boot[-skip]
@@ -3130,11 +3127,16 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
 lm_parms <- function (m)
 {
   sm <- summary(m)
-  a <- sm$coefficients[1, 1]
-  b <- sm$coefficients[2, 1]
-  b.se <- sm$coefficients[2, 2]
-  r2 <- sm$r.squared
-  c(a = a, b = b, b.se = b.se, r2 = r2, b.rsd = b.se/b)
+  if(dim(sm$coefficients)[1] >1 ){
+    a <- sm$coefficients[1, 1]
+    b <- sm$coefficients[2, 1]
+    b.se <- sm$coefficients[2, 2]
+    r2 <- sm$r.squared
+    c(a = a, b = b, b.se = b.se, r2 = r2, b.rsd = b.se/b)
+  }
+  else {
+    c(a = NA, b = NA, b.se = NA, r2 = NA, b.rsd = NA)
+  }
 }
 
 lm_window <- function (x, y, i0, h = 5)

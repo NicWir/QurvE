@@ -1233,7 +1233,7 @@ plot.grofit <- function(grofit,
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
   if(!is.null(conc)){
-    nm <- nm[which(str_extract(nm, "[:alnum:]+$") %in% conc)]
+    nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
@@ -1730,7 +1730,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
   if(!is.null(conc)){
-    nm <- nm[which(conc == str_extract(nm, "[:alnum:]+$"))]
+    nm <- nm[which(conc == str_extract(nm, "[:graph:]+$"))]
   }
   if(length(nm)==0){
     stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")

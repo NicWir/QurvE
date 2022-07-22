@@ -98,3 +98,10 @@ summary.flBootSpline <- function(object, ...)
   summary.flBootSpline <- table
   summary.flBootSpline
 }
+
+summary.flFit <- function(object,...)
+{
+  # object of class flFit
+  summary.flFit <- data.frame(object$flTable)
+  summary.flFit
+}

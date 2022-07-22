@@ -625,7 +625,7 @@ plot.flFitRes <-  function(object,
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
   if(!is.null(conc)){
-    nm <- nm[which(str_extract(nm, "(?<![:punct:])[:alnum:]+$") %in% conc)]
+    nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
