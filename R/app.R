@@ -253,6 +253,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   # tableOutput('contents'),
                   tabPanel("Visualize",
                            h1("under construction"),
+                           h3("Display parameter plot, when computation is run"),
                            plotOutput("console")),
 
                   tabPanel("Report",  h1("under construction")),
