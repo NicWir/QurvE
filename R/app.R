@@ -67,7 +67,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              h1("Custom data layout"),
                              img(src = 'data_instruction.png',
                                  heigt = '100%',
-                                 width = '100%')
+                                 width = '100%'),
+                             tableOutput("excel_data")
                            ) # main panel
 
                   ), # Navbar 1
@@ -243,9 +244,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                     ))
                            ),
 
-
-
-
                            ),
                   # display contents of infile
                   # tableOutput('contents'),
@@ -270,7 +268,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output){
   # load excel file
-  data <- reactive({
+  data.path <- reactive({
     req(input$excel_file)
 
     inFile <- input$excel_file
@@ -285,21 +283,16 @@ server <- function(input, output){
     return(df)
   })
 
-  # load csv file TODO: untested
-  data <- reactive({
-    req(input$csv_file)
-
-    inFile <- input$csv_file
+  output$excel_data <- renderTable({
+    inFile <- input$excel_file
 
     if(is.null(inFile))
       return(NULL)
 
-    df <- read.csv(inFile$datapath, ".xlsx", sep="")
-
-    return(df)
+    file.rename(inFile$datapath,
+                paste(inFile$datapath, ".xlsx", sep = ""))
+    read_excel(paste(inFile$datapath, ".xlsx", sep=""))
   })
-
-  # render input data
 
 
 
