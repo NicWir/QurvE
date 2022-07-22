@@ -1893,10 +1893,11 @@ fl.workflow <- function(grodata = NULL,
     }
   }
   # ///
-  flFitRes <- list(time = time, data = grodata, flFit1 = ifelse(exists("out.flFit1"), get("out.flFit1"), NA),
-                   flFit2 = ifelse(exists("out.flFit2"), get("out.flFit2"), NA),
-                 drFit1 = ifelse(exists("out.drFit1"), get("out.drFit1"), NA),
-                 drFit2 = ifelse(exists("out.drFit2"), get("out.drFit2"), NA),
+  na.obj <- NA
+  flFitRes <- list(time = time, data = grodata, flFit1 = get(ifelse(exists("out.flFit1"), "out.flFit1", "na.obj")),
+                   flFit2 = get(ifelse(exists("out.flFit2"), "out.flFit2", "na.obj")),
+                 drFit1 = get(ifelse(exists("out.drFit1"), "out.drFit1", "na.obj")),
+                 drFit2 = get(ifelse(exists("out.drFit2"), "out.drFit2", "na.obj")),
                  expdesign = expdesign, control = control)
   class(flFitRes) <- "flFitRes"
 
@@ -1925,12 +1926,12 @@ fl.workflow <- function(grodata = NULL,
              wd, "/results.fl.txt\n"))
   if (ec50 == TRUE) {
     if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-      res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table)
+      res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
       utils::write.table(res.table.dr_fl1, paste(wd, "results.dr1.txt",
                                                 sep = "/"), row.names = FALSE, sep = "\t")
     }
     if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-      res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table)
+      res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
       utils::write.table(res.table.dr_fl2, paste(wd, "results.dr2.txt",
                                                  sep = "/"), row.names = FALSE, sep = "\t")
     }

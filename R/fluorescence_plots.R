@@ -585,7 +585,8 @@ plot.flFitRes <-  function(object,
     raw_data <- object
   }
   if(is(object) == "flFitRes"){
-    flFit <- object$flFit
+    if(data.type == "spline1" || data.type == "raw1" || data.type == "norm.fl1") flFit <- object$flFit1
+    if(data.type == "spline2" || data.type == "raw2" || data.type == "norm.fl2") flFit <- object$flFit1
     raw_data <- object$data
   } else {
     flFit <- object
@@ -642,6 +643,11 @@ plot.flFitRes <-  function(object,
                                                                                                            "$"), sample.nm[ndx.filt.rep[[j]]])]))
   }
   ndx.filt <- unlist(filter.ls, recursive = F)
+  remove <- c()
+  for(i in 1:length(ndx.filt)){
+    if(length(ndx.filt[[i]]) == 0) remove <- c(remove, i)
+  }
+  ndx.filt <- ndx.filt[-remove]
   # Check FitFlag for each replicate, work per condition
   if(data.type == "spline1" || data.type == "spline2"){
     for(i in 1:length(ndx.filt)){
