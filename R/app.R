@@ -569,7 +569,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                   navbarMenu("Results",
                              tabPanel(title = "Growth",
-                                      h1('Under construction')),
+                                      tableOutput('results_table_growth')),
 
                              tabPanel(title = "Computation",
                                       h1('Under construction'))
@@ -671,6 +671,11 @@ server <- function(input, output){
   output$dose_response <- renderPlot({
     results <- results$growth
     plot(results$drFit$spline)
+  })
+
+  output$results_table_growth <- renderTable({
+    results <- results$growth
+    results$gcFit$gcTable
   })
 
   #output$console <- renderPlot({
