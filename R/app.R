@@ -545,6 +545,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 
                   ),
+
+                  tabPanel("Results",  h1("under construction")),
+
                   # display contents of infile
                   # tableOutput('contents'),
                   tabPanel("Visualize",
