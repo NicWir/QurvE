@@ -345,7 +345,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                value = TRUE),
 
                                                  numericInput(
-                                                   inputId = 'smoothing_factor_growth',
+                                                   inputId = 'smoothing_factor_nonparametric_growth',
                                                    label = 'smoothing factor',
                                                    value = 0.55,
                                                    min = NA,
@@ -655,6 +655,11 @@ server <- function(input, output){
                     #lin.RSD = input$RSD_threshold_growth,
                     #lin.dY = input$dY_threshold_growth,
                     #lin.h = input$custum_sliding_window_size_value_growth
+                    # PARAMETRIC FIT VARIABLES
+                    smooth.gc = input$smoothing_factor_nonparametric_growth,
+                    nboot.gc = input$number_of_bootstrappings_growth,
+                    neg.nan.act = input$remove_negative_values_in_bootstrapping_growth
+
     )
   })
 
