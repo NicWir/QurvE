@@ -169,107 +169,109 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                   ), # Navbar 1
 
-                  tabPanel("Computation",
-                           fluidRow(
-                             column(4,
-                                    mainPanel(
-                                      h2('Growth fit'),
-                                      h4('Options'),
-                                      checkboxInput(inputId = 'linear_regression',
-                                                    label = 'linear regression'),
-                                      checkboxInput(inputId = 'parametric_fit',
-                                                    label = 'parametric fit'),
-                                      checkboxInput(inputId = 'nonparametric_fit',
-                                                    label = 'nonparametric fit'),
-                                      checkboxInput(inputId = 'run_interactive_mode',
-                                                    label = 'run interactive mode')
-                                    ), # Growth fit
+                  navbarMenu('Computation',
+                             tabPanel("Growth",
+                                      fluidRow(
+                                        column(4,
+                                               mainPanel(
+                                                 h2('Growth fit'),
+                                                 h4('Options'),
+                                                 checkboxInput(inputId = 'linear_regression',
+                                                               label = 'linear regression'),
+                                                 checkboxInput(inputId = 'parametric_fit',
+                                                               label = 'parametric fit'),
+                                                 checkboxInput(inputId = 'nonparametric_fit',
+                                                               label = 'nonparametric fit'),
+                                                 checkboxInput(inputId = 'run_interactive_mode',
+                                                               label = 'run interactive mode')
+                                               ), # Growth fit
 
 
-                                    mainPanel(
-                                      h2('Dose-response Analysis'),
-                                      checkboxInput(inputId = 'perform_ec50',
-                                                    label = 'perform EC50 Analysis'),
+                                               mainPanel(
+                                                 h2('Dose-response Analysis'),
+                                                 checkboxInput(inputId = 'perform_ec50',
+                                                               label = 'perform EC50 Analysis'),
 
-                                      selectInput(inputId = "format",
-                                                  label = "Response Parameter",
-                                                  choices = c("mu.linfit" = "mu.linfit",
-                                                              "other.fit" = "other.fit")),
+                                                 selectInput(inputId = "format",
+                                                             label = "Response Parameter",
+                                                             choices = c("mu.linfit" = "mu.linfit",
+                                                                         "other.fit" = "other.fit")),
 
-                                      checkboxInput(inputId = 'log_transform_concentration',
-                                                    label = 'log transform concentration'),
+                                                 checkboxInput(inputId = 'log_transform_concentration',
+                                                               label = 'log transform concentration'),
 
-                                      checkboxInput(inputId = 'log_transform_response',
-                                                    label = 'log transform response'),
+                                                 checkboxInput(inputId = 'log_transform_response',
+                                                               label = 'log transform response'),
 
-                                      checkboxInput(inputId = 'run_interactive_mode',
-                                                    label = 'run interactive mode'),
+                                                 checkboxInput(inputId = 'run_interactive_mode',
+                                                               label = 'run interactive mode'),
 
-                                      selectInput(inputId = "smoothing_factor",
-                                                  label = "smoothing factor",
-                                                  choices = c("NULL" = "NULL",
-                                                              "other" = "other")),
+                                                 selectInput(inputId = "smoothing_factor",
+                                                             label = "smoothing factor",
+                                                             choices = c("NULL" = "NULL",
+                                                                         "other" = "other")),
 
-                                      actionButton(inputId = "run",
-                                                   label = "Run computation")
+                                                 actionButton(inputId = "run",
+                                                              label = "Run computation")
 
-                                    )
-                             ),
+                                               )
+                                        ),
 
-                             column(4,
-                                    mainPanel(
-                                      h2('Linear fit'),
+                                        column(4,
+                                               mainPanel(
+                                                 h2('Linear fit'),
 
-                                      checkboxInput(inputId = 'log_transform_data',
-                                                    label = 'log-transform data'),
+                                                 checkboxInput(inputId = 'log_transform_data',
+                                                               label = 'log-transform data'),
 
-                                      checkboxInput(inputId = 'log_transform_time',
-                                                    label = 'log-transform time'),
+                                                 checkboxInput(inputId = 'log_transform_time',
+                                                               label = 'log-transform time'),
 
-                                      numericInput(
-                                        inputId = 't0_linear_fit',
-                                        label = 't0',
-                                        value = 0,
-                                        min = NA,
-                                        max = NA,
-                                      ),
+                                                 numericInput(
+                                                   inputId = 't0_linear_fit',
+                                                   label = 't0',
+                                                   value = 0,
+                                                   min = NA,
+                                                   max = NA,
+                                                 ),
 
-                                      numericInput(
-                                        inputId = 'minimum_density_linear_fit',
-                                        label = 'minimum density',
-                                        value = 0,
-                                        min = NA,
-                                        max = NA,
-                                      ),
+                                                 numericInput(
+                                                   inputId = 'minimum_density_linear_fit',
+                                                   label = 'minimum density',
+                                                   value = 0,
+                                                   min = NA,
+                                                   max = NA,
+                                                 ),
 
-                                      numericInput(
-                                        inputId = 'R2_threshold',
-                                        label = 'R2 threshold',
-                                        value = 0.95,
-                                        min = NA,
-                                        max = NA,
-                                      ),
+                                                 numericInput(
+                                                   inputId = 'R2_threshold',
+                                                   label = 'R2 threshold',
+                                                   value = 0.95,
+                                                   min = NA,
+                                                   max = NA,
+                                                 ),
 
-                                      numericInput(
-                                        inputId = 'RSD_threshold',
-                                        label = 'RSD threshold',
-                                        value = 0.1,
-                                        min = NA,
-                                        max = NA,
-                                      ),
+                                                 numericInput(
+                                                   inputId = 'RSD_threshold',
+                                                   label = 'RSD threshold',
+                                                   value = 0.1,
+                                                   min = NA,
+                                                   max = NA,
+                                                 ),
 
-                                      checkboxInput(inputId = 'custom_sliding_window_size',
-                                                    label = 'custom sliding window size'),
+                                                 checkboxInput(inputId = 'custom_sliding_window_size',
+                                                               label = 'custom sliding window size'),
 
-                                      numericInput(
-                                        inputId = 'custum_sliding_window_size_value',
-                                        label = '',
-                                        value = 0.1,
-                                        min = NA,
-                                        max = NA,
-                                      ),
-                                    )
+                                                 numericInput(
+                                                   inputId = 'custum_sliding_window_size_value',
+                                                   label = '',
+                                                   value = 0.1,
+                                                   min = NA,
+                                                   max = NA,
+                                                 ),
+                                               )
 
+                                        ),
                              ),
 
                              column(4,
@@ -342,7 +344,198 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       ),
 
                                     ))
+                           ), # Growth Tab Panel
+
+                           tabPanel("Fluorescence",
+                                    fluidRow(
+                                      column(4,
+                                             mainPanel(
+                                               h2('Fluorescence fit'),
+                                               h4('Options'),
+                                               checkboxInput(inputId = 'linear_regression',
+                                                             label = 'linear regression'),
+                                               checkboxInput(inputId = 'parametric_fit',
+                                                             label = 'parametric fit'),
+                                               checkboxInput(inputId = 'nonparametric_fit',
+                                                             label = 'nonparametric fit'),
+                                               checkboxInput(inputId = 'run_interactive_mode',
+                                                             label = 'run interactive mode'),
+                                               checkboxInput(inputId = 'biphasic',
+                                                             label = 'Biphasic'),
+
+                                               selectInput(inputId = 'data_type_x',
+                                                           label = 'Data type x',
+                                                           choices = c('density', 'time')),
+
+                                               checkboxInput(inputId = 'normalize_fluorescence',
+                                                             label = 'Normalize fluorescence'),
+
+                                               numericInput(
+                                                 inputId = 'growth_threshold_in_percent',
+                                                 label = 'growth threshold (in %)',
+                                                 value = 1.5,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               numericInput(
+                                                 inputId = 'minimum_density',
+                                                 label = 'minimum_density',
+                                                 value = 0,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               numericInput(
+                                                 inputId = 't0_fluorescence',
+                                                 label = 't0',
+                                                 value = 0,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                             ), # Fluorescence fit
+
+
+                                             mainPanel(
+                                               h2('Dose-response Analysis'),
+                                               checkboxInput(inputId = 'perform_ec50',
+                                                             label = 'perform EC50 Analysis'),
+
+                                               selectInput(inputId = "format",
+                                                           label = "Response Parameter",
+                                                           choices = c("max_slope_spline" = "max_slope_spline")
+                                                           ),
+
+                                               checkboxInput(inputId = 'log_transform_concentration',
+                                                             label = 'log transform concentration'),
+
+                                               checkboxInput(inputId = 'log_transform_response',
+                                                             label = 'log transform response'),
+
+                                               numericInput(
+                                                 inputId = 'smoothing_factor',
+                                                 label = 'smoothing factor',
+                                                 value = NULL,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               numericInput(
+                                                 inputId = 'minimum_number_of_different_values',
+                                                 label = 'smoothing factor',
+                                                 value = 6,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               numericInput(
+                                                 inputId = 'number_of_bootrappings',
+                                                 label = 'number of bootrappings',
+                                                 value = 0,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+
+                                               actionButton(inputId = "run",
+                                                            label = "Run computation")
+                                             )
+                                      ), # Dose response analysis
+
+                                      column(4,
+                                             mainPanel(
+                                               h2('Linear fit'),
+
+                                               checkboxInput(inputId = 'log_transform_x',
+                                                             label = 'log-transform x'),
+
+                                               checkboxInput(inputId = 'log_transform_fluorescence',
+                                                             label = 'log-transform fluorescence'),
+
+                                               numericInput(
+                                                 inputId = 'R2_threshold',
+                                                 label = 'R2_threshold',
+                                                 value = 0.97,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               numericInput(
+                                                 inputId = 'RSD_threshold',
+                                                 label = 'RSD threshold',
+                                                 value = 0.05,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               numericInput(
+                                                 inputId = 'dY_threshold',
+                                                 label = 'dY threshold',
+                                                 value = 0.05,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               checkboxInput(inputId = 'custom_sliding_window_size',
+                                                             label = 'custom sliding window size'),
+
+                                               numericInput(
+                                                 inputId = 'custum_sliding_window_size_value',
+                                                 label = '',
+                                                 value = 8,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+                                             )
+
+                                      ), # Linear fit: Fluorescence
+
+                                      column(4,
+                                             mainPanel(
+                                               h2('Nonparametric fit'),
+
+                                               checkboxInput(inputId = 'log_transform_x',
+                                                             label = 'Log-transform x'),
+
+                                               checkboxInput(inputId = 'log_transform_fluorescence',
+                                                             label = 'Log-transform fluorescence'),
+
+                                               numericInput(
+                                                 inputId = 'smoothing_factor',
+                                                 label = 'smoothing factor',
+                                                 value = 0.55,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               numericInput(
+                                                 inputId = 'number_of_bootstrappings',
+                                                 label = 'number of bootstrappings',
+                                                 value = 0,
+                                                 min = NA,
+                                                 max = NA,
+                                               ),
+
+                                               checkboxInput(inputId = 'remove_neg_values_in_bootstrap',
+                                                             label = 'remove negative values in bootstrapping'),
+
+                                             ),
+
+                                             mainPanel(
+                                               checkboxInput(inputId = 'log_transform_data_parametric',
+                                                             label = 'Log-transform data'),
+
+                                               checkboxInput(inputId = 'log_transform_time_parametric',
+                                                             label = 'Log-transform time')
+                                             )
+                                      ),
+
+                                    ),
+
+
                            ),
+
 
                   ),
                   # display contents of infile
