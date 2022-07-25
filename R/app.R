@@ -176,42 +176,45 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                mainPanel(
                                                  h2('Growth fit'),
                                                  h4('Options'),
-                                                 checkboxInput(inputId = 'linear_regression',
+                                                 checkboxInput(inputId = 'linear_regression_growth',
                                                                label = 'linear regression'),
-                                                 checkboxInput(inputId = 'parametric_fit',
+
+                                                 checkboxInput(inputId = 'parametric_fit_growth',
                                                                label = 'parametric fit'),
-                                                 checkboxInput(inputId = 'nonparametric_fit',
+
+                                                 checkboxInput(inputId = 'nonparametric_fit_growth',
                                                                label = 'nonparametric fit'),
-                                                 checkboxInput(inputId = 'run_interactive_mode',
+
+                                                 checkboxInput(inputId = 'run_interactive_mode_growth',
                                                                label = 'run interactive mode')
                                                ), # Growth fit
 
 
                                                mainPanel(
                                                  h2('Dose-response Analysis'),
-                                                 checkboxInput(inputId = 'perform_ec50',
+                                                 checkboxInput(inputId = 'perform_ec50_growth',
                                                                label = 'perform EC50 Analysis'),
 
-                                                 selectInput(inputId = "format",
+                                                 selectInput(inputId = "response_parameter_growth",
                                                              label = "Response Parameter",
                                                              choices = c("mu.linfit" = "mu.linfit",
                                                                          "other.fit" = "other.fit")),
 
-                                                 checkboxInput(inputId = 'log_transform_concentration',
+                                                 checkboxInput(inputId = 'log_transform_concentration_growth',
                                                                label = 'log transform concentration'),
 
-                                                 checkboxInput(inputId = 'log_transform_response',
+                                                 checkboxInput(inputId = 'log_transform_response_growth',
                                                                label = 'log transform response'),
 
-                                                 checkboxInput(inputId = 'run_interactive_mode',
+                                                 checkboxInput(inputId = 'run_interactive_mode_growth',
                                                                label = 'run interactive mode'),
 
-                                                 selectInput(inputId = "smoothing_factor",
+                                                 selectInput(inputId = "smoothing_factor_growth",
                                                              label = "smoothing factor",
                                                              choices = c("NULL" = "NULL",
                                                                          "other" = "other")),
 
-                                                 actionButton(inputId = "run",
+                                                 actionButton(inputId = "run_growth",
                                                               label = "Run computation")
 
                                                )
@@ -221,14 +224,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                mainPanel(
                                                  h2('Linear fit'),
 
-                                                 checkboxInput(inputId = 'log_transform_data',
+                                                 checkboxInput(inputId = 'log_transform_data_growth',
                                                                label = 'log-transform data'),
 
-                                                 checkboxInput(inputId = 'log_transform_time',
+                                                 checkboxInput(inputId = 'log_transform_time_growth',
                                                                label = 'log-transform time'),
 
                                                  numericInput(
-                                                   inputId = 't0_linear_fit',
+                                                   inputId = 't0_linear_fit_growth',
                                                    label = 't0',
                                                    value = 0,
                                                    min = NA,
@@ -236,7 +239,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                  ),
 
                                                  numericInput(
-                                                   inputId = 'minimum_density_linear_fit',
+                                                   inputId = 'minimum_density_linear_fit_growth',
                                                    label = 'minimum density',
                                                    value = 0,
                                                    min = NA,
@@ -244,7 +247,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                  ),
 
                                                  numericInput(
-                                                   inputId = 'R2_threshold',
+                                                   inputId = 'R2_threshold_growth',
                                                    label = 'R2 threshold',
                                                    value = 0.95,
                                                    min = NA,
@@ -252,18 +255,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                  ),
 
                                                  numericInput(
-                                                   inputId = 'RSD_threshold',
+                                                   inputId = 'RSD_threshold_growth',
                                                    label = 'RSD threshold',
                                                    value = 0.1,
                                                    min = NA,
                                                    max = NA,
                                                  ),
 
-                                                 checkboxInput(inputId = 'custom_sliding_window_size',
+                                                 checkboxInput(inputId = 'custom_sliding_window_size_growth',
                                                                label = 'custom sliding window size'),
 
                                                  numericInput(
-                                                   inputId = 'custum_sliding_window_size_value',
+                                                   inputId = 'custum_sliding_window_size_value_growth',
                                                    label = '',
                                                    value = 0.1,
                                                    min = NA,
@@ -279,25 +282,25 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       h2('Parametric fit'),
                                       h4('Models:'),
 
-                                      checkboxInput(inputId = 'logistic',
+                                      checkboxInput(inputId = 'logistic_growth',
                                                     label = 'logistic'),
 
-                                      checkboxInput(inputId = 'richards',
+                                      checkboxInput(inputId = 'richards_growth',
                                                     label = 'Richards'),
 
-                                      checkboxInput(inputId = 'gompertz',
+                                      checkboxInput(inputId = 'gompertz_growth',
                                                     label = 'Gompertz'),
 
-                                      checkboxInput(inputId = 'extended_gompertz',
+                                      checkboxInput(inputId = 'extended_gompertz_growth',
                                                     label = 'extended Gompertz')
 
                                     ),
 
                                     mainPanel(
-                                      checkboxInput(inputId = 'log_transform_data_parametric',
+                                      checkboxInput(inputId = 'log_transform_data_parametric_growth',
                                                     label = 'Log-transform data'),
 
-                                      checkboxInput(inputId = 'log_transform_time_parametric',
+                                      checkboxInput(inputId = 'log_transform_time_parametric_growth',
                                                     label = 'Log-transform time')
                                     )
                              ),
@@ -305,14 +308,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                     mainPanel(
                                       h2('Nonparametric fit'),
 
-                                      checkboxInput(inputId = 'log_transform_data_nonparametric',
+                                      checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
                                                     label = 'Log-transform data'),
 
-                                      checkboxInput(inputId = 'log_transform_time_nonparametric',
+                                      checkboxInput(inputId = 'log_transform_time_nonparametric_growth',
                                                     label = 'Log-transform time'),
 
                                       numericInput(
-                                        inputId = 't0_nonparametric_fit',
+                                        inputId = 't0_nonparametric_fit_growth',
                                         label = 't0',
                                         value = 0,
                                         min = NA,
@@ -320,7 +323,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       ),
 
                                       numericInput(
-                                        inputId = 'minimum_density_nonparametric_fit',
+                                        inputId = 'minimum_density_nonparametric_fit_growth',
                                         label = 'minimum density',
                                         value = 0,
                                         min = NA,
@@ -328,7 +331,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       ),
 
                                       numericInput(
-                                        inputId = 'smoothing_factor',
+                                        inputId = 'smoothing_factor_growth',
                                         label = 'smoothing factor',
                                         value = 0.55,
                                         min = NA,
@@ -336,7 +339,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       ),
 
                                       numericInput(
-                                        inputId = 'number_of_bootstrappings',
+                                        inputId = 'number_of_bootstrappings_growth',
                                         label = 'number of bootstrappings',
                                         value = 0,
                                         min = NA,
@@ -352,18 +355,22 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                              mainPanel(
                                                h2('Fluorescence fit'),
                                                h4('Options'),
-                                               checkboxInput(inputId = 'linear_regression',
+                                               checkboxInput(inputId = 'linear_regression_fluorescence',
                                                              label = 'linear regression'),
-                                               checkboxInput(inputId = 'parametric_fit',
+
+                                               checkboxInput(inputId = 'parametric_fit_fluorescence',
                                                              label = 'parametric fit'),
-                                               checkboxInput(inputId = 'nonparametric_fit',
+
+                                               checkboxInput(inputId = 'nonparametric_fit_fluorescence',
                                                              label = 'nonparametric fit'),
-                                               checkboxInput(inputId = 'run_interactive_mode',
+
+                                               checkboxInput(inputId = 'run_interactive_mode_fluorescence',
                                                              label = 'run interactive mode'),
-                                               checkboxInput(inputId = 'biphasic',
+
+                                               checkboxInput(inputId = 'biphasic_fluorescence',
                                                              label = 'Biphasic'),
 
-                                               selectInput(inputId = 'data_type_x',
+                                               selectInput(inputId = 'data_type_x_fluorescence',
                                                            label = 'Data type x',
                                                            choices = c('density', 'time')),
 
@@ -371,7 +378,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              label = 'Normalize fluorescence'),
 
                                                numericInput(
-                                                 inputId = 'growth_threshold_in_percent',
+                                                 inputId = 'growth_threshold_in_percent_fluorescence',
                                                  label = 'growth threshold (in %)',
                                                  value = 1.5,
                                                  min = NA,
@@ -379,7 +386,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                ),
 
                                                numericInput(
-                                                 inputId = 'minimum_density',
+                                                 inputId = 'minimum_density_fluorescence',
                                                  label = 'minimum_density',
                                                  value = 0,
                                                  min = NA,
@@ -399,22 +406,22 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                              mainPanel(
                                                h2('Dose-response Analysis'),
-                                               checkboxInput(inputId = 'perform_ec50',
+                                               checkboxInput(inputId = 'perform_ec50_fluorescence',
                                                              label = 'perform EC50 Analysis'),
 
-                                               selectInput(inputId = "format",
+                                               selectInput(inputId = "format_fluorescence",
                                                            label = "Response Parameter",
                                                            choices = c("max_slope_spline" = "max_slope_spline")
                                                            ),
 
-                                               checkboxInput(inputId = 'log_transform_concentration',
+                                               checkboxInput(inputId = 'log_transform_concentration_fluorescence',
                                                              label = 'log transform concentration'),
 
-                                               checkboxInput(inputId = 'log_transform_response',
+                                               checkboxInput(inputId = 'log_transform_response_fluorescence',
                                                              label = 'log transform response'),
 
                                                numericInput(
-                                                 inputId = 'smoothing_factor',
+                                                 inputId = 'smoothing_factor_fluorescence',
                                                  label = 'smoothing factor',
                                                  value = NULL,
                                                  min = NA,
@@ -422,7 +429,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                ),
 
                                                numericInput(
-                                                 inputId = 'minimum_number_of_different_values',
+                                                 inputId = 'minimum_number_of_different_values_fluorescence',
                                                  label = 'smoothing factor',
                                                  value = 6,
                                                  min = NA,
@@ -430,7 +437,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                ),
 
                                                numericInput(
-                                                 inputId = 'number_of_bootrappings',
+                                                 inputId = 'number_of_bootrappings_fluorescence',
                                                  label = 'number of bootrappings',
                                                  value = 0,
                                                  min = NA,
@@ -438,7 +445,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                ),
 
 
-                                               actionButton(inputId = "run",
+                                               actionButton(inputId = "run_fluorescence",
                                                             label = "Run computation")
                                              )
                                       ), # Dose response analysis
@@ -584,7 +591,7 @@ server <- function(input, output){
     read_excel(paste(inFile$datapath, ".xlsx", sep=""))
   })
 
-  results <- eventReactive(input$run,{
+  results <- eventReactive(input$run_growth,{
       inFile <- input$growth_file
 
       if(is.null(inFile))
