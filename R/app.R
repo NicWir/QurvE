@@ -21,47 +21,142 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                   # load input file
                   tabPanel('Data',
-                           sidebarPanel(
-                             # select file type
-                             selectInput(inputId = "input_file_type",
-                                         label = "Select file type:",
-                                         choices = c("Excel (.xlsx)" = "xlsx",
-                                                     "csv (under construction...)" = "csv")),
+                           tabsetPanel(type = "tabs",
+                                       tabPanel(title = "Custom",
+                                                sidebarPanel(
+                                                  # select file type
+                                                  selectInput(inputId = "input_file_type_custom",
+                                                              label = "Select file type:",
+                                                              choices = c("Excel (.xlsx)" = "xlsx",
+                                                                          "csv" = "csv")),
 
-                             # upload excel: conditional
-                             conditionalPanel(
-                               condition = "input.input_file_type == 'xlsx'",
-                               fileInput(inputId = 'excel_file',
-                                         label = 'Choose Excel file',
-                                         accept = c('.xlsx', '.xls')),
+                                                  selectInput(inputId = "format",
+                                                              label = "Select Format",
+                                                              choices = c("Data in columns" = "data_in_columns",
+                                                                          "Data in rows" = "data_in_rows")),
 
-                               selectInput(inputId = "sheet",
-                                           label = "Select Sheet",
-                                           choices = c("Sheet 1" = "Sheet1",
-                                                       "Sheet 2" = "Sheet2",
-                                                       "Sheet 3" = "Sheet3")),
+                                                  fileInput(inputId = 'growth_file',
+                                                            label = 'Choose growth data file',
+                                                            accept = c('.xlsx', '.xls', '.csv')),
 
-                               selectInput(inputId = "format",
-                                           label = "Select Format",
-                                           choices = c("Data in columns" = "data_in_columns",
-                                                       "Data in rows" = "data_in_rows")),
+                                                  conditionalPanel(
+                                                    condition = "input.input_file_type_custom == 'xlsx'",
+                                                    selectInput(inputId = "sheet",
+                                                                label = "Select Sheet",
+                                                                choices = c("Sheet 1" = "Sheet1",
+                                                                            "Sheet 2" = "Sheet2",
+                                                                            "Sheet 3" = "Sheet3")),
+                                                  ), # select sheet: conditional
 
-                               checkboxInput(inputId = 'subtract_blanc',
-                                             label = 'Subtract blank'),
+                                                  conditionalPanel(
+                                                    condition = "input.input_file_type_custom == 'csv'",
+                                                    selectInput(inputId = "seperator",
+                                                                label = "Select separator",
+                                                                choices = c("," = "comma_seperator",
+                                                                            ";" = "semicolon_seperator")
+                                                                ),
 
-                               checkboxInput(inputId = 'calibration',
-                                             label = 'Calibration (under construction)')
+                                                    selectInput(inputId = "decimal_seperator",
+                                                                label = "Select Decimal separator",
+                                                                choices = c("." = "dot_decimal_seperator",
+                                                                            "," = "comma_decimal_seperator")
+                                                    ),
+                                                  ),
 
-                             ),
+                                                  checkboxInput(inputId = 'subtract_blanc',
+                                                                label = 'Subtract blank'),
 
-                             # upload csv: conditional
-                             conditionalPanel(
-                               condition = "input.input_file_type == 'csv'",
-                               fileInput(inputId = 'csv_file',
-                                         label = 'Choose csv file (under construction...)',
-                                         accept = c('.csv'))
-                             )
-                           ), # sidebar panel
+                                                  checkboxInput(inputId = 'calibration',
+                                                                label = 'Calibration (under construction)'),
+
+                                                  fileInput(inputId = 'fluorescence_file_1',
+                                                            label = 'Fluorescence data 1',
+                                                            accept = c('.xlsx', '.xls', '.csv')),
+
+                                                  fileInput(inputId = 'fluorescence_file_2',
+                                                            label = 'Fluorescence data 2',
+                                                            accept = c('.xlsx', '.xls', '.csv')),
+
+                                                ),# sidebar panel
+                                                ), # Custom tabPanel
+
+                           tabPanel(title = "Plate reader",
+                                    sidebarPanel(
+                                      # select file type
+                                      selectInput(inputId = "input_file_type_plate_reader",
+                                                  label = "Select file type:",
+                                                  choices = c("Excel (.xlsx)" = "xlsx",
+                                                              "csv" = "csv")),
+
+                                      selectInput(inputId = "format",
+                                                  label = "Select Format",
+                                                  choices = c("Data in columns" = "data_in_columns",
+                                                              "Data in rows" = "data_in_rows")),
+
+                                      fileInput(inputId = 'growth_file',
+                                                label = 'Choose growth data file',
+                                                accept = c('.xlsx', '.xls', '.csv')),
+
+                                      conditionalPanel(
+                                        condition = "input.input_file_type_plate_reader == 'xlsx'",
+                                        selectInput(inputId = "sheet",
+                                                    label = "Select Sheet",
+                                                    choices = c("Sheet 1" = "Sheet1",
+                                                                "Sheet 2" = "Sheet2",
+                                                                "Sheet 3" = "Sheet3")),
+                                      ), # select sheet: conditional
+
+                                      conditionalPanel(
+                                        condition = "input.input_file_type_plate_reader == 'csv'",
+                                        selectInput(inputId = "seperator",
+                                                    label = "Select separator",
+                                                    choices = c("," = "comma_seperator",
+                                                                ";" = "semicolon_seperator")
+                                        ),
+
+                                        selectInput(inputId = "decimal_seperator",
+                                                    label = "Select Decimal separator",
+                                                    choices = c("." = "dot_decimal_seperator",
+                                                                "," = "comma_decimal_seperator")
+                                        ),
+                                      ),
+
+                                      selectInput(inputId = "platereader_software",
+                                                  label = "Platereader software",
+                                                  choices = c("Biotek - Gen5/Gen6" = "biotek_gen5_gen6"
+                                                              ),
+                                      ),
+
+                                      selectInput(inputId = "density_data_read",
+                                                  label = "Density data",
+                                                  choices = c("Read 3:630" = "read_3_630"
+                                                  ),
+                                      ),
+
+                                      selectInput(inputId = "fluorescence_data_1_read",
+                                                  label = "Fluorescence data 1",
+                                                  choices = c("Read 4:485,528" = "read_4_485_528"
+                                                  ),
+                                      ),
+
+                                      selectInput(inputId = "fluorescence_data_2_read",
+                                                  label = "Fluorescence data 1",
+                                                  choices = c("Read 4:485,528[2]" = "read_4_485_528_2"
+                                                  ),
+                                      ),
+
+                                      checkboxInput(inputId = 'subtract_blanck_plate_reader',
+                                                    label = 'subtract blank'),
+
+                                      checkboxInput(inputId = 'convert_time_values_plate_reader',
+                                                    label = 'Convert time values'),
+
+                                      checkboxInput(inputId = 'calibration_plate_reader',
+                                                    label = 'Calibration'),
+
+                                    ),# sidebar panel
+                           ), # Plate reader tabPanel
+                           ), # tabSet Panel
 
                            mainPanel(
                              h1("Custom data layout"),
@@ -73,6 +168,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                            ) # main panel
 
                   ), # Navbar 1
+
                   tabPanel("Computation",
                            fluidRow(
                              column(4,
@@ -253,10 +349,20 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   # tableOutput('contents'),
                   tabPanel("Visualize",
                            h1("under construction"),
+                           tabsetPanel(type = "tabs",
+                                       tabPanel(title = "Group plots",
+                                                plotOutput("plot")),
+                                       tabPanel(title = "Dose-response analysis",
+                                                plotOutput("dose_response")),
+                                       tabPanel(title = "Parameter plots",
+                                                plotOutput("parameter_plot"))
+                           ),
                            h3("Display parameter plot, when computation is run"),
-                           plotOutput("console")),
+                           #plotOutput("console")
+                           ),
 
                   tabPanel("Report",  h1("under construction")),
+
                   tabPanel("About Us",
                            mainPanel(
                              h1("Authors"),
@@ -265,19 +371,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              'featuring publications which use this tool'
                            )
                   )
-
                 )
-
                 # show plots
                 # TODO: Which plots, which options, ...
-
 
 )
 
 server <- function(input, output){
   # load excel file
   output$excel_data <- renderTable({
-    inFile <- input$excel_file
+    inFile <- input$growth_file
 
     if(is.null(inFile))
       return(NULL)
@@ -289,7 +392,7 @@ server <- function(input, output){
   })
 
   results <- eventReactive(input$run,{
-      inFile <- input$excel_file
+      inFile <- input$growth_file
 
       if(is.null(inFile))
         return(NULL)
@@ -301,10 +404,20 @@ server <- function(input, output){
       growth.workflow(grodata = grodata)
   })
 
-  output$console <- renderPlot({
+  output$parameter_plot <- renderPlot({
     results <- results()
     plot.parameter(results)
-    })
+  })
+
+  output$dose_response <- renderPlot({
+    results <- results()
+    plot(results$drFit$spline)
+  })
+
+  #output$console <- renderPlot({
+  #  results <- results()
+  #  plot.parameter(results)
+  #  })
 
 }
 
