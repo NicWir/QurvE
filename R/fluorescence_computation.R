@@ -194,7 +194,17 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     } else {
       x <- density.log
     }
-
+    if(length(x)<4){
+      message("flFitSpline: Not enough data points above the chosen min.density.")
+      flFitSpline <- list(x.in = density.in, fl.in = fl_data.in, raw.x = density, raw.fl = fl_data,
+                          fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
+                          parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
+                                            lambda2 = NA, b.tangent2 = NA, integral = NA),
+                          spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                          control = control)
+      class(flFitSpline) <- "flFitSpline"
+      return(flFitSpline)
+    }
   } # if(x_type == "density")
   if(x_type == "time"){
     bad.values <- (is.na(time)) | (is.na(fl_data)) | fl_data <0 |
@@ -244,6 +254,17 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     } else {
       x <- time
     }
+    if(length(x)<4){
+      message("flFitSpline: Not enough data points above the chosen t0.")
+      flFitSpline <- list(x.in = density.in, fl.in = fl_data.in, raw.x = density, raw.fl = fl_data,
+                          fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
+                          parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
+                                            lambda2 = NA, b.tangent2 = NA, integral = NA),
+                          spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                          control = control)
+      class(flFitSpline) <- "flFitSpline"
+      return(flFitSpline)
+    }
   } # if(x_type == "time")
   x.in = get(ifelse(x_type == "density", "density.in", "time.in"))
   try(spline <- smooth.spline(x = x,
@@ -267,19 +288,23 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   else {
     # Perform spline fit and extract parameters
     deriv1 <- predict(spline, x, deriv = 1)
-    # find maximum in deriv1, exclude maxima at beginning of fit
-    success <- FALSE
-    while (!success){
-      max_slope.index <- which.max(deriv1$y)
-      if(!(max_slope.index %in% (length(deriv1$y)-2):length(deriv1$y))){
-        max_slope.index <- max_slope.index
-        success <- TRUE
-      } else {
-        deriv1 <- lapply(1:length(deriv1), function(x) deriv1[[x]][-max_slope.index])
-        names(deriv1) <- c("x", "y")
-        spline$x <- spline$x[-max_slope.index]
-        spline$y <- spline$y[-max_slope.index]
+    # find maximum in deriv1, exclude maxima at beginning of fit, if x_type is "time"
+    if(x_type == "time"){
+      success <- FALSE
+      while (!success){
+        max_slope.index <- which.max(deriv1$y)
+        if(!(max_slope.index %in% 1:3)){
+          max_slope.index <- max_slope.index
+          success <- TRUE
+        } else {
+          deriv1 <- lapply(1:length(deriv1), function(x) deriv1[[x]][-max_slope.index])
+          names(deriv1) <- c("x", "y")
+          spline$x <- spline$x[-max_slope.index]
+          spline$y <- spline$y[-max_slope.index]
+        }
       }
+    } else {
+      max_slope.index <- which.max(deriv1$y)
     }
     max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index]) # index of data point with maximum growth rate in spline fit
     x.max <- deriv1$x[max_slope.index] # x of maximum growth rate
@@ -295,11 +320,25 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       # Find local minima that frame max_slope and remove the 'peak' from deriv1
       n <- round((log(n.spl+4, base=2.1))/0.75)/2
       minima <- inflect(deriv1$y, threshold = n)$minima
-      if(length(minima) >1){
-        for(i in 1:(length(minima)-1)){
-          if(any(minima[i]:minima[i+1] %in% max_slope.index)){
-            min.ndx <- c(minima[i], minima[i+1])
+      if(length(minima)>0){
+        if(length(minima)>1){
+          for(i in 1:(length(minima)-1)){
+            if(any(minima[i]:minima[i+1] %in% max_slope.index)){
+              min.ndx <- c(minima[i], minima[i+1])
+            }
+            else if(any(minima[i]:length(spline$x) %in% max_slope.index)){
+              min.ndx <- c(minima[i], length(spline$x))
+            }
+            else if(any(1:minima[i] %in% max_slope.index)){
+              min.ndx <- c(1, minima[i])
+            }
           }
+        }
+        else if(any(minima:length(spline$x) %in% max_slope.index)){
+          min.ndx <- c(minima, length(spline$x))
+        }
+        else if(any(1:minima %in% max_slope.index)){
+          min.ndx <- c(1, minima)
         }
       }
       if(exists("min.ndx")){
@@ -692,13 +731,10 @@ flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control())
 
     # /// Non parametric fit
     if ("s" %in% control$fit.opt){
-      if ("l" %in% control$fit.opt){
-        if(control$x_type == "density"){
-          nonpara             <- flFitSpline(density = actx, fl_data = actwell, ID = ID, control = control)
-        } else {
-          nonpara             <- flFitSpline(time = actx, fl_data = actwell, ID = ID, control = control)
-        }
-        fitlinear.all[[i]] <- fitlinear
+      if(control$x_type == "density"){
+        nonpara             <- flFitSpline(density = actx, fl_data = actwell, ID = ID, control = control)
+      } else {
+        nonpara             <- flFitSpline(time = actx, fl_data = actwell, ID = ID, control = control)
       }
       fitnonpara.all[[i]] <- nonpara
     }
@@ -915,12 +951,26 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
         }
       }
     }
+    # Remove data points where y values stack on top of each other
+    fl_data <- fl_data[density >= cummax(density)]
+    fl_data.log <- fl_data.log[density >= cummax(density)]
+    density <- density[density >= cummax(density)]
     if (control$log.x.lin == FALSE) {
       x <- density
     } else {
       x <- density.log
     }
-
+    if(length(x)<4){
+      message("flFitLinear: Not enough data points above the chosen min.density.")
+      flFitLinear <- list(raw.x = density.in, raw.fl = fl_data.in, filt.x = density, filt.fl = fl_data,
+                          ID = ID, FUN = grow_exponential, fit = NA, par = c(
+                            y0 = NA, y0_lm = NA, max_slope = 0, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
+                            t_turn = NA, max_slope2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
+                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+      )
+      class(flFitLinear) <- "flFitLinear"
+      return(flFitLinear)
+    }
   } # if(x_type == "density")
   if(x_type == "time"){
     bad.values <- (is.na(time)) | (is.na(fl_data)) |
@@ -975,6 +1025,17 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       x <- time.log
     } else {
       x <- time
+    }
+    if(length(x)<4){
+      message("flFitLinear: Not enough data points above the chosen t0.")
+      flFitLinear <- list(raw.x = density.in, raw.fl = fl_data.in, filt.x = density, filt.fl = fl_data,
+                          ID = ID, FUN = grow_exponential, fit = NA, par = c(
+                            y0 = NA, y0_lm = NA, max_slope = 0, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
+                            t_turn = NA, max_slope2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
+                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+      )
+      class(flFitLinear) <- "flFitLinear"
+      return(flFitLinear)
     }
   } # if(x_type == "time")
   # extract period of growth (from defined t0)
@@ -1229,7 +1290,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
             if(control$log.y.lin == TRUE){
               spline <- stats::smooth.spline(obs$x, obs$ylog, spar = 0.5, cv = NA, keep.data = FALSE)
             } else {
-              spline <- stats::smooth.spline(obs$x, obs$fl_data, spar = 0.5, cv = NA, keep.data = FALSE)
+              spline <- stats::smooth.spline(obs$x, obs$fl_data, spar = 0.55, cv = NA, keep.data = FALSE)
             }
             deriv2 <- stats::predict(spline, deriv = 2)
             deriv2_spline <- stats::smooth.spline(deriv2$x, deriv2$y, spar = 0.4, cv = NA, keep.data = FALSE)
@@ -1283,134 +1344,146 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 ))][[1]]
             }
             tp.ext <- seq(min(candidates.ext), max(candidates.ext) + h-1)
-
-            # get local deriv2-minimum after max_slope
-            # postmin.ndx <- minima[(minima - tp.ext[length(tp.ext)]) >= 0][which.min(minima[(minima - tp.ext[length(tp.ext)]) >= 0])]
-            postmin.ndx <- minima[which.min(abs(minima - tp.ext[length(tp.ext)]))]
-            # extract linear regression results after post-max_slope turning point
-            ret.postmin <- ret[ret$x >= obs$x[postmin.ndx],]
-            # remove indices included in max_slope regression
-            ret.postmin <- ret.postmin[!(ret.postmin[,1] %in% tp),]
-            #Consider only slopes that span at least fit.dY
-            ret.postmin <- ret.postmin[ret.postmin[, "dY"] >= fit.dY, ]
-            # Consider only positive slopes
-            ret.postmin <- ret.postmin[ret.postmin[, "slope"] > 0, ]
-            ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
-            success <- FALSE
-            # apply min.density to list of linear regressions
-            if(x_type == "density"){
-              ret.postmin.check <- ret.postmin[ret.postmin[, 7] >= min.density, ]
-            } else {
-              ret.postmin.check <- ret.postmin
-            }
-
-            if (any(ret.postmin.check[, 5] >= R2 &
-                    abs(ret.postmin.check[, 6]) <= RSD)) {
-              while (!success) {
-                index.max <- which.max(ret.postmin.check[, 3])
-                if (ret.postmin.check[index.max, 5] >= R2 &&
-                    abs(ret.postmin.check[index.max, 6]) <= RSD &&
-                    !is.na(ret.postmin.check[index.max, 6])) {
-                  # prerequisites for suitable µmax candidate: R2 and RSD
-                  slope.max.postmin <- ret.postmin.check[index.max, 3]
-                  success <- TRUE
-                } else {
-                  ret.postmin.check <- ret.postmin.check[-index.max,]
-                }
-              }
-              index.max.ret.postmin <- ret.postmin[which(ret.postmin[, 3] == slope.max.postmin), 1] # index of maximum slope in fit table
-              slope.quota <- quota * slope.max.postmin
-
+            if(length(minima)>0){
+              # get local deriv2-minimum after max_slope
+              # postmin.ndx <- minima[(minima - tp.ext[length(tp.ext)]) >= 0][which.min(minima[(minima - tp.ext[length(tp.ext)]) >= 0])]
+              postmin.ndx <- minima[which.min(abs(minima - tp.ext[length(tp.ext)]))]
+              # extract linear regression results after post-max_slope turning point
+              ret.postmin <- ret[ret$x >= obs$x[postmin.ndx],]
+              # remove indices included in extended max_slope regression
+              ret.postmin <- ret.postmin[!(ret.postmin[,1] %in% tp.ext),]
+              #Consider only slopes that span at least fit.dY
+              ret.postmin <- ret.postmin[ret.postmin[, "dY"] >= fit.dY, ]
+              # Consider only positive slopes
+              ret.postmin <- ret.postmin[ret.postmin[, "slope"] > 0, ]
+              ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
+              success <- FALSE
+              # apply min.density to list of linear regressions
               if(x_type == "density"){
-                if(exists("min.density")){
-                  candidates.postmin <- ret.postmin[which(
-                    ret.postmin[, 3] >= slope.quota &
-                      ret.postmin[, 5] >= 0.98 * R2 &
-                      abs(ret.postmin[, 6]) <= 1.02 * RSD &
-                      ret.postmin[, 7] >= min.density), 1]
-                } else{
-                  candidates.postmin <- ret.postmin[which(
-                    ret.postmin[, 3] >= slope.quota &
-                      ret.postmin[, 5] >= 0.98 * R2 &
-                      abs(ret.postmin[, 6]) <= 1.02 * RSD), 1]
-                }
+                ret.postmin.check <- ret.postmin[ret.postmin[, 7] >= min.density, ]
               } else {
-                if(exists("t0")){
-                  candidates.postmin <- ret.postmin[which(
-                    ret.postmin[, 3] >= slope.quota &
-                      ret.postmin[, 5] >= 0.98 * R2 &
-                      abs(ret.postmin[, 6]) <= 1.02 * RSD &
-                      ret.postmin[, 7] >= t0), 1]
-                } else {
-                  candidates.postmin <- ret.postmin[which(
-                    ret.postmin[, 3] >= slope.quota &
-                      ret.postmin[, 5] >= 0.98 * R2 &
-                      abs(ret.postmin[, 6]) <= 1.02 * RSD), 1]
-                }
-              }
-              #consider only candidate windows next to index.max.ret.postmin
-              candidate_intervals.postmin <- split(candidates.postmin, cumsum(c(1, diff(candidates.postmin) != 1)))
-              if (index.max.ret.postmin %in% unlist(candidate_intervals.postmin)) {
-                candidates.postmin <- candidate_intervals.postmin[
-                  as.numeric(which(sapply(candidate_intervals.postmin,FUN = function(X) index.max.ret.postmin %in% X)))][[1]]
+                ret.postmin.check <- ret.postmin
               }
 
-              if (length(candidates.postmin) > 0) {
-                #perform linear regression with candidate fl_data points
-                tp.postmin <- seq(min(candidates.postmin), max(candidates.postmin) + h - 1)
-                if (control$log.y.lin == TRUE) {
-                  m.postmin <- lm_window(obs$x, obs$ylog, min(tp.postmin), length(tp.postmin)) # linear model
+              if (any(ret.postmin.check[, 5] >= R2 &
+                      abs(ret.postmin.check[, 6]) <= RSD)) {
+                while (!success) {
+                  index.max <- which.max(ret.postmin.check[, 3])
+                  if (ret.postmin.check[index.max, 5] >= R2 &&
+                      abs(ret.postmin.check[index.max, 6]) <= RSD &&
+                      !is.na(ret.postmin.check[index.max, 6])) {
+                    # prerequisites for suitable µmax candidate: R2 and RSD
+                    slope.max.postmin <- ret.postmin.check[index.max, 3]
+                    success <- TRUE
+                  } else {
+                    ret.postmin.check <- ret.postmin.check[-index.max,]
+                  }
+                }
+                index.max.ret.postmin <- ret.postmin[which(ret.postmin[, 3] == slope.max.postmin), 1] # index of maximum slope in fit table
+                slope.quota <- quota * slope.max.postmin
+
+                if(x_type == "density"){
+                  if(exists("min.density")){
+                    candidates.postmin <- ret.postmin[which(
+                      ret.postmin[, 3] >= slope.quota &
+                        ret.postmin[, 5] >= 0.98 * R2 &
+                        abs(ret.postmin[, 6]) <= 1.02 * RSD &
+                        ret.postmin[, 7] >= min.density), 1]
+                  } else{
+                    candidates.postmin <- ret.postmin[which(
+                      ret.postmin[, 3] >= slope.quota &
+                        ret.postmin[, 5] >= 0.98 * R2 &
+                        abs(ret.postmin[, 6]) <= 1.02 * RSD), 1]
+                  }
                 } else {
-                  m.postmin <- lm_window(obs$x, obs$fl_data, min(tp.postmin), length(tp.postmin)) # linear model
+                  if(exists("t0")){
+                    candidates.postmin <- ret.postmin[which(
+                      ret.postmin[, 3] >= slope.quota &
+                        ret.postmin[, 5] >= 0.98 * R2 &
+                        abs(ret.postmin[, 6]) <= 1.02 * RSD &
+                        ret.postmin[, 7] >= t0), 1]
+                  } else {
+                    candidates.postmin <- ret.postmin[which(
+                      ret.postmin[, 3] >= slope.quota &
+                        ret.postmin[, 5] >= 0.98 * R2 &
+                        abs(ret.postmin[, 6]) <= 1.02 * RSD), 1]
+                  }
                 }
-                p.postmin  <- c(lm_parms(m.postmin), n = length(tp.postmin)) # # slope equation parameters (linear model)
-              } else {
-                p.postmin <- c(
-                  a = 0,
-                  b = 0,
-                  se = 0,
-                  r2 = 0,
-                  cv = 0,
-                  n = 0
-                )
-                m = NULL
-              }
+                #consider only candidate windows next to index.max.ret.postmin
+                candidate_intervals.postmin <- split(candidates.postmin, cumsum(c(1, diff(candidates.postmin) != 1)))
+                if (index.max.ret.postmin %in% unlist(candidate_intervals.postmin)) {
+                  candidates.postmin <- candidate_intervals.postmin[
+                    as.numeric(which(sapply(candidate_intervals.postmin,FUN = function(X) index.max.ret.postmin %in% X)))][[1]]
+                }
 
-              if (length(candidates.postmin) > 0) {
-                ## get x window of exponential fit
-                x.max_start.postmin <- obs$x[tp.postmin[1]]
-                x.max_end.postmin <- obs$x[tp.postmin[length(tp.postmin)]]
-                if (control$log.y.lin == TRUE) {
-                  y_turn.postmin <- obs$ylog[postmin.ndx] # y at turning point
+                if (length(candidates.postmin) > 0) {
+                  #perform linear regression with candidate fl_data points
+                  tp.postmin <- seq(min(candidates.postmin), max(candidates.postmin) + h - 1)
+                  if (control$log.y.lin == TRUE) {
+                    m.postmin <- lm_window(obs$x, obs$ylog, min(tp.postmin), length(tp.postmin)) # linear model
+                  } else {
+                    m.postmin <- lm_window(obs$x, obs$fl_data, min(tp.postmin), length(tp.postmin)) # linear model
+                  }
+                  p.postmin  <- c(lm_parms(m.postmin), n = length(tp.postmin)) # # slope equation parameters (linear model)
                 } else {
-                  y_turn.postmin <- obs$fl_data[postmin.ndx] # y at turning point
-                }
-                t_turn.postmin <- obs$x[postmin.ndx]
-                y0_lm.postmin    <- unname(coef(m.postmin)[1]) # y-intercept of tangent
-                max_slope.postmin <- unname(coef(m.postmin)[2])
-
-                ## estimate lag phase between first and second growth phase
-                if (control$log.y.lin == TRUE) {
-                  lambda.postmin <- (obs$ylog[1] - y0_lm.postmin) / max_slope.postmin
-                } else {
-                  lambda.postmin <- (obs$fl_data[1] - y0_lm.postmin) / max_slope.postmin
+                  p.postmin <- c(
+                    a = 0,
+                    b = 0,
+                    se = 0,
+                    r2 = 0,
+                    cv = 0,
+                    n = 0
+                  )
+                  m = NULL
                 }
 
-                # correct y0 values for Ln(y(t)/y0)
-                if(control$log.y.lin == TRUE){
-                  y0_lm.postmin <- obs$fl_data[1] * exp(y0_lm.postmin)
-                }
+                if (length(candidates.postmin) > 0) {
+                  ## get x window of exponential fit
+                  x.max_start.postmin <- obs$x[tp.postmin[1]]
+                  x.max_end.postmin <- obs$x[tp.postmin[length(tp.postmin)]]
+                  if (control$log.y.lin == TRUE) {
+                    y_turn.postmin <- obs$ylog[postmin.ndx] # y at turning point
+                  } else {
+                    y_turn.postmin <- obs$fl_data[postmin.ndx] # y at turning point
+                  }
+                  t_turn.postmin <- obs$x[postmin.ndx]
+                  y0_lm.postmin    <- unname(coef(m.postmin)[1]) # y-intercept of tangent
+                  max_slope.postmin <- unname(coef(m.postmin)[2])
 
-                # get indices of x points used in linear fit
-                ndx.postmin <- seq(min(match(ret[candidates.postmin, "x"], x.in)),
-                                   max(match(ret[candidates.postmin, "x"], x.in)) + h -
-                                     1)
-                slope.se.postmin <- as.numeric(p.postmin[3]) # standard error of slope
-                rsquared.postmin <- p.postmin["r2"]
-                fitFlag.postmin <- TRUE
-              }
+                  ## estimate lag phase between first and second growth phase
+                  if (control$log.y.lin == TRUE) {
+                    lambda.postmin <- (obs$ylog[1] - y0_lm.postmin) / max_slope.postmin
+                  } else {
+                    lambda.postmin <- (obs$fl_data[1] - y0_lm.postmin) / max_slope.postmin
+                  }
+
+                  # correct y0 values for Ln(y(t)/y0)
+                  if(control$log.y.lin == TRUE){
+                    y0_lm.postmin <- obs$fl_data[1] * exp(y0_lm.postmin)
+                  }
+
+                  # get indices of x points used in linear fit
+                  ndx.postmin <- seq(min(match(ret[candidates.postmin, "x"], x.in)),
+                                     max(match(ret[candidates.postmin, "x"], x.in)) + h -
+                                       1)
+                  slope.se.postmin <- as.numeric(p.postmin[3]) # standard error of slope
+                  rsquared.postmin <- p.postmin["r2"]
+                  fitFlag.postmin <- TRUE
+                }
+                else {
+                  # of if(length(candidates.postmin) > 0)
+                  y0_lm.postmin = NA
+                  max_slope.postmin = NA
+                  slope.se.postmin = NA
+                  lag.postmin = NA
+                  x.max_start.postmin = NA
+                  x.max_end.postmin = NA
+                  ndx.postmin = NA
+                  rsquared.postmin = NA
+                  fitFlag.postmin = FALSE
+                }
+              } # if (any(ret.postmin.check[, 5] >= R2 & abs(ret.postmin.check[, 6]) <= RSD))
               else {
-                # of if(length(candidates.postmin) > 0)
                 y0_lm.postmin = NA
                 max_slope.postmin = NA
                 slope.se.postmin = NA
@@ -1421,7 +1494,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 rsquared.postmin = NA
                 fitFlag.postmin = FALSE
               }
-            } # if (any(ret.postmin.check[, 5] >= R2 & abs(ret.postmin.check[, 6]) <= RSD))
+            }
             else {
               y0_lm.postmin = NA
               max_slope.postmin = NA
@@ -1436,103 +1509,135 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
             # get local deriv2-maximum before max_slope
             # premin.ndx <- maxima[(maxima - tp.ext[1]) <= 0][which.max(maxima[(maxima - tp.ext[1]) <= 0])]
-            premin.ndx <- maxima[which.min(abs(maxima - tp.ext[1]))]
-            # extract linear regression results before pre-max_slope turning point
-            ret.premin <- ret[ret$x <= obs$x[premin.ndx-h],]
-            #Consider only slopes that span at least fit.dY
-            ret.premin <- ret.premin[ret.premin[, "dY"] >= fit.dY, ]
-            # remove indices included in max_slope regression
-            ret.premin <- ret.premin[!(ret.premin[,1] %in% tp),]
-            # Consider only positive slopes
-            ret.premin <- ret.premin[ret.premin[, "slope"] > 0, ]
-            ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
-            success <- FALSE
-            # apply min.density to list of linear regressions
-            ret.premin.check <- ret.premin[ret.premin[, 8] >= min.density, ]
-            if (any(ret.premin.check[, 5] >= R2 &
-                    abs(ret.premin.check[, 6]) <= RSD)) {
-              while (!success) {
-                index.max <- which.max(ret.premin.check[, 3])
-                if (ret.premin.check[index.max, 5] >= R2 &&
-                    abs(ret.premin.check[index.max, 6]) <= RSD &&
-                    !is.na(ret.premin.check[index.max, 6])) {
-                  # prerequisites for suitable µmax candidate: R2 and RSD
-                  slope.max.premin <- ret.premin.check[index.max, 3]
-                  success <- TRUE
+            if(length(maxima)>0){
+              premin.ndx <- maxima[which.min(abs(maxima - tp.ext[1]))]
+              if(premin.ndx > h){
+                # extract linear regression results before pre-max_slope turning point
+                ret.premin <- ret[ret$x <= obs$x[premin.ndx-h],]
+                #Consider only slopes that span at least fit.dY
+                ret.premin <- ret.premin[ret.premin[, "dY"] >= fit.dY, ]
+                # Consider only positive slopes
+                ret.premin <- ret.premin[ret.premin[, "slope"] > 0, ]
+                #remove regressions included in the extended candidate list
+                ret.premin <- ret.premin[!(ret.premin[, 1] %in% tp.ext), ]
+                ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
+                success <- FALSE
+                # apply min.density to list of linear regressions
+                if(x_type == "density"){
+                  ret.premin.check <- ret.premin[ret.premin[, 8] >= min.density, ]
                 } else {
-                  ret.premin.check <- ret.premin.check[-index.max,]
+                  ret.premin.check <- ret.premin
                 }
-              }
-              index.max.ret.premin <- ret.premin[which(ret.premin[, 3] == slope.max.premin), 1] # index of maximum slope in fit table
-              slope.quota <- quota * slope.max.premin
-              candidates.premin <- ret.premin[which(
-                ret.premin[, 3] >= slope.quota &
-                  ret.premin[, 5] >= 0.98 * R2 &
-                  abs(ret.premin[, 6]) <= 1.02 * RSD &
-                  ret.premin[, 7] >= t0), 1]
+                ret.premin.check <- ret.premin.check[!is.na(ret.premin.check[,1]), ]
+                if (any(ret.premin.check[, 5] >= R2 &
+                        abs(ret.premin.check[, 6]) <= RSD)) {
+                  while (!success) {
+                    index.max <- which.max(ret.premin.check[, 3])
+                    if (ret.premin.check[index.max, 5] >= R2 &&
+                        abs(ret.premin.check[index.max, 6]) <= RSD &&
+                        !is.na(ret.premin.check[index.max, 6])) {
+                      # prerequisites for suitable µmax candidate: R2 and RSD
+                      slope.max.premin <- ret.premin.check[index.max, 3]
+                      success <- TRUE
+                    } else {
+                      ret.premin.check <- ret.premin.check[-index.max,]
+                    }
+                  }
+                  index.max.ret.premin <- ret.premin[which(ret.premin[, 3] == slope.max.premin), 1] # index of maximum slope in fit table
+                  slope.quota <- quota * slope.max.premin
+                  candidates.premin <- ret.premin[which(
+                    ret.premin[, 3] >= slope.quota &
+                      ret.premin[, 5] >= 0.98 * R2 &
+                      abs(ret.premin[, 6]) <= 1.02 * RSD &
+                      ret.premin[, 7] >= t0), 1]
 
-              #consider only candidate windows next to index.max.ret.premin
-              candidate_intervals.premin <-split(candidates.premin, cumsum(c(1, diff(candidates.premin) != 1)))
-              if (index.max.ret.premin %in% unlist(candidate_intervals.premin)) {
-                candidates.premin <- candidate_intervals.premin[
-                  as.numeric(which(sapply(candidate_intervals.premin,FUN = function(X) index.max.ret.premin %in% X)))][[1]]
-              }
+                  #consider only candidate windows next to index.max.ret.premin
+                  candidate_intervals.premin <-split(candidates.premin, cumsum(c(1, diff(candidates.premin) != 1)))
+                  if (index.max.ret.premin %in% unlist(candidate_intervals.premin)) {
+                    candidates.premin <- candidate_intervals.premin[
+                      as.numeric(which(sapply(candidate_intervals.premin,FUN = function(X) index.max.ret.premin %in% X)))][[1]]
+                  }
 
 
-              if (length(candidates.premin) > 0) {
-                #perform linear regression with candidate fl_data points
-                tp.premin <- seq(min(candidates.premin), max(candidates.premin) + h - 1)
-                if (control$log.y.lin == TRUE) {
-                  m.premin <- lm_window(obs$x, obs$ylog, min(tp.premin), length(tp.premin)) # linear model
-                } else {
-                  m.premin <- lm_window(obs$x, obs$fl_data, min(tp.premin), length(tp.premin)) # linear model
+                  if (length(candidates.premin) > 0) {
+                    #perform linear regression with candidate fl_data points
+                    tp.premin <- seq(min(candidates.premin), max(candidates.premin) + h - 1)
+                    if (control$log.y.lin == TRUE) {
+                      m.premin <- lm_window(obs$x, obs$ylog, min(tp.premin), length(tp.premin)) # linear model
+                    } else {
+                      m.premin <- lm_window(obs$x, obs$fl_data, min(tp.premin), length(tp.premin)) # linear model
+                    }
+                    p.premin  <- c(lm_parms(m.premin), n = length(tp.premin)) # # slope equation parameters (linear model)
+                  } else {
+                    p.premin <- c(
+                      a = 0,
+                      b = 0,
+                      se = 0,
+                      r2 = 0,
+                      cv = 0,
+                      n = 0
+                    )
+                    m = NULL
+                  }
+
+                  if (length(candidates.premin) > 0) {
+                    ## get x window of exponential fit
+                    x.max_start.premin <- obs$x[tp.premin[1]]
+                    x.max_end.premin <- obs$x[tp.premin[length(tp.premin)]]
+                    if (control$log.y.lin == TRUE) {
+                      y_turn.premin <- obs$ylog[tp.premin[length(tp.premin)]] # y at turning point
+                    } else {
+                      y_turn.premin <- obs$fl_data[tp.premin[length(tp.premin)]] # y at turning point
+                    }
+                    t_turn.premin <- obs$x[premin.ndx]
+                    y0_lm.premin    <- unname(coef(m.premin)[1]) # y-intercept of tangent
+                    max_slope.premin <- unname(coef(m.premin)[2])
+
+                    ## estimate lag phase between first and second growth phase
+                    if (control$log.y.lin == TRUE) {
+                      lambda.premin <- (obs$ylog[1] - y0_lm.premin) / max_slope.premin
+                    } else {
+                      lambda.premin <- (obs$fl_data[1] - y0_lm.premin) / max_slope.premin
+                    }
+
+                    # correct y0 values for Ln(y(t)/y0)
+                    if(control$log.y.lin == TRUE){
+                      y0_lm.premin <-  obs$fl_data[1] * exp(y0_lm.premin)
+                    }
+
+                    # get indices of x points used in linear fit
+                    ndx.premin <- seq(min(match(ret[candidates.premin, "x"], x.in)),
+                                      max(match(ret[candidates.premin, "x"], x.in)) + h -
+                                        1)
+                    slope.se.premin <- as.numeric(p.premin[3]) # standard error of slope
+                    rsquared.premin <- p.premin["r2"]
+                    fitFlag.premin <- TRUE
+                  }
+                  else {
+                    # of if(length(candidates.premin) > 0)
+                    y0_lm.premin = NA
+                    max_slope.premin = NA
+                    slope.se.premin = NA
+                    lag.premin = NA
+                    x.max_start.premin = NA
+                    x.max_end.premin = NA
+                    ndx.premin = NA
+                    rsquared.premin = NA
+                    fitFlag.premin = FALSE
+                  }
+                } # if (any(ret.premin.check[, 5] >= R2 & abs(ret.premin.check[, 6]) <= RSD))
+                else{
+                  y0_lm.premin = NA
+                  max_slope.premin = NA
+                  slope.se.premin = NA
+                  lag.premin = NA
+                  x.max_start.premin = NA
+                  x.max_end.premin = NA
+                  ndx.premin = NA
+                  rsquared.premin = NA
+                  fitFlag.premin = FALSE
                 }
-                p.premin  <- c(lm_parms(m.premin), n = length(tp.premin)) # # slope equation parameters (linear model)
-              } else {
-                p.premin <- c(
-                  a = 0,
-                  b = 0,
-                  se = 0,
-                  r2 = 0,
-                  cv = 0,
-                  n = 0
-                )
-                m = NULL
-              }
-
-              if (length(candidates.premin) > 0) {
-                ## get x window of exponential fit
-                x.max_start.premin <- obs$x[tp.premin[1]]
-                x.max_end.premin <- obs$x[tp.premin[length(tp.premin)]]
-                if (control$log.y.lin == TRUE) {
-                  y_turn.premin <- obs$ylog[tp.premin[length(tp.premin)]] # y at turning point
-                } else {
-                  y_turn.premin <- obs$fl_data[tp.premin[length(tp.premin)]] # y at turning point
-                }
-                t_turn.premin <- obs$x[premin.ndx]
-                y0_lm.premin    <- unname(coef(m.premin)[1]) # y-intercept of tangent
-                max_slope.premin <- unname(coef(m.premin)[2])
-
-                ## estimate lag phase between first and second growth phase
-                if (control$log.y.lin == TRUE) {
-                  lambda.premin <- (obs$ylog[1] - y0_lm.premin) / max_slope.premin
-                } else {
-                  lambda.premin <- (obs$fl_data[1] - y0_lm.premin) / max_slope.premin
-                }
-
-                # correct y0 values for Ln(y(t)/y0)
-                if(control$log.y.lin == TRUE){
-                  y0_lm.premin <-  obs$fl_data[1] * exp(y0_lm.premin)
-                }
-
-                # get indices of x points used in linear fit
-                ndx.premin <- seq(min(match(ret[candidates.premin, "x"], x.in)),
-                                  max(match(ret[candidates.premin, "x"], x.in)) + h -
-                                    1)
-                slope.se.premin <- as.numeric(p.premin[3]) # standard error of slope
-                rsquared.premin <- p.premin["r2"]
-                fitFlag.premin <- TRUE
-              }
+              } # if(premin.ndx > h)
               else {
                 # of if(length(candidates.premin) > 0)
                 y0_lm.premin = NA
@@ -1545,8 +1650,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 rsquared.premin = NA
                 fitFlag.premin = FALSE
               }
-            } # if (any(ret.premin.check[, 5] >= R2 & abs(ret.premin.check[, 6]) <= RSD))
-            else{
+            }
+            else {
+              # of if(length(candidates.premin) > 0)
               y0_lm.premin = NA
               max_slope.premin = NA
               slope.se.premin = NA
@@ -1775,13 +1881,24 @@ fl.workflow <- function(grodata = NULL,
 
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
-    out.drFit <- growth.drFit(summary.flFit(out.flFit), control)
-    EC50.table <- out.drFit$drTable
-    boot.ec <- out.drFit$boot.ec
+    if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+      out.drFit1 <- growth.drFit(summary.flFit(out.flFit1), control)
+      EC50.table1 <- out.drFit1$drTable
+      boot.ec1 <- out.drFit1$boot.ec
+    }
+    if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+      out.drFit2 <- growth.drFit(summary.flFit(out.flFit2), control)
+      EC50.table2 <- out.drFit2$drTable
+      boot.ec2 <- out.drFit2$boot.ec
+    }
   }
   # ///
-  flFitRes <- list(time = time, data = grodata, flFit = out.flFit1, flFit2 = ifelse(exists("out.flFit2"), get("out.flFit2"), NA),
-                 drFit = out.drFit, expdesign = expdesign, control = control)
+  na.obj <- NA
+  flFitRes <- list(time = time, data = grodata, flFit1 = get(ifelse(exists("out.flFit1"), "out.flFit1", "na.obj")),
+                   flFit2 = get(ifelse(exists("out.flFit2"), "out.flFit2", "na.obj")),
+                 drFit1 = get(ifelse(exists("out.drFit1"), "out.drFit1", "na.obj")),
+                 drFit2 = get(ifelse(exists("out.drFit2"), "out.drFit2", "na.obj")),
+                 expdesign = expdesign, control = control)
   class(flFitRes) <- "flFitRes"
 
   if(!is.null(out.dir)){
@@ -1792,23 +1909,41 @@ fl.workflow <- function(grodata = NULL,
   }
   dir.create(wd, showWarnings = F)
 
-  flTable <- data.frame(apply(flFitRes[["flFit"]][["flTable"]],2,as.character))
-  res.table.fl <- Filter(function(x) !all(is.na(x)),flTable)
-  utils::write.table(res.table.fl, paste(wd, "results.gc.txt",
-                                         sep = "/"), row.names = FALSE, sep = "\t")
-  cat(paste0("Results of growth fit analysis saved as tab-delimited text file in:\n",
+  if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+    flTable1 <- data.frame(apply(flFitRes[["flFit1"]][["flTable"]],2,as.character))
+    res.table.fl1 <- Filter(function(x) !all(is.na(x)),flTable1)
+    utils::write.table(res.table.fl1, paste(wd, "results.fl1.txt",
+                                           sep = "/"), row.names = FALSE, sep = "\t")
+  }
+  if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+    flTable2 <- data.frame(apply(flFitRes[["flFit2"]][["flTable"]],2,as.character))
+    res.table.fl2 <- Filter(function(x) !all(is.na(x)),flTable2)
+    utils::write.table(res.table.fl2, paste(wd, "results.fl2.txt",
+                                           sep = "/"), row.names = FALSE, sep = "\t")
+  }
+
+  cat(paste0("Results of fluorescence analysis saved as tab-delimited text file in:\n",
              wd, "/results.fl.txt\n"))
   if (ec50 == TRUE) {
-    res.table.dr_fl <- Filter(function(x) !all(is.na(x)),EC50.table)
-    utils::write.table(res.table.dr_fl, paste(wd, "results.dr.txt",
-                                           sep = "/"), row.names = FALSE, sep = "\t")
+    if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+      res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
+      utils::write.table(res.table.dr_fl1, paste(wd, "results.dr1.txt",
+                                                sep = "/"), row.names = FALSE, sep = "\t")
+    }
+    if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+      res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
+      utils::write.table(res.table.dr_fl2, paste(wd, "results.dr2.txt",
+                                                 sep = "/"), row.names = FALSE, sep = "\t")
+    }
+
     cat(paste0("Results of EC50 analysis saved as tab-delimited in:\n",
-               wd, "/results.dr.txt\n"))
+               wd, "/results.fl_dr.txt\n"))
   } else {
-    res.table.dr_fl <- NULL
+    res.table.dr_fl1 <- NULL
+    res.table.dr_fl2 <- NULL
   }
   if(report == TRUE){
-    try(growth.report(flFitRes, report.dir = gsub(paste0(getwd(), "/"), "", wd), ec50=ec50, mean.grp = mean.grp, mean.conc = mean.conc,
+    try(growth.report(flFitRes, report.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc,
                       export = export))
   }
 
