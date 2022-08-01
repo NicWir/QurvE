@@ -1739,7 +1739,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   # get indices of replicates
   # remove conditions with fitFlag = FALSE in all replicates
     # Store each condition with its replicate indices in list filter.ls
-    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub(" ([[:punct:]]|[[:digit:]])+ \\|", "", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]])+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
@@ -1749,6 +1749,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
     }
   ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
+
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
   if(gsub(".+\\.", "", param)=="linfit") fit.type <- "linfit"
   if(gsub(".+\\.", "", param)=="model") fit.type <- "model"

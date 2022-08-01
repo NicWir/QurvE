@@ -786,7 +786,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
 #' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
-#' @param report (Logical) Create a PDF and HTML report after running all computations (\code{TRUE}) or not (\code{FALSE}).
+#' @param report (Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})
 #' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
 #' @param export (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #'
@@ -828,7 +828,7 @@ growth.workflow <- function (grodata = NULL,
                              log.x.dr = FALSE,
                              log.y.dr = FALSE,
                              nboot.dr = 0,
-                             report = TRUE,
+                             report = c('pdf', 'html'),
                              out.dir = NULL,
                              export = FALSE
 )
@@ -895,9 +895,9 @@ growth.workflow <- function (grodata = NULL,
   } else {
     res.table.dr <- NULL
   }
-  if(report == TRUE){
-    try(growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc,
-                  export = export))
+  if(any(report %in% c('pdf', 'html'))){
+    try(growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ec50, mean.grp = mean.grp, mean.conc = mean.conc,
+                  export = export, format = report))
   }
 
   grofit
@@ -916,6 +916,8 @@ growth.workflow <- function (grodata = NULL,
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 #'    \item \code{export}: Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
 #' }
+#' @param ec50 (Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
+#' @param format(Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
 #'
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
@@ -928,7 +930,7 @@ growth.workflow <- function (grodata = NULL,
 #' @import knitr
 #' @import plyr
 #' @include general_misc_utils.R
-growth.report <- function(grofit, report.dir = NULL, ...)
+growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'html'), ...)
   {
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
@@ -942,7 +944,6 @@ growth.report <- function(grofit, report.dir = NULL, ...)
   control <- grofit$control
   time <- grofit$gcFit$raw.time
   data <- grofit$gcFit$raw.data
-  ec50 <- control$ec50
   if(!exists("res.table.gc")){
     res.table.gc <- grofit$gcFit$gcTable
   }
@@ -967,7 +968,16 @@ growth.report <- function(grofit, report.dir = NULL, ...)
     }
   }
   file <- paste0(Report.wd, "/Report_Growth.Rmd")
-  rmarkdown::render(file, output_format = "all", output_dir = wd,
+  if(all(c('pdf', 'html') %in% format)){
+    format <- c('html_document', 'pdf_document')
+  } else if ('pdf' %in% format){
+    format <- 'pdf_document'
+  } else if ('html' %in% format){
+    format <- 'html_document'
+  } else {
+    stop("Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html').")
+  }
+  rmarkdown::render(file, output_format = format, output_dir = wd,
                     quiet = TRUE)
   message(paste0("Files saved in: '", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
@@ -2805,7 +2815,7 @@ growth.drFit <- function (FitData, control = growth.control())
       EC50.table <- rbind(EC50.table, out.row)
     }
   }
-  if(exists("skip")){
+  if(exists("skip") && !is.null(skip)){
     distinct <- distinct[-skip]
     EC50 <- EC50[-skip]
     EC50.boot <- EC50.boot[-skip]
@@ -2898,7 +2908,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
     cat("Spline could not be fitted in dose-response analysis!\n")
     fitFlag <- FALSE
     if (is.null(control$smooth.dr) == TRUE) {
-      cat("This might be caused by usage of smoothing parameter 'smooth.dr = NULL'.\n")
+      cat("This might be caused by usage of smoothing parameter 'smooth.dr = NULL'. Re-running the function might solve the problem. If not, please specify 'smooth.dr'.\n")
     }
     stop("Error in drFitSpline")
   }

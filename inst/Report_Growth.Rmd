@@ -31,19 +31,22 @@ cl <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = T
 doParallel::registerDoParallel(cl)
 knitr::opts_chunk$set(dev = "pdf")
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
-knit_table <- function(df, ...){
+knit_table <- function(df, caption){
   if (is_html_output()) {
-    df %>%
-      kable("html", align = "c", escape = F, ...) %>%
-      kable_styling(bootstrap_options = "hover")
+    DT::datatable(df, caption = caption, filter = 'top', escape = FALSE,
+         extensions = c('FixedColumns',"FixedHeader"),
+          options = list(scrollX = FALSE, 
+                         paging=TRUE,
+                         pageLength = 15,
+                         fixedHeader=TRUE))
   } else {
-     colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "µ~max~", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "t~start~", "$t_{start}$") %>% str_replace_all(., "t~D~", "$t_{D}$") %>% str_replace_all(., "t~end~", "$t_{end}$") %>% str_replace_all(., "R\\^2\\^", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "t~shift~", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y~max~", "y$_{max}$")
+     colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "µ<sub>max</sub>", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "t<sub>start</sub>", "$t_{start}$") %>% str_replace_all(., "t<sub>D</sub>", "$t_{D}$") %>% str_replace_all(., "t<sub>end</sub>", "$t_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "t<sub>shift</sub>", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "t<sub>max</sub>", "t$_{max}$")
      colnames(df) <- linebreak(colnames(df), align = "c")
      for(i in 2:ncol(df)){
        df[,i] <- df[,i] %>% str_replace_all(., "^\\*\\*", "\\\\textbf\\{") %>% str_replace_all(., "\\*\\*", "\\}")
      }
      df[,1] <- str_replace_all(df[,1], "_", "\\\\char`_")
-     df %>% kable("latex", align = "c", booktabs = T, escape = F, linesep = "",  ...) %>% kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = F, position = "center", font_size = 8)
+     df %>% kable("latex", align = "c", booktabs = T, escape = F, linesep = "",  caption = caption, longtable = TRUE) %>% kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = F, position = "center", font_size = 8)
    }
 }
 ```
@@ -59,7 +62,7 @@ _`r length(levels(grofit[["data"]][["concentration"]]))`_ different concentratio
 The following parameters were used to fit the data: 
 
 * minimum density considered: `r colFmt(ifelse(!is.null(grofit$control$min.density), grofit$control$min.density, "none"), 'NavyBlue')`
-* minimum time considered for exponential and spline fits (t0): `r colFmt(control$t0, 'NavyBlue')`
+* minimum time considered for linear and spline fits (t0): `r colFmt(control$t0, 'NavyBlue')`
 * log-transform density values for spline fits: `r colFmt(grofit$control$log.y.spline, 'NavyBlue')`
 * log-transform density values for parametric fits: `r colFmt(grofit$control$log.y.model, 'NavyBlue')`
 * log-transform time values: `r colFmt(grofit$control$log.x.gc, 'NavyBlue')`
@@ -76,37 +79,41 @@ The following parameters were used to fit the data:
 ## Growth fit results
 ```{r table_linear, echo=F, warning=F, message=F, results='asis'}
 if(any(c("a", "l") %in% control$fit.opt)){
-    if(!all(is.na(res.table.gc$lambda.linfit))){
-  table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-                             
-                             "µ~max~" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("**", round(as.numeric(res.table.gc$mu.linfit), 3), "**", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
-                             
-                             "t~D~" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("**", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "**", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
-                             
-                             "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2), 
-                             
-                             
-                             "Δy" = round(as.numeric(res.table.gc$dY.linfit), 3),
-                             
-                             
-                             "y~max~" = round(as.numeric(res.table.gc$A.linfit), 3),
-                             
-                             
-                             "t~start~<br>(µ~max~)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("**", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "**", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
-                             
-                             
-                             "t~end~<br>(µ~max~)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("**", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "**", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
-                             
-                             
-                             
-                             "R^2^<br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("**", round(as.numeric(res.table.gc$r2mu.linfit), 3), "**", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
-                             
-                             
-                             stringsAsFactors = F, check.names = F)
-  table_linear <- as.data.frame(apply(table_linear, 2, function(x) str_replace_all(x, "NA ± NA", "")))
-  table_linear[is.na(table_linear)] <- ""
-  knit_table(table_linear, caption = ifelse(control$biphasic, "Exponential Fit (Values in parentheses indicate parameters for secondary growth phase)", "Exponential Fit"), longtable = TRUE) %>% column_spec(column=1, width = "4cm")
+  if(!all(is.na(res.table.gc$lambda.linfit))){
+    table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                               
+                               "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("**", round(as.numeric(res.table.gc$mu.linfit), 3), "**", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
+                               
+                               "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("**", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "**", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
+                               
+                               "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2), 
+                               
+                               
+                               "Δy" = round(as.numeric(res.table.gc$dY.linfit), 3),
+                               
+                               
+                               "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
+                               
+                               
+                               "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("**", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "**", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
+                               
+                               
+                               "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("**", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "**", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
+                               
+                               
+                               
+                               "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("**", round(as.numeric(res.table.gc$r2mu.linfit), 3), "**", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
+                               
+                               
+                               stringsAsFactors = F, check.names = F)
+    table_linear <- as.data.frame(apply(table_linear, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+    table_linear[is.na(table_linear)] <- ""
+    if (is_html_output()) {
+      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit"))
+    } else {
+      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% column_spec(column=1, width = "4cm")
     }
+  }
 }
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
@@ -117,14 +124,14 @@ try(plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = paste
 `r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_model, echo=F, warning=F, message=F, results='asis', fig.align='center'}
 if(any(c("a", "b", "m") %in% control$fit.opt)){
-    if(!all(is.na(res.table.gc$lambda.model))){
+  if(!all(is.na(res.table.gc$lambda.model))){
     table_model <- suppressWarnings(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-           "Model" = res.table.gc$used.model,
-           "µ~max~" = ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(as.numeric(res.table.gc$mu.model), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.model),3))),
-           "t~D~" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
-           "λ" = paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3)),
-           "A" = paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3)),
-           stringsAsFactors = F, check.names = F))
+                                               "Model" = res.table.gc$used.model,
+                                               "µ<sub>max</sub>" = ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(as.numeric(res.table.gc$mu.model), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.model),3))),
+                                               "t<sub>D</sub>" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
+                                               "λ" = paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3)),
+                                               "A" = paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3)),
+                                               stringsAsFactors = F, check.names = F))
     if ( "richards" %in% res.table.gc$used.model  ){
       table_model <- suppressWarnings(cbind(table_model, data.frame("ν" = round(as.numeric(res.table.gc$parameter_nu.model), 3), stringsAsFactors = F, check.names = F)))
     }
@@ -132,12 +139,16 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
       table_model <- suppressWarnings(cbind(table_model, data.frame("α" = round(as.numeric(res.table.gc$parameter_alpha.model), 3), stringsAsFactors = F, check.names = F)))
     }
     if ( "gompertz.exp" %in% res.table.gc$used.model ){
-      table_model <- suppressWarnings(cbind(table_model, data.frame("t~shift~" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
+      table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
     }
     table_model <- as.data.frame(apply(table_model, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_model[is.na(table_model)] <- ""
-    knit_table(table_model, caption = "Parametric Fit", longtable = TRUE) %>% column_spec(column=1, width = "4.0cm")
+    if (is_html_output()) {
+      knit_table(table_model, caption = "Parametric Fit")
+    } else {
+      knit_table(table_model, caption = "Parametric Fit") %>% column_spec(column=1, width = "4cm")
     }
+  }
 }
 ```
 ```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
@@ -150,30 +161,34 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
   if(!all(is.na(res.table.gc$lambda.spline))){
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                              
-                             "µ~max~" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("**", round(as.numeric(res.table.gc$mu.spline), 3), "**", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
+                             "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("**", round(as.numeric(res.table.gc$mu.spline), 3), "**", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
                              
-                             "t~D~" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("**", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "**", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
+                             "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("**", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "**", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
                              
                              "λ" = round(as.numeric(res.table.gc$lambda.spline), 2), 
                              
-                             "y~max~" = round(as.numeric(res.table.gc$A.spline), 3),
+                             "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
                              
                              "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
                              
-                             "t~max~" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("**", round(as.numeric(res.table.gc$tmax.spline), 2), "**", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
+                             "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("**", round(as.numeric(res.table.gc$tmax.spline), 2), "**", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
                              
                              "smooth.<br>fac" = res.table.gc$smooth.spline,
                              
                              stringsAsFactors = F, check.names = F)
     if ( grofit$control$nboot.gc > 1 ){
-      table_spline <- cbind(table_spline, data.frame("µ~max~<br>boot" = paste(round(as.numeric(res.table.gc$mu.bt), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.bt),3)), 
+      table_spline <- cbind(table_spline, data.frame("µ<sub>max</sub><br>boot" = paste(round(as.numeric(res.table.gc$mu.bt), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.bt),3)), 
                                                    "λ<br>boot" = paste(round(as.numeric(res.table.gc$lambda.bt), 2),"\u00B1", round(as.numeric(res.table.gc$stdlambda.bt),2)),
                                                    "A<br>boot" = paste(round(as.numeric(res.table.gc$A.bt), 3),"\u00B1", round(as.numeric(res.table.gc$stdA.bt),3)),
                                                    stringsAsFactors = F, check.names = F))
     }
   table_spline <- as.data.frame(apply(table_spline, 2, function(x) str_replace_all(x, "NA ± NA", "")))
   table_spline[is.na(table_spline)] <- ""
-  knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"), longtable = TRUE) %>% column_spec(column=1, width = "4.0cm")
+  if (is_html_output()) {
+      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"))
+    } else {
+      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% column_spec(column=1, width = "4cm")
+    }
   }
 }
 ```
@@ -185,7 +200,7 @@ try(plot.parameter(grofit, param = "dY.spline", export = export, out.dir = paste
 \clearpage
 
 ## Plots
-### `r if(any(c("a", "l") %in% control$fit.opt)){"Exponential Fits"}`
+### `r if(any(c("a", "l") %in% control$fit.opt)){"Linear Fits"}`
 ```{r figure_linear, out.width = "33%", fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if(any(c("a", "l") %in% control$fit.opt)){
   plot.ggLinear <- function(){
