@@ -8,10 +8,45 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
   p <- function(){
     switch(which,
            fit = {
-
-             par(cex.lab=1.5)
-             plot(flFittedLinear$"filt.fl" ~ flFittedLinear$"filt.x", xlab="OD", ylab=ifelse(log == "y", "FL", "FL"),
+             control <- flFittedLinear$control
+             if(control$x_type == "time"){
+               if(control$norm_fl){
+                 if(control$log.y.lin){
+                   ylab = "norm. Ln[FL/FL(0)]"
+                 } else {
+                   ylab = "norm. FL"
+                 }
+               } else {
+                 if(control$log.y.lin){
+                   ylab = "Ln[FL/FL(0)]"
+                 } else {
+                   ylab = "FL"
+                 }
+               }
+             } else {
+               if(control$log.y.lin){
+                 ylab = "Ln[FL/FL(0)]"
+               } else {
+                 ylab = "FL"
+               }
+             }
+             if(control$x_type == "time"){
+               if(control$log.x.lin){
+                 xlab <- "Ln(time + 1)"
+               } else {
+                 xlab <- "Time"
+               }
+             } else {
+               if(control$log.x.lin){
+                 xlab <- "Ln(density + 1)"
+               } else {
+                 xlab <- "Density"
+               }
+             }
+             par(mar=c(5.1, 4.1 + nchar(round(max(flFittedLinear$"filt.fl")))/3.5, 4.1, 2.1), cex.lab=1.5)
+             plot(flFittedLinear$"filt.fl" ~ flFittedLinear$"filt.x", xlab=xlab, ylab = "",
                   log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", ...)
+             title(ylab = ylab, line = 3 + nchar(round(max(flFittedLinear$"filt.fl")))/4)
              axis(1,cex.axis=1.3)
              axis(2,cex.axis=1.3, las=1)
              try(points(flFittedLinear$raw.fl[flFittedLinear$ndx] ~ flFittedLinear$raw.x[flFittedLinear$ndx], pch=21, col="black", bg="red"))

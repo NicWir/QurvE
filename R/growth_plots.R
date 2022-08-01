@@ -1711,7 +1711,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   } else if (is(object)=="grofit"){
     gcTable <- object$gcFit$gcTable
   } else if (is(object)=="flFitRes"){
-    gcTable <- object$flFit$flTable
+    gcTable <- object$flFit1$flTable
   } else if (any(is(object) %in% "gcTable")){
     gcTable <- object
   } else if (is(object)=="flFit"){
@@ -1739,7 +1739,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   # get indices of replicates
   # remove conditions with fitFlag = FALSE in all replicates
     # Store each condition with its replicate indices in list filter.ls
-    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]])+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",

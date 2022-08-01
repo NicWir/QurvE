@@ -380,14 +380,24 @@ if(any(c("a", "l") %in% control$fit.opt)){
     }
   }
   plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))
-  if (knitr::is_latex_output()) {
+  if(all(c('pdf', 'html') %in% format)){
+    if (knitr::is_latex_output()) {
+      foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
+              .packages = "ggplot2") %dopar% {
+                if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                }
+              }
+    }
+  } else{
     foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
-        .packages = "ggplot2") %dopar% {
-          if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotLinear_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
-          }
-        }
-  }
+              .packages = "ggplot2") %dopar% {
+                if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                }
+              }
+  } 
+  
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotLinear_",
                                 full.names = TRUE)
@@ -534,7 +544,16 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     }
   }
   plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))
-  if (knitr::is_latex_output()) {
+  if(all(c('pdf', 'html') %in% format)){
+    if (knitr::is_latex_output()) {
+      foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedModels"]]),
+        .packages = "ggplot2") %dopar% {
+          if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
+            pdf(file=paste0(plotdir, "/PlotModel_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+          }
+        }
+    }
+  } else{
     foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedModels"]]),
         .packages = "ggplot2") %dopar% {
           if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
@@ -542,6 +561,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
           }
         }
   }
+
   
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotModel_",
@@ -859,7 +879,20 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
   }
   plotdir <-
     ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
-  if (knitr::is_latex_output()) {
+  if(all(c('pdf', 'html') %in% format)){
+    if (knitr::is_latex_output()) {
+      foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
+            .packages = "ggplot2") %dopar% {
+              if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub(" ", "_", gsub(
+                  "\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
+                )), ".pdf"))
+                plot.ggSpline()
+                invisible(dev.off())
+              }
+            }
+    }
+  } else{
     foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
@@ -871,6 +904,7 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
               }
             }
   }
+  
   Files_list <- list.files(path = plotdir,
                            pattern = "^PlotSpline_",
                            full.names = TRUE)

@@ -1097,18 +1097,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   max.fluorescence <- max(obs$fl_data)
   dY.total <- max.fluorescence - obs$fl_data[1]
 
-  if(max(fl_data.in) < control$growth.thresh * fl_data.in[1]){
-    if(control$suppress.messages==F) message(paste0("Linear fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
-      flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "x.in")), raw.fl = fl_data.in,
-                          filt.x = get(ifelse(x_type == "density", "density", "x")), filt.fl = fl_data,
-                          ID = ID, FUN = grow_exponential, fit = NA, par = c(
-                            y0 = NA, y0_lm = NA, max_slope = 0, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
-                            t_turn = NA, max_slope2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE)
-    class(flFitLinear) <- "flFitLinear"
-    if(control$suppress.messages==F) message("No fl_data range in accordance with the chosen parameters identified with appropriate linearity.")
-    return(flFitLinear)
-  }
+
   ## number of values
   N <- nrow(obs)
 
@@ -1809,7 +1798,7 @@ fl.workflow <- function(grodata = NULL,
                         x_type = c("density", "time"),
                         norm_fl = TRUE,
                         t0 = 0,
-                        min.density = NA,
+                        min.density = 0,
                         log.x.lin = FALSE,
                         log.x.spline = FALSE,
                         log.y.lin = FALSE,
@@ -1948,4 +1937,44 @@ fl.workflow <- function(grodata = NULL,
   }
 
   flFitRes
+}
+
+
+promoter_equation <- function (x, y.min, y.max, K, n, addpar = NULL)
+{
+  y.min <- y.min[1]
+  y.max <- y.max[1]
+  K <- K[1]
+  n <- n[1]
+  if (is.numeric(x) == FALSE || length(x) < 4)
+    stop("Need numeric vector with at least four elements for: x (i.e., inducer concentrations)")
+  if (is.numeric(y.min) == FALSE)
+    stop("Need numeric vector for: y.min")
+  if (is.numeric(y.max) == FALSE)
+    stop("Need numeric vector for: y.max")
+  if (is.numeric(K) == FALSE)
+    stop("Need numeric vector for: K")
+  if (is.numeric(n) == FALSE)
+    stop("Need numeric vector for: n")
+  y <- y.min + (y.max - y.min) * ( x^n / (K^n + x^n) )
+  promoter_equation <- y
+}
+
+initpromoter <- function (x, y)
+{
+  if (is.numeric(x) == FALSE || length(x) < 4)
+    stop("Need numeric vector with at least four elements for: x (i.e., inducer concentrations)")
+  if (is.numeric(y) == FALSE || length(y) < 4)
+    stop("Need numeric vector with at least four elements for: y (i.e., promoter response)")
+  if (is.numeric(y.min) == FALSE)
+    stop("Need numeric vector for: y.min")
+  if (is.numeric(K) == FALSE)
+    stop("Need numeric vector for: K")
+  if (is.numeric(n) == FALSE)
+    stop("Need numeric vector for: n")
+  y.min <- min(y)
+  y.max <- max(y)
+  K <- max(x)/2
+  n <- 3
+  initpromoter <- list( y.min = y.min, y.max = y.max, K = K, n = n, addpar = NULL)
 }
