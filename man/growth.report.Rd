@@ -4,12 +4,14 @@
 \alias{growth.report}
 \title{Create a PDF and HTML report with results from a growth curve analysis workflow}
 \usage{
-growth.report(grofit, report.dir = NULL, ...)
+growth.report(grofit, report.dir = NULL, ec50, format = c("pdf", "html"), ...)
 }
 \arguments{
 \item{grofit}{A \code{grofit} object created with \code{growth.workflow()}.}
 
 \item{report.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
+
+\item{ec50}{(Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{...}{Further arguments passed to create a report. Currently required:
 \itemize{
@@ -18,6 +20,8 @@ growth.report(grofit, report.dir = NULL, ...)
 \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 \item \code{export}: Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
 }}
+
+\item{format(Character)}{Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})}
 }
 \description{
 \code{growth.report()} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results obtained.

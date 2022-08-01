@@ -59,7 +59,7 @@ growth.control(
 
 \item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
 
-\item{biphasic}{(Logical) Shall \code{growth.gcFitLinear} and code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
+\item{biphasic}{(Logical) Shall \code{growth.gcFitLinear} and \code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
 
 \item{interactive}{(Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the \emph{Plots} pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.}
 

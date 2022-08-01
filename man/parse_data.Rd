@@ -5,18 +5,19 @@
 \title{Parse raw plate reader data and convert it to a format compatible with QurvE}
 \usage{
 parse_data(
-  file = NULL,
+  data.file = NULL,
   map.file = NULL,
   software = "Gen5",
   convert.time = TRUE,
-  sheet = 1,
+  data.sheet = 1,
+  map.sheet = 1,
   csvsep = ";",
   dec = ".",
   subtract.blank = T
 )
 }
 \arguments{
-\item{file}{(Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.}
+\item{data.file}{(Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.}
 
 \item{map.file}{(Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.}
 
@@ -24,9 +25,11 @@ parse_data(
 
 \item{convert.time}{(Logical) Shall the time be converted from, e.g., 00:15:00 in Excel into hours (\code{TRUE}) or not (\code{FALSE})?}
 
-\item{sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files (\emph{optional}). Default: \code{";"}}
+\item{data.sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
 
-\item{csvsep}{(Character) separator used in CSV file (ignored for other file types).}
+\item{map.sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
+
+\item{csvsep}{(Character) separator used in CSV file (ignored for other file types).  Default: \code{";"}}
 
 \item{dec}{(Character) decimal separator used in CSV, TSV and TXT files.}
 

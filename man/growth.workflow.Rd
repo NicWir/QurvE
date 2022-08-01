@@ -36,7 +36,7 @@ growth.workflow(
   log.x.dr = FALSE,
   log.y.dr = FALSE,
   nboot.dr = 0,
-  report = TRUE,
+  report = c("pdf", "html"),
   out.dir = NULL,
   export = FALSE
 )
@@ -104,7 +104,7 @@ growth.workflow(
 
 \item{nboot.dr}{(Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.}
 
-\item{report}{(Logical) Create a PDF and HTML report after running all computations (\code{TRUE}) or not (\code{FALSE}).}
+\item{report}{(Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})}
 
 \item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
 
