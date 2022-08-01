@@ -23,6 +23,7 @@ Depends:
 Imports: 
     data.table,
     doParallel,
+    DT,
     foreach,
     ggplot2,
     ggpubr,
