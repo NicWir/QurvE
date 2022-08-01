@@ -11,7 +11,9 @@ read_data(
   data.format = "col",
   csvsep = ";",
   dec = ".",
-  sheet = 1,
+  sheet.density = 1,
+  sheet.fluoro1 = 1,
+  sheet.fluoro2 = 1,
   subtract.blank = T
 )
 }
@@ -30,11 +32,15 @@ In column format, the first three table rows contain
 
 \item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \link{"col"}}
 
-\item{csvsep}{(Character) separator used in CSV file (ignored for other file types).}
+\item{csvsep}{(Character) separator used in CSV file (ignored for other file types). Default: \code{";"}}
 
-\item{dec}{(Character) decimal separator used in CSV, TSV and TXT files.}
+\item{dec}{(Character) decimal separator used in CSV, TSV and TXT files. Default: \code{"."}}
 
-\item{sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files (\emph{optional}). Default: \code{";"}}
+\item{sheet.density}{(Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (\emph{optional}).}
+
+\item{sheet.fluoro1}{(Numeric or Character) Number or name of the sheet with fluorescence 1 data in XLS or XLSX files (\emph{optional}).}
+
+\item{sheet.fluoro2}{(Numeric or Character) Number or name of the sheet with fluorescence 2 data in XLS or XLSX files (\emph{optional}).}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 }

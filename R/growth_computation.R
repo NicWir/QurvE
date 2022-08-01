@@ -12,10 +12,12 @@
 #' @param data.fluoro1 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
 #' @param data.fluoro2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
 #' @param data.format (Character) "col" for samples in columns, or "row" for samples in rows. Default: ["col"]
-#' @param csvsep (Character) separator used in CSV file (ignored for other file types).
-#' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
-#' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
+#' @param csvsep (Character) separator used in CSV file (ignored for other file types). Default: \code{";"}
+#' @param dec (Character) decimal separator used in CSV, TSV and TXT files. Default: \code{"."}
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
+#' @param sheet.density (Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (_optional_).
+#' @param sheet.fluoro1 (Numeric or Character) Number or name of the sheet with fluorescence 1 data in XLS or XLSX files (_optional_).
+#' @param sheet.fluoro2 (Numeric or Character) Number or name of the sheet with fluorescence 2 data in XLS or XLSX files (_optional_).
 #'
 #' @details
 #' \figure{Data_layout.png}
@@ -29,7 +31,9 @@ read_data <-
            data.format = "col",
            csvsep = ";",
            dec = ".",
-           sheet = 1,
+           sheet.density = 1,
+           sheet.fluoro1 = 1,
+           sheet.fluoro2 = 1,
            subtract.blank  = T)
   {
     # Load density data
@@ -37,7 +41,7 @@ read_data <-
       dat <- data.density
     } else {
       # Read table file
-      dat <- read_file(data.density, csvsep=csvsep, dec=dec, sheet=sheet)
+      dat <- read_file(data.density, csvsep=csvsep, dec=dec, sheet=sheet.density)
     }
     if(data.format == "col"){
       dat <- t(dat)
@@ -60,7 +64,7 @@ read_data <-
         fluoro1 <- data.fluoro1
       } else {
         # Read table file
-        fluoro1 <- read_file(data.fluoro1, csvsep=csvsep, dec=dec, sheet=sheet)
+        fluoro1 <- read_file(data.fluoro1, csvsep=csvsep, dec=dec, sheet=sheet.fluoro1)
       }
       if(data.format == "col"){
         fluoro1 <- t(fluoro1)
@@ -82,7 +86,7 @@ read_data <-
         fluoro2 <- data.fluoro2
       } else {
         # Read table file
-        fluoro2 <- read_file(data.fluoro2, csvsep=csvsep, dec=dec, sheet=sheet)
+        fluoro2 <- read_file(data.fluoro2, csvsep=csvsep, dec=dec, sheet=sheet.fluoro2)
       }
       if(data.format == "col"){
         fluoro2 <- t(fluoro2)
@@ -3361,3 +3365,41 @@ gompertz.exp <- function (time, A, mu, lambda, addpar)
   gompertz.exp <- y
 }
 
+promoter_equation <- function (x, y.min, y.max, K, n, addpar = NULL)
+{
+  y.min <- y.min[1]
+  y.max <- y.max[1]
+  K <- K[1]
+  n <- n[1]
+  if (is.numeric(x) == FALSE || length(x) < 4)
+    stop("Need numeric vector with at least four elements for: x (i.e., inducer concentrations)")
+  if (is.numeric(y.min) == FALSE)
+    stop("Need numeric vector for: y.min")
+  if (is.numeric(y.max) == FALSE)
+    stop("Need numeric vector for: y.max")
+  if (is.numeric(K) == FALSE)
+    stop("Need numeric vector for: K")
+  if (is.numeric(n) == FALSE)
+    stop("Need numeric vector for: n")
+  y <- y.min + (y.max - y.min) * ( x^n / (K^n + x^n) )
+  promoter_equation <- y
+}
+
+initpromoter <- function (x, y)
+{
+  if (is.numeric(x) == FALSE || length(x) < 4)
+    stop("Need numeric vector with at least four elements for: x (i.e., inducer concentrations)")
+  if (is.numeric(y) == FALSE || length(y) < 4)
+    stop("Need numeric vector with at least four elements for: y (i.e., promoter response)")
+  if (is.numeric(y.min) == FALSE)
+    stop("Need numeric vector for: y.min")
+  if (is.numeric(K) == FALSE)
+    stop("Need numeric vector for: K")
+  if (is.numeric(n) == FALSE)
+    stop("Need numeric vector for: n")
+  y.min <- min(y)
+  y.max <- max(y)
+  K <- max(x)/2
+  n <- 3
+  initpromoter <- list( y.min = y.min, y.max = y.max, K = K, n = n, addpar = NULL)
+}
