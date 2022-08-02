@@ -178,7 +178,7 @@ summary.gcFitLinear <- function(object,...)
   }
   else{
     table <- c(object$par[5], log(2)/object$par[5],
-               ifelse(!is.na(object$par["lag2"]), ifelse(object$par["lag2"]<object$par["lag"], object$par["lag2"], object$par["lag"]), object$par["lag"]),
+               ifelse(!is.na(object$par["lag2"]), ifelse(object$par["lag2"]<object$par["lag"]&&object$par["lag2"]>0, object$par["lag2"], object$par["lag"]), object$par["lag"]),
                object$par[2],
                object$par[3], object$par[9],
                object$par[10],

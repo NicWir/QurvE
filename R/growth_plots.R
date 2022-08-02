@@ -40,23 +40,23 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              if(gcFittedLinear$fitflag2){
                try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- gcFittedLinear$par["lag2"]
-               if(lag2 < lag){
+               if(lag2 < lag && lag2 > gcFittedLinear$raw.time[1]){
                  try(time2 <- seq(lag2, max(gcFittedLinear$"raw.time"), length=200), silent = T)
                  try(time <- seq(coef_["tmax_start"]-0.25*(coef_["tmax_end"]-coef_["tmax_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
-                 try(lines(time2, gcFittedLinear$FUN(time2, c(y0=unname(coef_["y0_lm2"]), mumax=unname(coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
                  try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag2), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
-                 try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
-                 try(time2 <- seq(coef_["tmax2_start"]-0.25*(coef_["tmax2_end"]-coef_["tmax2_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(time2 <- seq(coef_["tmax2_start"]-0.25*(coef_["tmax2_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
                  try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
-                 try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                  try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
-                 try(lines(time2, gcFittedLinear$FUN(time2, c(y0=unname(coef_["y0_lm2"]), mumax=unname(coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, parms = unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
 
                }
              } else {
                try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
-               try(lines(time, gcFittedLinear$FUN(time, c(y0=unname(coef_["y0_lm"]), mumax=unname(coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
            },
@@ -303,6 +303,8 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
     }
     if (plot == TRUE){
       suppress_warnings( {print(p)}, "is.na" )
+    } else {
+      return(p)
     }
   }
 }
@@ -1002,7 +1004,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
           lagtime2 <- coef$lambda2
           growth.time <- gcFitSpline$fit.time[which.max(gcFitSpline$fit.data)]
           mu2 <- coef$mu2
-          if(lagtime2 < lagtime){
+          if(lagtime2 < lagtime && lagtime2 > gcFitSpline$raw.time[1]){
             # time values for tangent at µmax
             time_start.ndx <- which.min(abs(gcFitSpline$fit.time-(coef$t.max-0.15*growth.time)))
             time_start <- gcFitSpline$fit.time[time_start.ndx]
@@ -1145,6 +1147,8 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       }
       if (plot == TRUE){
         print(p)
+      } else{
+        return(p)
       }
     } # else of if (add == TRUE)
   } # else of if ((is.na(gcFitSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE))
@@ -1244,12 +1248,13 @@ plot.grofit <- function(grofit,
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                           gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
+                                                                                                           gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
                                                                                                            ".+[[:space:]]",
                                                                                                            unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                                                           "$"), sample.nm[ndx.filt.rep[[j]]])]))
+                                                                                                           "$")), sample.nm[ndx.filt.rep[[j]]])]))
   }
   ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- ndx.filt[lapply(ndx.filt,length)>0]
   # Check FitFlag for each replicate, work per condition
   if(data.type == "spline"){
     for(i in 1:length(ndx.filt)){
@@ -1262,7 +1267,7 @@ plot.grofit <- function(grofit,
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0(
-    str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
+    str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
 
   if(data.type == "spline"){
     # correct for log transformation
@@ -1285,7 +1290,7 @@ plot.grofit <- function(grofit,
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1])),
+                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))),
                                              ".+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
@@ -1653,6 +1658,8 @@ plot.grofit <- function(grofit,
   }
   if (plot == TRUE){
     print(p)
+  } else {
+    return(p)
   }
 }
 
@@ -1687,9 +1694,9 @@ base_breaks <- function(n = 10){
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
+plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                                'mu.model', 'lambda.model', 'A.model',
-                                               'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
+                                               'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
                             names = NULL, conc = NULL, basesize = 12, reference.nm = NULL, reference.conc = NULL,
@@ -1697,11 +1704,11 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   param <- match.arg(param)
   # check class of object
   if(!(any(is(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
-  if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
+  if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                             'mu.model', 'lambda.model', 'A.model',
-                                            'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
+                                            'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                             'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')))
-                                            stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
+                                            stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'mu2.linfit', 'lambda2.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
 
   #extract gcTable
   if(any(is(object) %in% "gcTable")){
@@ -1743,7 +1750,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                            gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
+                                                                                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))),
                                                                             ".+[[:space:]]",
                                                                             unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
@@ -1831,6 +1838,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   }
   if (plot == TRUE){
     print(p)
+  } else {
+    return(p)
   }
 }
 

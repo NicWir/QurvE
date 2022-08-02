@@ -43,7 +43,7 @@ knit_table <- function(df, caption){
      colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "µ<sub>max</sub>", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "t<sub>start</sub>", "$t_{start}$") %>% str_replace_all(., "t<sub>D</sub>", "$t_{D}$") %>% str_replace_all(., "t<sub>end</sub>", "$t_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "t<sub>shift</sub>", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "t<sub>max</sub>", "t$_{max}$")
      colnames(df) <- linebreak(colnames(df), align = "c")
      for(i in 2:ncol(df)){
-       df[,i] <- df[,i] %>% str_replace_all(., "^\\*\\*", "\\\\textbf\\{") %>% str_replace_all(., "\\*\\*", "\\}")
+       df[,i] <- df[,i] %>% str_replace_all(., "^<b>", "\\\\textbf\\{") %>% str_replace_all(., "</b>", "\\}")
      }
      df[,1] <- str_replace_all(df[,1], "_", "\\\\char`_")
      df %>% kable("latex", align = "c", booktabs = T, escape = F, linesep = "",  caption = caption, longtable = TRUE) %>% kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = F, position = "center", font_size = 8)
@@ -82,9 +82,9 @@ if(any(c("a", "l") %in% control$fit.opt)){
   if(!all(is.na(res.table.gc$lambda.linfit))){
     table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                                
-                               "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("**", round(as.numeric(res.table.gc$mu.linfit), 3), "**", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
+                               "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<b>", round(as.numeric(res.table.gc$mu.linfit), 3), "</b>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
                                
-                               "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("**", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "**", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
+                               "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<b>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</b>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
                                
                                "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2), 
                                
@@ -95,14 +95,14 @@ if(any(c("a", "l") %in% control$fit.opt)){
                                "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
                                
                                
-                               "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("**", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "**", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
+                               "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<b>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</b>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
                                
                                
-                               "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("**", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "**", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
+                               "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<b>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</b>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
                                
                                
                                
-                               "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("**", round(as.numeric(res.table.gc$r2mu.linfit), 3), "**", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
+                               "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<b>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</b>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
                                
                                
                                stringsAsFactors = F, check.names = F)
@@ -161,9 +161,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
   if(!all(is.na(res.table.gc$lambda.spline))){
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                              
-                             "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("**", round(as.numeric(res.table.gc$mu.spline), 3), "**", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
+                             "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("<b>", round(as.numeric(res.table.gc$mu.spline), 3), "</b>", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
                              
-                             "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("**", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "**", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
+                             "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<b>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</b>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
                              
                              "λ" = round(as.numeric(res.table.gc$lambda.spline), 2), 
                              
@@ -171,7 +171,7 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
                              
                              "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
                              
-                             "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("**", round(as.numeric(res.table.gc$tmax.spline), 2), "**", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
+                             "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<b>", round(as.numeric(res.table.gc$tmax.spline), 2), "</b>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
                              
                              "smooth.<br>fac" = res.table.gc$smooth.spline,
                              
@@ -385,7 +385,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
       foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
               .packages = "ggplot2") %dopar% {
                 if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i])))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
                 }
               }
     }
@@ -393,7 +393,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
     foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
               .packages = "ggplot2") %dopar% {
                 if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i])))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
                 }
               }
   } 
@@ -401,7 +401,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotLinear_",
                                 full.names = TRUE)
-  sort.ndx <- match(gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels)))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- match(gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   
 knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
@@ -549,7 +549,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
       foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedModels"]]),
         .packages = "ggplot2") %dopar% {
           if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotModel_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+            pdf(file=paste0(plotdir, "/PlotModel_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i])))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
           }
         }
     }
@@ -557,7 +557,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedModels"]]),
         .packages = "ggplot2") %dopar% {
           if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotModel_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+            pdf(file=paste0(plotdir, "/PlotModel_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i])))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
           }
         }
   }
@@ -566,7 +566,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotModel_",
                                 full.names = TRUE)
-  sort.ndx <- match(gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels)))), gsub(".+PlotModel_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- match(gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels))))), gsub(".+PlotModel_","", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
 knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
@@ -884,9 +884,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
       foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                pdf(file = paste0(plotdir, "/PlotSpline_", gsub(" ", "_", gsub(
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-                )), ".pdf"))
+                ))), ".pdf"))
                 plot.ggSpline()
                 invisible(dev.off())
               }
@@ -896,9 +896,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
     foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                pdf(file = paste0(plotdir, "/PlotSpline_", gsub(" ", "_", gsub(
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-                )), ".pdf"))
+                ))), ".pdf"))
                 plot.ggSpline()
                 invisible(dev.off())
               }
@@ -909,9 +909,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
                            pattern = "^PlotSpline_",
                            full.names = TRUE)
   sort.ndx <-
-    match(gsub(" ", "_", gsub("\\/", "-", gsub(
+    match(gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
       " \\| ", "_", names(grofit$gcFit$gcFittedModels)
-    ))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
+    )))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }

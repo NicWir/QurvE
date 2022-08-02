@@ -1696,6 +1696,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
         # Find local minima that frame µmax and remove the 'peak' from deriv1
         n <- round((log(n.spl+4, base=2.1))/0.75)/2
         minima <- inflect(deriv1$y, threshold = n)$minima
+        minima <- c(1, minima)
         for(i in 1:(length(minima)-1)){
           if(any(minima[i]:minima[i+1] %in% mumax.index)){
             min.ndx <- c(minima[i], minima[i+1])
@@ -1705,14 +1706,26 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
           deriv1.2 <- deriv1
           deriv1.2$y[min.ndx[1]:min.ndx[2]] <- 0
           # find second mumax
-          mumax2.index <- which.max(deriv1.2$y) # index of data point with maximum growth rate in first derivative fit
-          mumax2.index.spl <- which(spline$x == deriv1.2$x[mumax2.index]) # index of data point with maximum growth rate in spline fit
-          t.max2 <- deriv1.2$x[mumax2.index] # time of maximum growth rate
           mumax2 <- max(deriv1.2$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
-          y.max2 <- spline$y[mumax2.index.spl] # cell density at time of max growth rate
-          b.spl2 <- y.max2 - mumax2 * t.max2 # the y-intercept of the tangent at µmax
-          lambda.spl2 <- -b.spl2/mumax2  # lag time
-          fitFlag2 <- TRUE
+          # accept second mumax only if it is at least 10% of the global mumax
+          if(mumax2 >= 0.1*mumax){
+            mumax2.index <- which.max(deriv1.2$y) # index of data point with maximum growth rate in first derivative fit
+            mumax2.index.spl <- which(spline$x == deriv1.2$x[mumax2.index]) # index of data point with maximum growth rate in spline fit
+            t.max2 <- deriv1.2$x[mumax2.index] # time of maximum growth rate
+            y.max2 <- spline$y[mumax2.index.spl] # cell density at time of max growth rate
+            b.spl2 <- y.max2 - mumax2 * t.max2 # the y-intercept of the tangent at µmax
+            lambda.spl2 <- -b.spl2/mumax2  # lag time
+            fitFlag2 <- TRUE
+          } else {
+            mumax2.index <- NA
+            mumax2.index.spl <- NA
+            t.max2 <- NA
+            mumax2 <- NA
+            y.max2 <- NA
+            b.spl2 <- NA
+            lambda.spl2 <- NA
+            fitFlag2 <- FALSE
+          }
         } else {
           mumax2.index <- NA
           mumax2.index.spl <- NA
@@ -2106,30 +2119,31 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
         success <- FALSE
         # apply min.density to list of linear regressions
         ret.check <- ret.check[ret.check[, 8] >= min.density, ]
-        if(any(ret.check[,5] >= R2 & abs(ret.check[,6]) <= RSD)){
+        ret.check2 <- ret.check
+        if(any(ret.check2[,5] >= R2 & abs(ret.check2[,6]) <= RSD)){
           while (!success){
-            index.max <- which.max(ret.check[, 3])
-            if(ret.check[index.max,5] >= R2 && abs(ret.check[index.max,6]) <= RSD && !is.na(ret.check[index.max,6]) ){ # prerequisites for suitable µmax candidate: R2 and RSD
-              slope.max <- ret.check[index.max,3]
+            index.max <- which.max(ret.check2[, 3])
+            if(ret.check2[index.max,5] >= R2 && abs(ret.check2[index.max,6]) <= RSD && !is.na(ret.check2[index.max,6]) ){ # prerequisites for suitable µmax candidate: R2 and RSD
+              slope.max <- ret.check2[index.max,3]
               success <- TRUE
             } else {
-              ret.check <- ret.check[-index.max,]
+              ret.check2 <- ret.check2[-index.max,]
             }
           }
           index.max.ret <- ret.check[which(ret.check[,3]==slope.max),1] # index of maximum slope in fit table
           slope.quota <- quota * slope.max
           if(exists("min.density")){
-            candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
-                                  ret[, 5] >= 0.98*R2 & # R2 criterion for candidates
-                                  abs(ret[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
-                                  ret[, 7] >= t0 & # consider only slopes after defined t0
-                                  ret[, 8] >= min.density # consider only slopes at densities higher than "min.density"
-            )
+            candidates <- ret.check[which(ret.check[, 3] >= slope.quota & # indices of slopes greater than slope.quota
+                                      ret.check[, 5] >= 0.98*R2 & # R2 criterion for candidates
+                                      abs(ret.check[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
+                                      ret.check[, 7] >= t0 & # consider only slopes after defined t0
+                                      ret.check[, 8] >= min.density # consider only slopes at densities higher than "min.density"
+            ), 1]
           } else{
-            candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
-                                  ret[, 5] >= 0.98*R2 & # R2 criterion for candidates
-                                  abs(ret[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
-                                  ret[, 7] >= t0) # consider only slopes after defined t0
+            candidates <- ret.check[which(ret.check[, 3] >= slope.quota & # indices of slopes greater than slope.quota
+                                  ret.check[, 5] >= 0.98*R2 & # R2 criterion for candidates
+                                  abs(ret.check[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
+                                  ret.check[, 7] >= t0), 1] # consider only slopes after defined t0
           }
           #consider only candidate windows next to index.max.ret
           candidate_intervals <- split(candidates, cumsum(c(1, diff(candidates) != 1)))
@@ -2172,8 +2186,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             y0_data <- obs$data[1]
 
             # get indices of time points used in linear fit
-            ndx <- seq(min(match(ret[candidates, "time"], time.in)),
-                       max(match(ret[candidates, "time"], time.in)) + h-1)
+            ndx <- seq(min(match(ret.check[match(candidates, ret.check[,1]), "time"], time.in)),
+                       max(match(ret.check[match(candidates, ret.check[,1]), "time"], time.in)) + h-1)
 
             mu.se <- as.numeric(p[3]) # standard error of slope
             fitFlag <- TRUE
@@ -2195,7 +2209,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             deriv2 <- stats::predict(spline, deriv = 2)
             deriv2_spline <- stats::smooth.spline(deriv2$x, deriv2$y, spar = 0.4, cv = NA, keep.data = FALSE)
             # extract local minima and maxima of deriv2
-            n = h/2
+            n = ceiling(h/2)
             minima <- inflect(deriv2_spline$y, threshold = n)$minima
             maxima <- inflect(deriv2_spline$y, threshold = n)$maxima
             # Regard only (negative) minima and (positive) maxima with a deriv2 value of >= 10% mumax
@@ -2205,17 +2219,17 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             # expand mumax window with more relaxed quota
             slope.quota.ext <- 0.8 * slope.max
             if(exists("min.density")){
-              candidates.ext <- which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
+              candidates.ext <- ret[which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
                                     ret[, 5] >= 0.95*R2 & # R2 criterion for candidates
                                     abs(ret[, 6]) <= 1.1 * RSD & # RSD criterion for candidates
                                     ret[, 7] >= t0 & # consider only slopes after defined t0
                                     ret[, 8] >= min.density # consider only slopes at densities higher than "min.density"
-              )
+              ), 1]
             } else{
-              candidates.ext <- which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
+              candidates.ext <- ret[which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
                                     ret[, 5] >= 0.95*R2 & # R2 criterion for candidates
                                     abs(ret[, 6]) <= 1.1 * RSD & # RSD criterion for candidates
-                                    ret[, 7] >= t0) # consider only slopes after defined t0
+                                    ret[, 7] >= t0), 1] # consider only slopes after defined t0
             }
             #consider only candidate windows next to index.max.ret
             candidate_intervals.ext <- split(candidates.ext, cumsum(c(1, diff(candidates.ext) != 1)))
@@ -2335,8 +2349,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 y0_lm.postmin <- obs$data[1] * exp(y0_lm.postmin)
 
                 # get indices of time points used in linear fit
-                ndx.postmin <- seq(min(match(ret[candidates.postmin, "time"], time.in)),
-                      max(match(ret[candidates.postmin, "time"], time.in)) + h -
+                ndx.postmin <- seq(min(match(ret[match(candidates.postmin, ret[,1]), "time"], time.in)),
+                      max(match(ret[match(candidates.postmin, ret[,1]), "time"], time.in)) + h -
                         1)
                 mu.se.postmin <- as.numeric(p.postmin[3]) # standard error of slope
                 rsquared.postmin <- p.postmin["r2"]
@@ -2445,8 +2459,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 y0_lm.premin <-  obs$data[1] * exp(y0_lm.premin)
 
                 # get indices of time points used in linear fit
-                ndx.premin <- seq(min(match(ret[candidates.premin, "time"], time.in)),
-                      max(match(ret[candidates.premin, "time"], time.in)) + h -
+                ndx.premin <- seq(min(match(ret[match(candidates.premin, ret[,1]), "time"], time.in)),
+                      max(match(ret[match(candidates.premin, ret[,1]), "time"], time.in)) + h -
                         1)
                 mu.se.premin <- as.numeric(p.premin[3]) # standard error of slope
                 rsquared.premin <- p.premin["r2"]
@@ -3165,7 +3179,7 @@ grow_exponential <- function (time, parms)
 {
   if (is.null(names(parms))) {
     y0 <- parms[1]
-    mumax <- parms[5]
+    mumax <- parms[2]
   }
   else {
     y0 <- parms["y0_lm"]
