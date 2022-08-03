@@ -1244,7 +1244,13 @@ plot.grofit <- function(grofit,
   }
   # remove conditions with fitFlag = FALSE in all replicates
   # Store each condition with its replicate indices in list filter.ls
-  ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i)which(gsub(" \\| .+", "", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1])))))
+  ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i) which(gsub(" \\| .+ \\| ", "_", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1], "_", unlist(str_split(sample.nm[i], " \\| "))[3])))))
+  #keep only replicate indices if condition defined in nm
+    # get indices of samples with selected names
+    ndx.keep <- grep(paste0(
+      str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
+    ndx.filt.rep <- ndx.filt.rep[unlist(lapply(1:length(ndx.filt.rep), function(i) all(ndx.filt.rep[[i]] %in% ndx.keep)))]
+
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
@@ -1266,8 +1272,8 @@ plot.grofit <- function(grofit,
   }
 
   # get indices of samples with selected names
-  ndx.keep <- grep(paste0(
-    str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
+  ndx.keep <- grep(paste0("^",
+    str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
 
   if(data.type == "spline"){
     # correct for log transformation
@@ -1700,7 +1706,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
                             names = NULL, conc = NULL, basesize = 12, reference.nm = NULL, reference.conc = NULL,
-                           plot = T, export = F, height = 7, width = NULL, out.dir = NULL){
+                           plot = T, export = F, height = 7, width = NULL, out.dir = NULL)
+  {
   param <- match.arg(param)
   # check class of object
   if(!(any(is(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")

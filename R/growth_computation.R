@@ -2861,7 +2861,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
   test <- as.vector(as.numeric(as.matrix(test)))
   conc <- as.vector(as.numeric(as.matrix(conc)))
   if (is.vector(conc) == FALSE || is.vector(test) == FALSE)
-    stop("drFitSpline: dose or response data must be a vector !")
+    stop("growth.drFitSpline: dose or response data must be a vector !")
   if (control$neg.nan.act == FALSE) {
     missings <- is.na(conc) | is.na(test) | !is.numeric(conc) |
       !is.numeric(test)
@@ -2873,11 +2873,11 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
   }
   else {
     if (sum(is.na(conc) | is.na(test)))
-      stop("drFitSpline: NA values encountered. Program terminated")
+      stop("growth.drFitSpline: NA values encountered. Program terminated")
     if ((sum((conc < 0)) > 0) | (sum((test < 0)) > 0))
-      stop("drFitSpline: Negative values encountered. Program terminated")
+      stop("growth.drFitSpline: Negative values encountered. Program terminated")
     if ((FALSE %in% is.numeric(conc)) || (FALSE %in% is.numeric(test)))
-      stop("drFitSpline: Non numeric values encountered. Program terminated")
+      stop("growth.drFitSpline: Non numeric values encountered. Program terminated")
   }
   if (length(test) < 6) {
     warning("drFitSpline: There is not enough valid data. Must have at least 6 unique values!")
@@ -3042,9 +3042,9 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     if (sum(is.na(conc) | is.na(test)))
       stop("NA values encountered. Program terminated")
     if ((sum((conc < 0)) > 0) | (sum((test < 0)) > 0))
-      stop("drFitSpline: Negative values encountered. Program terminated")
+      stop("growth.drFitSpline: Negative values encountered. Program terminated")
     if ((FALSE %in% is.numeric(conc)) || (FALSE %in% is.numeric(test)))
-      stop("drFitSpline: Non numeric values encountered. Program terminated")
+      stop("growth.drFitSpline: Non numeric values encountered. Program terminated")
   }
   if (length(test) < 6) {
     warning("drBootSpline: There is not enough valid data. Must have at least 6 unique values!")

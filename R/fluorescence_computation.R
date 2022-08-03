@@ -1,3 +1,38 @@
+#' Title
+#'
+#' @param fit.opt
+#' @param x_type
+#' @param norm_fl
+#' @param t0
+#' @param min.density
+#' @param log.x.lin
+#' @param log.x.spline
+#' @param log.y.lin
+#' @param log.y.spline
+#' @param lin.h
+#' @param lin.R2
+#' @param lin.RSD
+#' @param lin.dY
+#' @param dr.parameter
+#' @param dr.method For model, cite: https://doi.org/10.1038/s41467-020-20094-3
+#' @param dr.have.atleast
+#' @param smooth.dr
+#' @param log.x.dr
+#' @param log.y.dr
+#' @param nboot.dr
+#' @param biphasic
+#' @param interactive
+#' @param nboot.fl
+#' @param smooth.fl
+#' @param growth.thresh
+#' @param suppress.messages
+#' @param neg.nan.act
+#' @param clean.bootstrap
+#'
+#' @return
+#' @export
+#'
+#' @examples
 fl.control <- function(fit.opt = c("l", "s"),
                        x_type = c("density", "time"),
                        norm_fl = TRUE,
@@ -12,6 +47,7 @@ fl.control <- function(fit.opt = c("l", "s"),
                        lin.RSD = 0.05,
                        lin.dY = 0.05,
                        dr.parameter = "max_slope.spline",
+                       dr.method = c("model", "spline"),
                        dr.have.atleast = 5,
                        smooth.dr = NULL,
                        log.x.dr = FALSE,
@@ -27,10 +63,13 @@ fl.control <- function(fit.opt = c("l", "s"),
                        clean.bootstrap = TRUE)
 {
   x_type <- match.arg(x_type)
+  dr.method <- match.arg(dr.method)
   if ((is.character(fit.opt) == FALSE | !any(fit.opt %in% c("l", "s"))))
     stop("value of fit.opt must be character and contain one of or both 'l' and 's'.")
   if ((is.character(x_type) == FALSE | !any(x_type %in% c("density", "time"))))
-    stop("value of x_type must be character and contain one of or both 'density' and 'time'.")
+    stop("value of x_type must be character and contain one of 'density' or 'time'.")
+  if ((is.character(dr.method) == FALSE | !any(dr.method %in% c("model", "spline"))))
+    stop("value of dr.method must be character and contain one of 'model' or 'spline'.")
   if ((is.logical(suppress.messages) == FALSE) | (length(suppress.messages) != 1))
     stop("value of suppress.messages must be logical and of one element")
   if ((is.logical(log.x.lin) == FALSE) | (length(log.x.lin) != 1))
@@ -79,6 +118,7 @@ fl.control <- function(fit.opt = c("l", "s"),
                      lin.dY = lin.dY,
                      biphasic = biphasic,
                      dr.parameter = dr.parameter,
+                     dr.method = dr.method,
                      dr.have.atleast = dr.have.atleast,
                      smooth.dr = smooth.dr,
                      log.x.dr = log.x.dr,
@@ -1787,6 +1827,51 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   invisible(flFitLinear)
 }
 
+#' Title
+#'
+#' @param grodata
+#' @param time
+#' @param density
+#' @param fl_data
+#' @param ec50
+#' @param mean.grp
+#' @param mean.conc
+#' @param fit.opt
+#' @param x_type
+#' @param norm_fl
+#' @param t0
+#' @param min.density
+#' @param log.x.lin
+#' @param log.x.spline
+#' @param log.y.lin
+#' @param log.y.spline
+#' @param lin.h
+#' @param lin.R2
+#' @param lin.RSD
+#' @param lin.dY
+#' @param biphasic
+#' @param interactive
+#' @param dr.parameter
+#' @param dr.method For model, cite: https://doi.org/10.1038/s41467-020-20094-3
+#' @param dr.have.atleast
+#' @param smooth.dr
+#' @param log.x.dr
+#' @param log.y.dr
+#' @param nboot.dr
+#' @param nboot.fl
+#' @param smooth.fl
+#' @param growth.thresh
+#' @param suppress.messages
+#' @param neg.nan.act
+#' @param clean.bootstrap
+#' @param report
+#' @param out.dir
+#' @param export
+#'
+#' @return
+#' @export
+#'
+#' @examples
 fl.workflow <- function(grodata = NULL,
                         time = NULL,
                         density = NULL,
@@ -1810,6 +1895,7 @@ fl.workflow <- function(grodata = NULL,
                         biphasic = FALSE,
                         interactive = FALSE,
                         dr.parameter = "max_slope.spline",
+                        dr.method = c("model", "spline"),
                         dr.have.atleast = 5,
                         smooth.dr = NULL,
                         log.x.dr = FALSE,
@@ -1849,7 +1935,7 @@ fl.workflow <- function(grodata = NULL,
                         log.x.spline = log.x.spline, log.y.lin = log.y.lin, log.y.spline = log.y.spline,
                         lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, dr.have.atleast = dr.have.atleast,
                         smooth.dr = smooth.dr, log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = nboot.dr,
-                        biphasic = biphasic, interactive = interactive, nboot.fl = nboot.fl, dr.parameter = dr.parameter, clean.bootstrap = clean.bootstrap,
+                        biphasic = biphasic, interactive = interactive, nboot.fl = nboot.fl, dr.parameter = dr.parameter, dr.method = dr.method, clean.bootstrap = clean.bootstrap,
                         smooth.fl = smooth.fl, growth.thresh = growth.thresh, suppress.messages = suppress.messages, neg.nan.act = neg.nan.act)
   nboot.gc <- control$nboot.gc
   nboot.dr <- control$nboot.dr
@@ -1871,12 +1957,20 @@ fl.workflow <- function(grodata = NULL,
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
     if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-      out.drFit1 <- growth.drFit(summary.flFit(out.flFit1), control)
+      if(dr.method == "spline"){
+        out.drFit1 <- growth.drFit(summary.flFit(out.flFit1), control)
+      } else {
+        out.drFit1 <- fl.drFit(summary.flFit(out.flFit1), control)
+      }
       EC50.table1 <- out.drFit1$drTable
       boot.ec1 <- out.drFit1$boot.ec
     }
     if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-      out.drFit2 <- growth.drFit(summary.flFit(out.flFit2), control)
+      if(dr.method == "spline"){
+        out.drFit2 <- growth.drFit(summary.flFit(out.flFit2), control)
+      } else {
+        out.drFit2 <- fl.drFit(summary.flFit(out.flFit2), control)
+      }
       EC50.table2 <- out.drFit2$drTable
       boot.ec2 <- out.drFit2$boot.ec
     }
@@ -1939,8 +2033,246 @@ fl.workflow <- function(grodata = NULL,
   flFitRes
 }
 
+fl.drFit <- function(FitData, control = fl.control())
+{
+  if (is(control) != "fl.control")
+    stop("control must be of class fl.control!")
+  EC50.table <- NULL
+  all.EC50 <- NA
+  if(is.character(control$dr.parameter)){
+    dr.parameter <- match(control$dr.parameter, colnames(FitData))
+  }
+  FitData <- FitData[!is.na(FitData[,1]), ]
+  table.tests <- table((FitData[, 1])[which((FitData[,
+                                                     4] == TRUE) & (is.na(FitData[, dr.parameter]) ==
+                                                                      FALSE))])
+  distinct <- names(table.tests)
+  EC50 <- list()
+  EC50.boot <- list()
+  validdata <- cbind(as.character(distinct), table.tests)
+  colnames(validdata) <- c("TestID", "Number")
+  rownames(validdata) <- rep("     ", times = dim(validdata)[1])
+  if (control$suppress.messages == FALSE) {
+    cat("\n")
+    cat("=== Dose-Response Estimation via Model Fit ==============================\n")
+    cat("---------------------------------------------------\n")
+    cat("--> Checking data ...\n")
+    cat(paste("--> Number of distinct tests found:", as.character(length(distinct))),
+        "\n")
+    cat("--> Valid datasets per test: \n")
+    print(validdata, quote = FALSE)
+  }
+  if (TRUE %in% (table.tests < control$dr.have.atleast)) {
+    cat(paste("Warning: following tests have not enough ( <",
+              as.character(control$dr.have.atleast - 1), ") datasets:\n"))
+    cat(distinct[(table.tests < control$dr.have.atleast)])
+    cat("These tests will not be regarded\n")
+    distinct <- distinct[table.tests >= control$dr.have.atleast]
+  }
+  if ((length(distinct)) == 0) {
+    cat(paste("There are no tests having enough ( >", as.character(control$dr.have.atleast -
+                                                                     1), ") datasets!\n"))
+  }
+  else {
+    skip <- c()
+    for (i in 1:length(distinct)) {
+      conc <- factor((FitData[, 3])[which(FitData[, 1] ==
+                                            distinct[i])])
+      if(length(levels(conc)) < 4){
+        message(paste0(distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."))
+        skip <- c(skip, i)
+        next
+      }
+      test <- (as.numeric(FitData[, dr.parameter]))[FitData[, 1] == distinct[i]]
+      names(test) <- rep(names(FitData)[dr.parameter], length(test))
+      drID <- distinct[i]
+      EC50[[i]] <- fl.drFitModel(conc, test, drID, control)
+      if (control$nboot.dr > 0) {
+        EC50.boot[[i]] <- fl.drBootModel(conc, test, drID,
+                                              control)
+      }
+      else {
+        EC50.boot[[i]] <- list(raw.time = conc, raw.data = test,
+                               drID = drID, boot.x = NA, boot.y = NA, boot.drSpline = NA,
+                               ec50.boot = NA, bootFlag = FALSE, control = control)
+        class(EC50.boot[[i]]) <- "drBootModel"
+      }
+      description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
+                                log.y = control$log.y.dr, Samples = control$nboot.dr)
+      out.row <- cbind(description, summary.drFitModel(EC50[[i]]),
+                       summary.drBootSpline(EC50.boot[[i]]))
+      EC50.table <- rbind(EC50.table, out.row)
+    }
+  }
+  if(exists("skip") && !is.null(skip)){
+    distinct <- distinct[-skip]
+    EC50 <- EC50[-skip]
+    EC50.boot <- EC50.boot[-skip]
+  }
+  names(EC50) <- names(EC50.boot) <- distinct
+  drFitModel <- list(raw.data = FitData, drTable = EC50.table,
+                drBootModels = EC50.boot, drFittedModels = EC50, control = control)
+  class(drFitModel) <- "drFitModel"
+  drFitModel
+}
 
-promoter_equation <- function (x, y.min, y.max, K, n, addpar = NULL)
+fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control())
+{
+  if (is(control) != "fl.control")
+    stop("control must be of class fl.control!")
+  test.nm <- names(test)[1]
+  test <- as.vector(as.numeric(as.matrix(test)))
+  conc <- as.vector(as.numeric(as.matrix(conc)))
+  if (is.vector(conc) == FALSE || is.vector(test) == FALSE)
+    stop("fl.drFitModel: dose or response data must be a vector !")
+  if (control$neg.nan.act == FALSE) {
+    missings <- is.na(conc) | is.na(test) | !is.numeric(conc) |
+      !is.numeric(test)
+    conc <- conc[!missings]
+    test <- test[!missings]
+    negs <- (conc < 0) | (test < 0)
+    conc <- conc[!negs]
+    test <- test[!negs]
+  }
+  else {
+    if (sum(is.na(conc) | is.na(test)))
+      stop("fl.drFitModel: NA values encountered. Program terminated")
+    if ((sum((conc < 0)) > 0) | (sum((test < 0)) > 0))
+      stop("fl.drFitModel: Negative values encountered. Program terminated")
+    if ((FALSE %in% is.numeric(conc)) || (FALSE %in% is.numeric(test)))
+      stop("fl.drFitModel: Non numeric values encountered. Program terminated")
+  }
+  if (length(test) < 4) {
+    warning("drFitModel: There is not enough valid data. Must have at least 4 unique values!")
+    drFitModel <- list(raw.conc = conc, raw.test = test,
+                        drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
+                        parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                                          yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
+                        control = control)
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
+  }
+  if (length(test) < control$dr.have.atleast) {
+    warning("drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
+    drFitModel <- list(raw.conc = conc, raw.test = test,
+                        drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
+                        parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                                          yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
+                        control = control)
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
+  }
+  if (control$log.x.dr == TRUE)
+    conc.log <- log(conc + 1)
+  if (control$log.y.dr == TRUE)
+    test.log <- log(test + 1)
+  if (control$log.x.dr == TRUE) {
+    conc.fit <- log(conc + 1)
+  }
+  else {
+    conc.fit <- conc
+  }
+  if (control$log.y.dr == TRUE) {
+    test.fit <- log(test + 1)
+  }
+  else {
+    test.fit <- test
+  }
+  spltest <- NULL
+  fitFlag <- TRUE
+  y.model <- NULL
+  n_candidates <- seq(0.01,10,0.05)
+  i <- 1
+  while( is.null(y.model) && i < 200){
+    i <- i+1
+    try(
+      y.model <- nls(y ~ biosensor.eq(x, y.min, y.max, K, n), start = initbiosensor(x, y, n = n_candidates[i])), silent = T
+    )
+  }
+  if (is.null(y.model) == TRUE) {
+    cat("Model could not be fitted in dose-response analysis!\n")
+    fitFlag <- FALSE
+    stop("Error in fl.drFitModel")
+  }
+  m <- summary(y.model)
+  par <- m$parameters
+  y.min <- par[1,1]
+  y.max <- par[2,1]
+  fc <- par[2,1]/par[1,1]
+  K <- par[3,1]
+  n <- par[4,1]
+  conc.min <- min(conc.fit)
+  conc.max <- max(conc.fit)
+  yEC.test <- (max(ytest$y) - min(ytest$y))/2 + min(ytest$y)
+  last.test <- max(ytest$y)
+  kec.test <- 1
+  for (k in 1:(length(c.pred) - 1)) {
+    d1 <- (ytest$y[k] - yEC.test)
+    d2 <- (ytest$y[k + 1] - yEC.test)
+    if (((d1 <= 0) && (d2 >= 0)) | ((d1 >= 0) && (d2 <= 0))) {
+      kec.test <- k
+      break
+    }
+  }
+  EC.test <- c.pred[kec.test]
+  if (control$suppress.messages == FALSE) {
+    cat("\n\n=== Dose response curve estimation ================\n")
+    cat("--- EC 50 -----------------------------------------\n")
+    cat(paste("-->", as.character(drID)))
+    cat("\n")
+    cat(paste(c("xEC50", "yEC50"), c(EC.test, yEC.test)))
+  }
+  if ((control$log.x.dr == TRUE) && (control$log.y.dr == FALSE)) {
+    if (control$suppress.messages == FALSE) {
+      cat("\n--> Original scale \n")
+      cat(paste(c("xEC50", "yEC50"), c(exp(EC.test) - 1,
+                                       yEC.test)))
+    }
+    EC.orig <- c(exp(EC.test) - 1, yEC.test)
+  }
+  else {
+    if ((control$log.x.dr == FALSE) && (control$log.y.dr ==
+                                        TRUE)) {
+      if (control$suppress.messages == FALSE) {
+        cat("\n--> Original scale \n")
+        cat(paste(c("xEC50", "yEC50"), c(EC.test, exp(yEC.test) -
+                                           1)))
+      }
+      EC.orig <- c(EC.test, exp(yEC.test) - 1)
+    }
+    else {
+      if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
+                                         TRUE)) {
+        if (control$suppress.messages == FALSE) {
+          cat("\n--> Original scale \n")
+          cat(paste(c("xEC50", "yEC50"), c(exp(EC.test) -
+                                             1, exp(yEC.test) - 1)))
+        }
+        EC.orig <- c(exp(EC.test) - 1, exp(yEC.test) -
+                       1)
+      }
+      else {
+        if ((control$log.x.dr == FALSE) && (control$log.y.dr ==
+                                            FALSE)) {
+          EC.orig <- c(EC.test, yEC.test)
+        }
+      }
+    }
+  }
+  if (control$suppress.messages == FALSE) {
+    cat("\n\n\n")
+  }
+  drFitModel <- list(raw.conc = conc, raw.test = test, drID = drID,
+                      fit.conc = ytest$x, fit.test = ytest$y, spline = spltest,
+                      parameters = list(EC50 = EC.test[1], yEC50 = yEC.test,
+                                        EC50.orig = EC.orig[1], yEC50.orig = EC.orig[2], test = test.nm),
+                      fitFlag = fitFlag, reliable = NULL, control = control)
+  class(drFitModel) <- "drFitModel"
+  drFitModel
+}
+
+
+biosensor.eq <- function (x, y.min, y.max, K, n)
 {
   y.min <- y.min[1]
   y.max <- y.max[1]
@@ -1957,24 +2289,20 @@ promoter_equation <- function (x, y.min, y.max, K, n, addpar = NULL)
   if (is.numeric(n) == FALSE)
     stop("Need numeric vector for: n")
   y <- y.min + (y.max - y.min) * ( x^n / (K^n + x^n) )
-  promoter_equation <- y
+  biosensor.eq <- y
 }
 
-initpromoter <- function (x, y)
+
+
+initbiosensor <- function (x, y, n)
 {
   if (is.numeric(x) == FALSE || length(x) < 4)
     stop("Need numeric vector with at least four elements for: x (i.e., inducer concentrations)")
   if (is.numeric(y) == FALSE || length(y) < 4)
     stop("Need numeric vector with at least four elements for: y (i.e., promoter response)")
-  if (is.numeric(y.min) == FALSE)
-    stop("Need numeric vector for: y.min")
-  if (is.numeric(K) == FALSE)
-    stop("Need numeric vector for: K")
-  if (is.numeric(n) == FALSE)
-    stop("Need numeric vector for: n")
   y.min <- min(y)
   y.max <- max(y)
-  K <- max(x)/2
-  n <- 3
-  initpromoter <- list( y.min = y.min, y.max = y.max, K = K, n = n, addpar = NULL)
+  low <- lowess(x, y, f = 0.9)
+  K <- x[ceiling(which.max(low$y)/2)]
+  return(list( y.min = y.min, y.max = y.max, K = K, n = n))
 }
