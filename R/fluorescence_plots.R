@@ -59,7 +59,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
              if(flFittedLinear$fitflag2){
                try(points(flFittedLinear$raw.fl[flFittedLinear$ndx2] ~ flFittedLinear$raw.x[flFittedLinear$ndx2], pch=21, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- flFittedLinear$par["lag2"]
-               if(lag2 < lag){
+               if(lag2 < lag && lag2 > gcFittedLinear$raw.time[1]){
                  try(time2 <- seq(lag2, max(flFittedLinear$"raw.x"), length=200), silent = T)
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"raw.x"), length=200), silent = T)
                  try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
@@ -74,9 +74,14 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 
                }
              } else {
-               try(time <- seq(lag, max(flFittedLinear$"filt.x"), length=200), silent = T)
-               try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-               try(lines(c(min(flFittedLinear$"raw.x"[1]), lag), rep(flFittedLinear$"raw.fl"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+               if(lag < flFittedLinear$raw.x[flFittedLinear$ndx[1]]){
+                 try(time <- seq(lag, max(flFittedLinear$"filt.x"), length=200), silent = T)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(c(min(flFittedLinear$"raw.x"[1]), lag), rep(flFittedLinear$"raw.fl"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+               } else {
+                 try(time <- seq(flFittedLinear$raw.x[flFittedLinear$ndx[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               }
              }
            },
            diagnostics = {
@@ -331,10 +336,10 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
                                       yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
                                   data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
 
-            if(!(lag <0)){
-              p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-            }
+            # if(!(lag <0)){
+            #   p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
+            #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+            # }
           }
         } # if(flFitSpline$fitFlag2)
         else {
@@ -354,10 +359,10 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
                                     xend = x[which.min(abs(y - 1.1*p.yrange.end))],
                                     yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
                                 data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-          if(!(lag <0)){
-            p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-          }
+          # if(!(lag <0)){
+          #   p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
+          #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+          # }
         } # else of if(flFitSpline$fitFlag2)
       } # if(slope == TRUE && log.y == T)
 

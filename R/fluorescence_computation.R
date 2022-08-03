@@ -2186,7 +2186,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
   while( is.null(y.model) && i < 200){
     i <- i+1
     try(
-      y.model <- nls(y ~ biosensor.eq(x, y.min, y.max, K, n), start = initbiosensor(x, y, n = n_candidates[i])), silent = T
+      y.model <- nls(test.fit ~ biosensor.eq(x=conc.fit, y.min, y.max, K, n), start = initbiosensor(x=conc.fit, y=test.fit, n = n_candidates[i])), silent = F
     )
   }
   if (is.null(y.model) == TRUE) {
@@ -2198,13 +2198,20 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
   par <- m$parameters
   y.min <- par[1,1]
   y.max <- par[2,1]
-  fc <- par[2,1]/par[1,1]
-  K <- par[3,1]
-  n <- par[4,1]
+  fc <- par[2,1]/par[1,1] # fold-change
+  K <- par[3,1] # sensitivity
+  n <- par[4,1] # cooperativity
+
+  xin <- seq(0,1,0.01)
+  plot(conc.fit, test.fit)
+  lines(xin,  biosensor.eq(xin, y.min=par[1,1], y.max=par[2,1], K=par[3,1], n=par[4,1]))
+
+  # /// estimating EC 50 values
   conc.min <- min(conc.fit)
   conc.max <- max(conc.fit)
-  yEC.test <- (max(ytest$y) - min(ytest$y))/2 + min(ytest$y)
-  last.test <- max(ytest$y)
+  yEC.test <- (y.max - y.min)/2 + y.min
+  last.test <- y.max
+
   kec.test <- 1
   for (k in 1:(length(c.pred) - 1)) {
     d1 <- (ytest$y[k] - yEC.test)
