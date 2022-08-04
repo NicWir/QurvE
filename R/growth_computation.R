@@ -663,8 +663,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             interactive = FALSE,
                             nboot.gc = 0,
                             smooth.gc = 0.55,
-                            model.type = c("logistic",
-                                           "richards", "gompertz", "gompertz.exp"),
+                            model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "liquori"),
                             dr.have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
                             dr.parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
                             smooth.dr = NULL,
@@ -823,8 +822,7 @@ growth.workflow <- function (grodata = NULL,
                              interactive = FALSE,
                              nboot.gc = 0,
                              smooth.gc = 0.55,
-                             model.type = c("logistic",
-                                            "richards", "gompertz", "gompertz.exp"),
+                             model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "liquori"),
                              growth.thresh = 1.5,
                              dr.have.atleast = 6,
                              dr.parameter = 34,
@@ -1277,7 +1275,7 @@ growth.gcFit <- function(time, data, control= growth.control())
 
   } # /// end of for (i in 1:dim(data)[1])
   names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
-
+  # out.table <- data.frame(as.matrix(out.table))
   gcFit           <- list(raw.time = time, raw.data = data, gcTable = out.table, gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all, gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all, control=control)
 
   class(gcFit)    <- "gcFit"
@@ -1388,25 +1386,55 @@ grofit.param <- function(time, data, gcID = "undefined", control)
         cat(paste("--> Try to fit model", (control$model.type)[i]))
       }
       initmodel    <- paste("init", (control$model.type)[i], sep = "")
-      formulamodel <-
-        as.formula(paste(
-          "data ~ ",
-          (control$model.type)[i],
-          "(time, A, mu, lambda, addpar)",
-          sep = ""
-        ))
+
+      if(control$model.type[i] == "liquori"){
+        formulamodel <-
+          as.formula(paste(
+            "data ~ ",
+            (control$model.type)[i],
+            "(time, A, mu, addpar)",
+            sep = ""
+          ))
+      } else {
+        formulamodel <-
+          as.formula(paste(
+            "data ~ ",
+            (control$model.type)[i],
+            "(time, A, mu, lambda, addpar)",
+            sep = ""
+          ))
+      }
       if ((exists((control$model.type)[i])) && (exists(initmodel))) {
-        init.model  <-
-          do.call(initmodel,
-                  list(
-                    y = data,
-                    time = time,
-                    A = A.low,
-                    mu = mu.low,
-                    lambda = lambda.low
-                  ))
-        try(y.model <-
-              nls(formulamodel, start = init.model), silent = TRUE)
+        if(control$model.type[i] == "liquori"){
+          init.model  <-
+            do.call(initmodel,
+                    list(
+                      y = data,
+                      time = time,
+                      A = A.low,
+                      mu = mu.low
+                    ))
+        } else {
+          init.model  <-
+            do.call(initmodel,
+                    list(
+                      y = data,
+                      time = time,
+                      A = A.low,
+                      mu = mu.low,
+                      lambda = lambda.low
+                    ))
+        }
+        # x <- time
+        # y <- liquori(time, A=2.3, mu=0.16, addpar=c(0,290,1.7,45943,2.74,0.6))
+        # plot(x,y)
+        if(control$model.type[i] == "liquori"){
+          try(y.model <-
+                minpack.lm::nlsLM(formulamodel, start = init.model), silent = TRUE)
+        } else {
+          try(y.model <-
+                nls(formulamodel, start = init.model), silent = TRUE)
+        }
         if (!(TRUE %in% is.null(y.model))) {
           AIC       <- AIC(y.model)
         }
@@ -1461,6 +1489,8 @@ grofit.param <- function(time, data, gcID = "undefined", control)
           fitparbest <- list(nu = as.data.frame(t(fitparbest)))
         } else if (summary(best)[["formula"]][[3]][[1]] == "gompertz.exp"){
           fitparbest <- list(alpha = fitparbest[1,], t_shift = fitparbest[2,])
+        } else if (summary(best)[["formula"]][[3]][[1]] == "huang"){
+          fitparbest <- list(y0 = as.data.frame(t(fitparbest)))
         }
 
       }
@@ -2811,12 +2841,16 @@ growth.drFit <- function (FitData, control = growth.control())
     for (i in 1:length(distinct)) {
       conc <- factor((FitData[, 3])[which(FitData[, 1] ==
                                        distinct[i])])
+      test <- (as.numeric(FitData[, dr.parameter]))[FitData[, 1] == distinct[i]]
+      conc <- as.factor(as.character(conc[!is.na(test)]))
+      test <- test[!is.na(test)]
+
       if(length(levels(conc)) <4){
         message(paste0(distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."))
         skip <- c(skip, i)
         next
       }
-      test <- (as.numeric(FitData[, dr.parameter]))[FitData[, 1] == distinct[i]]
+
       names(test) <- rep(names(FitData)[dr.parameter], length(test))
       drID <- distinct[i]
       EC50[[i]] <- growth.drFitSpline(conc, test, drID, control)
@@ -2923,9 +2957,9 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
   spltest <- NULL
   fitFlag <- TRUE
   if(class(control) == "growth.control"){
-    try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE))
+    try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE), silent = T)
   } else {
-    try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE, w = ifelse(conc.fit == 0, 1, 0.05) ))
+    try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE, w = ifelse(conc.fit == 0, 1, 0.05) ), silent = T)
   }
   if (is.null(spltest) == TRUE) {
     cat("Spline could not be fitted in dose-response analysis!\n")
@@ -2933,7 +2967,13 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
     if (is.null(control$smooth.dr) == TRUE) {
       cat("This might be caused by usage of smoothing parameter 'smooth.dr = NULL'. Re-running the function might solve the problem. If not, please specify 'smooth.dr'.\n")
     }
-    stop("Error in drFitSpline")
+    drFitSpline <- list(raw.conc = conc, raw.test = test,
+                        drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
+                        parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                                          yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
+                        control = control)
+    class(drFitSpline) <- "drFitSpline"
+    return(drFitSpline)
   }
   conc.min <- min(conc.fit)
   conc.max <- max(conc.fit)
@@ -3279,6 +3319,98 @@ initrichards <- function (time, y, A, mu, lambda)
   mu <- mu[1]
   lambda <- lambda[1]
   initrichards <- list(A = A, mu = mu, lambda = lambda, addpar = nu)
+}
+
+inithuang <- function(time, y, A, mu, lambda)
+{
+  if (is.numeric(time) == FALSE)
+    stop("Need numeric vector for: time")
+  if (is.numeric(y) == FALSE)
+    stop("Need numeric vector for: y")
+  if (is.numeric(mu) == FALSE)
+    stop("Need numeric vector for: mu")
+  if (is.numeric(lambda) == FALSE)
+    stop("Need numeric vector for: lambda")
+  if (is.numeric(A) == FALSE)
+    stop("Need numeric vector for: A")
+  y0 <- y[1]
+  A <- max(y)
+  mu <- mu[1]
+  lambda <- lambda[1]
+  inithuang <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
+}
+
+huang <- function (time, A, mu, lambda, addpar)
+{
+  A <- A[1]
+  mu <- mu[1]
+  lambda <- lambda[1]
+  y0 <- addpar[1]
+  if (is.numeric(time) == FALSE)
+    stop("Need numeric vector for: time")
+  if (is.numeric(mu) == FALSE)
+    stop("Need numeric vector for: mu")
+  if (is.numeric(lambda) == FALSE)
+    stop("Need numeric vector for: lambda")
+  if (is.numeric(A) == FALSE)
+    stop("Need numeric vector for: A")
+
+  y <- y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu*(time+0.25*log((1+exp(-4*(time-lambda)))/(1+exp(4*lambda))))) )
+  huang <- y
+}
+
+initliquori <- function(time, y, A, mu, addpar)
+{
+  if (is.numeric(time) == FALSE)
+    stop("Need numeric vector for: time")
+  if (is.numeric(y) == FALSE)
+    stop("Need numeric vector for: y")
+  if (is.numeric(mu) == FALSE)
+    stop("Need numeric vector for: mu")
+  if (is.numeric(A) == FALSE)
+    stop("Need numeric vector for: A")
+  y0 <- 0.1
+  A <- max(y)
+  mu <- mu[1]
+  t_a1 = 17450/60
+  t_a2 = 102.44/60
+  t_b1 = 2756600/60
+  t_b2 = 164.62/60
+  x = 0.24
+  initliquori <- list(A = A, mu = mu, addpar = c(y0, t_a1, t_a2, t_b1, t_b2, x))
+}
+
+liquori <- function (time, A, mu, addpar)
+{
+  A <- A[1]
+  mu <- mu[1]
+  y0 <- addpar[1]
+  t_a1 <- addpar[2]
+  t_a2 <- addpar[3]
+  t_b1 <- addpar[4]
+  t_b2 <- addpar[5]
+  x <- addpar[6]
+  if (is.numeric(time) == FALSE)
+    stop("Need numeric vector for: time")
+  if (is.numeric(mu) == FALSE)
+    stop("Need numeric vector for: mu")
+  if (is.numeric(y0) == FALSE)
+    stop("Need numeric vector for: y0")
+  if (is.numeric(A) == FALSE)
+    stop("Need numeric vector for: A")
+  if (is.numeric(t_a1) == FALSE)
+    stop("Need numeric vector for: addpar[2]")
+  if (is.numeric(t_a2) == FALSE)
+    stop("Need numeric vector for: addpar[3]")
+  if (is.numeric(t_b1) == FALSE)
+    stop("Need numeric vector for: addpar[4]")
+  if (is.numeric(t_b2) == FALSE)
+    stop("Need numeric vector for: addpar[5]")
+  t <- time
+  y1 <- (1-exp(-(t/t_a1)))/(1-exp(-(t/t_a1))+exp(-(t/t_a2)))
+  y2 <- (1-exp(-(t/t_b1)))/(1-exp(-(t/t_b1))+exp(-(t/t_b2)))
+  y <- y0 + A*x*y1 + A*(1-x)*y2
+  liquori <- y
 }
 
 richards <- function (time, A, mu, lambda, addpar)

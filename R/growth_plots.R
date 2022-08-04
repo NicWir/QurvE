@@ -228,6 +228,23 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
                              breaks = "gompertz.exp",
                              values=c("model" = colModel, "gompertz.exp" = colModel))
       }
+      if(gcFittedModel$model == "huang"){
+        p <- p + annotate(
+          "text",
+          label = "y(t) == y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu%.%(t+0.25%.%log(frac(1+exp(-4%.%(t-lambda)),1+exp(4%.%lambda))))) )",
+          x = 1.16 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          angle = 90, parse = TRUE, size = 3.0) +
+           annotate("text",
+                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
+                                     lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ),
+                    x = 1.21 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                    y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                    angle = 90, parse = F, size = 2.3) +
+           scale_color_manual(name='Growth Model',
+                              breaks = "huang",
+                              values=c("model" = colModel, "huang" = colModel))
+      }
     } # if(equation == TRUE)
     else{
       if(gcFittedModel$model == "logistic"){

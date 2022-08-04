@@ -957,7 +957,7 @@ boot.ec50.df <- data.frame()
 
 ```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
 for(i in 1:length(grofit$drFit$drBootSplines)){
-  if(grofit$drFit$drBootSplines[[i]]$ bootFlag == TRUE){
+  if(grofit$drFit$drBootSplines[[i]]$bootFlag == TRUE){
     plot.drBootSpline(grofit$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = paste0(wd, "/Plots"))
   }
 }

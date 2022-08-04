@@ -640,7 +640,7 @@ plot.drFitModel <- function(drFittedModel,
                             height = 7, width = 9, out.dir = NULL,
                             ...)
 {
-  # drFitSpline an object of class drFitSpline
+  # drFittedModel an object of class drFittedModel
   if(is(drFittedModel) != "drFitModel") stop("drFittedModel needs to be an object created with fl.drFitModel().")
   # /// check input parameters
   if (is.logical(ec50line) == FALSE)
