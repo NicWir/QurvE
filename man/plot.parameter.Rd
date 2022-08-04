@@ -6,9 +6,10 @@
 \usage{
 \method{plot}{parameter}(
   object,
-  param = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit", "mu.model",
-    "lambda.model", "A.model", "mu.spline", "lambda.spline", "A.spline", "dY.spline",
-    "integral.spline", "mu.bt", "lambda.bt", "A.bt", "integral.bt", "max_slope.linfit",
+  param = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit", "mu2.linfit",
+    "lambda2.linfit", "mu.model", "lambda.model", "A.model", "mu.spline",
+    "lambda.spline", "A.spline", "dY.spline", "integral.spline", "mu2.spline",
+    "lambda2.spline", "mu.bt", "lambda.bt", "A.bt", "integral.bt", "max_slope.linfit",
     "max_slope.spline"),
   names = NULL,
   conc = NULL,
@@ -36,6 +37,10 @@
 \item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.}
 
 \item{basesize}{(Numeric) Base font size.}
+
+\item{reference.nm}{(Character) Name of the reference condition, to which parameter values are normalized.}
+
+\item{reference.conc}{(Numeric) Concentration of the reference condition, to which parameter values are normalized.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

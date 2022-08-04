@@ -105,3 +105,9 @@ summary.flFit <- function(object,...)
   summary.flFit <- data.frame(object$flTable)
   summary.flFit
 }
+
+summary.drFitModel <- function(object, ...)
+{
+  # object of class drFitSpline
+  data.frame(object$parameters)
+}

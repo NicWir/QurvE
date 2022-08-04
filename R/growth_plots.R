@@ -26,7 +26,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
            fit = {
 
              par(cex.lab=1.5)
-             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab=ifelse(log == "y", "Density", "Density"),
+             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab="Density",
                   log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", ...)
              axis(1,cex.axis=1.3)
              axis(2,cex.axis=1.3, las=1)
@@ -874,6 +874,9 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param colSpline
 #' @param cex
 #' @param lwd
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -888,7 +891,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
-                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
+                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
 {
@@ -975,7 +978,6 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         ylab(label = "Growth [y(t)]") +
         theme_classic(base_size = 16) +
         ggtitle(gsub(" \\| NA", "", paste(gcFitSpline$gcID, collapse=" | "))) +
-        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
         theme(legend.key = element_blank(),
               legend.background=element_blank(),
               legend.title = element_blank(),
@@ -991,9 +993,23 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
 
       if(log.y == TRUE){
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+        if(!is.null(y.lim)){
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = 'log')
+        } else {
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+        }
       } else {
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+        if(!is.null(y.lim)){
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
+        } else {
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+        }
+      }
+
+      if(!is.null(x.lim)){
+        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
       }
 
 
@@ -1122,9 +1138,19 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
           geom_line(color = colSpline, size = lwd) +
           theme_classic(base_size = 15) +
           xlab("Time") +
-          ylab(label = "Growth rate") +
-          scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-          scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+          ylab(label = "Growth rate")
+
+        if(!is.null(y.lim.deriv)){
+          p.mu <- p.mu + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 10))
+        } else {
+          p.mu <- p.mu + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+
+        }
+        if(!is.null(x.lim)){
+          p.mu <- p.mu + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+        } else {
+          p.mu <- p.mu + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+        }
 
         p <- ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1))
       }
@@ -1287,7 +1313,7 @@ plot.grofit <- function(grofit,
 
   if(mean == TRUE){
     # Combine replicates via their mean and standard deviation
-    conditions <- str_replace_all(nm, "\\| . \\| ", "| ")
+    conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
     conditions_unique <- unique(conditions)
 
     # Create lists for each selected condition, with density values and derivatives, respectively. Each list item represents one condition with their average and SD
@@ -1464,7 +1490,7 @@ plot.grofit <- function(grofit,
       }
 
 
-      if(!is.null(y.lim)){
+      if(!is.null(y.lim.deriv)){
         p.deriv <- p.deriv + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
         p.deriv <- p.deriv + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
@@ -1688,11 +1714,14 @@ base_breaks <- function(n = 10){
 #' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param basesize (Numeric) Base font size.
+#' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized.
+#' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+
 #'
 #' @export plot.parameter
 #' @export
@@ -1850,4 +1879,99 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   }
 }
 
+plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
+                              names = NULL, basesize = 12, reference.nm = NULL,
+                              plot = T, export = F, height = 7, width = NULL, out.dir = NULL)
+{
+  param <- match.arg(param)
+  # check class of object
+  if(!(any(is(object) %in% c("drTable", "grofit", "drFit", "flFitRes")))) stop("object needs to be either a 'grofit', 'drTable', 'drFit', or 'flFitRes' object created with growth.workflow(), growth.drFit(), fl.workflow(), or growth.drFit().")
+  if(!is.character(param) || !(param %in% c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y')))
+    stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'yEC50', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
 
+  #extract drTable
+  if(any(is(object) %in% "drTable")){
+    drTable <- object
+  } else if (is(object)=="drFit"){
+    drTable <- object$drTable
+  } else if (is(object)=="grofit"){
+    drTable <- object$drFit$drTable
+  } else if (is(object)=="flFitRes"){
+    drTable <- object$drFit1$drTable
+  } else if (any(is(object) %in% "drTable")){
+    drTable <- object
+  }
+  drTable <- as.data.frame(drTable)
+  #check if param exists in drTable and has a valid value
+  if(all(is.na(drTable[[param]]))){
+    if(gsub(".+\\.", "", param)=="linfit") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow()/fl.workflow() with 'fit.opt' containing 'l' or 'a', or growth.drFit()/fl.drFit() with a control object with 'fit.opt' containing 'l' or 'a'."))
+    if(gsub(".+\\.", "", param)=="model") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow()/fl.workflow() with 'fit.opt' containing 'm' or 'a', or growth.drFit()/fl.drFit() with a control object with 'fit.opt' containing 'm' or 'a'."))
+    if(gsub(".+\\.", "", param)=="spline") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow()/fl.workflow() with 'fit.opt' containing 's' or 'a', or growth.drFit()/fl.drFit() with a control object with 'fit.opt' containing 's' or 'a'."))
+  }
+  # Get name of conditions with multiple replicates
+  sample.nm <- nm <- as.character(drTable[,1])
+  if(!is.null(names)){
+    names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+    nm <- nm[grep(paste(names, collapse="|"), nm)]
+  }
+  if(length(nm)==0){
+    stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
+  }
+  drTable <- drTable[match(nm, drTable[,1]), ]
+  values <- drTable[, param]
+  # apply normalization to reference condition
+  if(!is.null(reference.nm)){
+    ref.ndx <- grep(reference.nm, labels)
+    if (length(ref.ndx) > 1){
+      if(!is.null(reference.conc)){
+        refconc.ndx <- which(reference.conc == str_extract(labels, "[:alnum:]+$"))
+        ref.ndx <- intersect(refconc.ndx, ref.ndx)
+      } else {
+        ref.ndx <- ref.ndx[1]
+      }
+    }
+    if(length(ref.ndx) > 1){
+      message("The provided combination of reference.nm = '", reference.nm, "' and reference.conc = ", reference.conc, " did not allow for the unique identification of a reference condition. The first match will be returned.")
+      ref.ndx <- ref.ndx[1]
+    }
+    value.ref <- values[ref.ndx]
+    values <- values/value.ref
+  }
+
+  df <- data.frame(name = nm, values = values)
+  df$name <- factor(df$name, levels = df$name)
+  df$values[is.na(df$values)] <- 0
+
+  p <- ggplot(df, aes(x=name, y=values)) +
+    geom_bar(stat="identity", color = "black") +
+    ggplot2::labs(x = "Condition", y = param) +
+    theme_minimal(base_size = basesize) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
+          plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"),
+          # remove the vertical grid lines
+          panel.grid.major.x = element_blank() ,
+          # explicitly set the horizontal lines (or they will disappear too)
+    ) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+  if(export == FALSE && plot == FALSE){
+    return(p)
+  }
+  if (export == TRUE){
+    w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
+    h <- height
+    out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+    dir.create(out.dir, showWarnings = F)
+    grDevices::png(paste0(out.dir, "/", "drParameterPlot_", param, ".png"),
+                   width = w, height = h, units = 'in', res = 300)
+    print(p)
+    grDevices::dev.off()
+    grDevices::pdf(paste0(out.dir, "/", "drParameterPlot_", param, ".pdf"), width = w, height = h)
+    print(p)
+    grDevices::dev.off()
+  }
+  if (plot == TRUE){
+    print(p)
+  } else {
+    return(p)
+  }
+}

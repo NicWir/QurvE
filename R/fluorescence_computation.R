@@ -1957,22 +1957,24 @@ fl.workflow <- function(grodata = NULL,
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
     if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-      if(dr.method == "spline"){
+      if(control$dr.method == "spline"){
         out.drFit1 <- growth.drFit(summary.flFit(out.flFit1), control)
+        boot.ec1 <- out.drFit1$boot.ec
       } else {
         out.drFit1 <- fl.drFit(summary.flFit(out.flFit1), control)
+        boot.ec1 <- NA
       }
       EC50.table1 <- out.drFit1$drTable
-      boot.ec1 <- out.drFit1$boot.ec
     }
     if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-      if(dr.method == "spline"){
+      if(control$dr.method == "spline"){
         out.drFit2 <- growth.drFit(summary.flFit(out.flFit2), control)
+        boot.ec2 <- out.drFit2$boot.ec
       } else {
         out.drFit2 <- fl.drFit(summary.flFit(out.flFit2), control)
+        boot.ec2 <- NA
       }
       EC50.table2 <- out.drFit2$drTable
-      boot.ec2 <- out.drFit2$boot.ec
     }
   }
   # ///
@@ -2048,7 +2050,6 @@ fl.drFit <- function(FitData, control = fl.control())
                                                                       FALSE))])
   distinct <- names(table.tests)
   EC50 <- list()
-  EC50.boot <- list()
   validdata <- cbind(as.character(distinct), table.tests)
   colnames(validdata) <- c("TestID", "Number")
   rownames(validdata) <- rep("     ", times = dim(validdata)[1])
@@ -2086,32 +2087,26 @@ fl.drFit <- function(FitData, control = fl.control())
       test <- (as.numeric(FitData[, dr.parameter]))[FitData[, 1] == distinct[i]]
       names(test) <- rep(names(FitData)[dr.parameter], length(test))
       drID <- distinct[i]
-      EC50[[i]] <- fl.drFitModel(conc, test, drID, control)
-      if (control$nboot.dr > 0) {
-        EC50.boot[[i]] <- fl.drBootModel(conc, test, drID,
-                                              control)
+      EC50[[i]] <- try(fl.drFitModel(conc, test, drID, control), silent = T)
+      if(!class(class(EC50[[i]])) != "try-error"){
+        description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
+                                  log.y = control$log.y.dr)
+        out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
+      } else {
+        out.row <- rep(NA, 12)
       }
-      else {
-        EC50.boot[[i]] <- list(raw.time = conc, raw.data = test,
-                               drID = drID, boot.x = NA, boot.y = NA, boot.drSpline = NA,
-                               ec50.boot = NA, bootFlag = FALSE, control = control)
-        class(EC50.boot[[i]]) <- "drBootModel"
-      }
-      description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
-                                log.y = control$log.y.dr, Samples = control$nboot.dr)
-      out.row <- cbind(description, summary.drFitModel(EC50[[i]]),
-                       summary.drBootSpline(EC50.boot[[i]]))
       EC50.table <- rbind(EC50.table, out.row)
+
     }
   }
+  class(EC50.table) <- c("drTable", "list")
   if(exists("skip") && !is.null(skip)){
     distinct <- distinct[-skip]
     EC50 <- EC50[-skip]
-    EC50.boot <- EC50.boot[-skip]
   }
-  names(EC50) <- names(EC50.boot) <- distinct
+  names(EC50) <- distinct
   drFitModel <- list(raw.data = FitData, drTable = EC50.table,
-                drBootModels = EC50.boot, drFittedModels = EC50, control = control)
+                drFittedModels = EC50, control = control)
   class(drFitModel) <- "drFitModel"
   drFitModel
 }
@@ -2178,22 +2173,37 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
   else {
     test.fit <- test
   }
-  spltest <- NULL
+  test.fit <- test.fit[order(conc.fit)]
+  conc.fit <- conc.fit[order(conc.fit)]
+  y.min <- mean(test.fit[which(conc.fit == conc.fit[1])])
   fitFlag <- TRUE
-  y.model <- NULL
-  n_candidates <- seq(0.01,10,0.05)
+  n_candidates <- seq(0,1,0.01)
   i <- 1
-  while( is.null(y.model) && i < 200){
+  plot(conc.fit, test.fit)
+  title(drID)
+  df <- data.frame(x=conc.fit,test.fit=test.fit)
+  y.model <- list()
+  y.model[["convInfo"]] <- list()
+  y.model$convInfo[["isConv"]] <- FALSE
+  while( y.model$convInfo$isConv == FALSE && i < 100){
     i <- i+1
     try(
-      y.model <- nls(test.fit ~ biosensor.eq(x=conc.fit, y.min, y.max, K, n), start = initbiosensor(x=conc.fit, y=test.fit, n = n_candidates[i])), silent = F
+      suppressWarnings(y.model <- minpack.lm::nlsLM(test.fit ~ biosensor.eq(x=conc.fit, y.min, y.max, K, n), start = initbiosensor(x=conc.fit, y=test.fit, n = n_candidates[i]))),
+      silent = F
     )
+    # try(
+    #   suppressWarnings(y.model <- nls(test.fit ~ biosensor.eq(x=conc.fit, y.min, y.max, K, n), start = initbiosensor(x=conc.fit, y=test.fit, n = n_candidates[i]))),
+    #   silent = F
+    # )
   }
-  if (is.null(y.model) == TRUE) {
-    cat("Model could not be fitted in dose-response analysis!\n")
+  if (y.model$convInfo$isConv == FALSE) {
+    if (control$suppress.messages == FALSE) {
+      cat("Model could not be fitted in dose-response analysis!\n")
+    }
     fitFlag <- FALSE
     stop("Error in fl.drFitModel")
   }
+  lines(conc.fit, biosensor.eq(x=conc.fit, y.min=coef(y.model)[1], y.max=coef(y.model)[2], K=coef(y.model)[3], n=coef(y.model)[4]), col = "red")
   m <- summary(y.model)
   par <- m$parameters
   y.min <- par[1,1]
@@ -2202,32 +2212,20 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
   K <- par[3,1] # sensitivity
   n <- par[4,1] # cooperativity
 
-  xin <- seq(0,1,0.01)
-  plot(conc.fit, test.fit)
-  lines(xin,  biosensor.eq(xin, y.min=par[1,1], y.max=par[2,1], K=par[3,1], n=par[4,1]))
+  x_fit <- seq(0,max(conc.fit), length.out = 1000)
+  y_fit <- biosensor.eq(x_fit, y.min=par[1,1], y.max=par[2,1], K=par[3,1], n=par[4,1])
+  # plot(conc.fit, test.fit)
+  # lines(xin,  biosensor.eq(xin, y.min=par[1,1], y.max=par[2,1], K=par[3,1], n=par[4,1]))
 
   # /// estimating EC 50 values
-  conc.min <- min(conc.fit)
-  conc.max <- max(conc.fit)
-  yEC.test <- (y.max - y.min)/2 + y.min
-  last.test <- y.max
-
-  kec.test <- 1
-  for (k in 1:(length(c.pred) - 1)) {
-    d1 <- (ytest$y[k] - yEC.test)
-    d2 <- (ytest$y[k + 1] - yEC.test)
-    if (((d1 <= 0) && (d2 >= 0)) | ((d1 >= 0) && (d2 <= 0))) {
-      kec.test <- k
-      break
-    }
-  }
-  EC.test <- c.pred[kec.test]
+  yEC.test <- y.min + (y.max - y.min) * ( K^n / (K^n + K^n) )
+  EC.test <- K
   if (control$suppress.messages == FALSE) {
     cat("\n\n=== Dose response curve estimation ================\n")
     cat("--- EC 50 -----------------------------------------\n")
     cat(paste("-->", as.character(drID)))
     cat("\n")
-    cat(paste(c("xEC50", "yEC50"), c(EC.test, yEC.test)))
+    cat(paste(c("sensitivity:", "yEC50:", "fold change:", "leakiness:"), c(signif(EC.test, digits = 3), round(yEC.test), round(fc, 2), round(y.min, 1)), collapse =  " | "))
   }
   if ((control$log.x.dr == TRUE) && (control$log.y.dr == FALSE)) {
     if (control$suppress.messages == FALSE) {
@@ -2270,14 +2268,13 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
     cat("\n\n\n")
   }
   drFitModel <- list(raw.conc = conc, raw.test = test, drID = drID,
-                      fit.conc = ytest$x, fit.test = ytest$y, spline = spltest,
-                      parameters = list(EC50 = EC.test[1], yEC50 = yEC.test,
-                                        EC50.orig = EC.orig[1], yEC50.orig = EC.orig[2], test = test.nm),
+                      fit.conc = x_fit, fit.test = y_fit, model = y.model,
+                      parameters = list(yEC50 = yEC.test, y.min = y.min, y.max = y.max, fc = fc, K = K, n = n,
+                                        yEC50.orig = EC.orig[2], K.orig = EC.orig[1], test = test.nm),
                       fitFlag = fitFlag, reliable = NULL, control = control)
   class(drFitModel) <- "drFitModel"
   drFitModel
 }
-
 
 biosensor.eq <- function (x, y.min, y.max, K, n)
 {
@@ -2309,7 +2306,10 @@ initbiosensor <- function (x, y, n)
     stop("Need numeric vector with at least four elements for: y (i.e., promoter response)")
   y.min <- min(y)
   y.max <- max(y)
-  low <- lowess(x, y, f = 0.9)
-  K <- x[ceiling(which.max(low$y)/2)]
-  return(list( y.min = y.min, y.max = y.max, K = K, n = n))
+  lo <- suppressWarnings(loess(y~x, span = 0.5))
+  xl <- seq(min(x),max(x), (max(x) - min(x))/500)
+  yl <- predict(lo,xl)
+  K <- xl[sample(1:(which.max(yl)*0.25), 1)]
+
+  return(list(y.min = y.min, y.max = y.max, K = K, n = n))
 }

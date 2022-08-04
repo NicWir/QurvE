@@ -1,3 +1,19 @@
+#' Title
+#'
+#' @param flFittedLinear
+#' @param log
+#' @param which
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics"),
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
@@ -221,11 +237,15 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       } else {
         "Time"
       }
-
+      y.label <- if(flFitSpline$control$norm_fl == TRUE){
+        "Norm. fluorescence"
+      } else {
+        "Fluorescence"
+      }
       p <- ggplot(NULL, aes(x=x, y=data)) +
         geom_line(aes(x=fit.x, y = fit.fl, color = "spline"), data = df.fit, size = lwd) +
         xlab(x.label) +
-        ylab(label = "Fluorescence") +
+        ylab(label = y.label) +
         theme_classic(base_size = 16) +
         ggtitle(gsub(" \\| NA", "", paste(flFitSpline$ID, collapse=" | "))) +
         scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
@@ -589,6 +609,180 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
   par(mfrow = c(1, 1))
 }
 
+#' Title
+#'
+#' @param drFittedModel
+#' @param ec50line
+#' @param pch
+#' @param colSpline
+#' @param colData
+#' @param cex
+#' @param lwd
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot.drFitModel <- function(drFittedModel,
+                            ec50line = TRUE,
+                            log = c("x", "y"),
+                            pch = 1,
+                            colSpline = 1,
+                            colData = 1,
+                            cex = 1,
+                            lwd = 2, plot = TRUE, export = FALSE,
+                            height = 7, width = 9, out.dir = NULL,
+                            ...)
+{
+  # drFitSpline an object of class drFitSpline
+  if(is(drFittedModel) != "drFitModel") stop("drFittedModel needs to be an object created with fl.drFitModel().")
+  # /// check input parameters
+  if (is.logical(ec50line) == FALSE)
+    stop("Need logical value for: ec50line")
+  if (is.numeric(pch) == FALSE)
+    stop("Need numeric value for: pch")
+  if (is.numeric(cex) == FALSE)
+    stop("Need numeric value for: cex")
+  p <- function(){
+    if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == TRUE)) {
+      plot(
+        log(drFittedModel$raw.conc + 1),
+        log(drFittedModel$raw.test + 1),
+        log = log,
+        pch = pch,
+        cex = cex,
+        col = colData,
+        xlab = "ln(1+concentration)",
+        ylab = "ln(1+response)"
+      )
+    }
+    else
+    {
+      if ((drFittedModel$control$log.x.dr == FALSE) && (drFittedModel$control$log.y.dr == TRUE)) {
+        plot(
+          drFittedModel$raw.conc,
+          log(drFittedModel$raw.test + 1),
+          log = log,
+          pch = pch,
+          cex = cex,
+          col = colData,
+          xlab = "concentration",
+          ylab = "ln(1+response)"
+        )
+      }
+      else
+      {
+        if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == FALSE)) {
+          plot(
+            log(drFittedModel$raw.conc + 1),
+            drFittedModel$raw.test,
+            log = log,
+            pch = pch,
+            cex = cex,
+            col = colData,
+            xlab = "Ln(1+concentration)",
+            ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), ""))
+          )
+        }
+        else
+        {
+          if ((drFittedModel$control$log.x.dr == FALSE) && (drFittedModel$control$log.y.dr == FALSE)) {
+            mean <- sapply(1:length(drFittedModel$raw.conc), function(x) mean(drFittedModel$raw.test[drFittedModel$raw.conc==unique(drFittedModel$raw.conc)[x]]))
+            mean <- mean[!is.na(mean)]
+            sd <- sapply(1:length(drFittedModel$raw.conc), function(x) sd(drFittedModel$raw.test[drFittedModel$raw.conc==unique(drFittedModel$raw.conc)[x]]))
+            sd <- sd[!is.na(sd)]
+            plot(
+              unique(drFittedModel$raw.conc)[order(unique(drFittedModel$raw.conc))],
+              mean,
+              log = log,
+              pch = pch,
+              cex = cex,
+              col = colData,
+              xlab = "Concentration",
+              ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), ""))
+            )
+            arrows(x0=unique(drFittedModel$raw.conc)[order(unique(drFittedModel$raw.conc))], y0=mean-sd,
+                   x1=unique(drFittedModel$raw.conc)[order(unique(drFittedModel$raw.conc))], y1=mean+sd, code=3, angle=90, length=0.1)
+          }
+        }
+      }
+    }
+
+    try(lines(
+      drFittedModel$fit.conc,
+      drFittedModel$fit.test,
+      type = "l",
+      lwd = lwd,
+      col = colSpline
+    ))
+
+    if (ec50line == TRUE) {
+      #vertical lines
+      totmin = min(min(drFittedModel$fit.conc), min(drFittedModel$fit.test))
+      lines(c(drFittedModel$parameters$K, drFittedModel$parameters$K),
+            c(totmin - 1, drFittedModel$parameters$yEC50),
+            lty = 2)
+      #horizontal
+      lines(c(-1, drFittedModel$parameters$K),
+            c(drFittedModel$parameters$yEC50, drFittedModel$parameters$yEC50),
+            lty = 2)
+    }
+    title(main = drFittedModel$drID)
+  } # p <- function()
+  if (export == TRUE){
+    w <- width
+    h <- height
+    out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+    dir.create(out.dir, showWarnings = F)
+    grDevices::png(paste0(out.dir, "/", paste(drFittedModel$drID, collapse = "_"), "_drFitModel.png"),
+                   width = w, height = h, units = 'in', res = 300)
+    p()
+    grDevices::dev.off()
+    grDevices::pdf(paste0(out.dir, "/", paste(drFittedModel$drID, collapse = "_"), "_drFitModel.pdf"))
+    p()
+    grDevices::dev.off()
+  }
+
+  if (plot == TRUE){
+    p()
+  }
+}
+
+#' Title
+#'
+#' @param object
+#' @param data.type
+#' @param names
+#' @param conc
+#' @param mean
+#' @param log.y
+#' @param deriv
+#' @param n.ybreaks
+#' @param colors
+#' @param basesize
+#' @param y.lim
+#' @param x.lim
+#' @param y.title
+#' @param x.title
+#' @param y.lim.deriv
+#' @param y.title.deriv
+#' @param lwd
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot.flFitRes <-  function(object,
                         data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
                         names = NULL,
@@ -687,7 +881,7 @@ plot.flFitRes <-  function(object,
   for(i in 1:length(ndx.filt)){
     if(length(ndx.filt[[i]]) == 0) remove <- c(remove, i)
   }
-  ndx.filt <- ndx.filt[-remove]
+  if(!is.null(remove)) ndx.filt <- ndx.filt[-remove]
   # Check FitFlag for each replicate, work per condition
   if(data.type == "spline1" || data.type == "spline2"){
     for(i in 1:length(ndx.filt)){
@@ -711,13 +905,13 @@ plot.flFitRes <-  function(object,
       }
     }
   }
-if(data.type == "spline1" || data.type == "spline2" && flFit$control$x_type == "density" && mean == TRUE){
-  message("Grouped of replicates is not supported for spline fits with x_type = 'density'. Argument changed to mean = FALSE.")
+if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type == "density" && mean == TRUE){
+  message("Grouping of replicates is not supported for spline fits with x_type = 'density'. Argument changed to mean = FALSE.")
   mean <- FALSE
 }
   if(mean == TRUE){
     # Combine replicates via their mean and standard deviation
-    conditions <- str_replace_all(nm, "\\| . \\| ", "| ")
+    conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
     conditions_unique <- unique(conditions)
 
     # Create lists for each selected condition, with density values and derivatives, respectively. Each list item represents one condition with their average and SD
@@ -726,7 +920,7 @@ if(data.type == "spline1" || data.type == "spline2" && flFit$control$x_type == "
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1])),
+                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))),
                                              ".+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))

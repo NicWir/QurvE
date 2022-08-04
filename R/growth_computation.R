@@ -59,7 +59,7 @@ read_data <-
       }
     }
     # Load fluorescence 1 data
-    if(!is.na(data.fluoro1)){
+    if((length(data.fluoro1) > 1 ) || !all(is.na(data.fluoro1))){
       if (!is.character(data.fluoro1)) {
         fluoro1 <- data.fluoro1
       } else {
@@ -81,7 +81,7 @@ read_data <-
       fluoro1 <- NA
     }
     # Load fluorescence 2 data
-    if(!is.na(data.fluoro2)){
+    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){
       if (!is.character(data.fluoro2)) {
         fluoro2 <- data.fluoro2
       } else {
@@ -146,8 +146,8 @@ read_data <-
         return(df)
       }
       if(length(dat)>1)             dat <- subtract_blank(dat)
-      if(!is.na(data.fluoro1))    fluoro1 <- subtract_blank(df=fluoro1)
-      if(!is.na(data.fluoro2))    fluoro2 <- subtract_blank(df=fluoro2)
+      if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1 <- subtract_blank(df=fluoro1)
+      if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- subtract_blank(df=fluoro2)
     }
 
     ### Combine technical replicates
@@ -197,8 +197,8 @@ read_data <-
       return(df)
     }
     if(length(dat)>1)              dat <- combine_techrep(dat)
-    if(!is.na(data.fluoro1))     fluoro1 <- combine_techrep(df=fluoro1)
-    if(!is.na(data.fluoro2))     fluoro2 <- combine_techrep(df=fluoro2)
+    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- combine_techrep(df=fluoro1)
+    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- combine_techrep(df=fluoro2)
 
 
     # remove blank columns from dataset
@@ -210,23 +210,23 @@ read_data <-
       return(df)
     }
     if(length(dat)>1)              dat <- remove_blank(dat)
-    if(!is.na(data.fluoro1))     fluoro1 <- remove_blank(df=fluoro1)
-    if(!is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
+    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- remove_blank(df=fluoro1)
+    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
 
     # Remove columns with NA measurements in all samples
     if(length(dat)>1)              dat <- dat[, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
-    if(!is.na(data.fluoro1))     fluoro1 <- fluoro1[, which(unlist(lapply(4:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))]
-    if(!is.na(data.fluoro2))     fluoro2 <- fluoro2[, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))]
+    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- fluoro1[, which(unlist(lapply(4:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))]
+    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))]
 
     # add minimum negative value + 1 to all fluorescence data
-    if(!is.na(data.fluoro1)){
+    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)){
       num.fluoro1 <- t(apply(fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)], 1, as.numeric))
       min.F1 <- unique(num.fluoro1[which(num.fluoro1 == min(num.fluoro1, na.rm = TRUE), arr.ind = TRUE)])
       if(min.F1 <=0){
         fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)] <- num.fluoro1+(-min.F1)+1
       }
     }
-    if(!is.na(data.fluoro2)){
+    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){
       num.fluoro2 <- t(apply(fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)], 1, as.numeric))
       min.F2 <- unique(num.fluoro2[which(num.fluoro2 == min(num.fluoro2, na.rm = TRUE), arr.ind = TRUE)])
       if(min.F2 <=0){
@@ -235,13 +235,13 @@ read_data <-
     }
 
     # normalize fluorescence
-    if(!is.na(data.fluoro1) && length(dat)>1){
+    if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){
       fluoro1.norm <- fluoro1
       time.ndx <- grep("time", unlist(fluoro1.norm[,1]), ignore.case = TRUE)
       fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)] <-
         t(apply(fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
     }
-    if(!is.na(data.fluoro2) && length(dat)>1){
+    if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){
       fluoro2.norm <- fluoro1
       time.ndx <- grep("time", unlist(fluoro2.norm[,1]), ignore.case = TRUE)
       fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)] <-
@@ -306,16 +306,16 @@ read_data <-
     return(df.mat)
   }
   if(length(dat)>1){dat.mat <- create_datmat(dat, time.ndx=time.ndx)}else{dat.mat <- NA}
-  if(!is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx)}else{fluoro1.mat <- NA}
-  if(!is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx)}else{fluoro2.mat <- NA}
-  if(!is.na(data.fluoro1) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx)}else{fluoro1.norm.mat <- NA}
-  if(!is.na(data.fluoro2) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx)}else{fluoro2.norm.mat <- NA}
+  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx)}else{fluoro1.mat <- NA}
+  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx)}else{fluoro2.mat <- NA}
+  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx)}else{fluoro1.norm.mat <- NA}
+  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx)}else{fluoro2.norm.mat <- NA}
 
   if(length(dat)>1)             colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if(!is.na(data.fluoro1))    colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if(!is.na(data.fluoro2))    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if(!is.na(data.fluoro1) && length(dat)>1)  colnames(fluoro1.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if(!is.na(data.fluoro2) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  colnames(fluoro1.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+    if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
 
   label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
   condition <- dat.mat[, 1]
@@ -325,16 +325,16 @@ read_data <-
   expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
 
   if(length(dat)>1)             dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
-  if(!is.na(data.fluoro1))    fluoro1.mat <- as.data.frame(unclass(fluoro1.mat), stringsAsFactors = TRUE)
-  if(!is.na(data.fluoro2))    fluoro2.mat <- as.data.frame(unclass(fluoro2.mat), stringsAsFactors = TRUE)
-  if(!is.na(data.fluoro1) && length(dat)>1)  fluoro1.norm.mat <- as.data.frame(unclass(fluoro1.norm.mat), stringsAsFactors = TRUE)
-  if(!is.na(data.fluoro2) && length(dat)>1)  fluoro2.norm.mat <- as.data.frame(unclass(fluoro2.norm.mat), stringsAsFactors = TRUE)
+  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1.mat <- as.data.frame(unclass(fluoro1.mat), stringsAsFactors = TRUE)
+  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat <- as.data.frame(unclass(fluoro2.mat), stringsAsFactors = TRUE)
+  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  fluoro1.norm.mat <- as.data.frame(unclass(fluoro1.norm.mat), stringsAsFactors = TRUE)
+  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat <- as.data.frame(unclass(fluoro2.norm.mat), stringsAsFactors = TRUE)
   #convert values from factor to numeric
   if(length(dat)>1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
-  if(!is.na(data.fluoro1))    fluoro1.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.mat[, -(1:3)]))
-  if(!is.na(data.fluoro2))    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
-  if(!is.na(data.fluoro1) && length(dat)>1)  fluoro1.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.norm.mat[, -(1:3)]))
-  if(!is.na(data.fluoro2) && length(dat)>1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
+  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.mat[, -(1:3)]))
+  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
+  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  fluoro1.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.norm.mat[, -(1:3)]))
+  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
 
 
   dataset <- list("time" = t.mat,
@@ -954,6 +954,10 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
   if(!exists("res.table.gc")){
     res.table.dr <- grofit$drFit$drTable
   }
+  # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
+  mu.min <- suppressWarnings(min(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) min(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+  if(mu.min >0) mu.min <- 0
+  mu.max <- suppressWarnings(max(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) max(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
   if(!is.null(report.dir)){
     wd <- paste0(getwd(), "/", report.dir)
   } else {
@@ -2833,6 +2837,7 @@ growth.drFit <- function (FitData, control = growth.control())
       EC50.table <- rbind(EC50.table, out.row)
     }
   }
+  class(EC50.table) <- c("drTable", "list")
   if(exists("skip") && !is.null(skip)){
     distinct <- distinct[-skip]
     EC50 <- EC50[-skip]
@@ -3034,7 +3039,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     warning("drBootSpline: There are not enough concentration values. Must have at least 4 unique values!")
     drBootSpline <- list(raw.conc = conc, raw.test = test,
                          drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
-                         ec50.boot = NA, bootFlag = FALSE, control = control)
+                         ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE, control = control)
     class(drBootSpline) <- "drBootSpline"
     return(drBootSpline)
   }
@@ -3050,7 +3055,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     warning("drBootSpline: There is not enough valid data. Must have at least 6 unique values!")
     drBootSpline <- list(raw.conc = conc, raw.test = test,
                          drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
-                         ec50.boot = NA, bootFlag = FALSE, control = control)
+                         ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE, control = control)
     class(drBootSpline) <- "drBootSpline"
     return(drBootSpline)
   }
@@ -3058,7 +3063,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     warning("drBootSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
     drBootSpline <- list(raw.conc = conc, raw.test = test,
                          drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
-                         ec50.boot = NA, bootFlag = FALSE, control = control)
+                         ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE, control = control)
     class(drBootSpline) <- "drBootSpline"
     return(drBootSpline)
   }
