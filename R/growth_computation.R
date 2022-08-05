@@ -663,7 +663,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             interactive = FALSE,
                             nboot.gc = 0,
                             smooth.gc = 0.55,
-                            model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "liquori"),
+                            model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"),
                             dr.have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
                             dr.parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
                             smooth.dr = NULL,
@@ -822,7 +822,7 @@ growth.workflow <- function (grodata = NULL,
                              interactive = FALSE,
                              nboot.gc = 0,
                              smooth.gc = 0.55,
-                             model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "liquori"),
+                             model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"),
                              growth.thresh = 1.5,
                              dr.have.atleast = 6,
                              dr.parameter = 34,
@@ -1387,54 +1387,26 @@ grofit.param <- function(time, data, gcID = "undefined", control)
       }
       initmodel    <- paste("init", (control$model.type)[i], sep = "")
 
-      if(control$model.type[i] == "liquori"){
-        formulamodel <-
-          as.formula(paste(
-            "data ~ ",
-            (control$model.type)[i],
-            "(time, A, mu, addpar)",
-            sep = ""
-          ))
-      } else {
-        formulamodel <-
-          as.formula(paste(
-            "data ~ ",
-            (control$model.type)[i],
-            "(time, A, mu, lambda, addpar)",
-            sep = ""
-          ))
-      }
+      formulamodel <-
+        as.formula(paste(
+          "data ~ ",
+          (control$model.type)[i],
+          "(time, A, mu, lambda, addpar)",
+          sep = ""
+        ))
       if ((exists((control$model.type)[i])) && (exists(initmodel))) {
-        if(control$model.type[i] == "liquori"){
-          init.model  <-
-            do.call(initmodel,
-                    list(
-                      y = data,
-                      time = time,
-                      A = A.low,
-                      mu = mu.low
-                    ))
-        } else {
-          init.model  <-
-            do.call(initmodel,
-                    list(
-                      y = data,
-                      time = time,
-                      A = A.low,
-                      mu = mu.low,
-                      lambda = lambda.low
-                    ))
-        }
-        # x <- time
-        # y <- liquori(time, A=2.3, mu=0.16, addpar=c(0,290,1.7,45943,2.74,0.6))
-        # plot(x,y)
-        if(control$model.type[i] == "liquori"){
-          try(y.model <-
-                minpack.lm::nlsLM(formulamodel, start = init.model), silent = TRUE)
-        } else {
-          try(y.model <-
-                nls(formulamodel, start = init.model), silent = TRUE)
-        }
+        init.model  <-
+          do.call(initmodel,
+                  list(
+                    y = data,
+                    time = time,
+                    A = A.low,
+                    mu = mu.low,
+                    lambda = lambda.low
+                  ))
+
+        try(y.model <-
+              nls(formulamodel, start = init.model), silent = TRUE)
         if (!(TRUE %in% is.null(y.model))) {
           AIC       <- AIC(y.model)
         }
@@ -2869,9 +2841,9 @@ growth.drFit <- function (FitData, control = growth.control())
       out.row <- cbind(description, summary.drFitSpline(EC50[[i]]),
                        summary.drBootSpline(EC50.boot[[i]]))
       EC50.table <- rbind(EC50.table, out.row)
+      class(EC50.table) <- c("drTable", "list")
     }
   }
-  class(EC50.table) <- c("drTable", "list")
   if(exists("skip") && !is.null(skip)){
     distinct <- distinct[-skip]
     EC50 <- EC50[-skip]
@@ -2956,11 +2928,18 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
   }
   spltest <- NULL
   fitFlag <- TRUE
-  if(class(control) == "growth.control"){
-    try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE), silent = T)
+  if(class(control) == "grofit.control"){
+    try(spltest <- lowess(conc.fit, test.fit, f = control$smooth.dr), silent = T)
   } else {
     try(spltest <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE, w = ifelse(conc.fit == 0, 1, 0.05) ), silent = T)
   }
+  # spltest2 <- smooth.spline(conc.fit, test.fit, spar = control$smooth.dr, keep.data = FALSE)
+  # plot(conc.fit, test.fit)
+  # lines(spltest2$x, spltest2$y, col="red")
+  spltest3 <- smooth.spline(spltest$x, spltest$y, spar = 0.35)
+  # lines(spltest3$x, spltest3$y, col="green")
+
+
   if (is.null(spltest) == TRUE) {
     cat("Spline could not be fitted in dose-response analysis!\n")
     fitFlag <- FALSE
@@ -2978,7 +2957,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
   conc.min <- min(conc.fit)
   conc.max <- max(conc.fit)
   c.pred <- seq(conc.min, conc.max, length.out = 1000)
-  ytest <- predict(spltest, c.pred)
+  ytest <- predict(spltest3, c.pred)
   yEC.test <- (max(ytest$y) - min(ytest$y))/2 + min(ytest$y)
   last.test <- max(ytest$y)
   kec.test <- 1
@@ -3359,26 +3338,7 @@ huang <- function (time, A, mu, lambda, addpar)
   huang <- y
 }
 
-initliquori <- function(time, y, A, mu, addpar)
-{
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(y) == FALSE)
-    stop("Need numeric vector for: y")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  y0 <- 0.1
-  A <- max(y)
-  mu <- mu[1]
-  t_a1 = 17450/60
-  t_a2 = 102.44/60
-  t_b1 = 2756600/60
-  t_b2 = 164.62/60
-  x = 0.24
-  initliquori <- list(A = A, mu = mu, addpar = c(y0, t_a1, t_a2, t_b1, t_b2, x))
-}
+
 
 liquori <- function (time, A, mu, addpar)
 {
