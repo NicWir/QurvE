@@ -2088,7 +2088,7 @@ fl.drFit <- function(FitData, control = fl.control())
       names(test) <- rep(names(FitData)[dr.parameter], length(test))
       drID <- distinct[i]
       EC50[[i]] <- try(fl.drFitModel(conc, test, drID, control), silent = T)
-      if(!class(class(EC50[[i]])) != "try-error"){
+      if(class(EC50[[i]]) != "try-error"){
         description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
                                   log.y = control$log.y.dr)
         out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
@@ -2179,8 +2179,8 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
   fitFlag <- TRUE
   n_candidates <- seq(0,1,0.01)
   i <- 1
-  plot(conc.fit, test.fit)
-  title(drID)
+  # plot(conc.fit, test.fit)
+  # title(drID)
   df <- data.frame(x=conc.fit,test.fit=test.fit)
   y.model <- list()
   y.model[["convInfo"]] <- list()
@@ -2189,7 +2189,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
     i <- i+1
     try(
       suppressWarnings(y.model <- minpack.lm::nlsLM(test.fit ~ biosensor.eq(x=conc.fit, y.min, y.max, K, n), start = initbiosensor(x=conc.fit, y=test.fit, n = n_candidates[i]))),
-      silent = F
+      silent = T
     )
     # try(
     #   suppressWarnings(y.model <- nls(test.fit ~ biosensor.eq(x=conc.fit, y.min, y.max, K, n), start = initbiosensor(x=conc.fit, y=test.fit, n = n_candidates[i]))),
@@ -2203,17 +2203,17 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
     fitFlag <- FALSE
     stop("Error in fl.drFitModel")
   }
-  lines(conc.fit, biosensor.eq(x=conc.fit, y.min=coef(y.model)[1], y.max=coef(y.model)[2], K=coef(y.model)[3], n=coef(y.model)[4]), col = "red")
+  # lines(conc.fit, biosensor.eq(x=conc.fit, y.min=coef(y.model)[1], y.max=coef(y.model)[2], K=coef(y.model)[3], n=coef(y.model)[4]), col = "red")
   m <- summary(y.model)
   par <- m$parameters
-  y.min <- par[1,1]
-  y.max <- par[2,1]
-  fc <- par[2,1]/par[1,1] # fold-change
-  K <- par[3,1] # sensitivity
-  n <- par[4,1] # cooperativity
+  # y.min <- par[1,1]
+  y.max <- par[1,1]
+  fc <- par[1,1]/y.min # fold-change
+  K <- par[2,1] # sensitivity
+  n <- par[3,1] # cooperativity
 
   x_fit <- seq(0,max(conc.fit), length.out = 1000)
-  y_fit <- biosensor.eq(x_fit, y.min=par[1,1], y.max=par[2,1], K=par[3,1], n=par[4,1])
+  y_fit <- biosensor.eq(x_fit, y.min=y.min, y.max=par[1,1], K=par[2,1], n=par[3,1])
   # plot(conc.fit, test.fit)
   # lines(xin,  biosensor.eq(xin, y.min=par[1,1], y.max=par[2,1], K=par[3,1], n=par[4,1]))
 
@@ -2311,5 +2311,5 @@ initbiosensor <- function (x, y, n)
   yl <- predict(lo,xl)
   K <- xl[sample(1:(which.max(yl)*0.25), 1)]
 
-  return(list(y.min = y.min, y.max = y.max, K = K, n = n))
+  return(list(y.max = y.max, K = K, n = n))
 }

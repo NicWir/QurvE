@@ -89,7 +89,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
 
                }
-             } else {
+             } else if(flFittedLinear$fitflag){
                if(lag < flFittedLinear$raw.x[flFittedLinear$ndx[1]]){
                  try(time <- seq(lag, max(flFittedLinear$"filt.x"), length=200), silent = T)
                  try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
@@ -631,7 +631,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @examples
 plot.drFitModel <- function(drFittedModel,
                             ec50line = TRUE,
-                            log = c("x", "y"),
+                            log = c("xy"),
                             pch = 1,
                             colSpline = 1,
                             colData = 1,
@@ -649,10 +649,11 @@ plot.drFitModel <- function(drFittedModel,
     stop("Need numeric value for: pch")
   if (is.numeric(cex) == FALSE)
     stop("Need numeric value for: cex")
+  conc <- drFittedModel$raw.conc
   p <- function(){
     if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == TRUE)) {
       plot(
-        log(drFittedModel$raw.conc + 1),
+        log(conc + 1),
         log(drFittedModel$raw.test + 1),
         log = log,
         pch = pch,
@@ -666,7 +667,7 @@ plot.drFitModel <- function(drFittedModel,
     {
       if ((drFittedModel$control$log.x.dr == FALSE) && (drFittedModel$control$log.y.dr == TRUE)) {
         plot(
-          drFittedModel$raw.conc,
+          conc,
           log(drFittedModel$raw.test + 1),
           log = log,
           pch = pch,
@@ -680,7 +681,7 @@ plot.drFitModel <- function(drFittedModel,
       {
         if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == FALSE)) {
           plot(
-            log(drFittedModel$raw.conc + 1),
+            log(conc + 1),
             drFittedModel$raw.test,
             log = log,
             pch = pch,
@@ -693,12 +694,15 @@ plot.drFitModel <- function(drFittedModel,
         else
         {
           if ((drFittedModel$control$log.x.dr == FALSE) && (drFittedModel$control$log.y.dr == FALSE)) {
-            mean <- sapply(1:length(drFittedModel$raw.conc), function(x) mean(drFittedModel$raw.test[drFittedModel$raw.conc==unique(drFittedModel$raw.conc)[x]]))
+            if(any(grep("x", log))){
+              conc[conc==0] <- drFittedModel$fit.conc[2]
+            }
+            mean <- sapply(1:length(conc), function(x) mean(drFittedModel$raw.test[conc==unique(conc)[x]]))
             mean <- mean[!is.na(mean)]
-            sd <- sapply(1:length(drFittedModel$raw.conc), function(x) sd(drFittedModel$raw.test[drFittedModel$raw.conc==unique(drFittedModel$raw.conc)[x]]))
+            sd <- sapply(1:length(conc), function(x) sd(drFittedModel$raw.test[conc==unique(conc)[x]]))
             sd <- sd[!is.na(sd)]
             plot(
-              unique(drFittedModel$raw.conc)[order(unique(drFittedModel$raw.conc))],
+              unique(conc)[order(unique(conc))],
               mean,
               log = log,
               pch = pch,
@@ -707,8 +711,10 @@ plot.drFitModel <- function(drFittedModel,
               xlab = "Concentration",
               ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), ""))
             )
-            arrows(x0=unique(drFittedModel$raw.conc)[order(unique(drFittedModel$raw.conc))], y0=mean-sd,
-                   x1=unique(drFittedModel$raw.conc)[order(unique(drFittedModel$raw.conc))], y1=mean+sd, code=3, angle=90, length=0.1)
+            if(length(sd)>0){
+            try(arrows(x0=unique(conc)[order(unique(conc))], y0=mean-sd,
+                   x1=unique(conc)[order(unique(conc))], y1=mean+sd, code=3, angle=90, length=0.1), silent = T)
+            }
           }
         }
       }
@@ -717,19 +723,18 @@ plot.drFitModel <- function(drFittedModel,
     try(lines(
       drFittedModel$fit.conc,
       drFittedModel$fit.test,
-      type = "l",
       lwd = lwd,
       col = colSpline
-    ))
+    ), silent = F)
 
     if (ec50line == TRUE) {
       #vertical lines
       totmin = min(min(drFittedModel$fit.conc), min(drFittedModel$fit.test))
       lines(c(drFittedModel$parameters$K, drFittedModel$parameters$K),
-            c(totmin - 1, drFittedModel$parameters$yEC50),
+            c(1, drFittedModel$parameters$yEC50),
             lty = 2)
       #horizontal
-      lines(c(-1, drFittedModel$parameters$K),
+      lines(c(ifelse(any(grep("x", log)), 0.001, -1), drFittedModel$parameters$K),
             c(drFittedModel$parameters$yEC50, drFittedModel$parameters$yEC50),
             lty = 2)
     }
@@ -1011,6 +1016,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
     df$name <- gsub(" \\| NA", "", df$name)
     df$name <- factor(df$name, levels = unique(factor(df$name)))
     df <- df[df[["mean"]]>0, ]
+    df <- df[!apply(df, 1, function(x){all(is.na(x))}),]
     if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
 
     # replace negative lower ribbon boundaries with 0 for log10 transformation
@@ -1092,6 +1098,75 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
                                )
         )
       }
+    }
+    if(deriv){
+      # /// add panel with growth rate over time
+      if(!is.null(x.lim)){
+        df.deriv <- df.deriv[df.deriv[,"time"]>=x.lim[1]&df.deriv[,"time"]<=x.lim[2],]
+      }
+      p.deriv <- ggplot(df.deriv, aes(x=time, y=mean, col = name)) +
+        geom_line(size=lwd) +
+        geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
+        theme_classic(base_size = basesize) +
+        xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank())
+
+      y.label.mu = if(object$control$log.y.spline == TRUE){
+        paste0("Slope [d(Ln(F/F0))/d",xlab.title, "]")
+      } else {
+        paste0("Slope [dF/d", xlab.title,"]")
+      }
+      if(is.null(y.title.deriv)){
+        p.deriv <- p.deriv + ylab(label = y.label.mu)
+      } else {
+        p.deriv <- p.deriv + ylab(label = y.title.deriv)
+      }
+
+      if(!is.null(x.lim)){
+        p.deriv <- p.deriv + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p.deriv <- p.deriv + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
+
+      if(!is.null(y.lim.deriv)){
+        p.deriv <- p.deriv + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p.deriv <- p.deriv + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+
+      if(is.null(colors)){
+        if (length(plotdata.ls) <= 8) {
+          p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else {
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                                 values = c(
+                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                                 )
+          ) + scale_color_manual(name = "Condition",
+                                 values = c(
+                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                 )
+          )
+        }
+      }
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
     }
   } # if(mean == TRUE)
   else {
@@ -1191,15 +1266,24 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
                                                           "time" = flFit$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
                                                           "y" = flFit$flFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
       }
+      if(!is.null(x.lim)){
+        df.deriv <- df.deriv[df.deriv[,"time"]>=x.lim[1]&df.deriv[,"time"]<=x.lim[2],]
+      }
       p.deriv <- ggplot(df.deriv, aes(x=time, y=y, col = name)) +
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
-        xlab(ifelse(is.null(x.title), "Time", x.title)) +
+        xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
+      y.label.mu = if(object$control$log.y.spline == TRUE){
+        paste0("Slope [d(Ln(F/F0))/d",xlab.title, "]")
+      } else {
+        paste0("Slope [dF/d", xlab.title,"]")
+      }
+
       if(is.null(y.title.deriv)){
-        p.deriv <- p.deriv + ylab(label = "Growth rate")
+        p.deriv <- p.deriv + ylab(label = y.label.mu)
       } else {
         p.deriv <- p.deriv + ylab(label = y.title.deriv)
       }
@@ -1274,4 +1358,457 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
   }
 }
 
-plot.flFit <- plot.flFitRes
+plot.flFit <- plot.grodata <- plot.flFitRes
+
+plot.dual <-  function(object,
+                           fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
+                           names = NULL,
+                           conc = NULL,
+                           mean = TRUE,
+                           log.y.density = F,
+                           log.y.fl = F,
+                           deriv = F,
+                           n.ybreaks = 6,
+                           colors = NULL,
+                           basesize = 20,
+                           y.lim.density = NULL,
+                           y.lim.fl = NULL,
+                           x.lim = NULL,
+                           y.title = NULL,
+                           x.title = NULL,
+                           y.title.density = NULL,
+                           y.title.fl = NULL,
+                           lwd = 1.1,
+                           plot = TRUE,
+                           export = FALSE,
+                           height = NULL,
+                           width = NULL,
+                           out.dir = NULL
+)
+{
+  if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
+  density <- density.nm <- "density"
+  fluorescence <- match.arg(fluorescence)
+
+  if(is(object) == "grodata"){
+    raw_data <- object
+  }
+  if(is(object) == "flFitRes"){
+    if(density == "density1") flFit <- object$flFit1
+    if(density == "density2") flFit <- object$flFit1
+    raw_data <- object$data
+  } else {
+    flFit <- object
+    raw_data <- object
+  }
+
+  # /// check input parameters
+  if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
+  if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
+
+
+  # Get name of conditions with multiple replicates
+  if(any(is(object) %in% c("flFit","flFitRes"))){
+    sample.nm <- nm <- as.character(names(flFit$flFittedSplines))
+  } else {
+    sample.nm <- nm <- paste(object$fluorescence1[,1], object$fluorescence1[,2], object$fluorescence1[,3], sep = " | ")
+  }
+  if(fluorescence == "fl1") fl.nm = "fluorescence1"
+  if(fluorescence == "fl2") fl.nm = "fluorescence1"
+  if(fluorescence == "norm.fl1") fl.nm = "norm.fluorescence1"
+  if(fluorescence == "norm.fl2") fl.nm = "norm.fluorescence2"
+
+  if(!is.null(names)){
+    names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+    nm <- nm[grep(paste(names, collapse="|"), nm)]
+  }
+  if(!is.null(conc)){
+    nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+  }
+  if(length(nm)==0){
+    stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
+  }
+  # remove conditions with fitFlag = FALSE in all replicates
+  # Store each condition with its replicate indices in list filter.ls
+  ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i)which(gsub(" \\| .+", "", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1])))))
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.rep)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                           gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), sample.nm[ndx.filt.rep[[j]]])]))
+  }
+  ndx.filt <- unlist(filter.ls, recursive = F)
+
+  # get indices of samples with selected names
+  ndx.keep <- grep(paste0(
+    str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
+
+  if(mean == TRUE){
+    # Combine replicates via their mean and standard deviation
+    conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
+    conditions_unique <- unique(conditions)
+
+    # Create lists for each selected condition, with density values and (normalized) fluorescence, respectively. Each list item represents one condition with their average and SD
+    plotdata.ls <- list()
+    deriv.ls <- list()
+    for(n in 1:length(conditions_unique)){
+      # find indexes of replicates
+      ndx <- intersect(ndx.keep, grep(paste0("^",
+                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))),
+                                             ".+[[:space:]]",
+                                             unlist(str_split(conditions_unique[n], " \\| "))[2],
+                                             "$"), sample.nm))
+      name <- conditions_unique[n]
+      # Create lists for density and time values for each sample
+
+      if(is(object) %in% "flFitRes"){
+        time <- lapply(1:length(ndx), function(i) raw_data$time[ndx[i], ])
+        dens.data <- raw_data[[density.nm]][ndx, 4:ncol(raw_data[[density.nm]])]
+        fl.data <- raw_data[[fl.nm]][ndx, 4:ncol(raw_data[[fl.nm]])]
+      } else {
+        time <- lapply(1:length(ndx), function(i) cbind(raw_data$time[ndx[[i]], ])) %>% as.list(.)
+        dens.data <- raw_data[[density.nm]][ndx, 4:ncol(raw_data[[density.nm]])]
+        fl.data <- raw_data[[fl.nm]][ndx, 4:ncol(raw_data[[fl.nm]])]
+      }
+      dens.data <- split(as.matrix(dens.data), 1:nrow(as.matrix(dens.data)))
+      dens.data <- lapply(1:length(dens.data), function(i) as.numeric(dens.data[[i]]))
+      fl.data <- split(as.matrix(fl.data), 1:nrow(as.matrix(fl.data)))
+      fl.data <- lapply(1:length(fl.data), function(i) as.numeric(fl.data[[i]]))
+
+      # correct for unequal lengths of data series
+      time.all <- Reduce(union, time)
+      for(i in 1:length(time)){
+        assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
+        if(length(get(paste0("time.missing_", i))) > 0){
+          for(j in 1:length(get(paste0("time.missing_", i)))){
+            # extract density values into a separate list
+            dens.data[[i]] <- append(dens.data[[i]],
+                                values = NA,
+                                after = match(get(paste0("time.missing_", i))[j],
+                                              time.all) - 1)
+            # extract fl values into a separate list
+            fl.data[[i]] <- append(fl.data[[i]],
+                                     values = NA,
+                                     after = match(get(paste0("time.missing_", i))[j],
+                                                   time.all) - 1)
+            # extract time values into a separate list
+            time[[i]] <-
+              append(time[[i]],
+                     values = get(paste0("time.missing_", i))[j],
+                     after = match(get(paste0("time.missing_", i))[j], time.all) - 1)
+          }
+        }
+      }
+      time <- time[[1]]
+      dens.data <- do.call("cbind", dens.data)
+      dens.avg <- rowMeans(dens.data, na.rm = F)
+      dens.sd <- apply(dens.data, 1, sd, na.rm = F)
+      fl.data <- do.call("cbind", fl.data)
+      fl.avg <- rowMeans(fl.data, na.rm = F)
+      fl.sd <- apply(fl.data, 1, sd, na.rm = F)
+      plotdata.ls[[n]] <- data.frame(name = name, time = time,
+                                     dens.mean = dens.avg, dens.upper = dens.avg+dens.sd, dens.lower = dens.avg-dens.sd,
+                                     fl.mean = fl.avg, fl.upper = fl.avg+fl.sd, fl.lower = fl.avg-fl.sd)
+    } # for(n in 1:length(conditions_unique))
+    names(plotdata.ls) <- gsub(" \\| NA", "", conditions_unique)
+
+    plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
+    df <- do.call(rbind.data.frame, plotdata.ls)
+    df$name <- gsub(" \\| NA", "", df$name)
+    df$name <- factor(df$name, levels = unique(factor(df$name)))
+    df <- df[df[["dens.mean"]]>0, ]
+    df <- df[df[["fl.mean"]]>0, ]
+    df <- df[!apply(df, 1, function(x){all(is.na(x))}),]
+    if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
+
+    # replace negative lower ribbon boundaries with 0 for log10 transformation
+    if(log.y.density==TRUE){
+      df$lower[df$lower<0] <- 0
+    }
+    xlab.title <- "Time"
+    ylab.title.dens <- "Density"
+
+    p <- ggplot(df, aes(x=time, y=dens.mean, col = name)) +
+      geom_line(size=lwd) +
+      geom_ribbon(aes(ymin=dens.lower,ymax=dens.upper, fill=name), alpha = 0.3, colour = NA) +
+      theme_classic(base_size = basesize) +
+      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title), ylab.title.dens, y.title)) +
+      theme(panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
+
+    if(log.y.density == TRUE){
+      if(!is.null(y.lim.density)){
+        p <- p + scale_y_log10(limits = y.lim.density, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+    } else {
+      if(!is.null(y.lim.density)){
+        p <- p + scale_y_continuous(limits = y.lim.density, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+    }
+
+    if(!is.null(x.lim)){
+      p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+    }
+
+    if(is.null(colors)){
+      if (length(plotdata.ls) <= 8) {
+        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+      } else {
+        p <- p + scale_fill_manual(name = "Condition",
+                                   values = c(
+                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                   )
+        ) + scale_color_manual(name = "Condition",
+                               values = c(
+                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                               )
+        )
+      }
+    }
+      # /// add panel with growth rate over time
+    ylab.title.fl <- "fluorescence"
+      p.fl <- ggplot(df, aes(x=time, y=fl.mean, col = name)) +
+        geom_line(size=lwd) +
+        geom_ribbon(aes(ymin=fl.lower,ymax=fl.upper, fill=name), alpha = 0.3, colour = NA) +
+        theme_classic(base_size = basesize) +
+        xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+        ylab(ifelse(is.null(y.title), ylab.title.dens, y.title)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank())
+
+      ylab.title.fl = if(any(grep("norm", fluorescence))){
+        paste0("Normalized fluorescence")
+      } else {
+        paste0("Fluorescence")
+      }
+      if(is.null(ylab.title.fl)){
+        p.fl <- p.fl + ylab(label = y.label.mu)
+      } else {
+        p.fl <- p.fl + ylab(label = ylab.title.fl)
+      }
+
+      if(!is.null(x.lim)){
+        p.fl <- p.fl + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
+
+      if(!is.null(y.lim.deriv)){
+        p.fl <- p.fl + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+
+      if(is.null(colors)){
+        if (length(plotdata.ls) <= 8) {
+          p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else {
+          p.fl <- p.fl + scale_fill_manual(name = "Condition",
+                                                 values = c(
+                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                                 )
+          ) + scale_color_manual(name = "Condition",
+                                 values = c(
+                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                 )
+          )
+        }
+      }
+      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+  } # if(mean == TRUE)
+  else {
+    df <- data.frame()
+    for(i in 1:length(ndx.keep)){
+          df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
+                                                "time" = as.vector(raw_data$time[ndx.keep[i], ]),
+                                                "density" = unlist(unname(type.convert(raw_data[[density.nm]][ndx.keep[i], 4:ncol(raw_data[[density.nm]])], as.is=T))),
+                                                "fl" = unlist(unname(type.convert(raw_data[[fl.nm]][ndx.keep[i], 4:ncol(raw_data[[fl.nm]])], as.is=T)))))
+
+    }
+    df <- df[df[["density"]]>0, ]
+    df <- df[df[["fl"]]>0, ]
+
+    if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
+    xlab.title <- "Time"
+
+    ylab.title <- "Density"
+    p <- ggplot(df, aes(x=time, y=density, col = name)) +
+      geom_line(size=lwd) +
+      theme_classic(base_size = basesize) +
+      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
+      theme(panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
+
+    if(!is.null(x.lim)){
+      p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+    }
+
+    if(log.y.density == TRUE){
+      if(!is.null(y.lim.density)){
+        p <- p + scale_y_log10(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+    } else {
+      if(!is.null(y.lim.density)){
+        p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+    }
+
+    if(is.null(colors)){
+      if (length(ndx.keep) <= 8) {
+        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+      } else if (length(ndx.keep) <= 12) {
+        p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
+      } else {
+        p <- p + scale_fill_manual(name = "Condition",
+                                   values = c(
+                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                   )
+        ) + scale_color_manual(name = "Condition",
+                               values = c(
+                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                               )
+        )
+      }
+    }
+    p.fl <- ggplot(df, aes(x=time, y=fl, col = name)) +
+        geom_line(size=lwd) +
+        theme_classic(base_size = basesize) +
+        xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank())
+
+    ylab.title <- if(any(grep("norm", fluorescence))){
+      "Normalized fluorescence"
+    } else {
+      "Fluorescence"
+    }
+
+      if(is.null(y.title.fl)){
+        p.fl <- p.fl + ylab(label = ylab.title)
+      } else {
+        p.fl <- p.fl + ylab(label = y.title.fl)
+      }
+
+      if(!is.null(y.lim.fl)){
+        p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = 10, bounds = FALSE))
+      } else {
+        p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = 10, bounds = FALSE))
+      }
+
+      if(!is.null(x.lim)){
+        p.fl <- p.fl + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
+
+      if(is.null(colors)){
+        if (length(ndx.keep) <= 8) {
+          p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else if (length(ndx.keep) <= 12) {
+          p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
+        } else {
+          p.fl <- p.fl + scale_fill_manual(name = "Condition",
+                                                 values = c(
+                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                                 )
+          ) + scale_color_manual(name = "Condition",
+                                 values = c(
+                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                 )
+          )
+        }
+      }
+      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+  }
+  if(export == FALSE && plot == FALSE){
+    return(p)
+  }
+  out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+  if (export == TRUE){
+    if(is.null(width)){
+      w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
+    } else {
+      w <- width
+    }
+    if(is.null(height)){
+      h <- ifelse(deriv==T, 9, 6)
+    } else {
+      h <- height
+    }
+    dir.create(out.dir, showWarnings = F)
+    grDevices::png(paste0(out.dir, "/", "grpSplineFit.png"),
+                   width = w, height = h, units = 'in', res = 300)
+    print(p)
+    grDevices::dev.off()
+    grDevices::pdf(paste0(out.dir, "/", "grpSplineFit.pdf"), width = w, height = h)
+    print(p)
+    grDevices::dev.off()
+  }
+  if (plot == TRUE){
+    print(p)
+  }
+}
