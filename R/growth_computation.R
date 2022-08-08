@@ -913,7 +913,7 @@ growth.workflow <- function (grodata = NULL,
 #' @param report.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
 #' @param ... Further arguments passed to create a report. Currently required:
 #' \itemize{
-#'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{growth.workflow()} or \code{growth.gcFit()}.
+#'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{growth.workflow()}?
 #'    \item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{"all"}, a string vector, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 #'    \item \code{export}: Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
@@ -942,14 +942,14 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
     assign(names(args)[i], args[[i]])
   }
   gcFit <- grofit$gcFit
-  drFit <- grofit$data
+  drFit <- grofit$drFit
   control <- grofit$control
   time <- grofit$gcFit$raw.time
   data <- grofit$gcFit$raw.data
   if(!exists("res.table.gc")){
     res.table.gc <- grofit$gcFit$gcTable
   }
-  if(!exists("res.table.gc")){
+  if(!exists("res.table.dr")){
     res.table.dr <- grofit$drFit$drTable
   }
   # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
@@ -1069,7 +1069,7 @@ growth.gcFit <- function(time, data, control= growth.control())
                                  log.data = NA, gcID = gcID, FUN = NA, fit = NA, par = c(
                                    y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
                                    t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                                   tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE)
+                                   tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
       class(fitlinear)   <- "gcFitLinear"
       fitlinear.all[[i]] <- fitlinear
     }
@@ -2060,7 +2060,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
                           t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                          tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+                          tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
     )
     class(gcFitLinear) <- "gcFitLinear"
     if(control$suppress.messages==F) message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
@@ -2090,7 +2090,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                           log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
                             t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                            tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+                            tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
       )
       class(gcFitLinear) <- "gcFitLinear"
       if(control$suppress.messages==F) message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
@@ -2115,7 +2115,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                             log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                               y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
                               t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                              tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+                              tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
         )
         class(gcFitLinear) <- "gcFitLinear"
         if(control$suppress.messages==F) message("No data range in accordance with the chosen parameters identified with appropriate linearity.")
@@ -2204,7 +2204,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                                 log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                                   y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
                                   t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                                  tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+                                  tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
             if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", R2, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
@@ -2250,6 +2250,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 ))][[1]]
             }
             tp.ext <- seq(min(candidates.ext), max(candidates.ext) + h-1)
+
+
 
               # # # Color functions
               #   cf.1 <- grDevices::colorRampPalette(c("red", "red"))
@@ -2507,7 +2509,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               rsquared2 <- ifelse(mumax.premin > mumax.postmin, rsquared.premin, rsquared.postmin)
               ndx2 <- if(mumax.premin > mumax.postmin){ndx.premin} else{ndx.postmin}
               t_turn <- ifelse(mumax.premin > mumax.postmin, t_turn.premin, t_turn.postmin)
-              fitflag2 <- TRUE
+              fitFlag2 <- TRUE
             } else if (!is.na(mumax.premin)){
               mumax2 <- mumax.premin
               y0_2 <- y0_lm.premin
@@ -2517,7 +2519,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               t_turn <- t_turn.premin
               rsquared2 <- rsquared.premin
               ndx2 <- ndx.premin
-              fitflag2 <- TRUE
+              fitFlag2 <- TRUE
             } else if (!is.na(mumax.postmin)){
               mumax2 <- mumax.postmin
               y0_2 <- y0_lm.postmin
@@ -2527,7 +2529,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               t_turn <- t_turn.postmin
               rsquared2 <- rsquared.postmin
               ndx2 <- ndx.postmin
-              fitflag2 <- TRUE
+              fitFlag2 <- TRUE
             } else {
               mumax2 <- NA
               y0_2 <- NA
@@ -2537,7 +2539,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               t_turn <- NA
               rsquared2 <- NA
               ndx2 <- NA
-              fitflag2 <- FALSE
+              fitFlag2 <- FALSE
             }
           } # if(control$biphasic)
           else{
@@ -2549,7 +2551,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             t_turn <- NA
             rsquared2 <- NA
             ndx2 <- NA
-            fitflag2 <- FALSE
+            fitFlag2 <- FALSE
           }
         } # if(any(ret.check[,5] >= R2 & ret.check[,6] <= RSD))
         else{
@@ -2559,7 +2561,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                 y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
                 t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+                tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
             )
           class(gcFitLinear) <- "gcFitLinear"
           if (!control$suppress.messages)
@@ -2583,7 +2585,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
                           t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                          tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitflag2 = FALSE
+                          tmax2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
     )
     class(gcFitLinear) <- "gcFitLinear"
     return(gcFitLinear)
@@ -2625,7 +2627,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     rsquared2 = rsquared2,
     control = control,
     fitFlag = fitFlag,
-    fitflag2 = fitflag2
+    fitFlag2 = fitFlag2
   )
 
   class(gcFitLinear) <- "gcFitLinear"

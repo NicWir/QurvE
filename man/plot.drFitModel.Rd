@@ -7,7 +7,7 @@
 \method{plot}{drFitModel}(
   drFittedModel,
   ec50line = TRUE,
-  log = c("x", "y"),
+  log = c("xy"),
   pch = 1,
   colSpline = 1,
   colData = 1,

@@ -8,6 +8,7 @@
   flFittedLinear,
   log = "",
   which = c("fit", "diagnostics"),
+  title = "Linear fit",
   plot = TRUE,
   export = FALSE,
   height = ifelse(which == "fit", 7, 5),

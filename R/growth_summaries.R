@@ -185,7 +185,7 @@ summary.gcFitLinear <- function(object,...)
                object$rsquared, as.character(object$fitFlag),
                object$par[12], object$par[13],
                object$par[16], object$par[17],
-               object$rsquared2, as.character(object$fitflag2))
+               object$rsquared2, as.character(object$fitFlag2))
 
   }
   table <- data.frame(t(table))

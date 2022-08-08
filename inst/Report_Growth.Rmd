@@ -67,7 +67,7 @@ The following parameters were used to fit the data:
 * log-transform density values for parametric fits: `r colFmt(grofit$control$log.y.model, 'NavyBlue')`
 * log-transform time values: `r colFmt(grofit$control$log.x.gc, 'NavyBlue')`
 * perform dose-response analysis: `r colFmt(ec50, 'NavyBlue')`
-* parameter used for dose-response analysis: `r if(ec50){colFmt(colnames(grofit$gcFit$gcTable)[grofit$control$parameter], 'NavyBlue')} else{"NA"}`
+`r if(ec50){paste0("* parameter used for dose-response analysis:")}` `r if(ec50){colFmt(control$dr.parameter, 'NavyBlue')}`
 * growth threshold: `r colFmt(grofit$control$growth.thresh, 'NavyBlue')` * start_density
 `r if(any(c("a", "l") %in% control$fit.opt)){paste0("* sliding window size in linear regression:")}` `r if(any(c("a", "l") %in% control$fit.opt)){colFmt(ifelse(!is.null(grofit$control$lin.h), grofit$control$lin.h, "automated calculation"), 'NavyBlue')}`
 `r if(any(c("a", "l") %in% control$fit.opt)){paste0("* R2 threshold for linear regression:")}` `r if(any(c("a", "l") %in% control$fit.opt)){colFmt(grofit$control$lin.R2, 'NavyBlue')}`
@@ -219,8 +219,8 @@ if(any(c("a", "l") %in% control$fit.opt)){
       df <- data.frame("time" = x[["raw.time"]],
                        "data" = x[["raw.data"]])
       
-      df.lagtime <- data.frame("time" = c(x[["raw.time"]][1], lagtime),
-                               "y" = c(x[["raw.data"]][1], x[["raw.data"]][1]))
+      df.lagtime <- data.frame("time" = c(x[["raw.time"]][x[["raw.time"]]>=control$t0][1], lagtime),
+                               "y" = c(x[["raw.data"]][x[["raw.time"]]>=control$t0][1], x[["raw.data"]][x[["raw.time"]]>=control$t0][1]))
       
       # Plot raw data points
       p <-    ggplot(df, aes(x = time, y = data)) +

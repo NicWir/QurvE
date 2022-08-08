@@ -34,7 +34,7 @@ summary.flFitLinear <- function(object,...)
                                 "A.linfit", "x.mu.start.linfit",
                                 "x.mu.end.linfit",
                                 "r2mu.linfit", "reliable_fit.linfit",
-                                "max_slope.linfit",
+                                "max_slope2.linfit",
                                 "x.mu2.start.linfit", "x.mu2.end.linfit",
                                 "r2mu2.linfit", "reliable_fit2.linfit")
 
@@ -51,7 +51,7 @@ summary.flFitLinear <- function(object,...)
                object$rsquared, as.character(object$fitFlag),
                object$par["max_slope2"],
                object$par["x.max2_start"], object$par["x.max2_end"],
-               object$rsquared2, as.character(object$fitflag2))
+               object$rsquared2, as.character(object$fitFlag2))
 
   }
   table <- data.frame(t(table))

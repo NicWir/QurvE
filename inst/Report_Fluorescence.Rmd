@@ -1,0 +1,622 @@
+---
+title: "Fluorescence analysis report"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+geometry: margin=0.8cm
+urlcolor: blue
+mainfont: Arial
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{makecell}
+  - \usepackage{longtable}
+  - \usepackage{colortbl}
+
+output:
+  pdf_document:
+    fig_caption: yes
+    toc: false
+    latex_engine: xelatex
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+dir.create(paste0(tempdir(),"/Plots"), showWarnings = F)
+wd.plots <- paste0(wd,"/Plots")
+if(export == T){
+ dir.create(wd.plots, showWarnings = F)
+}
+cl <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE)-1)
+doParallel::registerDoParallel(cl)
+knitr::opts_chunk$set(dev = "pdf")
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
+knit_table <- function(df, caption){
+  if (is_html_output()) {
+    DT::datatable(df, caption = caption, filter = 'top', escape = FALSE,
+         extensions = c('FixedColumns',"FixedHeader"),
+          options = list(scrollX = FALSE, 
+                         paging=TRUE,
+                         pageLength = 15,
+                         fixedHeader=TRUE))
+  } else {
+     colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "slope<sub>max</sub>", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "x<sub>start</sub>", "$t_{start}$") %>% str_replace_all(., "x<sub>D</sub>", "$t_{D}$") %>% str_replace_all(., "x<sub>end</sub>", "$t_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "x<sub>shift</sub>", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "x<sub>max</sub>", "t$_{max}$") 
+     colnames(df) <- linebreak(colnames(df), align = "c")
+     for(i in 2:ncol(df)){
+       df[,i] <- df[,i] %>% str_replace_all(., "^<b>", "\\\\textbf\\{") %>% str_replace_all(., "</b>", "\\}") 
+     }
+     df[,1] <- str_replace_all(df[,1], "_", "\\\\char`_") %>% str_replace_all(., "%", "\\\\%") 
+     df %>% kable("latex", align = "c", booktabs = T, escape = F, linesep = "",  caption = caption, longtable = TRUE) %>% kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = F, position = "center", font_size = 8)
+   }
+}
+```
+## Summary
+The dataset contains _`r nrow(flFitRes[["time"]])`_ samples.\
+
+_`r length(levels(data[["fluorescence1"]][["condition"]]))`_ conditions were identified:\
+  `r colFmt(levels(data[["fluorescence1"]][["condition"]]), 'NavyBlue')`\
+  
+_`r length(levels(data[["fluorescence1"]][["concentration"]]))`_ different concentrations were identified:\
+  `r colFmt(levels(data[["fluorescence1"]][["concentration"]]), 'NavyBlue')`\
+  
+The following parameters were used to fit the data: 
+
+* minimum density considered: `r colFmt(ifelse(!is.null(control$min.density),control$min.density, "none"), 'NavyBlue')`
+* minimum time considered for linear and spline fits (t0): `r colFmt(control$t0, 'NavyBlue')`
+* data type used as independent variable: `r colFmt(control$x_type, 'NavyBlue')`
+`r if(control$x_type == "time"){paste0("* normalized fluorescence used for fits:")}` `r if(control$x_type == "time"){colFmt(control$norm_fl, 'NavyBlue')}`
+* log-transform density values for spline fits: `r colFmt(control$log.y.spline, 'NavyBlue')`
+* log-transform density values for linear fits: `r colFmt(control$log.y.lin, 'NavyBlue')`
+* log-transform time values for spline fits: `r colFmt(control$log.x.spline, 'NavyBlue')`
+* log-transform time values for linear fits: `r colFmt(control$log.x.linear, 'NavyBlue')`
+* perform dose-response analysis: `r colFmt(ec50, 'NavyBlue')`
+`r if(ec50){paste0("* method used for dose-response analysis:")}` `r if(control$x_type == "time"){colFmt(control$norm_fl, 'NavyBlue')}`
+`r if(ec50){paste0("* parameter used for dose-response analysis:")}` `r if(ec50){colFmt(control$dr.method, 'NavyBlue')}`
+* growth threshold: `r colFmt(control$growth.thresh, 'NavyBlue')` * start_density
+`r if(any(c("l") %in% control$fit.opt)){paste0("* sliding window size in linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(ifelse(!is.null(control$lin.h), control$lin.h, "automated calculation"), 'NavyBlue')}`
+`r if(any(c("l") %in% control$fit.opt)){paste0("* R2 threshold for linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(control$lin.R2, 'NavyBlue')}`
+`r if(any(c("l") %in% control$fit.opt)){paste0("* RSD threshold for linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(control$lin.RSD, 'NavyBlue')}`
+`r if(any(c("l") %in% control$fit.opt)){paste0("* Relative ΔY threshold for linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(control$lin.dY, 'NavyBlue')}`
+
+\pagebreak
+
+## `r if(!is.na(flFit2)){"Fluorescence 1 fit results"} else {"Fluorescence fit results"}`
+```{r table_linear1, echo=F, warning=F, message=F, results='asis'}
+if(any(c("l") %in% control$fit.opt)){
+  if(!all(is.na(res.table.fl1$lambda.linfit))){
+    table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl1$TestId, res.table.fl1$AddId, res.table.fl1$concentration, sep = "|"),
+                               
+                               "slope<sub>max</sub>" = ifelse(res.table.fl1$max_slope.linfit==0 | is.na(res.table.fl1$max_slope.linfit), "", ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$max_slope.linfit), 3), paste0("<b>", round(as.numeric(res.table.fl1$max_slope.linfit), 3), "</b>", " (", round(as.numeric(res.table.fl1$max_slope2.linfit), 3), ")"))),
+                               
+                               "λ" = round(as.numeric(res.table.fl1$lambda.linfit), 2), 
+                               
+                               
+                               "Δy" = round(as.numeric(res.table.fl1$dY.linfit), 3),
+                               
+                               
+                               "y<sub>max</sub>" = round(as.numeric(res.table.fl1$A.linfit), 3),
+                               
+                               
+                               "x<sub>start</sub><br>(slope<sub>max</sub>)" = ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$x.mu.start.linfit), 2), paste0("<b>", round(as.numeric(res.table.fl1$x.mu.start.linfit), 2), "</b>", " (", round(as.numeric(res.table.fl1$x.mu2.start.linfit), 2), ")")),
+                               
+                               
+                               "x<sub>end</sub><br>(slope<sub>max</sub>)" = ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$x.mu.end.linfit), 2), paste0("<b>", round(as.numeric(res.table.fl1$x.mu.end.linfit), 2), "</b>", " (", round(as.numeric(res.table.fl1$x.mu2.end.linfit), 2), ")")),
+                               
+                               
+                               
+                               "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$r2mu.linfit), 3), paste0("<b>", round(as.numeric(res.table.fl1$r2mu.linfit), 3), "</b>", " (", round(as.numeric(res.table.fl1$r2mu2.linfit), 3), ")")),
+                               
+                               
+                               stringsAsFactors = F, check.names = F)
+    table_linear <- as.data.frame(apply(table_linear, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+    table_linear[is.na(table_linear)] <- ""
+    if (is_html_output()) {
+      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit"))
+    } else {
+      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% column_spec(column=1, width = "4cm")
+    }
+  }
+}
+```
+```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
+try(plot.parameter(flFitRes, param = "max_slope.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(flFitRes, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(flFitRes, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+```
+`r if(any(c("l") %in% control$fit.opt)){"\\clearpage"}`
+
+```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
+if(any(c("a", "b", "s") %in% control$fit.opt)){
+  if(!all(is.na(res.table.fl1$lambda.spline))){
+    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl1$TestId, res.table.fl1$AddId, res.table.fl1$concentration, sep = "|"),
+                             
+                             "slope<sub>max</sub>" = ifelse(res.table.fl1$max_slope.spline==0 | is.na(res.table.fl1$max_slope.spline), "", ifelse(is.na(res.table.fl1$max_slope2.spline), round(as.numeric(res.table.fl1$max_slope.spline), 3), paste0("<b>", round(as.numeric(res.table.fl1$max_slope.spline), 3), "</b>", " (", round(as.numeric(res.table.fl1$max_slope2.spline), 3), ")"))),
+                             
+                             "λ" = round(as.numeric(res.table.fl1$lambda.spline), 2), 
+                             
+                             "y<sub>max</sub>" = round(as.numeric(res.table.fl1$A.spline), 3),
+                             
+                             "Δy" = round(as.numeric(res.table.fl1$dY.spline), 3),
+                             
+                             "x<sub>max</sub>" = ifelse(is.na(res.table.fl1$max_slope2.spline), round(as.numeric(res.table.fl1$tmax.spline), 2), paste0("<b>", round(as.numeric(res.table.fl1$tmax.spline), 2), "</b>", " (", round(as.numeric(res.table.fl1$tmax2.spline), 2), ")")),
+                             
+                             "smooth.<br>fac" = res.table.fl1$smooth.spline,
+                             
+                             stringsAsFactors = F, check.names = F)
+    # if ( control$nboot.gc > 1 ){
+    #   table_spline <- cbind(table_spline, data.frame("slope<sub>max</sub><br>boot" = paste(round(as.numeric(res.table.fl1$max_slope.bt), 3),"\u00B1", round(as.numeric(res.table.fl1$stdmax_slope.bt),3)), 
+    #                                                "λ<br>boot" = paste(round(as.numeric(res.table.fl1$lambda.bt), 2),"\u00B1", round(as.numeric(res.table.fl1$stdlambda.bt),2)),
+    #                                                "A<br>boot" = paste(round(as.numeric(res.table.fl1$A.bt), 3),"\u00B1", round(as.numeric(res.table.fl1$stdA.bt),3)),
+    #                                                stringsAsFactors = F, check.names = F))
+    # }
+  table_spline <- as.data.frame(apply(table_spline, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+  table_spline[is.na(table_spline)] <- ""
+  if (is_html_output()) {
+      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"))
+    } else {
+      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% column_spec(column=1, width = "4cm")
+    }
+  }
+}
+```
+```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
+try(plot.parameter(flFitRes, param = "max_slope.spline", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(flFitRes, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(flFitRes, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
+```
+\clearpage
+
+## Plots
+### `r if(any(c("l") %in% control$fit.opt)){"Linear Fits"}`
+```{r figure_linear, out.width = "33%", fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
+if(any(c("l") %in% control$fit.opt)){
+  plot.ggLinear <- function(){
+    if(flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+      x <- flFitRes[["flFit1"]][["flFittedLinear"]][[i]]
+      QurvE:::plot.flFitLinear(x, print = T, export = F, title = gsub(" \\| NA", "", paste(x$ID, collapse = " | ")))
+    }
+  }
+  plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))
+  if(all(c('pdf', 'html') %in% format)){
+    if (knitr::is_latex_output()) {
+      foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedLinear"]]),
+              .packages = "ggplot2") %dopar% {
+                if(flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i])))), ".pdf"), width = 8, height = 6);   plot.ggLinear();   invisible(dev.off())
+                }
+              }
+    }
+  } else{
+    foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedLinear"]]),
+              .packages = "ggplot2") %dopar% {
+                if(flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6);   plot.ggLinear();   invisible(dev.off())
+                }
+              }
+  } 
+  
+  Files_list <- list.files(path = plotdir, 
+                                pattern = "^PlotLinear_",
+                                full.names = TRUE)
+  sort.ndx <- match(gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes$flFit1$gcFittedModels)))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- sort.ndx[!is.na(sort.ndx)]
+  
+knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
+}
+```
+`r if(any(c("a", "b", "s") %in% control$fit.opt)){"\\clearpage"}`
+
+### `r if(any(c("a", "b", "s") %in% control$fit.opt)){"Nonparametric Fits"}`
+```{r figure_spline, out.width = "33%", fig.asp=1.1, fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
+if(any(c("a", "b", "s") %in% control$fit.opt)) {
+  plot.ggSpline   <- function() {
+    if (flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+      x <- flFitRes[["flFit1"]][["flFittedSplines"]][[i]]
+      coef <- x[["parameters"]]
+      lagtime <- coef["lambda"][[1]][1]
+      df <- data.frame(
+        "time" = x[["raw.x"]],
+        "data" = exp(x[["raw.fl"]]) * x[["data.in"]][1],
+        "fit.time" = c(rep(NA, length(x[["raw.x"]]) -
+                             length(x[["fit.time"]])), x[["fit.time"]]),
+        "fit.data" = c(rep(NA, length(x[["raw.fl"]]) -
+                             length(x[["fit.data"]])), exp(x[["fit.data"]]) * x[["data.in"]][1])
+      )
+      
+      p <-    ggplot(df, aes(x = time, y = data)) +
+        geom_point(
+          shape = 1,
+          size = 2,
+          alpha = 0.5,
+          stroke = 0.15
+        ) +
+        geom_line(aes(x = fit.time, y = fit.data, color = "spline"), size = 0.7) +
+        xlab("Time") +
+        ylab(label = "Growth [y(t)]") +
+        theme_classic(base_size = 16) +
+        ggtitle(gsub(" \\| NA", "", paste(x$ID, collapse = " | "))) +
+        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+        theme(
+          legend.key = element_blank(),
+          legend.background = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(0.90, 0.08),
+          plot.title = element_text(size = 15),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()
+        ) +
+        scale_color_manual(
+          name = 'Growth Model',
+          breaks = "Spline fit",
+          values = c(
+            "spline" = ggplot2::alpha("dodgerblue3", 0.85),
+            "Spline fit" = ggplot2::alpha("dodgerblue3", 0.85)
+          )
+        )
+      
+      if (x$control$log.y.spline == TRUE) {
+        p <-
+          p + scale_y_continuous(breaks = scales::pretty_breaks(),
+                                 trans = 'log')
+        p.yrange.end <-
+          exp(ggplot_build(p)$layout$panel_params[[1]]$y.range[2])
+      } else {
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+        p.yrange.end <-
+          ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+      }
+      
+      # /// add tangent at maximum slope
+      
+      mu     <- as.numeric(coef$mu[1])
+      if (x$fitFlag2) {
+        lagtime2 <- coef$lambda2
+        growth.time <-
+          x$fit.time[which.max(x$fit.data)]
+        mu2 <- coef$mu2
+        if (lagtime2 < lagtime) {
+          # time values for tangent at slopemax
+          time_start.ndx <-
+            which.min(abs(
+              x$fit.time - (coef$t.max - 0.15 * growth.time)
+            ))
+          time_start <- x$fit.time[time_start.ndx]
+          time <-
+            seq(time_start, max(x$fit.time), length = 200)
+          # y values for tangent at slopemax
+          bla <-
+            ifelse(
+              x$control$log.y.spline == TRUE,
+              exp(coef["b.tangent"][[1]]) * x[["data.in"]][1],
+              coef["b.tangent"][[1]]
+            ) * exp(mu * time)
+          tangent.df <- data.frame("time" = time,
+                                   "y" = bla)
+          # time values for tangent at slopemax2
+          time2 <-
+            seq(ifelse(lagtime2 < 0, 0, lagtime2),
+                max(x$"fit.time"),
+                length = 200)
+          # y values for tangent at slopemax
+          bla2 <-
+            ifelse(
+              x$control$log.y.spline == TRUE,
+              exp(coef["b.tangent2"][[1]]) * x[["data.in"]][1],
+              coef["b.tangent2"][[1]]
+            ) * exp(mu2 * time2)
+          tangent.df2 <- data.frame("time" = time2,
+                                    "y" = bla2)
+          df.horizontal2 <-
+            data.frame("time" = c(x[["raw.x"]][1], lagtime2),
+                       "y" = x[["data.in"]][1])
+          
+          p <-
+            p + geom_segment(
+              aes(
+                x = time[which.min(abs(bla))],
+                y = y[which.min(abs(bla))],
+                xend = time[which.min(abs(y - 1.1 *
+                                            p.yrange.end))],
+                yend = y[which.min(abs(y - 1.1 * p.yrange.end))]
+              ),
+              data = tangent.df,
+              linetype = "dashed",
+              color = ggplot2::alpha("dodgerblue3", 0.85),
+              size = 0.5
+            )
+          p <-
+            p + geom_segment(
+              aes(
+                x = time[which.min(abs(bla2))],
+                y = y[which.min(abs(bla2))],
+                xend = time[which.min(abs(y - 1.1 *
+                                            p.yrange.end))],
+                yend = y[which.min(abs(y - 1.1 * p.yrange.end))]
+              ),
+              data = tangent.df2,
+              linetype = "dashed",
+              color = ggplot2::alpha("darkviolet", 0.85),
+              size = 0.5
+            )
+          
+          if (!(lagtime2 < 0)) {
+            p <-
+              p + geom_segment(
+                aes(
+                  x = time[1],
+                  y = y[1],
+                  xend = time[2],
+                  yend = y[2]
+                ),
+                data = df.horizontal2,
+                linetype = "dashed",
+                color = ggplot2::alpha("darkviolet", 0.85),
+                size = 0.5
+              )
+          }
+        } # if(lagtime2 < lagtime)
+        else {
+          # time values for tangent at slopemax
+          time <-
+            seq(ifelse(lagtime < 0, 0, lagtime),
+                max(x$"fit.time"),
+                length = 200)
+          # y values for tangent at slopemax
+          bla <-
+            ifelse(
+              x$control$log.y.spline == TRUE,
+              exp(coef["b.tangent"][[1]]) * x[["data.in"]][1],
+              coef["b.tangent"][[1]]
+            ) * exp(mu * time)
+          tangent.df <- data.frame("time" = time,
+                                   "y" = bla)
+          df.horizontal <-
+            data.frame("time" = c(x[["raw.x"]][1], lagtime),
+                       "y" = x[["data.in"]][1])
+          # time values for tangent at slopemax2
+          time2_start.ndx <-
+            which.min(abs(
+              x$fit.time - (coef$t.max2 - 0.15 * growth.time)
+            ))
+          time2_start <- x$fit.time[time2_start.ndx]
+          time2 <-
+            seq(time2_start, max(x$"fit.time"), length = 200)
+          # y values for tangent at slopemax
+          bla2 <-
+            ifelse(
+              x$control$log.y.spline == TRUE,
+              exp(coef["b.tangent2"][[1]]) * x[["data.in"]][1],
+              coef["b.tangent2"][[1]]
+            ) * exp(mu2 * time2)
+          tangent.df2 <- data.frame("time" = time2,
+                                    "y" = bla2)
+          
+          p <-
+            p + geom_segment(
+              aes(
+                x = time[which.min(abs(bla))],
+                y = y[which.min(abs(bla))],
+                xend = time[which.min(abs(y - 1.1 *
+                                            p.yrange.end))],
+                yend = y[which.min(abs(y - 1.1 * p.yrange.end))]
+              ),
+              data = tangent.df,
+              linetype = "dashed",
+              color = ggplot2::alpha("dodgerblue3", 0.85),
+              size = 0.5
+            )
+          p <-
+            p + geom_segment(
+              aes(
+                x = time[which.min(abs(bla2))],
+                y = y[which.min(abs(bla2))],
+                xend = time[which.min(abs(y - 1.1 *
+                                            p.yrange.end))],
+                yend = y[which.min(abs(y - 1.1 * p.yrange.end))]
+              ),
+              data = tangent.df2,
+              linetype = "dashed",
+              color = ggplot2::alpha("darkviolet", 0.85),
+              size = 0.5
+            )
+          
+          if (!(lagtime < 0)) {
+            p <-
+              p + geom_segment(
+                aes(
+                  x = time[1],
+                  y = y[1],
+                  xend = time[2],
+                  yend = y[2]
+                ),
+                data = df.horizontal,
+                linetype = "dashed",
+                color = ggplot2::alpha("dodgerblue3", 0.85),
+                size = 0.5
+              )
+          }
+        }
+      } # if(x$fitFlag2)
+      else {
+        # time values for tangent
+        time <-
+          seq(ifelse(lagtime < 0, 0, lagtime),
+              max(x$"fit.time"),
+              length = 200)
+        # y values for tangent
+        bla <-
+          ifelse(
+            x$control$log.y.spline == TRUE,
+            exp(coef["b.tangent"][[1]]) * x[["data.in"]][1],
+            coef["b.tangent"][[1]]
+          ) * exp(mu * time)
+        tangent.df <- data.frame("time" = time,
+                                 "y" = bla)
+        df.horizontal <-
+          data.frame("time" = c(x[["raw.x"]][1], lagtime),
+                     "y" = x[["data.in"]][1])
+        p <-
+          p + geom_segment(
+            aes(
+              x = time[which.min(abs(bla))],
+              y = y[which.min(abs(bla))],
+              xend = time[which.min(abs(y - 1.1 * p.yrange.end))],
+              yend = y[which.min(abs(y - 1.1 * p.yrange.end))]
+            ),
+            data = tangent.df,
+            linetype = "dashed",
+            color = ggplot2::alpha("dodgerblue3", 0.85),
+            size = 0.5
+          )
+        if (!(lagtime < 0)) {
+          p <-
+            p + geom_segment(
+              aes(
+                x = time[1],
+                y = y[1],
+                xend = time[2],
+                yend = y[2]
+              ),
+              data = df.horizontal,
+              linetype = "dashed",
+              color = ggplot2::alpha("dodgerblue3", 0.85),
+              size = 0.5
+            )
+        }
+      } # else of if(x$fitFlag2)
+      # /// add panel with growth rate vs. time
+      df.mu <-
+        data.frame(spline(x$spline.deriv1$x, x$spline.deriv1$y))
+      #add missing time values due to min.density and t0
+      df.mu <-
+        dplyr::bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
+                         df.mu)
+      
+      p.mu <- ggplot(df.mu, aes(x = x, y = y)) +
+        geom_line(color = "dodgerblue3") +
+        theme_classic(base_size = 15) +
+        xlab("Time") +
+        ylab(label = ("Slope")) +
+        scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      p.mu <- p.mu + scale_y_continuous(limits = c(max_slope.min, max_slope.max), breaks = scales::pretty_breaks(n = 10))
+      print(ggpubr::ggarrange(
+        p,
+        p.mu,
+        ncol = 1,
+        nrow = 2,
+        align = "v",
+        heights = c(2, 1.3)
+      ))
+    }
+  }
+  plotdir <-
+    ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
+  if(all(c('pdf', 'html') %in% format)){
+    if (knitr::is_latex_output()) {
+      foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
+            .packages = "ggplot2") %dopar% {
+              if (flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
+                )))), ".pdf"))
+                plot.ggSpline()
+                invisible(dev.off())
+              }
+            }
+    }
+  } else{
+    foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
+            .packages = "ggplot2") %dopar% {
+              if (flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
+                )))), ".pdf"))
+                plot.ggSpline()
+                invisible(dev.off())
+              }
+            }
+  }
+  
+  Files_list <- list.files(path = plotdir,
+                           pattern = "^PlotSpline_",
+                           full.names = TRUE)
+  sort.ndx <-
+    match(gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
+      " \\| ", "_", names(flFitRes$flFit1$flFittedSplines)
+    ))))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
+  sort.ndx <- sort.ndx[!is.na(sort.ndx)]
+  knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
+}
+```
+`r if(ec50){"\\clearpage"}`
+
+## `r if(ec50){"Dose-response analysis"}`
+```{r ec50_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0}
+cat(paste0("_", length(levels(data[["condition"]])), "_ conditions were identified::\n",
+           paste(colFmt(levels(data[["condition"]]), 'NavyBlue'), collapse = ", ")))
+cat("  \n")
+cat(paste0("_", length(levels(data[["concentration"]])), "_ different concentrations were identified:\n",
+           paste(colFmt(levels(data[["concentration"]]), 'NavyBlue'), collapse = ", ")))
+ec50.df <- data.frame()
+for(i in 1:length(flFitRes$drFit$drFittedSplines)){
+  ec50.df <- rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit$drFittedSplines)[i],
+                              "EC50" = round(flFitRes$drFit$drFittedSplines[[i]]$parameters$EC50, 3),
+                              "Response" = round(flFitRes$drFit$drFittedSplines[[i]]$parameters$yEC50, 3))
+  )
+}
+names(ec50.df)[3] <- paste0("Response (", flFitRes$drFit$drFittedSplines[[1]]$parameters$test, ")")
+knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
+```
+
+```{r ec50_spline_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0}
+plot.drFit(flFitRes$drFit, export = export)
+```
+
+```{r ec50.boot_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
+boot.ec50.df <- data.frame()
+  for (i in 1:length(flFitRes$drFit$drBootSplines)){
+    boot.ec50.df <-
+      rbind.fill(
+        boot.ec50.df,
+        data.frame(
+          "Condition" = flFitRes$drFit$drTable$Test[i],
+          "EC50.boot" = paste(round(as.numeric(flFitRes$drFit$drTable$drboot.meanEC50[i]), 3),"\u00B1", round(as.numeric(flFitRes$drFit$drTable$drboot.sdEC50[i]),3)),
+          "Response.boot" = paste(round(as.numeric(flFitRes$drFit$drTable$drboot.meanEC50y[i]), 3),"\u00B1", round(as.numeric(flFitRes$drFit$drTable$drboot.sdEC50y[i]),3))
+        )
+      )
+  }
+  knit_table(boot.ec50.df, caption = "Dose-Response Analysis - Bootstrapping")
+```
+
+```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
+for(i in 1:length(flFitRes$drFit$drBootSplines)){
+  if(flFitRes$drFit$drBootSplines[[i]]$bootFlag == TRUE){
+    plot.drBootSpline(flFitRes$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = paste0(wd, "/Plots"))
+  }
+}
+```
+`r if(!all(is.na(mean.grp))){"\\clearpage"}`
+
+## `r if(!all(is.na(mean.grp))){"Group average plots"}`
+```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
+if("all" %in% mean.grp){
+  if(length(flFitRes$flFit1$flFittedSplines[[1]]$spline)>1){
+    plot.flFitRes(flFitRes, basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+  }
+} else if(!all(is.na(mean.grp))){
+    for(i in 1:length(mean.grp)){
+      if(length(grep(mean.grp[i], as.character(names(flFitRes$flFit1$flFittedSplines))))>0){
+        plot.flFitRes(flFitRes, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+      }
+    }
+}
+if(!all(is.na(mean.conc))){
+  for(i in 1:length(mean.conc)){
+    if(length(grep(mean.conc[i], str_extract(names(flFitRes$flFit1$flFittedSplines), "[:alnum:]+$")))>0){
+      plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+    }
+  }
+}
+```
+```
+

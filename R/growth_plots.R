@@ -37,7 +37,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              coef_ <- gcFittedLinear$par
 
 
-             if(gcFittedLinear$fitflag2){
+             if(gcFittedLinear$fitFlag2){
                try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- gcFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > gcFittedLinear$raw.time[1]){

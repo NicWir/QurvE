@@ -22,7 +22,7 @@ growth.control(
   interactive = FALSE,
   nboot.gc = 0,
   smooth.gc = 0.55,
-  model.type = c("logistic", "richards", "gompertz", "gompertz.exp"),
+  model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"),
   dr.have.atleast = 6,
   dr.parameter = "mu.linfit",
   smooth.dr = NULL,
