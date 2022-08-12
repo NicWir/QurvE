@@ -65,7 +65,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
              title(ylab = ylab, line = 3 + nchar(round(max(flFittedLinear$"filt.fl")))/4)
              axis(1,cex.axis=1.3)
              axis(2,cex.axis=1.3, las=1)
-             try(points(flFittedLinear$raw.fl[flFittedLinear$ndx] ~ flFittedLinear$raw.x[flFittedLinear$ndx], pch=21, col="black", bg="red"))
+             try(points(flFittedLinear$filt.fl[flFittedLinear$ndx] ~ flFittedLinear$filt.x[flFittedLinear$ndx], pch=21, col="black", bg="red"))
 
              ## lag phase
              lag <- flFittedLinear$par["lag"]
@@ -83,19 +83,17 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
                  try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"raw.x"), length=200), silent = T)
-                 try(time <- seq(lag, max(flFittedLinear$"raw.x"), length=200), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"raw.x"), length=200), silent = T)
                  try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(c(min(flFittedLinear$"filt.x"[1]), lag), rep(flFittedLinear$"filt.fl"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
                  try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
 
                }
              } else if(flFittedLinear$fitFlag){
                if(lag < flFittedLinear$raw.x[flFittedLinear$ndx[1]]){
-                 try(time <- seq(lag, max(flFittedLinear$"filt.x"), length=200), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = T)
                  try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(c(min(flFittedLinear$"filt.x"[1]), lag), rep(flFittedLinear$"filt.fl"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
                } else {
-                 try(time <- seq(flFittedLinear$raw.x[flFittedLinear$ndx[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
+                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
                  try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
@@ -227,8 +225,8 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         fit.fl <- c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), flFitSpline[["fit.fl"]])
       }
 
-      df.raw <- data.frame("x" = flFitSpline[["raw.x"]],
-                         "data" = flFitSpline[["raw.fl"]])
+      df.raw <- data.frame("x" = flFitSpline[["x.in"]],
+                         "data" = flFitSpline[["fl.in"]])
       df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
                            "fit.fl" = fit.fl)
 
@@ -390,8 +388,9 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       if(deriv == TRUE){
         df.mu <- data.frame(spline(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y))
         #add missing x values due to min.density and t0
+        x.missing <- df.raw[df.raw$x < df.mu$x[1], ]$x
         df.mu <-
-          bind_rows(data.frame(x = df.raw$x[is.na(df.fit$fit.fl)], y = rep(NA, length(df.raw$x[is.na(df.fit$fit.fl)]))),
+          dplyr::bind_rows(data.frame(x = x.missing, y = rep(NA, length(x.missing))),
                     df.mu)
 
         y.label.mu = if(flFitSpline$control$log.y.spline == TRUE){
@@ -1394,8 +1393,8 @@ plot.dual <-  function(object,
     raw_data <- object
   }
   if(is(object) == "flFitRes"){
-    if(density == "density1") flFit <- object$flFit1
-    if(density == "density2") flFit <- object$flFit1
+    if(length(grep("1", fluorescence))>0) flFit <- object$flFit1
+    if(length(grep("2", fluorescence))>0) flFit <- object$flFit2
     raw_data <- object$data
   } else {
     flFit <- object
@@ -1618,8 +1617,8 @@ plot.dual <-  function(object,
         p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
       }
 
-      if(!is.null(y.lim.deriv)){
-        p.fl <- p.fl + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      if(!is.null(y.lim.fl)){
+        p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
         p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }

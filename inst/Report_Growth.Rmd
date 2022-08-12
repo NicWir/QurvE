@@ -385,7 +385,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
       foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
               .packages = "ggplot2") %dopar% {
                 if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i])))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
                 }
               }
     }
@@ -393,7 +393,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
     foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
               .packages = "ggplot2") %dopar% {
                 if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i])))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
                 }
               }
   } 
@@ -401,7 +401,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotLinear_",
                                 full.names = TRUE)
-  sort.ndx <- match(gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels)))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- match(gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedLinear))))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   
 knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
@@ -549,7 +549,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
       foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedModels"]]),
         .packages = "ggplot2") %dopar% {
           if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotModel_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i])))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+            pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
           }
         }
     }
@@ -557,7 +557,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     foreach(i = 1:  1:length(grofit[["gcFit"]][["gcFittedModels"]]),
         .packages = "ggplot2") %dopar% {
           if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotModel_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+            pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i])))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
           }
         }
   }
@@ -566,7 +566,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                                 pattern = "^PlotModel_",
                                 full.names = TRUE)
-  sort.ndx <- match(gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels)))))), gsub(".+PlotModel_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- match(gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(grofit$gcFit$gcFittedModels))))))), gsub(".+PlotModel_","", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
 knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
@@ -883,9 +883,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
       foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-                )))), ".pdf"))
+                ))))), ".pdf"))
                 plot.ggSpline()
                 invisible(dev.off())
               }
@@ -895,9 +895,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
     foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-                )))), ".pdf"))
+                ))))), ".pdf"))
                 plot.ggSpline()
                 invisible(dev.off())
               }
@@ -908,9 +908,9 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
                            pattern = "^PlotSpline_",
                            full.names = TRUE)
   sort.ndx <-
-    match(gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
+    match(gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
       " \\| ", "_", names(grofit$gcFit$gcFittedSplines)
-    ))))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
+    )))))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }

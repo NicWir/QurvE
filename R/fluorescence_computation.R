@@ -153,7 +153,15 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))]
   if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))]
   fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
-
+  bad.values <- (fl_data < 0)
+  if (TRUE %in% bad.values) {
+    fl_data <- fl_data.in <- fl_data[!bad.values]
+    if(x_type == "density"){
+      density <- density.in <- density[!bad.values]
+    } else {
+      time <- time.in <- time[!bad.values]
+    }
+  }
   if(x_type == "density" && is.null(density))
     stop("To perform a spline fit of fluorescence vs. density data, please provide a 'density' vector of the same length as 'fl_data'.")
   if(x_type == "time" && is.null(time))
@@ -183,6 +191,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     ndx.max <- which.max(density)
     density <- density[1:ndx.max]
     fl_data <- fl_data[1:ndx.max]
+    bad.values <- (fl_data < 0)
   }
   fl_data.log <- log(fl_data/fl_data[1])
   if(x_type == "density"){
@@ -329,23 +338,32 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     # Perform spline fit and extract parameters
     deriv1 <- predict(spline, x, deriv = 1)
     # find maximum in deriv1, exclude maxima at beginning of fit, if x_type is "time"
+    deriv1.test <- deriv1
+    spline.test <- spline
     if(x_type == "time"){
       success <- FALSE
       while (!success){
-        max_slope.index <- which.max(deriv1$y)
-        if(!(max_slope.index %in% 1:3)){
-          max_slope.index <- max_slope.index
+        if(length(deriv1.test$y) > 2){
+          max_slope.index <- which.max(deriv1.test$y)
+          if(!(max_slope.index %in% 1:3)){
+            max_slope.index <- max_slope.index
+            success <- TRUE
+          } else {
+            deriv1.test <- lapply(1:length(deriv1.test), function(x) deriv1.test[[x]][-max_slope.index])
+            names(deriv1.test) <- c("x", "y")
+            spline.test$x <- spline$x[-max_slope.index]
+            spline.test$y <- spline$y[-max_slope.index]
+          }
+        } else{
+          max_slope.index <- which.max(deriv1$y)
+          spline.test <- spline
           success <- TRUE
-        } else {
-          deriv1 <- lapply(1:length(deriv1), function(x) deriv1[[x]][-max_slope.index])
-          names(deriv1) <- c("x", "y")
-          spline$x <- spline$x[-max_slope.index]
-          spline$y <- spline$y[-max_slope.index]
         }
       }
     } else {
       max_slope.index <- which.max(deriv1$y)
     }
+    spline <- spline.test
     max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index]) # index of data point with maximum growth rate in spline fit
     x.max <- deriv1$x[max_slope.index] # x of maximum growth rate
     max_slope <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
@@ -895,7 +913,6 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   R2 <- control$lin.R2
   RSD <- control$lin.RSD
   h <- control$lin.h
-  fit.dY <- control$lin.dY
   t0 <- control$t0
   min.density <- control$min.density
 
@@ -991,6 +1008,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     #     }
     #   }
     # }
+
     # Remove data points where y values stack on top of each other
     fl_data <- fl_data[density >= cummax(density)]
     fl_data.log <- fl_data.log[density >= cummax(density)]
@@ -1080,8 +1098,16 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   } # if(x_type == "time")
   # extract period of growth (from defined t0)
   x.in = get(ifelse(x_type == "density", "density.in", "time.in"))
-
-  t.growth <- x[which.min(abs(x)):which.max(fl_data)]
+  end <- FALSE
+  step <- 0
+  while(end==FALSE){
+    step <- step+1
+    fldat <- fl_data[step:length(fl_data)]
+    fl.max.ndx <- which.max(fldat)
+    if(fl.max.ndx == 1) next
+    else fl.max.ndx <- fl.max.ndx + (i); end = TRUE
+  }
+  t.growth <- x[which.min(abs(x)):fl.max.ndx]
   if(!is.null(h) && !is.na(h) && h != ""){
     h <- as.numeric(h)
   } else {
@@ -1134,8 +1160,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   # store filtered and transformed fl_data
   obs <- data.frame(x, fl_data)
   obs$ylog <- fl_data.log
-  max.fluorescence <- max(obs$fl_data)
-  dY.total <- max.fluorescence - obs$fl_data[1]
+
 
 
   ## number of values
@@ -1161,13 +1186,18 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     } else {
       ret <- data.frame(ret, x = x[ret[,1]], fl_data = obs$fl_data[ret[,1]])
     }
-    # add dY, i.e., the percentage of density that a regression window covers, to ret
-    ret <- data.frame(ret, dY = ((obs$fl_data[match(ret[, "x"], obs$x)+(h-1)] - obs$fl_data[match(ret[, "x"], obs$x)]) / dY.total))
 
     bad <- is.na(ret[,5]) | is.na(ret[,6])
     ret <- ret[!bad,]
-    # Consider only regressions within the growth phase (from start to max x)
-    ret <- ret[ret$x <= t.growth[length(t.growth)], ]
+
+
+    if(x_type == "density"){
+      ret <- ret[which.min(abs(ret$fl_data-min.density)) : nrow(ret),] # consider only slopes from defined t0 and min.density
+    } else{
+      ret <- ret[which.min(abs(x-t0)):nrow(ret),] # consider only slopes from defined t0
+    }
+    ret <- ret[!is.na(ret[,1]), ]
+
     if(nrow(ret)<2){
       flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                           filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
@@ -1181,14 +1211,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
     else{
       # duplicate ret for further tuning of fit
-      if(x_type == "density"){
-        ret.check <- ret[which.min(abs(ret$fl_data-min.density)) : nrow(ret),] # consider only slopes from defined t0 and min.density
-      } else{
-        ret.check <- ret[which.min(abs(x-t0)):nrow(ret),] # consider only slopes from defined t0
-      }
-
-      #Consider only slopes that span at least fit.dY
-      ret.check <- ret.check[ret.check[,"dY"]>=fit.dY, ]
+      ret.check <- ret
 
       # Consider only positive slopes
       ret.check <- ret.check[ret.check[,"slope"]>0, ]
@@ -1245,6 +1268,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                                   )
             }
           }
+          candidates <- ret[candidates,1]
 
           #consider only candidate windows next to index.max.ret
           candidate_intervals <- split(candidates, cumsum(c(1, diff(candidates) != 1)))
@@ -1259,9 +1283,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               ))][[1]]
           }
 
-
           if(length(candidates) > 0) {
-            #perform linear regression with candidate fl_data points
+            # perform linear regression with candidate fl_data points
             tp <- seq(min(candidates), max(candidates) + h-1)
             if (control$log.y.lin == TRUE) {
               m <- lm_window(obs$x, obs$ylog, min(tp), length(tp)) # linear model
@@ -1269,23 +1292,26 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               m <- lm_window(obs$x, obs$fl_data, min(tp), length(tp)) # linear model
             }
             p  <- c(lm_parms(m), n=length(tp)) # # slope equation parameters (linear model)
-          } else {
-            p <- c(a=0, b=0, se=0, r2=0, cv=0, n=0)
-            m = NULL
-          }
-
-          if(length(candidates) > 0) {
-            ## get x window of exponential fit
+            ## get x window of linear fit
             x.max_start <- obs$x[tp[1]]
             x.max_end <- obs$x[tp[length(tp)]]
 
             y0_lm    <- unname(coef(m)[1]) # y-intercept of tangent
 
-            if(control$log.y.lin == TRUE){
-              y0_data  <- obs$ylog[1] # y0 in dataset
+            if(x_type == "time"){
+              if(control$log.y.lin == TRUE){
+                y0_data  <- obs$ylog[obs$x>=t0][1] # y0 in dataset
+              } else {
+                y0_data  <- obs$fl_data[obs$x>=t0][1] # y0 in dataset
+              }
             } else {
-              y0_data  <- obs$fl_data[1] # y0 in dataset
+              if(control$log.y.lin == TRUE){
+                y0_data  <- obs$ylog[obs$x>=min.density][1] # y0 in dataset
+              } else {
+                y0_data  <- obs$fl_data[obs$x>=min.density][1] # y0 in dataset
+              }
             }
+
             max_slope <- unname(coef(m)[2])
 
             ## estimate lag phase
@@ -1297,8 +1323,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
             }
 
             # get indices of x points used in linear fit
-            ndx <- seq(min(match(ret[candidates, "x"], x.in)),
-                       max(match(ret[candidates, "x"], x.in)) + h-1)
+              # ndx <- seq(min(match(ret[candidates, "x"], x.in)),
+              #            max(match(ret[candidates, "x"], x.in)) + h-1)
+            ndx <- tp
 
             slope.se <- as.numeric(p[3]) # standard error of slope
             fitFlag <- TRUE
@@ -1387,10 +1414,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               ret.postmin <- ret[ret$x >= obs$x[postmin.ndx],]
               # remove indices included in extended max_slope regression
               ret.postmin <- ret.postmin[!(ret.postmin[,1] %in% tp.ext),]
-              #Consider only slopes that span at least fit.dY
-              ret.postmin <- ret.postmin[ret.postmin[, "dY"] >= fit.dY, ]
-              # Consider only positive slopes
-              ret.postmin <- ret.postmin[ret.postmin[, "slope"] > 0, ]
+              # Consider only positive slopes that are at least 10% of max_slope
+              ret.postmin <- ret.postmin[ret.postmin[, "slope"] > 0 & ret.postmin[, "slope"] >= 0.1*max_slope, ]
               ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
               success <- FALSE
               # apply min.density to list of linear regressions
@@ -1549,10 +1574,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               if(premin.ndx > h){
                 # extract linear regression results before pre-max_slope turning point
                 ret.premin <- ret[ret$x <= obs$x[premin.ndx-h],]
-                #Consider only slopes that span at least fit.dY
-                ret.premin <- ret.premin[ret.premin[, "dY"] >= fit.dY, ]
-                # Consider only positive slopes
-                ret.premin <- ret.premin[ret.premin[, "slope"] > 0, ]
+                # Consider only positive slopes and slopes that are at least 10% of max_slope
+                ret.premin <- ret.premin[ret.premin[, "slope"] > 0 & ret.postmin[, "slope"] >= 0.1*max_slope, ]
                 #remove regressions included in the extended candidate list
                 ret.premin <- ret.premin[!(ret.premin[, 1] %in% tp.ext), ]
                 ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
@@ -1913,7 +1936,7 @@ fl.workflow <- function(grodata = NULL,
                         suppress.messages = FALSE,
                         neg.nan.act = FALSE,
                         clean.bootstrap = TRUE,
-                        report = TRUE,
+                        report = c('pdf', 'html'),
                         out.dir = NULL,
                         export = FALSE)
 {
@@ -2033,9 +2056,9 @@ fl.workflow <- function(grodata = NULL,
     res.table.dr_fl1 <- NULL
     res.table.dr_fl2 <- NULL
   }
-  if(report == TRUE){
+  if(any(report %in% c('pdf', 'html'))){
     try(fl.report(flFitRes, report.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc, ec50 = ec50,
-                      export = export))
+                      export = export, format = report))
   }
 
   flFitRes

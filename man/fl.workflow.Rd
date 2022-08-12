@@ -40,7 +40,7 @@ fl.workflow(
   suppress.messages = FALSE,
   neg.nan.act = FALSE,
   clean.bootstrap = TRUE,
-  report = TRUE,
+  report = c("pdf", "html"),
   out.dir = NULL,
   export = FALSE
 )
