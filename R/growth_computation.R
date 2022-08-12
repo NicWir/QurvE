@@ -315,11 +315,11 @@ read_data <-
     } # end of else {}
     return(df.mat)
   }
-  if(length(dat)>1){dat.mat <- create_datmat(dat, time.ndx=time.ndx)}else{dat.mat <- NA}
-  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx)}else{fluoro1.mat <- NA}
-  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx)}else{fluoro2.mat <- NA}
-  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx)}else{fluoro1.norm.mat <- NA}
-  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx)}else{fluoro2.norm.mat <- NA}
+  if(length(dat)>1){dat.mat <- create_datmat(dat, time.ndx=time.ndx); dat.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{dat.mat <- NA}
+  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx);  fluoro1.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro1.mat <- NA}
+  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx);  fluoro2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro2.mat <- NA}
+  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx);  fluoro1.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro1.norm.mat <- NA}
+  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx);  fluoro2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro2.norm.mat <- NA}
 
   if(length(dat)>1)             colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
   if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
