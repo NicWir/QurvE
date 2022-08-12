@@ -967,20 +967,30 @@ for(i in 1:length(grofit$drFit$drBootSplines)){
 ## `r if(!all(is.na(mean.grp))){"Group average plots"}`
 ```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if("all" %in% mean.grp){
-  if(length(grofit$gcFit$gcFittedSplines[[1]]$spline)>1){
+  if("s" %in% grofit$control$fit.opt){
     plot.grofit(grofit, basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+  } else {
+    plot.grofit(grofit, data.type = "raw", basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
   }
 } else if(!all(is.na(mean.grp))){
-    for(i in 1:length(mean.grp)){
+  for(i in 1:length(mean.grp)){
+    if("s" %in% grofit$control$fit.opt){
       if(length(grep(mean.grp[i], as.character(names(grofit$gcFit$gcFittedSplines))))>0){
         plot.grofit(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
       }
+    } else {
+      plot.grofit(grofit, data.type = "raw", names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
     }
+  }
 }
 if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
+    if("s" %in% grofit$control$fit.opt){
     if(length(grep(mean.conc[i], str_extract(names(grofit$gcFit$gcFittedSplines), "[:alnum:]+$")))>0){
       plot.grofit(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+    }
+    } else {
+      plot.grofit(grofit, data.type = "raw", conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
     }
   }
 }

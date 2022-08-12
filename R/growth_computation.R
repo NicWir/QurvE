@@ -1106,15 +1106,15 @@ growth.gcFit <- function(time, data, control= growth.control())
               } # end if ("n" %in% test_answer)
               else {
                 new_params <- unlist(strsplit(test_answer, split = ","))
-                t0_new <- dplyr::if_else(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
+                t0_new <- ifelse(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
                 h_new <- dplyr::if_else(!is.na(as.numeric(new_params[2])), as.numeric(new_params[2]), control$lin.h)
-                quota_new <- dplyr::if_else(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
-                min.density_new <- dplyr::if_else(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
+                quota_new <- ifelse(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
+                min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
                 R2_new <- dplyr::if_else(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
                 RSD_new <- dplyr::if_else(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
                 control_new <- control
                 control_new$t0 <- t0_new
-                control_new$lin.h <- h_new
+                if(!is.na(h_new)) control_new$lin.h <- h_new
                 control_new$lin.R2 <- R2_new
                 control_new$lin.RSD <- RSD_new
                 if(is.numeric(min.density_new)){
