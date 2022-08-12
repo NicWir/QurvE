@@ -248,7 +248,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
       
       
       
-      if(x$fitflag2){
+      if(x$fitFlag2){
         lagtime2 <- coef["lag2"]
         fit_df2 <- data.frame("time" = x[["raw.time"]][x$ndx2],
                               "y" = x[["raw.data"]][x$ndx2] )

@@ -2112,7 +2112,7 @@ fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html
     res.table.fl1 <- flFitRes$flFit1$flTable
   }
   if(!exists("res.table.dr1")){
-    res.table.dr1 <- flFitRes$drFit1$drTable
+    if(!is.na(flFitRes$drFit1)) res.table.dr1 <- flFitRes$drFit1$drTable
   }
   if(!exists("res.table.gc2")){
     if(!is.na(flFit2)){
@@ -2121,7 +2121,7 @@ fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html
   }
   if(!exists("res.table.dr2")){
     if(!is.na(flFit2)){
-      res.table.dr2 <- flFitRes$drFit2$drTable
+      if(!is.na(flFitRes$drFit2)) res.table.dr2 <- flFitRes$drFit2$drTable
     }
   }
   # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
