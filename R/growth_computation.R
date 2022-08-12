@@ -111,38 +111,48 @@ read_data <-
           blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
           if(length(blank.ndx)>0){
             blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = T)
-            df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- t(sweep(apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
+          } else {
+            blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
           }
+          df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- t(sweep(apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
         } else { # identify different datasets based on the occurence of multiple 'time' entities
           # identify additional time entities
           blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
           if(length(blank.ndx)>0){
-            blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
+            if(length(blank.ndx)>1){
+              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
+            }else {
+              blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
+            }
             df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)] <-
               t(sweep(apply(df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
-            for (i in 2:(length(time.ndx))){
-              blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 1])) {
-                (time.ndx[i] + 1):nrow(df)
-              } else {
-                (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
-              }, 1], ignore.case = T) + time.ndx[i]
-              if(length(blank.ndx)>0){
-                blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
+          }
+          for (i in 2:(length(time.ndx))){
+            blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 1])) {
+              (time.ndx[i] + 1):nrow(df)
+            } else {
+              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+            }, 1], ignore.case = T) + time.ndx[i]
 
-                df[if (is.na(time.ndx[i + 1])) {
+            if(length(blank.ndx)>0){
+              if(length(blank.ndx)>1){
+                blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
+              } else {
+                blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
+              }
+              df[if (is.na(time.ndx[i + 1])) {
+                ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
+              } else {
+                ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
+              }, 4:ncol(df)] <-
+                t(sweep(apply(df[if (is.na(time.ndx[i + 1])) {
                   ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
                 } else {
                   ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-                }, 4:ncol(df)] <-
-                  t(sweep(apply(df[if (is.na(time.ndx[i + 1])) {
-                    ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
-                  } else {
-                    ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-                  }, 4:ncol(df)], 1, as.numeric), 1, blank))
-              }
-            } # end of for (i in 2:(length(time.ndx)))
-          } # if(length(blank.ndx)>0){
-        } # end of else {}
+                }, 4:ncol(df)], 1, as.numeric), 1, blank))
+            }
+          } # end of for (i in 2:(length(time.ndx)))
+        } # end of else of if(length(time.ndx)==1)
         return(df)
       }
       if(length(dat)>1)             dat <- subtract_blank(dat)
