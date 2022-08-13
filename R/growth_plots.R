@@ -1318,7 +1318,7 @@ plot.grofit <- function(grofit,
   ndx.keep <- grep(paste0("^",
     str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
 
-  if(data.type == "spline"){
+  if(data.type == "spline"){i
     # correct for log transformation
     if(grofit$control$log.y.spline == TRUE){
       for(i in 1:length(ndx.keep)){
@@ -1747,7 +1747,7 @@ base_breaks <- function(n = 10){
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
-                                               'mu.model', 'lambda.model', 'A.model',
+                                               'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
@@ -1758,7 +1758,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   # check class of object
   if(!(any(is(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
   if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
-                                            'mu.model', 'lambda.model', 'A.model',
+                                            'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                                             'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                             'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')))
                                             stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'mu2.linfit', 'lambda2.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
