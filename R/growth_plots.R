@@ -1340,9 +1340,10 @@ plot.grofit <- function(grofit,
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
                                              gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))),
-                                             ".+[[:space:]]",
+                                             " \\|.+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
+
       name <- conditions_unique[n]
       # Create lists for density and time values for each sample
       if(data.type == "spline"){
@@ -1873,6 +1874,80 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
           # explicitly set the horizontal lines (or they will disappear too)
           ) +
     scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+
+
+
+  # df_reps <-
+  #   data.frame(SummarizedExperiment::assay(subset_list[[i]]) - ref.mean, check.names = FALSE) %>% tibble::rownames_to_column() %>%
+  #   gather(ID, val, -rowname) %>% left_join(., data.frame(SummarizedExperiment::colData(subset_list[[i]]), check.names = FALSE),
+  #                                           by = "ID")
+  # if (convert_name == TRUE) {
+  #   df_reps$rowname <- transform(df_reps,
+  #                                rowname = name_table[match(paste(df_reps$rowname),
+  #                                                           paste(unlist(str_split(
+  #                                                             Reduce(c, name_table[match.id]), ", "
+  #                                                           )))),
+  #                                                     match.name]) %>%
+  #     select(rowname) %>% unlist(., use.names = F)
+  # }
+  # df_reps$replicate <- as.factor(df_reps$replicate)
+  #
+  # df <-
+  #   df_reps %>% group_by(condition, rowname) %>% summarize(
+  #     mean = mean(val,
+  #                 na.rm = TRUE),
+  #     sd = sd(val, na.rm = TRUE),
+  #     n = n()
+  #   ) %>%
+  #   mutate(
+  #     error = stats::qnorm(0.975) * sd / sqrt(n),
+  #     CI.L = mean -
+  #       error,
+  #     CI.R = mean + error
+  #   ) %>% data.frame(check.names = FALSE)
+  #
+  # p <-
+  #   ggplot(df, aes(condition, mean)) + geom_hline(yintercept = 0) +
+  #   geom_col(aes(y = mean, fill = condition), colour = "black")
+  # if (length(unique(dep$condition)) <= 8) {
+  #   p <- p + scale_fill_manual(values = RColorBrewer::brewer.pal(n = length(unique(dep$condition)), name = "Dark2"))
+  # } else if (length(unique(dep$condition)) <= 12) {
+  #   p <- p + scale_fill_manual(values = RColorBrewer::brewer.pal(n = length(unique(dep$condition)), name = "Set3"))
+  # } else {
+  #   p <- p + scale_fill_manual(values = c(
+  #     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+  #     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+  #     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+  #     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+  #     "green1", "yellow4", "yellow3", "darkorange4", "brown"
+  #   ))
+  # }
+  # p <- p +
+  #   ggnewscale::new_scale_fill() +
+  #   geom_point(
+  #     data = df_reps,
+  #     aes(condition, val, fill = replicate),
+  #     shape = 23,
+  #     size = shape.size,
+  #     color = "black",
+  #     position = position_dodge(width = 0.3)
+  #   ) +
+  #   scale_fill_manual(values = case_when(
+  #     as.numeric(max(dep$replicate))<=8       ~ RColorBrewer::brewer.pal(n=as.numeric(max(dep$replicate)), name="Greys"),
+  #     as.numeric(max(dep$replicate))>8        ~ grDevices::colorRampPalette(RColorBrewer::brewer.pal(n=8, name="Greys"))(as.numeric(max(dep$replicate))))
+  #   ) +
+  #   geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.3) +
+  #   labs(
+  #     x = "Baits",
+  #     y = expr(log[2](intensity)-log[2](intensity[!!reference.nm])  ~
+  #                "(\u00B195% CI)"),
+  #     col = "Rep"
+  #   ) + facet_wrap( ~ rowname) +
+  #   theme(basesize = 12) + theme_DEP2()
+
+
+
+
   if(export == FALSE && plot == FALSE){
     return(p)
   }
