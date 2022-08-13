@@ -1105,7 +1105,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     fldat <- fl_data[step:length(fl_data)]
     fl.max.ndx <- which.max(fldat)
     if(fl.max.ndx == 1) next
-    else fl.max.ndx <- fl.max.ndx + (i); end = TRUE
+    else fl.max.ndx <- fl.max.ndx + (step); end = TRUE
   }
   t.growth <- x[which.min(abs(x)):fl.max.ndx]
   if(!is.null(h) && !is.na(h) && h != ""){
@@ -2112,15 +2112,15 @@ fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html
     res.table.fl1 <- flFitRes$flFit1$flTable
   }
   if(!exists("res.table.dr1")){
-    if(!is.na(flFitRes$drFit1)) res.table.dr1 <- flFitRes$drFit1$drTable
+    if(length(flFitRes$drFit1)>1) res.table.dr1 <- flFitRes$drFit1$drTable
   }
   if(!exists("res.table.gc2")){
-    if(!is.na(flFit2)){
+    if(length(flFit2)>1){
       res.table.fl2 <- flFitRes$flFit2$flTable
     }
   }
   if(!exists("res.table.dr2")){
-    if(!is.na(flFit2)){
+    if(length(flFit2)>1){
       if(!is.na(flFitRes$drFit2)) res.table.dr2 <- flFitRes$drFit2$drTable
     }
   }
@@ -2238,10 +2238,10 @@ fl.drFit <- function(FitData, control = fl.control())
     EC50 <- EC50[-skip]
   }
   names(EC50) <- distinct
-  drFitModel <- list(raw.data = FitData, drTable = EC50.table,
+  drFitfl <- list(raw.data = FitData, drTable = EC50.table,
                 drFittedModels = EC50, control = control)
-  class(drFitModel) <- "drFitModel"
-  drFitModel
+  class(drFitfl) <- "drFitfl"
+  drFitfl
 }
 
 fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control())

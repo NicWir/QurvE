@@ -782,6 +782,7 @@ plot.drFitModel <- function(drFittedModel,
 #' @param height
 #' @param width
 #' @param out.dir
+#' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #'
 #' @return
 #' @export
@@ -808,7 +809,8 @@ plot.flFitRes <-  function(object,
                         export = FALSE,
                         height = NULL,
                         width = NULL,
-                        out.dir = NULL
+                        out.dir = NULL,
+                        out.nm = NULL
 )
 {
   if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
@@ -1333,6 +1335,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
   }
   out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
   if (export == TRUE){
+  if(is.null(out.nm)) out.nm <- paste0("flGroupPlot")
     if(is.null(width)){
       w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
     } else {
@@ -1344,11 +1347,11 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       h <- height
     }
     dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", "grpSplineFit.png"),
+    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", "grpSplineFit.pdf"), width = w, height = h)
+    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
     print(p)
     grDevices::dev.off()
   }
@@ -1359,6 +1362,38 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
 
 plot.flFit <- plot.grodata <- plot.flFitRes
 
+#' Title
+#'
+#' @param object
+#' @param fluorescence
+#' @param names
+#' @param conc
+#' @param mean
+#' @param log.y.density
+#' @param log.y.fl
+#' @param deriv
+#' @param n.ybreaks
+#' @param colors
+#' @param basesize
+#' @param y.lim.density
+#' @param y.lim.fl
+#' @param x.lim
+#' @param y.title
+#' @param x.title
+#' @param y.title.density
+#' @param y.title.fl
+#' @param lwd
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot.dual <-  function(object,
                            fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
                            names = NULL,
@@ -1382,7 +1417,8 @@ plot.dual <-  function(object,
                            export = FALSE,
                            height = NULL,
                            width = NULL,
-                           out.dir = NULL
+                           out.dir = NULL,
+                           out.nm = NULL
 )
 {
   if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
@@ -1788,6 +1824,7 @@ plot.dual <-  function(object,
   }
   out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
   if (export == TRUE){
+    if(is.null(out.nm)) out.nm <- paste0("DualPlot_", fluorescence)
     if(is.null(width)){
       w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
     } else {
@@ -1799,11 +1836,11 @@ plot.dual <-  function(object,
       h <- height
     }
     dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", "grpSplineFit.png"),
+    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", "grpSplineFit.pdf"), width = w, height = h)
+    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
     print(p)
     grDevices::dev.off()
   }

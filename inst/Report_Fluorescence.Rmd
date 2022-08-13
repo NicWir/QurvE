@@ -79,7 +79,27 @@ The following parameters were used to fit the data:
 `r if(any(c("l") %in% control$fit.opt)){paste0("* Relative ΔY threshold for linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(control$lin.dY, 'NavyBlue')}`
 
 \pagebreak
+## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1){"Graphical overview -  Fluorescence 1"}`
+```{r dual_plot_fl1, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1}
+plot.dual(flFitRes, fluorescence = "fl1", export = export)
+```
 
+## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1){"Graphical overview -  Normalized fluorescence 1"}`
+```{r dual_plot_norm.fl1, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1}
+plot.dual(flFitRes, fluorescence = "norm.fl1", export = export)
+```
+
+## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1){"Graphical overview -  Fluorescence 2"}`
+```{r dual_plot_fl2, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1}
+plot.dual(flFitRes, fluorescence = "fl2", export = export)
+```
+
+## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1){"Graphical overview -  Normalized fluorescence 2"}`
+```{r dual_plot_norm.fl2, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1}
+plot.dual(flFitRes, fluorescence = "norm.fl2", export = export)
+```
+
+`r if((length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1)){"\\pagebreak"}`
 ## `r if(!is.na(flFit2)){"Fluorescence 1 fit results"} else {"Fluorescence fit results"}`
 ```{r table_linear1, echo=F, warning=F, message=F, results='asis'}
 if(any(c("l") %in% control$fit.opt)){
@@ -729,6 +749,10 @@ knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 for(i in 1:length(flFitRes[["drFit1"]][["drFittedModels"]])){
   plot.drFitModel(flFitRes$drFit1$drFittedModels[[i]], export = export)
 }
+plot.dr_parameter(flFitRes, param = "K", export = export)
+plot.dr_parameter(flFitRes, param = "fc", export = export)
+plot.dr_parameter(flFitRes, param = "y.min", export = export)
+plot.dr_parameter(flFitRes, param = "y.max", export = export)
 ```
 
 `r if(!all(is.na(mean.grp))){"\\clearpage"}`
