@@ -1734,25 +1734,25 @@ base_breaks <- function(n = 10){
 #' @param basesize (Numeric) Base font size.
 #' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized.
 #' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
+#' @param shape.size (Numeric) The size of the symbols indicating replicate values. Default: 2.5
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-
 #'
 #' @export plot.parameter
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
-#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
+#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab geom_hline geom_col
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                                'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
-                            names = NULL, conc = NULL, basesize = 12, reference.nm = NULL, reference.conc = NULL,
+                            names = NULL, conc = NULL, basesize = 12, reference.nm = NULL, reference.conc = NULL, shape.size = 2.5,
                            plot = T, export = F, height = 7, width = NULL, out.dir = NULL)
   {
   param <- match.arg(param)
@@ -1876,74 +1876,33 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
 
 
+  replicates <- unlist(lapply(1:length(ndx.filt), function(x) seq(1, length(ndx.filt[[x]]))))
+  df_reps <-
+    data.frame(condition = unlist(lapply(1:length(ndx.filt), function(x) rep(labels[x], length(ndx.filt[[x]])))),
+               replicate = unlist(lapply(1:length(ndx.filt), function(x) seq(1, length(ndx.filt[[x]])))),
+               value = unlist(lapply(1:length(ndx.filt), function (x) as.numeric(gcTable[ndx.filt[[x]], param])))
+               ) %>%
+    tibble::rownames_to_column()
 
-  # df_reps <-
-  #   data.frame(SummarizedExperiment::assay(subset_list[[i]]) - ref.mean, check.names = FALSE) %>% tibble::rownames_to_column() %>%
-  #   gather(ID, val, -rowname) %>% left_join(., data.frame(SummarizedExperiment::colData(subset_list[[i]]), check.names = FALSE),
-  #                                           by = "ID")
-  # if (convert_name == TRUE) {
-  #   df_reps$rowname <- transform(df_reps,
-  #                                rowname = name_table[match(paste(df_reps$rowname),
-  #                                                           paste(unlist(str_split(
-  #                                                             Reduce(c, name_table[match.id]), ", "
-  #                                                           )))),
-  #                                                     match.name]) %>%
-  #     select(rowname) %>% unlist(., use.names = F)
-  # }
-  # df_reps$replicate <- as.factor(df_reps$replicate)
-  #
-  # df <-
-  #   df_reps %>% group_by(condition, rowname) %>% summarize(
-  #     mean = mean(val,
-  #                 na.rm = TRUE),
-  #     sd = sd(val, na.rm = TRUE),
-  #     n = n()
-  #   ) %>%
-  #   mutate(
-  #     error = stats::qnorm(0.975) * sd / sqrt(n),
-  #     CI.L = mean -
-  #       error,
-  #     CI.R = mean + error
-  #   ) %>% data.frame(check.names = FALSE)
-  #
-  # p <-
-  #   ggplot(df, aes(condition, mean)) + geom_hline(yintercept = 0) +
-  #   geom_col(aes(y = mean, fill = condition), colour = "black")
-  # if (length(unique(dep$condition)) <= 8) {
-  #   p <- p + scale_fill_manual(values = RColorBrewer::brewer.pal(n = length(unique(dep$condition)), name = "Dark2"))
-  # } else if (length(unique(dep$condition)) <= 12) {
-  #   p <- p + scale_fill_manual(values = RColorBrewer::brewer.pal(n = length(unique(dep$condition)), name = "Set3"))
-  # } else {
-  #   p <- p + scale_fill_manual(values = c(
-  #     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-  #     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-  #     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-  #     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-  #     "green1", "yellow4", "yellow3", "darkorange4", "brown"
-  #   ))
-  # }
-  # p <- p +
-  #   ggnewscale::new_scale_fill() +
-  #   geom_point(
-  #     data = df_reps,
-  #     aes(condition, val, fill = replicate),
-  #     shape = 23,
-  #     size = shape.size,
-  #     color = "black",
-  #     position = position_dodge(width = 0.3)
-  #   ) +
-  #   scale_fill_manual(values = case_when(
-  #     as.numeric(max(dep$replicate))<=8       ~ RColorBrewer::brewer.pal(n=as.numeric(max(dep$replicate)), name="Greys"),
-  #     as.numeric(max(dep$replicate))>8        ~ grDevices::colorRampPalette(RColorBrewer::brewer.pal(n=8, name="Greys"))(as.numeric(max(dep$replicate))))
-  #   ) +
-  #   geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.3) +
-  #   labs(
-  #     x = "Baits",
-  #     y = expr(log[2](intensity)-log[2](intensity[!!reference.nm])  ~
-  #                "(\u00B195% CI)"),
-  #     col = "Rep"
-  #   ) + facet_wrap( ~ rowname) +
-  #   theme(basesize = 12) + theme_DEP2()
+  df_reps$condition <- as.factor(df_reps$condition)
+  df_reps$replicate <- as.factor(df_reps$replicate)
+
+
+   p <- p +
+     ggnewscale::new_scale_fill() +
+     geom_point(
+       data = df_reps,
+       aes(x = condition, y = value, fill = replicate),
+       shape = 23,
+       size = 2.5,
+       color = "black",
+       position = position_dodge(width = 0.3),
+       inherit.aes = FALSE
+     ) +
+     scale_fill_manual(values = case_when(
+       as.numeric(max(replicates))<=8       ~ RColorBrewer::brewer.pal(n=as.numeric(max(replicates)), name="Greys"),
+       as.numeric(max(replicates))>8        ~ grDevices::colorRampPalette(RColorBrewer::brewer.pal(n=8, name="Greys"))(as.numeric(max(replicates))))
+     )
 
 
 

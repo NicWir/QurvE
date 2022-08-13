@@ -7,15 +7,16 @@
 \method{plot}{parameter}(
   object,
   param = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit", "mu2.linfit",
-    "lambda2.linfit", "mu.model", "lambda.model", "A.model", "mu.spline",
-    "lambda.spline", "A.spline", "dY.spline", "integral.spline", "mu2.spline",
-    "lambda2.spline", "mu.bt", "lambda.bt", "A.bt", "integral.bt", "max_slope.linfit",
-    "max_slope.spline"),
+    "lambda2.linfit", "mu.model", "lambda.model", "A.model", "tD.linfit", "tD2.linfit",
+    "tD.spline", "tD2.spline", "mu.spline", "lambda.spline", "A.spline", "dY.spline",
+    "integral.spline", "mu2.spline", "lambda2.spline", "mu.bt", "lambda.bt", "A.bt",
+    "integral.bt", "max_slope.linfit", "max_slope.spline"),
   names = NULL,
   conc = NULL,
   basesize = 12,
   reference.nm = NULL,
   reference.conc = NULL,
+  shape.size = 2.5,
   plot = T,
   export = F,
   height = 7,
@@ -41,6 +42,8 @@
 \item{reference.nm}{(Character) Name of the reference condition, to which parameter values are normalized.}
 
 \item{reference.conc}{(Numeric) Concentration of the reference condition, to which parameter values are normalized.}
+
+\item{shape.size}{(Numeric) The size of the symbols indicating replicate values. Default: 2.5}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 
