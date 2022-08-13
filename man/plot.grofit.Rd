@@ -26,7 +26,8 @@
   export = FALSE,
   height = NULL,
   width = NULL,
-  out.dir = NULL
+  out.dir = NULL,
+  out.nm = NULL
 )
 }
 \arguments{
@@ -73,6 +74,8 @@
 \item{width}{(Numeric) Width of the exported image in inches.}
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
+
+\item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
 }
 \description{
 \code{plot.grofit} extracts the spline fits of a subset of samples in a \code{grofit} object calculates averages and standard deviations of conditions with replicates and combines them into a single plot.

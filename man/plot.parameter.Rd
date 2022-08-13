@@ -21,7 +21,8 @@
   export = F,
   height = 7,
   width = NULL,
-  out.dir = NULL
+  out.dir = NULL,
+  out.nm = NULL
 )
 }
 \arguments{
@@ -54,6 +55,8 @@
 \item{width}{(Numeric) Width of the exported image in inches.}
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
+
+\item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
 }
 \description{
 \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95\% confidence interval. If no error bars are shown for a column, the number of replicates for the respective condition with valid fit data was smaller than 3.

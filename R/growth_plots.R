@@ -1224,6 +1224,8 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' @param y.title (Character) Optional: Provide a title for the y-axis of the growth curve plot.
 #' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
 #' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #'
 #' @export plot.grofit
 #' @export
@@ -1253,7 +1255,8 @@ plot.grofit <- function(grofit,
                         export = FALSE,
                         height = NULL,
                         width = NULL,
-                        out.dir = NULL
+                        out.dir = NULL,
+                        out.nm = NULL
 )
 {
   data.type <- match.arg(data.type)
@@ -1687,6 +1690,7 @@ plot.grofit <- function(grofit,
   }
   out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
   if (export == TRUE){
+    if(is.null(out.nm)) out.nm <- paste0("GroupPlot")
     if(is.null(width)){
       w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
     } else {
@@ -1698,11 +1702,11 @@ plot.grofit <- function(grofit,
       h <- height
     }
     dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", "grpSplineFit.png"),
+    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", "grpSplineFit.pdf"), width = w, height = h)
+    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
     print(p)
     grDevices::dev.off()
   }
@@ -1740,6 +1744,7 @@ base_breaks <- function(n = 10){
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #'
 #' @export plot.parameter
 #' @export
@@ -1753,7 +1758,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
                             names = NULL, conc = NULL, basesize = 12, reference.nm = NULL, reference.conc = NULL, shape.size = 2.5,
-                           plot = T, export = F, height = 7, width = NULL, out.dir = NULL)
+                           plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL)
   {
   param <- match.arg(param)
   # check class of object
@@ -1911,15 +1916,16 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     return(p)
   }
   if (export == TRUE){
+    if(is.null(out.nm)) out.nm <- paste0("ParameterPlot_", param)
     w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
     h <- height
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
     dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", "ParameterPlot_", param, ".png"),
+    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", "ParameterPlot_", param, ".pdf"), width = w, height = h)
+    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
     print(p)
     grDevices::dev.off()
   }
