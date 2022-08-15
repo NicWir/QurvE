@@ -1870,7 +1870,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   p <- ggplot(df, aes(x=name, y=mean, fill = group)) +
     geom_bar(stat="identity", color = "black") +
     geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.2) +
-    ggplot2::labs(x = "Sample", y = paste0(param, " (\u00B1 95% CI)")) +
+    ggplot2::labs(x = "Condition", y = paste0(param, " (\u00B1 95% CI)")) +
     theme_minimal(base_size = basesize) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"),
