@@ -110,11 +110,13 @@ read_data <-
         if(length(time.ndx)==1){
           blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
           if(length(blank.ndx)>0){
-            blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = T)
-          } else {
-            blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
+            if(length(blank.ndx)>1){
+              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = T)
+            } else {
+              blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
+            }
+            df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- t(sweep(apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
           }
-          df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- t(sweep(apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
         } else { # identify different datasets based on the occurence of multiple 'time' entities
           # identify additional time entities
           blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
