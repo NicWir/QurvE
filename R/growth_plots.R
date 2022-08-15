@@ -94,6 +94,9 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
   }
 }
 
+#' Generic plot function for \code{gcBootSpline} objects.
+#'
+#' Plot the results of a parametric model fit on density vs. time data
 #'
 #' @param gcFittedModel A \code{gcFittedModel} object created with \code{growth.gcFitModel()} or stored within a \code{grofit} or \code{gcFit} object created with \code{growth.workflow()} or \code{growth.gcFit()}, respectively.
 #' @param raw (Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).
@@ -326,6 +329,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
   }
 }
 
+#' Generic plot function for \code{gcBootSpline} objects.
 #'
 #' @param drBootSpline A \code{drBootSpline} object created with \code{growth.drBootSpline()} or stored within a \code{grofit} or \code{drFit} object created with \code{growth.workflow()} or \code{growth.drFit()}, respectively.
 #' @param pch (Numeric) Size of the raw data points.
@@ -504,6 +508,9 @@ plot.drBootSpline <- function (drBootSpline,
   } # /// else of if (drBootSpline$bootFlag==FALSE){
 }
 
+#' Generic plot function for \code{drFit} objects.
+#'
+#' code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis
 #'
 #' @param drFit
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
@@ -516,22 +523,135 @@ plot.drBootSpline <- function (drBootSpline,
 #' @export plot.drFit
 #' @export
 #'
-plot.drFit <- function(drFit, plot = TRUE, export = FALSE, out.dir = NULL, ...)
+plot.drFit <- function(drFit, combine = TRUE, pch = 2, basesize = 15, colors = NULL, lwd = 0.7,
+                       plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   # x an object of class drFit
 
   n <- length(drFit$drFittedSplines)
+  if(combine == FALSE || n < 2){
+    # /// plot all drFitSpline objects
+    for (i in 1:n) {
+      try(plot(drFit$drFittedSplines[[i]], pch = pch, export = export, plot = plot, height = 7, width = 9, out.dir = out.dir))
+    }
+  } else {
+    if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == TRUE)) {
+      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.conc + 1))
+      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.test + 1))
+    } else if ((drFit$control$log.x.dr == FALSE) && (drFit$control$log.y.dr == TRUE)) {
+      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.conc))
+      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.test + 1))
+    } else if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == FALSE)) {
+      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.conc + 1))
+      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.test))
+    } else if ((drFit$control$log.x.dr == FALSE) && (drFit$control$log.y.dr == FALSE)) {
+      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.conc))
+      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.test))
+    }
+    names(raw.x) <- names(raw.y) <- names(drFit$drFittedSplines)
+    raw.df <- lapply(1:length(raw.x), function(x) data.frame(x = raw.x[[x]], y = raw.y[[x]], Condition = rep(names(raw.x)[[x]], length(raw.x[[x]]))))
+    raw.df <- do.call("rbind", raw.df)
 
-  # /// plot all drFitSpline objects
-  for (i in 1:n) {
-    try(plot(drFit$drFittedSplines[[i]], export = export, plot = plot, height = 7, width = 9, out.dir = out.dir))
+    res.df <- lapply(1:length(raw.x), function(x) data.frame(Condition = names(drFit$drFittedSplines)[[x]],
+                                                             ec50 = drFit$drFittedSplines[[x]][["parameters"]][["EC50"]],
+                                                             yEC50 = drFit$drFittedSplines[[x]][["parameters"]][["yEC50"]]))
+    res.df <- do.call("rbind", res.df)
+
+    spline.df  <- lapply(1:length(raw.x), function(x) data.frame(x = drFit$drFittedSplines[[x]][["fit.conc"]],
+                                                                 y = drFit$drFittedSplines[[x]][["fit.test"]],
+                                                                 Condition = rep(names(drFit$drFittedSplines)[[x]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
+    spline.df <- do.call("rbind", spline.df)
+
+    nrow <- ceiling(length(drFit$drFittedSplines)/2)
+    p <- ggplot(data = raw.df, aes(x, y, colour = Condition)) +
+      geom_point(size=pch) +
+      geom_line(data = spline.df, aes(x, y, colour = Condition), size = lwd) +
+      theme_classic(base_size = basesize) +
+      scale_y_continuous(breaks = scales::pretty_breaks()) +
+      xlab(ifelse(drFit$control$log.x.dr == TRUE, "Ln(concentration + 1)", "Concentration")) +
+      ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, ")"), paste0(drFit$control$dr.parameter)))+
+      theme(legend.position="bottom") +
+      ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
+
+
+    plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
+    plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
+
+    p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = 1) +
+      geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd) +
+      scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks()) +
+      scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+
+
+
+
+    if(is.null(colors)){
+      if (length(drFit$drFittedSplines) <= 8) {
+        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+      } else {
+        p <- p + scale_fill_manual(name = "Condition",
+                                   values = c(
+                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                   )
+        ) + scale_color_manual(name = "Condition",
+                               values = c(
+                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                               )
+        )
+      }
+    }
+    if (export == TRUE){
+      out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+      if(is.null(out.nm)) out.nm <- paste0("drFitPlot")
+      if(is.null(width)){
+        w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
+      } else {
+        w <- width
+      }
+      if(is.null(height)){
+        h <- ifelse(deriv==T, 9, 6)
+      } else {
+        h <- height
+      }
+      dir.create(out.dir, showWarnings = F)
+      grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
+                     width = w, height = h, units = 'in', res = 300)
+      print(p)
+      grDevices::dev.off()
+      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+      print(p)
+      grDevices::dev.off()
+    }
+    if (plot == TRUE){
+      print(p)
+    } else {
+      return(p)
+    }
   }
-
 }
 
+#' Generic plot function for \code{drFitSpline} objects.
+#'
+#' code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
 #'
 #' @param drFitSpline
-#' @param add
+#' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{plot.drBootSpline()}.
 #' @param ec50line
 #' @param pch
 #' @param colSpline
@@ -714,6 +834,7 @@ plot.drFitSpline <-
     }
   }
 
+#' Generic plot function for \code{gcBootSpline} objects.
 #'
 #' @param gcBootSpline
 #' @param pch
@@ -878,19 +999,22 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
   par(mfrow = c(1, 1))
 }
 
+#' Generic plot function for \code{gcFitSpline} objects.
 #'
-#' @param gcFitSpline
-#' @param add
-#' @param raw
-#' @param slope
-#' @param deriv
-#' @param spline
-#' @param log.y
-#' @param pch
-#' @param colData
-#' @param colSpline
-#' @param cex
-#' @param lwd
+#'code{plot.gcFitSpline} generates the spline fit plot for a single sample.
+#'
+#' @param gcFitSpline object of class \code{gcFitSpline}, generated with \code{growth.gcFitSpline()}.
+#' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{plot.gcBootSpline()}.
+#' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
+#' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
+#' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
+#' @param log.y (Logical) Log-transform the y-axis (\code{TRUE}) or not (\code{FALSE}).
+#' @param pch (Logical) Size of the raw data circles.
+#' @param colData (Numeric or character) Contour color of the raw data circles.
+#' @param colSpline (Numeric or character) Spline line colour.
+#' @param basesize (Numeric) Base font size.
+#' @param lwd (Numeric) Spline line width.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
@@ -908,7 +1032,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
-                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
+                             pch=2, colData=1, colSpline="dodgerblue3", basesize=16, lwd = 0.7, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
 {
@@ -918,8 +1042,9 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
+  if (is.logical(deriv)==FALSE) stop("Need logical value for: deriv")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
+  if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: cex")
 
   # /// check if a data fit is available
   if ((is.na(gcFitSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE)){
@@ -989,20 +1114,20 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 
 
       p <- ggplot(df, aes(x=time, y=data)) +
-        geom_point(shape=1, size = 2,alpha = 0.6, stroke=0.15) +
+        geom_point(shape=1, size = pch,alpha = 0.6, stroke=0.15*pch, color = colData) +
         geom_line(aes(x=fit.time, y = fit.data, color = "spline"), size = lwd) +
         xlab("Time") +
         ylab(label = "Growth [y(t)]") +
-        theme_classic(base_size = 16) +
+        theme_classic(base_size = basesize) +
         ggtitle(gsub(" \\| NA", "", paste(gcFitSpline$gcID, collapse=" | "))) +
         theme(legend.key = element_blank(),
               legend.background=element_blank(),
               legend.title = element_blank(),
               legend.position = c(0.90, 0.08),
-              plot.title = element_text(size=15),
+              plot.title = element_text(size = basesize, face = "bold"),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank()) +
-        scale_color_manual(name='Growth Model',
+        scale_color_manual(name='Growth fit',
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
 
@@ -1148,12 +1273,12 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         df.mu <- data.frame(spline(gcFitSpline$spline.deriv1$x, gcFitSpline$spline.deriv1$y))
         #add missing time values due to min.density and t0
         df.mu <-
-          bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
+          dplyr::bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
                     df.mu)
 
         p.mu <- ggplot(df.mu, aes(x=x, y=y)) +
           geom_line(color = colSpline, size = lwd) +
-          theme_classic(base_size = 15) +
+          theme_classic(base_size = basesize) +
           xlab("Time") +
           ylab(label = "Growth rate")
 
@@ -1197,7 +1322,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
   } # else of if ((is.na(gcFitSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE))
 }
 
-#' Combine different groups of samples into a single plot
+#' Generic plot function for \code{grofit} objects. Combine different groups of samples into a single plot
 #'
 #' \code{plot.grofit} extracts the spline fits of a subset of samples in a \code{grofit} object calculates averages and standard deviations of conditions with replicates and combines them into a single plot.
 #'
@@ -1725,7 +1850,7 @@ base_breaks <- function(n = 10){
 
 #' Compare growth parameters between samples or conditions
 #'
-#' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95% confidence interval. If no error bars are shown for a column, the number of replicates for the respective condition with valid fit data was smaller than 3.
+#' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
 #'
 #' @param object A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{growth.workflow()} or \code{growth.gcFit}.
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
@@ -1936,6 +2061,25 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   }
 }
 
+#' Compare calculated dose-response parameters between conditions.
+#'
+#' \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
+#'
+#' @param object
+#' @param param
+#' @param names
+#' @param basesize
+#' @param reference.nm
+#' @param plot
+#' @param export
+#' @param height
+#' @param width
+#' @param out.dir
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
                               names = NULL, basesize = 12, reference.nm = NULL,
                               plot = T, export = F, height = 7, width = NULL, out.dir = NULL)
@@ -1945,7 +2089,6 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   if(!(any(is(object) %in% c("drTable", "grofit", "drFit", "flFitRes")))) stop("object needs to be either a 'grofit', 'drTable', 'drFit', or 'flFitRes' object created with growth.workflow(), growth.drFit(), fl.workflow(), or growth.drFit().")
   if(!is.character(param) || !(param %in% c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y')))
     stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'yEC50', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
-
   #extract drTable
   if(any(is(object) %in% "drTable")){
     drTable <- object
@@ -1959,6 +2102,7 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
     drTable <- object
   }
   drTable <- as.data.frame(drTable)
+  if(!(param %in% colnames(drTable))) stop(paste0(param, " is not a suitable dr parameter for the performed dose-response analysis. Options 'y.max', 'y.min', 'fc', 'K', or 'n' are only available for drFitfl or flFitRes objects created with dr.method = 'model' in the fl.control object."))
   #check if param exists in drTable and has a valid value
   if(all(is.na(drTable[[param]]))){
     if(gsub(".+\\.", "", param)=="linfit") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow()/fl.workflow() with 'fit.opt' containing 'l' or 'a', or growth.drFit()/fl.drFit() with a control object with 'fit.opt' containing 'l' or 'a'."))

@@ -962,7 +962,7 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
     res.table.gc <- grofit$gcFit$gcTable
   }
   if(!exists("res.table.dr")){
-    if(!is.na(grofit$drFit)) res.table.dr <- grofit$drFit$drTable
+    if(length(grofit$drFit) >1 ) res.table.dr <- grofit$drFit$drTable
   }
   # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
   mu.min <- suppressWarnings(min(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) min(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05

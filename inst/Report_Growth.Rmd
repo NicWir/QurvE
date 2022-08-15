@@ -935,8 +935,8 @@ names(ec50.df)[3] <- paste0("Response (", grofit$drFit$drFittedSplines[[1]]$para
 knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 ```
 
-```{r ec50_spline_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0}
-plot.drFit(grofit$drFit, export = export)
+```{r ec50_spline_plots, fig.width=8, fig.height=7, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0}
+plot.drFit(grofit$drFit, export = export, combine = TRUE, basesize = 12)
 ```
 
 ```{r ec50.boot_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
