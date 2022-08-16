@@ -898,10 +898,38 @@ growth.workflow <- function (grodata = NULL,
 
   gcTable <- data.frame(apply(grofit[["gcFit"]][["gcTable"]],2,as.character))
   res.table.gc <- Filter(function(x) !all(is.na(x)),gcTable)
+  res.table.gc[, c(8:16, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
   utils::write.table(res.table.gc, paste(wd, "results.gc.txt",
                                   sep = "/"), row.names = FALSE, sep = "\t")
   cat(paste0("Results of growth fit analysis saved as tab-delimited text file in:\n",
-             wd, "/results.gc.txt\n"))
+             wd, "/results.gc.txt\n\n"))
+
+  # Calculate average and SD for each condition and export results as table
+    nm <- as.character(paste(res.table.gc[,1], res.table.gc[,2], res.table.gc[,3], sep = " | "))
+    cond <- unique(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm))
+    # get indices of replicates
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i) which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    # extract numeric columns
+    num_cols <- unlist(lapply(res.table.gc, is.numeric))
+    # create lists of dataframes with mean or sd results for each condition
+    mean.ls <- lapply(1:length(ndx.filt.rep), function(i) colMeans(res.table.gc[ndx.filt.rep[[i]], c(8:16, 20:27, 29:44)], na.rm = T))
+    sd.ls <- lapply(1:length(ndx.filt.rep), function(i) apply(res.table.gc[ndx.filt.rep[[i]], c(8:16, 20:27, 29:44)], 2, sd, na.rm = T))
+    names(mean.ls) <- names(sd.ls) <- cond
+    # convert lists to dataframes
+    mean.df <- do.call(rbind, mean.ls)
+    colnames(mean.df) <- paste0("mean_", colnames(mean.df))
+    sd.df <- do.call(rbind, sd.ls)
+    colnames(sd.df) <- paste0("sd_", colnames(sd.df))
+    # combine dataframes with alternating columns
+    combined.df <- zipFastener(mean.df, sd.df)
+    combined.df <- cbind(data.frame(condition = gsub(" \\|.+", "", rownames(combined.df)), concentration = gsub(".+\\| ", "", rownames(combined.df))), combined.df)
+
+    # export table
+    utils::write.table(combined.df, paste(wd, "mean_results.gc.txt",
+                                           sep = "/"), row.names = FALSE, sep = "\t")
+    cat(paste0("Per-group average results of growth fit analysis saved as tab-delimited text file in:\n",
+               wd, "/mean_results.gc.txt\n\n"))
+
   if (ec50 == TRUE) {
     res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
     utils::write.table(res.table.dr, paste(wd, "results.dr.txt",
