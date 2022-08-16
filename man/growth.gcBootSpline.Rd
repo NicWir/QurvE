@@ -2,15 +2,36 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.gcBootSpline}
 \alias{growth.gcBootSpline}
-\title{gcBootSpline: Function to generate a bootstrap}
+\title{Perform a bootstrap on the dataset followed by spline fits for each resample}
 \usage{
 growth.gcBootSpline(time, data, gcID = "undefined", control = growth.control())
 }
 \arguments{
+\item{time}{Vector of the independent variable (usually: time).}
+
+\item{data}{Vector of dependent variable (usually: density values).}
+
 \item{gcID}{(Character) The name of the analyzed sample.}
 
-\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
+}
+\value{
+A \code{gcBootSpline} object containing a distribution of growth parameters and
+a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
+to visualize the all bootstrapping splines as well as the distribution of
+physiological parameters.
 }
 \description{
-gcBootSpline: Function to generate a bootstrap
+\code{growth.gcBootSpline} resamples the density values in a dataset with replacement and performs a spline fit for each bootstrap sample.
 }
+\seealso{
+Other fitting functions: 
+\code{\link{grofit.param}()},
+\code{\link{growth.drBootSpline}()},
+\code{\link{growth.drFitSpline}()},
+\code{\link{growth.drFit}()},
+\code{\link{growth.gcFitLinear}()},
+\code{\link{growth.gcFitModel}()},
+\code{\link{growth.gcFitSpline}()}
+}
+\concept{fitting functions}

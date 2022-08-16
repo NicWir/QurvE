@@ -45,10 +45,10 @@ In column format, the first three table rows contain
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 }
 \value{
-An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{growth.workflow} or, together with a \code{grofit.control} object in \code{growth.gcFit}, \code{growth.gcFitLinear}, \code{growth.gcFitModel}, \code{growth.gcFitSpline}, or \code{growth.gcBootSpline}
+An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{\link{growth.workflow}} or, together with a \code{grofit.control} object, in \code{\link{growth.gcFit}}, \code{\link{growth.gcFitLinear}}, \code{\link{growth.gcFitModel}}, \code{\link{growth.gcFitSpline}}, or \code{\link{growth.gcBootSpline}}.
 }
 \description{
-\link{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
+\code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
 }
 \details{
 \figure{Data_layout.png}

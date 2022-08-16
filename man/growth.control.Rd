@@ -47,23 +47,23 @@ growth.control(
 
 \item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
 
-\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and spline fits. Default: \code{TRUE}}
+\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and \emph{spline} fits. Default: \code{TRUE}}
 
 \item{log.y.model}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{model} fits. Default: \code{TRUE}}
 
-\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{growth.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
+\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
 
-\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.}
+\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}}
 
-\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{growth.gcFitLinear()}.}
+\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{growth.gcFitLinear}}}
 
 \item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
 
-\item{biphasic}{(Logical) Shall \code{growth.gcFitLinear} and \code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
+\item{biphasic}{(Logical) Shall \code{\link{growth.gcFitLinear}} and \code{\link{growth.gcFitSpline}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
 
 \item{interactive}{(Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the \emph{Plots} pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.}
 
-\item{nboot.gc}{(Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}}
+\item{nboot.gc}{(Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}}
 
 \item{smooth.gc}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}}
 
@@ -84,5 +84,5 @@ growth.control(
 \item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 }
 \description{
-A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
+A \code{grofit.control} object is required to perform various computations on growth data stored within \code{grodata} objects (created with \code{\link{read_data}} or \code{\link{parse_data}}). A \code{grofit.control} object is created automatically as part of \code{\link{growth.workflow}}.
 }

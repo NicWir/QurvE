@@ -2,15 +2,30 @@
 % Please edit documentation in R/growth_computation.R
 \name{grofit.param}
 \alias{grofit.param}
-\title{internal function called within \code{growth.gcFitModel()}.}
+\title{Internal function called within \code{\link{growth.gcFitModel}}.}
 \usage{
 grofit.param(time, data, gcID = "undefined", control)
 }
 \arguments{
+\item{time}{Vector of the independent variable (usually time).}
+
+\item{data}{Vector of dependent variable (usually density values).}
+
 \item{gcID}{(Character) The name of the analyzed sample.}
 
-\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
 }
 \description{
-internal function called within \code{growth.gcFitModel()}.
+Internal function called within \code{\link{growth.gcFitModel}}.
 }
+\seealso{
+Other fitting functions: 
+\code{\link{growth.drBootSpline}()},
+\code{\link{growth.drFitSpline}()},
+\code{\link{growth.drFit}()},
+\code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFitLinear}()},
+\code{\link{growth.gcFitModel}()},
+\code{\link{growth.gcFitSpline}()}
+}
+\concept{fitting functions}

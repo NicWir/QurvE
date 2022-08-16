@@ -2,10 +2,11 @@
 % Please edit documentation in R/growth_plots.R
 \name{plot.grofit}
 \alias{plot.grofit}
-\title{Combine different groups of samples into a single plot}
+\title{Generic plot function for \code{grofit} objects. Combine different groups of samples into a single plot}
 \usage{
 \method{plot}{grofit}(
   grofit,
+  ...,
   data.type = c("spline", "raw"),
   names = NULL,
   conc = NULL,
@@ -35,7 +36,7 @@
 
 \item{data.type}{(Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results}
 
-\item{names}{(String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
+\item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 
 \item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.}
 
@@ -47,7 +48,7 @@
 
 \item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
 
-\item{colors}{(String vector) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
+\item{colors}{(vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
 
 \item{basesize}{(Numeric) Base font size.}
 

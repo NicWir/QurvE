@@ -1,18 +1,20 @@
-#' Title
+#' Create a \code{fl.control} object.
 #'
-#' @param fit.opt
-#' @param x_type
-#' @param norm_fl
-#' @param t0
-#' @param min.density
-#' @param log.x.lin
-#' @param log.x.spline
-#' @param log.y.lin
-#' @param log.y.spline
-#' @param lin.h
-#' @param lin.R2
-#' @param lin.RSD
-#' @param lin.dY
+#' A \code{fl.control} object is required to perform various computations on fluorescence data stored within \code{grodata} objects (created with \code{read_data()} or \code{parse_data()}). A \code{grofit.control} object is created automatically as part of \code{growth.workflow()}.
+#'
+#' @param x_type (Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.
+#' @param fit.opt (Character or vector of strings) Indicates whether the program should perform a linear regression (\code{"l"}) and/or spline fit (\code{"s"}). Default:  \code{fit.opt = c("l", "s")}.
+#' @param norm_fl (Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}
+#' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
+#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
+#' @param log.x.lin (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _linear_ fits. Default: \code{FALSE}.
+#' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
+#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{FALSE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{FALSE}
+#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{fl.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
+#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{fl.gcFitLinear()}.
+#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{fl.gcFitLinear()}.
+#' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param dr.parameter
 #' @param dr.method For model, cite: https://doi.org/10.1038/s41467-020-20094-3
 #' @param dr.have.atleast
@@ -30,6 +32,8 @@
 #' @param clean.bootstrap
 #'
 #' @return
+#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
+#' Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
 #' @export
 #'
 #' @examples
@@ -2073,7 +2077,7 @@ fl.workflow <- function(grodata = NULL,
 #' @param ... Further arguments passed to create a report. Currently required:
 #' \itemize{
 #'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{fl.workflow()}?
-#'    \item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{"all"}, a string vector, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
+#'    \item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{"all"}, a vector of strings, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 #'    \item \code{export}: Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
 #' }

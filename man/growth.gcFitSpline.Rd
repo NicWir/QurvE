@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.gcFitSpline}
 \alias{growth.gcFitSpline}
-\title{Model a smooth spline fit for density data.}
+\title{Perform a smooth spline fit on growth data}
 \usage{
 growth.gcFitSpline(
   time,
@@ -12,27 +12,50 @@ growth.gcFitSpline(
 )
 }
 \arguments{
-\item{time}{Vector of the independent variable (e.g., time).}
+\item{time}{Vector of the independent variable (usually time).}
 
-\item{data}{Vector of dependent variable (e.g., density values).}
+\item{data}{Vector of dependent variable (usually: density values).}
 
 \item{gcID}{(Character) The name of the analyzed sample.}
 
-\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}},
+defining relevant fitting options.}
 
-\item{biphasic}{(Logical) Shall \code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
-If \code{TRUE}, the following steps are performed to define a second growth phase:
-\enumerate{
-\item Determine local minima within the first derivative of the smooth spline fit.
-\item Remove the 'peak' containing the highest value of the first derivative (i.e., \eqn{mu_{max}}) that is flanked by two local minima.
-\item Repeat the smooth spline fit and identification of maximum slope for later time values than the local minimum after \eqn{mu_{max}}.
-\item Repeat the smooth spline fit and identification of maximum slope for earlier time values than the local minimum before \eqn{mu_{max}}.
-\item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
-}}
+\item{biphasic}{(Logical) Shall \code{growth.gcFitSpline} try to extract growth
+parameters for two different growth phases (as observed with, e.g., diauxic shifts)
+(\code{TRUE}) or not (\code{FALSE})?}
 }
 \value{
-A \code{gcFitSpline} object containing the spline fit, its first derivative, and relevant parameters. The lag time is estimated as the intersection between the tangent at the maximum slope and the horizontal line with \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The intersection of the fit with the abscissa is indicated as \code{b.spl}.
+A \code{gcFitSpline} object containing the spline fit, its first derivative,
+and relevant parameters. The lag time is estimated as the intersection between the
+tangent at the maximum slope and the horizontal line with \eqn{y=y_0}, where
+\code{y0} is the first value of the dependent variable. The intersection of the fit
+with the abscissa is stored as \code{b.spl}. Use \code{\link{plot.gcFitSpline}} to
+visualize the spline fit and derivative over time.
 }
 \description{
-\code{growth.gcFitSpline()} performs a smooth spline fit on the dataset and determines the highest growth rate as the global maximum in the first derivative of the spline.
+\code{growth.gcFitSpline} performs a smooth spline fit on the dataset and determines
+the highest growth rate as the global maximum in the first derivative of the spline.
 }
+\details{
+If \code{biphasic = TRUE}, the following steps are performed to define a
+second growth phase: \enumerate{ \item Determine local minima within the first
+derivative of the smooth spline fit. \item Remove the 'peak' containing the highest
+value of the first derivative (i.e., \eqn{mu_{max}}) that is flanked by two local
+minima. \item Repeat the smooth spline fit and identification of maximum slope for
+later time values than the local minimum after \eqn{mu_{max}}. \item Repeat the
+smooth spline fit and identification of maximum slope for earlier time values than
+the local minimum before \eqn{mu_{max}}. \item Choose the greater of the two
+independently determined slopes as \eqn{mu_{max}2}. }
+}
+\seealso{
+Other fitting functions: 
+\code{\link{grofit.param}()},
+\code{\link{growth.drBootSpline}()},
+\code{\link{growth.drFitSpline}()},
+\code{\link{growth.drFit}()},
+\code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFitLinear}()},
+\code{\link{growth.gcFitModel}()}
+}
+\concept{fitting functions}

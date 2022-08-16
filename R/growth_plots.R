@@ -1,4 +1,4 @@
-#' Plot the results of a linear regression on ln-transformed data
+#' Generic plot function for \code{gcFittedLinear} objects. Plot the results of a linear regression on ln-transformed data
 #'
 #' \code{plot.gcFitLinear} shows the results of a linear regression on log-transformed data and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
 #'
@@ -115,7 +115,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @export plot.gcFitModel
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
@@ -332,10 +332,10 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
 #' Generic plot function for \code{gcBootSpline} objects.
 #'
 #' @param drBootSpline A \code{drBootSpline} object created with \code{growth.drBootSpline()} or stored within a \code{grofit} or \code{drFit} object created with \code{growth.workflow()} or \code{growth.drFit()}, respectively.
-#' @param pch (Numeric) Size of the raw data points.
+#' @param pch (Numeric) Shape of the raw data symbols.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
 #' @param colSpline (Numeric or Character) Color used to plot the splines.
-#' @param cex (Numeric) Line width of the individual splines.
+#' @param cex (Numeric) Size of the raw data points.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -347,10 +347,10 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
 #' @export
 #'
 plot.drBootSpline <- function (drBootSpline,
-                               pch = 1,
+                               pch = 19,
                                colData = 1,
                                colSpline = scales::alpha("black", 0.15),
-                               cex = 0.5, plot = TRUE, export = FALSE,
+                               cex = 1, plot = TRUE, export = FALSE,
                                height = 7, width = 9, out.dir = NULL,
                                ...)
 {
@@ -443,7 +443,7 @@ plot.drBootSpline <- function (drBootSpline,
       points(
         drBootSpline$raw.conc,
         drBootSpline$raw.test,
-        col = colData,
+        col = colData, bg = colData,
         pch = pch,
         cex = cex
       )
@@ -512,18 +512,27 @@ plot.drBootSpline <- function (drBootSpline,
 #'
 #' code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis
 #'
-#' @param drFit
+#' @param drFit object of class \code{drFit}, created with \code{growth.drFit()}.
+#' @param combine (Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param pch (Numeric) Shape of the raw data symbols.
+#' @param basesize (Numeric) Base font size.
+#' @param colors (Numeric or character) Define colors for different conditions.
+#' @param lwd (Numeric) Line width of the individual splines.
+#' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 values (\code{TRUE}) or not (\code{FALSE}).
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
+#' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-#' @param ...
 #'
 #' @export plot.drFit
 #' @export
-#'
-plot.drFit <- function(drFit, combine = TRUE, pch = 2, basesize = 15, colors = NULL, lwd = 0.7,
+#' @importFrom ggplot2 aes element_text geom_errorbar geom_line
+#'   geom_point geom_segment ggplot ggtitle labs
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
+#'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
+plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   # x an object of class drFit
@@ -532,7 +541,7 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 2, basesize = 15, colors = N
   if(combine == FALSE || n < 2){
     # /// plot all drFitSpline objects
     for (i in 1:n) {
-      try(plot(drFit$drFittedSplines[[i]], pch = pch, export = export, plot = plot, height = 7, width = 9, out.dir = out.dir))
+      try(plot(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch, cex = cex, export = export, plot = plot, height = 7, width = 9, out.dir = out.dir))
     }
   } else {
     if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == TRUE)) {
@@ -550,7 +559,24 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 2, basesize = 15, colors = N
     }
     names(raw.x) <- names(raw.y) <- names(drFit$drFittedSplines)
     raw.df <- lapply(1:length(raw.x), function(x) data.frame(x = raw.x[[x]], y = raw.y[[x]], Condition = rep(names(raw.x)[[x]], length(raw.x[[x]]))))
-    raw.df <- do.call("rbind", raw.df)
+    # raw.df <- do.call("rbind", raw.df)
+
+    n <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
+    conc <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) unique(raw.x[[i]])[x]))
+    mean <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) mean(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
+    sd <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) sd(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
+    names <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) rep(names(drFit$drFittedSplines)[i], length_out=length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]]))))
+    error <- stats::qnorm(0.975) * sd / sqrt(n) # standard error
+    CI.L <- mean - error #left confidence interval
+    CI.R <- mean + error #right confidence interval
+
+    raw.df <- data.frame(Condition = as.vector(names), conc = as.vector(conc), mean = as.vector(mean), CI.L = as.vector(CI.L), CI.R = as.vector(CI.R))
+    # raw.df$Condition <- factor(raw.df$Condition, levels = raw.df$Condition)
+    # raw.df$group <- gsub(" \\|.+", "", raw.df$name)
+    # raw.df$mean[is.na(raw.df$mean)] <- 0
+    # raw.df$CI.L[is.na(raw.df$CI.L)] <- 0
+    # raw.df$CI.R[is.na(raw.df$CI.R)] <- 0
+
 
     res.df <- lapply(1:length(raw.x), function(x) data.frame(Condition = names(drFit$drFittedSplines)[[x]],
                                                              ec50 = drFit$drFittedSplines[[x]][["parameters"]][["EC50"]],
@@ -563,8 +589,9 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 2, basesize = 15, colors = N
     spline.df <- do.call("rbind", spline.df)
 
     nrow <- ceiling(length(drFit$drFittedSplines)/2)
-    p <- ggplot(data = raw.df, aes(x, y, colour = Condition)) +
-      geom_point(size=pch) +
+    p <- ggplot(data = raw.df, aes(conc, mean, colour = Condition)) +
+      geom_point(size=cex, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
+      geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
       geom_line(data = spline.df, aes(x, y, colour = Condition), size = lwd) +
       theme_classic(base_size = basesize) +
       scale_y_continuous(breaks = scales::pretty_breaks()) +
@@ -573,14 +600,16 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 2, basesize = 15, colors = N
       theme(legend.position="bottom") +
       ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
 
-
-    plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
-    plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
-
-    p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = 1) +
-      geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd) +
-      scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks()) +
-      scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+    if(ec50line){
+      plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
+      plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
+      p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = 1) +
+        geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd) +
+        scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks()) +
+        scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+    } else {
+      p <- p + scale_x_continuous(breaks = scales::pretty_breaks())
+    }
 
 
 
@@ -650,14 +679,14 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 2, basesize = 15, colors = N
 #'
 #' code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
 #'
-#' @param drFitSpline
+#' @param drFitSpline object of class \code{drFitSpline}, created with \code{growth.drFitSpline()}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{plot.drBootSpline()}.
-#' @param ec50line
-#' @param pch
-#' @param colSpline
-#' @param colData
-#' @param cex
-#' @param lwd
+#' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).
+#' @param pch (Numeric) Shape of the raw data symbols.
+#' @param colData (Numeric or character) Contour color of the raw data circles.
+#' @param colSpline (Numeric or character) Spline line colour.
+#' @param cex (Numeric) Size of the raw data symbols.
+#' @param lwd (Numeric) Line width of spline.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -672,7 +701,7 @@ plot.drFitSpline <-
   function (drFitSpline,
             add = FALSE,
             ec50line = TRUE,
-            pch = 1,
+            pch = 16,
             colSpline = 1,
             colData = 1,
             cex = 1,
@@ -697,7 +726,7 @@ plot.drFitSpline <-
           plot(
             log(drFitSpline$raw.conc + 1),
             log(drFitSpline$raw.test + 1),
-            pch = pch,
+            pch = pch, bg = colData,
             cex = cex,
             col = colData,
             xlab = "ln(1+concentration)",
@@ -710,7 +739,7 @@ plot.drFitSpline <-
             plot(
               drFitSpline$raw.conc,
               log(drFitSpline$raw.test + 1),
-              pch = pch,
+              pch = pch, bg = colData,
               cex = cex,
               col = colData,
               xlab = "concentration",
@@ -723,7 +752,7 @@ plot.drFitSpline <-
               plot(
                 log(drFitSpline$raw.conc + 1),
                 drFitSpline$raw.test,
-                pch = pch,
+                pch = pch, bg = colData,
                 cex = cex,
                 col = colData,
                 xlab = "Ln(1+concentration)",
@@ -736,7 +765,7 @@ plot.drFitSpline <-
                 plot(
                   drFitSpline$raw.conc,
                   drFitSpline$raw.test,
-                  pch = pch,
+                  pch = pch, bg = colData,
                   cex = cex,
                   col = colData,
                   xlab = "Concentration",
@@ -752,7 +781,7 @@ plot.drFitSpline <-
           points(
             log(drFitSpline$raw.conc + 1),
             log(drFitSpline$raw.test + 1),
-            pch = pch,
+            pch = pch, bg = colData,
             cex = cex,
             col = colData
           )
@@ -762,7 +791,7 @@ plot.drFitSpline <-
             points(
               drFitSpline$raw.conc,
               log(drFitSpline$raw.test + 1),
-              pch = pch,
+              pch = pch, bg = colData,
               cex = cex,
               col = colData
             )
@@ -773,7 +802,7 @@ plot.drFitSpline <-
               points(
                 log(drFitSpline$raw.conc + 1),
                 drFitSpline$raw.test,
-                pch = pch,
+                pch = pch, bg = colData,
                 cex = cex,
                 col = colData
               )
@@ -784,7 +813,7 @@ plot.drFitSpline <-
                 points(
                   drFitSpline$raw.conc,
                   drFitSpline$raw.test,
-                  pch = pch,
+                  pch = pch, bg = colData,
                   cex = cex,
                   col = colData
                 )
@@ -836,12 +865,12 @@ plot.drFitSpline <-
 
 #' Generic plot function for \code{gcBootSpline} objects.
 #'
-#' @param gcBootSpline
-#' @param pch
-#' @param colData
-#' @param deriv
-#' @param colSpline
-#' @param cex
+#' @param gcBootSpline object of class \code{gcBootSpline}, created with \code{growth.gcBootSpline()}.
+#' @param pch (Numeric) Size of the raw data circles.
+#' @param colData (Numeric or character) Contour color of the raw data circles.
+#' @param deriv (Logical) Show the derivatives (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param colSpline (Numeric or character) Spline line colour.
+#' @param pch (Numeric) Size of the raw data circles.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -1003,14 +1032,14 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'
 #'code{plot.gcFitSpline} generates the spline fit plot for a single sample.
 #'
-#' @param gcFitSpline object of class \code{gcFitSpline}, generated with \code{growth.gcFitSpline()}.
+#' @param gcFitSpline object of class \code{gcFitSpline}, created with \code{growth.gcFitSpline()}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{plot.gcBootSpline()}.
 #' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
 #' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
 #' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
 #' @param log.y (Logical) Log-transform the y-axis (\code{TRUE}) or not (\code{FALSE}).
-#' @param pch (Logical) Size of the raw data circles.
+#' @param pch (Numeric) Size of the raw data circles.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param colSpline (Numeric or character) Spline line colour.
 #' @param basesize (Numeric) Base font size.
@@ -1028,7 +1057,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @export plot.gcFitSpline
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
@@ -1329,13 +1358,13 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #'
 #' @param grofit A \code{grofit} object created with \code{growth.workflow()} containing spline fits.
 #' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
-#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
 #' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
-#' @param colors (String vector) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
 #' @param basesize (Numeric) Base font size.
 #' @param lwd (Numeric) Line width of the individual plots.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
@@ -1355,11 +1384,11 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' @export plot.grofit
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab xlim ylim
 #'
-plot.grofit <- function(grofit,
+plot.grofit <- function(grofit, ...,
                         data.type = c("spline", "raw"),
                         names = NULL,
                         conc = NULL,
@@ -1384,6 +1413,30 @@ plot.grofit <- function(grofit,
                         out.nm = NULL
 )
 {
+
+  call <- match.call()
+  # remove all function arguments from call to leave only multiple grofit objects
+  call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <-
+    call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
+    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- NULL
+
+  arglist <- lapply(call[-1], function(x) x)
+  var.names <- vapply(arglist, deparse, character(1))
+  arglist <- lapply(arglist, eval.parent, n = 2)
+  names(arglist) <- var.names
+  if(length(arglist) > 1){
+    # combine several grofit objects for joint plotting
+    lapply(arglist, function(x) {
+      if(is(x) != "grofit") stop("Input objects need to be of class 'grofit' created with growth.workflow().")
+    })
+    merged <- grofit
+    for(i in 2:length(arglist)){
+      merged$time <- as.matrix(rbind.fill(as.data.frame(merged$time), as.data.frame(arglist[[i]]$time)))
+      merged$data <- rbind.fill(merged$data, arglist[[i]]$data)
+      merged$gcFit$gcFittedSplines <- c(merged$gcFit$gcFittedSplines, arglist[[i]]$gcFit$gcFittedSplines)
+    }
+    grofit <- merged
+  }
   data.type <- match.arg(data.type)
   if(data.type == "raw" && deriv ==TRUE){
     warning("Derivatives cannot be calculated for 'raw' data. Only the density values will be shown.")
@@ -1858,10 +1911,10 @@ base_breaks <- function(n = 10){
 #' 'mu.model', 'lambda.model', 'A.model',
 #' 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
 #' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
-#' @param names (String or string vector) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param basesize (Numeric) Base font size.
-#' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized.
+#' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
 #' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
 #' @param shape.size (Numeric) The size of the symbols indicating replicate values. Default: 2.5
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
@@ -1874,7 +1927,7 @@ base_breaks <- function(n = 10){
 #' @export plot.parameter
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab geom_hline geom_col
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
@@ -2065,16 +2118,19 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #'
 #' \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
 #'
-#' @param object
-#' @param param
-#' @param names
-#' @param basesize
-#' @param reference.nm
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' @param object A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{growth.workflow()}, \code{growth.drFit()},  \code{fl.drFit()}, or \code{fl.workflow()}.
+#' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
+#' 'y.max', 'y.min', 'fc', 'K', or 'n' for fluorescence dose-response analyses with \code{dr.type = 'model'} in the \code{control} argument,
+#' or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.
+#' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param basesize (Numeric) Base font size.
+#' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #'
 #' @return
 #' @export
@@ -2082,7 +2138,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #' @examples
 plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
                               names = NULL, basesize = 12, reference.nm = NULL,
-                              plot = T, export = F, height = 7, width = NULL, out.dir = NULL)
+                              plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   param <- match.arg(param)
   # check class of object
@@ -2158,15 +2214,16 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
     return(p)
   }
   if (export == TRUE){
+    if(is.null(out.nm)) out.nm <- paste0("drParameterPlot_", param)
     w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
     h <- height
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
     dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", "drParameterPlot_", param, ".png"),
+    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", "drParameterPlot_", param, ".pdf"), width = w, height = h)
+    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
     print(p)
     grDevices::dev.off()
   }

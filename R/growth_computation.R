@@ -1,6 +1,6 @@
 #' Read growth and fluorescence data in table format
 #'
-#' [read_data] reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
+#' \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
 #'
 #' @param data.density An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing density data.
 #' In column format, the first three table rows contain
@@ -21,7 +21,7 @@
 #'
 #' @details
 #' \figure{Data_layout.png}
-#' @return An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{growth.workflow} or, together with a \code{grofit.control} object in \code{growth.gcFit}, \code{growth.gcFitLinear}, \code{growth.gcFitModel}, \code{growth.gcFitSpline}, or \code{growth.gcBootSpline}
+#' @return An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{\link{growth.workflow}} or, together with a \code{grofit.control} object, in \code{\link{growth.gcFit}}, \code{\link{growth.gcFitLinear}}, \code{\link{growth.gcFitModel}}, \code{\link{growth.gcFitSpline}}, or \code{\link{growth.gcBootSpline}}.
 #' @export
 #' @md
 read_data <-
@@ -363,7 +363,7 @@ read_data <-
 
 #' Parse raw plate reader data and convert it to a format compatible with QurvE
 #'
-#' \code{parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{growth.workflow()}.
+#' \code{parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}.
 #'
 #' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
 #' @param map.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
@@ -376,7 +376,7 @@ read_data <-
 #' @param map.file (Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #'
-#' @return A grodata object suitable to run \code{growth.workflow()}.
+#' @return A grodata object suitable to run \code{\link{growth.workflow}}.
 #' @export
 #'
 parse_data <-
@@ -628,7 +628,7 @@ parse_data <-
 
 #' Create a \code{grofit.control} object.
 #'
-#' A \code{grofit.control} object is required to perform various computations on \code{grodata} objects created with \code{read_data()}. Such object is created automatically as part of \code{growth.workflow()}.
+#' A \code{grofit.control} object is required to perform various computations on growth data stored within \code{grodata} objects (created with \code{\link{read_data}} or \code{\link{parse_data}}). A \code{grofit.control} object is created automatically as part of \code{\link{growth.workflow}}.
 #'
 #' @param neg.nan.act (Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
@@ -637,15 +637,15 @@ parse_data <-
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and _spline_ fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
-#' @param biphasic (Logical) Shall \code{growth.gcFitLinear} and \code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
-#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{growth.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
-#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.
-#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{growth.gcFitLinear()}.
+#' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} and \code{\link{growth.gcFitSpline}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
+#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
+#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
+#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{growth.gcFitLinear}}
 #' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
-#' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
+#' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
@@ -768,9 +768,9 @@ growth.control <- function (neg.nan.act = FALSE,
 
 #' Run a complete growth curve analysis and dose-reponse analysis workflow.
 #'
-#' \code{grofit.workflow()} runs \code{growth.control()} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
+#' \code{growth.workflow} runs \code{\link{growth.control}} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
 #'
-#' @param grodata A \code{grodata} object created with \code{read_data()} or \code{parse_data()}, or a list containing a \code{'time'} matrix as well as a \code{'density'} dataframe.
+#' @param grodata A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, or a list containing a \code{'time'} matrix as well as a \code{'density'} dataframe.
 #' @param time (optional) A matrix containing time values for each sample.
 #' @param data (optional) A dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
@@ -785,13 +785,13 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
-#' @param biphasic (Logical) Shall \code{growth.gcFitLinear} and code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
-#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{growth.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
-#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.
-#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{growth.gcFitLinear()}.
+#' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} and code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
+#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
+#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
+#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}
 #' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
-#' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{growth.gcBootSpline()}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
+#' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
@@ -805,7 +805,9 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
 #' @param export (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #'
-#' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{growth.report()}.
+#' @family workflows
+#'
+#' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
@@ -919,19 +921,19 @@ growth.workflow <- function (grodata = NULL,
 
 #' Create a PDF and HTML report with results from a growth curve analysis workflow
 #'
-#' \code{growth.report()} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results obtained.
+#' \code{growth.report} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results.
 #'
-#' @param grofit A \code{grofit} object created with \code{growth.workflow()}.
+#' @param grofit A \code{grofit} object created with \code{\link{growth.workflow}}.
 #' @param report.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
 #' @param ... Further arguments passed to create a report. Currently required:
 #' \itemize{
-#'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{growth.workflow()}?
+#'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{\link{growth.workflow}}?
 #'    \item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{"all"}, a string vector, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 #'    \item \code{export}: Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
 #' }
 #' @param ec50 (Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
-#' @param format(Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
+#' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
 #'
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
@@ -1001,22 +1003,30 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
 }
 
-#' Perform a growth curve analysis on all samples in a provided dataset
+#' Perform a growth curve analysis on all samples in the provided dataset.
 #'
-#' \code{growth.gcFit} performs all computational growth fitting operations based on the user input.
+#' \code{growth.gcFit} performs all computational growth fitting operations based on the
+#' user input.
 #'
 #' @param time (optional) A matrix containing time values for each sample.
-#' @param data Either a \code{grodata} object created with \code{read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
+#' @param data Either a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
+#'   a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes,
+#'   or a dataframe containing density values (if a \code{time} matrix is provided as separate argument).
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}},
+#'   defining relevant fitting options. See \code{?growth.control}.
 #'
-#' @return A \code{gcFit} object that contains all growth fitting results, compatible with various plotting functions of the QurvE package.
+#' @return A \code{gcFit} object that contains all growth fitting results, compatible with
+#'   various plotting functions of the QurvE package.
+#'
+#' @family workflows
 #'
 #' @export
-#' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
-#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
-#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
+#' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text
+#'   geom_bar geom_errorbar geom_line geom_point geom_ribbon geom_segment ggplot
+#'   ggplot_build ggplot ggtitle labs position_dodge scale_color_manual scale_fill_brewer
+#'   scale_color_brewer scale_fill_manual scale_x_continuous scale_y_continuous
+#'   scale_y_log10 theme theme_classic theme_minimal xlab ylab
 growth.gcFit <- function(time, data, control= growth.control())
 {
   # /// check if start density values are above min.density in all samples
@@ -1294,12 +1304,18 @@ growth.gcFit <- function(time, data, control= growth.control())
   gcFit
 }
 
-#' Fit different growth models to density data
+#' Fit nonlinear growth models to density data
 #'
-#' @param time
-#' @param data
+#' \code{growth.gcFitModel} determines a parametric growth model that best describes the data.
+#'
+#' @param time Vector of the independent variable (usually time).
+#' @param data Vector of dependent variable (usually density values).
 #' @param gcID (Character) The name of the analyzed sample.
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#'
+#' @return A \code{gcFitModel} object that contains physiological parameters and information about the best fit. Use \code{\link{plot.gcFitModel}} to visualize the parametric fit and growth equation.
+#'
+#' @family fitting functions
 #'
 #' @export
 #'
@@ -1338,12 +1354,14 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
   return(gcFitModel)
 }
 
-#' internal function called within \code{growth.gcFitModel()}.
+#' Internal function called within \code{\link{growth.gcFitModel}}.
 #'
-#' @param time
-#' @param data
+#' @param time Vector of the independent variable (usually time).
+#' @param data Vector of dependent variable (usually density values).
 #' @param gcID (Character) The name of the analyzed sample.
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#'
+#' @family fitting functions
 #'
 #' @return
 #'
@@ -1538,25 +1556,38 @@ grofit.param <- function(time, data, gcID = "undefined", control)
     invisible(gcFitModel)
   }
 
-#' Model a smooth spline fit for density data.
+#' Perform a smooth spline fit on growth data
 #'
-#' \code{growth.gcFitSpline()} performs a smooth spline fit on the dataset and determines the highest growth rate as the global maximum in the first derivative of the spline.
+#' \code{growth.gcFitSpline} performs a smooth spline fit on the dataset and determines
+#' the highest growth rate as the global maximum in the first derivative of the spline.
 #'
-#' @param time Vector of the independent variable (e.g., time).
-#' @param data Vector of dependent variable (e.g., density values).
+#' @param time Vector of the independent variable (usually time).
+#' @param data Vector of dependent variable (usually: density values).
 #' @param gcID (Character) The name of the analyzed sample.
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
-#' @param biphasic (Logical) Shall \code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
-#' If \code{TRUE}, the following steps are performed to define a second growth phase:
-#' \enumerate{
-#'   \item Determine local minima within the first derivative of the smooth spline fit.
-#'   \item Remove the 'peak' containing the highest value of the first derivative (i.e., \eqn{mu_{max}}) that is flanked by two local minima.
-#'   \item Repeat the smooth spline fit and identification of maximum slope for later time values than the local minimum after \eqn{mu_{max}}.
-#'   \item Repeat the smooth spline fit and identification of maximum slope for earlier time values than the local minimum before \eqn{mu_{max}}.
-#'   \item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
-#' }
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}},
+#'   defining relevant fitting options.
+#' @param biphasic (Logical) Shall \code{growth.gcFitSpline} try to extract growth
+#'   parameters for two different growth phases (as observed with, e.g., diauxic shifts)
+#'   (\code{TRUE}) or not (\code{FALSE})?
 #'
-#' @return A \code{gcFitSpline} object containing the spline fit, its first derivative, and relevant parameters. The lag time is estimated as the intersection between the tangent at the maximum slope and the horizontal line with \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The intersection of the fit with the abscissa is indicated as \code{b.spl}.
+#' @details If \code{biphasic = TRUE}, the following steps are performed to define a
+#'   second growth phase: \enumerate{ \item Determine local minima within the first
+#'   derivative of the smooth spline fit. \item Remove the 'peak' containing the highest
+#'   value of the first derivative (i.e., \eqn{mu_{max}}) that is flanked by two local
+#'   minima. \item Repeat the smooth spline fit and identification of maximum slope for
+#'   later time values than the local minimum after \eqn{mu_{max}}. \item Repeat the
+#'   smooth spline fit and identification of maximum slope for earlier time values than
+#'   the local minimum before \eqn{mu_{max}}. \item Choose the greater of the two
+#'   independently determined slopes as \eqn{mu_{max}2}. }
+#'
+#' @return A \code{gcFitSpline} object containing the spline fit, its first derivative,
+#'   and relevant parameters. The lag time is estimated as the intersection between the
+#'   tangent at the maximum slope and the horizontal line with \eqn{y=y_0}, where
+#'   \code{y0} is the first value of the dependent variable. The intersection of the fit
+#'   with the abscissa is stored as \code{b.spl}. Use \code{\link{plot.gcFitSpline}} to
+#'   visualize the spline fit and derivative over time.
+#'
+#' @family fitting functions
 #'
 #' @export
 #'
@@ -1765,14 +1796,6 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
         lambda.spl2 <- NA
         fitFlag2 <- FALSE
       }
-
-
-
-
-
-
-
-
       #   # extract local minima and maxima of deriv2
       #   n <- round((log(n.spl+4, base=2.1))/0.75)/2
       #   minima <- inflect(deriv2_spline$y, threshold = n)$minima
@@ -1930,7 +1953,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
   gcFitSpline
 }
 
-#' Fit Exponential Growth Model with a Heuristic Linear Method
+#' Fit an exponential growth model with a heuristic linear method
 #'
 #' Determine maximum growth rates from the log-linear part of a growth curve using
 #' a heuristic approach similar to the ``growth rates made easy''-method of
@@ -1955,23 +1978,25 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #'   \item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
 #' }
 #'
-#' @param time Vector of the independent variable (e.g., time).
-#' @param data Vector of dependent variable (e.g., density values).
+#' @param time Vector of the independent variable (usually: time).
+#' @param data Vector of dependent variable (usually: density values).
 #' @param quota (Numeric, between 0 an 1) Define what fraction of \eqn{mu_{max}} the slope of regression windows adjacent to the window with highest slope should have to be included in the overall linear fit.
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
 #' @param gcID (Character) The name of the analyzed sample.
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param lin.h (Numeric) Manually define the size of the sliding window . If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
-#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.
-#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{growth.gcFitLinear()}.
+#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
+#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}
 #' @param lin.dY (Numeric) Enter the minimum percentage of density increase that a linear regression should cover.
-#' @param biphasic (Logical) Shall \code{growth.gcFitLinear} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
-
+#' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
 #'
-#' @return A \code{gcFitLinear} object with parameters of the fit. The lag time is  estimated as the intersection between the fit and the horizontal line with \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The intersection of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
-
-#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
-#' Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
+#' @return A \code{gcFitLinear} object with parameters of the fit. The lag time is
+#'   estimated as the intersection between the fit and the horizontal line with
+#'   \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The
+#'   intersection of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear
+#'   model). Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
+#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
+#' Petzoldt T (2022). _growthrates: Estimate Growth Rates from Experimental Data_. R package version 0.8.3, <https://CRAN.R-project.org/package=growthrates>.
 #'
 #' @family fitting functions
 #'
@@ -2647,11 +2672,21 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   invisible(gcFitLinear)
 }
 
-#' gcBootSpline: Function to generate a bootstrap
-#' @param time
-#' @param data
+#' Perform a bootstrap on the dataset followed by spline fits for each resample
+#'
+#' \code{growth.gcBootSpline} resamples the density values in a dataset with replacement and performs a spline fit for each bootstrap sample.
+#'
+#' @param time Vector of the independent variable (usually: time).
+#' @param data Vector of dependent variable (usually: density values).
 #' @param gcID (Character) The name of the analyzed sample.
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#'
+#' @family fitting functions
+#'
+#' @return A \code{gcBootSpline} object containing a distribution of growth parameters and
+#'   a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
+#'   to visualize the all bootstrapping splines as well as the distribution of
+#'   physiological parameters.
 #'
 #' @export
 #'
@@ -2776,22 +2811,39 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
   gcBootSpline
 }
 
+#' Perform smooth spline fits on response vs. concentration data
 #'
-#' @param FitData
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' \code{growth.drFit} serves to determine dose-response curves on every condition in a
+#' dataset. The response parameter can be chosen from every physiological parameter in a
+#' \code{gcTable} table which is obtained via \code{\link{growth.gcFit}}. \code{\link{growth.drFit}}
+#' calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBootSpline}} to
+#' generate a table with estimates for EC50 and respecting statistics.
+#'
+#' @param gcTable A dataframe containing the data for the dose-response curve estimation. Such table of class \code{gcTable} can be obtained by running \code{\link{growth.gcFit}}.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#'
+#' @family fitting functions
+#'
+#' @return An object of class \code{drFit}.
+#' \item{raw.data}{Data that passed to the function as \code{gcTable}.}
+#' \item{drTable}{Dataframe containing condition identifiers, fit options, and results of the dose-response analysis.}
+#' \item{drBootSplines}{List of all \code{drBootSpline} objects generated by the call of \code{\link{growth.drBootSpline}} for each distinct experiment.}
+#' \item{drFittedSplines}{List of all \code{drFitSpline} objects generated by the call of \code{\link{growth.drFitSpline}} for each distinct experiments.}
+#' \item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
+#'
 #'
 #' @export
 #'
-growth.drFit <- function (FitData, control = growth.control())
+growth.drFit <- function (gcTable, control = growth.control())
 {
   if (is(control) != "grofit.control" && is(control) != "fl.control")
     stop("control must be of class grofit.control or fl.control!")
   EC50.table <- NULL
   all.EC50 <- NA
   if(is.character(control$dr.parameter)){
-    dr.parameter <- match(control$dr.parameter, colnames(FitData))
+    dr.parameter <- match(control$dr.parameter, colnames(gcTable))
   }
-  FitData <- FitData[!is.na(FitData[,1]), ]
+  FitData <- gcTable[!is.na(gcTable[,1]), ]
   table.tests <- table((FitData[, 1])[which((FitData[,
                                                          4] == TRUE) & (is.na(FitData[, dr.parameter]) ==
                                                                           FALSE))])
@@ -2874,7 +2926,9 @@ growth.drFit <- function (FitData, control = growth.control())
 #' @param conc
 #' @param test
 #' @param drID
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#'
+#' @family fitting functions
 #'
 #' @export
 #'
@@ -3044,7 +3098,9 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
 #' @param conc
 #' @param test
 #' @param drID
-#' @param control A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#'
+#' @family fitting functions
 #'
 #' @export
 #'
@@ -3352,6 +3408,43 @@ huang <- function (time, A, mu, lambda, addpar)
   huang <- y
 }
 
+# baranyi <- function(time, A, mu, lambda, addpar)
+# {
+#   A <- A[1]
+#   mu <- mu[1]
+#   lambda <- lambda[1]
+#   y0 <- addpar[1]
+#   if (is.numeric(time) == FALSE)
+#     stop("Need numeric vector for: time")
+#   if (is.numeric(mu) == FALSE)
+#     stop("Need numeric vector for: mu")
+#   if (is.numeric(lambda) == FALSE)
+#     stop("Need numeric vector for: lambda")
+#   if (is.numeric(A) == FALSE)
+#     stop("Need numeric vector for: A")
+#   B <- time + 1/mu * log(exp(-mu * time) + exp(-mu * lambda) - exp(-mu * (time + lambda)))
+#   y <- y0 + mu * B - log(1 + (exp(mu * B) - 1)/exp(A - y0))
+#   baranyi <- y
+# }
+#
+# initbaranyi <- function(time, y, A, mu, lambda)
+# {
+#   if (is.numeric(time) == FALSE)
+#     stop("Need numeric vector for: time")
+#   if (is.numeric(y) == FALSE)
+#     stop("Need numeric vector for: y")
+#   if (is.numeric(mu) == FALSE)
+#     stop("Need numeric vector for: mu")
+#   if (is.numeric(lambda) == FALSE)
+#     stop("Need numeric vector for: lambda")
+#   if (is.numeric(A) == FALSE)
+#     stop("Need numeric vector for: A")
+#   y0 <- y[1]
+#   A <- max(y)
+#   mu <- mu[1]
+#   lambda <- lambda[1]
+#   initbaranyi <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
+# }
 
 
 liquori <- function (time, A, mu, addpar)

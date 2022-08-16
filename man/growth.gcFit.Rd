@@ -2,22 +2,32 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.gcFit}
 \alias{growth.gcFit}
-\title{Perform a growth curve analysis on all samples in a provided dataset}
+\title{Perform a growth curve analysis on all samples in the provided dataset.}
 \usage{
 growth.gcFit(time, data, control = growth.control())
 }
 \arguments{
 \item{time}{(optional) A matrix containing time values for each sample.}
 
-\item{data}{Either a \code{grodata} object created with \code{read_data()}, a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes, or a dataframe containing growth data (if a \code{time} matrix is provided as separate argument).}
+\item{data}{Either a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
+a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes,
+or a dataframe containing density values (if a \code{time} matrix is provided as separate argument).}
 
-\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}},
+defining relevant fitting options. See \code{?growth.control}.}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 }
 \value{
-A \code{gcFit} object that contains all growth fitting results, compatible with various plotting functions of the QurvE package.
+A \code{gcFit} object that contains all growth fitting results, compatible with
+various plotting functions of the QurvE package.
 }
 \description{
-\code{growth.gcFit} performs all computational growth fitting operations based on the user input.
+\code{growth.gcFit} performs all computational growth fitting operations based on the
+user input.
 }
+\seealso{
+Other workflows: 
+\code{\link{growth.workflow}()}
+}
+\concept{workflows}

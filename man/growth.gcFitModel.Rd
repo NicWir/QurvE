@@ -2,15 +2,33 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.gcFitModel}
 \alias{growth.gcFitModel}
-\title{Fit different growth models to density data}
+\title{Fit nonlinear growth models to density data}
 \usage{
 growth.gcFitModel(time, data, gcID = "undefined", control = growth.control())
 }
 \arguments{
+\item{time}{Vector of the independent variable (usually time).}
+
+\item{data}{Vector of dependent variable (usually density values).}
+
 \item{gcID}{(Character) The name of the analyzed sample.}
 
-\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
+}
+\value{
+A \code{gcFitModel} object that contains physiological parameters and information about the best fit. Use \code{\link{plot.gcFitModel}} to visualize the parametric fit and growth equation.
 }
 \description{
-Fit different growth models to density data
+\code{growth.gcFitModel} determines a parametric growth model that best describes the data.
 }
+\seealso{
+Other fitting functions: 
+\code{\link{grofit.param}()},
+\code{\link{growth.drBootSpline}()},
+\code{\link{growth.drFitSpline}()},
+\code{\link{growth.drFit}()},
+\code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFitLinear}()},
+\code{\link{growth.gcFitSpline}()}
+}
+\concept{fitting functions}

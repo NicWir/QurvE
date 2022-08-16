@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluorescence_computation.R
 \name{fl.control}
 \alias{fl.control}
-\title{Title}
+\title{Create a \code{fl.control} object.}
 \usage{
 fl.control(
   fit.opt = c("l", "s"),
@@ -36,10 +36,40 @@ fl.control(
 )
 }
 \arguments{
+\item{fit.opt}{(Character or vector of strings) Indicates whether the program should perform a linear regression (\code{"l"}) and/or spline fit (\code{"s"}). Default:  \code{fit.opt = c("l", "s")}.}
+
+\item{x_type}{(Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.}
+
+\item{norm_fl}{(Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}}
+
+\item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
+
+\item{min.density}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.}
+
+\item{log.x.lin}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the independent variable for \emph{linear} fits. Default: \code{FALSE}.}
+
+\item{log.x.spline}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the independent variable for \emph{spline} fits. Default: \code{FALSE}.}
+
+\item{log.y.lin}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} fits. Default: \code{FALSE}}
+
+\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{spline} fits. Default: \code{FALSE}}
+
+\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{fl.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
+
+\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{fl.gcFitLinear()}.}
+
+\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{fl.gcFitLinear()}.}
+
+\item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
+
 \item{dr.method}{For model, cite: https://doi.org/10.1038/s41467-020-20094-3}
 
 \item{clean.bootstrap}{}
 }
 \description{
-Title
+A \code{fl.control} object is required to perform various computations on fluorescence data stored within \code{grodata} objects (created with \code{read_data()} or \code{parse_data()}). A \code{grofit.control} object is created automatically as part of \code{growth.workflow()}.
+}
+\references{
+Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
+Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_plots.R
 \name{plot.gcFitLinear}
 \alias{plot.gcFitLinear}
-\title{Plot the results of a linear regression on ln-transformed data}
+\title{Generic plot function for \code{gcFittedLinear} objects. Plot the results of a linear regression on ln-transformed data}
 \usage{
 \method{plot}{gcFitLinear}(
   gcFittedLinear,

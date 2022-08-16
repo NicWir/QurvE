@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.gcFitLinear}
 \alias{growth.gcFitLinear}
-\title{Fit Exponential Growth Model with a Heuristic Linear Method}
+\title{Fit an exponential growth model with a heuristic linear method}
 \usage{
 growth.gcFitLinear(
   time,
@@ -14,30 +14,34 @@ growth.gcFitLinear(
 )
 }
 \arguments{
-\item{time}{Vector of the independent variable (e.g., time).}
+\item{time}{Vector of the independent variable (usually: time).}
 
-\item{data}{Vector of dependent variable (e.g., density values).}
+\item{data}{Vector of dependent variable (usually: density values).}
 
 \item{gcID}{(Character) The name of the analyzed sample.}
 
 \item{quota}{(Numeric, between 0 an 1) Define what fraction of \eqn{mu_{max}} the slope of regression windows adjacent to the window with highest slope should have to be included in the overall linear fit.}
 
-\item{control}{A \code{grofit.control} object created with \code{growth.control()}, defining relevant fitting options.}
+\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 
 \item{lin.h}{(Numeric) Manually define the size of the sliding window . If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
 
-\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{growth.gcFitLinear()}.}
+\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}}
 
-\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{growth.gcFitLinear()}.}
+\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}}
 
 \item{lin.dY}{(Numeric) Enter the minimum percentage of density increase that a linear regression should cover.}
 
-\item{biphasic}{(Logical) Shall \code{growth.gcFitLinear} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
+\item{biphasic}{(Logical) Shall \code{\link{growth.gcFitLinear}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
 }
 \value{
-A \code{gcFitLinear} object with parameters of the fit. The lag time is  estimated as the intersection between the fit and the horizontal line with \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The intersection of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear model).
+A \code{gcFitLinear} object with parameters of the fit. The lag time is
+estimated as the intersection between the fit and the horizontal line with
+\eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The
+intersection of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear
+model). Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
 }
 \description{
 Determine maximum growth rates from the log-linear part of a growth curve using
@@ -65,7 +69,17 @@ If \code{biphasic = TRUE}, the following steps are performed to define a second 
 }
 }
 \references{
-Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
-Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
+Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
+Petzoldt T (2022). \emph{growthrates: Estimate Growth Rates from Experimental Data}. R package version 0.8.3, \url{https://CRAN.R-project.org/package=growthrates}.
+}
+\seealso{
+Other fitting functions: 
+\code{\link{grofit.param}()},
+\code{\link{growth.drBootSpline}()},
+\code{\link{growth.drFitSpline}()},
+\code{\link{growth.drFit}()},
+\code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFitModel}()},
+\code{\link{growth.gcFitSpline}()}
 }
 \concept{fitting functions}
