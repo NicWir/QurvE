@@ -34,6 +34,8 @@
 \arguments{
 \item{grofit}{A \code{grofit} object created with \code{growth.workflow()} containing spline fits.}
 
+\item{...}{(\emph{optional}) Additional \code{grofit} objects created in separate workflows.}
+
 \item{data.type}{(Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results}
 
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
