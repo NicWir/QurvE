@@ -16,6 +16,8 @@
   basesize = 12,
   reference.nm = NULL,
   reference.conc = NULL,
+  exclude.nm = NULL,
+  exclude.conc = NULL,
   shape.size = 2.5,
   plot = T,
   export = F,
@@ -43,6 +45,10 @@
 \item{reference.nm}{(Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.}
 
 \item{reference.conc}{(Numeric) Concentration of the reference condition, to which parameter values are normalized.}
+
+\item{exclude.nm}{(String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.}
+
+\item{exclude.conc}{(Numeric or numeric vector) Define concentrations to exclude from the plot.}
 
 \item{shape.size}{(Numeric) The size of the symbols indicating replicate values. Default: 2.5}
 

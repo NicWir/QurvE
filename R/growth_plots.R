@@ -1925,6 +1925,8 @@ base_breaks <- function(n = 10){
 #' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
+#' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
+#' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
 #' @param basesize (Numeric) Base font size.
 #' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
 #' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
@@ -1943,12 +1945,24 @@ base_breaks <- function(n = 10){
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab geom_hline geom_col
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
-                                               'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
-                                               'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
-                                               'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
+                                             'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
+                                             'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
+                                             'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
-                            names = NULL, conc = NULL, basesize = 12, reference.nm = NULL, reference.conc = NULL, shape.size = 2.5,
-                           plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL)
+                           names = NULL,
+                           conc = NULL,
+                           basesize = 12,
+                           reference.nm = NULL,
+                           reference.conc = NULL,
+                           exclude.nm = NULL,
+                           exclude.conc = NULL,
+                           shape.size = 2.5,
+                           plot = T,
+                           export = F,
+                           height = 7,
+                           width = NULL,
+                           out.dir = NULL,
+                           out.nm = NULL)
   {
   param <- match.arg(param)
   # check class of object
@@ -1987,6 +2001,13 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   }
   if(!is.null(conc)){
     nm <- nm[which(conc == str_extract(nm, "[:graph:]+$"))]
+  }
+  if(!is.null(exclude.nm)){
+    names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+    nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+  }
+  if(!is.null(exclude.conc)){
+    nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
@@ -2081,8 +2102,16 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   df_reps$condition <- as.factor(df_reps$condition)
   df_reps$replicate <- as.factor(df_reps$replicate)
+  # apply normalization to reference condition
+  if(!is.null(reference.nm)){
+    df_reps$value <- df_reps$value/mean.ref
+  }
 
-
+  if(as.numeric(max(replicates))<=8){
+    pal <- RColorBrewer::brewer.pal(n=as.numeric(max(replicates)), name="Greys")
+  } else{
+    pal <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n=8, name="Greys"))(as.numeric(max(replicates)))
+  }
    p <- p +
      ggnewscale::new_scale_fill() +
      geom_point(
@@ -2094,10 +2123,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
        position = position_dodge(width = 0.3),
        inherit.aes = FALSE
      ) +
-     scale_fill_manual(values = case_when(
-       as.numeric(max(replicates))<=8       ~ RColorBrewer::brewer.pal(n=as.numeric(max(replicates)), name="Greys"),
-       as.numeric(max(replicates))>8        ~ grDevices::colorRampPalette(RColorBrewer::brewer.pal(n=8, name="Greys"))(as.numeric(max(replicates))))
-     )
+     scale_fill_manual(values = pal)
 
 
 
