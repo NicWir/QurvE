@@ -32,7 +32,7 @@ growth.workflow(
   growth.thresh = 1.5,
   dr.have.atleast = 6,
   dr.parameter = 34,
-  smooth.dr = NULL,
+  smooth.dr = 0.1,
   log.x.dr = FALSE,
   log.y.dr = FALSE,
   nboot.dr = 0,
@@ -58,7 +58,7 @@ growth.workflow(
 
 \item{clean.bootstrap}{(Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.}
 
-\item{suppress.messages}{(Logical) Indicates wether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.}
+\item{suppress.messages}{(Logical) Indicates whether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.}
 
 \item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default:  \code{fit.opt = c("l", "s")}.}
 
@@ -112,6 +112,12 @@ growth.workflow(
 }
 \value{
 A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.
+\item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided).}
+\item{data}{Raw density dataframe passed to the function as \code{data} (if no \code{grofit} object is provided).}
+\item{gcFit}{\code{gcFit} object created with the call of \code{\link{growth.gcFit}}.}
+\item{drFit}{\code{drFit} object created with the call of \code{\link{growth.drFit}}.}
+\item{expdesign}{Experimental design table inherited from \code{grodata} or created from the identifier columns (columns 1-3) in \code{data}.}
+\item{control}{Object of class \code{grofit.control} created with the call of \code{\link{growth.control}}.}
 }
 \description{
 \code{growth.workflow} runs \code{\link{growth.control}} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
@@ -119,5 +125,21 @@ A \code{grofit} object that contains all computation results, compatible with va
 \seealso{
 Other workflows: 
 \code{\link{growth.gcFit}()}
+
+Other growth fitting functions: 
+\code{\link{grofit.param}()},
+\code{\link{growth.drFit}()},
+\code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFitLinear}()},
+\code{\link{growth.gcFitModel}()},
+\code{\link{growth.gcFitSpline}()},
+\code{\link{growth.gcFit}()}
+
+Other dose-response analysis functions: 
+\code{\link{growth.drBootSpline}()},
+\code{\link{growth.drFitSpline}()},
+\code{\link{growth.gcFit}()}
 }
+\concept{dose-response analysis functions}
+\concept{growth fitting functions}
 \concept{workflows}

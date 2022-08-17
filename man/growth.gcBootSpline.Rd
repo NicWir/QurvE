@@ -18,20 +18,30 @@ growth.gcBootSpline(time, data, gcID = "undefined", control = growth.control())
 \value{
 A \code{gcBootSpline} object containing a distribution of growth parameters and
 a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
-to visualize the all bootstrapping splines as well as the distribution of
+to visualize all bootstrapping splines as well as the distribution of
 physiological parameters.
+\item{raw.time}{Raw time values provided to the function as \code{time}.}
+\item{raw.data}{Raw density data for provided to the function as \code{data}.}
+\item{gcID}{(Character) Identifies the tested sample.}
+\item{boot.time}{Table of time values per column, resulting from each spline fit of the bootstrap.}
+\item{boot.data}{Table of density values per column, resulting from each spline fit of the bootstrap.}
+\item{lambda}{Vector of estimated lambda values from each bootstrap entry.}
+\item{mu}{Vector of estimated mu values from each bootstrap entry.}
+\item{integral}{Vector of estimated integral values from each bootstrap entry.}
+\item{bootFlag}{(Logical) Indicates the success of the bootstrapping operation.}
+\item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
 }
 \description{
 \code{growth.gcBootSpline} resamples the density values in a dataset with replacement and performs a spline fit for each bootstrap sample.
 }
 \seealso{
-Other fitting functions: 
+Other growth fitting functions: 
 \code{\link{grofit.param}()},
-\code{\link{growth.drBootSpline}()},
-\code{\link{growth.drFitSpline}()},
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcFitLinear}()},
 \code{\link{growth.gcFitModel}()},
-\code{\link{growth.gcFitSpline}()}
+\code{\link{growth.gcFitSpline}()},
+\code{\link{growth.gcFit}()},
+\code{\link{growth.workflow}()}
 }
-\concept{fitting functions}
+\concept{growth fitting functions}

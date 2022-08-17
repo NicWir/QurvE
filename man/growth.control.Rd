@@ -37,7 +37,7 @@ growth.control(
 
 \item{clean.bootstrap}{(Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.}
 
-\item{suppress.messages}{(Logical) Indicates wether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.}
+\item{suppress.messages}{(Logical) Indicates whether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.}
 
 \item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default:  \code{fit.opt = c("l", "s")}.}
 
@@ -82,6 +82,9 @@ growth.control(
 \item{nboot.dr}{(Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.}
 
 \item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
+}
+\value{
+Generates a list with all arguments described above as entries.
 }
 \description{
 A \code{grofit.control} object is required to perform various computations on growth data stored within \code{grodata} objects (created with \code{\link{read_data}} or \code{\link{parse_data}}). A \code{grofit.control} object is created automatically as part of \code{\link{growth.workflow}}.

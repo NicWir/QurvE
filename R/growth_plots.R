@@ -1361,6 +1361,8 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
+#' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
+#' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
 #' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
 #' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
@@ -1393,6 +1395,8 @@ plot.grofit <- function(grofit, ...,
                         data.type = c("spline", "raw"),
                         names = NULL,
                         conc = NULL,
+                        exclude.nm = NULL,
+                        exclude.conc = NULL,
                         mean = TRUE,
                         log.y = T,
                         deriv = T,
@@ -1419,7 +1423,7 @@ plot.grofit <- function(grofit, ...,
   # remove all function arguments from call to leave only multiple grofit objects
   call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <-
     call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
-    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- NULL
+    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- NULL
 
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
@@ -1463,6 +1467,13 @@ plot.grofit <- function(grofit, ...,
   }
   if(!is.null(conc)){
     nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+  }
+  if(!is.null(exclude.nm)){
+    names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+    nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+  }
+  if(!is.null(exclude.conc)){
+    nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")

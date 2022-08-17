@@ -45,7 +45,17 @@ In column format, the first three table rows contain
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 }
 \value{
-An R list object of class \code{grodata} containing a time matrix, a data matrix, and an experimental design table. The \code{grodata} object can be directly used to run \code{\link{growth.workflow}} or, together with a \code{grofit.control} object, in \code{\link{growth.gcFit}}, \code{\link{growth.gcFitLinear}}, \code{\link{growth.gcFitModel}}, \code{\link{growth.gcFitSpline}}, or \code{\link{growth.gcBootSpline}}.
+An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with density and fluorescence data (if applicable),
+and an experimental design table. The \code{grodata} object can be directly
+used to run \code{\link{growth.workflow}}/\code{\link{fl.workflow}} or, together with a \code{grofit.control}/\code{fl.control}
+object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
+\item{time}{Matrix with raw time values extracted from \code{data.density}.}
+\item{density}{Dataframe with raw density values and sample identifiers extracted from \code{data.density}.}
+\item{fluorescence1}{Dataframe with raw fluorescence1 values and sample identifiers extracted from \code{data.fluoro1}. \code{NA}, if no fluorescence1 data is provided.}
+\item{fluorescence2}{Dataframe with raw fluorescence2 values and sample identifiers extracted from \code{data.fluoro2}. \code{NA}, if no fluorescence2 data is provided.}
+\item{norm.fluorescence1}{fluorescence1 data divided by density values. \code{NA}, if no fluorescence1 data is provided.}
+\item{norm.fluorescence2}{fluorescence2 data divided by density values. \code{NA}, if no fluorescence1 data is provided.}
+\item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.density}.}
 }
 \description{
 \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.

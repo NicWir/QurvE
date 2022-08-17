@@ -36,7 +36,7 @@ parse_data(
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 }
 \value{
-A grodata object suitable to run \code{\link{growth.workflow}}.
+A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for object structure.
 }
 \description{
 \code{parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}.

@@ -10,6 +10,8 @@
   data.type = c("spline", "raw"),
   names = NULL,
   conc = NULL,
+  exclude.nm = NULL,
+  exclude.conc = NULL,
   mean = TRUE,
   log.y = T,
   deriv = T,
@@ -41,6 +43,10 @@
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 
 \item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.}
+
+\item{exclude.nm}{(String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.}
+
+\item{exclude.conc}{(Numeric or numeric vector) Define concentrations to exclude from the plot.}
 
 \item{mean}{(Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?}
 

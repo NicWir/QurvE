@@ -26,3 +26,4 @@ growth.report(grofit, report.dir = NULL, ec50, format = c("pdf", "html"), ...)
 \description{
 \code{growth.report} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results.
 }
+\concept{reports}

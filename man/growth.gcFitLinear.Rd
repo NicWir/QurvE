@@ -39,9 +39,44 @@ growth.gcFitLinear(
 \value{
 A \code{gcFitLinear} object with parameters of the fit. The lag time is
 estimated as the intersection between the fit and the horizontal line with
-\eqn{y=y_0}, where \code{y0} is the first value of the dependent variable. The
-intersection of the fit with the abscissa is indicated as \code{y0_lm} (lm for linear
-model). Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
+\eqn{y=y_0}, where \code{y0} is the first value of the dependent variable.
+Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
+\item{raw.time}{Raw time values provided to the function as \code{time}.}
+\item{raw.data}{Raw density data for provided to the function as \code{data}.}
+\item{filt.time}{Filtered time values used for the heuristic linear method.}
+\item{filt.data}{Filtered density values.}
+\item{log.data}{Log-transformed, filtered density values used for the heuristic linear method.}
+\item{gcID}{(Character) Identifies the tested sample.}
+\item{FUN}{Linear \emph{function} used for plotting the tangent at mumax.}
+\item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
+\item{par}{List of determined growth parameters.}
+\itemize{
+\item \code{y0}: {Minimum density value considered for the heuristic linear method.}
+\item \code{dY}: {Difference in maximum density and minimum density.}
+\item \code{A}: {Maximum density.}
+\item \code{y0_lm}: {Intersection of the linear fit with the abscissa.}
+\item \code{mumax}: {Maximum growth rate (i.e., slope of the linear fit).}
+\item \code{tD}: {Doubling time.}
+\item \code{mu.se}: {Standard error of the maximum growth rate.}
+\item \code{lag}: {Lag time.}
+\item \code{tmax_start}: {Time value of the first data point within the window used for the linear regression.}
+\item \code{tmax_end}: {Time value of the last data point within the window used for the linear regression.}
+\item \code{t_turn}: {For biphasic growth: Time of the inflection point that separates two growth phases.}
+\item \code{mumax2}: {For biphasic growth: Growth rate of the second growth phase.}
+\item \code{tD2}: {Doubling time of the second growth phase.}
+\item \code{y0_lm2}: {For biphasic growth: Intersection of the linear fit of the second growth phase with the abscissa.}
+\item \code{lag2}: {For biphasic growth: Lag time determined for the second growth phase..}
+\item \code{tmax2_start}: {For biphasic growth: Time value of the first data point within the window used for the linear regression of the second growth phase.}
+\item \code{tmax2_end}: {For biphasic growth: Time value of the last data point within the window used for the linear regression of the second growth phase.}
+}
+\item{ndx}{Index of data points used for the linear regression.}
+\item{ndx2}{Index of data points used for the linear regression for the second growth phase.}
+\item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
+\item{rsquared}{\ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} of the linear regression.}
+\item{rsquared2}{\ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} of the linear regression for the second growth phase.}
+\item{fitFlag}{(Logical) Indicates whether linear regression was successfully performed on the data.}
+\item{fitFlag2}{(Logical) Indicates whether a second growth phase was identified.}
+\item{reliable}{(Logical) Indicates whether the performed fit is reliable (to be set manually).}
 }
 \description{
 Determine maximum growth rates from the log-linear part of a growth curve using
@@ -61,7 +96,7 @@ points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear
 If \code{biphasic = TRUE}, the following steps are performed to define a second growth phase:
 \enumerate{
 \item Perform a smooth spline fit on the data with a smoothing factor of 0.5.
-\item Calculate the second derivative of the spline fit and in turn perform a smooth spline fit of the derivative with a smoothing factor of 0.4.
+\item Calculate the second derivative of the spline fit and perform a smooth spline fit of the derivative with a smoothing factor of 0.4.
 \item Determine local maxima and minima in the second derivative.
 \item Find the local minimum following \eqn{mu_{max}} and repeat the heuristic linear method for later time values.
 \item Find the local maximum before \eqn{mu_{max}} and repeat the heuristic linear method for earlier time values.
@@ -73,13 +108,13 @@ Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mo
 Petzoldt T (2022). \emph{growthrates: Estimate Growth Rates from Experimental Data}. R package version 0.8.3, \url{https://CRAN.R-project.org/package=growthrates}.
 }
 \seealso{
-Other fitting functions: 
+Other growth fitting functions: 
 \code{\link{grofit.param}()},
-\code{\link{growth.drBootSpline}()},
-\code{\link{growth.drFitSpline}()},
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcBootSpline}()},
 \code{\link{growth.gcFitModel}()},
-\code{\link{growth.gcFitSpline}()}
+\code{\link{growth.gcFitSpline}()},
+\code{\link{growth.gcFit}()},
+\code{\link{growth.workflow}()}
 }
-\concept{fitting functions}
+\concept{growth fitting functions}
