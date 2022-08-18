@@ -578,7 +578,55 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
                                                            sidebarPanel(
-                                                             # add sidebar stuff
+
+                                                             selectInput(inputId = "data_type_growth_group_plots",
+                                                                         label = "Data type",
+                                                                         choices = c("Raw density" = "raw",
+                                                                                     "Spline fits" = "spline")
+                                                                         ),
+
+                                                             textInput(inputId = "select_samples_based_on_string_growth_group_plots",
+                                                                         label = "Select sample based on string (separate by ;)"
+                                                                       ),
+
+                                                             textInput(inputId = "select_samples_based_on_concentration_growth_group_plots",
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "exclude_samples_based_on_string_growth_group_plots",
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plots",
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
+
+                                                             checkboxInput(inputId = "plot_group_averages_growth_group_plots",
+                                                                           label = "Plot group averages",
+                                                                           value = TRUE),
+
+                                                             checkboxInput(inputId = "plot_derivative_growth_group_plots",
+                                                                           label = "Plot derivative",
+                                                                           value = TRUE),
+
+                                                             h3("Customize plot appearance"),
+
+                                                             checkboxInput(inputId = "log_transform_y_axis_group_plots",
+                                                                           label = "Log-transform y-axis",
+                                                                           value = TRUE),
+
+                                                             numericRangeInput(
+                                                               inputId = "x-Range",
+                                                               label = ,
+                                                               value,
+                                                               width = NULL,
+                                                               separator = " to ",
+                                                               min = NA,
+                                                               max = NA,
+                                                               step = NA
+                                                             )
+
+
                                                            ),
                                                            mainPanel(
                                                              plotOutput("growth_group_plot")
@@ -638,6 +686,11 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          label = 'Reference condition',
                                                                          choices = ""
                                                              ),
+
+                                                             selectInput(inputId = 'reference_concentration_growth_parameter_plot',
+                                                                         label = 'Reference concentration',
+                                                                         choices = ""
+                                                             ),
                                                            ),
 
                                                            mainPanel(
@@ -671,7 +724,53 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                   tabPanel(title = "Parameter plots",
                                                            sidebarPanel(
-                                                             # add sibar stuff
+                                                             selectInput(inputId = "parameter_growth_parameter_fluorescence_plot",
+                                                                         label = "Parameter",
+                                                                         choices = c("mu.linfit" = "mu.linfit_fluorescence_parameter_plot",
+                                                                                     "other" = "other_fluorescence_parameter_plot")
+                                                             ),
+
+                                                             textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
+                                                                       label = "Select sample based on string (separated by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "select_sample_based_on_concentration_fluorescence_parameter_plot",
+                                                                       label = "Select sample based on concentration (separated by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "exclude_sample_based_on_strings_fluorescence_parameter_plot",
+                                                                       label = "Exclude sample based on strings (separated by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "exclude_sample_based_on_concentration_fluorescence_parameter_plot",
+                                                                       label = "Exclude sample based on concentration (separated by ;)"
+                                                             ),
+
+                                                             checkboxInput(inputId = 'normalize_to_reference_fluorescence_parameter_plot',
+                                                                           label = 'normalize to reference',
+                                                                           value = TRUE),
+
+                                                             sliderInput(inputId = "shape.size_fluorescence_parameter_plot",
+                                                                         label = "Shape size",
+                                                                         min = 1,
+                                                                         max = 10,
+                                                                         value = 2.5),
+
+                                                             sliderInput(inputId = "basesize_fluorescence_parameter_plot",
+                                                                         label = "Base size",
+                                                                         min = 1,
+                                                                         max = 25,
+                                                                         value = 12),
+
+                                                             selectInput(inputId = 'reference_condition_fluorescence_parameter_plot',
+                                                                         label = 'Reference condition',
+                                                                         choices = ""
+                                                             ),
+
+                                                             selectInput(inputId = 'reference_concentration_fluorescence_parameter_plot',
+                                                                         label = 'Reference concentration',
+                                                                         choices = ""
+                                                             ),
                                                            ),
                                                            mainPanel(
                                                              plotOutput("fluorescence_parameter_plot")
@@ -790,10 +889,16 @@ server <- function(input, output){
     results$gcFit$gcTable
   })
 
-  # conditional selection
+  # conditional selections:
+  ## Growth
   selected_inputs_reference_condition_growth_parameter_plot <- reactive({
     results <- results$growth
     results$expdesign$condition
+  })
+
+  select_inputs_reference_concentration_growth_parameter_plot <- reactive({
+    results <- results$growth
+    results$expdesign$concentration
   })
 
   observe({
@@ -801,6 +906,31 @@ server <- function(input, output){
                       choices = selected_inputs_reference_condition_growth_parameter_plot()
     )})
 
+  observe({
+    updateSelectInput(inputId = "reference_concentration_growth_parameter_plot",
+                      choices = select_inputs_reference_concentration_growth_parameter_plot()
+    )})
+
+  ## Fluorescence
+  selected_inputs_reference_condition_fluorescence_parameter_plot <- reactive({
+    results <- results$growth
+    results$expdesign$condition
+  })
+
+  select_inputs_reference_concentration_fluorescence_parameter_plot <- reactive({
+    results <- results$growth
+    results$expdesign$concentration
+  })
+
+  observe({
+    updateSelectInput(inputId = "reference_condition_fluorescence_parameter_plot",
+                      choices = selected_inputs_reference_condition_fluorescence_parameter_plot()
+    )})
+
+  observe({
+    updateSelectInput(inputId = "reference_concentration_fluorescence_parameter_plot",
+                      choices = select_inputs_reference_concentration_fluorescence_parameter_plot()
+    )})
   # in case you want to print a consol output:
   #output$console <- renderPlot({
   #  results <- results()
