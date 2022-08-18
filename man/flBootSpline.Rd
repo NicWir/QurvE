@@ -13,10 +13,40 @@ flBootSpline(
 )
 }
 \arguments{
+\item{time}{Vector of the independent variable: time (if \code{x_type = 'time'} in \code{fl.control} object.}
+
+\item{density}{Vector of the independent variable: density (if \code{x_type = 'density'} in \code{fl.control} object.}
+
+\item{fl_data}{Vector of dependent variable: fluorescence.}
+
 \item{ID}{(Character) The name of the analyzed sample.}
 
-\item{control}{A \code{fl.control} object created with \code{growth.control()}, defining relevant fitting options.}
+\item{control}{A \code{fl.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
+}
+\value{
+A \code{gcBootSpline} object containing a distribution of growth parameters and
+a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
+to visualize all bootstrapping splines as well as the distribution of
+physiological parameters.
+\item{raw.x}{Raw time values provided to the function as \code{time}.}
+\item{raw.fl}{Raw density data provided to the function as \code{data}.}
+\item{ID}{(Character) Identifies the tested sample.}
+\item{boot.x}{Table of time values per column, resulting from each spline fit of the bootstrap.}
+\item{boot.fl}{Table of density values per column, resulting from each spline fit of the bootstrap.}
+\item{boot.flSpline}{List of \code{flFitSpline} object, created by \code{\link{flFitSpline}} for each resample of the bootstrap.}
+\item{lambda}{Vector of estimated lambda (lag time) values from each bootstrap entry.}
+\item{max_slope}{Vector of estimated max_slope (maximum slope) values from each bootstrap entry.}
+\item{A}{Vector of estimated A (maximum fluorescence) values from each bootstrap entry.}
+\item{integral}{Vector of estimated integral values from each bootstrap entry.}
+\item{bootFlag}{(Logical) Indicates the success of the bootstrapping operation.}
+\item{control}{Object of class \code{fl.control} containing list of options passed to the function as \code{control}.}
 }
 \description{
-flBootSpline: Function to generate a bootstrap
+\code{fl.gcBootSpline} resamples the fluorescence-'x' value pairs in a dataset with replacement and performs a spline fit for each bootstrap sample.
 }
+\seealso{
+Other fluorescence fitting functions: 
+\code{\link{flFitSpline}()},
+\code{\link{flFit}()}
+}
+\concept{fluorescence fitting functions}

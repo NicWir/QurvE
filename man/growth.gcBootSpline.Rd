@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_computation.R
 \name{growth.gcBootSpline}
 \alias{growth.gcBootSpline}
-\title{Perform a bootstrap on the dataset followed by spline fits for each resample}
+\title{Perform a bootstrap on density vs. time data followed by spline fits for each resample}
 \usage{
 growth.gcBootSpline(time, data, gcID = "undefined", control = growth.control())
 }
@@ -21,18 +21,23 @@ a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBo
 to visualize all bootstrapping splines as well as the distribution of
 physiological parameters.
 \item{raw.time}{Raw time values provided to the function as \code{time}.}
-\item{raw.data}{Raw density data for provided to the function as \code{data}.}
+\item{raw.data}{Raw density data provided to the function as \code{data}.}
 \item{gcID}{(Character) Identifies the tested sample.}
 \item{boot.time}{Table of time values per column, resulting from each spline fit of the bootstrap.}
 \item{boot.data}{Table of density values per column, resulting from each spline fit of the bootstrap.}
-\item{lambda}{Vector of estimated lambda values from each bootstrap entry.}
-\item{mu}{Vector of estimated mu values from each bootstrap entry.}
+\item{boot.gcSpline}{List of \code{gcFitSpline} object, created by \code{\link{growth.gcFitSpline}} for each resample of the bootstrap.}
+\item{lambda}{Vector of estimated lambda (lag time) values from each bootstrap entry.}
+\item{mu}{Vector of estimated mu (maximum growth rate) values from each bootstrap entry.}
+\item{A}{Vector of estimated A (maximum density) values from each bootstrap entry.}
 \item{integral}{Vector of estimated integral values from each bootstrap entry.}
 \item{bootFlag}{(Logical) Indicates the success of the bootstrapping operation.}
 \item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
 }
 \description{
-\code{growth.gcBootSpline} resamples the density values in a dataset with replacement and performs a spline fit for each bootstrap sample.
+\code{growth.gcBootSpline} resamples the density-time value pairs in a dataset with replacement and performs a spline fit for each bootstrap sample.
+}
+\references{
+Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
 }
 \seealso{
 Other growth fitting functions: 

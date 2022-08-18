@@ -54,22 +54,50 @@ fl.control(
 
 \item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{spline} fits. Default: \code{FALSE}}
 
-\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{fl.gcFitLinear()}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
+\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{\link{fl.gcFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
 
-\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{fl.gcFitLinear()}.}
+\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{fl.gcFitLinear}}.}
 
-\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{fl.gcFitLinear()}.}
+\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{fl.gcFitLinear}}.}
 
 \item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
 
-\item{dr.method}{For model, cite: https://doi.org/10.1038/s41467-020-20094-3}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{"max_slope.spline"}, which represents the maximum slope of the spline fit Typical options include: \code{"max_slope.linfit"}, \code{"dY.linfit"}, \code{"max_slope.spline"}, and \code{"dY.spline"}.}
 
-\item{clean.bootstrap}{}
+\item{dr.method}{(Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{"spline"}) or fit a biosensor response model (proposed by Meyer et al., 2019).}
+
+\item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
+
+\item{smooth.dr}{(Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See \code{\link{smooth.spline}} for further details. Default: \code{NULL}.}
+
+\item{log.x.dr}{(Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.}
+
+\item{log.y.dr}{(Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.}
+
+\item{nboot.dr}{(Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.}
+
+\item{biphasic}{(Logical) Shall \code{\link{flFitLinear}} and \code{\link{flFitSpline}} try to extract fluorescence parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages) (\code{TRUE}) or not (\code{FALSE})?}
+
+\item{interactive}{(Logical) Controls whether the fit for each sample and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the \emph{Plots} pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.}
+
+\item{nboot.fl}{(Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}}
+
+\item{smooth.fl}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}}
+
+\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
+
+\item{suppress.messages}{(Logical) Indicates whether messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.}
+
+\item{neg.nan.act}{(Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.}
+
+\item{clean.bootstrap}{(Logical) Determines if negative values which occur during bootstrap should be removed (\code{TRUE}) or kept (\code{FALSE}). Note: Infinite values are always removed. Default: \code{TRUE}.}
+}
+\value{
+Generates a list with all arguments described above as entries.
 }
 \description{
-A \code{fl.control} object is required to perform various computations on fluorescence data stored within \code{grodata} objects (created with \code{read_data()} or \code{parse_data()}). A \code{grofit.control} object is created automatically as part of \code{growth.workflow()}.
+A \code{fl.control} object is required to perform various computations on fluorescence data stored within \code{grodata} objects (created with \code{\link{read_data}} or \code{\link{parse_data}}). A \code{fl.control} object is created automatically as part of \code{\link{fl.workflow}}.
 }
 \references{
-Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy.
-Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
+Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. \emph{Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors.} Nat Chem Biol 15, 196–204 (2019). \doi{10.1038/s41589-018-0168-3}
 }

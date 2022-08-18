@@ -46,8 +46,12 @@ assigned to data points with a concentration value of 0, as well as to x-y pairs
 a response parameter value of 0 and pairs at concentration values before
 zero-response parameter values.
 }
+\references{
+Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+}
 \seealso{
 Other dose-response analysis functions: 
+\code{\link{flFit}()},
 \code{\link{growth.drBootSpline}()},
 \code{\link{growth.gcFit}()},
 \code{\link{growth.workflow}()}

@@ -18,7 +18,7 @@ growth.gcFitModel(time, data, gcID = "undefined", control = growth.control())
 \value{
 A \code{gcFitModel} object that contains physiological parameters and information about the best fit. Use \code{\link{plot.gcFitModel}} to visualize the parametric fit and growth equation.
 \item{raw.time}{Raw time values provided to the function as \code{time}.}
-\item{raw.data}{Raw density data for provided to the function as \code{data}.}
+\item{raw.data}{Raw density data provided to the function as \code{data}.}
 \item{gcID}{(Character) Identifies the tested sample.}
 \item{fit.time}{Fitted time values.}
 \item{fit.data}{Fitted density values.}
@@ -40,6 +40,9 @@ A \code{gcFitModel} object that contains physiological parameters and informatio
 }
 \description{
 \code{growth.gcFitModel} determines a parametric growth model that best describes the data.
+}
+\references{
+Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
 }
 \seealso{
 Other growth fitting functions: 

@@ -42,7 +42,7 @@ estimated as the intersection between the fit and the horizontal line with
 \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable.
 Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
 \item{raw.time}{Raw time values provided to the function as \code{time}.}
-\item{raw.data}{Raw density data for provided to the function as \code{data}.}
+\item{raw.data}{Raw density data provided to the function as \code{data}.}
 \item{filt.time}{Filtered time values used for the heuristic linear method.}
 \item{filt.data}{Filtered density values.}
 \item{log.data}{Log-transformed, filtered density values used for the heuristic linear method.}

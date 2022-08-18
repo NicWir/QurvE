@@ -34,8 +34,12 @@ various plotting functions of the QurvE package.
 \code{growth.gcFit} performs all computational growth fitting operations based on the
 user input.
 }
+\references{
+Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+}
 \seealso{
 Other workflows: 
+\code{\link{flFit}()},
 \code{\link{growth.workflow}()}
 
 Other growth fitting functions: 
@@ -48,6 +52,7 @@ Other growth fitting functions:
 \code{\link{growth.workflow}()}
 
 Other dose-response analysis functions: 
+\code{\link{flFit}()},
 \code{\link{growth.drBootSpline}()},
 \code{\link{growth.drFitSpline}()},
 \code{\link{growth.workflow}()}

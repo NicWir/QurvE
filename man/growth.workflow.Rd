@@ -58,7 +58,7 @@ growth.workflow(
 
 \item{clean.bootstrap}{(Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.}
 
-\item{suppress.messages}{(Logical) Indicates whether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the processing of high throuput data. Note: warnings are still displayed. Default: \code{FALSE}.}
+\item{suppress.messages}{(Logical) Indicates whether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.}
 
 \item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default:  \code{fit.opt = c("l", "s")}.}
 
@@ -124,6 +124,7 @@ A \code{grofit} object that contains all computation results, compatible with va
 }
 \seealso{
 Other workflows: 
+\code{\link{flFit}()},
 \code{\link{growth.gcFit}()}
 
 Other growth fitting functions: 
@@ -136,6 +137,7 @@ Other growth fitting functions:
 \code{\link{growth.gcFit}()}
 
 Other dose-response analysis functions: 
+\code{\link{flFit}()},
 \code{\link{growth.drBootSpline}()},
 \code{\link{growth.drFitSpline}()},
 \code{\link{growth.gcFit}()}
