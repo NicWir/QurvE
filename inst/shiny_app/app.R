@@ -611,23 +611,48 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                              h3("Customize plot appearance"),
 
-                                                             checkboxInput(inputId = "log_transform_y_axis_group_plots",
+                                                             checkboxInput(inputId = "log_transform_y_axis_growth_group_plots",
                                                                            label = "Log-transform y-axis",
                                                                            value = TRUE),
 
-                                                             # numericRangeInput(
-                                                             #   inputId = "x-Range",
-                                                             #   label = ,
-                                                             #   value,
-                                                             #   width = NULL,
-                                                             #   separator = " to ",
-                                                             #   min = NA,
-                                                             #   max = NA,
-                                                             #   step = NA
-                                                             # )
+                                                             textInput(inputId = "x_range_growth_group_plot",
+                                                                       label = "x-Range (separated by ;)",
+                                                                       value = "lower;upper"
+                                                             ),
 
+                                                             textInput(inputId = "y_range_growth_group_plot",
+                                                                       label = "y-Range (separated by ;)",
+                                                                       value = "lower;upper"
+                                                             ),
 
-                                                           ),
+                                                             textInput(inputId = "y_range_derivative_growth_group_plot",
+                                                                       label = "y-Range derivative (separated by ;)",
+                                                                       value = "lower;upper"
+                                                             ),
+
+                                                             textInput(inputId = "y_axis_title_growth_group_plot",
+                                                                       label = "y-axis title",
+                                                                       value = "Growth [y(t)]"
+                                                             ),
+
+                                                             textInput(inputId = "x_axis_title_growth_group_plot",
+                                                                       label = "x-axis title",
+                                                                       value = "Time"
+                                                             ),
+
+                                                             textInput(inputId = "y_axis_title_derivative_growth_group_plot",
+                                                                       label = "y-axis title derivative",
+                                                                       value = "Growth rate"
+                                                             ),
+
+                                                             sliderInput(inputId = "line_width_growth_group_plot",
+                                                                         label = "Line width",
+                                                                         min = 0.01,
+                                                                         max = 5,
+                                                                         value = 1.1)
+
+                                                           ), # Side panel growth group plots
+
                                                            mainPanel(
                                                              plotOutput("growth_group_plot")
                                                            )
@@ -706,8 +731,80 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
                                                            sidebarPanel(
-                                                             # add sibar stuff
-                                                           ),
+
+                                                             selectInput(inputId = "data_type_fluorescence_group_plots",
+                                                                         label = "Data type",
+                                                                         choices = c("Raw density" = "raw",
+                                                                                     "Spline fits" = "spline")
+                                                             ),
+
+                                                             textInput(inputId = "select_samples_based_on_string_fluorescence_group_plots",
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "select_samples_based_on_concentration_fluorescence_group_plots",
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "exclude_samples_based_on_string_fluorescence_group_plots",
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
+
+                                                             textInput(inputId = "exclude_samples_based_on_concentration_fluorescence_group_plots",
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
+
+                                                             checkboxInput(inputId = "plot_group_averages_fluorescence_group_plots",
+                                                                           label = "Plot group averages",
+                                                                           value = TRUE),
+
+                                                             checkboxInput(inputId = "plot_derivative_fluorescence_group_plots",
+                                                                           label = "Plot derivative",
+                                                                           value = TRUE),
+
+                                                             h3("Customize plot appearance"),
+
+                                                             checkboxInput(inputId = "log_transform_y_axis_fluorescence_group_plots",
+                                                                           label = "Log-transform y-axis",
+                                                                           value = TRUE),
+
+                                                             textInput(inputId = "x_range_fluorescence_group_plot",
+                                                                       label = "x-Range (separated by ;)",
+                                                                       value = "lower;upper"
+                                                             ),
+
+                                                             textInput(inputId = "y_range_fluorescence_group_plot",
+                                                                       label = "y-Range (separated by ;)",
+                                                                       value = "lower;upper"
+                                                             ),
+
+                                                             textInput(inputId = "y_range_derivative_fluorescence_group_plot",
+                                                                       label = "y-Range derivative (separated by ;)",
+                                                                       value = "lower;upper"
+                                                             ),
+
+                                                             textInput(inputId = "y_axis_title_fluorescence_group_plot",
+                                                                       label = "y-axis title",
+                                                                       value = "Growth [y(t)]"
+                                                             ),
+
+                                                             textInput(inputId = "x_axis_title_fluorescence_group_plot",
+                                                                       label = "x-axis title",
+                                                                       value = "Time"
+                                                             ),
+
+                                                             textInput(inputId = "y_axis_title_derivative_fluorescence_group_plot",
+                                                                       label = "y-axis title derivative",
+                                                                       value = "Growth rate"
+                                                             ),
+
+                                                             sliderInput(inputId = "line_width_fluorescence_group_plot",
+                                                                         label = "Line width",
+                                                                         min = 0.01,
+                                                                         max = 5,
+                                                                         value = 1.1)
+
+                                                           ), # Side panel growth fluorescence plots
                                                            mainPanel(
                                                              plotOutput("fluorescence_group_plot")
                                                            )
