@@ -558,10 +558,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                label = 'Log-transform time')
                                                )
                                         ),
-
                                       ),
-
-
                              ),
 
 
@@ -580,11 +577,31 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       h1("Growth Plots"),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
-                                                           plotOutput("growth_group_plot")),
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
+                                                           mainPanel(
+                                                             plotOutput("growth_group_plot")
+                                                             )
+                                                           ),
+
                                                   tabPanel(title = "Dose-response analysis",
-                                                           plotOutput("growth_dose_response_plot")),
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
+                                                           mainPanel(
+                                                             plotOutput("growth_dose_response_plot")
+                                                             )
+                                                           ),
+
                                                   tabPanel(title = "Parameter plots",
-                                                           plotOutput("growth_parameter_plot"))
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
+                                                           mainPanel(
+                                                             plotOutput("growth_parameter_plot")
+                                                             )
+                                                           )
                                       )
                              ),
 
@@ -593,11 +610,31 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       h1("Flourescence Plots"),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
-                                                           plotOutput("fluorescence_group_plot")),
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
+                                                           mainPanel(
+                                                             plotOutput("fluorescence_group_plot")
+                                                             )
+                                                           ),
+
                                                   tabPanel(title = "Dose-response analysis",
-                                                           plotOutput("fluorescence_dose_response_plot")),
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
+                                                           mainPanel(
+                                                             plotOutput("fluorescence_dose_response_plot")
+                                                             )
+                                                           ),
+
                                                   tabPanel(title = "Parameter plots",
-                                                           plotOutput("fluorescence_parameter_plot"))
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
+                                                           mainPanel(
+                                                             plotOutput("fluorescence_parameter_plot")
+                                                             )
+                                                           )
                                       )
                              ),
 
@@ -605,30 +642,23 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       h1("Growth & Flourescence Plots"),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
                                                            plotOutput("growth_and_fluorescence_group_plot")),
                                                   tabPanel(title = "Dose-response analysis",
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
                                                            plotOutput("growth_and_fluorescence_dose_response_plot")),
                                                   tabPanel(title = "Parameter plots",
+                                                           sidebarPanel(
+                                                             # add sibar stuff
+                                                           ),
                                                            plotOutput("growth_and_fluorescence_parameter_plot"))
                                       )
                              ),
                   ),
-
-                  # display contents of infile
-                  # tableOutput('contents'),
-                  # tabPanel("Visualize",
-                  #          h1("under construction"),
-                  #          tabsetPanel(type = "tabs",
-                  #                      tabPanel(title = "Group plots",
-                  #                               plotOutput("plot")),
-                  #                      tabPanel(title = "Dose-response analysis",
-                  #                               plotOutput("dose_response")),
-                  #                      tabPanel(title = "Parameter plots",
-                  #                               plotOutput("parameter_plot"))
-                  #          ),
-                  #          h3("Display parameter plot, when computation is run"),
-                  #          #plotOutput("console")
-                  # ),
 
                   tabPanel("Report",  h1("under construction")),
 
@@ -678,31 +708,31 @@ server <- function(input, output){
     }
 
     results$growth <- growth.workflow(grodata = grodata,
-                    log.x.gc = input$log_transform_time_growth,
-                    biphasic = input$biphasic_growth_growth,
-                    growth.thresh = input$growth_threshold_growth,
-                    min.density = input$minimum_density_growth,
-                    t0 = input$t0_growth,
-                    ec50 = input$perform_ec50_growth,
-                    dr.parameter = input$response_parameter_growth,
-                    log.x.dr = input$log_transform_concentration_growth,
-                    log.y.dr = input$log_transform_response_growth,
-                    smooth.dr = smooth.dr,
-                    dr.have.atleast = input$minimum_number_of_different_values_growth,
-                    nboot.dr = input$number_of_bootstrappings_dr_growth,
-                    #lin.R2 = input$R2_threshold_growth, ## Here seem to be problems
-                    #lin.RSD = input$RSD_threshold_growth,
-                    #lin.dY = input$dY_threshold_growth,
-                    #lin.h = input$custum_sliding_window_size_value_growth
-                    # PARAMETRIC FIT VARIABLES
-                    smooth.gc = input$smoothing_factor_nonparametric_growth,
-                    nboot.gc = input$number_of_bootstrappings_growth,
-                    neg.nan.act = input$remove_negative_values_in_bootstrapping_growth
+                                      log.x.gc = input$log_transform_time_growth,
+                                      biphasic = input$biphasic_growth_growth,
+                                      growth.thresh = input$growth_threshold_growth,
+                                      min.density = input$minimum_density_growth,
+                                      t0 = input$t0_growth,
+                                      ec50 = input$perform_ec50_growth,
+                                      dr.parameter = input$response_parameter_growth,
+                                      log.x.dr = input$log_transform_concentration_growth,
+                                      log.y.dr = input$log_transform_response_growth,
+                                      smooth.dr = smooth.dr,
+                                      dr.have.atleast = input$minimum_number_of_different_values_growth,
+                                      nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                      #lin.R2 = input$R2_threshold_growth, ## Here seem to be problems
+                                      #lin.RSD = input$RSD_threshold_growth,
+                                      #lin.dY = input$dY_threshold_growth,
+                                      #lin.h = input$custum_sliding_window_size_value_growth
+                                      # PARAMETRIC FIT VARIABLES
+                                      smooth.gc = input$smoothing_factor_nonparametric_growth,
+                                      nboot.gc = input$number_of_bootstrappings_growth,
+                                      neg.nan.act = input$remove_negative_values_in_bootstrapping_growth
 
     )
   })
 
-  output$parameter_plot <- renderPlot({
+  output$growth_parameter_plot <- renderPlot({
     results <- results$growth
     plot.parameter(results)
   })
