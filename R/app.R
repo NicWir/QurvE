@@ -575,21 +575,60 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       h1('Under construction'))
                   ),
 
+                  navbarMenu("Visualize",
+                             tabPanel(title = "Growth Plots",
+                                      h1("Growth Plots"),
+                                      tabsetPanel(type = "tabs",
+                                                  tabPanel(title = "Group plots",
+                                                           plotOutput("growth_group_plot")),
+                                                  tabPanel(title = "Dose-response analysis",
+                                                           plotOutput("growth_dose_response_plot")),
+                                                  tabPanel(title = "Parameter plots",
+                                                           plotOutput("growth_parameter_plot"))
+                                      )
+                             ),
+
+
+                             tabPanel(title = "Flourescence Plots",
+                                      h1("Flourescence Plots"),
+                                      tabsetPanel(type = "tabs",
+                                                  tabPanel(title = "Group plots",
+                                                           plotOutput("fluorescence_group_plot")),
+                                                  tabPanel(title = "Dose-response analysis",
+                                                           plotOutput("fluorescence_dose_response_plot")),
+                                                  tabPanel(title = "Parameter plots",
+                                                           plotOutput("fluorescence_parameter_plot"))
+                                      )
+                             ),
+
+                             tabPanel(title = "Growth & Flourescence Plots",
+                                      h1("Growth & Flourescence Plots"),
+                                      tabsetPanel(type = "tabs",
+                                                  tabPanel(title = "Group plots",
+                                                           plotOutput("growth_and_fluorescence_group_plot")),
+                                                  tabPanel(title = "Dose-response analysis",
+                                                           plotOutput("growth_and_fluorescence_dose_response_plot")),
+                                                  tabPanel(title = "Parameter plots",
+                                                           plotOutput("growth_and_fluorescence_parameter_plot"))
+                                      )
+                             ),
+                  ),
+
                   # display contents of infile
                   # tableOutput('contents'),
-                  tabPanel("Visualize",
-                           h1("under construction"),
-                           tabsetPanel(type = "tabs",
-                                       tabPanel(title = "Group plots",
-                                                plotOutput("plot")),
-                                       tabPanel(title = "Dose-response analysis",
-                                                plotOutput("dose_response")),
-                                       tabPanel(title = "Parameter plots",
-                                                plotOutput("parameter_plot"))
-                           ),
-                           h3("Display parameter plot, when computation is run"),
-                           #plotOutput("console")
-                  ),
+                  # tabPanel("Visualize",
+                  #          h1("under construction"),
+                  #          tabsetPanel(type = "tabs",
+                  #                      tabPanel(title = "Group plots",
+                  #                               plotOutput("plot")),
+                  #                      tabPanel(title = "Dose-response analysis",
+                  #                               plotOutput("dose_response")),
+                  #                      tabPanel(title = "Parameter plots",
+                  #                               plotOutput("parameter_plot"))
+                  #          ),
+                  #          h3("Display parameter plot, when computation is run"),
+                  #          #plotOutput("console")
+                  # ),
 
                   tabPanel("Report",  h1("under construction")),
 
