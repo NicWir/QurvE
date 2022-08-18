@@ -621,7 +621,7 @@
 #     file.rename(inFile$datapath,
 #                 paste(inFile$datapath, ".xlsx", sep = ""))
 #
-#     read_excel(paste(inFile$datapath, ".xlsx", sep=""))
+#     read_excel(paste(inFile$datapath, ".xlsx", sep="",  col_names = F))
 #   })
 #
 #   observeEvent(input$run_growth,{
