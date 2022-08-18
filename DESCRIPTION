@@ -51,7 +51,6 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
 Collate: 
-    'app.R'
     'general_misc_utils.R'
     'fluorescence_computation.R'
     'fluorescence_plots.R'
