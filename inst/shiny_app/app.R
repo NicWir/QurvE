@@ -7,13 +7,13 @@ library(readxl)
 library(tidyverse)
 library(shinythemes)
 
-source("../R/general_misc_utils.R")
-source("../R/growth_computation.R")
-source("../R/growth_plots.R")
-source("../R/growth_summaries.R")
-source("../R/fluorescence_computation.R")
-source("../R/fluorescence_plots.R")
-source("../R/fluorescence_summaries.R")
+source("../../R/general_misc_utils.R")
+source("../../R/growth_computation.R")
+source("../../R/growth_plots.R")
+source("../../R/growth_summaries.R")
+source("../../R/fluorescence_computation.R")
+source("../../R/fluorescence_plots.R")
+source("../../R/fluorescence_summaries.R")
 
 ui <- fluidPage(theme = shinytheme('sandstone'),
                 navbarPage(
@@ -615,16 +615,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = "Log-transform y-axis",
                                                                            value = TRUE),
 
-                                                             numericRangeInput(
-                                                               inputId = "x-Range",
-                                                               label = ,
-                                                               value,
-                                                               width = NULL,
-                                                               separator = " to ",
-                                                               min = NA,
-                                                               max = NA,
-                                                               step = NA
-                                                             )
+                                                             # numericRangeInput(
+                                                             #   inputId = "x-Range",
+                                                             #   label = ,
+                                                             #   value,
+                                                             #   width = NULL,
+                                                             #   separator = " to ",
+                                                             #   min = NA,
+                                                             #   max = NA,
+                                                             #   step = NA
+                                                             # )
 
 
                                                            ),
