@@ -103,7 +103,7 @@ read_data <-
       if(data.format == "col"){
         fluoro2 <- t(fluoro2)
       }
-      if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
+      if(!(any(grepl("time", unlist(fluoro2[,1]), ignore.case = TRUE)))){
         if(data.format == "col"){
           stop("Could not find 'time' in column 1 of data.fluoro2")
         } else {
@@ -406,190 +406,24 @@ parse_data <-
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
     if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
-    if("Gen5" %in% software){
+    # Read table file
+    if (file.exists(data.file)) {
       # Read table file
-      if (file.exists(data.file)) {
-        if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "csv") {
-          input <-
-            utils::read.csv(
-              data.file,
-              dec = dec,
-              sep = csvsep,
-              header = F,
-              stringsAsFactors = F,
-              fill = T,
-              na.strings = "",
-              quote = "",
-              comment.char = "",
-              check.names = F,
-              na.strings = c("NA", "OVRFLW")
-            )
-        } else if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "xls" |
-                   stringr::str_replace(data.file, ".{1,}\\.", "") == "xlsx") {
-          input <- data.frame(suppressMessages(readxl::read_excel(data.file, col_names = F, sheet = data.sheet, na = c("NA", "OVRFLW"))))
-        } else if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "tsv") {
-          input <-
-            utils::read.csv(
-              data.file,
-              dec = dec,
-              sep = "\t",
-              header = F,
-              stringsAsFactors = F,
-              fill = T,
-              na.strings = "",
-              quote = "",
-              comment.char = "",
-              check.names = F,
-              na.strings = c("NA", "OVRFLW")
-            )
-        } else if (stringr::str_replace_all(data.file, ".{1,}\\.", "") == "txt") {
-          input <-
-            utils::read.table(
-              data.file,
-              dec = dec,
-              sep = "\t",
-              header = F,
-              stringsAsFactors = F,
-              fill = T,
-              na.strings = "",
-              quote = "",
-              comment.char = "",
-              check.names = F,
-              na.strings = c("NA", "OVRFLW")
-            )
-        } else {
-          stop(
-            "No compatible file format provided.
-                 Supported formats are: \\.txt (tab delimited), \\.csv (delimiters can be specified with the argument \"csvsep = \", \\.tsv, \\.xls, and \\.xlsx"
-          )
-        }
+      input <- read_file(data.file, csvsep=csvsep, dec=dec, sheet=data.sheet)
+    } else {
+      stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
+    }
+    if(!is.null(map.file)){
+      if (file.exists(map.file)) {
+        mapping <- read_file(map.file, csvsep=csvsep, dec=dec, sheet=map.sheet)
       } else {
-        stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
+        stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
       }
-      if(!is.null(map.file)){
-        if (file.exists(map.file)) {
-          if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "csv") {
-            mapping <-
-              utils::read.csv(
-                map.file,
-                dec = dec,
-                sep = csvsep,
-                header = F,
-                stringsAsFactors = F,
-                fill = T,
-                na.strings = "",
-                quote = "",
-                comment.char = "",
-                check.names = F
-              )
-          } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "xls" |
-                     stringr::str_replace(map.file, ".{1,}\\.", "") == "xlsx") {
-            mapping <- data.frame(suppressMessages(readxl::read_excel(map.file, col_names = F, sheet = map.sheet)))
-          } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "tsv") {
-            mapping <-
-              utils::read.csv(
-                map.file,
-                dec = dec,
-                sep = "\t",
-                header = F,
-                stringsAsFactors = F,
-                fill = T,
-                na.strings = "",
-                quote = "",
-                comment.char = "",
-                check.names = F
-              )
-          } else if (stringr::str_replace_all(map.file, ".{1,}\\.", "") == "txt") {
-            mapping <-
-              utils::read.table(
-                map.file,
-                dec = dec,
-                sep = "\t",
-                header = F,
-                stringsAsFactors = F,
-                fill = T,
-                na.strings = "",
-                quote = "",
-                comment.char = "",
-                check.names = F
-              )
-          } else {
-            stop(
-              "No compatible file format provided.
-                 Supported formats are: \\.txt (tab delimited), \\.csv (delimiters can be specified with the argument \"csvsep = \", \\.tsv, \\.xls, and \\.xlsx"
-            )
-          }
-        } else {
-          stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
-        }
-      }
-
-      # get row numbers for "time" in column 2
-      time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = T)
-      # extract different read data in dataset
-      reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
-      read.ndx <- time.ndx[!is.na(reads)]
-      reads <- reads[!is.na(reads)]
-      read.data <- list()
-      ncol <- length(input[read.ndx[1],][!is.na(input[read.ndx[1],])])
-      # Extract all read tables except the last
-      read.data <- lapply(1:(length(read.ndx)-1), function(x) input[read.ndx[x]:(read.ndx[x+1]-3),2:(ncol)])
-      read.data <- lapply(1:length(read.data), function(x) as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]),])
-      # Extract last read table
-      read.data[[length(read.ndx)]] <- data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1),2:(ncol)])
-      read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
-      # Remove time points with NA in all samples
-      for(i in 1:length(read.data))
-        read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
-                                read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ])
-      # give all reads the same time values as the first read
-      for(i in 2:length(read.data)){
-        read.data[[i]][[1]] <- read.data[[1]][[1]]
-      }
-      names(read.data) <- reads
-      data.ls <- list()
-      if(length(reads)>1){
-
-        answer <- readline(paste0("Indicate where the density data is stored?\n",
-                                  paste(unlist(lapply(1:length(reads), function (i)
-                                    paste0("[", i, "] ", reads[i]))),
-                                    collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
-        if(as.numeric(answer) == length(reads)+1){
-          density <- NA
-        } else {
-          density <- read.data[[as.numeric(answer)]]
-        }
-
-        answer <- readline(paste0("Indicate where the fluorescence 1 data is stored?\n",
-                                  paste(unlist(lapply(1:length(reads), function (i)
-                                    paste0("[", i, "] ", reads[i]))),
-                                    collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 1 data\n"))
-        if(as.numeric(answer) == length(reads)+1){
-          fluorescence1 <- NA
-        } else {
-          fluorescence1 <- read.data[[as.numeric(answer)]]
-        }
-        data.ls[[1]] <- density
-        data.ls[[2]] <- fluorescence1
-
-        if(length(reads)>2){
-          answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
-                                    paste(unlist(lapply(1:length(reads), function (i)
-                                      paste0("[", i, "] ", reads[i]))),
-                                      collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
-          if(as.numeric(answer) == length(reads)+1){
-            fluorescence2 <- NA
-          } else {
-            fluorescence2 <- read.data[[as.numeric(answer)]]
-          }
-          data.ls[[3]] <- fluorescence2
-        }
-      } else {
-        density <- read.data[[1]]
-        data.ls[[1]] <- density
-        data.ls[[2]] <- NA
-        data.ls[[3]] <- NA
-      }
+    }
+    if(any(c("Gen5", "Gen6") %in% software)){
+      parsed.ls <- parse_Gen5Gen6(input)
+      data.ls <- parsed.ls[[1]]
+      read.data <- parsed.ls[[2]]
     } # if("Gen5" %in% software)
     # Convert time values to hours
     if(convert.time){
