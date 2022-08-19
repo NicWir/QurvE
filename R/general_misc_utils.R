@@ -203,3 +203,14 @@ zipFastener <- function(df1, df2, along=2)
 }
 
 
+run_app <- function() {
+
+  # Locate all the shiny apps that exist
+  valid_apps <- list.files(system.file("shiny_app", package = "QurvE"))
+
+
+
+  # Launch the app
+  appDir <- system.file("shiny_app", package = "QurvE")
+  suppressWarnings(shiny::runApp(appDir, display.mode = "normal"))
+}

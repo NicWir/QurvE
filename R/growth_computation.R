@@ -906,6 +906,7 @@ growth.workflow <- function (grodata = NULL,
   nboot.dr <- control$nboot.dr
   out.gcFit <- NA
   out.drFit <- NA
+  class(out.drFit) <- "drFit"
 
   # /// fit of growth curves -----------------------------------
   out.gcFit <- growth.gcFit(time, data, control)
