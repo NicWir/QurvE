@@ -393,29 +393,31 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     # find maximum in deriv1, exclude maxima at beginning of fit, if x_type is "time"
     deriv1.test <- deriv1
     spline.test <- spline
-    if(x_type == "time"){
-      success <- FALSE
-      while (!success){
-        if(length(deriv1.test$y) > 2){
-          max_slope.index <- which.max(deriv1.test$y)
-          if(!(max_slope.index %in% 1:3)){
-            max_slope.index <- max_slope.index
-            success <- TRUE
-          } else {
-            deriv1.test <- lapply(1:length(deriv1.test), function(x) deriv1.test[[x]][-max_slope.index])
-            names(deriv1.test) <- c("x", "y")
-            spline.test$x <- spline$x[-max_slope.index]
-            spline.test$y <- spline$y[-max_slope.index]
-          }
-        } else{
-          max_slope.index <- which.max(deriv1$y)
-          spline.test <- spline
-          success <- TRUE
-        }
-      }
-    } else {
-      max_slope.index <- which.max(deriv1$y)
-    }
+    # if(x_type == "time"){
+    # Take only max slope values that are not at the start of the curve
+    #   success <- FALSE
+    #   while (!success){
+    #     if(length(deriv1.test$y) > 2){
+    #       max_slope.index <- which.max(deriv1.test$y)
+    #       if(!(max_slope.index %in% 1:3)){
+    #         max_slope.index <- max_slope.index
+    #         success <- TRUE
+    #       } else {
+    #         deriv1.test <- lapply(1:length(deriv1.test), function(x) deriv1.test[[x]][-max_slope.index])
+    #         names(deriv1.test) <- c("x", "y")
+    #         spline.test$x <- spline$x[-max_slope.index]
+    #         spline.test$y <- spline$y[-max_slope.index]
+    #       }
+    #     } else{
+    #       max_slope.index <- which.max(deriv1$y)
+    #       spline.test <- spline
+    #       success <- TRUE
+    #     }
+    #   }
+    # } else {
+    #   max_slope.index <- which.max(deriv1$y)
+    # }
+    max_slope.index <- which.max(deriv1$y)
     spline <- spline.test
     max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index]) # index of data point with maximum slope in spline fit
     x.max <- deriv1$x[max_slope.index] # x of maximum slope
@@ -2093,19 +2095,39 @@ fl.workflow <- function(grodata = NULL,
 
   # /// fit of fluorescence curves -----------------------------------
   if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence1) && length(norm.fluorescence1) > 1 && !all(is.na(norm.fluorescence1)))){
+    if ((control$suppress.messages==FALSE)){
+      cat("\n\n")
+      cat(paste("=== Performing Fits for Fluorescence 1 =================================\n"))
+      cat("----------------------------------------------------\n")
+    }
     out.flFit1 <- flFit(time = time, density = density, fl_data = norm.fluorescence1, control = control)
   } else if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
     out.flFit1 <- flFit(time = time, density = density, fl_data = fluorescence1, control = control)
   }
   if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence2) && length(norm.fluorescence2) > 1 && !all(is.na(norm.fluorescence2)))){
+    if ((control$suppress.messages==FALSE)){
+      cat("\n\n")
+      cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
+      cat("----------------------------------------------------\n")
+    }
     out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control)
   } else if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+    if ((control$suppress.messages==FALSE)){
+      cat("\n\n")
+      cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
+      cat("----------------------------------------------------\n")
+    }
     out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control)
   }
 
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
     if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+      if ((control$suppress.messages==FALSE)){
+        cat("\n\n")
+        cat(paste("=== Performing Dose-Response Analysis for  Fluorescence 1 =================================\n"))
+        cat("----------------------------------------------------\n")
+      }
       if(control$dr.method == "spline"){
         out.drFit1 <- growth.drFit(summary.flFit(out.flFit1), control)
         boot.ec1 <- out.drFit1$boot.ec
@@ -2116,6 +2138,11 @@ fl.workflow <- function(grodata = NULL,
       EC50.table1 <- out.drFit1$drTable
     }
     if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+      if ((control$suppress.messages==FALSE)){
+        cat("\n\n")
+        cat(paste("=== Performing Dose-Response Analysis for  Fluorescence 2 =================================\n"))
+        cat("----------------------------------------------------\n")
+      }
       if(control$dr.method == "spline"){
         out.drFit2 <- growth.drFit(summary.flFit(out.flFit2), control)
         boot.ec2 <- out.drFit2$boot.ec
@@ -2160,18 +2187,25 @@ fl.workflow <- function(grodata = NULL,
              wd, "/results.fl.txt\n"))
   if (ec50 == TRUE) {
     if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-      res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
-      utils::write.table(res.table.dr_fl1, paste(wd, "results.dr1.txt",
-                                                sep = "/"), row.names = FALSE, sep = "\t")
+      if(!is.na(EC50.table1)) {
+        res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
+        utils::write.table(res.table.dr_fl1, paste(wd, "results.fl_dr1.txt",
+                                                  sep = "/"), row.names = FALSE, sep = "\t")
+        cat(paste0("Results of EC50 analysis for fluorescence 1 saved as tab-delimited in:\n",
+                   wd, "/results.fl_dr1.txt\n"))
+      }
     }
     if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-      res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
-      utils::write.table(res.table.dr_fl2, paste(wd, "results.dr2.txt",
-                                                 sep = "/"), row.names = FALSE, sep = "\t")
+      if(!is.na(EC50.table1)) {
+        res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
+        utils::write.table(res.table.dr_fl2, paste(wd, "results.fl_dr2.txt",
+                                                   sep = "/"), row.names = FALSE, sep = "\t")
+        cat(paste0("Results of EC50 analysis for fluorescence 2 saved as tab-delimited in:\n",
+                   wd, "/results.fl_dr2.txt\n"))
+      }
     }
 
-    cat(paste0("Results of EC50 analysis saved as tab-delimited in:\n",
-               wd, "/results.fl_dr.txt\n"))
+
   } else {
     res.table.dr_fl1 <- NULL
     res.table.dr_fl2 <- NULL
@@ -2232,7 +2266,7 @@ fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html
     res.table.fl1 <- flFitRes$flFit1$flTable
   }
   if(!exists("res.table.dr1")){
-    if(length(flFitRes$drFit1)>1) res.table.dr1 <- flFitRes$drFit1$drTable
+    if(length(flFitRes$drFit1)>1 && !is.na(flFitRes$drFit1$drTable)) res.table.dr1 <- flFitRes$drFit1$drTable
   }
   if(!exists("res.table.gc2")){
     if(length(flFit2)>1){
@@ -2240,15 +2274,13 @@ fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html
     }
   }
   if(!exists("res.table.dr2")){
-    if(length(flFit2)>1){
-      if(!is.na(flFitRes$drFit2)) res.table.dr2 <- flFitRes$drFit2$drTable
-    }
+    if(length(flFitRes$drFit2)>1 && !is.na(flFitRes$drFit2$drTable)) res.table.dr2 <- flFitRes$drFit2$drTable
   }
   # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
   mu.min1 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) min(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
   if(mu.min1 >0) mu.min1 <- 0
   mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) max(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
-  if(!is.na(flFit2)){
+  if(length(flFit2)>1){
     mu.min2 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) min(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
     if(mu.min2 >0) mu.min2 <- 0
     mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) max(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
@@ -2330,13 +2362,17 @@ fl.drFit <- function(FitData, control = fl.control())
   if (TRUE %in% (table.tests < control$dr.have.atleast)) {
     cat(paste("Warning: following tests have not enough ( <",
               as.character(control$dr.have.atleast - 1), ") datasets:\n"))
-    cat(distinct[(table.tests < control$dr.have.atleast)])
+    cat(paste(distinct[(table.tests < control$dr.have.atleast)], sep = "\n"))
     cat("These tests will not be regarded\n")
     distinct <- distinct[table.tests >= control$dr.have.atleast]
   }
   if ((length(distinct)) == 0) {
     cat(paste("There are no tests having enough ( >", as.character(control$dr.have.atleast -
                                                                      1), ") datasets!\n"))
+    drFitfl <- list(raw.data = FitData, drTable = NA,
+                    drFittedModels = NA, control = control)
+    class(drFitfl) <- "drFitfl"
+    return(drFitfl)
   }
   else {
     skip <- c()
