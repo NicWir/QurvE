@@ -340,7 +340,11 @@ if(any(c("l") %in% control$fit.opt)){
     #         }
     for(i in 1:length(flFitRes[["flFit1"]][["flFittedLinear"]])){
         if(length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+<<<<<<< HEAD
                   pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|\\(|\\)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6)
+=======
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|(|)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6)
+>>>>>>> d2845362296fbb775cbf78b9bdf358f34f10e623
           plot.ggLinear()
           invisible(dev.off())
                  }
@@ -350,7 +354,11 @@ if(any(c("l") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                            pattern = "^PlotLinear_",
                            full.names = TRUE)
+<<<<<<< HEAD
   sort.ndx <- match(gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes$flFit1$flFittedLinear))))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+=======
+  sort.ndx <- match(gsub("∙|>|<|(|)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes$flFit1$flFittedLinear))))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+>>>>>>> d2845362296fbb775cbf78b9bdf358f34f10e623
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
@@ -660,7 +668,11 @@ if(any(c("s") %in% control$fit.opt)) {
     foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+<<<<<<< HEAD
                 pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+=======
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|(|)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+>>>>>>> d2845362296fbb775cbf78b9bdf358f34f10e623
                   "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
                 ))))),  ".pdf"))
                 plot.ggSpline()
@@ -673,7 +685,11 @@ if(any(c("s") %in% control$fit.opt)) {
                            pattern = "^PlotSpline_",
                            full.names = TRUE)
   sort.ndx <-
+<<<<<<< HEAD
     match(gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
+=======
+    match(gsub("∙|>|<|(|)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
+>>>>>>> d2845362296fbb775cbf78b9bdf358f34f10e623
       " \\| ", "_", names(flFitRes$flFit1$flFittedSplines)
     )))))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
