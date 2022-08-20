@@ -1685,6 +1685,11 @@ plot.grofit <- function(grofit, ...,
                                )
         )
       }
+    } else {
+      p <- p + scale_fill_manual(name = "Condition",
+                                 values = colors) +
+        scale_color_manual(name = "Condition",
+                           values = colors)
     }
     if(deriv){
       # /// add panel with growth rate over time
@@ -1745,6 +1750,11 @@ plot.grofit <- function(grofit, ...,
                                  )
           )
         }
+      } else {
+        p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
       }
       p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
     }

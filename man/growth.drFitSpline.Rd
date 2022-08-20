@@ -26,7 +26,7 @@ A \code{drFitSpline} object.
 \item{spline.low}{\code{x} and {y} values of \code{\link{lowess}} spline fit on raw data. Used to call \code{\link{smooth.spline}}.}
 \item{parameters}{List of parameters estimated from dose response curve fit.}
 \itemize{
-\item \code{EC50}: {Half maximal concentration.}
+\item \code{EC50}: {Concentration at half-maximal response.}
 \item \code{yEC50}: {Response value related to EC50.}
 \item \code{EC50.orig}: {EC50 value in original scale, if a transformation was applied.}
 \item \code{xEC50.orig}: {Response value for EC50 in original scale, if a transformation was applied.}

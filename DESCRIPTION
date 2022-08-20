@@ -58,3 +58,4 @@ Collate:
     'growth_computation.R'
     'growth_plots.R'
     'growth_summaries.R'
+    'shiny_app_functions.R'

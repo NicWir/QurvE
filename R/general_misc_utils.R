@@ -287,3 +287,41 @@ parse_Gen5Gen6 <- function(input)
   }
   return(list(data.ls, read.data))
 }
+
+biosensor.eq <- function (x, y.min, y.max, K, n)
+{
+  y.min <- y.min[1]
+  y.max <- y.max[1]
+  K <- K[1]
+  n <- n[1]
+  if (is.numeric(x) == FALSE || length(x) < 4)
+    stop("Need numeric vector with at least four elements for: x (i.e., inducer concentrations)")
+  if (is.numeric(y.min) == FALSE)
+    stop("Need numeric vector for: y.min")
+  if (is.numeric(y.max) == FALSE)
+    stop("Need numeric vector for: y.max")
+  if (is.numeric(K) == FALSE)
+    stop("Need numeric vector for: K")
+  if (is.numeric(n) == FALSE)
+    stop("Need numeric vector for: n")
+  y <- y.min + (y.max - y.min) * ( x^n / (K^n + x^n) )
+  biosensor.eq <- y
+}
+
+
+
+initbiosensor <- function (x, y, n)
+{
+  if (is.numeric(x) == FALSE || length(x) < 4)
+    stop("Need numeric vector with at least four elements for: x (i.e., inducer concentrations)")
+  if (is.numeric(y) == FALSE || length(y) < 4)
+    stop("Need numeric vector with at least four elements for: y (i.e., promoter response)")
+  y.min <- min(y)
+  y.max <- max(y)
+  lo <- suppressWarnings(loess(y~x, span = 0.5))
+  xl <- seq(min(x),max(x), (max(x) - min(x))/500)
+  yl <- predict(lo,xl)
+  K <- xl[sample(1:(which.max(yl)*0.25), 1)]
+
+  return(list(y.max = y.max, K = K, n = n))
+}
