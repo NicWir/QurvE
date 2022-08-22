@@ -656,7 +656,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                            mainPanel(
                                                              plotOutput("growth_group_plot")
-                                                           )
+                                                           ),
+                                                           verbatimTextOutput('test')
                                                   ),
 
                                                   tabPanel(title = "Dose-response analysis",
@@ -978,13 +979,35 @@ server <- function(input, output){
     results <- results$growth
     plot.grofit(results,
                 data.type = input$data_type_growth_group_plots,
-                names = unlist(
-                  str_split(
-                    gsub(";[[:space:]]+", ";",
-                         gsub("[[:space:]]+;",
-                              ";",
-                              input$select_samples_based_on_string_growth_group_plots)),
-                    pattern = ";")))
+                names = input$select_samples_based_on_string_growth_group_plots,
+                conc = input$select_samples_based_on_concentration_growth_group_plots,
+                exclude.nm = input$exclude_samples_based_on_string_growth_group_plots,
+                exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots
+
+
+
+                # conc = unlist(
+                #   str_split(
+                #     gsub(";[[:space:]]+", ";",
+                #          gsub("[[:space:]]+;",";",
+                #               input$select_samples_based_on_concentration_growth_group_plots)),
+                #     pattern = ";")),
+                #
+                # exclude.nm = unlist(
+                #   str_split(
+                #     gsub(";[[:space:]]+", ";",
+                #          gsub("[[:space:]]+;",";",
+                #               input$exclude_samples_based_on_string_growth_group_plots)),
+                #     pattern = ";")),
+
+                #exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots
+
+                )
+  })
+
+  output$test <- renderText({
+    results <- input$select_samples_based_on_string_growth_group_plots
+    print(paste(results, typeof(results)))
   })
 
   output$dose_response_plot <- renderPlot({
@@ -1045,6 +1068,9 @@ server <- function(input, output){
     updateSelectInput(inputId = "reference_concentration_fluorescence_parameter_plot",
                       choices = select_inputs_reference_concentration_fluorescence_parameter_plot()
     )})
+
+
+
   # in case you want to print a consol output:
   #output$console <- renderPlot({
   #  results <- results()
