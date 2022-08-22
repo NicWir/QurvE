@@ -572,6 +572,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       h1('Under construction'))
                   ),
 
+                  # Visualize
                   navbarMenu("Visualize",
                              tabPanel(title = "Growth Plots",
                                       h1("Growth Plots"),
@@ -660,7 +661,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                   tabPanel(title = "Dose-response analysis",
                                                            sidebarPanel(
-                                                             # add sibar stuff
+                                                             #
                                                            ),
                                                            mainPanel(
                                                              plotOutput("growth_dose_response_plot")
@@ -971,15 +972,31 @@ server <- function(input, output){
     )
   })
 
+  # Group Plots:
+  ## Growth
+  output$growth_group_plot <- renderPlot({
+    results <- results$growth
+    plot.grofit(results,
+                data.type = input$data_type_growth_group_plots,
+                names = unlist(
+                  str_split(
+                    gsub(";[[:space:]]+", ";",
+                         gsub("[[:space:]]+;",
+                              ";",
+                              input$select_samples_based_on_string_growth_group_plots)),
+                    pattern = ";")))
+  })
+
+  output$dose_response_plot <- renderPlot({
+    results <- results$growth
+    plot(results$drFit)
+  })
+
   output$growth_parameter_plot <- renderPlot({
     results <- results$growth
     plot.parameter(results)
   })
 
-  output$dose_response <- renderPlot({
-    results <- results$growth
-    plot(results$drFit$spline)
-  })
 
   output$results_table_growth <- renderTable({
     results <- results$growth
