@@ -14,7 +14,10 @@ source("../../R/growth_summaries.R")
 source("../../R/fluorescence_computation.R")
 source("../../R/fluorescence_plots.R")
 source("../../R/fluorescence_summaries.R")
-
+gc_parameters <- c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
+                   'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
+                   'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
+                   'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')
 ui <- fluidPage(theme = shinytheme('sandstone'),
                 navbarPage(
                   'QurvE',
@@ -710,8 +713,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                            sidebarPanel(
                                                              selectInput(inputId = "parameter_growth_parameter_growth_plot",
                                                                          label = "Parameter",
-                                                                         choices = c("mu.linfit" = "mu.linfit",
-                                                                                     "other" = "other_growth_parameter_plot")
+                                                                         choices = gc_parameters
                                                              ),
 
                                                              textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
@@ -1014,6 +1016,31 @@ server <- function(input, output){
                                       report = NULL,
                                       out.dir = "Test"
     )
+    gc_parameters <- c()
+    if("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt){
+      gc_parameters <- c(gc_parameters,
+                         'mu.spline' = 'mu.spline',
+                         "tD.spline" = "tD.spline",
+                         'lambda.spline' = 'lambda.spline',
+                         'A.spline' = 'A.spline',
+                         'dY.spline' = 'dY.spline',
+                         'integral.spline' = 'integral.spline')
+    }
+    if("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt){
+      gc_parameters <- c(gc_parameters,
+                         'mu.linfit' = 'mu.linfit',
+                         "tD.linfit" = "tD.linfit",
+                         'lambda.linfit' = 'lambda.linfit',
+                         'A.linfit' = 'A.linfit',
+                         'dY.linfit' = 'dY.linfit')
+    }
+    if("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt){
+      gc_parameters <- c(gc_parameters,
+                         'mu.model' = 'mu.model',
+                         'lambda.model' = 'lambda.model',
+                         'A.model' = 'A.model',
+                         'dY.model' = 'dY.model')
+    }
   })
 
   # Group Plots:

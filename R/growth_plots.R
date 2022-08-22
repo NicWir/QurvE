@@ -2096,8 +2096,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   # apply normalization to reference condition
-  if(!is.null(reference.nm)){
-    ref.ndx <- grep(reference.nm, labels)
+  if(!is.null(reference.nm) && reference.nm != ""){
+    ref.ndx <- grep(gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", gsub("\\?", "\\\\?", reference.nm))), labels)
     if (length(ref.ndx) > 1){
       if(!is.null(reference.conc)){
         refconc.ndx <- which(reference.conc == str_extract(labels, "[:alnum:]+$"))
@@ -2165,7 +2165,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
        data = df_reps,
        aes(x = condition, y = value, fill = replicate),
        shape = 23,
-       size = 2.5,
+       size = shape.size,
        color = "black",
        position = position_dodge(width = 0.3),
        inherit.aes = FALSE
