@@ -2047,7 +2047,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   if(!is.null(conc) && length(conc) > 0){
     if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)  && length(conc) > 0){
+  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
       names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
@@ -2082,8 +2082,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   # Check FitFlag for each replicate, work per condition
   for(i in 1:length(ndx.filt)){
-    if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["gcFit"]][[ifelse(fit.type=="linfit", "gcFittedLinear", ifelse(fit.type=="model", "gcFittedModels", "gcFittedSplines"))]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
-      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (object[["gcFit"]][[ifelse(fit.type=="linfit", "gcFittedLinear", ifelse(fit.type=="model", "gcFittedModels", "gcFittedSplines"))]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+    if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (as.logical(gcTable[j, ifelse(fit.type=="linfit", "reliable_fit.linfit", ifelse(fit.type=="model", "reliable_fit.model", "reliable_fit.spline"))])))))){
+      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (as.logical(gcTable[j, ifelse(fit.type=="linfit", "reliable_fit.linfit", ifelse(fit.type=="model", "reliable_fit.model", "reliable_fit.spline"))]))))
       nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
       ndx.filt[[i]] <- ndx.filt[[i]][fitflags]
     }
