@@ -834,6 +834,17 @@ plot.flFitRes <-  function(object,
                         out.nm = NULL
 )
 {
+  # Convert range arguments
+  x.lim <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", x.lim)), pattern = ";|,"))
+  y.lim <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim)), pattern = ";|,"))
+  y.lim.deriv <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim.deriv)), pattern = ";|,"))
+  suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
+  if(all(is.na(x.lim))) x.lim <- NULL
+  suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
+  if(all(is.na(y.lim))) y.lim <- NULL
+  suppressWarnings(assign("y.lim.deriv" ,as.numeric(y.lim.deriv)))
+  if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
+
   if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
   if(is(object) == "grodata" && !any(data.type %in% c("raw1", "raw2", "norm.fl1", "norm.fl2"))) stop("Raw input data can only be used to visualize data.type 'raw1', 'raw2', 'norm.fl1', or 'norm.fl2'.")
 
@@ -884,19 +895,23 @@ plot.flFitRes <-  function(object,
   if(data.type == "norm.fl2") data.nm = "norm.fluorescence2"
   if(data.type == "raw1") data.nm = "fluorescence1"
   if(data.type == "raw2") data.nm = "fluorescence2"
-  if(!is.null(names) || !is.na(names)){
-    names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
-    nm <- nm[grep(paste(names, collapse="|"), nm)]
+  if(!is.null(names)  && length(names) > 0){
+    if(!is.na(names) && names != ""){
+      names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+      nm <- nm[grep(paste(names, collapse="|"), nm)]
+    }
   }
-  if(!is.null(conc) || !is.na(conc)){
-    nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+  if(!is.null(conc) && length(conc) > 0){
+    if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm) || !is.na(exclude.nm)){
-    names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
-    nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+  if(!is.null(exclude.nm)  && length(conc) > 0){
+    if(!is.na(exclude.nm) && exclude.nm != ""){
+      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+    }
   }
-  if(!is.null(exclude.conc) || !is.na(exclude.conc)){
-    nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+  if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
+    if(!is.na(exclude.conc)) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.flFitRes() with valid 'names' or 'conc' argument.")
@@ -1453,6 +1468,17 @@ plot.dual <-  function(object,
                            out.nm = NULL
 )
 {
+  # Convert range arguments
+  x.lim <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", x.lim)), pattern = ";|,"))
+  y.lim.fl <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim.fl)), pattern = ";|,"))
+  y.lim.density <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim.density)), pattern = ";|,"))
+  suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
+  if(all(is.na(x.lim))) x.lim <- NULL
+  suppressWarnings(assign("y.lim.fl" ,as.numeric(y.lim.fl)))
+  if(all(is.na(y.lim.fl))) y.lim.fl <- NULL
+  suppressWarnings(assign("y.lim.density" ,as.numeric(y.lim.density)))
+  if(all(is.na(y.lim.density))) y.lim.density <- NULL
+
   if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
   density <- density.nm <- "density"
   fluorescence <- match.arg(fluorescence)
@@ -1485,19 +1511,23 @@ plot.dual <-  function(object,
   if(fluorescence == "norm.fl1") fl.nm = "norm.fluorescence1"
   if(fluorescence == "norm.fl2") fl.nm = "norm.fluorescence2"
 
-  if(!is.null(names) || !is.na(names)){
-    names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
-    nm <- nm[grep(paste(names, collapse="|"), nm)]
+  if(!is.null(names)  && length(names) > 0){
+    if(!is.na(names) && names != ""){
+      names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+      nm <- nm[grep(paste(names, collapse="|"), nm)]
+    }
   }
-  if(!is.null(conc) || !is.na(conc)){
-    nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+  if(!is.null(conc) && length(conc) > 0){
+    if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm) || !is.na(exclude.nm)){
-    names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
-    nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+  if(!is.null(exclude.nm)  && length(conc) > 0){
+    if(!is.na(exclude.nm) && exclude.nm != ""){
+      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+    }
   }
-  if(!is.null(exclude.conc) || !is.na(exclude.conc)){
-    nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+  if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
+    if(!is.na(exclude.conc)) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
