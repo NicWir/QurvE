@@ -591,15 +591,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                        ),
 
                                                              textInput(inputId = "select_samples_based_on_concentration_growth_group_plots",
-                                                                       label = "Select sample based on string (separate by ;)"
+                                                                       label = "Select sample based on concentration (separate by ;)"
                                                              ),
 
                                                              textInput(inputId = "exclude_samples_based_on_string_growth_group_plots",
-                                                                       label = "Select sample based on string (separate by ;)"
+                                                                       label = "Exclude sample based on string (separate by ;)"
                                                              ),
 
                                                              textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plots",
-                                                                       label = "Select sample based on string (separate by ;)"
+                                                                       label = "Exclude sample based on concentration (separate by ;)"
                                                              ),
 
                                                              checkboxInput(inputId = "plot_group_averages_growth_group_plots",
@@ -616,19 +616,55 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = "Log-transform y-axis",
                                                                            value = TRUE),
 
-                                                             textInput(inputId = "x_range_growth_group_plot",
-                                                                       label = "x-Range (separated by ;)",
-                                                                       value = "lower;upper"
+                                                             strong("x-Range"),
+                                                             fluidRow(
+                                                               column(3,
+                                                                      textInput(inputId = "x_range_min_growth_group_plot",
+                                                                                label = NULL,
+                                                                                value = "min"
+                                                                      )
+                                                               ),
+
+                                                               column(3,
+                                                                      textInput(inputId = "x_range_max_growth_group_plot",
+                                                                                label = NULL,
+                                                                                value = "max"
+                                                                      )
+                                                               )
                                                              ),
 
-                                                             textInput(inputId = "y_range_growth_group_plot",
-                                                                       label = "y-Range (separated by ;)",
-                                                                       value = "lower;upper"
+                                                             strong("y-Range"),
+                                                             fluidRow(
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_min_growth_group_plot",
+                                                                                label = NULL,
+                                                                                value = "min"
+                                                                      )
+                                                               ),
+
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_max_growth_group_plot",
+                                                                                label = NULL,
+                                                                                value = "max"
+                                                                      )
+                                                               )
                                                              ),
 
-                                                             textInput(inputId = "y_range_derivative_growth_group_plot",
-                                                                       label = "y-Range derivative (separated by ;)",
-                                                                       value = "lower;upper"
+                                                             strong("y-Range (derivative)"),
+                                                             fluidRow(
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_min_derivative_growth_group_plot",
+                                                                                label = NULL,
+                                                                                value = "min"
+                                                                      )
+                                                               ),
+
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_max_derivative_growth_group_plot",
+                                                                                label = NULL,
+                                                                                value = "max"
+                                                                      )
+                                                               )
                                                              ),
 
                                                              textInput(inputId = "y_axis_title_growth_group_plot",
@@ -656,8 +692,10 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                            mainPanel(
                                                              plotOutput("growth_group_plot")
-                                                           ),
-                                                           verbatimTextOutput('test')
+                                                           )
+
+                                                           # TEST CONSOL OUTPUT
+                                                           #verbatimTextOutput('test')
                                                   ),
 
                                                   tabPanel(title = "Dose-response analysis",
@@ -982,31 +1020,22 @@ server <- function(input, output){
                 names = input$select_samples_based_on_string_growth_group_plots,
                 conc = input$select_samples_based_on_concentration_growth_group_plots,
                 exclude.nm = input$exclude_samples_based_on_string_growth_group_plots,
-                exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots
-
-
-
-                # conc = unlist(
-                #   str_split(
-                #     gsub(";[[:space:]]+", ";",
-                #          gsub("[[:space:]]+;",";",
-                #               input$select_samples_based_on_concentration_growth_group_plots)),
-                #     pattern = ";")),
-                #
-                # exclude.nm = unlist(
-                #   str_split(
-                #     gsub(";[[:space:]]+", ";",
-                #          gsub("[[:space:]]+;",";",
-                #               input$exclude_samples_based_on_string_growth_group_plots)),
-                #     pattern = ";")),
-
-                #exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots
-
+                exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots,
+                mean = input$plot_group_averages_growth_group_plots,
+                deriv = input$plot_derivative_growth_group_plots,
+                log.y = input$log_transform_y_axis_growth_group_plots,
+                # x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
+                # ylim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
+                # y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
+                y.title = input$y_axis_title_growth_group_plot,
+                x.title = input$x_axis_title_growth_group_plot,
+                y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
+                lwd = input$line_width_growth_group_plot
                 )
   })
 
   output$test <- renderText({
-    results <- input$select_samples_based_on_string_growth_group_plots
+    results <- c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot)
     print(paste(results, typeof(results)))
   })
 
