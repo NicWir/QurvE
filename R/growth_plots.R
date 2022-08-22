@@ -2018,7 +2018,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
   if(!is.null(names)  && length(conc) > 0){
-    if(!is.na(names)){
+    if(!is.na(names) && names != ""){
       names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
       nm <- nm[grep(paste(names, collapse="|"), nm)]
     }
@@ -2027,7 +2027,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
   if(!is.null(exclude.nm)  && length(conc) > 0){
-    if(!is.na(exclude.nm)){
+    if(!is.na(exclude.nm) && exclude.nm != ""){
       names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
     }
