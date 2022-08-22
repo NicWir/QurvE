@@ -294,12 +294,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                  checkboxInput(inputId = 'custom_sliding_window_size_growth',
                                                                label = 'custom sliding window size',
-                                                               value = TRUE),
+                                                               value = FALSE),
 
                                                  numericInput(
                                                    inputId = 'custum_sliding_window_size_value_growth',
-                                                   label = '',
-                                                   value = 0.1,
+                                                   label = NULL,
+                                                   value = 1,
                                                    min = NA,
                                                    max = NA,
                                                  ),
@@ -694,8 +694,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              plotOutput("growth_group_plot")
                                                            )
 
-                                                           # TEST CONSOL OUTPUT
-                                                           #verbatimTextOutput('test')
+
                                                   ),
 
                                                   tabPanel(title = "Dose-response analysis",
@@ -711,7 +710,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                            sidebarPanel(
                                                              selectInput(inputId = "parameter_growth_parameter_growth_plot",
                                                                          label = "Parameter",
-                                                                         choices = c("mu.linfit" = "mu.linfit_growth_parameter_plot",
+                                                                         choices = c("mu.linfit" = "mu.linfit",
                                                                                      "other" = "other_growth_parameter_plot")
                                                              ),
 
@@ -735,6 +734,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = 'normalize to reference',
                                                                            value = TRUE),
 
+                                                             # reactive selection
+                                                             selectInput(inputId = 'reference_condition_growth_parameter_plot',
+                                                                         label = 'Reference condition',
+                                                                         choices = ""
+                                                             ),
+
+                                                             # reactive selection
+                                                             selectInput(inputId = 'reference_concentration_growth_parameter_plot',
+                                                                         label = 'Reference concentration',
+                                                                         choices = ""
+                                                             ),
+
                                                              sliderInput(inputId = "shape.size_growth_parameter_plot",
                                                                          label = "Shape size",
                                                                          min = 1,
@@ -745,22 +756,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          label = "Base size",
                                                                          min = 1,
                                                                          max = 25,
-                                                                         value = 12),
+                                                                         value = 12)
 
-                                                             selectInput(inputId = 'reference_condition_growth_parameter_plot',
-                                                                         label = 'Reference condition',
-                                                                         choices = ""
-                                                             ),
 
-                                                             selectInput(inputId = 'reference_concentration_growth_parameter_plot',
-                                                                         label = 'Reference concentration',
-                                                                         choices = ""
-                                                             ),
                                                            ),
 
                                                            mainPanel(
                                                              plotOutput("growth_parameter_plot")
                                                            )
+                                                           # TEST CONSOL OUTPUT
+                                                           #verbatimTextOutput('test')
                                                   )
                                       )
                              ),
@@ -1024,9 +1029,9 @@ server <- function(input, output){
                 mean = input$plot_group_averages_growth_group_plots,
                 deriv = input$plot_derivative_growth_group_plots,
                 log.y = input$log_transform_y_axis_growth_group_plots,
-                # x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
-                # ylim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
-                # y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
+                x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
+                y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
+                y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
                 y.title = input$y_axis_title_growth_group_plot,
                 x.title = input$x_axis_title_growth_group_plot,
                 y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
@@ -1035,8 +1040,7 @@ server <- function(input, output){
   })
 
   output$test <- renderText({
-    results <- c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot)
-    print(paste(results, typeof(results)))
+    print(ifelse(is.null(input$reference_condition_growth_parameter_plot), "Null", input$reference_condition_growth_parameter_plot))
   })
 
   output$dose_response_plot <- renderPlot({
@@ -1046,7 +1050,18 @@ server <- function(input, output){
 
   output$growth_parameter_plot <- renderPlot({
     results <- results$growth
-    plot.parameter(results)
+
+    plot.parameter(results,
+                   param = input$parameter_growth_parameter_growth_plot,
+                   names = input$select_sample_based_on_string_growth_parameter_plot,
+                   conc = input$select_sample_based_on_concentration_growth_parameter_plot,
+                   exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
+                   exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
+                   reference.nm = input$reference_condition_growth_parameter_plot,
+                   reference.conc = input$reference_concentration_growth_parameter_plot,
+                   shape.size = input$shape.size_growth_parameter_plot,
+                   basesize = input$basesize_growth_parameter_plot
+                   )
   })
 
 
@@ -1056,7 +1071,7 @@ server <- function(input, output){
   })
 
   # conditional selections:
-  ## Growth
+  ## Growth plot
   selected_inputs_reference_condition_growth_parameter_plot <- reactive({
     results <- results$growth
     results$expdesign$condition
@@ -1076,6 +1091,7 @@ server <- function(input, output){
     updateSelectInput(inputId = "reference_concentration_growth_parameter_plot",
                       choices = select_inputs_reference_concentration_growth_parameter_plot()
     )})
+
 
   ## Fluorescence
   selected_inputs_reference_condition_fluorescence_parameter_plot <- reactive({
