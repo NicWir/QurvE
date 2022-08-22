@@ -1465,7 +1465,7 @@ plot.grofit <- function(grofit, ...,
 
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(names(grofit$gcFit$gcFittedSplines))
-  if(!is.null(names)  && length(conc) > 0){
+  if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
       names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
       nm <- nm[grep(paste(names, collapse="|"), nm)]
