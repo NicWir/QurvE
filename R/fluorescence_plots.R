@@ -834,10 +834,14 @@ plot.flFitRes <-  function(object,
                         out.nm = NULL
 )
 {
-  # Convert range arguments
-  x.lim <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", x.lim)), pattern = ";|,"))
-  y.lim <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim)), pattern = ";|,"))
-  y.lim.deriv <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim.deriv)), pattern = ";|,"))
+  # Convert range  and selecting arguments
+  names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
+  conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
+  exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
+  exclude.conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.conc)), pattern = ";"))
+  x.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", x.lim)), pattern = ";"))
+  y.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim)), pattern = ";"))
+  y.lim.deriv <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.deriv)), pattern = ";"))
   suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
   if(all(is.na(x.lim))) x.lim <- NULL
   suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
@@ -1468,10 +1472,10 @@ plot.dual <-  function(object,
                            out.nm = NULL
 )
 {
-  # Convert range arguments
-  x.lim <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", x.lim)), pattern = ";|,"))
-  y.lim.fl <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim.fl)), pattern = ";|,"))
-  y.lim.density <- unlist(str_split(gsub(";[[:space:]]+", ";", gsub("[[:space:]]+;", ";", y.lim.density)), pattern = ";|,"))
+  # Convert range  and selecting arguments
+  x.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", x.lim)), pattern = ";|,"))
+  y.lim.fl <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.fl)), pattern = ";|,"))
+  y.lim.density <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.density)), pattern = ";|,"))
   suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
   if(all(is.na(x.lim))) x.lim <- NULL
   suppressWarnings(assign("y.lim.fl" ,as.numeric(y.lim.fl)))

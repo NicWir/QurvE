@@ -1996,6 +1996,20 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                            out.dir = NULL,
                            out.nm = NULL)
   {
+  # Convert range  and selecting arguments
+  names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
+  conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
+  exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
+  exclude.conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.conc)), pattern = ";"))
+  x.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", x.lim)), pattern = ";"))
+  y.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim)), pattern = ";"))
+  y.lim.deriv <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.deriv)), pattern = ";"))
+  suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
+  if(all(is.na(x.lim))) x.lim <- NULL
+  suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
+  if(all(is.na(y.lim))) y.lim <- NULL
+  suppressWarnings(assign("y.lim.deriv" ,as.numeric(y.lim.deriv)))
+  if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
   param <- match.arg(param)
   # check class of object
   if(!(any(is(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
