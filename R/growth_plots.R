@@ -2017,7 +2017,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
-  if(!is.null(names)  && length(conc) > 0){
+  if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
       names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
       nm <- nm[grep(paste(names, collapse="|"), nm)]
