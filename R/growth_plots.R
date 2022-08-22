@@ -1420,6 +1420,12 @@ plot.grofit <- function(grofit, ...,
                         out.nm = NULL
 )
 {
+  suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
+  if(all(is.na(x.lim))) x.lim <- NULL
+  suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
+  if(all(is.na(y.lim))) y.lim <- NULL
+  suppressWarnings(assign("y.lim.deriv" ,as.numeric(y.lim.deriv)))
+  if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
 
   call <- match.call()
   # remove all function arguments from call to leave only multiple grofit objects
