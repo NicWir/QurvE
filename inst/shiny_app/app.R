@@ -763,10 +763,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                            mainPanel(
                                                              plotOutput("growth_parameter_plot")
-                                                             # TEST CONSOL OUTPUT
-
-                                                           ),
-                                                           verbatimTextOutput('test')
+                                                           )
+                                                           # TEST CONSOL OUTPUT
+                                                           #verbatimTextOutput('test')
                                                   )
                                       )
                              ),
