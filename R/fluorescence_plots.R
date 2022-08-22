@@ -1,14 +1,16 @@
-#' Title
+#' Generic plot function for \code{flcFittedLinear} objects. Plot the results of a linear regression on ln-transformed data
 #'
-#' @param flFittedLinear
-#' @param log
-#' @param which
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
-#' @param ...
+#' \code{plot.flFitLinear} shows the results of a linear regression and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
+#'
+#' @param flFittedLinear A \code{flFittedLinear} object created with \code{\link{flFitLinear}} or stored within a \code{flFitRes} or \code{flFit} object created with \code{\link{fl.workflow}} or \code{\link{flFit}}, respectively.
+#' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
+#' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @return
 #' @export
@@ -132,19 +134,22 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
   }
 }
 
+#' Generic plot function for \code{flFitSpline} objects.
 #'
-#' @param flFitSpline
-#' @param add
-#' @param raw
-#' @param slope
-#' @param deriv
-#' @param spline
-#' @param log.y
-#' @param pch
-#' @param colData
-#' @param colSpline
-#' @param cex
-#' @param lwd
+#' code{plot.flFitSpline} generates the spline fit plot for a single sample.
+#'
+#' @param flFitSpline object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.
+#' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.flBootSpline}}.
+#' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
+#' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
+#' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
+#' @param log.y (Logical) Log-transform the y-axis (\code{TRUE}) or not (\code{FALSE}).
+#' @param pch (Numeric) Size of the raw data circles.
+#' @param colData (Numeric or character) Contour color of the raw data circles.
+#' @param colSpline (Numeric or character) Spline line colour.
+#' @param basesize (Numeric) Base font size.
+#' @param lwd (Numeric) Spline line width.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -159,7 +164,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = F,
-                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
+                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
   {
@@ -265,9 +270,23 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
 
       if(log.y == TRUE){
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+        if(!is.null(y.lim)){
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = 'log')
+        } else {
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+        }
       } else {
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+        if(!is.null(y.lim)){
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
+        } else {
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+        }
+      }
+
+      if(!is.null(x.lim)){
+        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
       }
 
 
@@ -793,6 +812,8 @@ plot.flFitRes <-  function(object,
                         names = NULL,
                         conc = NULL,
                         mean = TRUE,
+                        exclude.nm = NULL,
+                        exclude.conc = NULL,
                         log.y = F,
                         deriv = F,
                         n.ybreaks = 6,
@@ -839,6 +860,8 @@ plot.flFitRes <-  function(object,
     if (!("s" %in% flFit$control$fit.opt | "a" %in% flFit$control$fit.opt)) stop("To plot spline fit results, please run fl.workflow() with 's' in fit.opt.")
   }
 
+  conc <- as.numeric(conc)
+  exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates
   if(any(is(object) %in% c("flFit","flFitRes"))){
@@ -861,15 +884,22 @@ plot.flFitRes <-  function(object,
   if(data.type == "norm.fl2") data.nm = "norm.fluorescence2"
   if(data.type == "raw1") data.nm = "fluorescence1"
   if(data.type == "raw2") data.nm = "fluorescence2"
-  if(!is.null(names)){
+  if(!is.null(names) || !is.na(names)){
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
-  if(!is.null(conc)){
+  if(!is.null(conc) || !is.na(conc)){
     nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
+  if(!is.null(exclude.nm) || !is.na(exclude.nm)){
+    names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+    nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+  }
+  if(!is.null(exclude.conc) || !is.na(exclude.conc)){
+    nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+  }
   if(length(nm)==0){
-    stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
+    stop("Please run plot.flFitRes() with valid 'names' or 'conc' argument.")
   }
   # remove conditions with fitFlag = FALSE in all replicates
   # Store each condition with its replicate indices in list filter.ls
@@ -1399,6 +1429,8 @@ plot.dual <-  function(object,
                            names = NULL,
                            conc = NULL,
                            mean = TRUE,
+                           exclude.nm = NULL,
+                           exclude.conc = NULL,
                            log.y.density = F,
                            log.y.fl = F,
                            deriv = F,
@@ -1453,12 +1485,19 @@ plot.dual <-  function(object,
   if(fluorescence == "norm.fl1") fl.nm = "norm.fluorescence1"
   if(fluorescence == "norm.fl2") fl.nm = "norm.fluorescence2"
 
-  if(!is.null(names)){
+  if(!is.null(names) || !is.na(names)){
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
-  if(!is.null(conc)){
+  if(!is.null(conc) || !is.na(conc)){
     nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+  }
+  if(!is.null(exclude.nm) || !is.na(exclude.nm)){
+    names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+    nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+  }
+  if(!is.null(exclude.conc) || !is.na(exclude.conc)){
+    nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")

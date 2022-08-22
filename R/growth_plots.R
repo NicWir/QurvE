@@ -2,7 +2,7 @@
 #'
 #' \code{plot.gcFitLinear} shows the results of a linear regression on log-transformed data and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
 #'
-#' @param gcFittedLinear A \code{gcFittedLinear} object created with \code{growth.gcFitLinear()} or stored within a \code{grofit} or \code{gcFit} object created with \code{growth.workflow()} or \code{growth.gcFit()}, respectively.
+#' @param gcFittedLinear A \code{gcFittedLinear} object created with \code{\link{growth.gcFitLinear}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
 #' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
@@ -98,7 +98,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'
 #' Plot the results of a parametric model fit on density vs. time data
 #'
-#' @param gcFittedModel A \code{gcFittedModel} object created with \code{growth.gcFitModel()} or stored within a \code{grofit} or \code{gcFit} object created with \code{growth.workflow()} or \code{growth.gcFit()}, respectively.
+#' @param gcFittedModel A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param raw (Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param slope (Logical) Show the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param colData (Numeric or Character) Color used to plot the raw data.
@@ -331,7 +331,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
 
 #' Generic plot function for \code{gcBootSpline} objects.
 #'
-#' @param drBootSpline A \code{drBootSpline} object created with \code{growth.drBootSpline()} or stored within a \code{grofit} or \code{drFit} object created with \code{growth.workflow()} or \code{growth.drFit()}, respectively.
+#' @param drBootSpline A \code{drBootSpline} object created with \code{\link{growth.drBootSpline}} or stored within a \code{grofit} or \code{drFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.drFit}}, respectively.
 #' @param pch (Numeric) Shape of the raw data symbols.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
 #' @param colSpline (Numeric or Character) Color used to plot the splines.
@@ -512,7 +512,7 @@ plot.drBootSpline <- function (drBootSpline,
 #'
 #' code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis
 #'
-#' @param drFit object of class \code{drFit}, created with \code{growth.drFit()}.
+#' @param drFit object of class \code{drFit}, created with \code{\link{growth.drFit}}.
 #' @param combine (Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param pch (Numeric) Shape of the raw data symbols.
 #' @param basesize (Numeric) Base font size.
@@ -681,8 +681,8 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
 #'
 #' code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
 #'
-#' @param drFitSpline object of class \code{drFitSpline}, created with \code{growth.drFitSpline()}.
-#' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{plot.drBootSpline()}.
+#' @param drFitSpline object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.
+#' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.drBootSpline}}.
 #' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).
 #' @param pch (Numeric) Shape of the raw data symbols.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
@@ -867,7 +867,7 @@ plot.drFitSpline <-
 
 #' Generic plot function for \code{gcBootSpline} objects.
 #'
-#' @param gcBootSpline object of class \code{gcBootSpline}, created with \code{growth.gcBootSpline()}.
+#' @param gcBootSpline object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.
 #' @param pch (Numeric) Size of the raw data circles.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param deriv (Logical) Show the derivatives (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
@@ -1032,10 +1032,10 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 
 #' Generic plot function for \code{gcFitSpline} objects.
 #'
-#'code{plot.gcFitSpline} generates the spline fit plot for a single sample.
+#' code{plot.gcFitSpline} generates the spline fit plot for a single sample.
 #'
-#' @param gcFitSpline object of class \code{gcFitSpline}, created with \code{growth.gcFitSpline()}.
-#' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{plot.gcBootSpline()}.
+#' @param gcFitSpline object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.
+#' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.
 #' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
 #' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
 #' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
@@ -1358,7 +1358,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' \code{plot.grofit} extracts the spline fits of a subset of samples in a \code{grofit} object calculates averages and standard deviations of conditions with replicates and combines them into a single plot.
 #'
 #'
-#' @param grofit A \code{grofit} object created with \code{growth.workflow()} containing spline fits.
+#' @param grofit A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.
 #' @param ... (_optional_) Additional \code{grofit} objects created in separate workflows.
 #' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
@@ -1460,21 +1460,23 @@ plot.grofit <- function(grofit, ...,
     if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("To plot spline fit results, please run growth.workflow() with 'a' or 's' in fit.opt.")
   }
 
+  conc <- as.numeric(conc)
+  exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(names(grofit$gcFit$gcFittedSplines))
-  if(!is.null(names)){
+  if(!is.null(names) || !is.na(names)){
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
-  if(!is.null(conc)){
+  if(!is.null(conc) || !is.na(conc)){
     nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)){
+  if(!is.null(exclude.nm) || !is.na(exclude.nm)){
     names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
     nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
   }
-  if(!is.null(exclude.conc)){
+  if(!is.null(exclude.conc) || !is.na(exclude.conc)){
     nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
@@ -1929,7 +1931,7 @@ base_breaks <- function(n = 10){
 #'
 #' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
 #'
-#' @param object A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{growth.workflow()} or \code{growth.gcFit}.
+#' @param object A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}.
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 #' 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
 #' 'mu.model', 'lambda.model', 'A.model',
@@ -2005,20 +2007,24 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     if(gsub(".+\\.", "", param)=="model") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'm' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'm' or 'a'."))
     if(gsub(".+\\.", "", param)=="spline") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 's' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 's' or 'a'."))
   }
+
+  conc <- as.numeric(conc)
+  exclude.conc <- as.numeric(exclude.conc)
+
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
-  if(!is.null(names)){
+  if(!is.null(names) || !is.na(names)){
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
-  if(!is.null(conc)){
-    nm <- nm[which(conc == str_extract(nm, "[:graph:]+$"))]
+  if(!is.null(conc) || !is.na(conc)){
+    nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)){
+  if(!is.null(exclude.nm) || !is.na(exclude.nm)){
     names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
     nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
   }
-  if(!is.null(exclude.conc)){
+  if(!is.null(exclude.conc) || !is.na(exclude.conc)){
     nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
@@ -2168,7 +2174,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #'
 #' \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
 #'
-#' @param object A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{growth.workflow()}, \code{growth.drFit()},  \code{fl.drFit()}, or \code{fl.workflow()}.
+#' @param object A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{\link{growth.workflow}}, \code{\link{growth.drFit}}, \code{\link{fl.drFit}}, or \code{\link{fl.workflow}}.
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 #' 'y.max', 'y.min', 'fc', 'K', or 'n' for fluorescence dose-response analyses with \code{dr.type = 'model'} in the \code{control} argument,
 #' or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.
