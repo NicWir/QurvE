@@ -100,7 +100,7 @@ plot.dual(flFitRes, fluorescence = "norm.fl2", export = export)
 ```
 
 `r if((length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1)){"\\pagebreak"}`
-## `r if(!is.na(flFit2)){"Fluorescence 1 fit results"} else {"Fluorescence fit results"}`
+## `r if(length(flFit2)>1){"Fluorescence 1 fit results"} else {"Fluorescence fit results"}`
 ```{r table_linear1, echo=F, warning=F, message=F, results='asis'}
 if(any(c("l") %in% control$fit.opt)){
   if(!all(is.na(res.table.fl1$lambda.linfit))){
@@ -340,7 +340,7 @@ if(any(c("l") %in% control$fit.opt)){
     #         }
     for(i in 1:length(flFitRes[["flFit1"]][["flFittedLinear"]])){
         if(length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6)
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|\\(|\\)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6)
           plot.ggLinear()
           invisible(dev.off())
                  }
@@ -350,7 +350,7 @@ if(any(c("l") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                            pattern = "^PlotLinear_",
                            full.names = TRUE)
-  sort.ndx <- match(gsub("∙|>|<", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes$flFit1$flFittedLinear))))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- match(gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes$flFit1$flFittedLinear))))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
@@ -660,7 +660,7 @@ if(any(c("s") %in% control$fit.opt)) {
     foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
                 ))))),  ".pdf"))
                 plot.ggSpline()
@@ -673,7 +673,7 @@ if(any(c("s") %in% control$fit.opt)) {
                            pattern = "^PlotSpline_",
                            full.names = TRUE)
   sort.ndx <-
-    match(gsub("∙|>|<", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
+    match(gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
       " \\| ", "_", names(flFitRes$flFit1$flFittedSplines)
     )))))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
@@ -725,7 +725,7 @@ for(i in 1:length(flFitRes$drFit1$drBootSplines)){
   }
 }
 ```
-```{r ec50_model_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 0}
+```{r ec50_model_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 1}
 cat(paste0("_", length(flFitRes$drFit1$drTable$Test), "_ conditions were identified:\n",
            paste(colFmt(flFitRes$drFit1$drTable$Test, 'NavyBlue'), collapse = ", ")))
 cat("  \n")
@@ -745,7 +745,7 @@ names(ec50.df)[7] <- paste0("Response (", flFitRes$drFit1$drFittedModels[[1]]$pa
 knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 ```
 
-```{r ec50_model_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 0}
+```{r ec50_model_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 1}
 for(i in 1:length(flFitRes[["drFit1"]][["drFittedModels"]])){
   plot.drFitModel(flFitRes$drFit1$drFittedModels[[i]], export = export)
 }

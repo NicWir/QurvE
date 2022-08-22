@@ -1072,7 +1072,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
     if(is.null(colors)){
       if (length(plotdata.ls) <= 8) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else {
+      } else if (length(plotdata.ls) <=50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(
                                      "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1139,7 +1139,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       if(is.null(colors)){
         if (length(plotdata.ls) <= 8) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else {
+        } else if (length(plotdata.ls) <=50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
                                                  values = c(
                                                    "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1240,7 +1240,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
       } else if (length(ndx.keep) <= 12) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-      } else {
+      } else if (length(ndx.keep) <=50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(
                                      "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1306,7 +1306,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else if (length(ndx.keep) <= 12) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-        } else {
+        } else if (length(ndx.keep) <=50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
                                                  values = c(
                                                    "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1597,7 +1597,7 @@ plot.dual <-  function(object,
     if(is.null(colors)){
       if (length(plotdata.ls) <= 8) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else {
+      } else if (length(plotdata.ls) <=50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(
                                      "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1662,7 +1662,7 @@ plot.dual <-  function(object,
       if(is.null(colors)){
         if (length(plotdata.ls) <= 8) {
           p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else {
+        } else if (length(plotdata.ls) <=50){
           p.fl <- p.fl + scale_fill_manual(name = "Condition",
                                                  values = c(
                                                    "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1741,7 +1741,7 @@ plot.dual <-  function(object,
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
       } else if (length(ndx.keep) <= 12) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-      } else {
+      } else if (length(ndx.keep) <=50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(
                                      "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1797,7 +1797,7 @@ plot.dual <-  function(object,
           p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else if (length(ndx.keep) <= 12) {
           p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-        } else {
+        } else if (length(ndx.keep) <=50){
           p.fl <- p.fl + scale_fill_manual(name = "Condition",
                                                  values = c(
                                                    "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",

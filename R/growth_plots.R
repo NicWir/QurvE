@@ -536,7 +536,8 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   # x an object of class drFit
-
+  if(is(drFit) != "drFit") stop("drFit needs to be an object of class 'drFit', created with growth.drFit() or fl.drFit(control=fl.control(dr.method='spline').")
+  if(length(drFit) == 1) stop("drFit is NA. Please run growth.drFit() with valid data input or growth.workflow() with 'ec50 = T'.")
   n <- length(drFit$drFittedSplines)
   if(combine == FALSE || n < 2){
     # /// plot all drFitSpline objects
@@ -617,7 +618,7 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
     if(is.null(colors)){
       if (length(drFit$drFittedSplines) <= 8) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else {
+      } else if (length(drFit$drFittedSplines) <=50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(
                                      "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -649,12 +650,12 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
       out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
       if(is.null(out.nm)) out.nm <- paste0("drFitPlot")
       if(is.null(width)){
-        w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
+        w <- 7 + ifelse(combine==TRUE,length(unique(names)), length(unique(names)))/15
       } else {
         w <- width
       }
       if(is.null(height)){
-        h <- ifelse(deriv==T, 9, 6)
+        h <- 6
       } else {
         h <- height
       }
@@ -666,6 +667,7 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
       grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
       print(p)
       grDevices::dev.off()
+      cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
     }
     if (plot == TRUE){
       print(p)
@@ -1656,7 +1658,7 @@ plot.grofit <- function(grofit, ...,
     if(is.null(colors)){
       if (length(plotdata.ls) <= 8) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else {
+      } else if (length(plotdata.ls) <=50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(
                                      "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1683,6 +1685,11 @@ plot.grofit <- function(grofit, ...,
                                )
         )
       }
+    } else {
+      p <- p + scale_fill_manual(name = "Condition",
+                                 values = colors) +
+        scale_color_manual(name = "Condition",
+                           values = colors)
     }
     if(deriv){
       # /// add panel with growth rate over time
@@ -1716,7 +1723,7 @@ plot.grofit <- function(grofit, ...,
       if(is.null(colors)){
         if (length(plotdata.ls) <= 8) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else {
+        } else if (length(plotdata.ls) <=50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
                                                  values = c(
                                                    "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1743,6 +1750,11 @@ plot.grofit <- function(grofit, ...,
                                  )
           )
         }
+      } else {
+        p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
       }
       p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
     }
@@ -1794,7 +1806,7 @@ plot.grofit <- function(grofit, ...,
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
       } else if (length(ndx.keep) <= 12) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-      } else {
+      } else if (length(ndx.keep) <=50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(
                                      "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
@@ -1851,7 +1863,7 @@ plot.grofit <- function(grofit, ...,
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else if (length(ndx.keep) <= 12) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-        } else {
+        } else if (length(ndx.keep) <=50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
                                      values = c(
                                        "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",

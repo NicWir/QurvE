@@ -120,7 +120,7 @@ A \code{grofit} object that contains all computation results, compatible with va
 \item{control}{Object of class \code{grofit.control} created with the call of \code{\link{growth.control}}.}
 }
 \description{
-\code{growth.workflow} runs \code{\link{growth.control}} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF and HTML format that summarizes all results obtained.
+\code{growth.workflow} runs \code{\link{growth.control}} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF or HTML format that summarizes all results obtained.
 }
 \seealso{
 Other workflows: 
