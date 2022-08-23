@@ -6,6 +6,7 @@ library(shiny)
 library(readxl)
 library(tidyverse)
 library(shinythemes)
+library(DT)
 
 source("../../R/general_misc_utils.R")
 source("../../R/growth_computation.R")
@@ -315,9 +316,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                    value = FALSE),
 
                                                      numericInput(
-                                                       inputId = 'custum_sliding_window_size_value_growth',
+                                                       inputId = 'custom_sliding_window_size_value_growth',
                                                        label = NULL,
-                                                       value = 1,
+                                                       value = 0,
                                                        min = NA,
                                                        max = NA,
                                                      ),
@@ -532,7 +533,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                label = 'custom sliding window size'),
 
                                                  numericInput(
-                                                   inputId = 'custum_sliding_window_size_value',
+                                                   inputId = 'custom_sliding_window_size_value_growth',
                                                    label = '',
                                                    value = 8,
                                                    min = NA,
@@ -589,9 +590,19 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                   navbarMenu("Results",
                              tabPanel(title = "Growth",
-                                      tableOutput('results_table_growth')),
-
-                             tabPanel(title = "Computation",
+                                      tabsetPanel(type = "tabs",
+                                                  tabPanel(title = "Linear Fit",
+                                                           DT::dataTableOutput('results_table_growth_linear')
+                                                  ),
+                                                  tabPanel(title = "Nonparametric Fit",
+                                                           DT::dataTableOutput('results_table_growth_spline')
+                                                  ),
+                                                  tabPanel(title = "Parametric Fit",
+                                                           DT::dataTableOutput('results_table_growth_model')
+                                                  )
+                                      )
+                             ),
+                             tabPanel(title = "Fluorescence",
                                       h1('Under construction'))
                   ),
 
@@ -974,7 +985,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   tabPanel("About Us",
                            mainPanel(
                              h1("Authors"),
-                             'Nicolas Wirth, Jonathan Funk, Stefano Donatino',
+                             'Nicolas Wirth, Jonathan Funk',
                              h1("Publications"),
                              'featuring publications which use this tool'
                            )
@@ -1039,7 +1050,7 @@ server <- function(input, output){
                                       log.y.model = input$log_transform_data_parametric_growth,
                                       log.y.spline = input$log_transform_data_nonparametric_growth,
                                       biphasic = input$biphasic_growth_growth,
-                                      lin.h = input$custum_sliding_window_size_value_growth,## Here seem to be problems
+                                      lin.h = input$custom_sliding_window_size_value_growth,## Here seem to be problems
                                       lin.R2 = input$R2_threshold_growth,
                                       lin.RSD = input$RSD_threshold_growth,
                                       lin.dY = input$dY_threshold_growth, ##
@@ -1142,9 +1153,64 @@ server <- function(input, output){
   })
 
 
-  output$results_table_growth <- renderTable({
-    results <- results$growth
-    results$gcFit$gcTable
+  output$results_table_growth_linear <- DT::renderDT({
+    res.table.gc <- results$growth$gcFit$gcTable
+
+    table_linear <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                              "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
+                              "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
+                              "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2),
+                              "Δy" = round(as.numeric(res.table.gc$dY.linfit), 3),
+                              "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
+                              "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
+                              "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
+                              "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
+                              stringsAsFactors = F, check.names = F),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                              escape = FALSE)
+    # table_linear <- res.table.gc
+    table_linear
+  })
+
+  output$results_table_growth_spline <- DT::renderDT({
+    res.table.gc <- results$growth$gcFit$gcTable
+    table_spline <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                                         "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.spline), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
+                                         "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
+                                         "λ" = round(as.numeric(res.table.gc$lambda.spline), 2),
+                                         "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
+                                         "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
+                                         "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
+                                         "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                              escape = FALSE)
+    table_spline
+  })
+
+  output$results_table_growth_model <- DT::renderDT({
+    res.table.gc <- results$growth$gcFit$gcTable
+    table_model <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                     "Model" = res.table.gc$used.model,
+                     "µ<sub>max</sub>" = ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(as.numeric(res.table.gc$mu.model), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.model),3))),
+                     "t<sub>D</sub>" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
+                     "λ" = paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3)),
+                     "A" = paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3)),
+                     stringsAsFactors = F, check.names = F)
+    if(!is.null(res.table.gc)){
+      if ( "richards" %in% res.table.gc$used.model  ){
+        table_model <- suppressWarnings(cbind(table_model, data.frame("ν" = round(as.numeric(res.table.gc$parameter_nu.model), 3), stringsAsFactors = F, check.names = F)))
+      }
+      if ( "gompertz" %in% res.table.gc$used.model ){
+        table_model <- suppressWarnings(cbind(table_model, data.frame("α" = round(as.numeric(res.table.gc$parameter_alpha.model), 3), stringsAsFactors = F, check.names = F)))
+      }
+      if ( "gompertz.exp" %in% res.table.gc$used.model ){
+        table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
+      }
+    }
+    table_model <- datatable(table_model,
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                              escape = FALSE)
+    table_model
   })
 
   # conditional selections:

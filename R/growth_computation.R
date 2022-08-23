@@ -535,6 +535,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             nboot.dr = 0,
                             growth.thresh = 1.5)
 {
+  if(lin.h == "" || lin.h == "NULL" || lin.h == 0) lin.h <- NULL
   if ((is.character(fit.opt) == FALSE) | !any(fit.opt %in% c("l", "s", "m", "a")))
     stop("value of fit.opt must be character and contain one or more of 'l', 's', or 'm', or be 'a' (for all).")
   if (is.character(model.type) == FALSE)
@@ -576,7 +577,7 @@ growth.control <- function (neg.nan.act = FALSE,
   if (((is.numeric(lin.RSD) == FALSE) |  (length(lin.RSD) != 1) | !(0 < lin.RSD) ))
     stop("value of lin.RSD must be numeric (0 < lin.RSD) and of one element")
   if (((is.numeric(lin.h) == FALSE) && (is.null(lin.h) == FALSE)))
-    stop("value of lin.h must be numeric (> 0) and of one element")
+    stop("value of lin.h must be numeric (> 0) and of one element, or NULL")
   if (((is.numeric(growth.thresh) == FALSE) && (is.na(growth.thresh) == FALSE)))
     stop("value of growth.thresh must be numeric (one element) or NA")
   if ((is.numeric(t0) == FALSE) | (length(t0) != 1) | (t0 < 0))
