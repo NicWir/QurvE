@@ -2027,7 +2027,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     gcTable <- object$flTable
   }
   #check if param exists in gcTable and has a valid value
-  if(all(is.na(gcTable[[param]]))){
+  if(all(is.na(gcTable[[param]])) || all(gcTable[[param]] == 0)){
     if(gsub(".+\\.", "", param)=="linfit") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'l' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'l' or 'a'."))
     if(gsub(".+\\.", "", param)=="model") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'm' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'm' or 'a'."))
     if(gsub(".+\\.", "", param)=="spline") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 's' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 's' or 'a'."))

@@ -713,7 +713,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                            sidebarPanel(
                                                              selectInput(inputId = "parameter_growth_parameter_growth_plot",
                                                                          label = "Parameter",
-                                                                         choices = gc_parameters
+                                                                         choices = ""
                                                              ),
 
                                                              textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
@@ -1098,26 +1098,82 @@ server <- function(input, output){
   })
 
   # conditional selections:
-  ## Growth plot
-  selected_inputs_reference_condition_growth_parameter_plot <- reactive({
-    results <- results$growth
-    results$expdesign$condition
-  })
+  ## Growth plots
+    ### growth.parameter()
 
-  select_inputs_reference_concentration_growth_parameter_plot <- reactive({
-    results <- results$growth
-    results$expdesign$concentration
-  })
+    selected_inputs_parameter_growth_parameter_plot <- reactive({
+      results <- results$growth
+      gc_parameters <- c()
+      if("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+        if(results$control$biphasic){
+          gc_parameters <- c(gc_parameters,
+                             'Growth rate (Spline)' = 'mu.spline',
+                             'Growth rate phase 2 (Spline)' = 'mu.spline',
+                             "Doubling time (Spline)" = "tD.spline",
+                             "Doubling time phase 2 (Spline)" = "tD.spline",
+                             'Lag time (Spline)' = 'lambda.spline',
+                             'Maximum density (Spline)' = 'A.spline',
+                             'ΔDensity (Spline)' = 'dY.spline',
+                             'Area under the curve (Spline)' = 'integral.spline')
+        } else {
+          gc_parameters <- c(gc_parameters,
+                             'Growth rate (Spline)' = 'mu.spline',
+                             "Doubling time (Spline)" = "tD.spline",
+                             'Lag time (Spline)' = 'lambda.spline',
+                             'Maximum density (Spline)' = 'A.spline',
+                             'ΔDensity (Spline)' = 'dY.spline',
+                             'Area under the curve (Spline)' = 'integral.spline')
+        }
+      }
+      if("l" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+        if(results$control$biphasic){
+          gc_parameters <- c(gc_parameters,
+                             'Growth rate (linear fit)' = 'mu.linfit',
+                             'Growth rate phase 2 (linear fit)' = 'mu.linfit',
+                             "Doubling time (linear fit)" = "tD.linfit",
+                             "Doubling time phase 2 (linear fit)" = "tD.linfit",
+                             'Lag time (linear fit)' = 'lambda.linfit',
+                             'Maximum density (linear fit)' = 'A.linfit',
+                             'ΔDensity (linear fit)' = 'dY.linfit')
+        } else {
+          gc_parameters <- c(gc_parameters,
+                             'Growth rate (linear fit)' = 'mu.linfit',
+                             "Doubling time (linear fit)" = "tD.linfit",
+                             'Lag time (linear fit)' = 'lambda.linfit',
+                             'Maximum density (linear fit)' = 'A.linfit',
+                             'ΔDensity (linear fit)' = 'dY.linfit')
+        }
+      }
+      if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+          gc_parameters <- c(gc_parameters, 'mu.model' = 'mu.model', 'lambda.model' = 'lambda.model', 'A.model' = 'A.model', 'dY.model' = 'dY.model')
+      }
+      gc_parameters
+    })
 
-  observe({
-    updateSelectInput(inputId = "reference_condition_growth_parameter_plot",
-                      choices = selected_inputs_reference_condition_growth_parameter_plot()
-    )})
+    selected_inputs_reference_condition_growth_parameter_plot <- reactive({
+      results <- results$growth
+      results$expdesign$condition
+    })
 
-  observe({
-    updateSelectInput(inputId = "reference_concentration_growth_parameter_plot",
-                      choices = select_inputs_reference_concentration_growth_parameter_plot()
-    )})
+    select_inputs_reference_concentration_growth_parameter_plot <- reactive({
+      results <- results$growth
+      results$expdesign$concentration
+    })
+
+    observe({
+      updateSelectInput(inputId = "parameter_growth_parameter_growth_plot",
+                        choices = selected_inputs_parameter_growth_parameter_plot()
+      )})
+
+    observe({
+      updateSelectInput(inputId = "reference_condition_growth_parameter_plot",
+                        choices = selected_inputs_reference_condition_growth_parameter_plot()
+      )})
+
+    observe({
+      updateSelectInput(inputId = "reference_concentration_growth_parameter_plot",
+                        choices = select_inputs_reference_concentration_growth_parameter_plot()
+      )})
 
 
   ## Fluorescence
