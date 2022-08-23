@@ -1015,6 +1015,28 @@ server <- function(input, output){
                    's')
     }
 
+    model.type <- c()
+    if(input$logistic_growth){
+      model.type <- c(model.type,
+                   'logistic')
+    }
+    if(input$richards_growth){
+      model.type <- c(model.type,
+                      'richards')
+    }
+    if(input$gompertz_growth){
+      model.type <- c(model.type,
+                      'gompertz')
+    }
+    if(input$extended_gompertz_growth){
+      model.type <- c(model.type,
+                      'gompertz.exp')
+    }
+    if(input$huang_growth){
+      model.type <- c(model.type,
+                      'huang')
+    }
+
     results$growth <- growth.workflow(grodata = grodata,
                                       ec50 = input$perform_ec50_growth,
                                       fit.opt = fit.opt,
@@ -1031,7 +1053,7 @@ server <- function(input, output){
                                       interactive = FALSE, ### TODO (popups)
                                       nboot.gc = input$number_of_bootstrappings,
                                       smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                      model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"), ### TODO: implement like model and huang button
+                                      model.type = model.type, ### TODO: implement like model and huang button
                                       growth.thresh = input$growth_threshold_growth,
                                       dr.parameter = input$response_parameter_growth, ### TODO if else bla
                                       smooth.dr = input$smooth.dr,
