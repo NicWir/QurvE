@@ -27,6 +27,8 @@ ui <- fluidPage(
                            tabsetPanel(type = "tabs",
                                        tabPanel(title = "Custom",
                                                 sidebarPanel(
+                                                  wellPanel(
+                                                    style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding: 1',
                                                   # select file type
                                                   selectInput(inputId = "input_file_type_custom",
                                                               label = "Select file type:",
@@ -40,8 +42,11 @@ ui <- fluidPage(
 
                                                   fileInput(inputId = 'growth_file',
                                                             label = 'Choose growth data file',
-                                                            accept = c('.xlsx', '.xls', '.csv')),
+                                                            accept = c('.xlsx', '.xls', '.csv'))
+                                                  ),
 
+                                                  wellPanel(
+                                                    style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding: 1',
                                                   conditionalPanel(
                                                     condition = "input.input_file_type_custom == 'xlsx'",
                                                     selectInput(inputId = "sheet",
@@ -64,6 +69,7 @@ ui <- fluidPage(
                                                                 choices = c("." = "dot_decimal_seperator",
                                                                             "," = "comma_decimal_seperator")
                                                     ),
+                                                  )
                                                   ),
 
                                                   checkboxInput(inputId = 'subtract_blanc',
@@ -182,7 +188,7 @@ ui <- fluidPage(
                                                  sidebarPanel( width = 12,
                                                                style='border-color: #ADADAD',
                                                                wellPanel(
-                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD',
+                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding-top: 0',
                                                                  h2('Growth fit'),
                                                                  h4('Options'),
                                                                  checkboxInput(inputId = 'linear_regression_growth',
@@ -231,7 +237,7 @@ ui <- fluidPage(
 
 
                                                                wellPanel(
-                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD',
+                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding-top: 0',
                                                                  h2('Dose-response Analysis'),
                                                                  checkboxInput(inputId = 'perform_ec50_growth',
                                                                                label = 'perform EC50 Analysis',
@@ -273,52 +279,53 @@ ui <- fluidPage(
                                           column(6,
                                                  conditionalPanel(
                                                    condition = "input.linear_regression_growth",
-                                                   sidebarPanel(width = 4,
-                                                                style='border-color: #ADADAD',
-                                                                h2('Linear fit'),
+                                                   sidebarPanel(
+                                                     width = 4,
+                                                     style='border-color: #ADADAD; padding-top: 0',
+                                                     h3('Linear fit'),
 
-                                                                numericInput(
-                                                                  inputId = 'R2_threshold_growth',
-                                                                  label = 'R2 threshold',
-                                                                  value = 0.95,
-                                                                  min = NA,
-                                                                  max = NA,
-                                                                ),
+                                                     numericInput(
+                                                       inputId = 'R2_threshold_growth',
+                                                       label = 'R2 threshold',
+                                                       value = 0.95,
+                                                       min = NA,
+                                                       max = NA,
+                                                     ),
 
-                                                                numericInput(
-                                                                  inputId = 'RSD_threshold_growth',
-                                                                  label = 'RSD threshold',
-                                                                  value = 0.1,
-                                                                  min = NA,
-                                                                  max = NA,
-                                                                ),
+                                                     numericInput(
+                                                       inputId = 'RSD_threshold_growth',
+                                                       label = 'RSD threshold',
+                                                       value = 0.1,
+                                                       min = NA,
+                                                       max = NA,
+                                                     ),
 
-                                                                numericInput(
-                                                                  inputId = 'dY_threshold_growth',
-                                                                  label = 'dY threshold',
-                                                                  value = 0.05,
-                                                                  min = NA,
-                                                                  max = NA,
-                                                                ),
+                                                     numericInput(
+                                                       inputId = 'dY_threshold_growth',
+                                                       label = 'dY threshold',
+                                                       value = 0.05,
+                                                       min = NA,
+                                                       max = NA,
+                                                     ),
 
-                                                                checkboxInput(inputId = 'custom_sliding_window_size_growth',
-                                                                              label = 'custom sliding window size',
-                                                                              value = FALSE),
+                                                     checkboxInput(inputId = 'custom_sliding_window_size_growth',
+                                                                   label = 'custom sliding window size',
+                                                                   value = FALSE),
 
-                                                                numericInput(
-                                                                  inputId = 'custum_sliding_window_size_value_growth',
-                                                                  label = NULL,
-                                                                  value = 1,
-                                                                  min = NA,
-                                                                  max = NA,
-                                                                ),
+                                                     numericInput(
+                                                       inputId = 'custum_sliding_window_size_value_growth',
+                                                       label = NULL,
+                                                       value = 1,
+                                                       min = NA,
+                                                       max = NA,
+                                                     ),
                                                    )
                                                  ), # conditionalPanel
                                                  conditionalPanel(
                                                    condition = "input.parametric_fit_growth",
                                                    sidebarPanel(
-                                                     style='border-color: #ADADAD',
-                                                     h2('Parametric fit'),
+                                                     style='border-color: #ADADAD; padding-top: 0',
+                                                     h3('Parametric fit'),
                                                      wellPanel(
                                                        h4('Models:'),
                                                        style='background-color:#EDEDED; padding: 1',
@@ -352,8 +359,8 @@ ui <- fluidPage(
                                                  conditionalPanel(
                                                    condition = "input.nonparametric_fit_growth",
                                                    sidebarPanel(
-                                                     style='border-color: #ADADAD',
-                                                     h2('Nonparametric fit'),
+                                                     style='border-color: #ADADAD; padding-top: 0',
+                                                     h3('Nonparametric fit'),
 
                                                      checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
                                                                    label = 'Log-transform data',
