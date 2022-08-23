@@ -30,47 +30,47 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                   style='border-color: #ADADAD',
                                                   wellPanel(
                                                     style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                  # select file type
-                                                  selectInput(inputId = "input_file_type_custom",
-                                                              label = "Select file type:",
-                                                              choices = c("Excel (.xlsx)" = "xlsx",
-                                                                          "csv" = "csv")),
+                                                    # select file type
+                                                    selectInput(inputId = "input_file_type_custom",
+                                                                label = "Select file type:",
+                                                                choices = c("Excel (.xlsx)" = "xlsx",
+                                                                            "csv" = "csv")),
 
-                                                  selectInput(inputId = "format",
-                                                              label = "Select Format",
-                                                              choices = c("Data in columns" = "data_in_columns",
-                                                                          "Data in rows" = "data_in_rows")),
+                                                    selectInput(inputId = "format",
+                                                                label = "Select Format",
+                                                                choices = c("Data in columns" = "data_in_columns",
+                                                                            "Data in rows" = "data_in_rows")),
 
-                                                  fileInput(inputId = 'growth_file',
-                                                            label = 'Choose growth data file',
-                                                            accept = c('.xlsx', '.xls', '.csv'))
+                                                    fileInput(inputId = 'growth_file',
+                                                              label = 'Choose growth data file',
+                                                              accept = c('.xlsx', '.xls', '.csv'))
                                                   ),
 
                                                   wellPanel(
                                                     style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                  conditionalPanel(
-                                                    condition = "input.input_file_type_custom == 'xlsx'",
-                                                    selectInput(inputId = "sheet",
-                                                                label = "Select Sheet",
-                                                                choices = c("Sheet 1" = "Sheet1",
-                                                                            "Sheet 2" = "Sheet2",
-                                                                            "Sheet 3" = "Sheet3")),
-                                                  ), # select sheet: conditional
+                                                    conditionalPanel(
+                                                      condition = "input.input_file_type_custom == 'xlsx'",
+                                                      selectInput(inputId = "sheet",
+                                                                  label = "Select Sheet",
+                                                                  choices = c("Sheet 1" = "Sheet1",
+                                                                              "Sheet 2" = "Sheet2",
+                                                                              "Sheet 3" = "Sheet3")),
+                                                    ), # select sheet: conditional
 
-                                                  conditionalPanel(
-                                                    condition = "input.input_file_type_custom == 'csv'",
-                                                    selectInput(inputId = "seperator",
-                                                                label = "Select separator",
-                                                                choices = c("," = "comma_seperator",
-                                                                            ";" = "semicolon_seperator")
-                                                    ),
+                                                    conditionalPanel(
+                                                      condition = "input.input_file_type_custom == 'csv'",
+                                                      selectInput(inputId = "seperator",
+                                                                  label = "Select separator",
+                                                                  choices = c("," = "comma_seperator",
+                                                                              ";" = "semicolon_seperator")
+                                                      ),
 
-                                                    selectInput(inputId = "decimal_seperator",
-                                                                label = "Select Decimal separator",
-                                                                choices = c("." = "dot_decimal_seperator",
-                                                                            "," = "comma_decimal_seperator")
-                                                    ),
-                                                  )
+                                                      selectInput(inputId = "decimal_seperator",
+                                                                  label = "Select Decimal separator",
+                                                                  choices = c("." = "dot_decimal_seperator",
+                                                                              "," = "comma_decimal_seperator")
+                                                      ),
+                                                    )
                                                   ),
 
                                                   checkboxInput(inputId = 'subtract_blanc',
@@ -172,7 +172,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                            ), # tabSet Panel
 
                            mainPanel(
-                             h1("Custom data layout"),
                              img(src = 'data_instruction.png',
                                  heigt = '100%',
                                  width = '100%'),
@@ -245,40 +244,42 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                label = 'perform EC50 Analysis',
                                                                                value = FALSE),
 
-                                                                 selectInput(inputId = "response_parameter_growth",
-                                                                             label = "Response Parameter",
-                                                                             choices = c("mu.linfit" = "mu.linfit",
-                                                                                         "other.fit" = "other.fit")),
 
-                                                                 checkboxInput(inputId = 'log_transform_concentration_growth',
-                                                                               label = 'log transform concentration'),
+                                                                 conditionalPanel(condition = "input.perform_ec50_growth",
+                                                                                  selectInput(inputId = "response_parameter_growth",
+                                                                                              label = "Response Parameter",
+                                                                                              choices = c("mu.linfit" = "mu.linfit",
+                                                                                                          "other.fit" = "other.fit")),
 
-                                                                 checkboxInput(inputId = 'log_transform_response_growth',
-                                                                               label = 'log transform response'),
+                                                                                  checkboxInput(inputId = 'log_transform_concentration_growth',
+                                                                                                label = 'log transform concentration'),
+
+                                                                                  checkboxInput(inputId = 'log_transform_response_growth',
+                                                                                                label = 'log transform response'),
 
 
-                                                                 selectInput(inputId = "smoothing_factor_growth",
-                                                                             label = "smoothing factor",
-                                                                             choices = c("NULL" = "NULL",
-                                                                                         "other" = "other")),
+                                                                                  selectInput(inputId = "smoothing_factor_growth",
+                                                                                              label = "smoothing factor",
+                                                                                              choices = c("NULL" = "NULL",
+                                                                                                          "other" = "other")),
 
-                                                                 numericInput(
-                                                                   inputId = 'number_of_bootstrappings_dr_growth',
-                                                                   label = 'Number of bootstrappings',
-                                                                   value = 0,
-                                                                   min = NA,
-                                                                   max = NA,
+                                                                                  numericInput(
+                                                                                    inputId = 'number_of_bootstrappings_dr_growth',
+                                                                                    label = 'Number of bootstrappings',
+                                                                                    value = 0,
+                                                                                    min = NA,
+                                                                                    max = NA,
+                                                                                  )
                                                                  )
                                                                ),
 
 
                                                                actionButton(inputId = "run_growth",
                                                                             label = "Run computation")
+                                                 ) # sidebarPanel
 
-
-                                                 ) # sidebarPanel(
                                           ), # column
-                                          column(6,
+                                          column(8,
                                                  conditionalPanel(
                                                    condition = "input.linear_regression_growth",
                                                    sidebarPanel(
@@ -314,12 +315,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                    label = 'custom sliding window size',
                                                                    value = FALSE),
 
-                                                     numericInput(
-                                                       inputId = 'custum_sliding_window_size_value_growth',
-                                                       label = NULL,
-                                                       value = 1,
-                                                       min = NA,
-                                                       max = NA,
+                                                     conditionalPanel(
+                                                       condition = "input.custom_sliding_window_size_growth",
+                                                       numericInput(
+                                                         inputId = 'custum_sliding_window_size_value_growth',
+                                                         label = NULL,
+                                                         value = 1,
+                                                         min = NA,
+                                                         max = NA,
+                                                       )
+
                                                      ),
                                                    )
                                                  ), # conditionalPanel
@@ -361,6 +366,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                  conditionalPanel(
                                                    condition = "input.nonparametric_fit_growth",
                                                    sidebarPanel(
+                                                     width = 4,
                                                      style='border-color: #ADADAD; padding-top: 0',
                                                      h3(strong('Nonparametric fit')),
 
@@ -453,40 +459,45 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                  checkboxInput(inputId = 'perform_ec50_fluorescence',
                                                                label = 'perform EC50 Analysis'),
 
-                                                 selectInput(inputId = "format_fluorescence",
-                                                             label = "Response Parameter",
-                                                             choices = c("max_slope_spline" = "max_slope_spline")
-                                                 ),
+                                                 conditionalPanel(
+                                                   condition = "input.perform_ec50_fluorescence",
+                                                   selectInput(inputId = "format_fluorescence",
+                                                               label = "Response Parameter",
+                                                               choices = c("max_slope_spline" = "max_slope_spline")
+                                                   ),
 
-                                                 checkboxInput(inputId = 'log_transform_concentration_fluorescence',
-                                                               label = 'log transform concentration'),
+                                                   checkboxInput(inputId = 'log_transform_concentration_fluorescence',
+                                                                 label = 'log transform concentration'),
 
-                                                 checkboxInput(inputId = 'log_transform_response_fluorescence',
-                                                               label = 'log transform response'),
+                                                   checkboxInput(inputId = 'log_transform_response_fluorescence',
+                                                                 label = 'log transform response'),
 
-                                                 numericInput(
-                                                   inputId = 'smoothing_factor_fluorescence',
-                                                   label = 'smoothing factor',
-                                                   value = NULL,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                   numericInput(
+                                                     inputId = 'smoothing_factor_fluorescence',
+                                                     label = 'smoothing factor',
+                                                     value = NULL,
+                                                     min = NA,
+                                                     max = NA,
+                                                   ),
 
-                                                 numericInput(
-                                                   inputId = 'minimum_number_of_different_values_fluorescence',
-                                                   label = 'smoothing factor',
-                                                   value = 6,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                   numericInput(
+                                                     inputId = 'minimum_number_of_different_values_fluorescence',
+                                                     label = 'smoothing factor',
+                                                     value = 6,
+                                                     min = NA,
+                                                     max = NA,
+                                                   ),
 
-                                                 numericInput(
-                                                   inputId = 'number_of_bootrappings_fluorescence',
-                                                   label = 'number of bootrappings',
-                                                   value = 0,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                   numericInput(
+                                                     inputId = 'number_of_bootrappings_fluorescence',
+                                                     label = 'number of bootrappings',
+                                                     value = 0,
+                                                     min = NA,
+                                                     max = NA,
+                                                   )
+                                                 )
+
+                                                 ,
 
 
                                                  actionButton(inputId = "run_fluorescence",
