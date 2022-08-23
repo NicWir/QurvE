@@ -1083,7 +1083,7 @@ server <- function(input, output){
     results <- results$growth
 
     if (input$normalize_to_reference_growth_parameter_plot){
-      reference.conc <- input$reference_condition_growth_parameter_plot
+      reference.conc <- as.numeric(input$reference_concentration_growth_parameter_plot)
       reference.nm <- input$reference_condition_growth_parameter_plot
     } else {
       reference.conc <- NULL
