@@ -185,9 +185,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                label = 'linear regression',
                                                                value = TRUE),
 
-                                                 checkboxInput(inputId = 'nonparametric_fit_growth',
+                                                 checkboxInput(inputId = 'parametric_fit_growth',
                                                                label = 'parametric fit',
+                                                               value = FALSE),
+
+                                                 checkboxInput(inputId = 'nonparametric_fit_growth',
+                                                               label = 'non parametric fit',
                                                                value = TRUE),
+
 
                                                  checkboxInput(inputId = 'log_transform_time_growth',
                                                                label = 'Log-transform time'),
@@ -245,14 +250,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          "other" = "other")),
 
                                                  numericInput(
-                                                   inputId = 'minimum_number_of_different_values_growth',
-                                                   label = 'Minimum number of different values',
-                                                   value = 6,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
-
-                                                 numericInput(
                                                    inputId = 'number_of_bootstrappings_dr_growth',
                                                    label = 'Number of bootstrappings',
                                                    value = 0,
@@ -267,106 +264,110 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                )
                                         ),
 
-                                        column(4,
-                                               mainPanel(
-                                                 h2('Linear fit'),
+                                        conditionalPanel(condition = "input.linear_regression_growth",
+                                                         column(4,
 
-                                                 numericInput(
-                                                   inputId = 'R2_threshold_growth',
-                                                   label = 'R2 threshold',
-                                                   value = 0.95,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                                mainPanel(
+                                                                  h2('Linear fit'),
 
-                                                 numericInput(
-                                                   inputId = 'RSD_threshold_growth',
-                                                   label = 'RSD threshold',
-                                                   value = 0.1,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                                  numericInput(
+                                                                    inputId = 'R2_threshold_growth',
+                                                                    label = 'R2 threshold',
+                                                                    value = 0.95,
+                                                                    min = NA,
+                                                                    max = NA,
+                                                                  ),
 
-                                                 numericInput(
-                                                   inputId = 'dY_threshold_growth',
-                                                   label = 'dY threshold',
-                                                   value = 0.05,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                                  numericInput(
+                                                                    inputId = 'RSD_threshold_growth',
+                                                                    label = 'RSD threshold',
+                                                                    value = 0.1,
+                                                                    min = NA,
+                                                                    max = NA,
+                                                                  ),
 
-                                                 checkboxInput(inputId = 'custom_sliding_window_size_growth',
-                                                               label = 'custom sliding window size',
-                                                               value = FALSE),
+                                                                  numericInput(
+                                                                    inputId = 'dY_threshold_growth',
+                                                                    label = 'dY threshold',
+                                                                    value = 0.05,
+                                                                    min = NA,
+                                                                    max = NA,
+                                                                  ),
 
-                                                 numericInput(
-                                                   inputId = 'custum_sliding_window_size_value_growth',
-                                                   label = NULL,
-                                                   value = 1,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
-                                               )
+                                                                  checkboxInput(inputId = 'custom_sliding_window_size_growth',
+                                                                                label = 'custom sliding window size',
+                                                                                value = FALSE),
 
-                                        ),
-
-                                        column(4,
-                                               mainPanel(
-                                                 h2('Parametric fit'),
-                                                 h4('Models:'),
-
-                                                 checkboxInput(inputId = 'logistic_growth',
-                                                               label = 'logistic',
-                                                               value = TRUE),
-
-                                                 checkboxInput(inputId = 'richards_growth',
-                                                               label = 'Richards',
-                                                               value = TRUE),
-
-                                                 checkboxInput(inputId = 'gompertz_growth',
-                                                               label = 'Gompertz',
-                                                               value = TRUE),
-
-                                                 checkboxInput(inputId = 'extended_gompertz_growth',
-                                                               label = 'extended Gompertz',
-                                                               value = TRUE),
-
-                                                 checkboxInput(inputId = 'log_transform_data_parametric_growth',
-                                                               label = 'Log-transform data',
-                                                               value = TRUE),
-
-                                               ),
+                                                                  numericInput(
+                                                                    inputId = 'custum_sliding_window_size_value_growth',
+                                                                    label = NULL,
+                                                                    value = 1,
+                                                                    min = NA,
+                                                                    max = NA,
+                                                                  ),
+                                                                )
+                                                         )
 
                                         ),
 
-                                        column(4,
-                                               mainPanel(
-                                                 h2('Nonparametric fit'),
+                                        conditionalPanel(condition = "input.parametric_fit_growth",
+                                                         column(4,
+                                                                mainPanel(
+                                                                  h2('Parametric fit'),
+                                                                  h4('Models:'),
 
-                                                 checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
-                                                               label = 'Log-transform data',
-                                                               value = TRUE),
+                                                                  checkboxInput(inputId = 'logistic_growth',
+                                                                                label = 'logistic',
+                                                                                value = TRUE),
 
-                                                 numericInput(
-                                                   inputId = 'smoothing_factor_nonparametric_growth',
-                                                   label = 'smoothing factor',
-                                                   value = 0.55,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                                  checkboxInput(inputId = 'richards_growth',
+                                                                                label = 'Richards',
+                                                                                value = TRUE),
 
-                                                 numericInput(
-                                                   inputId = 'number_of_bootstrappings_growth',
-                                                   label = 'number of bootstrappings',
-                                                   value = 0,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                                  checkboxInput(inputId = 'gompertz_growth',
+                                                                                label = 'Gompertz',
+                                                                                value = TRUE),
 
-                                                 checkboxInput(inputId = 'remove_negative_values_in_bootstrapping_growth',
-                                                               label = 'Remove negative values in bootstrapping growth',
-                                                               value = TRUE)
-                                               ))
+                                                                  checkboxInput(inputId = 'extended_gompertz_growth',
+                                                                                label = 'extended Gompertz',
+                                                                                value = TRUE),
+
+                                                                  checkboxInput(inputId = 'log_transform_data_parametric_growth',
+                                                                                label = 'Log-transform data',
+                                                                                value = TRUE),
+
+                                                                )
+                                                         )
+
+                                        ),
+
+                                        conditionalPanel(condition = "input.nonparametric_fit_growth",
+                                                         column(4,
+                                                                mainPanel(
+                                                                  h2('Nonparametric fit'),
+
+                                                                  checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
+                                                                                label = 'Log-transform data',
+                                                                                value = TRUE),
+
+                                                                  numericInput(
+                                                                    inputId = 'smoothing_factor_nonparametric_growth',
+                                                                    label = 'smoothing factor',
+                                                                    value = 0.55,
+                                                                    min = NA,
+                                                                    max = NA,
+                                                                  ),
+
+                                                                  numericInput(
+                                                                    inputId = 'number_of_bootstrappings_growth',
+                                                                    label = 'number of bootstrappings',
+                                                                    value = 0,
+                                                                    min = NA,
+                                                                    max = NA,
+                                                                  )
+                                                                )
+                                                         )
+                                        )
                                       ),
                              ), # Growth Tab Panel
 
@@ -554,7 +555,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                ),
 
                                                mainPanel(
-                                                 checkboxInput(inputId = 'log_transform_data_parametric',
+                                                 checkboxInput(inputId = 'log_transform_data_nonparametric',
                                                                label = 'Log-transform data'),
 
                                                  checkboxInput(inputId = 'log_transform_time_parametric',
@@ -587,11 +588,11 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          label = "Data type",
                                                                          choices = c("Raw density" = "raw",
                                                                                      "Spline fits" = "spline")
-                                                                         ),
+                                                             ),
 
                                                              textInput(inputId = "select_samples_based_on_string_growth_group_plots",
-                                                                         label = "Select sample based on string (separate by ;)"
-                                                                       ),
+                                                                       label = "Select sample based on string (separate by ;)"
+                                                             ),
 
                                                              textInput(inputId = "select_samples_based_on_concentration_growth_group_plots",
                                                                        label = "Select sample based on concentration (separate by ;)"
@@ -996,27 +997,43 @@ server <- function(input, output){
       smooth.dr = NULL
     }
 
+    fit.opt <- c()
+    if(input$linear_regression_growth){
+      fit.opt <- c(fit.opt,
+                   'l')
+    }
+    if(input$parametric_fit_growth){
+      fit.opt <- c(fit.opt,
+                   'm')
+    }
+    if(input$nonparametric_fit_growth){
+      fit.opt <- c(fit.opt,
+                   's')
+    }
+
     results$growth <- growth.workflow(grodata = grodata,
-                                      log.x.gc = input$log_transform_time_growth,
-                                      biphasic = input$biphasic_growth_growth,
-                                      growth.thresh = input$growth_threshold_growth,
-                                      min.density = input$minimum_density_growth,
-                                      t0 = input$t0_growth,
                                       ec50 = input$perform_ec50_growth,
-                                      dr.parameter = input$response_parameter_growth,
+                                      fit.opt = fit.opt,
+                                      t0 = input$t0_growth,
+                                      min.density = input$minimum_density_growth,
+                                      log.x.gc = input$log_transform_time_growth,
+                                      log.y.model = input$log_transform_data_parametric_growth,
+                                      log.y.spline = input$log_transform_data_nonparametric_growth,
+                                      biphasic = input$biphasic_growth_growth,
+                                      lin.h = input$custum_sliding_window_size_value_growth,## Here seem to be problems
+                                      lin.R2 = input$R2_threshold_growth,
+                                      lin.RSD = input$RSD_threshold_growth,
+                                      lin.dY = input$dY_threshold_growth, ##
+                                      interactive = FALSE, ### TODO (popups)
+                                      nboot.gc = input$number_of_bootstrappings,
+                                      smooth.gc = input$smoothing_factor_nonparametric_growth,
+                                      model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"), ### TODO: implement like model and huang button
+                                      growth.thresh = input$growth_threshold_growth,
+                                      dr.parameter = input$response_parameter_growth, ### TODO if else bla
+                                      smooth.dr = input$smooth.dr,
                                       log.x.dr = input$log_transform_concentration_growth,
                                       log.y.dr = input$log_transform_response_growth,
-                                      smooth.dr = smooth.dr,
-                                      dr.have.atleast = input$minimum_number_of_different_values_growth,
                                       nboot.dr = input$number_of_bootstrappings_dr_growth,
-                                      #lin.R2 = input$R2_threshold_growth, ## Here seem to be problems
-                                      #lin.RSD = input$RSD_threshold_growth,
-                                      #lin.dY = input$dY_threshold_growth,
-                                      #lin.h = input$custum_sliding_window_size_value_growth
-                                      # PARAMETRIC FIT VARIABLES
-                                      smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                      nboot.gc = input$number_of_bootstrappings_growth,
-                                      neg.nan.act = input$remove_negative_values_in_bootstrapping_growth,
                                       report = NULL,
                                       out.dir = "Test"
     )
@@ -1067,7 +1084,7 @@ server <- function(input, output){
                 x.title = input$x_axis_title_growth_group_plot,
                 y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
                 lwd = input$line_width_growth_group_plot
-                )
+    )
   })
 
   output$test <- renderText({
@@ -1102,7 +1119,7 @@ server <- function(input, output){
                    reference.conc = reference.conc,
                    shape.size = input$shape.size_growth_parameter_plot,
                    basesize = input$basesize_growth_parameter_plot
-                   )
+    )
   })
 
 
@@ -1113,81 +1130,81 @@ server <- function(input, output){
 
   # conditional selections:
   ## Growth plots
-    ### growth.parameter()
+  ### growth.parameter()
 
-    selected_inputs_parameter_growth_parameter_plot <- reactive({
-      results <- results$growth
-      gc_parameters <- c()
-      if("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
-        if(results$control$biphasic){
-          gc_parameters <- c(gc_parameters,
-                             'Growth rate (Spline)' = 'mu.spline',
-                             'Growth rate phase 2 (Spline)' = 'mu.spline',
-                             "Doubling time (Spline)" = "tD.spline",
-                             "Doubling time phase 2 (Spline)" = "tD.spline",
-                             'Lag time (Spline)' = 'lambda.spline',
-                             'Maximum density (Spline)' = 'A.spline',
-                             'ΔDensity (Spline)' = 'dY.spline',
-                             'Area under the curve (Spline)' = 'integral.spline')
-        } else {
-          gc_parameters <- c(gc_parameters,
-                             'Growth rate (Spline)' = 'mu.spline',
-                             "Doubling time (Spline)" = "tD.spline",
-                             'Lag time (Spline)' = 'lambda.spline',
-                             'Maximum density (Spline)' = 'A.spline',
-                             'ΔDensity (Spline)' = 'dY.spline',
-                             'Area under the curve (Spline)' = 'integral.spline')
-        }
+  selected_inputs_parameter_growth_parameter_plot <- reactive({
+    results <- results$growth
+    gc_parameters <- c()
+    if("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      if(results$control$biphasic){
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (Spline)' = 'mu.spline',
+                           'Growth rate phase 2 (Spline)' = 'mu.spline',
+                           "Doubling time (Spline)" = "tD.spline",
+                           "Doubling time phase 2 (Spline)" = "tD.spline",
+                           'Lag time (Spline)' = 'lambda.spline',
+                           'Maximum density (Spline)' = 'A.spline',
+                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Area under the curve (Spline)' = 'integral.spline')
+      } else {
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (Spline)' = 'mu.spline',
+                           "Doubling time (Spline)" = "tD.spline",
+                           'Lag time (Spline)' = 'lambda.spline',
+                           'Maximum density (Spline)' = 'A.spline',
+                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Area under the curve (Spline)' = 'integral.spline')
       }
-      if("l" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
-        if(results$control$biphasic){
-          gc_parameters <- c(gc_parameters,
-                             'Growth rate (linear fit)' = 'mu.linfit',
-                             'Growth rate phase 2 (linear fit)' = 'mu.linfit',
-                             "Doubling time (linear fit)" = "tD.linfit",
-                             "Doubling time phase 2 (linear fit)" = "tD.linfit",
-                             'Lag time (linear fit)' = 'lambda.linfit',
-                             'Maximum density (linear fit)' = 'A.linfit',
-                             'ΔDensity (linear fit)' = 'dY.linfit')
-        } else {
-          gc_parameters <- c(gc_parameters,
-                             'Growth rate (linear fit)' = 'mu.linfit',
-                             "Doubling time (linear fit)" = "tD.linfit",
-                             'Lag time (linear fit)' = 'lambda.linfit',
-                             'Maximum density (linear fit)' = 'A.linfit',
-                             'ΔDensity (linear fit)' = 'dY.linfit')
-        }
+    }
+    if("l" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      if(results$control$biphasic){
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (linear fit)' = 'mu.linfit',
+                           'Growth rate phase 2 (linear fit)' = 'mu.linfit',
+                           "Doubling time (linear fit)" = "tD.linfit",
+                           "Doubling time phase 2 (linear fit)" = "tD.linfit",
+                           'Lag time (linear fit)' = 'lambda.linfit',
+                           'Maximum density (linear fit)' = 'A.linfit',
+                           'ΔDensity (linear fit)' = 'dY.linfit')
+      } else {
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (linear fit)' = 'mu.linfit',
+                           "Doubling time (linear fit)" = "tD.linfit",
+                           'Lag time (linear fit)' = 'lambda.linfit',
+                           'Maximum density (linear fit)' = 'A.linfit',
+                           'ΔDensity (linear fit)' = 'dY.linfit')
       }
-      if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
-          gc_parameters <- c(gc_parameters, 'mu.model' = 'mu.model', 'lambda.model' = 'lambda.model', 'A.model' = 'A.model', 'dY.model' = 'dY.model')
-      }
-      gc_parameters
-    })
+    }
+    if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      gc_parameters <- c(gc_parameters, 'mu.model' = 'mu.model', 'lambda.model' = 'lambda.model', 'A.model' = 'A.model', 'dY.model' = 'dY.model')
+    }
+    gc_parameters
+  })
 
-    selected_inputs_reference_condition_growth_parameter_plot <- reactive({
-      results <- results$growth
-      results$expdesign$condition
-    })
+  selected_inputs_reference_condition_growth_parameter_plot <- reactive({
+    results <- results$growth
+    results$expdesign$condition
+  })
 
-    select_inputs_reference_concentration_growth_parameter_plot <- reactive({
-      results <- results$growth
-      results$expdesign$concentration
-    })
+  select_inputs_reference_concentration_growth_parameter_plot <- reactive({
+    results <- results$growth
+    results$expdesign$concentration
+  })
 
-    observe({
-      updateSelectInput(inputId = "parameter_growth_parameter_growth_plot",
-                        choices = selected_inputs_parameter_growth_parameter_plot()
-      )})
+  observe({
+    updateSelectInput(inputId = "parameter_growth_parameter_growth_plot",
+                      choices = selected_inputs_parameter_growth_parameter_plot()
+    )})
 
-    observe({
-      updateSelectInput(inputId = "reference_condition_growth_parameter_plot",
-                        choices = selected_inputs_reference_condition_growth_parameter_plot()
-      )})
+  observe({
+    updateSelectInput(inputId = "reference_condition_growth_parameter_plot",
+                      choices = selected_inputs_reference_condition_growth_parameter_plot()
+    )})
 
-    observe({
-      updateSelectInput(inputId = "reference_concentration_growth_parameter_plot",
-                        choices = select_inputs_reference_concentration_growth_parameter_plot()
-      )})
+  observe({
+    updateSelectInput(inputId = "reference_concentration_growth_parameter_plot",
+                      choices = select_inputs_reference_concentration_growth_parameter_plot()
+    )})
 
 
   ## Fluorescence
