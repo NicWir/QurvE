@@ -734,19 +734,23 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                              checkboxInput(inputId = 'normalize_to_reference_growth_parameter_plot',
                                                                            label = 'normalize to reference',
-                                                                           value = TRUE),
+                                                                           value = FALSE),
 
-                                                             # reactive selection
-                                                             selectInput(inputId = 'reference_condition_growth_parameter_plot',
-                                                                         label = 'Reference condition',
-                                                                         choices = ""
+                                                             # Conditional Panel
+                                                             conditionalPanel(condition = "input.normalize_to_reference_growth_parameter_plot",
+                                                                              # reactive selection
+                                                                              selectInput(inputId = 'reference_condition_growth_parameter_plot',
+                                                                                          label = 'Reference condition',
+                                                                                          choices = ""
+                                                                              ),
+
+                                                                              # reactive selection
+                                                                              selectInput(inputId = 'reference_concentration_growth_parameter_plot',
+                                                                                          label = 'Reference concentration',
+                                                                                          choices = ""
+                                                                              ),
                                                              ),
 
-                                                             # reactive selection
-                                                             selectInput(inputId = 'reference_concentration_growth_parameter_plot',
-                                                                         label = 'Reference concentration',
-                                                                         choices = ""
-                                                             ),
 
                                                              sliderInput(inputId = "shape.size_growth_parameter_plot",
                                                                          label = "Shape size",
@@ -1078,14 +1082,24 @@ server <- function(input, output){
   output$growth_parameter_plot <- renderPlot({
     results <- results$growth
 
+    if (input$normalize_to_reference_growth_parameter_plot){
+      reference.conc <- input$reference_condition_growth_parameter_plot
+      reference.nm <- input$reference_condition_growth_parameter_plot
+    } else {
+      reference.conc <- NULL
+      reference.nm <- NULL
+    }
+
+
+
     plot.parameter(results,
                    param = input$parameter_growth_parameter_growth_plot,
                    names = input$select_sample_based_on_string_growth_parameter_plot,
                    conc = input$select_sample_based_on_concentration_growth_parameter_plot,
                    exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
                    exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
-                   reference.nm = input$reference_condition_growth_parameter_plot,
-                   reference.conc = input$reference_concentration_growth_parameter_plot,
+                   reference.nm = reference.nm,
+                   reference.conc = reference.conc,
                    shape.size = input$shape.size_growth_parameter_plot,
                    basesize = input$basesize_growth_parameter_plot
                    )
