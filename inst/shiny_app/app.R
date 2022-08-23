@@ -18,7 +18,7 @@ gc_parameters <- c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.l
                    'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                    'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                    'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')
-ui <- fluidPage(theme = shinytheme('sandstone'),
+ui <- fluidPage(
                 navbarPage(
                   'QurvE',
 
@@ -177,201 +177,208 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   navbarMenu('Computation',
                              tabPanel("Growth",
                                       fluidRow(
-                                        column(4,
-                                               mainPanel(
-                                                 h2('Growth fit'),
-                                                 h4('Options'),
-                                                 checkboxInput(inputId = 'linear_regression_growth',
-                                                               label = 'linear regression',
-                                                               value = TRUE),
+                                        sidebarLayout(
+                                          column(4,
+                                                 sidebarPanel( width = 12,
+                                                               style='border-color: #ADADAD',
+                                                               wellPanel(
+                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD',
+                                                                 h2('Growth fit'),
+                                                                 h4('Options'),
+                                                                 checkboxInput(inputId = 'linear_regression_growth',
+                                                                               label = 'linear regression',
+                                                                               value = TRUE),
 
-                                                 checkboxInput(inputId = 'parametric_fit_growth',
-                                                               label = 'parametric fit',
-                                                               value = FALSE),
+                                                                 checkboxInput(inputId = 'parametric_fit_growth',
+                                                                               label = 'parametric fit',
+                                                                               value = FALSE),
 
-                                                 checkboxInput(inputId = 'nonparametric_fit_growth',
-                                                               label = 'non parametric fit',
-                                                               value = TRUE),
-
-
-                                                 checkboxInput(inputId = 'log_transform_time_growth',
-                                                               label = 'Log-transform time'),
-
-                                                 checkboxInput(inputId = 'biphasic_growth_growth',
-                                                               label = 'Biphasic growth'),
-
-                                                 numericInput(
-                                                   inputId = 'growth_threshold_growth',
-                                                   label = 'growth threshold',
-                                                   value = 1.5,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
-
-                                                 numericInput(
-                                                   inputId = 'minimum_density_growth',
-                                                   label = 'minimum density',
-                                                   value = 0,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
-
-                                                 numericInput(
-                                                   inputId = 't0_growth',
-                                                   label = 't0',
-                                                   value = 0,
-                                                   min = NA,
-                                                   max = NA,
-                                                 )
-                                               ), # Growth fit
+                                                                 checkboxInput(inputId = 'nonparametric_fit_growth',
+                                                                               label = 'non parametric fit',
+                                                                               value = TRUE),
 
 
-                                               mainPanel(
-                                                 h2('Dose-response Analysis'),
-                                                 checkboxInput(inputId = 'perform_ec50_growth',
-                                                               label = 'perform EC50 Analysis',
-                                                               value = FALSE),
+                                                                 checkboxInput(inputId = 'log_transform_time_growth',
+                                                                               label = 'Log-transform time'),
 
-                                                 selectInput(inputId = "response_parameter_growth",
-                                                             label = "Response Parameter",
-                                                             choices = c("mu.linfit" = "mu.linfit",
-                                                                         "other.fit" = "other.fit")),
+                                                                 checkboxInput(inputId = 'biphasic_growth_growth',
+                                                                               label = 'Biphasic growth'),
 
-                                                 checkboxInput(inputId = 'log_transform_concentration_growth',
-                                                               label = 'log transform concentration'),
+                                                                 numericInput(
+                                                                   inputId = 'growth_threshold_growth',
+                                                                   label = 'growth threshold',
+                                                                   value = 1.5,
+                                                                   min = NA,
+                                                                   max = NA,
+                                                                 ),
 
-                                                 checkboxInput(inputId = 'log_transform_response_growth',
-                                                               label = 'log transform response'),
+                                                                 numericInput(
+                                                                   inputId = 'minimum_density_growth',
+                                                                   label = 'minimum density',
+                                                                   value = 0,
+                                                                   min = NA,
+                                                                   max = NA,
+                                                                 ),
+
+                                                                 numericInput(
+                                                                   inputId = 't0_growth',
+                                                                   label = 't0',
+                                                                   value = 0,
+                                                                   min = NA,
+                                                                   max = NA,
+                                                                 )
+                                                               ), # Growth fit
 
 
-                                                 selectInput(inputId = "smoothing_factor_growth",
-                                                             label = "smoothing factor",
-                                                             choices = c("NULL" = "NULL",
-                                                                         "other" = "other")),
+                                                               wellPanel(
+                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD',
+                                                                 h2('Dose-response Analysis'),
+                                                                 checkboxInput(inputId = 'perform_ec50_growth',
+                                                                               label = 'perform EC50 Analysis',
+                                                                               value = FALSE),
 
-                                                 numericInput(
-                                                   inputId = 'number_of_bootstrappings_dr_growth',
-                                                   label = 'Number of bootstrappings',
-                                                   value = 0,
-                                                   min = NA,
-                                                   max = NA,
-                                                 ),
+                                                                 selectInput(inputId = "response_parameter_growth",
+                                                                             label = "Response Parameter",
+                                                                             choices = c("mu.linfit" = "mu.linfit",
+                                                                                         "other.fit" = "other.fit")),
+
+                                                                 checkboxInput(inputId = 'log_transform_concentration_growth',
+                                                                               label = 'log transform concentration'),
+
+                                                                 checkboxInput(inputId = 'log_transform_response_growth',
+                                                                               label = 'log transform response'),
 
 
-                                                 actionButton(inputId = "run_growth",
-                                                              label = "Run computation")
+                                                                 selectInput(inputId = "smoothing_factor_growth",
+                                                                             label = "smoothing factor",
+                                                                             choices = c("NULL" = "NULL",
+                                                                                         "other" = "other")),
 
-                                               )
-                                        ),
+                                                                 numericInput(
+                                                                   inputId = 'number_of_bootstrappings_dr_growth',
+                                                                   label = 'Number of bootstrappings',
+                                                                   value = 0,
+                                                                   min = NA,
+                                                                   max = NA,
+                                                                 )
+                                                               ),
 
-                                        conditionalPanel(condition = "input.linear_regression_growth",
-                                                         column(4,
 
-                                                                mainPanel(
-                                                                  h2('Linear fit'),
+                                                               actionButton(inputId = "run_growth",
+                                                                            label = "Run computation")
 
-                                                                  numericInput(
-                                                                    inputId = 'R2_threshold_growth',
-                                                                    label = 'R2 threshold',
-                                                                    value = 0.95,
-                                                                    min = NA,
-                                                                    max = NA,
-                                                                  ),
 
-                                                                  numericInput(
-                                                                    inputId = 'RSD_threshold_growth',
-                                                                    label = 'RSD threshold',
-                                                                    value = 0.1,
-                                                                    min = NA,
-                                                                    max = NA,
-                                                                  ),
+                                                 ) # sidebarPanel(
+                                          ), # column
+                                          column(6,
+                                                 conditionalPanel(
+                                                   condition = "input.linear_regression_growth",
+                                                   sidebarPanel(width = 4,
+                                                                style='border-color: #ADADAD',
+                                                                h2('Linear fit'),
 
-                                                                  numericInput(
-                                                                    inputId = 'dY_threshold_growth',
-                                                                    label = 'dY threshold',
-                                                                    value = 0.05,
-                                                                    min = NA,
-                                                                    max = NA,
-                                                                  ),
+                                                                numericInput(
+                                                                  inputId = 'R2_threshold_growth',
+                                                                  label = 'R2 threshold',
+                                                                  value = 0.95,
+                                                                  min = NA,
+                                                                  max = NA,
+                                                                ),
 
-                                                                  checkboxInput(inputId = 'custom_sliding_window_size_growth',
-                                                                                label = 'custom sliding window size',
-                                                                                value = FALSE),
+                                                                numericInput(
+                                                                  inputId = 'RSD_threshold_growth',
+                                                                  label = 'RSD threshold',
+                                                                  value = 0.1,
+                                                                  min = NA,
+                                                                  max = NA,
+                                                                ),
 
-                                                                  numericInput(
-                                                                    inputId = 'custum_sliding_window_size_value_growth',
-                                                                    label = NULL,
-                                                                    value = 1,
-                                                                    min = NA,
-                                                                    max = NA,
-                                                                  ),
-                                                                )
-                                                         )
+                                                                numericInput(
+                                                                  inputId = 'dY_threshold_growth',
+                                                                  label = 'dY threshold',
+                                                                  value = 0.05,
+                                                                  min = NA,
+                                                                  max = NA,
+                                                                ),
 
-                                        ),
+                                                                checkboxInput(inputId = 'custom_sliding_window_size_growth',
+                                                                              label = 'custom sliding window size',
+                                                                              value = FALSE),
 
-                                        conditionalPanel(condition = "input.parametric_fit_growth",
-                                                         column(4,
-                                                                mainPanel(
-                                                                  h2('Parametric fit'),
-                                                                  h4('Models:'),
+                                                                numericInput(
+                                                                  inputId = 'custum_sliding_window_size_value_growth',
+                                                                  label = NULL,
+                                                                  value = 1,
+                                                                  min = NA,
+                                                                  max = NA,
+                                                                ),
+                                                   )
+                                                 ), # conditionalPanel
+                                                 conditionalPanel(
+                                                   condition = "input.parametric_fit_growth",
+                                                   sidebarPanel(
+                                                     style='border-color: #ADADAD',
+                                                     h2('Parametric fit'),
+                                                     wellPanel(
+                                                       h4('Models:'),
+                                                       style='background-color:#EDEDED; padding: 1',
+                                                       checkboxInput(inputId = 'logistic_growth',
+                                                                     label = 'logistic',
+                                                                     value = TRUE),
 
-                                                                  checkboxInput(inputId = 'logistic_growth',
-                                                                                label = 'logistic',
-                                                                                value = TRUE),
+                                                       checkboxInput(inputId = 'richards_growth',
+                                                                     label = 'Richards',
+                                                                     value = TRUE),
 
-                                                                  checkboxInput(inputId = 'richards_growth',
-                                                                                label = 'Richards',
-                                                                                value = TRUE),
+                                                       checkboxInput(inputId = 'gompertz_growth',
+                                                                     label = 'Gompertz',
+                                                                     value = TRUE),
 
-                                                                  checkboxInput(inputId = 'gompertz_growth',
-                                                                                label = 'Gompertz',
-                                                                                value = TRUE),
+                                                       checkboxInput(inputId = 'extended_gompertz_growth',
+                                                                     label = 'extended Gompertz',
+                                                                     value = TRUE),
 
-                                                                  checkboxInput(inputId = 'extended_gompertz_growth',
-                                                                                label = 'extended Gompertz',
-                                                                                value = TRUE),
+                                                       checkboxInput(inputId = 'huang_growth',
+                                                                     label = 'Huang',
+                                                                     value = TRUE)
+                                                     ),
+                                                     checkboxInput(inputId = 'log_transform_data_parametric_growth',
+                                                                   label = 'Log-transform data',
+                                                                   value = TRUE)
 
-                                                                  checkboxInput(inputId = 'huang_growth',
-                                                                                label = 'Huang',
-                                                                                value = TRUE),
+                                                   )
+                                                 ),  # conditionalPanel
 
-                                                                  checkboxInput(inputId = 'log_transform_data_parametric_growth',
-                                                                                label = 'Log-transform data',
-                                                                                value = TRUE)
-                                                                )
-                                                         )
+                                                 conditionalPanel(
+                                                   condition = "input.nonparametric_fit_growth",
+                                                   sidebarPanel(
+                                                     style='border-color: #ADADAD',
+                                                     h2('Nonparametric fit'),
 
-                                        ),
+                                                     checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
+                                                                   label = 'Log-transform data',
+                                                                   value = TRUE),
 
-                                        conditionalPanel(condition = "input.nonparametric_fit_growth",
-                                                         column(4,
-                                                                mainPanel(
-                                                                  h2('Nonparametric fit'),
+                                                     numericInput(
+                                                       inputId = 'smoothing_factor_nonparametric_growth',
+                                                       label = 'smoothing factor',
+                                                       value = 0.55,
+                                                       min = NA,
+                                                       max = NA,
+                                                     ),
 
-                                                                  checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
-                                                                                label = 'Log-transform data',
-                                                                                value = TRUE),
-
-                                                                  numericInput(
-                                                                    inputId = 'smoothing_factor_nonparametric_growth',
-                                                                    label = 'smoothing factor',
-                                                                    value = 0.55,
-                                                                    min = NA,
-                                                                    max = NA,
-                                                                  ),
-
-                                                                  numericInput(
-                                                                    inputId = 'number_of_bootstrappings_growth',
-                                                                    label = 'number of bootstrappings',
-                                                                    value = 0,
-                                                                    min = NA,
-                                                                    max = NA,
-                                                                  )
-                                                                )
-                                                         )
-                                        )
-                                      ),
+                                                     numericInput(
+                                                       inputId = 'number_of_bootstrappings_growth',
+                                                       label = 'number of bootstrappings',
+                                                       value = 0,
+                                                       min = NA,
+                                                       max = NA,
+                                                     )
+                                                   )
+                                                 )  # conditionalPanel
+                                          ) # column
+                                        ) # sidebarLayout
+                                      ), # fluidRow
                              ), # Growth Tab Panel
 
 
@@ -1014,28 +1021,6 @@ server <- function(input, output){
                    's')
     }
 
-    model.type <- c()
-    if(input$logistic_growth){
-      model.type <- c(model.type,
-                   'logistic')
-    }
-    if(input$richards_growth){
-      model.type <- c(model.type,
-                      'richards')
-    }
-    if(input$gompertz_growth){
-      model.type <- c(model.type,
-                      'gompertz')
-    }
-    if(input$extended_gompertz_growth){
-      model.type <- c(model.type,
-                      'gompertz.exp')
-    }
-    if(input$huang_growth){
-      model.type <- c(model.type,
-                      'huang')
-    }
-
     results$growth <- growth.workflow(grodata = grodata,
                                       ec50 = input$perform_ec50_growth,
                                       fit.opt = fit.opt,
@@ -1052,7 +1037,7 @@ server <- function(input, output){
                                       interactive = FALSE, ### TODO (popups)
                                       nboot.gc = input$number_of_bootstrappings,
                                       smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                      model.type = model.type,
+                                      model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"), ### TODO: implement like model and huang button
                                       growth.thresh = input$growth_threshold_growth,
                                       dr.parameter = input$response_parameter_growth, ### TODO if else bla
                                       smooth.dr = input$smooth.dr,
