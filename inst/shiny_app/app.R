@@ -317,12 +317,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                    label = 'custom sliding window size',
                                                                    value = FALSE),
 
-                                                     numericInput(
-                                                       inputId = 'custom_sliding_window_size_value_growth',
-                                                       label = NULL,
-                                                       value = 0,
-                                                       min = NA,
-                                                       max = NA,
+                                                     conditionalPanel(
+                                                       condition = "input.custom_sliding_window_size_growth",
+                                                       numericInput(
+                                                         inputId = 'custum_sliding_window_size_value_growth',
+                                                         label = NULL,
+                                                         value = 1,
+                                                         min = NA,
+                                                         max = NA,
+                                                       )
                                                      ),
                                                    )
                                                  ), # conditionalPanel
