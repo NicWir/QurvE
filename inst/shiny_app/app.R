@@ -18,7 +18,7 @@ gc_parameters <- c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.l
                    'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                    'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                    'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme('sandstone'),
                 navbarPage(
                   'QurvE',
 
@@ -27,8 +27,9 @@ ui <- fluidPage(
                            tabsetPanel(type = "tabs",
                                        tabPanel(title = "Custom",
                                                 sidebarPanel(
+                                                  style='border-color: #ADADAD',
                                                   wellPanel(
-                                                    style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding: 1',
+                                                    style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
                                                   # select file type
                                                   selectInput(inputId = "input_file_type_custom",
                                                               label = "Select file type:",
@@ -46,7 +47,7 @@ ui <- fluidPage(
                                                   ),
 
                                                   wellPanel(
-                                                    style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding: 1',
+                                                    style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
                                                   conditionalPanel(
                                                     condition = "input.input_file_type_custom == 'xlsx'",
                                                     selectInput(inputId = "sheet",
@@ -91,6 +92,7 @@ ui <- fluidPage(
 
                                        tabPanel(title = "Plate reader",
                                                 sidebarPanel(
+                                                  style='border-color: #ADADAD',
                                                   # select file type
                                                   selectInput(inputId = "input_file_type_plate_reader",
                                                               label = "Select file type:",
@@ -188,8 +190,8 @@ ui <- fluidPage(
                                                  sidebarPanel( width = 12,
                                                                style='border-color: #ADADAD',
                                                                wellPanel(
-                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding-top: 0',
-                                                                 h2('Growth fit'),
+                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+                                                                 h2(strong('Growth fit')),
                                                                  h4('Options'),
                                                                  checkboxInput(inputId = 'linear_regression_growth',
                                                                                label = 'linear regression',
@@ -237,8 +239,8 @@ ui <- fluidPage(
 
 
                                                                wellPanel(
-                                                                 style='background-color:#EDEDED; padding: 1; border-color: #ADADAD; padding-top: 0',
-                                                                 h2('Dose-response Analysis'),
+                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+                                                                 h2(strong('Dose-response Analysis')),
                                                                  checkboxInput(inputId = 'perform_ec50_growth',
                                                                                label = 'perform EC50 Analysis',
                                                                                value = FALSE),
@@ -282,7 +284,7 @@ ui <- fluidPage(
                                                    sidebarPanel(
                                                      width = 4,
                                                      style='border-color: #ADADAD; padding-top: 0',
-                                                     h3('Linear fit'),
+                                                     h3(strong('Linear fit')),
 
                                                      numericInput(
                                                        inputId = 'R2_threshold_growth',
@@ -325,10 +327,10 @@ ui <- fluidPage(
                                                    condition = "input.parametric_fit_growth",
                                                    sidebarPanel(
                                                      style='border-color: #ADADAD; padding-top: 0',
-                                                     h3('Parametric fit'),
+                                                     h3(strong('Parametric fit')),
                                                      wellPanel(
-                                                       h4('Models:'),
-                                                       style='background-color:#EDEDED; padding: 1',
+                                                       h4(strong('Models:')),
+                                                       style='background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
                                                        checkboxInput(inputId = 'logistic_growth',
                                                                      label = 'logistic',
                                                                      value = TRUE),
@@ -360,7 +362,7 @@ ui <- fluidPage(
                                                    condition = "input.nonparametric_fit_growth",
                                                    sidebarPanel(
                                                      style='border-color: #ADADAD; padding-top: 0',
-                                                     h3('Nonparametric fit'),
+                                                     h3(strong('Nonparametric fit')),
 
                                                      checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
                                                                    label = 'Log-transform data',
