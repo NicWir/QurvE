@@ -332,14 +332,13 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                 label = 'extended Gompertz',
                                                                                 value = TRUE),
 
-                                                                  checkboxInput(inputId = 'log_transform_data_parametric_growth',
-                                                                                label = 'Log-transform data',
-                                                                                value = TRUE),
-
                                                                   checkboxInput(inputId = 'huang_growth',
                                                                                 label = 'Huang',
-                                                                                value = TRUE)
+                                                                                value = TRUE),
 
+                                                                  checkboxInput(inputId = 'log_transform_data_parametric_growth',
+                                                                                label = 'Log-transform data',
+                                                                                value = TRUE)
                                                                 )
                                                          )
 
@@ -1053,7 +1052,7 @@ server <- function(input, output){
                                       interactive = FALSE, ### TODO (popups)
                                       nboot.gc = input$number_of_bootstrappings,
                                       smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                      model.type = model.type, ### TODO: implement like model and huang button
+                                      model.type = model.type,
                                       growth.thresh = input$growth_threshold_growth,
                                       dr.parameter = input$response_parameter_growth, ### TODO if else bla
                                       smooth.dr = input$smooth.dr,
