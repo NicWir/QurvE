@@ -336,6 +336,10 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                 label = 'Log-transform data',
                                                                                 value = TRUE),
 
+                                                                  checkboxInput(inputId = 'huang_growth',
+                                                                                label = 'Huang',
+                                                                                value = TRUE)
+
                                                                 )
                                                          )
 
