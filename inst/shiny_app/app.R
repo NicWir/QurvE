@@ -1,8 +1,9 @@
-list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes")
+list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes", "shinyFiles")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
 library(shiny)
+library(shinyFiles)
 library(readxl)
 library(tidyverse)
 library(shinythemes)
@@ -733,7 +734,41 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                   tabPanel(title = "Dose-response analysis",
                                                            sidebarPanel(
-                                                             #
+                                                             wellPanel(
+                                                               style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                               checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot',
+                                                                             label = 'Combine conditions into a single plot',
+                                                                             value = TRUE)
+                                                             ),
+
+                                                             h3('Customize plot appearance'),
+                                                             sliderInput(inputId = 'shape_type_dose_response_growth_plot',
+                                                                         label = 'Shape type',
+                                                                         min = 1,
+                                                                         max = 25,
+                                                                         value = 15),
+
+                                                             sliderInput(inputId = 'shape_size_dose_response_growth_plot',
+                                                                         label = 'Shape size',
+                                                                         min = 1,
+                                                                         max = 10,
+                                                                         value = 2),
+
+                                                             sliderInput(inputId = 'base_size_dose_response_growth_plot',
+                                                                         label = 'Base size',
+                                                                         min = 1,
+                                                                         max = 25,
+                                                                         value = 15),
+
+                                                             sliderInput(inputId = 'line_width_dose_response_growth_plot',
+                                                                         label = 'Line width',
+                                                                         min = 1,
+                                                                         max = 25,
+                                                                         value = 15),
+
+                                                             checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot',
+                                                                           label = 'Show EC50 indicator lines',
+                                                                           value = TRUE)
                                                            ),
                                                            mainPanel(
                                                              plotOutput("growth_dose_response_plot")
@@ -808,8 +843,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              ),
 
 
-                             tabPanel(title = "Flourescence Plots",
-                                      h1("Flourescence Plots"),
+                             tabPanel(title = "Fluorescence Plots",
+                                      h1("Fluorescence Plots"),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
                                                            sidebarPanel(
@@ -825,15 +860,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              ),
 
                                                              textInput(inputId = "select_samples_based_on_concentration_fluorescence_group_plots",
-                                                                       label = "Select sample based on string (separate by ;)"
+                                                                       label = "Select sample based on concentration (separate by ;)"
                                                              ),
 
                                                              textInput(inputId = "exclude_samples_based_on_string_fluorescence_group_plots",
-                                                                       label = "Select sample based on string (separate by ;)"
+                                                                       label = "Exclude sample based on string (separate by ;)"
                                                              ),
 
                                                              textInput(inputId = "exclude_samples_based_on_concentration_fluorescence_group_plots",
-                                                                       label = "Select sample based on string (separate by ;)"
+                                                                       label = "Exclude sample based on concentration (separate by ;)"
                                                              ),
 
                                                              checkboxInput(inputId = "plot_group_averages_fluorescence_group_plots",
@@ -850,19 +885,55 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = "Log-transform y-axis",
                                                                            value = TRUE),
 
-                                                             textInput(inputId = "x_range_fluorescence_group_plot",
-                                                                       label = "x-Range (separated by ;)",
-                                                                       value = "lower;upper"
+                                                             strong("x-Range"),
+                                                             fluidRow(
+                                                               column(3,
+                                                                      textInput(inputId = "x_range_min_fluorescence_group_plot",
+                                                                                label = NULL,
+                                                                                value = "min"
+                                                                      )
+                                                               ),
+
+                                                               column(3,
+                                                                      textInput(inputId = "x_range_max_fluorescence_group_plot",
+                                                                                label = NULL,
+                                                                                value = "max"
+                                                                      )
+                                                               )
                                                              ),
 
-                                                             textInput(inputId = "y_range_fluorescence_group_plot",
-                                                                       label = "y-Range (separated by ;)",
-                                                                       value = "lower;upper"
+                                                             strong("y-Range"),
+                                                             fluidRow(
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_min_fluorescence_group_plot",
+                                                                                label = NULL,
+                                                                                value = "min"
+                                                                      )
+                                                               ),
+
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_max_fluorescence_group_plot",
+                                                                                label = NULL,
+                                                                                value = "max"
+                                                                      )
+                                                               )
                                                              ),
 
-                                                             textInput(inputId = "y_range_derivative_fluorescence_group_plot",
-                                                                       label = "y-Range derivative (separated by ;)",
-                                                                       value = "lower;upper"
+                                                             strong("y-Range (derivative)"),
+                                                             fluidRow(
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_min_derivative_fluorescence_group_plot",
+                                                                                label = NULL,
+                                                                                value = "min"
+                                                                      )
+                                                               ),
+
+                                                               column(3,
+                                                                      textInput(inputId = "y_range_max_derivative_fluorescence_group_plot",
+                                                                                label = NULL,
+                                                                                value = "max"
+                                                                      )
+                                                               )
                                                              ),
 
                                                              textInput(inputId = "y_axis_title_fluorescence_group_plot",
@@ -886,15 +957,52 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          max = 5,
                                                                          value = 1.1)
 
-                                                           ), # Side panel growth fluorescence plots
+                                                           ), # Side panel growth group plots
+
                                                            mainPanel(
                                                              plotOutput("fluorescence_group_plot")
                                                            )
+
+
                                                   ),
 
                                                   tabPanel(title = "Dose-response analysis",
                                                            sidebarPanel(
-                                                             # add sibar stuff
+                                                             wellPanel(
+                                                               style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                               checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_fluorescence_plot',
+                                                                             label = 'Combine conditions into a single plot',
+                                                                             value = TRUE)
+                                                             ),
+
+                                                             h3('Customize plot appearance'),
+                                                             sliderInput(inputId = 'shape_type_dose_response_fluorescence_plot',
+                                                                         label = 'Shape type',
+                                                                         min = 1,
+                                                                         max = 25,
+                                                                         value = 15),
+
+                                                             sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot',
+                                                                         label = 'Shape size',
+                                                                         min = 1,
+                                                                         max = 10,
+                                                                         value = 2),
+
+                                                             sliderInput(inputId = 'base_size_dose_response_fluorescence_plot',
+                                                                         label = 'Base size',
+                                                                         min = 1,
+                                                                         max = 25,
+                                                                         value = 15),
+
+                                                             sliderInput(inputId = 'line_width_dose_response_fluorescence_plot',
+                                                                         label = 'Line width',
+                                                                         min = 1,
+                                                                         max = 25,
+                                                                         value = 15),
+
+                                                             checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_fluorescence_plot',
+                                                                           label = 'Show EC50 indicator lines',
+                                                                           value = TRUE)
                                                            ),
                                                            mainPanel(
                                                              plotOutput("fluorescence_dose_response_plot")
@@ -903,10 +1011,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                   tabPanel(title = "Parameter plots",
                                                            sidebarPanel(
-                                                             selectInput(inputId = "parameter_growth_parameter_fluorescence_plot",
+                                                             selectInput(inputId = "parameter_fluorescence_parameter_fluorescence_plot",
                                                                          label = "Parameter",
-                                                                         choices = c("mu.linfit" = "mu.linfit_fluorescence_parameter_plot",
-                                                                                     "other" = "other_fluorescence_parameter_plot")
+                                                                         choices = ""
                                                              ),
 
                                                              textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
@@ -927,7 +1034,23 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                              checkboxInput(inputId = 'normalize_to_reference_fluorescence_parameter_plot',
                                                                            label = 'normalize to reference',
-                                                                           value = TRUE),
+                                                                           value = FALSE),
+
+                                                             # Conditional Panel
+                                                             conditionalPanel(condition = "input.normalize_to_reference_fluorescence_parameter_plot",
+                                                                              # reactive selection
+                                                                              selectInput(inputId = 'reference_condition_fluorescence_parameter_plot',
+                                                                                          label = 'Reference condition',
+                                                                                          choices = ""
+                                                                              ),
+
+                                                                              # reactive selection
+                                                                              selectInput(inputId = 'reference_concentration_fluorescence_parameter_plot',
+                                                                                          label = 'Reference concentration',
+                                                                                          choices = ""
+                                                                              ),
+                                                             ),
+
 
                                                              sliderInput(inputId = "shape.size_fluorescence_parameter_plot",
                                                                          label = "Shape size",
@@ -939,21 +1062,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          label = "Base size",
                                                                          min = 1,
                                                                          max = 25,
-                                                                         value = 12),
+                                                                         value = 12)
 
-                                                             selectInput(inputId = 'reference_condition_fluorescence_parameter_plot',
-                                                                         label = 'Reference condition',
-                                                                         choices = ""
-                                                             ),
 
-                                                             selectInput(inputId = 'reference_concentration_fluorescence_parameter_plot',
-                                                                         label = 'Reference concentration',
-                                                                         choices = ""
-                                                             ),
                                                            ),
+
                                                            mainPanel(
                                                              plotOutput("fluorescence_parameter_plot")
                                                            )
+                                                           # TEST CONSOL OUTPUT
+                                                           #verbatimTextOutput('test')
                                                   )
                                       )
                              ),
@@ -980,7 +1098,24 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              ),
                   ),
 
-                  tabPanel("Report",  h1("under construction")),
+                  tabPanel("Report",
+                           sidebarPanel(
+                             shinyDirButton(id = 'report_folder',
+                                            label = 'Select a folder',
+                                            title = 'Please select a folder',
+                                            FALSE),
+
+                             textInput(inputId = 'report_file_name',
+                                       label = 'Choose file name'),
+
+                             selectInput(inputId = 'report_file_type',
+                                         label = 'Choose file type',
+                                         choices = c('.pdf' = '.pdf',
+                                                     '.html' = '.html')),
+
+                             textOutput('report_folder')
+                           )
+                  ),
 
                   tabPanel("About Us",
                            mainPanel(
@@ -994,7 +1129,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                 # show plots
                 # TODO: Which plots, which options, ...
 
-)
+                )
 
 server <- function(input, output){
 
@@ -1257,6 +1392,26 @@ server <- function(input, output){
     updateSelectInput(inputId = "reference_concentration_fluorescence_parameter_plot",
                       choices = select_inputs_reference_concentration_fluorescence_parameter_plot()
     )})
+
+  # Save report
+  volumes <- getVolumes() # this makes the directory at the base of your computer.
+
+  shinyDirChoose(input, 'report_folder', roots = volumes())
+
+  report_folder <- reactive(input$report_folder)
+
+  report_file_name <- reactive(input$report_file_name)
+
+  report_file_type <- reactive(input$report_file_type)
+
+  output$report_folder <- renderPrint({
+    path <- unlist(report_folder())
+    file_name <-  report_file_name()
+    report_file_type <- report_file_type()
+
+    paste0(paste(path, collapse="/"), "/", file_name, report_file_type())
+  })
+
 
 
 
