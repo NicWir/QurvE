@@ -20,7 +20,7 @@ gc_parameters <- c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.l
                    'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')
 ui <- fluidPage(theme = shinytheme('sandstone'),
                 navbarPage(
-                  'QurvE2',
+                  'QurvE',
 
                   # load input file
                   tabPanel('Data',
