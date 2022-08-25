@@ -4,7 +4,7 @@
 \alias{flFit}
 \title{Perform a fluorescence curve analysis on all samples in the provided dataset.}
 \usage{
-flFit(time = NULL, density = NULL, fl_data, control = fl.control())
+flFit(time = NULL, density = NULL, fl_data, control = fl.control(), ...)
 }
 \arguments{
 \item{time}{(optional) A matrix containing time values for each sample.}
@@ -17,6 +17,8 @@ or \item a dataframe containing (normalized) fluorescence values (if a \code{tim
 
 \item{control}{A \code{fl.control} object created with \code{\link{fl.control}},
 defining relevant fitting options.}
+
+\item{...}{Further arguments passed to the shiny app.}
 }
 \value{
 An \code{flFit} object that contains all fluorescence fitting results, compatible with

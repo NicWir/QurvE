@@ -3,6 +3,8 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)) install.packages(new.packages)
 
 library(shiny)
+library(shinyjs)
+library(shinycssloaders)
 library(shinyFiles)
 library(readxl)
 library(tidyverse)
@@ -16,28 +18,49 @@ source("../../R/growth_summaries.R")
 source("../../R/fluorescence_computation.R")
 source("../../R/fluorescence_plots.R")
 source("../../R/fluorescence_summaries.R")
-gc_parameters <- c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
-                   'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
-                   'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
-                   'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline')
+
+jscode <- "
+shinyjs.disableTab = function(name) {
+var tab = $('.nav li a[data-value=' + name + ']');
+tab.bind('click.tab', function(e) {
+e.preventDefault();
+return false;
+});
+tab.addClass('disabled');
+}
+
+shinyjs.enableTab = function(name) {
+var tab = $('.nav li a[data-value=' + name + ']');
+tab.unbind('click.tab');
+tab.removeClass('disabled');
+}
+"
+css <- "
+.nav li a.disabled {
+background-color: #65675F !important;
+color: #333 !important;
+cursor: not-allowed !important;
+border-color: #aaa !important;
+}"
+
 ui <- fluidPage(theme = shinytheme('sandstone'),
+                tagList(
+                useShinyjs(),
+                shinyjs::extendShinyjs(text = jscode, functions = c("disableTab","enableTab")),
+                shinyjs::inlineCSS(css),
                 navbarPage(
-                  'QurvE',
+                  'QurvE', id = "navbar",
 
                   # load input file
-                  tabPanel('Data',
+                  tabPanel('Data', value = "tabPanel",
                            tabsetPanel(type = "tabs",
                                        tabPanel(title = "Custom",
                                                 sidebarPanel(
                                                   style='border-color: #ADADAD',
                                                   wellPanel(
-                                                    style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                    h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
+                                                    style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
                                                     # select file type
-                                                    selectInput(inputId = "input_file_type_custom",
-                                                                label = "Select file type:",
-                                                                choices = c("Excel (.xlsx)" = "xlsx",
-                                                                            "csv" = "csv")),
-
                                                     selectInput(inputId = "format",
                                                                 label = "Select Format",
                                                                 choices = c("Data in columns" = "data_in_columns",
@@ -45,33 +68,32 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     fileInput(inputId = 'growth_file',
                                                               label = 'Choose growth data file',
-                                                              accept = c('.xlsx', '.xls', '.csv'))
+                                                              accept = c('.xlsx', '.xls', '.csv', 'txt', 'tsv'))
                                                   ),
 
-                                                  wellPanel(
-                                                    style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                    conditionalPanel(
-                                                      condition = "input.input_file_type_custom == 'xlsx'",
-                                                      selectInput(inputId = "sheet",
+                                                  conditionalPanel(
+                                                    condition = "output.growthfileUploaded && output.data_growth_format == 'xlsx'",
+                                                    wellPanel(
+                                                      style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                      selectInput(inputId = "custom_growth_sheets",
                                                                   label = "Select Sheet",
-                                                                  choices = c("Sheet 1" = "Sheet1",
-                                                                              "Sheet 2" = "Sheet2",
-                                                                              "Sheet 3" = "Sheet3")),
-                                                    ), # select sheet: conditional
-
-                                                    conditionalPanel(
-                                                      condition = "input.input_file_type_custom == 'csv'",
-                                                      selectInput(inputId = "seperator",
+                                                                  choices = "Sheet1")
+                                                    )), # select sheet: conditional
+                                                  conditionalPanel(
+                                                    condition = "output.growthfileUploaded && output.data_growth_format == 'csv'",
+                                                    wellPanel(
+                                                      style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                      selectInput(inputId = "separator",
                                                                   label = "Select separator",
-                                                                  choices = c("," = "comma_seperator",
-                                                                              ";" = "semicolon_seperator")
+                                                                  choices = c("," = ",",
+                                                                              ";" = ";")
                                                       ),
 
-                                                      selectInput(inputId = "decimal_seperator",
+                                                      selectInput(inputId = "decimal_separator",
                                                                   label = "Select Decimal separator",
-                                                                  choices = c("." = "dot_decimal_seperator",
-                                                                              "," = "comma_decimal_seperator")
-                                                      ),
+                                                                  choices = c("." = ".",
+                                                                              "," = ",")
+                                                      )
                                                     )
                                                   ),
 
@@ -108,7 +130,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                   fileInput(inputId = 'growth_file',
                                                             label = 'Choose growth data file',
-                                                            accept = c('.xlsx', '.xls', '.csv')),
+                                                            accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt')),
 
                                                   conditionalPanel(
                                                     condition = "input.input_file_type_plate_reader == 'xlsx'",
@@ -121,16 +143,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                   conditionalPanel(
                                                     condition = "input.input_file_type_plate_reader == 'csv'",
-                                                    selectInput(inputId = "seperator",
+                                                    selectInput(inputId = "separator",
                                                                 label = "Select separator",
-                                                                choices = c("," = "comma_seperator",
-                                                                            ";" = "semicolon_seperator")
+                                                                choices = c("," = ",",
+                                                                            ";" = ";")
                                                     ),
 
-                                                    selectInput(inputId = "decimal_seperator",
+                                                    selectInput(inputId = "decimal_separator",
                                                                 label = "Select Decimal separator",
-                                                                choices = c("." = "dot_decimal_seperator",
-                                                                            "," = "comma_decimal_seperator")
+                                                                choices = c("." = ".",
+                                                                            "," = ",")
                                                     ),
                                                   ),
 
@@ -178,13 +200,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                  heigt = '100%',
                                  width = '100%'),
                              h1("Your Data"),
-                             tableOutput("excel_data")
+                             withSpinner(
+                               DT::dataTableOutput("growth_data")
+                             )
                            ) # main panel
 
                   ), # Navbar 1
 
-                  navbarMenu('Computation',
-                             tabPanel("Growth",
+                  navbarMenu('Computation', menuName = "navbarMenu_Computation",
+                             tabPanel("Growth", value = "tabPanel_Growth",
                                       fluidRow(
                                         sidebarLayout(
                                           column(4,
@@ -320,9 +344,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                      conditionalPanel(
                                                        condition = "input.custom_sliding_window_size_growth",
                                                        numericInput(
-                                                         inputId = 'custum_sliding_window_size_value_growth',
+                                                         inputId = 'custom_sliding_window_size_value_growth',
                                                          label = NULL,
-                                                         value = 1,
+                                                         value = "",
                                                          min = NA,
                                                          max = NA,
                                                        )
@@ -395,12 +419,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                           ) # column
                                         ) # sidebarLayout
                                       ), # fluidRow
+                                      textOutput("text")
                              ), # Growth Tab Panel
 
+                             "----",
 
-
-
-                             tabPanel("Fluorescence",
+                             tabPanel("Fluorescence", id = "tabPanel_Computation_Fluorescence",
                                       fluidRow(
                                         column(4,
                                                mainPanel(
@@ -599,27 +623,28 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                   ),
 
-                  navbarMenu("Results",
-                             tabPanel(title = "Growth",
-                                      tabsetPanel(type = "tabs",
-                                                  tabPanel(title = "Linear Fit",
+                  navbarMenu(title = "Results", menuName = "navbarMenu_Results",
+                             tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
+                                      tabsetPanel(type = "tabs", id = "tabsetPanel_Results",
+                                                  tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
                                                            DT::dataTableOutput('results_table_growth_linear')
                                                   ),
-                                                  tabPanel(title = "Nonparametric Fit",
+                                                  tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
                                                            DT::dataTableOutput('results_table_growth_spline')
                                                   ),
-                                                  tabPanel(title = "Parametric Fit",
+                                                  tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
                                                            DT::dataTableOutput('results_table_growth_model')
                                                   )
                                       )
                              ),
-                             tabPanel(title = "Fluorescence",
+
+                             tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
                                       h1('Under construction'))
                   ),
 
                   # Visualize
                   navbarMenu("Visualize",
-                             tabPanel(title = "Growth Plots",
+                             tabPanel(title = "Growth Plots", value = "tabPanel_Visalize_Growth",
                                       h1("Growth Plots"),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
@@ -736,13 +761,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                            ), # Side panel growth group plots
 
                                                            mainPanel(
-                                                             plotOutput("growth_group_plot")
+                                                             withSpinner(
+                                                               plotOutput("growth_group_plot")
+                                                             )
                                                            )
 
 
                                                   ),
 
-                                                  tabPanel(title = "Dose-response analysis",
+                                                  tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
                                                            sidebarPanel(
                                                              wellPanel(
                                                                style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
@@ -852,8 +879,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       )
                              ),
 
-
-                             tabPanel(title = "Fluorescence Plots",
+                             tabPanel(title = "Fluorescence Plots",  value = "tabPabel_Visualize_Fluorescence",
                                       h1("Fluorescence Plots"),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
@@ -1086,7 +1112,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                       )
                              ),
 
-                             tabPanel(title = "Growth & Flourescence Plots",
+                             tabPanel(title = "Growth & Flourescence Plots", value = "tabPabel_Visualize_GrowthandFluorescence",
                                       h1("Growth & Flourescence Plots"),
                                       tabsetPanel(type = "tabs",
                                                   tabPanel(title = "Group plots",
@@ -1135,38 +1161,134 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              'featuring publications which use this tool'
                            )
                   )
-                )
+                ) #  navbarPage
+                ), # tagList
                 # show plots
                 # TODO: Which plots, which options, ...
-
+                verbatimTextOutput("debug")
                 )
 
-server <- function(input, output){
+server <- function(input, output, session){
+  output$debug <- renderPrint({
+    results$growth$control$ec50
+  })
+  # Disable navbar menus before running computations
+  disable(selector = "#navbar li a[data-value=Report]")
+  disable(selector = "#navbar li a[data-value=Visualize]")
+  disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+
 
   results <- reactiveValues()
 
-  # load excel file
-  output$excel_data <- renderTable({
+  # Test if growth_file was loaded
+  output$growthfileUploaded <- reactive({
+    if(is.null(input$growth_file)) return(FALSE)
+    else return(TRUE)
+  })
+  outputOptions(output, 'growthfileUploaded', suspendWhenHidden=FALSE)
+
+  output$growth_data <- DT::renderDT({
     inFile <- input$growth_file
 
     if(is.null(inFile))
       return(NULL)
 
-    file.rename(inFile$datapath,
-                paste(inFile$datapath, ".xlsx", sep = ""))
+    filename <- inFile$datapath
+    dec <- input$decimal_separator
+    csvsep <- input$separator
+    if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
+      dat <-
+        utils::read.csv(
+          filename,
+          dec = dec,
+          sep = csvsep,
+          header = T,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
+               stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
+      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = T, sheet = input$custom_growth_sheets, progress = T)))
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
+      dat <-
+        utils::read.csv(
+          filename,
+          dec = dec,
+          sep = "\t",
+          header = T,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
+      dat <-
+        utils::read.table(
+          filename,
+          dec = dec,
+          sep = "\t",
+          header = T,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    }
+    dat[-(1:3),] <- apply(dat[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
+    dat
+  })
 
-    read_excel(paste(inFile$datapath, ".xlsx", sep=""),  col_names = F)
+  output$data_growth_format <- reactive({
+    if(is.null(input$growth_file)) return(NULL)
+
+    filename <- input$growth_file$datapath
+
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    format
+  })
+  outputOptions(output, 'data_growth_format', suspendWhenHidden=FALSE)
+
+  growth_excel_sheets <- reactive({
+    filename <- input$growth_file$datapath
+    if(is.null(input$growth_file)) return("")
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    if(format != "xlsx" && format != "xls") return("")
+    sheets <- readxl::excel_sheets(input$growth_file$datapath)
+    sheets
   })
 
   observeEvent(input$run_growth,{
+
     inFile <- input$growth_file
 
     if(is.null(inFile))
       return(NULL)
-    file.rename(inFile$datapath,
-                paste(inFile$datapath, ".xlsx", sep=""))
 
-    grodata <- read_data(paste(inFile$datapath, ".xlsx", sep=""))
+    # withCallingHandlers({
+    #
+    #   shinyjs::html(id = "text", html = '<br>', add = TRUE)
+    # # Activate menus
+    # enable(selector = "#navbar li:nth-child(3)")
+    # enable(selector = "#navbar li:nth-child(4)")
+    # enable(selector = "#navbar li:nth-child(5)")
+    #
+    # # Inactivate Fluorescence menus
+    # disable(selector = "#navbar li:nth-child(3) li:nth-child(2)")
+    # disable(selector = "#navbar li:nth-child(4) li:nth-child(2)")
+    # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
+
+
+
+    # Read data
+    grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator, dec = input$decimal_separator)
 
     if (input$smoothing_factor_growth == "NULL") {
       smooth.dr = NULL
@@ -1186,32 +1308,50 @@ server <- function(input, output){
                    's')
     }
 
-    results$growth <- growth.workflow(grodata = grodata,
-                                      ec50 = input$perform_ec50_growth,
-                                      fit.opt = fit.opt,
-                                      t0 = input$t0_growth,
-                                      min.density = input$minimum_density_growth,
-                                      log.x.gc = input$log_transform_time_growth,
-                                      log.y.model = input$log_transform_data_parametric_growth,
-                                      log.y.spline = input$log_transform_data_nonparametric_growth,
-                                      biphasic = input$biphasic_growth_growth,
-                                      lin.h = input$custom_sliding_window_size_value_growth,## Here seem to be problems
-                                      lin.R2 = input$R2_threshold_growth,
-                                      lin.RSD = input$RSD_threshold_growth,
-                                      lin.dY = input$dY_threshold_growth, ##
-                                      interactive = FALSE, ### TODO (popups)
-                                      nboot.gc = input$number_of_bootstrappings,
-                                      smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                      model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"), ### TODO: implement like model and huang button
-                                      growth.thresh = input$growth_threshold_growth,
-                                      dr.parameter = input$response_parameter_growth, ### TODO if else bla
-                                      smooth.dr = input$smooth.dr,
-                                      log.x.dr = input$log_transform_concentration_growth,
-                                      log.y.dr = input$log_transform_response_growth,
-                                      nboot.dr = input$number_of_bootstrappings_dr_growth,
-                                      report = NULL,
-                                      out.dir = "Test"
+    # Run growth workflow
+    shiny::withProgress(
+      results$growth <- growth.workflow(grodata = grodata,
+                                        ec50 = input$perform_ec50_growth,
+                                        fit.opt = fit.opt,
+                                        t0 = input$t0_growth,
+                                        min.density = input$minimum_density_growth,
+                                        log.x.gc = input$log_transform_time_growth,
+                                        log.y.model = input$log_transform_data_parametric_growth,
+                                        log.y.spline = input$log_transform_data_nonparametric_growth,
+                                        biphasic = input$biphasic_growth_growth,
+                                        lin.h = input$custom_sliding_window_size_value_growth,## Here seem to be problems
+                                        lin.R2 = input$R2_threshold_growth,
+                                        lin.RSD = input$RSD_threshold_growth,
+                                        lin.dY = input$dY_threshold_growth, ##
+                                        interactive = FALSE, ### TODO (popups)
+                                        nboot.gc = input$number_of_bootstrappings,
+                                        smooth.gc = input$smoothing_factor_nonparametric_growth,
+                                        model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"), ### TODO: implement like model and huang button
+                                        growth.thresh = input$growth_threshold_growth,
+                                        dr.parameter = input$response_parameter_growth, ### TODO if else bla
+                                        smooth.dr = input$smooth.dr,
+                                        log.x.dr = input$log_transform_concentration_growth,
+                                        log.y.dr = input$log_transform_response_growth,
+                                        nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                        report = NULL,
+                                        shiny = TRUE
+      )
     )
+    enable(selector = "#navbar li a[data-value=Report]")
+    enable(selector = "#navbar li a[data-value=Visualize]")
+    enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+    hide(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
+    hide(selector = "#navbar li a[data-value=tabPabel_Visualize_Fluorescence]")
+    hide(selector = "#navbar li a[data-value=tabPabel_Visualize_GrowthandFluorescence]")
+
+
+    # )},
+    # message = function(m) {
+    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
+    # },
+    # warning = function(m) {
+    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
+    # }
     gc_parameters <- c()
     if("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt){
       gc_parameters <- c(gc_parameters,
@@ -1239,8 +1379,86 @@ server <- function(input, output){
     }
   })
 
-  # Group Plots:
-  ## Growth
+  # Results Tables
+  observe({
+    if(!is.null(results$growth)){
+      if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Spline")
+
+      }
+      if(!("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Linear")
+      }
+      if(!("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Model")
+
+      }
+    }
+  })
+
+  output$results_table_growth_linear <- DT::renderDT({
+    res.table.gc <- results$growth$gcFit$gcTable
+
+    table_linear <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                                         "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
+                                         "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
+                                         "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2),
+                                         "Δy" = round(as.numeric(res.table.gc$dY.linfit), 3),
+                                         "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
+                                         "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
+                                         "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
+                                         "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
+                                         stringsAsFactors = F, check.names = F),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                              escape = FALSE)
+    # table_linear <- res.table.gc
+    table_linear
+  })
+
+  output$results_table_growth_spline <- DT::renderDT({
+    res.table.gc <- results$growth$gcFit$gcTable
+    table_spline <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                                         "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.spline), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
+                                         "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
+                                         "λ" = round(as.numeric(res.table.gc$lambda.spline), 2),
+                                         "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
+                                         "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
+                                         "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
+                                         "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                              escape = FALSE)
+    table_spline
+  })
+
+  output$results_table_growth_model <- DT::renderDT({
+    res.table.gc <- results$growth$gcFit$gcTable
+    table_model <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                              "Model" = res.table.gc$used.model,
+                              "µ<sub>max</sub>" = ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(as.numeric(res.table.gc$mu.model), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.model),3))),
+                              "t<sub>D</sub>" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
+                              "λ" = paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3)),
+                              "A" = paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3)),
+                              stringsAsFactors = F, check.names = F)
+    if(!is.null(res.table.gc)){
+      if ( "richards" %in% res.table.gc$used.model  ){
+        table_model <- suppressWarnings(cbind(table_model, data.frame("ν" = round(as.numeric(res.table.gc$parameter_nu.model), 3), stringsAsFactors = F, check.names = F)))
+      }
+      if ( "gompertz" %in% res.table.gc$used.model ){
+        table_model <- suppressWarnings(cbind(table_model, data.frame("α" = round(as.numeric(res.table.gc$parameter_alpha.model), 3), stringsAsFactors = F, check.names = F)))
+      }
+      if ( "gompertz.exp" %in% res.table.gc$used.model ){
+        table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
+      }
+    }
+    table_model <- datatable(table_model,
+                             options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                             escape = FALSE)
+    table_model
+  })
+
+
+  # Growth Plots:
+  ## Group Plots
   output$growth_group_plot <- renderPlot({
     results <- results$growth
     plot.grofit(results,
@@ -1260,10 +1478,6 @@ server <- function(input, output){
                 y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
                 lwd = input$line_width_growth_group_plot
     )
-  })
-
-  output$test <- renderText({
-    print(ifelse(is.null(input$reference_condition_growth_parameter_plot), "Null", input$reference_condition_growth_parameter_plot))
   })
 
   output$dose_response_plot <- renderPlot({
@@ -1297,70 +1511,36 @@ server <- function(input, output){
     )
   })
 
+  # conditional selections:
+  ## Computations
+  # observe({
+  #   if(is.null(results$growth)){
+  #   shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+  #   shinyjs::disable(selector = "#navbar li a[data-value=Report]")
+  #   }
+  # })
+  # observeEvent(input$run_fluorescence, {
+  #   shinyjs::enable(selector = "#navbar li a[data-value=Results]")
+  #   shinyjs::enable(selector = "#navbar li a[data-value=Report]")
+  # })
 
-  output$results_table_growth_linear <- DT::renderDT({
-    res.table.gc <- results$growth$gcFit$gcTable
+  # observe({
+  #   if (output$computation_type == "fluorescence") {
+  #     shinyjs::enable("tabPanel_Results_Fluorescence")
+  #   } else {
+  #     shinyjs::disable("tabPanel_Results_Fluorescence")
+  #   }
+  # })
 
-    table_linear <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-                              "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
-                              "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
-                              "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2),
-                              "Δy" = round(as.numeric(res.table.gc$dY.linfit), 3),
-                              "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
-                              "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
-                              "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
-                              "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
-                              stringsAsFactors = F, check.names = F),
-                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
-                              escape = FALSE)
-    # table_linear <- res.table.gc
-    table_linear
-  })
-
-  output$results_table_growth_spline <- DT::renderDT({
-    res.table.gc <- results$growth$gcFit$gcTable
-    table_spline <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-                                         "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.spline), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
-                                         "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
-                                         "λ" = round(as.numeric(res.table.gc$lambda.spline), 2),
-                                         "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
-                                         "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
-                                         "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
-                                         "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F),
-                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
-                              escape = FALSE)
-    table_spline
-  })
-
-  output$results_table_growth_model <- DT::renderDT({
-    res.table.gc <- results$growth$gcFit$gcTable
-    table_model <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-                     "Model" = res.table.gc$used.model,
-                     "µ<sub>max</sub>" = ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(as.numeric(res.table.gc$mu.model), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.model),3))),
-                     "t<sub>D</sub>" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
-                     "λ" = paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3)),
-                     "A" = paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3)),
-                     stringsAsFactors = F, check.names = F)
-    if(!is.null(res.table.gc)){
-      if ( "richards" %in% res.table.gc$used.model  ){
-        table_model <- suppressWarnings(cbind(table_model, data.frame("ν" = round(as.numeric(res.table.gc$parameter_nu.model), 3), stringsAsFactors = F, check.names = F)))
-      }
-      if ( "gompertz" %in% res.table.gc$used.model ){
-        table_model <- suppressWarnings(cbind(table_model, data.frame("α" = round(as.numeric(res.table.gc$parameter_alpha.model), 3), stringsAsFactors = F, check.names = F)))
-      }
-      if ( "gompertz.exp" %in% res.table.gc$used.model ){
-        table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
+  ## growth: plot.drFit
+  observe({
+    if(!is.null(results$growth)){
+      if(!input$perform_ec50_growth){
+        hideTab(inputId = "tabsetPanel_Visalize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
       }
     }
-    table_model <- datatable(table_model,
-                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
-                              escape = FALSE)
-    table_model
   })
-
-  # conditional selections:
-  ## Growth plots
-  ### growth.parameter()
+  ### growth: plot.parameter()
 
   selected_inputs_parameter_growth_parameter_plot <- reactive({
     results <- results$growth
@@ -1420,6 +1600,12 @@ server <- function(input, output){
     results <- results$growth
     results$expdesign$concentration
   })
+
+
+  observe({
+    updateSelectInput(inputId = "custom_growth_sheets",
+                      choices = growth_excel_sheets()
+    )})
 
   observe({
     updateSelectInput(inputId = "parameter_growth_parameter_growth_plot",

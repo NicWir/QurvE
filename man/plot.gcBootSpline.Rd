@@ -20,7 +20,7 @@
 )
 }
 \arguments{
-\item{gcBootSpline}{object of class \code{gcBootSpline}, created with \code{growth.gcBootSpline()}.}
+\item{gcBootSpline}{object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.}
 
 \item{pch}{(Numeric) Size of the raw data circles.}
 

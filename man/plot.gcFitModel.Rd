@@ -21,7 +21,7 @@
 )
 }
 \arguments{
-\item{gcFittedModel}{A \code{gcFittedModel} object created with \code{growth.gcFitModel()} or stored within a \code{grofit} or \code{gcFit} object created with \code{growth.workflow()} or \code{growth.gcFit()}, respectively.}
+\item{gcFittedModel}{A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.}
 
 \item{raw}{(Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).}
 

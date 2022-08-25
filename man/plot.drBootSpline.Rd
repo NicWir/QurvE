@@ -19,7 +19,7 @@
 )
 }
 \arguments{
-\item{drBootSpline}{A \code{drBootSpline} object created with \code{growth.drBootSpline()} or stored within a \code{grofit} or \code{drFit} object created with \code{growth.workflow()} or \code{growth.drFit()}, respectively.}
+\item{drBootSpline}{A \code{drBootSpline} object created with \code{\link{growth.drBootSpline}} or stored within a \code{grofit} or \code{drFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.drFit}}, respectively.}
 
 \item{pch}{(Numeric) Shape of the raw data symbols.}
 

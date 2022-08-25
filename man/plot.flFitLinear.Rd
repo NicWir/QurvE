@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluorescence_plots.R
 \name{plot.flFitLinear}
 \alias{plot.flFitLinear}
-\title{Title}
+\title{Generic plot function for \code{flcFittedLinear} objects. Plot the results of a linear regression on ln-transformed data}
 \usage{
 \method{plot}{flFitLinear}(
   flFittedLinear,
@@ -18,8 +18,24 @@
 )
 }
 \arguments{
-\item{...}{}
+\item{flFittedLinear}{A \code{flFittedLinear} object created with \code{\link{flFitLinear}} or stored within a \code{flFitRes} or \code{flFit} object created with \code{\link{fl.workflow}} or \code{\link{flFit}}, respectively.}
+
+\item{log}{("x" or "y") Display the x- or y-axis on a logarithmic scale.}
+
+\item{which}{("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.}
+
+\item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{export}{(Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{height}{(Numeric) Height of the exported image in inches.}
+
+\item{width}{(Numeric) Width of the exported image in inches.}
+
+\item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
+
+\item{...}{Further arguments to refine the generated base R plot.}
 }
 \description{
-Title
+\code{plot.flFitLinear} shows the results of a linear regression and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
 }

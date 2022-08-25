@@ -17,7 +17,7 @@
 )
 }
 \arguments{
-\item{gcFittedLinear}{A \code{gcFittedLinear} object created with \code{growth.gcFitLinear()} or stored within a \code{grofit} or \code{gcFit} object created with \code{growth.workflow()} or \code{growth.gcFit()}, respectively.}
+\item{gcFittedLinear}{A \code{gcFittedLinear} object created with \code{\link{growth.gcFitLinear}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.}
 
 \item{log}{("x" or "y") Display the x- or y-axis on a logarithmic scale.}
 

@@ -22,9 +22,9 @@
 )
 }
 \arguments{
-\item{drFitSpline}{object of class \code{drFitSpline}, created with \code{growth.drFitSpline()}.}
+\item{drFitSpline}{object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.}
 
-\item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{plot.drBootSpline()}.}
+\item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.drBootSpline}}.}
 
 \item{ec50line}{(Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).}
 

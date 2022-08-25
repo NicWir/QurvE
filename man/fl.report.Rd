@@ -4,12 +4,21 @@
 \alias{fl.report}
 \title{Create a PDF and HTML report with results from a fluorescence analysis workflow}
 \usage{
-fl.report(flFitRes, report.dir = NULL, ec50, format = c("pdf", "html"), ...)
+fl.report(
+  flFitRes,
+  out.dir = NULL,
+  out.nm = NULL,
+  ec50,
+  format = c("pdf", "html"),
+  ...
+)
 }
 \arguments{
 \item{flFitRes}{A \code{grofit} object created with \code{\link{fl.workflow}}.}
 
-\item{report.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
+\item{out.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.}
+
+\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "FluorescenceReport_" and the current date and time.}
 
 \item{ec50}{(Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 

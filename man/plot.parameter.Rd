@@ -28,7 +28,7 @@
 )
 }
 \arguments{
-\item{object}{A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{growth.workflow()} or \code{growth.gcFit}.}
+\item{object}{A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}.}
 
 \item{param}{(Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',

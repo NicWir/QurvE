@@ -4,12 +4,22 @@
 \alias{growth.report}
 \title{Create a PDF and HTML report with results from a growth curve analysis workflow}
 \usage{
-growth.report(grofit, report.dir = NULL, ec50, format = c("pdf", "html"), ...)
+growth.report(
+  grofit,
+  out.dir = NULL,
+  out.nm = NULL,
+  ec50 = FALSE,
+  format = c("pdf", "html"),
+  export = FALSE,
+  ...
+)
 }
 \arguments{
 \item{grofit}{A \code{grofit} object created with \code{\link{growth.workflow}}.}
 
-\item{report.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
+\item{out.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
+
+\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.}
 
 \item{ec50}{(Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 

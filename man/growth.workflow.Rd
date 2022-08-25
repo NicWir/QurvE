@@ -38,7 +38,9 @@ growth.workflow(
   nboot.dr = 0,
   report = c("pdf", "html"),
   out.dir = NULL,
-  export = FALSE
+  out.nm = NULL,
+  export.fig = FALSE,
+  ...
 )
 }
 \arguments{
@@ -106,9 +108,13 @@ growth.workflow(
 
 \item{report}{(Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})}
 
-\item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
+\item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "GrowthResults_" and the current date and time.}
 
-\item{export}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).}
+\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.}
+
+\item{export.fig}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{...}{Further arguments passed to the shiny app.}
 }
 \value{
 A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.

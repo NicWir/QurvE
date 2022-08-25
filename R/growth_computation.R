@@ -535,7 +535,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             nboot.dr = 0,
                             growth.thresh = 1.5)
 {
-  if(lin.h == "" || lin.h == "NULL" || lin.h == 0) lin.h <- NULL
+  if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
   if ((is.character(fit.opt) == FALSE) | !any(fit.opt %in% c("l", "s", "m", "a")))
     stop("value of fit.opt must be character and contain one or more of 'l', 's', or 'm', or be 'a' (for all).")
   if (is.character(model.type) == FALSE)
@@ -654,8 +654,10 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
 #' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
 #' @param report (Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})
-#' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
-#' @param export (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
+#' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "GrowthResults_" and the current date and time.
+#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.
+#' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
+#' @param ... Further arguments passed to the shiny app.
 #'
 #' @family workflows
 #' @family growth fitting functions
@@ -707,9 +709,32 @@ growth.workflow <- function (grodata = NULL,
                              nboot.dr = 0,
                              report = c('pdf', 'html'),
                              out.dir = NULL,
-                             export = FALSE
+                             out.nm = NULL,
+                             export.fig = FALSE,
+                             ...
 )
 {
+  if(exists("lin.h") && !is.null(lin.h) && (is.na(lin.h) || lin.h == "")) lin.h <- NULL
+  # Define objects based on additional function calls
+  call <- match.call()
+
+  ## remove strictly defined arguments
+  call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <-
+    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.model <- call$biphasic <-
+    call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <-
+    call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
+
+
+  arglist <- sapply(call, function(x) x)
+  arglist <- unlist(arglist)[-1]
+  ## Assign additional arguments (...) as R objects
+  if(length(arglist) > 0){
+    for(i in 1:length(arglist)){
+      assign(names(arglist)[i], arglist[[i]])
+    }
+  }
+
+  # Test input
   if(is.null(grodata) || !(class(grodata)=="list") && !(class(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
@@ -744,7 +769,8 @@ growth.workflow <- function (grodata = NULL,
   class(out.drFit) <- "drFit"
 
   # /// fit of growth curves -----------------------------------
-  out.gcFit <- growth.gcFit(time, data, control)
+  if(exists("shiny") && shiny == TRUE) out.gcFit <- growth.gcFit(time, data, control, shiny = TRUE)
+  else out.gcFit <- growth.gcFit(time, data, control, shiny = shiny)
 
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
@@ -756,62 +782,64 @@ growth.workflow <- function (grodata = NULL,
   grofit <- list(time = time, data = data, gcFit = out.gcFit,
                  drFit = out.drFit, expdesign = expdesign, control = control)
   class(grofit) <- "grofit"
+  if(!exists("shiny") || shiny != TRUE){
+    if(!is.null(out.dir)){
+      wd <- paste0(out.dir)
+    } else {
+      wd <- paste(getwd(), "/GrowthResults_", format(Sys.time(),
+                                                     "%Y%m%d_%H%M%S"), sep = "")
+    }
+    dir.create(wd, showWarnings = F)
 
-  if(!is.null(out.dir)){
-    wd <- paste0(getwd(), "/", out.dir)
-  } else {
-    wd <- paste(getwd(), "/Report.growth_", format(Sys.time(),
-                                            "%Y%m%d_%H%M%S"), sep = "")
-  }
-  dir.create(wd, showWarnings = F)
+    gcTable <- data.frame(apply(grofit[["gcFit"]][["gcTable"]],2,as.character))
+    res.table.gc <- Filter(function(x) !all(is.na(x)),gcTable)
+    export_Table(table = res.table.gc, out.dir = wd, out.nm = "results.gc")
+    # res.table.gc[, c(8:14, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
+    message(paste0("\n\nResults of growth fit analysis saved as tab-delimited text file in: '",
+               wd, "/results.gc.txt'"))
 
-  gcTable <- data.frame(apply(grofit[["gcFit"]][["gcTable"]],2,as.character))
-  res.table.gc <- Filter(function(x) !all(is.na(x)),gcTable)
-  # res.table.gc[, c(8:14, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
-  utils::write.table(res.table.gc, paste(wd, "results.gc.txt",
-                                  sep = "/"), row.names = FALSE, sep = "\t")
-  cat(paste0("Results of growth fit analysis saved as tab-delimited text file in:\n",
-             wd, "/results.gc.txt\n\n"))
+    # # Calculate average and SD for each condition and export results as table
+    #   nm <- as.character(paste(res.table.gc[,1], res.table.gc[,2], res.table.gc[,3], sep = " | "))
+    #   cond <- unique(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm))
+    #   # get indices of replicates
+    #   ndx.filt.rep <- unique(lapply(1:length(nm), function(i) which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    #   # extract numeric columns
+    #   num_cols <- unlist(lapply(res.table.gc, is.numeric))
+    #   # create lists of dataframes with mean or sd results for each condition
+    #   mean.ls <- lapply(1:length(ndx.filt.rep), function(i) colMeans(res.table.gc[ndx.filt.rep[[i]], c(8:16, 20:27, 29:44)], na.rm = T))
+    #   sd.ls <- lapply(1:length(ndx.filt.rep), function(i) apply(res.table.gc[ndx.filt.rep[[i]], c(8:16, 20:27, 29:44)], 2, sd, na.rm = T))
+    #   names(mean.ls) <- names(sd.ls) <- cond
+    #   # convert lists to dataframes
+    #   mean.df <- do.call(rbind, mean.ls)
+    #   colnames(mean.df) <- paste0("mean_", colnames(mean.df))
+    #   sd.df <- do.call(rbind, sd.ls)
+    #   colnames(sd.df) <- paste0("sd_", colnames(sd.df))
+    #   # combine dataframes with alternating columns
+    #   combined.df <- zipFastener(mean.df, sd.df)
+    #   combined.df <- cbind(data.frame(condition = gsub(" \\|.+", "", rownames(combined.df)), concentration = gsub(".+\\| ", "", rownames(combined.df))), combined.df)
+    #
+    #   # export table
+    #   utils::write.table(combined.df, paste(wd, "mean_results.gc.txt",
+    #                                          sep = "/"), row.names = FALSE, sep = "\t")
+    #   cat(paste0("Per-group average results of growth fit analysis saved as tab-delimited text file in:\n",
+    #              wd, "/mean_results.gc.txt\n\n"))
 
-  # # Calculate average and SD for each condition and export results as table
-  #   nm <- as.character(paste(res.table.gc[,1], res.table.gc[,2], res.table.gc[,3], sep = " | "))
-  #   cond <- unique(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm))
-  #   # get indices of replicates
-  #   ndx.filt.rep <- unique(lapply(1:length(nm), function(i) which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
-  #   # extract numeric columns
-  #   num_cols <- unlist(lapply(res.table.gc, is.numeric))
-  #   # create lists of dataframes with mean or sd results for each condition
-  #   mean.ls <- lapply(1:length(ndx.filt.rep), function(i) colMeans(res.table.gc[ndx.filt.rep[[i]], c(8:16, 20:27, 29:44)], na.rm = T))
-  #   sd.ls <- lapply(1:length(ndx.filt.rep), function(i) apply(res.table.gc[ndx.filt.rep[[i]], c(8:16, 20:27, 29:44)], 2, sd, na.rm = T))
-  #   names(mean.ls) <- names(sd.ls) <- cond
-  #   # convert lists to dataframes
-  #   mean.df <- do.call(rbind, mean.ls)
-  #   colnames(mean.df) <- paste0("mean_", colnames(mean.df))
-  #   sd.df <- do.call(rbind, sd.ls)
-  #   colnames(sd.df) <- paste0("sd_", colnames(sd.df))
-  #   # combine dataframes with alternating columns
-  #   combined.df <- zipFastener(mean.df, sd.df)
-  #   combined.df <- cbind(data.frame(condition = gsub(" \\|.+", "", rownames(combined.df)), concentration = gsub(".+\\| ", "", rownames(combined.df))), combined.df)
-  #
-  #   # export table
-  #   utils::write.table(combined.df, paste(wd, "mean_results.gc.txt",
-  #                                          sep = "/"), row.names = FALSE, sep = "\t")
-  #   cat(paste0("Per-group average results of growth fit analysis saved as tab-delimited text file in:\n",
-  #              wd, "/mean_results.gc.txt\n\n"))
+    if (ec50 == TRUE) {
+      res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
+      export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
+      cat(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
+                 wd, "/results.dr.txt'"))
+    } else {
+      res.table.dr <- NULL
+    }
+    # Export RData object
+    export_RData(grofit, out.dir = wd)
 
-  if (ec50 == TRUE) {
-    res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
-    utils::write.table(res.table.dr, paste(wd, "results.dr.txt",
-                                           sep = "/"), row.names = FALSE, sep = "\t")
-    cat(paste0("Results of EC50 analysis saved as tab-delimited in:\n",
-               wd, "/results.dr.txt\n"))
-  } else {
-    res.table.dr <- NULL
-  }
-  if(any(report %in% c('pdf', 'html'))){
-    try(growth.report(grofit, report.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ec50, mean.grp = mean.grp, mean.conc = mean.conc,
-                  export = export, format = report))
-  }
+    if(any(report %in% c('pdf', 'html'))){
+      try(growth.report(grofit, out.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ec50, mean.grp = mean.grp, mean.conc = mean.conc,
+                        export = export.fig, format = report, out.nm = out.nm))
+    }
+  } # if(!exists("shiny") || shiny != TRUE)
 
   grofit
 }
@@ -821,7 +849,8 @@ growth.workflow <- function (grodata = NULL,
 #' \code{growth.report} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results.
 #'
 #' @param grofit A \code{grofit} object created with \code{\link{growth.workflow}}.
-#' @param report.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
+#' @param out.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
+#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.
 #' @param ... Further arguments passed to create a report. Currently required:
 #' \itemize{
 #'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{\link{growth.workflow}}?
@@ -844,7 +873,7 @@ growth.workflow <- function (grodata = NULL,
 #' @import plyr
 #' @include general_misc_utils.R
 #' @family reports
-growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'html'), ...)
+growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
   {
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
@@ -868,17 +897,20 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
   mu.min <- suppressWarnings(min(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) min(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
   if(mu.min >0) mu.min <- 0
   mu.max <- suppressWarnings(max(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) max(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
-  if(!is.null(report.dir)){
-    wd <- paste0(getwd(), "/", report.dir)
+  if(!is.null(out.dir)){
+    wd <-  out.dir
   } else {
     wd <- paste(getwd(), "/Report.growth_", format(Sys.time(),
                                                    "%Y%m%d_%H%M%S"), sep = "")
   }
-  message("Save RData object")
-  save(grofit, file = paste(wd, "results.RData", sep = "/"))
+  if(is.null(out.nm)){
+    out.nm <- paste("/GrowthReport_", format(Sys.time(),
+                                                   "%Y%m%d_%H%M%S"), sep = "")
+  }
+  dir.create(wd, showWarnings = F)
+
   message("Render reports...")
 
-  dir.create(wd, showWarnings = F)
   for(i in 1:length(.libPaths())){
     QurvE.ndx <- grep("QurvE", list.files(.libPaths()[i]))
     if(length(QurvE.ndx)>0){
@@ -895,11 +927,12 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
   } else {
     stop("Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html').")
   }
-  rmarkdown::render(file, output_format = format, output_dir = wd,
+  rmarkdown::render(file, output_format = format, output_dir = wd, output_file = out.nm,
                     quiet = TRUE)
-  message(paste0("Files saved in: '", wd, "'"))
+  message(paste0("Report files saved in: '/", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
 }
+
 
 #' Perform a growth curve analysis on all samples in the provided dataset.
 #'
@@ -913,6 +946,7 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}},
 #'   defining relevant fitting options.
+#' @param ... Further arguments passed to the shiny app.
 #'
 #' @return A \code{gcFit} object that contains all growth fitting results, compatible with
 #'   various plotting functions of the QurvE package.
@@ -937,8 +971,24 @@ growth.report <- function(grofit, report.dir = NULL, ec50, format = c('pdf', 'ht
 #'   ggplot_build ggplot ggtitle labs position_dodge scale_color_manual scale_fill_brewer
 #'   scale_color_brewer scale_fill_manual scale_x_continuous scale_y_continuous
 #'   scale_y_log10 theme theme_classic theme_minimal xlab ylab
-growth.gcFit <- function(time, data, control= growth.control())
+growth.gcFit <- function(time, data, control= growth.control(), ...)
 {
+  # Define objects based on additional function calls
+  call <- match.call()
+
+  ## remove strictly defined arguments
+  call$time <- call$data <- call$control <- NULL
+
+
+  arglist <- sapply(call, function(x) x)
+  arglist <- unlist(arglist)[-1]
+  ## Assign additional arguments (...) as R objects
+  if(length(arglist) > 0){
+    for(i in 1:length(arglist)){
+      assign(names(arglist)[i], arglist[[i]])
+    }
+  }
+
   if(!(class(data)=="list") && !(class(data)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
@@ -986,6 +1036,12 @@ growth.gcFit <- function(time, data, control= growth.control())
 
   # /// loop over all wells
   for (i in 1:dim(data)[1]){
+    # Progress indicator for shiny app
+    if(exists("shiny") && shiny == TRUE){
+      shiny::incProgress(
+        amount = 1/(dim(data)[1]),
+        message = "Computations completed")
+    }
     # /// conversion, to handle even data.frame inputs
     acttime    <-
       as.numeric(as.matrix(time[i, ]))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]

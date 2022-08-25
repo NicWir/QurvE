@@ -22,7 +22,7 @@
 )
 }
 \arguments{
-\item{drFit}{object of class \code{drFit}, created with \code{growth.drFit()}.}
+\item{drFit}{object of class \code{drFit}, created with \code{\link{growth.drFit}}.}
 
 \item{combine}{(Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).}
 

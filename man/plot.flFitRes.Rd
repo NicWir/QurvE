@@ -10,6 +10,8 @@
   names = NULL,
   conc = NULL,
   mean = TRUE,
+  exclude.nm = NULL,
+  exclude.conc = NULL,
   log.y = F,
   deriv = F,
   n.ybreaks = 6,

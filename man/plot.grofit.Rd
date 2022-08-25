@@ -34,7 +34,7 @@
 )
 }
 \arguments{
-\item{grofit}{A \code{grofit} object created with \code{growth.workflow()} containing spline fits.}
+\item{grofit}{A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.}
 
 \item{...}{(\emph{optional}) Additional \code{grofit} objects created in separate workflows.}
 

@@ -719,6 +719,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #'   or \item a dataframe containing (normalized) fluorescence values (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).}
 #' @param control A \code{fl.control} object created with \code{\link{fl.control}},
 #'   defining relevant fitting options.
+#' @param ... Further arguments passed to the shiny app.
 #'
 #' @return An \code{flFit} object that contains all fluorescence fitting results, compatible with
 #'   various plotting functions of the QurvE package.
@@ -738,8 +739,24 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' @export
 #'
 #' @examples
-flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control())
+flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control(), ...)
 {
+  # Define objects based on additional function calls
+  call <- match.call()
+
+  ## remove strictly defined arguments
+  call$time <- call$density <- call$fl_data <- call$control <- NULL
+
+
+  arglist <- sapply(call, function(x) x)
+  arglist <- unlist(arglist)[-1]
+  ## Assign additional arguments (...) as R objects
+  if(length(arglist) > 0){
+    for(i in 1:length(arglist)){
+      assign(names(arglist)[i], arglist[[i]])
+    }
+  }
+
   x_type <- control$x_type
 
   if(!(class(fl_data)=="list") && !(class(fl_data)=="grodata")){
@@ -805,6 +822,13 @@ flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control())
 
   # /// loop over all wells
   for (i in 1:dim(fl_data)[1]){
+    # Progress indicator for shiny app
+    if(exists("shiny") && shiny == TRUE){
+      shiny::incProgress(
+        amount = 1/(dim(data)[1]),
+        message = "Computations completed")
+    }
+
     # /// conversion, to handle even data.frame inputs
     actx    <-
       as.numeric(as.matrix(x[i, ]))[!is.na(as.numeric(as.matrix(x[i, ])))][!is.na(as.numeric(as.matrix((fl_data[i, -1:-3]))))]
@@ -2078,7 +2102,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (\code{TRUE}) or kept (\code{FALSE}). Note: Infinite values are always removed. Default: \code{TRUE}.
 #' @param report (Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})
 #' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
-#' @param export (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
+#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.
+#' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
+#' @param ... Further arguments passed to the shiny app.
 #'
 #' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.
 #' \item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided. Else, extracted from \code{grofit}).}
@@ -2129,8 +2155,29 @@ fl.workflow <- function(grodata = NULL,
                         clean.bootstrap = TRUE,
                         report = c('pdf', 'html'),
                         out.dir = NULL,
-                        export = FALSE)
+                        out.nm = NULL,
+                        export.fig = FALSE,
+                        ...)
 {
+  # Define objects based on additional function calls
+  call <- match.call()
+
+  ## remove strictly defined arguments
+  call$grodata <- call$time <- call$density <- call$fl_data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <-
+    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.lin <- call$log.x.spline <- call$log.y.spline <- call$log.y.lin <- call$biphasic <- call$norm_fl <-
+    call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.fl <- call$smooth.fl <- call$dr.method <- call$growth.thresh <-
+    call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
+
+
+  arglist <- sapply(call, function(x) x)
+  arglist <- unlist(arglist)[-1]
+  ## Assign additional arguments (...) as R objects
+  if(length(arglist) > 0){
+    for(i in 1:length(arglist)){
+      assign(names(arglist)[i], arglist[[i]])
+    }
+  }
+
   if(!is.null(grodata) && !(class(grodata)=="list") && !(class(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
@@ -2231,57 +2278,61 @@ fl.workflow <- function(grodata = NULL,
                  expdesign = expdesign, control = control)
   class(flFitRes) <- "flFitRes"
 
-  if(!is.null(out.dir)){
-    wd <- paste0(getwd(), "/", out.dir)
-  } else {
-    wd <- paste(getwd(), "/Report.growth_", format(Sys.time(),
-                                                   "%Y%m%d_%H%M%S"), sep = "")
-  }
-  dir.create(wd, showWarnings = F)
+  if(!exists("shiny") || shiny != TRUE){
+    if(!is.null(out.dir)){
+      wd <- paste0(out.dir)
+    } else {
+      wd <- paste(getwd(), "/FluorescenceResults_", format(Sys.time(),
+                                                     "%Y%m%d_%H%M%S"), sep = "")
+    }
+    dir.create(wd, showWarnings = F)
 
-  if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-    flTable1 <- data.frame(apply(flFitRes[["flFit1"]][["flTable"]],2,as.character))
-    res.table.fl1 <- Filter(function(x) !all(is.na(x)),flTable1)
-    utils::write.table(res.table.fl1, paste(wd, "results.fl1.txt",
-                                           sep = "/"), row.names = FALSE, sep = "\t")
-  }
-  if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-    flTable2 <- data.frame(apply(flFitRes[["flFit2"]][["flTable"]],2,as.character))
-    res.table.fl2 <- Filter(function(x) !all(is.na(x)),flTable2)
-    utils::write.table(res.table.fl2, paste(wd, "results.fl2.txt",
-                                           sep = "/"), row.names = FALSE, sep = "\t")
-  }
-
-  cat(paste0("Results of fluorescence analysis saved as tab-delimited text file in:\n",
-             wd, "/results.fl.txt\n"))
-  if (ec50 == TRUE) {
     if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-      if(!is.na(EC50.table1)) {
-        res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
-        utils::write.table(res.table.dr_fl1, paste(wd, "results.fl_dr1.txt",
-                                                  sep = "/"), row.names = FALSE, sep = "\t")
-        cat(paste0("Results of EC50 analysis for fluorescence 1 saved as tab-delimited in:\n",
-                   wd, "/results.fl_dr1.txt\n"))
-      }
+      flTable1 <- data.frame(apply(flFitRes[["flFit1"]][["flTable"]],2,as.character))
+      res.table.fl1 <- Filter(function(x) !all(is.na(x)),flTable1)
+      export_Table(table = res.table.fl1, out.dir = wd, out.nm = "results.fl1")
+      cat(paste0("\nResults of fluorescence 1 analysis saved as tab-delimited text file in:\n",
+                 wd, "/results.fl1.txt\n"))
     }
     if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-      if(!is.na(EC50.table1)) {
-        res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
-        utils::write.table(res.table.dr_fl2, paste(wd, "results.fl_dr2.txt",
-                                                   sep = "/"), row.names = FALSE, sep = "\t")
-        cat(paste0("Results of EC50 analysis for fluorescence 2 saved as tab-delimited in:\n",
-                   wd, "/results.fl_dr2.txt\n"))
-      }
+      flTable2 <- data.frame(apply(flFitRes[["flFit2"]][["flTable"]],2,as.character))
+      res.table.fl2 <- Filter(function(x) !all(is.na(x)),flTable2)
+      export_Table(table = res.table.fl2, out.dir = wd, out.nm = "results.fl2")
+      cat(paste0("Results of fluorescence 2 analysis saved as tab-delimited text file in:\n",
+                 wd, "/results.fl2.txt\n"))
     }
 
+    if (ec50 == TRUE) {
+      if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+        if(!is.na(EC50.table1)) {
+          res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
+          export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
+          cat(paste0("\nResults of EC50 analysis for fluorescence 1 saved as tab-delimited in:\n",
+                     wd, "/results.fl_dr1.txt\n"))
+        }
+      }
+      if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+        if(!is.na(EC50.table1)) {
+          res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
+          export_Table(table = res.table.dr_fl2, out.dir = wd, out.nm = "results.fl_dr2")
 
-  } else {
-    res.table.dr_fl1 <- NULL
-    res.table.dr_fl2 <- NULL
-  }
-  if(any(report %in% c('pdf', 'html'))){
-    try(fl.report(flFitRes, report.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc, ec50 = ec50,
-                      export = export, format = report))
+          cat(paste0("Results of EC50 analysis for fluorescence 2 saved as tab-delimited in:\n",
+                     wd, "/results.fl_dr2.txt\n"))
+        }
+      }
+
+
+    } else {
+      res.table.dr_fl1 <- NULL
+      res.table.dr_fl2 <- NULL
+    }
+    # Export RData object
+    export_RData(flFitRes, out.dir = wd)
+
+    if(any(report %in% c('pdf', 'html'))){
+      try(fl.report(flFitRes, out.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc, ec50 = ec50,
+                    export = export.fig, format = report, out.nm = out.nm))
+    }
   }
 
   flFitRes
@@ -2292,7 +2343,8 @@ fl.workflow <- function(grodata = NULL,
 #' \code{fl.report} requires a \code{flFitRes} object and creates a report in PDF and HTML format that summarizes all results obtained.
 #'
 #' @param flFitRes A \code{grofit} object created with \code{\link{fl.workflow}}.
-#' @param report.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
+#' @param out.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.
+#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "FluorescenceReport_" and the current date and time.
 #' @param ... Further arguments passed to create a report. Currently required:
 #' \itemize{
 #'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{\link{fl.workflow}}?
@@ -2314,7 +2366,7 @@ fl.workflow <- function(grodata = NULL,
 #' @import knitr
 #' @import plyr
 #' @include general_misc_utils.R
-fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html'), ...)
+fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50, format = c('pdf', 'html'), ...)
 {
   # results an object of class grofit
   if(class(flFitRes) != "flFitRes") stop("flFitRes needs to be an object created with fl.workflow().")
@@ -2355,17 +2407,21 @@ fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html
     mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) max(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
   }
 
-  if(!is.null(report.dir)){
-    wd <- paste0(getwd(), "/", report.dir)
+  if(!is.null(out.dir)){
+    wd <- out.dir
   } else {
     wd <- paste(getwd(), "/Report.fluorescence_", format(Sys.time(),
                                                    "%Y%m%d_%H%M%S"), sep = "")
   }
-  message("Save RData object")
-  save(flFitRes, file = paste(wd, "results.RData", sep = "/"))
-  message("Render reports...")
+  if(is.null(out.nm)){
+    out.nm <- paste("/FluorescenceReport_", format(Sys.time(),
+                                             "%Y%m%d_%H%M%S"), sep = "")
+  }
 
   dir.create(wd, showWarnings = F)
+
+  message("Render reports...")
+
   # for(i in 1:length(.libPaths())){
   #   QurvE.ndx <- grep("QurvE", list.files(.libPaths()[i]))
   #   if(length(QurvE.ndx)>0){
@@ -2383,7 +2439,7 @@ fl.report <- function(flFitRes, report.dir = NULL, ec50, format = c('pdf', 'html
   } else {
     stop("Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html').")
   }
-  rmarkdown::render(file, output_format = format, output_dir = wd,
+  rmarkdown::render(file, output_format = format, output_dir = wd, output_file = out.nm,
                     quiet = TRUE)
   message(paste0("Files saved in: '", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)

@@ -4,7 +4,7 @@
 \alias{growth.gcFit}
 \title{Perform a growth curve analysis on all samples in the provided dataset.}
 \usage{
-growth.gcFit(time, data, control = growth.control())
+growth.gcFit(time, data, control = growth.control(), ...)
 }
 \arguments{
 \item{time}{(optional) A matrix containing time values for each sample.}
@@ -15,6 +15,8 @@ or \item a dataframe containing density values (if a \code{time} matrix is provi
 
 \item{control}{A \code{grofit.control} object created with \code{\link{growth.control}},
 defining relevant fitting options.}
+
+\item{...}{Further arguments passed to the shiny app.}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 }

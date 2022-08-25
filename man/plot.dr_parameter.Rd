@@ -20,7 +20,7 @@
 )
 }
 \arguments{
-\item{object}{A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{growth.workflow()}, \code{growth.drFit()},  \code{fl.drFit()}, or \code{fl.workflow()}.}
+\item{object}{A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{\link{growth.workflow}}, \code{\link{growth.drFit}}, \code{\link{fl.drFit}}, or \code{\link{fl.workflow}}.}
 
 \item{param}{(Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 'y.max', 'y.min', 'fc', 'K', or 'n' for fluorescence dose-response analyses with \code{dr.type = 'model'} in the \code{control} argument,

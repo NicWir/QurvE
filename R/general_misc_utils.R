@@ -325,3 +325,24 @@ initbiosensor <- function (x, y, n)
 
   return(list(y.max = y.max, K = K, n = n))
 }
+
+export_Table <- function(table, out.dir = getwd(), out.nm = deparse(substitute(table)))
+{
+  out.nm <- gsub("\\.txt$", "", out.nm)
+  dir.create(out.dir, showWarnings = F)
+  utils::write.table(x = table,
+                     file = paste(out.dir, paste0(out.nm, ".txt"), sep = "/"),
+                     row.names = FALSE,
+                     sep = "\t"
+                     )
+}
+
+export_RData <- function(object, out.dir = getwd(), out.nm = class(object))
+{
+  # # an object of class grofit or flFitRes
+  # if(is(grofit) != "grofit" || is(grofit) != "flFitRes") stop("grofit needs to be an object created with growth.workflow() or fl.workflow().")
+  dir.create(out.dir, showWarnings = F)
+  out.nm <- gsub("\\.RData$", "", out.nm)
+  message(paste0("Save RData object to: '", gsub(getwd(), "", out.dir), "/", out.nm, ".RData'"))
+  save(object, file = paste(out.dir, paste0(out.nm, ".RData"), sep = "/"))
+}
