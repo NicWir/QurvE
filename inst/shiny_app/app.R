@@ -1211,7 +1211,11 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    paste(typeof(input), input)
+    paste("pch:", input$shape_type_dose_response_growth_plot,
+          "cex:", input$shape_size_dose_response_growth_plot,
+          "basesize:", input$base_size_dose_response_growth_plot,
+          "lwd:", input$line_width_dose_response_growth_plot,
+          "ec50line", input$show_ec50_indicator_lines_dose_response_growth_plot)
   })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")

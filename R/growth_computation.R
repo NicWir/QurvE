@@ -828,7 +828,7 @@ growth.workflow <- function (grodata = NULL,
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
       cat(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
-                 wd, "/results.dr.txt'"))
+                 wd, "/results.dr.txt'\n"))
     } else {
       res.table.dr <- NULL
     }

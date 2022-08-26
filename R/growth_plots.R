@@ -573,7 +573,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
         nm <- nm[grep(paste(names, collapse="|"), nm)]
       }
     }
-    if(!is.na(exclude.nm) && exclude.nm != ""){
+    if(!is.null(names)  && !is.na(exclude.nm) && exclude.nm != ""){
       names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
     }
@@ -1505,7 +1505,7 @@ plot.grofit <- function(grofit, ...,
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
       names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
-      nm <- nm[grep(paste(names, collapse="|"), nm)]
+      nm <- nm[grep(paste(names, collapse="|"), gsub(" \\| .+", "", nm))]
     }
   }
   if(!is.null(conc) && length(conc) > 0){
