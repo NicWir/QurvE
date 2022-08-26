@@ -2,7 +2,7 @@ list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes", 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-library(icons)
+# library(icons)
 library(shiny)
 library(shinyjs)
 library(shinyBS)
@@ -14,7 +14,7 @@ library(shinythemes)
 library(DT)
 
 # Define icon set from custom SVG files
-iconset <- icon_set("icons/")
+# iconset <- icon_set("icons/")
 
 source("../../R/general_misc_utils.R")
 source("../../R/growth_computation.R")
