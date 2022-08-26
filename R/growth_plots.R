@@ -514,6 +514,8 @@ plot.drBootSpline <- function (drBootSpline,
 #'
 #' @param drFit object of class \code{drFit}, created with \code{\link{growth.drFit}}.
 #' @param combine (Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param names (String or vector of strings) Define conditions to combine into a single plot (if \code{combine = TRUE}). Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param exclude.nm (String or vector of strings) Define conditions to exclude from the plot (if \code{combine = TRUE}). Partial matches with sample/group names are accepted.
 #' @param pch (Numeric) Shape of the raw data symbols.
 #' @param basesize (Numeric) Base font size.
 #' @param colors (Numeric or character) Define colors for different conditions.
@@ -532,7 +534,7 @@ plot.drBootSpline <- function (drBootSpline,
 #'   geom_point geom_segment ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
-plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
+plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   # x an object of class drFit
@@ -558,7 +560,28 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
       raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.conc))
       raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.test))
     }
-    names(raw.x) <- names(raw.y) <- names(drFit$drFittedSplines)
+    sample.nm <- nm <- names(raw.x) <- names(raw.y) <- names(drFit$drFittedSplines)
+
+    # Convert range  and selecting arguments
+    names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
+    exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
+
+    # Get name of conditions with multiple replicates; apply selecting arguments
+    if(!is.null(names)  && length(names) > 0){
+      if(!is.na(names) && names != ""){
+        names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+        nm <- nm[grep(paste(names, collapse="|"), nm)]
+      }
+    }
+    if(!is.na(exclude.nm) && exclude.nm != ""){
+      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+    }
+    if(length(nm)==0){
+      stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
+    }
+    raw.x <- raw.x[nm]
+    raw.y <- raw.y[nm]
     raw.df <- lapply(1:length(raw.x), function(x) data.frame(x = raw.x[[x]], y = raw.y[[x]], Condition = rep(names(raw.x)[[x]], length(raw.x[[x]]))))
     # raw.df <- do.call("rbind", raw.df)
 
@@ -566,7 +589,7 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
     conc <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) unique(raw.x[[i]])[x]))
     mean <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) mean(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
     sd <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) sd(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
-    names <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) rep(names(drFit$drFittedSplines)[i], length_out=length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]]))))
+    names <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) rep(names(drFit$drFittedSplines)[match(names(raw.x)[[i]], names(drFit$drFittedSplines))], length_out=length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]]))))
     error <- stats::qnorm(0.975) * sd / sqrt(n) # standard error
     CI.L <- mean - error #left confidence interval
     CI.R <- mean + error #right confidence interval
@@ -579,14 +602,14 @@ plot.drFit <- function(drFit, combine = TRUE, pch = 16, cex = 2, basesize = 15, 
     # raw.df$CI.R[is.na(raw.df$CI.R)] <- 0
 
 
-    res.df <- lapply(1:length(raw.x), function(x) data.frame(Condition = names(drFit$drFittedSplines)[[x]],
-                                                             ec50 = drFit$drFittedSplines[[x]][["parameters"]][["EC50"]],
-                                                             yEC50 = drFit$drFittedSplines[[x]][["parameters"]][["yEC50"]]))
+    res.df <- lapply(1:length(raw.x), function(x) data.frame(Condition = names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]],
+                                                             ec50 = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["EC50"]],
+                                                             yEC50 = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["yEC50"]]))
     res.df <- do.call("rbind", res.df)
 
-    spline.df  <- lapply(1:length(raw.x), function(x) data.frame(x = drFit$drFittedSplines[[x]][["fit.conc"]],
-                                                                 y = drFit$drFittedSplines[[x]][["fit.test"]],
-                                                                 Condition = rep(names(drFit$drFittedSplines)[[x]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
+    spline.df  <- lapply(1:length(raw.x), function(x) data.frame(x = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.conc"]],
+                                                                 y = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.test"]],
+                                                                 Condition = rep(names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
     spline.df <- do.call("rbind", spline.df)
 
     nrow <- ceiling(length(drFit$drFittedSplines)/2)
@@ -1477,7 +1500,7 @@ plot.grofit <- function(grofit, ...,
   conc <- as.numeric(conc)
   exclude.conc <- as.numeric(exclude.conc)
 
-  # Get name of conditions with multiple replicates
+  # Get name of conditions with multiple replicates; apply selecting arguments
   sample.nm <- nm <- as.character(names(grofit$gcFit$gcFittedSplines))
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
@@ -1486,7 +1509,7 @@ plot.grofit <- function(grofit, ...,
     }
   }
   if(!is.null(conc) && length(conc) > 0){
-    if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+    if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
   if(!is.null(exclude.nm)  && length(conc) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
@@ -2045,7 +2068,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     }
   }
   if(!is.null(conc) && length(conc) > 0){
-    if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+    if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
   if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
