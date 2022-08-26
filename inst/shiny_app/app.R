@@ -1735,7 +1735,8 @@ server <- function(input, output, session){
   })
 
   select_inputs_individual_plots_dose_response_growth_plot<- reactive({
-    names(results$growth$drFit$drFittedSplines)
+    if (length(results$growth$drFit)>1) names(results$growth$drFit$drFittedSplines)
+    else return("")
   })
 
 
