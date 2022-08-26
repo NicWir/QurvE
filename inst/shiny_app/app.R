@@ -833,8 +833,75 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                                checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot',
                                                                              label = 'Show EC50 indicator lines',
-                                                                             value = TRUE)
-                                                             ),
+                                                                             value = TRUE),
+
+                                                               h3("Customize plot appearance"),
+
+                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_plot",
+                                                                             label = "Log-transform y-axis",
+                                                                             value = TRUE),
+
+                                                               strong("x-Range"),
+                                                               fluidRow(
+                                                                 column(3,
+                                                                        textInput(inputId = "x_range_min_dose_response_plot",
+                                                                                  label = NULL,
+                                                                                  value = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(3,
+                                                                        textInput(inputId = "x_range_max_dose_response_plot",
+                                                                                  label = NULL,
+                                                                                  value = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+
+                                                               strong("y-Range"),
+                                                               fluidRow(
+                                                                 column(3,
+                                                                        textInput(inputId = "y_range_min_dose_response_plot",
+                                                                                  label = NULL,
+                                                                                  value = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(3,
+                                                                        textInput(inputId = "y_range_max_dose_response_plot",
+                                                                                  label = NULL,
+                                                                                  value = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+
+                                                               strong("y-Range (derivative)"),
+                                                               fluidRow(
+                                                                 column(3,
+                                                                        textInput(inputId = "y_range_min_derivative_dose_response_plot",
+                                                                                  label = NULL,
+                                                                                  value = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(3,
+                                                                        textInput(inputId = "y_range_max_derivative_dose_response_plot",
+                                                                                  label = NULL,
+                                                                                  value = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+                                                               textInput(inputId = "y_axis_title_dose_response_plot",
+                                                                         label = "y-axis title",
+                                                                         value = "mu.linfit"
+                                                               ),
+
+                                                               textInput(inputId = "x_axis_title_dose_response_plot",
+                                                                         label = "x-axis title",
+                                                                         value = "Concentration"
+                                                               )
+
+                                                             ), #
 
                                                              conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
                                                                               mainPanel(
@@ -851,7 +918,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                             choices = ""),
                                                                                 plotOutput("dose_response_plot_individual")
                                                                               )
-                                                             )
+                                                             ),
+
+
                                                     ),
 
                                                     tabPanel(title = "Parameter plots",
@@ -1749,6 +1818,5 @@ server <- function(input, output, session){
                })
 
 }
-
 
 shinyApp(ui = ui, server = server)
