@@ -521,6 +521,11 @@ plot.drBootSpline <- function (drBootSpline,
 #' @param colors (Numeric or character) Define colors for different conditions.
 #' @param lwd (Numeric) Line width of the individual splines.
 #' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 values (\code{TRUE}) or not (\code{FALSE}).
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.title (Character) Optional: Provide a title for the y-axis.
+#' @param x.title (Character) Optional: Provide a title for the x-axis.
+
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -535,6 +540,7 @@ plot.drBootSpline <- function (drBootSpline,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
 plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
+                       y.lim = NULL, x.lim = NULL, y.title = NULL, x.title = NULL,
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   # x an object of class drFit
@@ -544,7 +550,10 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
   if(combine == FALSE || n < 2){
     # /// plot all drFitSpline objects
     for (i in 1:n) {
-      try(plot(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch, cex = cex, export = export, plot = plot, height = 7, width = 9, out.dir = out.dir))
+      try(plot(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch,
+               y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
+               cex = cex, export = export,
+               plot = plot, height = 7, width = 9, out.dir = out.dir))
     }
   } else {
     if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == TRUE)) {
@@ -618,21 +627,35 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
       geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
       geom_line(data = spline.df, aes(x, y, colour = Condition), size = lwd) +
       theme_classic(base_size = basesize) +
-      scale_y_continuous(breaks = scales::pretty_breaks()) +
       xlab(ifelse(drFit$control$log.x.dr == TRUE, "Ln(concentration + 1)", "Concentration")) +
       ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, ")"), paste0(drFit$control$dr.parameter)))+
       theme(legend.position="bottom") +
       ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
+
+    if(!is.null(y.lim)){
+      p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
+    } else {
+      p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+    }
 
     if(ec50line){
       plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
       plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
       p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = 1) +
         geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd) +
-        scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks()) +
         scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+
+      if(!is.null(x.lim)){
+        p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+      } else {
+        p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+      }
     } else {
-      p <- p + scale_x_continuous(breaks = scales::pretty_breaks())
+      if(!is.null(x.lim)){
+        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks())
+      } else {
+        p <- p + scale_x_continuous(breaks = scales::pretty_breaks())
+      }
     }
 
 
@@ -711,6 +734,10 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param colSpline (Numeric or character) Spline line colour.
 #' @param cex (Numeric) Size of the raw data symbols.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.title (Character) Optional: Provide a title for the y-axis.
+#' @param x.title (Character) Optional: Provide a title for the x-axis.
 #' @param lwd (Numeric) Line width of spline.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
@@ -730,6 +757,8 @@ plot.drFitSpline <-
             colSpline = 1,
             colData = 1,
             cex = 1,
+            y.lim = NULL, x.lim = NULL,
+            y.title = NULL, x.title = NULL,
             lwd = 2, plot = TRUE, export = FALSE,
             height = 7, width = 9, out.dir = NULL,
             ...)
@@ -748,53 +777,61 @@ plot.drFitSpline <-
     p <- function(){
       if (add == FALSE) {
         if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == TRUE)) {
+          xlab = ifelse(!is.null(x.title), x.title, "ln(1+concentration)")
+          ylab = ifelse(!is.null(y.title), y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
           plot(
             log(drFitSpline$raw.conc + 1),
             log(drFitSpline$raw.test + 1),
             pch = pch, bg = colData,
             cex = cex,
             col = colData,
-            xlab = "ln(1+concentration)",
-            ylab = "ln(1+response)"
+            xlab = xlab,
+            ylab = ylab, xlim = x.lim, ylim = y.lim
           )
         }
         else
         {
           if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == TRUE)) {
+            xlab = ifelse(!is.null(x.title), x.title, "concentration")
+            ylab = ifelse(!is.null(y.title), y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
             plot(
               drFitSpline$raw.conc,
               log(drFitSpline$raw.test + 1),
               pch = pch, bg = colData,
               cex = cex,
               col = colData,
-              xlab = "concentration",
-              ylab = "ln(1+response)"
+              xlab = xlab,
+              ylab = ylab, xlim = x.lim, ylim = y.lim
             )
           }
           else
           {
             if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == FALSE)) {
+              xlab = ifelse(!is.null(x.title), x.title, "ln(1+concentration)")
+              ylab = ifelse(!is.null(y.title), y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
               plot(
                 log(drFitSpline$raw.conc + 1),
                 drFitSpline$raw.test,
                 pch = pch, bg = colData,
                 cex = cex,
                 col = colData,
-                xlab = "Ln(1+concentration)",
-                ylab = paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""))
+                xlab = xlab,
+                ylab = ylab, xlim = x.lim, ylim = y.lim
               )
             }
             else
             {
               if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == FALSE)) {
+                xlab = ifelse(!is.null(x.title), x.title, "Concentration")
+                ylab = ifelse(!is.null(y.title), y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
                 plot(
                   drFitSpline$raw.conc,
                   drFitSpline$raw.test,
                   pch = pch, bg = colData,
                   cex = cex,
                   col = colData,
-                  xlab = "Concentration",
-                  ylab = paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""))
+                  xlab = xlab,
+                  ylab = ylab, xlim = x.lim, ylim = y.lim
                 )
               }
             }
@@ -1400,8 +1437,8 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
-#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.title (Character) Optional: Provide a title for the y-axis of the growth curve plot.
 #' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.

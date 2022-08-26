@@ -440,7 +440,7 @@ parse_data <-
     }
     # apply identifiers specified in mapping file
     for(i in noNA.ndx){
-      if(!is.null(mapping)){
+      if(!is.null(map.file)){
         # assign names to samples
         map.ndx <- match(data.ls[[i]][1,1:ncol( data.ls[[i]])], mapping[2:nrow(mapping),1])+1
         names <- mapping[map.ndx, 2]
@@ -770,7 +770,7 @@ growth.workflow <- function (grodata = NULL,
 
   # /// fit of growth curves -----------------------------------
   if(exists("shiny") && shiny == TRUE) out.gcFit <- growth.gcFit(time, data, control, shiny = TRUE)
-  else out.gcFit <- growth.gcFit(time, data, control, shiny = shiny)
+  else out.gcFit <- growth.gcFit(time, data, control)
 
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
