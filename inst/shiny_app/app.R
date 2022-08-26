@@ -1178,20 +1178,19 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                     tabPanel("Report",
                              sidebarPanel(
-                               shinyDirButton(id = 'report_folder',
-                                              label = 'Select a folder',
-                                              title = 'Please select a folder',
-                                              FALSE),
+                               shinyDirButton("dir",
+                                              "Choose destination for saving",
+                                              "Choose destination for saving"),
+
+                               verbatimTextOutput("dir", placeholder = TRUE),
 
                                textInput(inputId = 'report_file_name',
-                                         label = 'Choose file name'),
+                                         label = 'Choose file name',
+                                         value = 'GrowthReport'),
 
                                selectInput(inputId = 'report_file_type',
                                            label = 'Choose file type',
-                                           choices = c('.pdf' = '.pdf',
-                                                       '.html' = '.html')),
-
-                               textOutput('report_folder')
+                                           choices = c('pdf', 'html'))
                              )
                     ),
 
@@ -1717,30 +1716,33 @@ server <- function(input, output, session){
   # Save report
   volumes <- getVolumes() # this makes the directory at the base of your computer.
 
-  shinyDirChoose(input, 'report_folder', roots = volumes())
+  #shinyDirChoose(input, 'report_folder', roots = volumes())
+  shinyDirChoose(
+    input,
+    'dir',
+    roots = c(home = '~'),
+    filetypes = c('', 'txt', 'bigWig', "tsv", "csv", "bw")
+  )
 
-  report_folder <- reactive(input$report_folder)
+  global <- reactiveValues(datapath = getwd())
 
-  report_file_name <- reactive(input$report_file_name)
+  dir <- reactive(input$dir)
 
-  report_file_type <- reactive(input$report_file_type)
-
-  output$report_folder <- renderPrint({
-    path <- unlist(report_folder())
-    file_name <-  report_file_name()
-    report_file_type <- report_file_type()
-
-    paste0(paste(path, collapse="/"), "/", file_name, report_file_type())
+  output$dir <- renderText({
+    global$datapath
   })
 
-
-
-
-  # in case you want to print a consol output:
-  #output$console <- renderPlot({
-  #  results <- results()
-  #  plot.parameter(results)
-  #  })
+  observeEvent(ignoreNULL = TRUE,
+               eventExpr = {
+                 input$dir
+               },
+               handlerExpr = {
+                 if (!"path" %in% names(dir())) return()
+                 home <- normalizePath("~")
+                 fname <-paste(input$report_file_name, input$report_file_type, sep = '.')
+                 global$datapath <-
+                   file.path(home, paste(unlist(dir()$path[-1]), collapse = .Platform$file.sep), fname)
+               })
 
 }
 
