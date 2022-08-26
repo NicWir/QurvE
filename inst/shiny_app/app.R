@@ -1,4 +1,4 @@
-list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes", "shinyFiles")
+list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes", "shinyFiles", "shinyjs", "shinyBS", "shinycssloaders")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
@@ -828,15 +828,29 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                sliderInput(inputId = 'line_width_dose_response_growth_plot',
                                                                            label = 'Line width',
                                                                            min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
+                                                                           max = 10,
+                                                                           value = 1),
 
                                                                checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot',
                                                                              label = 'Show EC50 indicator lines',
                                                                              value = TRUE)
                                                              ),
-                                                             mainPanel(
-                                                               plotOutput("growth_dose_response_plot")
+
+                                                             conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                              mainPanel(
+                                                                                h3('Combined plots'),
+                                                                                plotOutput("dose_response_plot_combined")
+                                                                              )
+                                                             ),
+
+                                                             conditionalPanel(condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                              mainPanel(
+                                                                                h3('Individual plots'),
+                                                                                selectInput(inputId = 'individual_plots_dose_response_growth_plot',
+                                                                                            label = 'Select plot',
+                                                                                            choices = ""),
+                                                                                plotOutput("dose_response_plot_individual")
+                                                                              )
                                                              )
                                                     ),
 
@@ -1510,9 +1524,26 @@ server <- function(input, output, session){
     )
   })
 
-  output$dose_response_plot <- renderPlot({
-    results <- results$growth
-    plot(results$drFit)
+  output$dose_response_plot_combined <- renderPlot({
+    results <- results$growth$drFit
+      plot.drFit(results,
+                 combine=TRUE,
+                 pch = input$shape_type_dose_response_growth_plot,
+                 cex = input$shape_size_dose_response_growth_plot,
+                 basesize = input$base_size_dose_response_growth_plot,
+                 lwd = input$line_width_dose_response_growth_plot,
+                 ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot)
+  })
+
+  output$dose_response_plot_individual <- renderPlot({
+    results <- results$growth$drFit$drFittedSplines[[input$individual_plots_dose_response_growth_plot]]
+    plot.drFitSpline(results,
+                     combine=FALSE,
+                     pch = input$shape_type_dose_response_growth_plot,
+                     cex = input$shape_size_dose_response_growth_plot,
+                     basesize = input$base_size_dose_response_growth_plot,
+                     lwd = input$line_width_dose_response_growth_plot,
+                     ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot)
   })
 
   output$growth_parameter_plot <- renderPlot({
@@ -1631,6 +1662,10 @@ server <- function(input, output, session){
     results$expdesign$concentration
   })
 
+  select_inputs_individual_plots_dose_response_growth_plot<- reactive({
+    names(results$growth$drFit$drFittedSplines)
+  })
+
 
   observe({
     updateSelectInput(inputId = "custom_growth_sheets",
@@ -1651,6 +1686,11 @@ server <- function(input, output, session){
     updateSelectInput(inputId = "reference_concentration_growth_parameter_plot",
                       choices = select_inputs_reference_concentration_growth_parameter_plot()
     )})
+
+  observe({
+    updateSelectInput(inputId = "individual_plots_dose_response_growth_plot",
+                      choices = select_inputs_individual_plots_dose_response_growth_plot())
+  })
 
 
   ## Fluorescence
