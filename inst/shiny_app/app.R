@@ -5,6 +5,7 @@ if(length(new.packages)) install.packages(new.packages)
 library(icons)
 library(shiny)
 library(shinyjs)
+library(shinyBS)
 library(shinycssloaders)
 library(shinyFiles)
 library(readxl)
@@ -328,7 +329,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  actionButton(inputId = "run_growth",
                                                                               label = "Run computation",
                                                                               icon=icon("gears"),
-                                                                              style="padding:3px; font-size:120%")
+                                                                              style="padding:5px; font-size:120%")
                                                    ) # sidebarPanel
 
                                             ), # column
@@ -1197,12 +1198,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    results$growth$control$ec50
+    paste(typeof(input), input)
   })
-  # Disable navbar menus before running computations
-  disable(selector = "#navbar li a[data-value=Report]")
-  disable(selector = "#navbar li a[data-value=Visualize]")
-  disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+  # # Disable navbar menus before running computations
+  # disable(selector = "#navbar li a[data-value=Report]")
+  # disable(selector = "#navbar li a[data-value=Visualize]")
+  # disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
 
 
   results <- reactiveValues()
@@ -1350,7 +1351,7 @@ server <- function(input, output, session){
                                         lin.R2 = input$R2_threshold_growth,
                                         lin.RSD = input$RSD_threshold_growth,
                                         lin.dY = input$dY_threshold_growth, ##
-                                        interactive = FALSE, ### TODO (popups)
+                                        interactive = F, ### TODO (popups)
                                         nboot.gc = input$number_of_bootstrappings,
                                         smooth.gc = input$smoothing_factor_nonparametric_growth,
                                         model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"), ### TODO: implement like model and huang button
@@ -1362,14 +1363,16 @@ server <- function(input, output, session){
                                         nboot.dr = input$number_of_bootstrappings_dr_growth,
                                         report = NULL,
                                         shiny = TRUE
+
       )
     )
-    enable(selector = "#navbar li a[data-value=Report]")
-    enable(selector = "#navbar li a[data-value=Visualize]")
-    enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
-    hide(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
-    hide(selector = "#navbar li a[data-value=tabPabel_Visualize_Fluorescence]")
-    hide(selector = "#navbar li a[data-value=tabPabel_Visualize_GrowthandFluorescence]")
+    ## ENABLE DISABLED PLOTS AFTER RUNNING COMPUTATION
+    # enable(selector = "#navbar li a[data-value=Report]")
+    # enable(selector = "#navbar li a[data-value=Visualize]")
+    # enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+    # hide(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
+    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_Fluorescence]")
+    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_GrowthandFluorescence]")
 
 
     # )},

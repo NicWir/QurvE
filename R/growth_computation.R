@@ -1076,6 +1076,17 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
           answer_satisfied <- "n"
           reliability_tag_linear <- NA
           while ("n" %in% answer_satisfied) {
+
+            # if(exists("shiny") && shiny == TRUE){
+            #   outputfitlinear_plot <- renderPlot({
+            #     plot(fitlinear, log = "y")
+            #   })
+            #   showModal(modalDialog(
+            #     title = "Important message",
+            #     "This is an important message!",
+            #     plotOutput("fitlinear_plot"))
+            #   )
+            # }
             try(plot(fitlinear, log = "y"))
             mtext(side = 3, line = 0, adj = 0,
                   outer = F,
