@@ -14,7 +14,7 @@ library(shinythemes)
 library(DT)
 
 # Define icon set from custom SVG files
-# iconset <- icon_set("icons/")
+# iconset <- icons::icon_set("icons/")
 
 source("../../R/general_misc_utils.R")
 source("../../R/growth_computation.R")
@@ -75,9 +75,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                     id = "navbar",
 
                     # load input file
-                    tabPanel('Data', value = "tabPanel",
-                             icon=icon(name = NULL, "verify_fa = FALSE",
-                                       img("../icons/icon_Upload.svg")),
+                    tabPanel('Data',
+                             icon = icon("file-lines"),
+                             value = "tabPanel",
                              tabsetPanel(type = "tabs",
 
                                          tabPanel(title = "Custom",
@@ -104,7 +104,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                         selectInput(inputId = "custom_growth_sheets",
                                                                     label = "Select Sheet",
                                                                     choices = "Sheet1")
-                                                      )), # select sheet: conditional
+                                                      )
+                                                    ), # select sheet: conditional
                                                     conditionalPanel(
                                                       condition = "output.growthfileUploaded && output.data_growth_format == 'csv'",
                                                       wellPanel(
@@ -122,8 +123,19 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                         )
                                                       )
                                                     ),
+                                                    conditionalPanel(
+                                                      condition = "output.growthfileUploaded && (output.data_growth_format == 'tsv' || output.data_growth_format == 'txt')",
+                                                      wellPanel(
+                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                        selectInput(inputId = "decimal_separator",
+                                                                    label = "Select Decimal separator",
+                                                                    choices = c("." = ".",
+                                                                                "," = ",")
+                                                        )
+                                                      )
+                                                    ),
 
-                                                    checkboxInput(inputId = 'subtract_blanc',
+                                                    checkboxInput(inputId = 'subtract_blank',
                                                                   label = 'Subtract blank'),
 
                                                     checkboxInput(inputId = 'calibration',
@@ -144,42 +156,44 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                   sidebarPanel(
                                                     style='border-color: #ADADAD',
                                                     # select file type
-                                                    selectInput(inputId = "input_file_type_plate_reader",
-                                                                label = "Select file type:",
-                                                                choices = c("Excel (.xlsx)" = "xlsx",
-                                                                            "csv" = "csv")),
-
-                                                    selectInput(inputId = "format",
-                                                                label = "Select Format",
-                                                                choices = c("Data in columns" = "data_in_columns",
-                                                                            "Data in rows" = "data_in_rows")),
-
-                                                    fileInput(inputId = 'growth_file',
+                                                    fileInput(inputId = 'parse_file',
                                                               label = 'Choose growth data file',
                                                               accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt')),
-
                                                     conditionalPanel(
-                                                      condition = "input.input_file_type_plate_reader == 'xlsx'",
-                                                      selectInput(inputId = "sheet",
-                                                                  label = "Select Sheet",
-                                                                  choices = c("Sheet 1" = "Sheet1",
-                                                                              "Sheet 2" = "Sheet2",
-                                                                              "Sheet 3" = "Sheet3")),
-                                                    ), # select sheet: conditional
-
+                                                      condition = "output.parsefileUploaded && output.data_parse_format == 'xlsx'",
+                                                      wellPanel(
+                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                        selectInput(inputId = "parse_data_sheets",
+                                                                    label = "Select Sheet",
+                                                                    choices = "Sheet1")
+                                                      )), # select sheet: conditional
                                                     conditionalPanel(
-                                                      condition = "input.input_file_type_plate_reader == 'csv'",
-                                                      selectInput(inputId = "separator",
-                                                                  label = "Select separator",
-                                                                  choices = c("," = ",",
-                                                                              ";" = ";")
-                                                      ),
+                                                      condition = "output.parsefileUploaded && output.data_parse_format == 'csv'",
+                                                      wellPanel(
+                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                        selectInput(inputId = "separator",
+                                                                    label = "Select separator",
+                                                                    choices = c("," = ",",
+                                                                                ";" = ";")
+                                                        ),
 
-                                                      selectInput(inputId = "decimal_separator",
-                                                                  label = "Select Decimal separator",
-                                                                  choices = c("." = ".",
-                                                                              "," = ",")
-                                                      ),
+                                                        selectInput(inputId = "decimal_separator",
+                                                                    label = "Select Decimal separator",
+                                                                    choices = c("." = ".",
+                                                                                "," = ",")
+                                                        )
+                                                      )
+                                                    ),
+                                                    conditionalPanel(
+                                                      condition = "output.parsefileUploaded && (output.data_parse_format == 'tsv' || output.data_parse_format == 'txt')",
+                                                      wellPanel(
+                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                        selectInput(inputId = "decimal_separator",
+                                                                    label = "Select Decimal separator",
+                                                                    choices = c("." = ".",
+                                                                                "," = ",")
+                                                        )
+                                                      )
                                                     ),
 
                                                     selectInput(inputId = "platereader_software",
@@ -188,25 +202,22 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                 ),
                                                     ),
 
-                                                    selectInput(inputId = "density_data_read",
+                                                    selectInput(inputId = "density_data_reads",
                                                                 label = "Density data",
-                                                                choices = c("Read 3:630" = "read_3_630"
-                                                                ),
+                                                                choices = "Bla"
                                                     ),
 
                                                     selectInput(inputId = "fluorescence_data_1_read",
                                                                 label = "Fluorescence data 1",
-                                                                choices = c("Read 4:485,528" = "read_4_485_528"
-                                                                ),
+                                                                choices = ""
                                                     ),
 
                                                     selectInput(inputId = "fluorescence_data_2_read",
                                                                 label = "Fluorescence data 1",
-                                                                choices = c("Read 4:485,528[2]" = "read_4_485_528_2"
-                                                                ),
+                                                                choices = ""
                                                     ),
 
-                                                    checkboxInput(inputId = 'subtract_blanck_plate_reader',
+                                                    checkboxInput(inputId = 'subtract_blankk_plate_reader',
                                                                   label = 'subtract blank',
                                                                   value = TRUE),
 
@@ -222,12 +233,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              ), # tabSet Panel
 
                              mainPanel(
-                               img(src = 'data_instruction.png',
-                                   heigt = '100%',
-                                   width = '100%'),
                                h1("Your Data"),
                                withSpinner(
-                                 DT::dataTableOutput("growth_data")
+                                 DT::dataTableOutput("parsed_data")
                                )
                              ) # main panel
 
@@ -260,7 +268,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                    checkboxInput(inputId = 'log_transform_time_growth',
                                                                                  label = 'Log-transform time'),
 
-                                                                   checkboxInput(inputId = 'biphasic_growth_growth',
+                                                                   checkboxInput(inputId = 'biphasic_growth',
                                                                                  label = 'Biphasic growth'),
 
                                                                    numericInput(
@@ -300,8 +308,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                    conditionalPanel(condition = "input.perform_ec50_growth",
                                                                                     selectInput(inputId = "response_parameter_growth",
                                                                                                 label = "Response Parameter",
-                                                                                                choices = c("mu.linfit" = "mu.linfit",
-                                                                                                            "other.fit" = "other.fit")),
+                                                                                                choices = ""),
 
                                                                                     checkboxInput(inputId = 'log_transform_concentration_growth',
                                                                                                   label = 'log transform concentration'),
@@ -388,7 +395,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                        h3(strong('Parametric fit')),
                                                        wellPanel(
                                                          h4(strong('Models:')),
-                                                         style='background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
+                                                         style='border-color: #ADADAD; background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
                                                          checkboxInput(inputId = 'logistic_growth',
                                                                        label = 'logistic',
                                                                        value = TRUE),
@@ -655,9 +662,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
                                         tabsetPanel(type = "tabs", id = "tabsetPanel_Results",
                                                     tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
+                                                             conditionalPanel(condition = "input.biphasic_growth",
+                                                               h5("(Values in parentheses indicate parameters for secondary growth phase)")
+                                                             ),
                                                              DT::dataTableOutput('results_table_growth_linear')
                                                     ),
                                                     tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
+                                                             conditionalPanel(condition = "input.biphasic_growth",
+                                                                              h5("(Values in parentheses indicate parameters for secondary growth phase)")
+                                                             ),
                                                              DT::dataTableOutput('results_table_growth_spline')
                                                     ),
                                                     tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
@@ -670,7 +683,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                         h1('Under construction'))
                     ),
                     # Validate
-                    navbarMenu("Validate",
+                    navbarMenu("Validate", icon = icon("user-check"),
                                tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
                                         h1("Growth Fits"),
                                         tabsetPanel(type = "tabs",
@@ -682,7 +695,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                       choices = "",
                                                                                       multiple = FALSE,
                                                                                       selectize = FALSE,
-                                                                                      size = 5,
+                                                                                      size = 5
                                                                           ),
                                                                           checkboxInput(inputId = 'logy_validate_growth_plot_linear',
                                                                                         label = 'Log-transform y axis',
@@ -804,7 +817,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                )
                     ),
                     # Visualize
-                    navbarMenu("Visualize",
+                    navbarMenu("Visualize", icon = icon("chart-line"),
                                tabPanel(title = "Growth Plots", value = "tabPanel_Visalize_Growth",
                                         h1("Growth Plots"),
                                         tabsetPanel(type = "tabs",
@@ -917,13 +930,20 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = "Line width",
                                                                            min = 0.01,
                                                                            max = 5,
-                                                                           value = 1.1)
+                                                                           value = 1.1),
+                                                               sliderInput(inputId = 'base_size_growth_group_plot',
+                                                                           label = 'Base font size',
+                                                                           min = 10,
+                                                                           max = 35,
+                                                                           value = 20,
+                                                                           step = 0.5)
 
                                                              ), # Side panel growth group plots
 
                                                              mainPanel(
                                                                withSpinner(
-                                                                 plotOutput("growth_group_plot")
+                                                                 plotOutput("growth_group_plot",
+                                                                            width = "100%", height = "1000px")
                                                                )
                                                              )
 
@@ -950,18 +970,20 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = 'Shape size',
                                                                            min = 1,
                                                                            max = 10,
-                                                                           value = 2),
+                                                                           value = 2,
+                                                                           step = 0.5),
 
                                                                sliderInput(inputId = 'base_size_dose_response_growth_plot',
-                                                                           label = 'Base size',
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
+                                                                           label = 'Base font size',
+                                                                           min = 10,
+                                                                           max = 35,
+                                                                           value = 15,
+                                                                           step = 0.5),
 
                                                                sliderInput(inputId = 'line_width_dose_response_growth_plot',
                                                                            label = 'Line width',
-                                                                           min = 1,
-                                                                           max = 10,
+                                                                           min = 0.01,
+                                                                           max = 5,
                                                                            value = 1),
 
                                                                checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot',
@@ -969,10 +991,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                              value = TRUE),
 
                                                                h3("Customize plot appearance"),
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_plot",
-                                                                             label = "Log-transform y-axis",
-                                                                             value = TRUE),
 
                                                                strong("x-Range"),
                                                                fluidRow(
@@ -1039,7 +1057,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
                                                                               mainPanel(
                                                                                 h3('Combined plots'),
-                                                                                plotOutput("dose_response_plot_combined")
+                                                                                plotOutput("dose_response_plot_combined",
+                                                                                           width = "100%", height = "800px")
                                                                               )
                                                              ),
 
@@ -1048,8 +1067,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                 h3('Individual plots'),
                                                                                 selectInput(inputId = 'individual_plots_dose_response_growth_plot',
                                                                                             label = 'Select plot',
-                                                                                            choices = ""),
-                                                                                plotOutput("dose_response_plot_individual")
+                                                                                            choices = "",
+                                                                                            multiple = FALSE,
+                                                                                            selectize = FALSE,
+                                                                                            size = 3),
+                                                                                plotOutput("dose_response_plot_individual",
+                                                                                           width = "100%", height = "800px")
                                                                               )
                                                              ),
 
@@ -1103,19 +1126,28 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = "Shape size",
                                                                            min = 1,
                                                                            max = 10,
-                                                                           value = 2.5),
+                                                                           value = 2.5,
+                                                                           step = 0.5),
 
                                                                sliderInput(inputId = "basesize_growth_parameter_plot",
-                                                                           label = "Base size",
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 12)
+                                                                           label = "Base font size",
+                                                                           min = 10,
+                                                                           max = 35,
+                                                                           value = 12,
+                                                                           step = 0.5),
+                                                               sliderInput(inputId = "label.size_growth_parameter_plot",
+                                                                           label = "Label font size",
+                                                                           min = 5,
+                                                                           max = 35,
+                                                                           value = 12,
+                                                                           step = 0.5)
 
 
                                                              ),
 
                                                              mainPanel(
-                                                               plotOutput("growth_parameter_plot")
+                                                               plotOutput("growth_parameter_plot",
+                                                                          width = "100%", height = "800px")
                                                              )
                                                              # TEST CONSOL OUTPUT
                                                              #verbatimTextOutput('test')
@@ -1266,19 +1298,21 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = 'Shape size',
                                                                            min = 1,
                                                                            max = 10,
-                                                                           value = 2),
+                                                                           value = 2,
+                                                                           step = 0.5),
 
                                                                sliderInput(inputId = 'base_size_dose_response_fluorescence_plot',
-                                                                           label = 'Base size',
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
+                                                                           label = 'Base font size',
+                                                                           min = 10,
+                                                                           max = 35,
+                                                                           value = 15,
+                                                                           step = 0.5),
 
                                                                sliderInput(inputId = 'line_width_dose_response_fluorescence_plot',
                                                                            label = 'Line width',
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
+                                                                           min = 0.1,
+                                                                           max = 5,
+                                                                           value = 1),
 
                                                                checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_fluorescence_plot',
                                                                              label = 'Show EC50 indicator lines',
@@ -1336,13 +1370,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            label = "Shape size",
                                                                            min = 1,
                                                                            max = 10,
-                                                                           value = 2.5),
+                                                                           value = 2.5,
+                                                                           step = 0.5),
 
                                                                sliderInput(inputId = "basesize_fluorescence_parameter_plot",
-                                                                           label = "Base size",
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 12)
+                                                                           label = "Base font size",
+                                                                           min = 10,
+                                                                           max = 35,
+                                                                           value = 12,
+                                                                           step = 0.5)
 
 
                                                              ),
@@ -1378,7 +1414,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ),
                     ),
 
-                    tabPanel("Report",
+                    tabPanel("Report", icon=icon("file-contract"),
                              sidebarPanel(
                                shinyDirButton("dir",
                                               "Choose destination for saving",
@@ -1398,9 +1434,11 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                     tabPanel("About Us",
                              mainPanel(
-                               h1("Authors"),
+                               h2("Authors"),
                                'Nicolas Wirth, Jonathan Funk',
-                               h1("Publications"),
+                               h2("Bug reports"),
+                               uiOutput("bug_report"),
+                               h2("Publications"),
                                'featuring publications which use this tool'
                              )
                     )
@@ -1413,8 +1451,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$data.in
-    input$min.density.model.rerun
+    input$growth_file$name
+    stringr::str_replace_all(input$growth_file$name, ".{1,}\\.", "")
   })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
@@ -1430,6 +1468,13 @@ server <- function(input, output, session){
     else return(TRUE)
   })
   outputOptions(output, 'growthfileUploaded', suspendWhenHidden=FALSE)
+
+  # Test if parse_file was loaded
+  output$parsefileUploaded <- reactive({
+    if(is.null(input$parse_file)) return(FALSE)
+    else return(TRUE)
+  })
+  outputOptions(output, 'parsefileUploaded', suspendWhenHidden=FALSE)
 
   output$growth_data <- DT::renderDT({
     inFile <- input$growth_file
@@ -1456,7 +1501,9 @@ server <- function(input, output, session){
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
+      showModal(modalDialog("Reading data file...", footer=NULL))
       dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = T, sheet = input$custom_growth_sheets, progress = T)))
+      removeModal()
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
       dat <-
         utils::read.csv(
@@ -1493,13 +1540,24 @@ server <- function(input, output, session){
   output$data_growth_format <- reactive({
     if(is.null(input$growth_file)) return(NULL)
 
-    filename <- input$growth_file$datapath
+    filename <- input$growth_file$name
 
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     format
   })
 
   outputOptions(output, 'data_growth_format', suspendWhenHidden=FALSE)
+
+  output$data_parse_format <- reactive({
+    if(is.null(input$parse_file)) return(NULL)
+
+    filename <- input$parse_file$name
+
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    format
+  })
+
+  outputOptions(output, 'data_parse_format', suspendWhenHidden=FALSE)
 
   growth_excel_sheets <- reactive({
     filename <- input$growth_file$datapath
@@ -1510,8 +1568,34 @@ server <- function(input, output, session){
     sheets
   })
 
-  observeEvent(input$run_growth,{
+  parse_excel_sheets <- reactive({
+    filename <- input$parse_file$datapath
+    if(is.null(input$parse_file)) return("")
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    if(format != "xlsx" && format != "xls") return("")
+    sheets <- readxl::excel_sheets(input$parse_file$datapath)
+    sheets
+  })
 
+  # Computation
+  selected_inputs_response_parameter_growth <- reactive({
+    select_options <- c()
+    if(input$linear_regression_growth) select_options <- c(select_options, 'mu.linfit', 'lambda.linfit', 'dY.linfit',
+                                                           'A.linfit')
+    if(input$nonparametric_fit_growth) select_options <- c(select_options, 'mu.spline', 'lambda.spline',
+                                                           'A.spline', 'dY.spline', 'integral.spline')
+    if(input$parametric_fit_growth) select_options <- c(select_options, 'mu.model', 'lambda.model', 'A.model', 'integral.model')
+    select_options
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "response_parameter_growth",
+                      choices = selected_inputs_response_parameter_growth()
+    )})
+
+  observeEvent(input$run_growth,{
+    showModal(modalDialog("Reading data input...", footer=NULL))
     inFile <- input$growth_file
 
     if(is.null(inFile))
@@ -1552,6 +1636,24 @@ server <- function(input, output, session){
       fit.opt <- c(fit.opt,
                    's')
     }
+
+    # Parse data
+    selected_inputs_parsed_reads <- reactive({
+      inFile <- input$parse_file
+
+      if(is.null(inFile))
+        return(NULL)
+
+      filename <- inFile$datapath
+      reads <- parse_properties_Gen5Gen6(filename)
+      reads
+    })
+    observe({
+      updateSelectInput(session,
+                        inputId = "density_data_reads",
+                        choices = selected_inputs_parsed_reads()
+      )})
+
     # combine selected models into vector
     models <- c()
     if(input$logistic_growth == TRUE) models <- c(models, "logistic")
@@ -1560,8 +1662,10 @@ server <- function(input, output, session){
     if(input$extended_gompertz_growth == TRUE) models <- c(models, "gompertz.exp")
     if(input$huang_growth == TRUE) models <- c(models, "huang")
 
+    # removeModal()
+    showModal(modalDialog("Running computations...", footer=NULL))
     # Run growth workflow
-    shiny::withProgress(
+    shiny::withProgress(message = "Computations completed",
 
       results$growth <- growth.workflow(grodata = grodata,
                                         ec50 = input$perform_ec50_growth,
@@ -1571,7 +1675,7 @@ server <- function(input, output, session){
                                         log.x.gc = input$log_transform_time_growth,
                                         log.y.model = input$log_transform_data_parametric_growth,
                                         log.y.spline = input$log_transform_data_nonparametric_growth,
-                                        biphasic = input$biphasic_growth_growth,
+                                        biphasic = input$biphasic_growth,
                                         lin.h = input$custom_sliding_window_size_value_growth,## Here seem to be problems
                                         lin.R2 = input$R2_threshold_growth,
                                         lin.RSD = input$RSD_threshold_growth,
@@ -1632,6 +1736,7 @@ server <- function(input, output, session){
                          'A.model' = 'A.model',
                          'dY.model' = 'dY.model')
     }
+    removeModal()
   })
 
   # Results Tables
@@ -1664,7 +1769,7 @@ server <- function(input, output, session){
                                          "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
                                          "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
                                          stringsAsFactors = F, check.names = F),
-                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                               escape = FALSE)
     # table_linear <- res.table.gc
     table_linear
@@ -1680,7 +1785,7 @@ server <- function(input, output, session){
                                          "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
                                          "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
                                          "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F),
-                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                               escape = FALSE)
     table_spline
   })
@@ -1706,7 +1811,7 @@ server <- function(input, output, session){
       }
     }
     table_model <- datatable(table_model,
-                             options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, -1), c("15","25", "50", "All")) ),
+                             options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                              escape = FALSE)
     table_model
   })
@@ -1775,17 +1880,20 @@ server <- function(input, output, session){
 
   output$validate_growth_plot_linear <- renderPlot({
     results <- results$growth
+    if(length(results$gcFit$gcFittedLinear[[input$sample_validate_growth_linear]]) > 1){
 
-    plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
-                     log = logy_validate_growth_plot_linear()
-                     # ADD FURTHER INPUT (see Notion)
-    )
-    if(input$diagnostics_validate_growth_plot_linear){
+
       plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
-                       which = "fit_diagnostics",
                        log = logy_validate_growth_plot_linear()
                        # ADD FURTHER INPUT (see Notion)
       )
+      if(input$diagnostics_validate_growth_plot_linear){
+        plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+                         which = "fit_diagnostics",
+                         log = logy_validate_growth_plot_linear()
+                         # ADD FURTHER INPUT (see Notion)
+        )
+      }
     }
   })
 
@@ -1888,10 +1996,13 @@ server <- function(input, output, session){
 
   output$validate_growth_plot_spline <- renderPlot({
     results <- results$growth
-
-    plot.gcFitSpline(results$gcFit$gcFittedSpline[[input$sample_validate_growth_spline]],
-                     log.y = input$logy_validate_growth_plot_spline, colData = 1
-    )
+    if(length(results$gcFit$gcFittedSplines[[input$sample_validate_growth_spline]]) > 1){
+      showModal(modalDialog("Creating plot...", footer=NULL))
+      plot.gcFitSpline(results$gcFit$gcFittedSplines[[input$sample_validate_growth_spline]],
+                       log.y = input$logy_validate_growth_plot_spline, colData = 1
+      )
+      removeModal()
+    }
   })
 
   spline.rerun.param <- reactiveValues()
@@ -1980,10 +2091,13 @@ server <- function(input, output, session){
 
   output$validate_growth_plot_model <- renderPlot({
     results <- results$growth
-
-    plot.gcFitModel(results$gcFit$gcFittedModels[[input$sample_validate_growth_model]],
-                    colData=1, colModel=2, colLag = 3,
-    )
+    if(length(results$gcFit$gcFittedModels[[input$sample_validate_growth_model]]) > 1){
+      showModal(modalDialog("Creating plot...", footer=NULL))
+      plot.gcFitModel(results$gcFit$gcFittedModels[[input$sample_validate_growth_model]],
+                      colData=1, colModel=2, colLag = 3,
+      )
+      removeModal()
+    }
   })
 
   model.rerun.param <- reactiveValues()
@@ -2099,7 +2213,9 @@ server <- function(input, output, session){
                 y.title = input$y_axis_title_growth_group_plot,
                 x.title = input$x_axis_title_growth_group_plot,
                 y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
-                lwd = input$line_width_growth_group_plot
+                lwd = input$line_width_growth_group_plot,
+                basesize = input$base_size_growth_group_plot,
+                shiny = TRUE
     )
   })
 
@@ -2147,7 +2263,8 @@ server <- function(input, output, session){
                    reference.nm = reference.nm,
                    reference.conc = reference.conc,
                    shape.size = input$shape.size_growth_parameter_plot,
-                   basesize = input$basesize_growth_parameter_plot
+                   basesize = input$basesize_growth_parameter_plot,
+                   label.size = input$label.size_growth_parameter_plot
     )
   })
 
@@ -2248,6 +2365,11 @@ server <- function(input, output, session){
 
 
   observe({
+    updateSelectInput(inputId = "parse_data_sheets",
+                      choices = parse_excel_sheets()
+    )})
+
+  observe({
     updateSelectInput(inputId = "custom_growth_sheets",
                       choices = growth_excel_sheets()
     )})
@@ -2324,6 +2446,11 @@ server <- function(input, output, session){
                  global$datapath <-
                    file.path(home, paste(unlist(dir()$path[-1]), collapse = .Platform$file.sep), fname)
                })
+  # Bug report message
+  github_url <- a("QurvE Github", href="https://github.com/NicWir/QurvE/issues")
+  output$bug_report <- renderUI({
+    tagList("Please report bugs and user feedback at:", github_url)
+  })
 
 }
 

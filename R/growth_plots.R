@@ -1541,6 +1541,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
+#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #'
 #' @export plot.grofit
 #' @export
@@ -1573,7 +1574,8 @@ plot.grofit <- function(grofit, ...,
                         height = NULL,
                         width = NULL,
                         out.dir = NULL,
-                        out.nm = NULL
+                        out.nm = NULL,
+                        shiny = FALSE
 )
 {
   # Convert range  and selecting arguments
@@ -1595,7 +1597,7 @@ plot.grofit <- function(grofit, ...,
   # remove all function arguments from call to leave only multiple grofit objects
   call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <-
     call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
-    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- NULL
+    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- NULL
 
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
@@ -1689,7 +1691,7 @@ plot.grofit <- function(grofit, ...,
   ndx.keep <- grep(paste0("^",
     str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
 
-  if(data.type == "spline"){i
+  if(data.type == "spline"){
     # correct for log transformation
     if(grofit$control$log.y.spline == TRUE){
       for(i in 1:length(ndx.keep)){
@@ -1808,8 +1810,12 @@ plot.grofit <- function(grofit, ...,
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
-      theme(panel.grid.major = element_blank(),
+      theme(legend.position="bottom",
+            panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
+    else p <- p + guides(fill=guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -1874,7 +1880,8 @@ plot.grofit <- function(grofit, ...,
         geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
-        theme(panel.grid.major = element_blank(),
+        theme(legend.position="bottom",
+              panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
       if(is.null(y.title.deriv)){
@@ -1932,7 +1939,7 @@ plot.grofit <- function(grofit, ...,
           scale_color_manual(name = "Condition",
                              values = colors)
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p, position = "right"))
     }
   } # if(mean == TRUE)
   else {
@@ -1954,8 +1961,12 @@ plot.grofit <- function(grofit, ...,
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
-      theme(panel.grid.major = element_blank(),
+      theme(legend.position="bottom",
+            panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
+    else p <- p + guides(fill=guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -2013,7 +2024,8 @@ plot.grofit <- function(grofit, ...,
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
-        theme(panel.grid.major = element_blank(),
+        theme(legend.position="bottom",
+              panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
       if(is.null(y.title.deriv)){
@@ -2059,7 +2071,7 @@ plot.grofit <- function(grofit, ...,
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
     } # if(deriv)
 
   }
@@ -2116,6 +2128,7 @@ base_breaks <- function(n = 10){
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
 #' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
 #' @param basesize (Numeric) Base font size.
+#' @param label.size (Numeric) Font size for sample labels below x-axis.
 #' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
 #' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
 #' @param shape.size (Numeric) The size of the symbols indicating replicate values. Default: 2.5
@@ -2140,6 +2153,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                            names = NULL,
                            conc = NULL,
                            basesize = 12,
+                           label.size = NULL,
                            reference.nm = NULL,
                            reference.conc = NULL,
                            exclude.nm = NULL,
@@ -2264,7 +2278,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     }
     if(length(ref.ndx) > 1){
       message("The provided combination of reference.nm = '", reference.nm, "' and reference.conc = ", reference.conc, " did not allow for the unique identification of a reference condition. The first match will be returned.")
-      ref.ndx <- ref.ndx[1]
+      ref.ndx <- refplot..ndx[1]
     }
     mean.ref <- mean[ref.ndx]
     mean <- mean/mean.ref
@@ -2281,12 +2295,15 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   df$mean[is.na(df$mean)] <- 0
   df$CI.L[is.na(df$CI.L)] <- 0
   df$CI.R[is.na(df$CI.R)] <- 0
+
+  if(is.null(label.size) || label.size == "") label.size <-  12-length(unique(df$name))^(1/3)
+
   p <- ggplot(df, aes(x=name, y=mean, fill = group)) +
     geom_bar(stat="identity", color = "black") +
     geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.2) +
     ggplot2::labs(x = "Condition", y = paste0(param, " (\u00B1 95% CI)")) +
     theme_minimal(base_size = basesize) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = label.size),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"),
           # remove the vertical grid lines
           panel.grid.major.x = element_blank() ,

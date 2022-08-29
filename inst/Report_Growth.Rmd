@@ -982,7 +982,7 @@ for(i in 1:length(grofit$drFit$drBootSplines)){
 `r if(!all(is.na(mean.grp))){"\\clearpage"}`
 
 ## `r if(!all(is.na(mean.grp))){"Group average plots"}`
-```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
+```{r average_plots, fig.width=10, fig.height = 12, echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if("all" %in% mean.grp){
   if("s" %in% grofit$control$fit.opt){
     plot.grofit(grofit, basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
