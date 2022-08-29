@@ -5,6 +5,12 @@
 #' @param gcFittedLinear A \code{gcFittedLinear} object created with \code{\link{growth.gcFitLinear}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
 #' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param cex.axis (Numeric) Font size of axis annotations.
+#' @param lwd (Numeric) Line width.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -15,7 +21,8 @@
 #' @export plot.gcFitLinear
 #' @export
 #'
-plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics"),
+plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics", "fit_diagnostics"), cex.point = 1, cex.lab = 1.5,
+                             cex.axis = 1.3, lwd = 2, y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
 {
@@ -25,12 +32,13 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
     switch(which,
            fit = {
 
-             par(cex.lab=1.5)
+             par(cex.lab = cex.lab, cex.axis = cex.axis)
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab="Density",
-                  log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", ...)
-             axis(1,cex.axis=1.3)
-             axis(2,cex.axis=1.3, las=1)
-             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=21, col="black", bg="red"))
+                  log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
+             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point)
+             axis(1)
+             axis(2, las=1)
+             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=21, cex = cex.point*1.15, col="black", bg="red"))
 
              ## lag phase
              lag <- gcFittedLinear$par["lag"]
@@ -38,31 +46,39 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 
 
              if(gcFittedLinear$fitFlag2){
-               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- gcFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > gcFittedLinear$raw.time[1]){
                  try(time2 <- seq(lag2, max(gcFittedLinear$"raw.time"), length=200), silent = T)
                  try(time <- seq(coef_["tmax_start"]-0.25*(coef_["tmax_end"]-coef_["tmax_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
-                 try(lines(time2, gcFittedLinear$FUN(time2, unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
-                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag2), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
-                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag2), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
+                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
                  try(time2 <- seq(coef_["tmax2_start"]-0.25*(coef_["tmax2_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
                  try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
                  try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
-                 try(lines(time2, gcFittedLinear$FUN(time2, parms = unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
-
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, parms = unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
                }
              } else {
                try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
-               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
+             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , line = -2, outer = TRUE)
+             mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
+                         "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
+                         "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
+                         "t0:", gcFittedLinear$control$t0,
+                         "  min.density:", gcFittedLinear$control$min.density,
+                         "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
+                          side = 3, line = -4, adj = 0.05, outer = TRUE)
+
            },
            diagnostics = {
-             opar <- par(no.readonly = TRUE)
-             on.exit(par(opar))
+             # opar <- par(no.readonly = TRUE)
+             # on.exit(par(opar))
              par(mfrow=c(1,2))
 
              ## residuals vs. fitted
@@ -72,6 +88,74 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              abline(h=0, col="grey")
              ## normal q-q-plot
              qqnorm(gcFittedLinear$fit[["residuals"]])
+             qqline(gcFittedLinear$fit[["residuals"]])
+           },
+           fit_diagnostics = {
+             opar <- par(no.readonly = TRUE)
+             on.exit(par(opar))
+             layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
+             par(mai = c(0.7, 0.7, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+
+             # par(cex.lab = cex.lab)
+             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab="Density",
+                  log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
+             title("Linear fit", line = 2)
+             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point)
+             axis(1)
+             axis(2, las=1)
+             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=21, cex = cex.point*1.15, col="black", bg="red"))
+
+             ## lag phase
+             lag <- gcFittedLinear$par["lag"]
+             coef_ <- gcFittedLinear$par
+
+
+             if(gcFittedLinear$fitFlag2){
+               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               lag2 <- gcFittedLinear$par["lag2"]
+               if(lag2 < lag && lag2 > gcFittedLinear$raw.time[1]){
+                 try(time2 <- seq(lag2, max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(time <- seq(coef_["tmax_start"]-0.25*(coef_["tmax_end"]-coef_["tmax_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag2), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
+                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               } else {
+                 try(time2 <- seq(coef_["tmax2_start"]-0.25*(coef_["tmax2_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
+                 try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+                 try(lines(time2, gcFittedLinear$FUN(time2, parms = unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+
+               }
+             } else {
+               try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
+               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
+             }
+             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.5, outer = TRUE)
+             mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
+                         "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
+                         "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
+                         "t0:", gcFittedLinear$control$t0,
+                         "  min.density:", gcFittedLinear$control$min.density,
+                         "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
+                   side = 3, line = -2.5, adj = 0.05, outer = TRUE)
+
+             # mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 3 , adj = 0.95, line = -1, outer = TRUE)
+             # mtext(paste("h:", gcFittedLinear$control4lin.h,
+             #             "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
+             #             "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
+             #             "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
+             #       side = 4, line = -2, outer = TRUE)
+
+             ## residuals vs. fitted
+             obs <- gcFittedLinear$log.data
+             sim <- gcFittedLinear$FUN(gcFittedLinear$"raw.time", gcFittedLinear$par)
+             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals", type = "n")
+             points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point)
+             abline(h=0, col="grey")
+             ## normal q-q-plot
+             qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point)
              qqline(gcFittedLinear$fit[["residuals"]])
            }
     )
@@ -149,7 +233,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
     p <-    ggplot(df, aes(x=time, y=data)) +
       geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
       xlab("Time") +
-      ylab(label = ifelse(gcFittedModel$control$log.y.spline == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
+      ylab(label = ifelse(gcFittedModel$control$log.y.model == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
       theme_classic(base_size = 16) +
       ggtitle(gsub(" \\| NA", "", paste(gcFittedModel$gcID, collapse=" | "))) +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
@@ -166,13 +250,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           "text",
           label = "y(t) == frac(A , 1+exp(frac(4 %.% mu, A) %.% (lambda - t) + 2))",
           x = 1.08 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.2) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ),
                    x = 1.13 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = F, size = 2.5) +
           scale_color_manual(name='Growth Model',
                              breaks = "logistic",
@@ -183,13 +267,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           "text",
           label = "y(t) == A%.%(1.0+nu%.%italic(e)^{1+nu}%.%exp(frac(mu,A)%.%(1+nu)^(1+frac(1,nu))%.%( lambda - t )))^(-1/nu)",
           x = 1.17 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.2) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ~~~~ nu == .(round(as.numeric(gcFittedModel$parameters$fitpar$nu[1],3)))),
                    x = 1.22 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = F, size = 2.5) +
           scale_color_manual(name='Growth Model',
                              breaks = "richards",
@@ -200,13 +284,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           "text",
           label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1))",
           x = 1.08 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.4) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ),
                    x = 1.13 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = F, size = 2.5) +
           scale_color_manual(name='Growth Model',
                              breaks = "gompertz",
@@ -218,14 +302,14 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           "text",
           label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1)) + A%.%exp(alpha%.%(t-t[shift]))",
           x = 1.16 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.2) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ alpha == .(round(gcFittedModel$parameters$fitpar$alpha[1],3))  ~~~~
                                     t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[1],2)) ),
                    x = 1.21 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-                   y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                   y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = F, size = 2.5) +
           scale_color_manual(name='Growth Model',
                              breaks = "gompertz.exp",
@@ -236,13 +320,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           "text",
           label = "y(t) == y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu%.%(t+0.25%.%log(frac(1+exp(-4%.%(t-lambda)),1+exp(4%.%lambda))))) )",
           x = 1.16 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-          y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.0) +
            annotate("text",
                     label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                      lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ),
                     x = 1.21 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
-                    y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                     angle = 90, parse = F, size = 2.3) +
            scale_color_manual(name='Growth Model',
                               breaks = "huang",
@@ -1225,6 +1309,20 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 
       p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
 
+      if(!is.null(x.lim)){
+        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
+
+      p <- p +
+        annotate(
+          "text",
+          label = paste("t0:", gcFitSpline$control$t0, "  min.density:", gcFitSpline$control$min.density, "  smoothing:", gcFitSpline$control$smooth.gc),
+          x = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$x.range[2],
+          y = 1.2 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+          angle = 0, parse = F, size = 3.2)
+
       if(log.y == TRUE){
         if(!is.null(y.lim)){
           p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = 'log')
@@ -1239,11 +1337,9 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         }
       }
 
-      if(!is.null(x.lim)){
-        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
-      } else {
-        p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
-      }
+
+
+
 
 
       # /// add tangent at maximum slope

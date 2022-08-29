@@ -964,8 +964,8 @@ boot.ec50.df <- data.frame()
         boot.ec50.df,
         data.frame(
           "Condition" = grofit$drFit$drTable$Test[i],
-          "EC50.boot" = paste(round(as.numeric(grofit$drFit$drTable$drboot.meanEC50[i]), 3),"\u00B1", round(as.numeric(grofit$drFit$drTable$drboot.sdEC50[i]),3)),
-          "Response.boot" = paste(round(as.numeric(grofit$drFit$drTable$drboot.meanEC50y[i]), 3),"\u00B1", round(as.numeric(grofit$drFit$drTable$drboot.sdEC50y[i]),3))
+          "EC50.boot \u00B1 SD" = paste(round(as.numeric(grofit$drFit$drTable$drboot.meanEC50[i]), 3),"\u00B1", round(as.numeric(grofit$drFit$drTable$drboot.sdEC50[i]),3)),
+          "Response.boot \u00B1 SD" = paste(round(as.numeric(grofit$drFit$drTable$drboot.meanEC50y[i]), 3),"\u00B1", round(as.numeric(grofit$drFit$drTable$drboot.sdEC50y[i]),3))
         )
       )
   }

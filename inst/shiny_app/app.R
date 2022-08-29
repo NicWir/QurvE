@@ -669,7 +669,140 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
                                         h1('Under construction'))
                     ),
+                    # Validate
+                    navbarMenu("Validate",
+                               tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
+                                        h1("Growth Fits"),
+                                        tabsetPanel(type = "tabs",
+                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_linearFits",
+                                                             sidebarPanel(width = 5,
+                                                                          selectInput(inputId = "sample_validate_growth_linear",
+                                                                                      label = "Sample:",
+                                                                                      width = "fit-content",
+                                                                                      choices = "",
+                                                                                      multiple = FALSE,
+                                                                                      selectize = FALSE,
+                                                                                      size = 5,
+                                                                          ),
+                                                                          checkboxInput(inputId = 'logy_validate_growth_plot_linear',
+                                                                                        label = 'Log-transform y axis',
+                                                                                        value = TRUE),
+                                                                          checkboxInput(inputId = 'diagnostics_validate_growth_plot_linear',
+                                                                                        label = 'Show diagnostics',
+                                                                                        value = FALSE)
 
+                                                             ),
+                                                             mainPanel(width = 7,
+                                                                       plotOutput("validate_growth_plot_linear", width = "100%", height = "600px"),
+                                                                       fluidRow(
+                                                                         column(6, align = "center", offset = 3,
+                                                                                actionButton(inputId = "rerun_growth_linear",
+                                                                                             label = "Re-run with modified parameters",
+                                                                                             icon=icon("gears"),
+                                                                                             style="padding:5px; font-size:120%"),
+                                                                                actionButton(inputId = "restore_growth_linear",
+                                                                                             label = "Restore fit",
+                                                                                             # icon=icon("gears"),
+                                                                                             style="padding:5px; font-size:120%")
+                                                                         )
+                                                                       )
+                                                             )
+
+                                                    ),
+                                                    tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
+                                                             sidebarPanel(width = 5,
+                                                                          selectInput(inputId = "sample_validate_growth_spline",
+                                                                                      label = "Sample:",
+                                                                                      width = "fit-content",
+                                                                                      choices = "",
+                                                                                      multiple = FALSE,
+                                                                                      selectize = FALSE,
+                                                                                      size = 5,
+                                                                          ),
+                                                                          checkboxInput(inputId = 'logy_validate_growth_plot_spline',
+                                                                                        label = 'Log-transform y axis',
+                                                                                        value = TRUE)
+
+                                                             ),
+                                                             mainPanel(width = 7,
+                                                                       withSpinner(
+                                                                         plotOutput("validate_growth_plot_spline",
+                                                                                    width = "100%", height = "700px")
+                                                                       ),
+                                                                       fluidRow(
+                                                                         column(6, align = "center", offset = 3,
+                                                                                actionButton(inputId = "rerun_growth_spline",
+                                                                                             label = "Re-run with modified parameters",
+                                                                                             icon=icon("gears"),
+                                                                                             style="padding:5px; font-size:120%"),
+                                                                                actionButton(inputId = "restore_growth_spline",
+                                                                                             label = "Restore fit",
+                                                                                             # icon=icon("gears"),
+                                                                                             style="padding:5px; font-size:120%")
+                                                                         )
+                                                                       )
+                                                             )
+
+                                                    ),
+                                                    tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
+                                                             sidebarPanel(width = 5,
+                                                                          wellPanel(
+                                                                            style='background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
+                                                                            selectInput(inputId = "sample_validate_growth_model",
+                                                                                        label = "Sample:",
+                                                                                        width = "fit-content",
+                                                                                        choices = "",
+                                                                                        multiple = FALSE,
+                                                                                        selectize = FALSE,
+                                                                                        size = 5,
+                                                                            )
+                                                                          )
+
+                                                             ),
+                                                             mainPanel(width = 7,
+                                                                       withSpinner(
+                                                                         plotOutput("validate_growth_plot_model",
+                                                                                    width = "100%", height = "600px")
+                                                                       ),
+                                                                       fluidRow(
+                                                                         column(6, align = "center", offset = 3,
+                                                                                actionButton(inputId = "rerun_growth_model",
+                                                                                             label = "Re-run with modified parameters",
+                                                                                             icon=icon("gears"),
+                                                                                             style="padding:5px; font-size:120%"),
+
+                                                                                actionButton(inputId = "restore_growth_model",
+                                                                                             label = "Restore fit",
+                                                                                             # icon=icon("gears"),
+                                                                                             style="padding:5px; font-size:120%")
+                                                                         )
+                                                                       )
+                                                             )
+
+                                                    )
+                                        )
+                               ),
+                               tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
+                                        h1("Fluorescence Fits"),
+                                        tabsetPanel(type = "tabs",
+                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Fluorescence_linearFits",
+                                                             sidebarPanel(
+                                                               selectInput(inputId = "sample_validate_fluorescence_linear",
+                                                                           label = "Sample:",
+                                                                           choices = "",
+                                                                           multiple = TRUE
+                                                               )
+
+                                                             )
+
+                                                    ),
+                                                    tabPanel(title = "Nonparametric fits",
+                                                             sidebarPanel()
+
+                                                    )
+                                        )
+                               )
+                    ),
                     # Visualize
                     navbarMenu("Visualize",
                                tabPanel(title = "Growth Plots", value = "tabPanel_Visalize_Growth",
@@ -1280,11 +1413,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    paste("pch:", input$shape_type_dose_response_growth_plot,
-          "cex:", input$shape_size_dose_response_growth_plot,
-          "basesize:", input$base_size_dose_response_growth_plot,
-          "lwd:", input$line_width_dose_response_growth_plot,
-          "ec50line", input$show_ec50_indicator_lines_dose_response_growth_plot)
+    results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$data.in
+    input$min.density.model.rerun
   })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
@@ -1368,6 +1498,7 @@ server <- function(input, output, session){
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     format
   })
+
   outputOptions(output, 'data_growth_format', suspendWhenHidden=FALSE)
 
   growth_excel_sheets <- reactive({
@@ -1421,9 +1552,17 @@ server <- function(input, output, session){
       fit.opt <- c(fit.opt,
                    's')
     }
+    # combine selected models into vector
+    models <- c()
+    if(input$logistic_growth == TRUE) models <- c(models, "logistic")
+    if(input$richards_growth == TRUE) models <- c(models, "richards")
+    if(input$gompertz_growth == TRUE) models <- c(models, "gompertz")
+    if(input$extended_gompertz_growth == TRUE) models <- c(models, "gompertz.exp")
+    if(input$huang_growth == TRUE) models <- c(models, "huang")
 
     # Run growth workflow
     shiny::withProgress(
+
       results$growth <- growth.workflow(grodata = grodata,
                                         ec50 = input$perform_ec50_growth,
                                         fit.opt = fit.opt,
@@ -1440,7 +1579,7 @@ server <- function(input, output, session){
                                         interactive = F, ### TODO (popups)
                                         nboot.gc = input$number_of_bootstrappings,
                                         smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                        model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"), ### TODO: implement like model and huang button
+                                        model.type = models,
                                         growth.thresh = input$growth_threshold_growth,
                                         dr.parameter = input$response_parameter_growth, ### TODO if else bla
                                         smooth.dr = input$smooth.dr,
@@ -1571,10 +1710,378 @@ server <- function(input, output, session){
                              escape = FALSE)
     table_model
   })
+  # Validate
+  ## Growth
+
+  #### Hide [Restore Fit] buttons when starting the app
+  hide("restore_growth_linear"); hide("restore_growth_spline"); hide("restore_growth_model")
+  #### Hide [Restore Fit] buttons whenever a sample is changed
+  observeEvent(input$sample_validate_growth_linear, {
+    hide("restore_growth_linear")
+  })
+  observeEvent(input$sample_validate_growth_spline, {
+    hide("restore_growth_spline")
+  })
+  observeEvent(input$sample_validate_growth_model, {
+    hide("restore_growth_model")
+  })
 
 
-  # Growth Plots:
-  ## Group Plots
+  #####------- Initialize the Memory to store settings ----------
+  selected_vals_validate_growth <- reactiveValues(sample_validate_growth_linear = 1,
+                                                  sample_validate_growth_spline = 1,
+                                                  sample_validate_growth_model = 1)
+
+  #####------ Whenever any of the inputs are changed, it only modifies the memory----
+  observe({
+    req(input$sample_validate_growth_linear)
+    selected_vals_validate_growth$sample_validate_growth_linear <- input$sample_validate_growth_linear
+  })
+  observe({
+    req(input$sample_validate_growth_spline)
+    selected_vals_validate_growth$sample_validate_growth_spline <- input$sample_validate_growth_spline
+  })
+  observe({
+    req(input$sample_validate_growth_model)
+    selected_vals_validate_growth$sample_validate_growth_model <- input$sample_validate_growth_model
+  })
+
+  #### Linear Fits
+
+
+  selected_inputs_validate_growth_linear_sample <- reactive({
+    results <- results$growth
+    if(is.null(results)) return("")
+    if("l" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      select_samples <- names(results$gcFit$gcFittedLinear)
+    } else {
+      return("")
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "sample_validate_growth_linear",
+                      choices = selected_inputs_validate_growth_linear_sample(),
+                      selected = selected_vals_validate_growth$sample_validate_growth_linear
+    )})
+
+  logy_validate_growth_plot_linear <- reactive({
+    if(input$logy_validate_growth_plot_linear) return("y")
+    else return("")
+  })
+
+
+  output$validate_growth_plot_linear <- renderPlot({
+    results <- results$growth
+
+    plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+                     log = logy_validate_growth_plot_linear()
+                     # ADD FURTHER INPUT (see Notion)
+    )
+    if(input$diagnostics_validate_growth_plot_linear){
+      plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+                       which = "fit_diagnostics",
+                       log = logy_validate_growth_plot_linear()
+                       # ADD FURTHER INPUT (see Notion)
+      )
+    }
+  })
+
+  lin.rerun.param <- reactiveValues()
+
+  observeEvent(input$rerun_growth_linear, {
+    # display a modal dialog with a header, textinput and action buttons
+    showModal(
+      modalDialog(
+        tags$h2('Please enter adjusted parameters'),
+        textInput('t0.lin.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$t0)),
+        textInput('min.density.lin.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.density)),
+        textAreaInput('quota.rerun', 'Quota', placeholder = HTML(paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$quota,
+                                                                        "\n",
+                                                                        "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
+        textInput('lin.h.rerun', 'Sliding window size (h)', placeholder = paste0("previously: ",
+                                                                                 ifelse(!is.null(results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.h),
+                                                                                                 results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.h,
+                                                                                                 "NULL"))),
+        textInput('lin.R2.rerun', 'R2 threshold', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.R2)),
+        textInput('lin.RSD.rerun', 'RSD threshold for slope', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.RSD)),
+        footer=tagList(
+          actionButton('submit.rerun.linear', 'Submit'),
+          modalButton('cancel')
+        )
+      )
+    )
+  })
+
+  # Re-run selected linear fit with user-defined parameters upon click on 'submit'
+  observeEvent(input$submit.rerun.linear, {
+    if(!is.null(results$growth$gcFit)){
+      # store previous fit in memory
+      selected_vals_validate_growth$restore_growth_linear <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]
+
+      # Re-run fit and store in results object
+      actwell <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$raw.data
+      acttime <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$raw.time
+      control <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control
+      control_new <- control
+      gcID <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$gcID
+
+      lin.h.new <- dplyr::if_else(!is.na(as.numeric(input$lin.h.rerun)), as.numeric(input$lin.h.rerun), control$lin.h)
+      if(!is.na(lin.h.new)) control_new$lin.h <- lin.h.new
+      control_new$lin.R2 <- dplyr::if_else(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
+      control_new$lin.RSD <- dplyr::if_else(!is.na(as.numeric(input$lin.RSD.rerun)), as.numeric(input$lin.RSD.rerun), control$lin.RSD)
+      control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun)), as.numeric(input$t0.lin.rerun), control$t0)
+      min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun)), as.numeric(input$min.density.lin.rerun), control$min.density)
+      if(is.numeric(min.density.lin.new)){
+        if(!is.na(min.density.lin.new) && all(as.vector(actwell) < min.density.lin.new)){
+          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
+        } else if(!is.na(min.density.lin.new)){
+          control_new$min.density <- min.density.lin.new
+        }
+      }
+      quota_new <- ifelse(!is.na(as.numeric(input$quota.rerun)), as.numeric(input$quota.rerun), 0.95)
+
+
+      try(
+        results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]] <-
+          growth.gcFitLinear(acttime, actwell,
+                             gcID = gcID,
+                             control = control_new,
+                             quota = quota_new)
+      )
+      # Show [Restore fit] button
+      show("restore_growth_linear")
+    }
+
+    removeModal()
+  })
+
+  # Restore previous linear fit upon click on [Restore Fit]
+  observeEvent(input$restore_growth_linear, {
+    # store previous fit from memory
+    results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]] <- selected_vals_validate_growth$restore_growth_linear
+    hide("restore_growth_linear")
+  })
+
+  #### Spline Fits
+  selected_inputs_validate_growth_spline_sample <- reactive({
+    results <- results$growth
+    if(is.null(results)) return("")
+    if("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      select_samples <- names(results$gcFit$gcFittedSpline)
+    } else {
+      return("")
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "sample_validate_growth_spline",
+                      choices = selected_inputs_validate_growth_spline_sample(),
+                      selected = selected_vals_validate_growth$sample_validate_growth_spline
+    )})
+
+
+  output$validate_growth_plot_spline <- renderPlot({
+    results <- results$growth
+
+    plot.gcFitSpline(results$gcFit$gcFittedSpline[[input$sample_validate_growth_spline]],
+                     log.y = input$logy_validate_growth_plot_spline, colData = 1
+    )
+  })
+
+  spline.rerun.param <- reactiveValues()
+
+  observeEvent(input$rerun_growth_spline, {
+    # display a modal dialog with a header, textinput and action buttons
+    showModal(
+      modalDialog(
+        tags$h2('Please enter adjusted parameters'),
+        textInput('t0.spline.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSpline[[input$sample_validate_growth_spline]]$control$t0)),
+        textInput('min.density.spline.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSpline[[input$sample_validate_growth_spline]]$control$min.density)),
+        textInput('smooth.gc.rerun', 'Smoothing factor', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSpline[[input$sample_validate_growth_spline]]$control$smooth.gc)),
+        footer=tagList(
+          actionButton('submit.rerun.spline', 'Submit'),
+          modalButton('cancel')
+        )
+      )
+    )
+  })
+
+  # Re-run selected spline fit with user-defined parameters upon click on 'submit'
+  observeEvent(input$submit.rerun.spline, {
+    if(!is.null(results$growth$gcFit)){
+    # store previous fit in memory
+    selected_vals_validate_growth$restore_growth_spline <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]
+
+    # Re-run fit and store in results object
+    actwell <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$data.in
+    acttime <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$time.in
+    control <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control
+    control_new <- control
+    gcID <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$gcID
+
+    control_new$smooth.gc <- dplyr::if_else(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$lin.R2)
+    control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
+    min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
+    if(is.numeric(min.density.spline.new)){
+      if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
+        message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                       min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
+      } else if(!is.na(min.density.spline.new)){
+        control_new$min.density <- min.density.spline.new
+      }
+    }
+
+
+    try(
+      results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]] <-
+        growth.gcFitSpline(acttime, actwell,
+                           gcID = gcID,
+                           control = control_new)
+    )
+    # Show [Restore fit] button
+    show("restore_growth_spline")
+    }
+
+    removeModal()
+
+  })
+
+  # Restore previous spline fit upon click on [Restore Fit]
+  observeEvent(input$restore_growth_spline, {
+    # store previous fit from memory
+    results$growth$gcFit$gcFittedSpline[[selected_vals_validate_growth$sample_validate_growth_spline]] <- selected_vals_validate_growth$restore_growth_spline
+    hide("restore_growth_spline")
+  })
+
+  #### Model Fits
+  selected_inputs_validate_growth_model_sample <- reactive({
+    results <- results$growth
+    if(is.null(results)) return("")
+    if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      select_samples <- names(results$gcFit$gcFittedModel)
+    } else {
+      return("")
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "sample_validate_growth_model",
+                      choices = selected_inputs_validate_growth_model_sample(),
+                      selected = selected_vals_validate_growth$sample_validate_growth_model
+    )})
+
+  output$validate_growth_plot_model <- renderPlot({
+    results <- results$growth
+
+    plot.gcFitModel(results$gcFit$gcFittedModels[[input$sample_validate_growth_model]],
+                    colData=1, colModel=2, colLag = 3,
+    )
+  })
+
+  model.rerun.param <- reactiveValues()
+
+  observeEvent(input$rerun_growth_model, {
+    # display a modal dialog with a header, textinput and action buttons
+    showModal(
+      modalDialog(
+        tags$h2('Please enter adjusted parameters'),
+        textInput('t0.model.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$t0)),
+        textInput('min.density.model.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$min.density)),
+        wellPanel(
+          h4(strong('Models:')),
+          style='background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
+          checkboxInput(inputId = 'logistic_growth_rerun',
+                        label = 'logistic',
+                        value = ("logistic" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+
+          checkboxInput(inputId = 'richards_growth_rerun',
+                        label = 'Richards',
+                        value = ("richards" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+
+          checkboxInput(inputId = 'gompertz_growth_rerun',
+                        label = 'Gompertz',
+                        value = ("gompertz" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+
+          checkboxInput(inputId = 'extended_gompertz_growth_rerun',
+                        label = 'extended Gompertz',
+                        value = ("gompertz.exp" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+
+          checkboxInput(inputId = 'huang_growth_rerun',
+                        label = 'Huang',
+                        value = ("huang" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type))
+        ),
+        footer=tagList(
+          actionButton('submit.rerun.model', 'Submit'),
+          modalButton('cancel')
+        )
+      )
+    )
+  })
+
+  # Re-run selected model fit with user-defined parameters upon click on 'submit'
+  observeEvent(input$submit.rerun.model, {
+    if(!is.null(results$growth$gcFit)){
+      # store previous fit in memory
+      selected_vals_validate_growth$restore_growth_model <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]
+
+      # Re-run fit and store in results object
+      actwell <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$data.in
+      acttime <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$time.in
+      control <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control
+      control_new <- control
+      gcID <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$gcID
+
+      control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.model.rerun)), as.numeric(input$t0.model.rerun), control$t0)
+      min.density.model.new <- ifelse(!is.na(as.numeric(input$min.density.model.rerun)), as.numeric(input$min.density.model.rerun), control$min.density)
+      if(is.numeric(min.density.model.new)){
+        if(!is.na(min.density.model.new) && all(as.vector(actwell) < min.density.model.new)){
+          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
+        } else if(!is.na(min.density.model.new)){
+          control_new$min.density <- min.density.model.new
+        }
+      }
+      # combine selected models into vector
+      models <- c()
+      if(input$logistic_growth_rerun == TRUE) models <- c(models, "logistic")
+      if(input$richards_growth_rerun == TRUE) models <- c(models, "richards")
+      if(input$gompertz_growth_rerun == TRUE) models <- c(models, "gompertz")
+      if(input$extended_gompertz_growth_rerun == TRUE) models <- c(models, "gompertz.exp")
+      if(input$huang_growth_rerun == TRUE) models <- c(models, "huang")
+      control_new$model.type <- models
+
+      try(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]] <-
+        growth.gcFitModel(acttime, actwell,
+                           gcID = gcID,
+                           control = control_new))
+      # Show [Restore fit] button
+      show("restore_growth_model")
+    }
+
+    removeModal()
+
+  })
+
+  # Restore previous model fit upon click on [Restore Fit]
+  observeEvent(input$restore_growth_model, {
+    # store previous fit from memory
+    results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]] <- selected_vals_validate_growth$restore_growth_model
+    hide("restore_growth_model")
+  })
+
+
+  ## Fluorescence
+  # Visualize
+  ## Growth Plots:
+  ### Group Plots
   output$growth_group_plot <- renderPlot({
     results <- results$growth
     plot.grofit(results,
@@ -1665,7 +2172,7 @@ server <- function(input, output, session){
   #   }
   # })
 
-  ## growth: plot.drFit
+  ### growth: plot.drFit
   observe({
     if(!is.null(results$growth)){
       if(!input$perform_ec50_growth){
