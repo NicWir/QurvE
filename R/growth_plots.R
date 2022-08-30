@@ -2390,10 +2390,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #'
-#' @return
 #' @export
 #'
-#' @examples
 plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
                               names = NULL, basesize = 12, reference.nm = NULL,
                               plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL)

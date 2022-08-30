@@ -37,7 +37,6 @@
 #'
 #' @export
 #'
-#' @examples
 fl.control <- function(fit.opt = c("l", "s"),
                        x_type = c("density", "time"),
                        norm_fl = TRUE,
@@ -187,7 +186,6 @@ fl.control <- function(fit.opt = c("l", "s"),
 #'
 #' @export
 #'
-#' @examples
 flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
                         control = fl.control(x_type = c("density", "time"), log.x.spline = FALSE, log.y.spline = FALSE, smooth.fl = 0.75, t0 = 0, min.density = NA))
 {
@@ -738,7 +736,6 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' @return
 #' @export
 #'
-#' @examples
 flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control(), ...)
 {
   # Define objects based on additional function calls
@@ -1110,7 +1107,6 @@ flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control(), .
 #'
 #' @export
 #'
-#' @examples
 flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined",  quota = 0.95,
                         control = fl.control(x_type = c("density", "time"), t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY = 0.05, biphasic = FALSE))
 {
@@ -2117,7 +2113,6 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' \item{control}{Object of class \code{fl.control} created with the call of \code{\link{fl.control}}.}
 #' @export
 #'
-#' @examples
 fl.workflow <- function(grodata = NULL,
                         time = NULL,
                         density = NULL,
@@ -2459,7 +2454,6 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50, format = c(
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). \doi{10.1038/s41589-018-0168-3}
 #'
-#' @examples
 fl.drFit <- function(FitData, control = fl.control())
 {
   if (is(control) != "fl.control")
@@ -2576,7 +2570,6 @@ fl.drFit <- function(FitData, control = fl.control())
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). \doi{10.1038/s41589-018-0168-3}
 #'
-#' @examples
 fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control())
 {
   if (is(control) != "fl.control")
