@@ -383,8 +383,10 @@ read_data <-
 #' @param convert.time (Logical) Shall the time be converted from, e.g., 00:15:00 in Excel into hours (\code{TRUE}) or not (\code{FALSE})?
 #' @param data.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
 #' @param map.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
-#' @param csvsep (Character) separator used in CSV file (ignored for other file types).  Default: \code{";"}
-#' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
+#' @param csvsep.data (Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}
+#' @param dec.data (Character) decimal separator used in CSV, TSV or TXT data file.
+#' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
+#' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
 #' @param map.file (Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #'
@@ -399,8 +401,10 @@ parse_data <-
            convert.time = TRUE,
            data.sheet = 1,
            map.sheet = 1,
-           csvsep = ";",
-           dec = ".",
+           csvsep.data = ";",
+           dec.data = ".",
+           csvsep.map = ";",
+           dec.map = ".",
            subtract.blank  = T
   ) {
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
@@ -409,13 +413,13 @@ parse_data <-
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
-      input <- read_file(data.file, csvsep=csvsep, dec=dec, sheet=data.sheet)
+      input <- read_file(data.file, csvsep=csvsep.data, dec=dec.data, sheet=data.sheet)
     } else {
       stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
     }
     if(!is.null(map.file)){
       if (file.exists(map.file)) {
-        mapping <- read_file(map.file, csvsep=csvsep, dec=dec, sheet=map.sheet)
+        mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=map.sheet)
       } else {
         stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
       }

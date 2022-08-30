@@ -18,14 +18,3 @@ grofit.param(time, data, gcID = "undefined", control)
 \description{
 Internal function called within \code{\link{growth.gcFitModel}}.
 }
-\seealso{
-Other growth fitting functions: 
-\code{\link{growth.drFit}()},
-\code{\link{growth.gcBootSpline}()},
-\code{\link{growth.gcFitLinear}()},
-\code{\link{growth.gcFitModel}()},
-\code{\link{growth.gcFitSpline}()},
-\code{\link{growth.gcFit}()},
-\code{\link{growth.workflow}()}
-}
-\concept{growth fitting functions}

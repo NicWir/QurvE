@@ -11,8 +11,10 @@ parse_data(
   convert.time = TRUE,
   data.sheet = 1,
   map.sheet = 1,
-  csvsep = ";",
-  dec = ".",
+  csvsep.data = ";",
+  dec.data = ".",
+  csvsep.map = ";",
+  dec.map = ".",
   subtract.blank = T
 )
 }
@@ -29,9 +31,13 @@ parse_data(
 
 \item{map.sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
 
-\item{csvsep}{(Character) separator used in CSV file (ignored for other file types).  Default: \code{";"}}
+\item{csvsep.data}{(Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}}
 
-\item{dec}{(Character) decimal separator used in CSV, TSV and TXT files.}
+\item{dec.data}{(Character) decimal separator used in CSV, TSV or TXT data file.}
+
+\item{csvsep.map}{(Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}}
+
+\item{dec.map}{(Character) decimal separator used in CSV, TSV or TXT mapping file.}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 }

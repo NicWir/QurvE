@@ -7,12 +7,18 @@
 \method{plot}{drFit}(
   drFit,
   combine = TRUE,
+  names = NULL,
+  exclude.nm = NULL,
   pch = 16,
   cex = 2,
   basesize = 15,
   colors = NULL,
   lwd = 0.7,
   ec50line = TRUE,
+  y.lim = NULL,
+  x.lim = NULL,
+  y.title = NULL,
+  x.title = NULL,
   plot = TRUE,
   export = FALSE,
   height = NULL,
@@ -26,6 +32,10 @@
 
 \item{combine}{(Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).}
 
+\item{names}{(String or vector of strings) Define conditions to combine into a single plot (if \code{combine = TRUE}). Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
+
+\item{exclude.nm}{(String or vector of strings) Define conditions to exclude from the plot (if \code{combine = TRUE}). Partial matches with sample/group names are accepted.}
+
 \item{pch}{(Numeric) Shape of the raw data symbols.}
 
 \item{basesize}{(Numeric) Base font size.}
@@ -35,6 +45,14 @@
 \item{lwd}{(Numeric) Line width of the individual splines.}
 
 \item{ec50line}{(Logical) Show pointed horizontal and vertical lines at the EC50 values (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.title}{(Character) Optional: Provide a title for the y-axis.}
+
+\item{x.title}{(Character) Optional: Provide a title for the x-axis.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).}
 

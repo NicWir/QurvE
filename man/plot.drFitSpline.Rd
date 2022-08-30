@@ -12,6 +12,10 @@
   colSpline = 1,
   colData = 1,
   cex = 1,
+  y.lim = NULL,
+  x.lim = NULL,
+  y.title = NULL,
+  x.title = NULL,
   lwd = 2,
   plot = TRUE,
   export = FALSE,
@@ -35,6 +39,14 @@
 \item{colData}{(Numeric or character) Contour color of the raw data circles.}
 
 \item{cex}{(Numeric) Size of the raw data symbols.}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.title}{(Character) Optional: Provide a title for the y-axis.}
+
+\item{x.title}{(Character) Optional: Provide a title for the x-axis.}
 
 \item{lwd}{(Numeric) Line width of spline.}
 

@@ -109,7 +109,6 @@ Petzoldt T (2022). \emph{growthrates: Estimate Growth Rates from Experimental Da
 }
 \seealso{
 Other growth fitting functions: 
-\code{\link{grofit.param}()},
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcBootSpline}()},
 \code{\link{growth.gcFitModel}()},

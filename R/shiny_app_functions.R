@@ -123,19 +123,19 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
   }
   names(read.data) <- reads
   data.ls <- list()
-  if (!is.null(density.nm))
+  if (!is.null(density.nm) && density.nm != "Ignore")
     density <- read.data[[match(density.nm, reads)]]
   else
     density <-  read.data[[match(density.nm, reads)]] <- NULL
 
-  if(!is.null(fl1.nm)){
+  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
     fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
     fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
   }
   else
     fluorescence1 <- NULL
 
-  if(!is.null(fl2.nm)){
+  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
     fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
     fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
   }

@@ -45,7 +45,6 @@ Other workflows:
 \code{\link{growth.workflow}()}
 
 Other growth fitting functions: 
-\code{\link{grofit.param}()},
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcBootSpline}()},
 \code{\link{growth.gcFitLinear}()},

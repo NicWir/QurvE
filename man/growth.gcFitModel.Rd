@@ -46,7 +46,6 @@ Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Ksch
 }
 \seealso{
 Other growth fitting functions: 
-\code{\link{grofit.param}()},
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcBootSpline}()},
 \code{\link{growth.gcFitLinear}()},

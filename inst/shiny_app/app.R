@@ -23,6 +23,7 @@ source("../../R/growth_summaries.R")
 source("../../R/fluorescence_computation.R")
 source("../../R/fluorescence_plots.R")
 source("../../R/fluorescence_summaries.R")
+source("../../R/shiny_app_functions.R")
 
 jscode <- "
 shinyjs.disableTab = function(name) {
@@ -78,59 +79,155 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                     tabPanel('Data',
                              icon = icon("file-lines"),
                              value = "tabPanel",
-                             tabsetPanel(type = "tabs",
+                             tabsetPanel(type = "tabs", id = "tabs_data",
 
                                          tabPanel(title = "Custom",
                                                   sidebarPanel(
                                                     style='border-color: #ADADAD',
+                                                    selectInput(inputId = "format",
+                                                                label = "Select Format",
+                                                                choices = c("Data in columns" = "data_in_columns",
+                                                                            "Data in rows" = "data_in_rows")),
                                                     wellPanel(
                                                       h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                       style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                      # select file type
-                                                      selectInput(inputId = "format",
-                                                                  label = "Select Format",
-                                                                  choices = c("Data in columns" = "data_in_columns",
-                                                                              "Data in rows" = "data_in_rows")),
 
                                                       fileInput(inputId = 'growth_file',
                                                                 label = 'Choose growth data file',
-                                                                accept = c('.xlsx', '.xls', '.csv', 'txt', 'tsv'))
-                                                    ),
+                                                                accept = c('.xlsx', '.xls', '.csv', 'txt', 'tsv')
+                                                      ),
 
-                                                    conditionalPanel(
-                                                      condition = "output.growthfileUploaded && output.data_growth_format == 'xlsx'",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                        selectInput(inputId = "custom_growth_sheets",
-                                                                    label = "Select Sheet",
-                                                                    choices = "Sheet1")
-                                                      )
-                                                    ), # select sheet: conditional
-                                                    conditionalPanel(
-                                                      condition = "output.growthfileUploaded && output.data_growth_format == 'csv'",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                        selectInput(inputId = "separator",
-                                                                    label = "Select separator",
-                                                                    choices = c("," = ",",
-                                                                                ";" = ";")
-                                                        ),
+                                                      conditionalPanel(
+                                                        condition = "output.growthfileUploaded && output.custom_density_format == 'xlsx'",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "custom_growth_sheets",
+                                                                      label = "Select Sheet",
+                                                                      choices = "Sheet1")
+                                                        )
+                                                      ), # select sheet: conditional
+                                                      conditionalPanel(
+                                                        condition = "output.growthfileUploaded && output.custom_density_format == 'csv'",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "separator_custom_density",
+                                                                      label = "Select separator",
+                                                                      choices = c("," = ",",
+                                                                                  ";" = ";")
+                                                          ),
 
-                                                        selectInput(inputId = "decimal_separator",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
+                                                          selectInput(inputId = "decimal_separator_custom_density",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
+                                                        )
+                                                      ),
+                                                      conditionalPanel(
+                                                        condition = "output.growthfileUploaded && (output.custom_density_format == 'tsv' || output.custom_density_format == 'txt')",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "decimal_separator_custom_density",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
                                                         )
                                                       )
                                                     ),
-                                                    conditionalPanel(
-                                                      condition = "output.growthfileUploaded && (output.data_growth_format == 'tsv' || output.data_growth_format == 'txt')",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                        selectInput(inputId = "decimal_separator",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
+                                                    #____Fluorescence 1___________
+                                                    wellPanel(
+                                                      h4(strong("Fluorescence 1 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
+                                                      style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+
+                                                      fileInput(inputId = 'custom_file_fluorescence1',
+                                                                label = 'Fluorescence data 1',
+                                                                accept = c('.xlsx', '.xls', '.csv')
+                                                      ),
+
+                                                      conditionalPanel(
+                                                        condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'xlsx'",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "custom_fluorescence1_sheets",
+                                                                      label = "Select Sheet",
+                                                                      choices = "Sheet1")
+                                                        )
+                                                      ), # select sheet: conditional
+                                                      conditionalPanel(
+                                                        condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'csv'",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "separator_custom_fluorescence1",
+                                                                      label = "Select separator",
+                                                                      choices = c("," = ",",
+                                                                                  ";" = ";")
+                                                          ),
+
+                                                          selectInput(inputId = "decimal_separator_custom_fluorescence1",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
+                                                        )
+                                                      ),
+                                                      conditionalPanel(
+                                                        condition = "output.fluorescence1fileUploaded && (output.custom_fluorescence1_format == 'tsv' || output.custom_fluorescence1_format == 'txt')",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "decimal_separator_custom_fluorescence1",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
+                                                        )
+                                                      )
+                                                    ),
+                                                    #_____Fluorescence 2___________
+                                                    wellPanel(
+                                                      h4(strong("Fluorescence 2 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
+                                                      style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+
+                                                      fileInput(inputId = 'custom_file_fluorescence2',
+                                                                label = 'Fluorescence data 2',
+                                                                accept = c('.xlsx', '.xls', '.csv')
+                                                      ),
+
+                                                      conditionalPanel(
+                                                        condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "custom_fluorescence2_sheets",
+                                                                      label = "Select Sheet",
+                                                                      choices = "Sheet1")
+                                                        )
+                                                      ), # select sheet: conditional
+                                                      conditionalPanel(
+                                                        condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'csv'",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "separator_custom_fluorescence2",
+                                                                      label = "Select separator",
+                                                                      choices = c("," = ",",
+                                                                                  ";" = ";")
+                                                          ),
+
+                                                          selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
+                                                        )
+                                                      ),
+                                                      conditionalPanel(
+                                                        condition = "output.fluorescence2fileUploaded && (output.custom_fluorescence2_format == 'tsv' || output.custom_fluorescence2_format == 'txt')",
+                                                        wellPanel(
+                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
                                                         )
                                                       )
                                                     ),
@@ -141,83 +238,137 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     checkboxInput(inputId = 'calibration',
                                                                   label = 'Calibration (under construction)'),
 
-                                                    fileInput(inputId = 'fluorescence_file_1',
-                                                              label = 'Fluorescence data 1',
-                                                              accept = c('.xlsx', '.xls', '.csv')),
-
-                                                    fileInput(inputId = 'fluorescence_file_2',
-                                                              label = 'Fluorescence data 2',
-                                                              accept = c('.xlsx', '.xls', '.csv')),
-
                                                   ),# sidebar panel
                                          ), # Custom tabPanel
 
                                          tabPanel(title = "Plate reader",
                                                   sidebarPanel(
                                                     style='border-color: #ADADAD',
-                                                    # select file type
-                                                    fileInput(inputId = 'parse_file',
-                                                              label = 'Choose growth data file',
-                                                              accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt')),
-                                                    conditionalPanel(
-                                                      condition = "output.parsefileUploaded && output.data_parse_format == 'xlsx'",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                    wellPanel(
+                                                      div(style = "margin-top: -10px"),
+                                                      h3(strong("1. Load data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
+                                                      style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD;',
+                                                      # select file type
+                                                      fileInput(inputId = 'parse_file',
+                                                                label = 'Choose plate reader export file',
+                                                                accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt')),
+                                                      div(style = "margin-top: -10px"),
+                                                      conditionalPanel(
+                                                        condition = "output.parsefileUploaded && (output.parse_file_format == 'xlsx' | output.parse_file_format == 'xls')",
                                                         selectInput(inputId = "parse_data_sheets",
-                                                                    label = "Select Sheet",
+                                                                    label = "Select sheet with read data",
                                                                     choices = "Sheet1")
-                                                      )), # select sheet: conditional
-                                                    conditionalPanel(
-                                                      condition = "output.parsefileUploaded && output.data_parse_format == 'csv'",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                        selectInput(inputId = "separator",
+                                                      ), # select sheet: conditional
+                                                      conditionalPanel(
+                                                        condition = "output.parsefileUploaded && output.parse_file_format == 'csv'",
+                                                        selectInput(inputId = "separator_parse",
                                                                     label = "Select separator",
                                                                     choices = c("," = ",",
                                                                                 ";" = ";")
                                                         ),
 
-                                                        selectInput(inputId = "decimal_separator",
+                                                        selectInput(inputId = "decimal_separator_parse",
+                                                                    label = "Select Decimal separator",
+                                                                    choices = c("." = ".",
+                                                                                "," = ",")
+                                                        )
+                                                      ),
+                                                      conditionalPanel(
+                                                        condition = "output.parsefileUploaded && (output.parse_file_format == 'tsv' || output.parse_file_format == 'txt')",
+                                                        selectInput(inputId = "decimal_separator_parse",
                                                                     label = "Select Decimal separator",
                                                                     choices = c("." = ".",
                                                                                 "," = ",")
                                                         )
                                                       )
                                                     ),
+                                                    div(style = "margin-top: -15px"),
                                                     conditionalPanel(
-                                                      condition = "output.parsefileUploaded && (output.data_parse_format == 'tsv' || output.data_parse_format == 'txt')",
+                                                      condition = "output.parsefileUploaded",
                                                       wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                        selectInput(inputId = "decimal_separator",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
+                                                        style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                        div(style = "margin-top: -10px"),
+                                                        h3(strong("2. Format"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
+                                                        selectInput(inputId = "platereader_software",
+                                                                    label = "Platereader software",
+                                                                    choices = c("Biotek - Gen5/Gen6" = "Gen5"
+                                                                    )
+                                                        )
+                                                      )
+                                                    ),
+                                                    div(style = "margin-top: -15px"),
+                                                    conditionalPanel(
+                                                      condition = "output.parsefileUploaded",
+                                                      wellPanel(
+                                                        style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                        div(style = "margin-top: -10px"),
+                                                        h3(strong("3. Assign data type"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
+                                                        selectInput(inputId = "parsed_reads_density",
+                                                                    label = "Density data",
+                                                                    choices = ""
+                                                        ),
+
+                                                        selectInput(inputId = "parsed_reads_fluorescence1",
+                                                                    label = "Fluorescence data 1",
+                                                                    choices = ""
+                                                        ),
+
+                                                        selectInput(inputId = "parsed_reads_fluorescence2",
+                                                                    label = "Fluorescence data 2",
+                                                                    choices = ""
+                                                        )
+                                                      )
+                                                    ),
+                                                    div(style = "margin-top: -15px"),
+                                                    conditionalPanel(
+                                                      condition = "output.parsefileUploaded",
+                                                      wellPanel(
+                                                        style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                        div(style = "margin-top: -10px"),
+                                                        h3(strong("4. Load mapping"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
+                                                        checkboxInput(inputId = 'mapping_included_in_parse',
+                                                                      label = 'Included in data file (xlsx/xls)',
+                                                                      value = FALSE),
+                                                        tags$div(title = "Table with four columns: Well | Description | Replicate | Concentration",
+                                                                 fileInput(inputId = 'map_file',
+                                                                           label = 'Choose mapping file',
+                                                                           accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt'),
+                                                                           placeholder = "map file",
+                                                                 )
+                                                        ),
+                                                        conditionalPanel(
+                                                          condition = "(input.mapping_included_in_parse && (output.parse_file_format == 'xlsx' | output.parse_file_format == 'xls')) || (!input.mapping_included_in_parse && output.mapfileUploaded && (output.map_file_format == 'xlsx' | output.map_file_format == 'xls'))",
+                                                          selectInput(inputId = "map_data_sheets",
+                                                                      label = "Select sheet with mapping information",
+                                                                      choices = "Sheet1")
+                                                        ),
+                                                        conditionalPanel(
+                                                          condition = "!input.mapping_included_in_parse && output.mapfileUploaded && output.map_file_format == 'csv'",
+                                                          selectInput(inputId = "separator_map",
+                                                                      label = "Select separator",
+                                                                      choices = c("," = ",",
+                                                                                  ";" = ";")
+                                                          ),
+
+                                                          selectInput(inputId = "decimal_separator_map",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
+                                                        ),
+                                                        conditionalPanel(
+                                                          condition = "!input.mapping_included_in_parse && output.mapfileUploaded && (output.map_file_format == 'tsv' || output.map_file_format == 'txt')",
+                                                          style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                          selectInput(inputId = "decimal_separator_map",
+                                                                      label = "Select Decimal separator",
+                                                                      choices = c("." = ".",
+                                                                                  "," = ",")
+                                                          )
                                                         )
                                                       )
                                                     ),
 
-                                                    selectInput(inputId = "platereader_software",
-                                                                label = "Platereader software",
-                                                                choices = c("Biotek - Gen5/Gen6" = "biotek_gen5_gen6"
-                                                                ),
-                                                    ),
-
-                                                    selectInput(inputId = "density_data_reads",
-                                                                label = "Density data",
-                                                                choices = "Bla"
-                                                    ),
-
-                                                    selectInput(inputId = "fluorescence_data_1_read",
-                                                                label = "Fluorescence data 1",
-                                                                choices = ""
-                                                    ),
-
-                                                    selectInput(inputId = "fluorescence_data_2_read",
-                                                                label = "Fluorescence data 1",
-                                                                choices = ""
-                                                    ),
-
-                                                    checkboxInput(inputId = 'subtract_blankk_plate_reader',
+                                                    checkboxInput(inputId = 'subtract_blank_plate_reader',
                                                                   label = 'subtract blank',
                                                                   value = TRUE),
 
@@ -227,18 +378,70 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     checkboxInput(inputId = 'calibration_plate_reader',
                                                                   label = 'Calibration'),
-
+                                                    fluidRow(
+                                                      column(12,
+                                                             div(
+                                                               actionButton(inputId = "parse_data",
+                                                                            label = "Parse data",
+                                                                            icon=icon("file-lines"),
+                                                                            style="padding:5px; font-size:120%"),
+                                                               style="float:right")
+                                                      )
+                                                    )
                                                   ),# sidebar panel
                                          ), # Plate reader tabPanel
                              ), # tabSet Panel
 
                              mainPanel(
-                               h1("Your Data"),
-                               withSpinner(
-                                 DT::dataTableOutput("parsed_data")
+                               conditionalPanel(
+                                 condition = "input.tabs_data == 'Custom'",
+                                 img(src = 'data_instruction.png',
+                                     heigt = '100%',
+                                     width = '100%')
+                               ),
+
+                               conditionalPanel(condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
+                                                h1("Your Data"),
+                                                tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
+                                                            tabPanel(title = "Density", value = "tabPanel_custom_tables_density",
+                                                                     withSpinner(
+                                                                       DT::dataTableOutput("growth_data")
+                                                                     )
+                                                            ),
+                                                            tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1",
+                                                                     withSpinner(
+                                                                       DT::dataTableOutput("custom_table_fluorescence1")
+                                                                     )
+                                                            ),
+                                                            tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
+                                                                     withSpinner(
+                                                                       DT::dataTableOutput("custom_table_fluorescence2")
+                                                                     )
+                                                            ),
+                                                            tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
+                                                                     DT::dataTableOutput('custom_data_table_expdesign')
+                                                            )
+
+                                                )
+                               ),
+                               conditionalPanel(condition = 'output.parsefileUploaded && !is.null(output.parsed_data_table_expdesign)',
+                                                h1("Parsed Data"),
+                                                tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
+                                                            tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
+                                                                     DT::dataTableOutput('parsed_data_table_density')
+                                                            ),
+                                                            tabPanel(title = "Fluorescence 1", value = "tabPanel_parsed_tables_fluorescence1",
+                                                                     DT::dataTableOutput('parsed_data_table_fluorescence1')
+                                                            ),
+                                                            tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
+                                                                     DT::dataTableOutput('parsed_data_table_fluorescence2')
+                                                            ),
+                                                            tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
+                                                                     DT::dataTableOutput('parsed_data_table_expdesign')
+                                                            )
+                                                )
                                )
                              ) # main panel
-
                     ), # Navbar 1
 
                     navbarMenu('Computation', menuName = "navbarMenu_Computation", icon=icon("gears"),
@@ -331,12 +534,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                     )
                                                                    )
                                                                  ),
-
-
-                                                                 actionButton(inputId = "run_growth",
-                                                                              label = "Run computation",
-                                                                              icon=icon("gears"),
-                                                                              style="padding:5px; font-size:120%")
+                                                                 fluidRow(
+                                                                   column(12,
+                                                                          div(
+                                                                            actionButton(inputId = "run_growth",
+                                                                                         label = "Run computation",
+                                                                                         icon=icon("gears"),
+                                                                                         style="padding:5px; font-size:120%"),
+                                                                            style="float:right")
+                                                                   )
+                                                                 )
                                                    ) # sidebarPanel
 
                                             ), # column
@@ -953,7 +1160,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
                                                              sidebarPanel(
                                                                wellPanel(
-                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
                                                                  checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot',
                                                                                label = 'Combine conditions into a single plot',
                                                                                value = TRUE)
@@ -1281,7 +1488,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     tabPanel(title = "Dose-response analysis",
                                                              sidebarPanel(
                                                                wellPanel(
-                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
                                                                  checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_fluorescence_plot',
                                                                                label = 'Combine conditions into a single plot',
                                                                                value = TRUE)
@@ -1451,9 +1658,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    input$growth_file$name
-    stringr::str_replace_all(input$growth_file$name, ".{1,}\\.", "")
-  })
+    paste(custom_data_table_expdesign[[1]])
+    })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
   # disable(selector = "#navbar li a[data-value=Visualize]")
@@ -1462,20 +1668,30 @@ server <- function(input, output, session){
 
   results <- reactiveValues()
 
-  # Test if growth_file was loaded
+  # Read data
+  ## Custom
+  ### Test if growth_file was loaded
   output$growthfileUploaded <- reactive({
     if(is.null(input$growth_file)) return(FALSE)
     else return(TRUE)
   })
   outputOptions(output, 'growthfileUploaded', suspendWhenHidden=FALSE)
 
-  # Test if parse_file was loaded
-  output$parsefileUploaded <- reactive({
-    if(is.null(input$parse_file)) return(FALSE)
+  ### Test if custom_file_fluorescence1 was loaded
+  output$fluorescence1fileUploaded <- reactive({
+    if(is.null(input$custom_file_fluorescence1)) return(FALSE)
     else return(TRUE)
   })
-  outputOptions(output, 'parsefileUploaded', suspendWhenHidden=FALSE)
+  outputOptions(output, 'fluorescence1fileUploaded', suspendWhenHidden=FALSE)
 
+  ### Test if custom_file_fluorescence1 was loaded
+  output$fluorescence2fileUploaded <- reactive({
+    if(is.null(input$custom_file_fluorescence2)) return(FALSE)
+    else return(TRUE)
+  })
+  outputOptions(output, 'fluorescence2fileUploaded', suspendWhenHidden=FALSE)
+
+  ### Render custom density table
   output$growth_data <- DT::renderDT({
     inFile <- input$growth_file
 
@@ -1483,15 +1699,15 @@ server <- function(input, output, session){
       return(NULL)
 
     filename <- inFile$datapath
-    dec <- input$decimal_separator
-    csvsep <- input$separator
+    dec <- input$decimal_separator_custom_density
+    csvsep <- input$separator_custom_density
     if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
       dat <-
         utils::read.csv(
           filename,
           dec = dec,
           sep = csvsep,
-          header = T,
+          header = F,
           stringsAsFactors = F,
           fill = T,
           na.strings = "",
@@ -1502,7 +1718,7 @@ server <- function(input, output, session){
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
       showModal(modalDialog("Reading data file...", footer=NULL))
-      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = T, sheet = input$custom_growth_sheets, progress = T)))
+      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_growth_sheets, progress = T)))
       removeModal()
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
       dat <-
@@ -1510,7 +1726,7 @@ server <- function(input, output, session){
           filename,
           dec = dec,
           sep = "\t",
-          header = T,
+          header = F,
           stringsAsFactors = F,
           fill = T,
           na.strings = "",
@@ -1524,7 +1740,7 @@ server <- function(input, output, session){
           filename,
           dec = dec,
           sep = "\t",
-          header = T,
+          header = F,
           stringsAsFactors = F,
           fill = T,
           na.strings = "",
@@ -1534,10 +1750,197 @@ server <- function(input, output, session){
         )
     }
     dat[-(1:3),] <- apply(dat[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
-    dat
+
+    #### Render experimental design table
+    output$custom_data_table_expdesign <- DT::renderDT({
+
+      dat.mat <- t(dat)
+      label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
+      condition <- dat.mat[, 1]
+      replicate <- dat.mat[, 2]
+      concentration <- dat.mat[, 3]
+
+      expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
+
+      expdesign[-1, ]
+    })
+
+    colnames(dat)[1] <- "Time"
+    dat[1,1] <- ""
+    datatable(dat,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(dat)-3)))
   })
 
-  output$data_growth_format <- reactive({
+  ### Render custom fluorescence 1 table
+  output$custom_table_fluorescence1 <- DT::renderDT({
+    inFile <- input$custom_file_fluorescence1
+
+    if(is.null(inFile))
+      return(NULL)
+
+    filename <- inFile$datapath
+    dec <- input$decimal_separator_custom_fluorescence1
+    csvsep <- input$separator_custom_fluorescence1
+    if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
+      f1 <-
+        utils::read.csv(
+          filename,
+          dec = dec,
+          sep = csvsep,
+          header = F,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
+               stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
+      showModal(modalDialog("Reading data file...", footer=NULL))
+      f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence1_sheets, progress = T)))
+      removeModal()
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
+      f1 <-
+        utils::read.csv(
+          filename,
+          dec = dec,
+          sep = "\t",
+          header = F,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
+      f1 <-
+        utils::read.table(
+          filename,
+          dec = dec,
+          sep = "\t",
+          header = F,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    }
+    f1[-(1:3),] <- apply(f1[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
+
+    #### Render experimental design table
+    if(!exists("output$custom_data_table_expdesign")){
+      output$custom_data_table_expdesign <- DT::renderDT({
+
+        f1.mat <- t(f1)
+        label <- unlist(lapply(1:nrow(f1.mat), function(x) paste(f1.mat[x,1], f1.mat[x,2], f1.mat[x,3], sep = " | ")))
+        condition <- f1.mat[, 1]
+        replicate <- f1.mat[, 2]
+        concentration <- f1.mat[, 3]
+
+        expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
+
+        expdesign[-1, ]
+      })
+    }
+
+    colnames(f1)[1] <- "Time"
+    f1[1,1] <- ""
+    datatable(f1,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f1)-3)))
+  })
+
+  ### Render custom fluorescence 2 table
+  output$custom_table_fluorescence2 <- DT::renderDT({
+    inFile <- input$custom_file_fluorescence2
+
+    if(is.null(inFile))
+      return(NULL)
+
+    filename <- inFile$datapath
+    dec <- input$decimal_separator_custom_fluorescence2
+    csvsep <- input$separator_custom_fluorescence2
+    if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
+      f2 <-
+        utils::read.csv(
+          filename,
+          dec = dec,
+          sep = csvsep,
+          header = F,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
+               stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
+      showModal(modalDialog("Reading data file...", footer=NULL))
+      f2 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence2_sheets, progress = T)))
+      removeModal()
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
+      f2 <-
+        utils::read.csv(
+          filename,
+          dec = dec,
+          sep = "\t",
+          header = F,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
+      f2 <-
+        utils::read.table(
+          filename,
+          dec = dec,
+          sep = "\t",
+          header = F,
+          stringsAsFactors = F,
+          fill = T,
+          na.strings = "",
+          quote = "",
+          comment.char = "",
+          check.names = F
+        )
+    }
+    f2[-(1:3),] <- apply(f2[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
+
+    #### Render experimental design table
+    if(!exists("output$custom_data_table_expdesign")){
+      output$custom_data_table_expdesign <- DT::renderDT({
+
+        f2.mat <- t(f2)
+        label <- unlist(lapply(1:nrow(f2.mat), function(x) paste(f2.mat[x,1], f2.mat[x,2], f2.mat[x,3], sep = " | ")))
+        condition <- f2.mat[, 1]
+        replicate <- f2.mat[, 2]
+        concentration <- f2.mat[, 3]
+
+        expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
+
+        expdesign[-1, ]
+      })
+    }
+
+    colnames(f2)[1] <- "Time"
+    f2[1,1] <- ""
+    datatable(f2,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f2)-3)))
+  })
+
+
+
+  output$custom_density_format <- reactive({
     if(is.null(input$growth_file)) return(NULL)
 
     filename <- input$growth_file$name
@@ -1545,19 +1948,27 @@ server <- function(input, output, session){
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     format
   })
+  outputOptions(output, 'custom_density_format', suspendWhenHidden=FALSE)
 
-  outputOptions(output, 'data_growth_format', suspendWhenHidden=FALSE)
+  output$custom_fluorescence1_format <- reactive({
+    if(is.null(input$custom_file_fluorescence1)) return(NULL)
 
-  output$data_parse_format <- reactive({
-    if(is.null(input$parse_file)) return(NULL)
-
-    filename <- input$parse_file$name
+    filename <- input$custom_file_fluorescence1$name
 
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     format
   })
+  outputOptions(output, 'custom_fluorescence1_format', suspendWhenHidden=FALSE)
 
-  outputOptions(output, 'data_parse_format', suspendWhenHidden=FALSE)
+  output$custom_fluorescence2_format <- reactive({
+    if(is.null(input$custom_file_fluorescence2)) return(NULL)
+
+    filename <- input$custom_file_fluorescence2$name
+
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    format
+  })
+  outputOptions(output, 'custom_fluorescence2_format', suspendWhenHidden=FALSE)
 
   growth_excel_sheets <- reactive({
     filename <- input$growth_file$datapath
@@ -1568,6 +1979,43 @@ server <- function(input, output, session){
     sheets
   })
 
+  fluorescence1_excel_sheets <- reactive({
+    filename <- input$custom_file_fluorescence1$datapath
+    if(is.null(input$custom_file_fluorescence1)) return("")
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    if(format != "xlsx" && format != "xls") return("")
+    sheets <- readxl::excel_sheets(input$custom_file_fluorescence1$datapath)
+    sheets
+  })
+
+  fluorescence2_excel_sheets <- reactive({
+    filename <- input$custom_file_fluorescence2$datapath
+    if(is.null(input$custom_file_fluorescence2)) return("")
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    if(format != "xlsx" && format != "xls") return("")
+    sheets <- readxl::excel_sheets(input$custom_file_fluorescence2$datapath)
+    sheets
+  })
+
+
+  ## Parse data
+  ### Hide elements to guide user
+  hide("parsed_reads_density")
+  hide("parsed_reads_fluorescence1")
+  hide("parsed_reads_fluorescence2")
+  hide("parse_data")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+  ### Test if parse_file was loaded
+  output$parsefileUploaded <- reactive({
+    if(is.null(input$parse_file)) return(FALSE)
+    else return(TRUE)
+  })
+  outputOptions(output, 'parsefileUploaded', suspendWhenHidden=FALSE)
+
   parse_excel_sheets <- reactive({
     filename <- input$parse_file$datapath
     if(is.null(input$parse_file)) return("")
@@ -1576,6 +2024,274 @@ server <- function(input, output, session){
     sheets <- readxl::excel_sheets(input$parse_file$datapath)
     sheets
   })
+
+  map_excel_sheets <- reactive({
+    filename <- input$map_file$datapath
+    if(is.null(input$map_file)) return("")
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    if(format != "xlsx" && format != "xls") return("")
+    sheets <- readxl::excel_sheets(input$map_file$datapath)
+    sheets
+  })
+
+  ### Test if map_file was loaded
+  output$mapfileUploaded <- reactive({
+    if(is.null(input$map_file)) return(FALSE)
+    else return(TRUE)
+  })
+  outputOptions(output, 'mapfileUploaded', suspendWhenHidden=FALSE)
+
+  ### get file formats for parse_file and map_file
+  output$parse_file_format <- reactive({
+    if(is.null(input$parse_file)) return(NULL)
+
+    filename <- input$parse_file$name
+
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    format
+  })
+  outputOptions(output, 'parse_file_format', suspendWhenHidden=FALSE)
+
+  output$map_file_format <- reactive({
+    if(is.null(input$map_file)) return(NULL)
+
+    filename <- input$map_file$name
+
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    format
+  })
+  outputOptions(output, 'map_file_format', suspendWhenHidden=FALSE)
+
+  ### Extract reads from data file
+  selected_inputs_parsed_reads <- reactive({
+    inFile <- input$parse_file
+
+    if(is.null(inFile))
+      return(NULL)
+
+    filename <- inFile$datapath
+
+    showModal(modalDialog("Reading data file...", footer=NULL))
+    try(reads <- parse_properties_Gen5Gen6(file=filename,
+                                       csvsep = input$separator_custom_density,
+                                       dec = input$decimal_separator_custom_density,
+                                       sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) )
+
+    )
+    if(exists("reads")){
+      show("parsed_reads_density")
+      if(length(reads)>1) show("parsed_reads_fluorescence1")
+      if(length(reads)>2) show("parsed_reads_fluorescence2")
+      show("parse_data")
+      removeModal()
+      reads <- c(reads, "Ignore")
+    } else {
+      showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software?", easyClose = T, footer=NULL))
+    }
+  })
+  observe({
+    updateSelectInput(inputId = "parsed_reads_density",
+                      choices = selected_inputs_parsed_reads()
+    )
+  })
+  observe({
+    updateSelectInput(inputId = "parsed_reads_fluorescence1",
+                      choices = selected_inputs_parsed_reads()
+    )
+  })
+  observe({
+    updateSelectInput(inputId = "parsed_reads_fluorescence2",
+                      choices = selected_inputs_parsed_reads()
+    )
+  })
+  observeEvent(input$mapping_included_in_parse,{
+    if(input$mapping_included_in_parse) hide("map_file")
+    if(!input$mapping_included_in_parse) show("map_file")
+  }, ignoreInit = TRUE)
+
+
+  #### Parse data and extract read tabs
+  observeEvent(input$parse_data,{
+
+    showModal(modalDialog("Parsing data input...", footer=NULL))
+
+    if(input$mapping_included_in_parse){
+      results$parsed_data <- parse_data_shiny(
+        data.file = input$parse_file$datapath,
+        map.file = input$parse_file$datapath,
+        software = input$platereader_software,
+        convert.time = input$convert_time_values_plate_reader,
+        data.sheet = input$parse_data_sheets,
+        map.sheet = input$map_data_sheets,
+        csvsep =  input$separator_parse,
+        dec = input$decimal_separator_parse,
+        csvsep.map =  input$separator_map,
+        dec.map = input$decimal_separator_map,
+        subtract.blank = input$subtract_blank_plate_reader,
+        density.nm = input$parsed_reads_density,
+        fl1.nm = input$parsed_reads_fluorescence1,
+        fl2.nm = input$parsed_reads_fluorescence2
+      )
+    } else {
+      results$parsed_data <- parse_data_shiny(
+        data.file = input$parse_file$datapath,
+        map.file = input$map_file$datapath,
+        software = input$platereader_software,
+        convert.time = input$convert_time_values_plate_reader,
+        data.sheet = input$parse_data_sheets,
+        map.sheet = input$map_data_sheets,
+        csvsep.data =  input$separator_parse,
+        dec.data = input$decimal_separator_parse,
+        csvsep.map =  input$separator_map,
+        dec.map = input$decimal_separator_map,
+        subtract.blank = input$subtract_blank_plate_reader,
+        density.nm = input$parsed_reads_density,
+        fl1.nm = input$parsed_reads_fluorescence1,
+        fl2.nm = input$parsed_reads_fluorescence2
+      )
+    }
+    showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+    if("density" %in% names(results$parsed_data) && length(results$parsed_data$density)>1){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+    }
+    if("fluorescence1" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence1)>1){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+    }
+    if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+    }
+    #
+    # }
+    # if("fluorescence1" %in% names(results$parsed_data) && length(results$parsed_dat$fluorescence1)>1)
+      # output$parsed_data_table_density <- DT::renderDT({
+    #
+    # })
+    # output$parsed_data_table_density <- DT::renderDT({
+    #
+    # })
+    removeModal()
+  })
+  #### Generate parsed tables to display in [DATA] tab
+  output$parsed_data_table_density <- DT::renderDT({
+
+    if(is.null(results$parsed_data) || length(results$parsed_data$density)<2) return(NULL)
+
+    table_density <- t(results$parsed_data$density)
+    table_density[-(1:3), ] <- apply(apply(table_density[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
+    rownames(table_density)[-(1:3)] <- ""
+    table_density <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
+                           table_density)
+
+    table_density <- datatable(table_density,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
+
+    table_density
+  })
+  output$parsed_data_table_fluorescence1 <- DT::renderDT({
+
+    if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence1)<2) return(NULL)
+
+    table_fl1 <- t(results$parsed_data$fluorescence1)
+    table_fl1[-(1:3), ] <- apply(apply(table_fl1[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+    rownames(table_fl1)[-(1:3)] <- ""
+    table_fl1 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
+                           table_fl1)
+
+    table_fl1 <- datatable(table_fl1,
+                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
+
+    table_fl1
+  })
+  output$parsed_data_table_fluorescence2 <- DT::renderDT({
+
+    if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence2)<2) return(NULL)
+
+    table_fl2 <- t(results$parsed_data$fluorescence2)
+    table_fl2[-(1:3), ] <- apply(apply(table_fl2[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+    rownames(table_fl2)[-(1:3)] <- ""
+    table_fl2 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
+                       table_fl2)
+
+    table_fl2 <- datatable(table_fl2,
+                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl2)-3)))
+
+    table_fl2
+  })
+  output$parsed_data_table_expdesign <- DT::renderDT({
+
+    if(is.null(results$parsed_data) || length(results$parsed_data$expdesign)<2) return(NULL)
+
+    expdesign <- results$parsed_data$expdesign
+
+    expdesign <- datatable(expdesign,
+                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                           escape = FALSE, rownames = T)
+
+    expdesign
+  })
+  #   inFile <- input$parse_file
+  #
+  #   if(is.null(inFile))
+  #     return(NULL)
+  #
+  #   filename <- inFile$datapath
+  #   dec <- input$decimal_separator_custom_density
+  #   csvsep <- input$separator_custom_density
+  #   if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
+  #     dat <-
+  #       utils::read.csv(
+  #         filename,
+  #         dec = dec,
+  #         sep = csvsep,
+  #         header = T,
+  #         stringsAsFactors = F,
+  #         fill = T,
+  #         na.strings = "",
+  #         quote = "",
+  #         comment.char = "",
+  #         check.names = F
+  #       )
+  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
+  #              stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
+  #     showModal(modalDialog("Reading data file...", footer=NULL))
+  #     dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = T, sheet = input$custom_growth_sheets, progress = T)))
+  #     removeModal()
+  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
+  #     dat <-
+  #       utils::read.csv(
+  #         filename,
+  #         dec = dec,
+  #         sep = "\t",
+  #         header = T,
+  #         stringsAsFactors = F,
+  #         fill = T,
+  #         na.strings = "",
+  #         quote = "",
+  #         comment.char = "",
+  #         check.names = F
+  #       )
+  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
+  #     dat <-
+  #       utils::read.table(
+  #         filename,
+  #         dec = dec,
+  #         sep = "\t",
+  #         header = T,
+  #         stringsAsFactors = F,
+  #         fill = T,
+  #         na.strings = "",
+  #         quote = "",
+  #         comment.char = "",
+  #         check.names = F
+  #       )
+  #   }
+  #   dat[-(1:3),] <- apply(dat[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
+  #   dat
+  # })
 
   # Computation
   selected_inputs_response_parameter_growth <- reactive({
@@ -1616,8 +2332,8 @@ server <- function(input, output, session){
 
 
 
-    # Read data
-    grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator, dec = input$decimal_separator)
+    ## Read data
+    grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator_custom_density, dec = input$decimal_separator_custom_density)
 
     if (input$smoothing_factor_growth == "NULL") {
       smooth.dr = NULL
@@ -1636,23 +2352,6 @@ server <- function(input, output, session){
       fit.opt <- c(fit.opt,
                    's')
     }
-
-    # Parse data
-    selected_inputs_parsed_reads <- reactive({
-      inFile <- input$parse_file
-
-      if(is.null(inFile))
-        return(NULL)
-
-      filename <- inFile$datapath
-      reads <- parse_properties_Gen5Gen6(filename)
-      reads
-    })
-    observe({
-      updateSelectInput(session,
-                        inputId = "density_data_reads",
-                        choices = selected_inputs_parsed_reads()
-      )})
 
     # combine selected models into vector
     models <- c()
@@ -2370,8 +3069,30 @@ server <- function(input, output, session){
     )})
 
   observe({
+    if(input$mapping_included_in_parse){
+      updateSelectInput(inputId = "map_data_sheets",
+                        choices = parse_excel_sheets()
+      )
+    } else {
+      updateSelectInput(inputId = "map_data_sheets",
+                        choices = map_excel_sheets()
+      )
+    }
+    })
+
+  observe({
     updateSelectInput(inputId = "custom_growth_sheets",
                       choices = growth_excel_sheets()
+    )})
+
+  observe({
+    updateSelectInput(inputId = "custom_fluorescence1_sheets",
+                      choices = fluorescence1_excel_sheets()
+    )})
+
+  observe({
+    updateSelectInput(inputId = "custom_fluorescence2_sheets",
+                      choices = fluorescence2_excel_sheets()
     )})
 
   observe({
