@@ -84,7 +84,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                          tabPanel(title = "Custom",
                                                   sidebarPanel(
                                                     style='border-color: #ADADAD',
-                                                    selectInput(inputId = "format",
+                                                    selectInput(inputId = "custom_format",
                                                                 label = "Select Format",
                                                                 choices = c("Data in columns" = "data_in_columns",
                                                                             "Data in rows" = "data_in_rows")),
@@ -92,7 +92,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                       h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                       style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
 
-                                                      fileInput(inputId = 'growth_file',
+                                                      fileInput(inputId = 'custom_file_density',
                                                                 label = 'Choose growth data file',
                                                                 accept = c('.xlsx', '.xls', '.csv', 'txt', 'tsv')
                                                       ),
@@ -232,12 +232,24 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                       )
                                                     ),
 
-                                                    checkboxInput(inputId = 'subtract_blank',
+                                                    checkboxInput(inputId = 'subtract_blank_custom',
                                                                   label = 'Subtract blank'),
 
                                                     checkboxInput(inputId = 'calibration',
                                                                   label = 'Calibration (under construction)'),
-
+                                                    conditionalPanel(
+                                                      condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
+                                                      fluidRow(
+                                                        column(12,
+                                                               div(
+                                                                 actionButton(inputId = "read_custom",
+                                                                              label = "Read data",
+                                                                              icon=icon("file-lines"),
+                                                                              style="padding:5px; font-size:120%"),
+                                                                 style="float:right")
+                                                        )
+                                                      )
+                                                    )
                                                   ),# sidebar panel
                                          ), # Custom tabPanel
 
@@ -424,7 +436,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                 )
                                ),
-                               conditionalPanel(condition = 'output.parsefileUploaded && !is.null(output.parsed_data_table_expdesign)',
+                               conditionalPanel(condition = 'output.parsefileUploaded',
                                                 h1("Parsed Data"),
                                                 tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
                                                             tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
@@ -1658,7 +1670,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    paste(custom_data_table_expdesign[[1]])
+    paste(input$custom_file_fluorescence1$datapath)
     })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
@@ -1670,9 +1682,14 @@ server <- function(input, output, session){
 
   # Read data
   ## Custom
-  ### Test if growth_file was loaded
+  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
+  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+
+  ### Test if custom_file_density was loaded
   output$growthfileUploaded <- reactive({
-    if(is.null(input$growth_file)) return(FALSE)
+    if(is.null(input$custom_file_density)) return(FALSE)
     else return(TRUE)
   })
   outputOptions(output, 'growthfileUploaded', suspendWhenHidden=FALSE)
@@ -1691,9 +1708,75 @@ server <- function(input, output, session){
   })
   outputOptions(output, 'fluorescence2fileUploaded', suspendWhenHidden=FALSE)
 
+  # Read data upon click on [Read data]
+  observeEvent(input$read_custom,{
+    showModal(modalDialog("Reading data input...", footer=NULL))
+    density.file <- input$custom_file_density
+    fl1.file <- input$custom_file_fluorescence1
+    fl2.file <- input$custom_file_fluorescence2
+
+    if(is.null(density.file) && is.null(fl1.file) && is.null(fl2.file)) return(NULL)
+
+    # withCallingHandlers({
+    #
+    #   shinyjs::html(id = "text", html = '<br>', add = TRUE)
+    # # Activate menus
+    # enable(selector = "#navbar li:nth-child(3)")
+    # enable(selector = "#navbar li:nth-child(4)")
+    # enable(selector = "#navbar li:nth-child(5)")
+    #
+    # # Inactivate Fluorescence menus
+    # disable(selector = "#navbar li:nth-child(3) li:nth-child(2)")
+    # disable(selector = "#navbar li:nth-child(4) li:nth-child(2)")
+    # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
+
+
+
+    ## Read data
+    results$custom_data <- read_data(data.density = density.file$datapath,
+                                     data.fluoro1 = fl1.file$datapath,
+                                     data.fluoro2 = fl2.file$datapath,
+                                     data.format = input$custom_format,
+                                     sheet.density = input$custom_growth_sheets,
+                                     sheet.fluoro1 = input$custom_fluorescence1_sheets,
+                                     sheet.fluoro2 = input$custom_fluorescence2_sheets,
+                                     csvsep = input$separator_custom_density,
+                                     dec = input$decimal_separator_custom_density,
+                                     csvsep.fl1 = input$separator_custom_density,
+                                     dec.fl1 = input$decimal_separator_custom_density,
+                                     csvsep.fl2 = input$separator_custom_density,
+                                     dec.fl2 = input$decimal_separator_custom_density,
+                                     subtract.blank = input$subtract_blank_custom)
+
+    showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+
+    if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+    }
+    if("fluorescence1" %in% names(results$custom_data) && length(results$custom_data$fluorescence1)>1){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
+    }
+    if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+    }
+
+    # Remove eventually pre-loaded parsed data
+    results$parse_data <- NULL
+    hide("parsed_reads_density")
+    hide("parsed_reads_fluorescence1")
+    hide("parsed_reads_fluorescence2")
+    hide("parse_data")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+    removeModal()
+  })
+
   ### Render custom density table
   output$growth_data <- DT::renderDT({
-    inFile <- input$growth_file
+    inFile <- input$custom_file_density
 
     if(is.null(inFile))
       return(NULL)
@@ -1941,9 +2024,9 @@ server <- function(input, output, session){
 
 
   output$custom_density_format <- reactive({
-    if(is.null(input$growth_file)) return(NULL)
+    if(is.null(input$custom_file_density)) return(NULL)
 
-    filename <- input$growth_file$name
+    filename <- input$custom_file_density$name
 
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     format
@@ -1971,11 +2054,11 @@ server <- function(input, output, session){
   outputOptions(output, 'custom_fluorescence2_format', suspendWhenHidden=FALSE)
 
   growth_excel_sheets <- reactive({
-    filename <- input$growth_file$datapath
-    if(is.null(input$growth_file)) return("")
+    filename <- input$custom_file_density$datapath
+    if(is.null(input$custom_file_density)) return("")
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     if(format != "xlsx" && format != "xls") return("")
-    sheets <- readxl::excel_sheets(input$growth_file$datapath)
+    sheets <- readxl::excel_sheets(input$custom_file_density$datapath)
     sheets
   })
 
@@ -1996,7 +2079,6 @@ server <- function(input, output, session){
     sheets <- readxl::excel_sheets(input$custom_file_fluorescence2$datapath)
     sheets
   })
-
 
   ## Parse data
   ### Hide elements to guide user
@@ -2123,8 +2205,8 @@ server <- function(input, output, session){
         convert.time = input$convert_time_values_plate_reader,
         data.sheet = input$parse_data_sheets,
         map.sheet = input$map_data_sheets,
-        csvsep =  input$separator_parse,
-        dec = input$decimal_separator_parse,
+        csvsep.data =  input$separator_parse,
+        dec.data = input$decimal_separator_parse,
         csvsep.map =  input$separator_map,
         dec.map = input$decimal_separator_map,
         subtract.blank = input$subtract_blank_plate_reader,
@@ -2161,21 +2243,20 @@ server <- function(input, output, session){
     if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
     }
-    #
-    # }
-    # if("fluorescence1" %in% names(results$parsed_data) && length(results$parsed_dat$fluorescence1)>1)
-      # output$parsed_data_table_density <- DT::renderDT({
-    #
-    # })
-    # output$parsed_data_table_density <- DT::renderDT({
-    #
-    # })
+    # Remove eventually pre-loaded custom data
+    results$custom_data <- NULL
+    hide("read_custom")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+
     removeModal()
   })
   #### Generate parsed tables to display in [DATA] tab
   output$parsed_data_table_density <- DT::renderDT({
 
-    if(is.null(results$parsed_data) || length(results$parsed_data$density)<2) return(NULL)
+    if(is.null(results$parsed_data) || length(results$parsed_data$density) < 2) return(NULL)
 
     table_density <- t(results$parsed_data$density)
     table_density[-(1:3), ] <- apply(apply(table_density[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
@@ -2233,65 +2314,6 @@ server <- function(input, output, session){
 
     expdesign
   })
-  #   inFile <- input$parse_file
-  #
-  #   if(is.null(inFile))
-  #     return(NULL)
-  #
-  #   filename <- inFile$datapath
-  #   dec <- input$decimal_separator_custom_density
-  #   csvsep <- input$separator_custom_density
-  #   if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
-  #     dat <-
-  #       utils::read.csv(
-  #         filename,
-  #         dec = dec,
-  #         sep = csvsep,
-  #         header = T,
-  #         stringsAsFactors = F,
-  #         fill = T,
-  #         na.strings = "",
-  #         quote = "",
-  #         comment.char = "",
-  #         check.names = F
-  #       )
-  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
-  #              stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
-  #     showModal(modalDialog("Reading data file...", footer=NULL))
-  #     dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = T, sheet = input$custom_growth_sheets, progress = T)))
-  #     removeModal()
-  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
-  #     dat <-
-  #       utils::read.csv(
-  #         filename,
-  #         dec = dec,
-  #         sep = "\t",
-  #         header = T,
-  #         stringsAsFactors = F,
-  #         fill = T,
-  #         na.strings = "",
-  #         quote = "",
-  #         comment.char = "",
-  #         check.names = F
-  #       )
-  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
-  #     dat <-
-  #       utils::read.table(
-  #         filename,
-  #         dec = dec,
-  #         sep = "\t",
-  #         header = T,
-  #         stringsAsFactors = F,
-  #         fill = T,
-  #         na.strings = "",
-  #         quote = "",
-  #         comment.char = "",
-  #         check.names = F
-  #       )
-  #   }
-  #   dat[-(1:3),] <- apply(dat[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
-  #   dat
-  # })
 
   # Computation
   selected_inputs_response_parameter_growth <- reactive({
@@ -2311,12 +2333,6 @@ server <- function(input, output, session){
     )})
 
   observeEvent(input$run_growth,{
-    showModal(modalDialog("Reading data input...", footer=NULL))
-    inFile <- input$growth_file
-
-    if(is.null(inFile))
-      return(NULL)
-
     # withCallingHandlers({
     #
     #   shinyjs::html(id = "text", html = '<br>', add = TRUE)
@@ -2333,7 +2349,12 @@ server <- function(input, output, session){
 
 
     ## Read data
-    grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator_custom_density, dec = input$decimal_separator_custom_density)
+    # grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator_custom_density, dec = input$decimal_separator_custom_density)
+
+    # Choose data input
+    if(!is.null(results$custom_data)) grodata <- results$custom_data
+    else if(!is.null(results$parsed_data)) grodata <- results$parsed_data
+    else return(NULL)
 
     if (input$smoothing_factor_growth == "NULL") {
       smooth.dr = NULL

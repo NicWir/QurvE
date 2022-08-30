@@ -12,8 +12,12 @@
 #' @param data.fluoro1 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
 #' @param data.fluoro2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
 #' @param data.format (Character) "col" for samples in columns, or "row" for samples in rows. Default: ["col"]
-#' @param csvsep (Character) separator used in CSV file (ignored for other file types). Default: \code{";"}
-#' @param dec (Character) decimal separator used in CSV, TSV and TXT files. Default: \code{"."}
+#' @param csvsep (Character) separator used in CSV file storing density data (ignored for other file types). Default: \code{";"}
+#' @param dec (Character) decimal separator used in CSV, TSV or TXT file storing density data. Default: \code{"."}
+#' @param csvsep.fl1 (Character) separator used in CSV file storing fluorescence 1 data (ignored for other file types). Default: \code{";"}
+#' @param dec.fl1 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 1 data. Default: \code{"."}
+#' @param csvsep.fl2 (Character) separator used in CSV file storing fluorescence 2 data (ignored for other file types). Default: \code{";"}
+#' @param dec.fl2 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 2 data. Default: \code{"."}
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #' @param sheet.density (Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (_optional_).
 #' @param sheet.fluoro1 (Numeric or Character) Number or name of the sheet with fluorescence 1 data in XLS or XLSX files (_optional_).
@@ -43,11 +47,18 @@ read_data <-
            data.format = "col",
            csvsep = ";",
            dec = ".",
+           csvsep.fl1 = ";",
+           dec.fl1 = ".",
+           csvsep.fl2 = ";",
+           dec.fl2 = ".",
            sheet.density = 1,
            sheet.fluoro1 = 1,
            sheet.fluoro2 = 1,
            subtract.blank  = T)
   {
+    if(is.null(data.fluoro1)) data.fluoro1 <- NA
+    if(is.null(data.fluoro2)) data.fluoro2 <- NA
+
     # Load density data
     if (!is.character(data.density)) {
       dat <- data.density
@@ -76,7 +87,7 @@ read_data <-
         fluoro1 <- data.fluoro1
       } else {
         # Read table file
-        fluoro1 <- read_file(data.fluoro1, csvsep=csvsep, dec=dec, sheet=sheet.fluoro1)
+        fluoro1 <- read_file(data.fluoro1, csvsep=csvsep.fl1, dec=dec.fl1, sheet=sheet.fluoro1)
       }
       if(data.format == "col"){
         fluoro1 <- t(fluoro1)
@@ -98,7 +109,7 @@ read_data <-
         fluoro2 <- data.fluoro2
       } else {
         # Read table file
-        fluoro2 <- read_file(data.fluoro2, csvsep=csvsep, dec=dec, sheet=sheet.fluoro2)
+        fluoro2 <- read_file(data.fluoro2, csvsep=csvsep.fl2, dec=dec.fl2, sheet=sheet.fluoro2)
       }
       if(data.format == "col"){
         fluoro2 <- t(fluoro2)

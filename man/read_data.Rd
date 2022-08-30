@@ -11,6 +11,10 @@ read_data(
   data.format = "col",
   csvsep = ";",
   dec = ".",
+  csvsep.fl1 = ";",
+  dec.fl1 = ".",
+  csvsep.fl2 = ";",
+  dec.fl2 = ".",
   sheet.density = 1,
   sheet.fluoro1 = 1,
   sheet.fluoro2 = 1,
@@ -32,9 +36,17 @@ In column format, the first three table rows contain
 
 \item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \link{"col"}}
 
-\item{csvsep}{(Character) separator used in CSV file (ignored for other file types). Default: \code{";"}}
+\item{csvsep}{(Character) separator used in CSV file storing density data (ignored for other file types). Default: \code{";"}}
 
-\item{dec}{(Character) decimal separator used in CSV, TSV and TXT files. Default: \code{"."}}
+\item{dec}{(Character) decimal separator used in CSV, TSV or TXT file storing density data. Default: \code{"."}}
+
+\item{csvsep.fl1}{(Character) separator used in CSV file storing fluorescence 1 data (ignored for other file types). Default: \code{";"}}
+
+\item{dec.fl1}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 1 data. Default: \code{"."}}
+
+\item{csvsep.fl2}{(Character) separator used in CSV file storing fluorescence 2 data (ignored for other file types). Default: \code{";"}}
+
+\item{dec.fl2}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 2 data. Default: \code{"."}}
 
 \item{sheet.density}{(Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (\emph{optional}).}
 
