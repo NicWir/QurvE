@@ -1187,8 +1187,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                withSpinner(
                                                                  plotOutput("growth_group_plot",
                                                                             width = "100%", height = "1000px")
-                                                                 #downloadButton('downloads_growth_group_plot',"Download table")
-                                                               )
+                                                               ),
+                                                               downloadButton('downloads_growth_group_plot',"Download plot")
                                                              )
 
 
@@ -3113,41 +3113,42 @@ server <- function(input, output, session){
     )
   })
 
-  # output$downloads_growth_group_plot <- downloadHandler(
-  #   filename = function() {
-  #     paste("data-", Sys.Date(), ".csv", sep="")
-  #   },
-  #   content = function(file) {
-  #     out.nm <- gsub(paste0("^.+", paste(.Platform$file.sep)), "", file)
-  #     out.dir <- gsub(paste0("[^", .Platform$file.sep, "]+$"), "", file)
-  #     file.format <- gsub("^.+\\.", "", file)
-  #     results <- results$growth
-  #
-  #     plot.grofit(results,
-  #                 data.type = input$data_type_growth_group_plots,
-  #                 names = input$select_samples_based_on_string_growth_group_plots,
-  #                 conc = input$select_samples_based_on_concentration_growth_group_plots,
-  #                 exclude.nm = input$exclude_samples_based_on_string_growth_group_plots,
-  #                 exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots,
-  #                 mean = input$plot_group_averages_growth_group_plots,
-  #                 deriv = input$plot_derivative_growth_group_plots,
-  #                 log.y = input$log_transform_y_axis_growth_group_plots,
-  #                 x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
-  #                 y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
-  #                 y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
-  #                 y.title = input$y_axis_title_growth_group_plot,
-  #                 x.title = input$x_axis_title_growth_group_plot,
-  #                 y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
-  #                 lwd = input$line_width_growth_group_plot,
-  #                 basesize = input$base_size_growth_group_plot,
-  #                 shiny = TRUE,
-  #                 export = TRUE,
-  #                 out.nm = out.nm,
-  #                 out.dir = out.dir
-  #     )
-  #   }
-  # )
-  #
+  output$downloads_growth_group_plot <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), sep="")
+    },
+    content = function(file) {
+      out.nm <- gsub(paste0("^.+", paste(.Platform$file.sep)), "", file)
+      out.dir <- gsub(paste0("[^", .Platform$file.sep, "]+$"), "", file)
+      file.format <- gsub("^.+\\.", "", file)
+      results <- results$growth
+      browser()
+      plot.grofit(results,
+                  data.type = input$data_type_growth_group_plots,
+                  names = input$select_samples_based_on_string_growth_group_plots,
+                  conc = input$select_samples_based_on_concentration_growth_group_plots,
+                  exclude.nm = input$exclude_samples_based_on_string_growth_group_plots,
+                  exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots,
+                  mean = input$plot_group_averages_growth_group_plots,
+                  deriv = input$plot_derivative_growth_group_plots,
+                  log.y = input$log_transform_y_axis_growth_group_plots,
+                  x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
+                  y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
+                  y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
+                  y.title = input$y_axis_title_growth_group_plot,
+                  x.title = input$x_axis_title_growth_group_plot,
+                  y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
+                  lwd = input$line_width_growth_group_plot,
+                  basesize = input$base_size_growth_group_plot,
+                  shiny = TRUE,
+                  export = TRUE,
+                  out.nm = out.nm,
+                  out.dir = out.dir,
+                  plot = FALSE
+      )
+    }
+  )
+
   # output$downloads_dose_response_plot_combined_growth <- downloadHandler(
   #   filename = function() {
   #     paste("data-", Sys.Date(), ".csv", sep="")
@@ -3234,6 +3235,7 @@ server <- function(input, output, session){
       paste("data-", Sys.Date(), ".csv", sep="")
     },
     content = function(file) {
+      browser()
       write.csv(table_growth_linear(), file)
     }
   )
