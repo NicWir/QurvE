@@ -1684,8 +1684,8 @@ server <- function(input, output, session){
 
   results <- reactiveValues()
 
-  # Read data
-  ## Custom
+  #____Read data____####
+  ##___Custom____####
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
@@ -2099,7 +2099,7 @@ server <- function(input, output, session){
                       choices = fluorescence2_excel_sheets()
     )})
 
-  ## Parse data
+  ##__Parse data____####
   ### Hide elements to guide user
   hide("parsed_reads_density")
   hide("parsed_reads_fluorescence1")
@@ -2369,7 +2369,8 @@ server <- function(input, output, session){
     }
   })
 
-  # Computation
+  #### Computation ####
+  #####____Growth____#####
   selected_inputs_response_parameter_growth <- reactive({
     select_options <- c()
     if(input$linear_regression_growth) select_options <- c(select_options, 'mu.linfit', 'lambda.linfit', 'dY.linfit',
@@ -2512,8 +2513,9 @@ server <- function(input, output, session){
     }
     removeModal()
   })
+  #####____Fluorescence____#####
 
-  # Results Tables
+  #### Results ####
   observe({
     if(!is.null(results$growth)){
       if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
@@ -2589,8 +2591,8 @@ server <- function(input, output, session){
                              escape = FALSE)
     table_model
   })
-  # Validate
-  ## Growth
+  #### Validate ####
+  ##### Growth #####
 
   #### Hide [Restore Fit] buttons when starting the app
   hide("restore_growth_linear"); hide("restore_growth_spline"); hide("restore_growth_model")
@@ -2606,12 +2608,12 @@ server <- function(input, output, session){
   })
 
 
-  #####------- Initialize the Memory to store settings ----------
+  #------- Initialize the Memory to store settings
   selected_vals_validate_growth <- reactiveValues(sample_validate_growth_linear = 1,
                                                   sample_validate_growth_spline = 1,
                                                   sample_validate_growth_model = 1)
 
-  #####------ Whenever any of the inputs are changed, it only modifies the memory----
+  #------ Whenever any of the inputs are changed, it only modifies the memory
   observe({
     req(input$sample_validate_growth_linear)
     selected_vals_validate_growth$sample_validate_growth_linear <- input$sample_validate_growth_linear
@@ -2966,10 +2968,12 @@ server <- function(input, output, session){
   })
 
 
-  ## Fluorescence
-  # Visualize
-  ## Growth Plots:
-  ### Group Plots
+  ##### Fluorescence #####
+
+  #### Visualize ####
+
+  ##### Growth Plots: #####
+  ## Group Plots ##
   output$growth_group_plot <- renderPlot({
     results <- results$growth
     plot.grofit(results,
