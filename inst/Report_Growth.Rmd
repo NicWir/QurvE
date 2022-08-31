@@ -89,7 +89,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
                                "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2), 
                                
                                
-                               "Δy" = round(as.numeric(res.table.gc$dY.linfit), 3),
+                               "ΔY" = round(as.numeric(res.table.gc$dY.linfit), 3),
                                
                                
                                "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
@@ -169,7 +169,7 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
                              
                              "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
                              
-                             "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
+                             "ΔY" = round(as.numeric(res.table.gc$dY.spline), 3),
                              
                              "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<b>", round(as.numeric(res.table.gc$tmax.spline), 2), "</b>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
                              

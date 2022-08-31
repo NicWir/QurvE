@@ -555,7 +555,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                       max = NA,
                                                                                     )
                                                                    ) # conditionalPanel(condition = "input.perform_ec50_growth"
-                                                                 ),
+                                                                 ), #  wellPanel
                                                                  fluidRow(
                                                                    column(12,
                                                                           div(
@@ -716,22 +716,25 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                    selectInput(
                                                                      inputId = 'data_type_x_fluorescence', # TODO change choices based on presence of density and time
                                                                      label = 'Data type x',
-                                                                     choices = c('density', 'time')
+                                                                     choices = ""
                                                                    ),
 
                                                                    checkboxInput(inputId = 'normalize_fluorescence', # TODO inactivate if no density values are present
                                                                                  label = 'Normalize fluorescence'
                                                                    ),
 
-                                                                   numericInput(
-                                                                     inputId = 'growth_threshold_in_percent_fluorescence',
-                                                                     label = 'growth threshold (in %)',
-                                                                     value = 1.5,
-                                                                     min = NA,
-                                                                     max = NA,
+                                                                   conditionalPanel(
+                                                                     condition = 'input.data_type_x_fluorescence.includes("density")',
+                                                                     numericInput(
+                                                                       inputId = 'growth_threshold_in_percent_fluorescence',
+                                                                       label = 'growth threshold (in %)',
+                                                                       value = 1.5,
+                                                                       min = NA,
+                                                                       max = NA,
+                                                                     )
                                                                    ),
                                                                    conditionalPanel(
-                                                                     condition = '"density" %in% input.data_type_x_fluorescence',
+                                                                     condition = 'input.data_type_x_fluorescence.includes("density")',
                                                                      numericInput(
                                                                        inputId = 'minimum_density_fluorescence', # TODO inactivate if no density values are present
                                                                        label = 'minimum_density',
@@ -741,7 +744,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                      )
                                                                    ),
                                                                    conditionalPanel(
-                                                                     condition = '"time" %in% input.data_type_x_fluorescence',
+                                                                     condition = 'input.data_type_x_fluorescence.includes("time")',
                                                                      numericInput(
                                                                        inputId = 't0_fluorescence', # TODO inactivate if no time values are present
                                                                        label = 't0',
@@ -750,7 +753,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                        max = NA,
                                                                      )
                                                                    ),
-                                                                 ), # Fluorescence fit
+                                                                 ), # wellPanel
 
 
                                                                  wellPanel(style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
@@ -766,8 +769,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                                                     selectInput(inputId = "dr_method_fluorescence",
                                                                                                 label = "Method",
-                                                                                                choices = c("Biosensor response model",
-                                                                                                            "Response spline fit")), # TODO tooltip with reference to Meyer et al., 2019
+                                                                                                choices = c("Biosensor response model" = "model",
+                                                                                                            "Response spline fit" = "spline")
+                                                                                                ), # TODO tooltip with reference to Meyer et al., 2019
 
                                                                                     selectInput(inputId = "response_parameter_fluorescence",
                                                                                                 label = "Response Parameter",
@@ -799,19 +803,22 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  ), # wellPanel
 
                                                                  # [Run Computation] button
-                                                                 fluidRow(
-                                                                   column(12,
-                                                                          div(
-                                                                            actionButton(inputId = "run_fluorescence",
-                                                                                         label = "Run computation",
-                                                                                         icon=icon("gears"),
-                                                                                         style="padding:5px; font-size:120%"),
-                                                                            style="float:right")
+                                                                 conditionalPanel(
+                                                                   condition = 'output.fluorescence_present',
+                                                                   fluidRow(
+                                                                     column(12,
+                                                                            div(
+                                                                              actionButton(inputId = "run_fluorescence",
+                                                                                           label = "Run computation",
+                                                                                           icon=icon("gears"),
+                                                                                           style="padding:5px; font-size:120%"),
+                                                                              style="float:right")
+                                                                     )
                                                                    )
                                                                  )
                                                    ) # sidebarPanel
-
                                             ), # column
+
                                             column(8,
                                                    conditionalPanel(
                                                      condition = "input.linear_regression_fluorescence",
@@ -843,6 +850,11 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                          min = NA,
                                                          max = NA,
                                                        ),
+                                                       checkboxInput(inputId = 'log_transform_data_linear_fluorescence',
+                                                                     label = 'Log-transform fluorescence data'),
+
+                                                       checkboxInput(inputId = 'log_transform_x_linear_fluorescence',
+                                                                     label = 'Log-transform x data'),
 
                                                        checkboxInput(inputId = 'custom_sliding_window_size_fluorescence',
                                                                      label = 'custom sliding window size',
@@ -857,7 +869,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                            min = NA,
                                                            max = NA,
                                                          )
-                                                       ),
+                                                       )
                                                      )
                                                    ), # conditionalPanel
 
@@ -886,7 +898,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                        checkboxInput(inputId = 'log_transform_data_nonparametric_fluorescence',
                                                                      label = 'Log-transform fluorescence data'),
 
-                                                       checkboxInput(inputId = 'log_transform_x_parametric_fluorescence',
+                                                       checkboxInput(inputId = 'log_transform_x_nonparametric_fluorescence',
                                                                      label = 'Log-transform x data')
                                                      )
                                                    )  # conditionalPanel
@@ -1671,7 +1683,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                selectInput(inputId = 'report_file_type',
                                            label = 'Choose file type',
-                                           choices = c('pdf', 'html'))
+                                           choices = c('PDF' = 'pdf', 'HTML' = 'html'))
                              )
                     ),
 
@@ -1710,6 +1722,19 @@ server <- function(input, output, session){
   results <- reactiveValues()
 
   #____Read data____####
+  # Test if fluorescence data is contained in custom/parsed object
+  output$fluorescence_present <- reactive({
+    if(!is.null(results$custom_data)){
+      grodata <- results$custom_data
+    } else if(!is.null(results$parsed_data)){
+      grodata <- results$parsed_data
+    } else return(FALSE)
+
+    if(length(grodata$fluorescence1) > 1 || length(grodata$fluorescence2) > 1){
+      return(TRUE)
+    } else return(FALSE)
+  })
+  outputOptions(output, 'fluorescence_present', suspendWhenHidden=FALSE)
   ##___Custom____####
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
@@ -2265,7 +2290,7 @@ server <- function(input, output, session){
           input$parsed_reads_fluorescence2 == input$parsed_reads_density |
             input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
           NA,
-          input$parsed_reads_fluorescence1
+          input$parsed_reads_fluorescence2
         )
       )
     } else {
@@ -2310,7 +2335,6 @@ server <- function(input, output, session){
     }
     # Remove eventually pre-loaded custom data
     results$custom_data <- NULL
-    hide("read_custom")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
@@ -2414,7 +2438,8 @@ server <- function(input, output, session){
     updateSelectInput(session,
                       inputId = "response_parameter_growth",
                       choices = selected_inputs_response_parameter_growth()
-    )})
+    )
+  })
 
   observeEvent(input$run_growth,{
     # withCallingHandlers({
@@ -2443,6 +2468,8 @@ server <- function(input, output, session){
 
     if (input$smoothing_factor_growth == "NULL") {
       smooth.dr = NULL
+    } else {
+      smooth.dr <- input$smoothing_factor_growth
     }
 
     fit.opt <- c()
@@ -2468,7 +2495,6 @@ server <- function(input, output, session){
                    's')
     }
 
-    # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
     # Run growth workflow
     shiny::withProgress(message = "Computations completed",
@@ -2482,17 +2508,17 @@ server <- function(input, output, session){
                                         log.y.model = input$log_transform_data_parametric_growth,
                                         log.y.spline = input$log_transform_data_nonparametric_growth,
                                         biphasic = input$biphasic_growth,
-                                        lin.h = input$custom_sliding_window_size_value_growth,## Here seem to be problems
+                                        lin.h = input$custom_sliding_window_size_value_growth,
                                         lin.R2 = input$R2_threshold_growth,
                                         lin.RSD = input$RSD_threshold_growth,
-                                        lin.dY = input$dY_threshold_growth, ##
-                                        interactive = F, ### TODO (popups)
+                                        lin.dY = input$dY_threshold_growth,
+                                        interactive = F,
                                         nboot.gc = input$number_of_bootstrappings_growth,
                                         smooth.gc = input$smoothing_factor_nonparametric_growth,
                                         model.type = models,
                                         growth.thresh = input$growth_threshold_growth,
-                                        dr.parameter = input$response_parameter_growth, ### TODO if else bla
-                                        smooth.dr = input$smooth.dr,
+                                        dr.parameter = input$response_parameter_growth,
+                                        smooth.dr = smooth.dr,
                                         log.x.dr = input$log_transform_concentration_growth,
                                         log.y.dr = input$log_transform_response_growth,
                                         nboot.dr = input$number_of_bootstrappings_dr_growth,
@@ -2501,7 +2527,7 @@ server <- function(input, output, session){
 
       )
     )
-    ## ENABLE DISABLED PLOTS AFTER RUNNING COMPUTATION
+    ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
     # enable(selector = "#navbar li a[data-value=Report]")
     # enable(selector = "#navbar li a[data-value=Visualize]")
     # enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
@@ -2517,31 +2543,7 @@ server <- function(input, output, session){
     # warning = function(m) {
     #   shinyjs::html(id = "text", html = m$message, add = TRUE)
     # }
-    gc_parameters <- c()
-    if("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt){
-      gc_parameters <- c(gc_parameters,
-                         'mu.spline' = 'mu.spline',
-                         "tD.spline" = "tD.spline",
-                         'lambda.spline' = 'lambda.spline',
-                         'A.spline' = 'A.spline',
-                         'dY.spline' = 'dY.spline',
-                         'integral.spline' = 'integral.spline')
-    }
-    if("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt){
-      gc_parameters <- c(gc_parameters,
-                         'mu.linfit' = 'mu.linfit',
-                         "tD.linfit" = "tD.linfit",
-                         'lambda.linfit' = 'lambda.linfit',
-                         'A.linfit' = 'A.linfit',
-                         'dY.linfit' = 'dY.linfit')
-    }
-    if("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt){
-      gc_parameters <- c(gc_parameters,
-                         'mu.model' = 'mu.model',
-                         'lambda.model' = 'lambda.model',
-                         'A.model' = 'A.model',
-                         'dY.model' = 'dY.model')
-    }
+
     removeModal()
   })
   #####____Fluorescence____#####
@@ -2565,12 +2567,125 @@ server <- function(input, output, session){
     )
   })
 
+  selected_inputs_response_parameter_fluorescence <- reactive({
+    select_options <- c()
+    if(input$linear_regression_fluorescence) select_options <- c(select_options, 'max_slope.linfit', 'lambda.linfit', 'dY.linfit',
+                                                           'A.linfit')
+    if(input$nonparametric_fit_fluorescence) select_options <- c(select_options, 'max_slope.spline', 'lambda.spline',
+                                                           'A.spline', 'dY.spline', 'integral.spline')
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "response_parameter_fluorescence",
+                      choices = selected_inputs_response_parameter_fluorescence()
+    )
+  })
+
+  observeEvent(input$run_fluorescence,{
+    # withCallingHandlers({
+    #
+    #   shinyjs::html(id = "text", html = '<br>', add = TRUE)
+    # # Activate menus
+    # enable(selector = "#navbar li:nth-child(3)")
+    # enable(selector = "#navbar li:nth-child(4)")
+    # enable(selector = "#navbar li:nth-child(5)")
+    #
+    # # Inactivate Fluorescence menus
+    # disable(selector = "#navbar li:nth-child(3) li:nth-child(2)")
+    # disable(selector = "#navbar li:nth-child(4) li:nth-child(2)")
+    # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
+
+    # Choose data input
+    if(!is.null(results$custom_data)){
+      grodata <- results$custom_data
+    } else if(!is.null(results$parsed_data)){
+      grodata <- results$parsed_data
+    } else return(NULL)
+
+    if (input$smoothing_factor_fluorescence == "NULL") {
+      smooth.dr = NULL
+    } else {
+      smooth.dr <- input$smoothing_factor_fluorescence
+    }
+
+    fit.opt <- c()
+    if(input$linear_regression_growth){
+      fit.opt <- c(fit.opt,
+                   'l')
+    }
+    if(input$nonparametric_fit_growth){
+      fit.opt <- c(fit.opt,
+                   's')
+    }
+
+    # removeModal()
+    showModal(modalDialog("Running computations...", footer=NULL))
+    # Run growth workflow
+    shiny::withProgress(message = "Computations completed",
+
+                        results$fluorescence <- fl.workflow(grodata = NULL,
+                                                            ec50 = input$perform_ec50_fluorescence,
+                                                            fit.opt = fit.opt,
+                                                            x_type = c("density", "time"),
+                                                            norm_fl = input$normalize_fluorescence,
+                                                            t0 = input$t0_fluorescence,
+                                                            min.density = input$minimum_density_fluorescence,
+                                                            log.x.lin = input$log_transform_x_linear_fluorescence,
+                                                            log.x.spline = input$log_transform_x_nonparametric_fluorescence,
+                                                            log.y.lin = input$log_transform_data_linear_fluorescence,
+                                                            log.y.spline = input$log_transform_data_nonparametric_fluorescence,
+                                                            lin.h = input$custom_sliding_window_size_value_fluorescence,
+                                                            lin.R2 = input$R2_threshold_fluorescence,
+                                                            lin.RSD = input$RSD_threshold_fluorescence,
+                                                            lin.dY = input$dY_threshold_fluorescence,
+                                                            biphasic = input$biphasic_fluorescence,
+                                                            interactive = FALSE,
+                                                            dr.parameter = input$response_parameter_growth,
+                                                            dr.method = input$dr_method_fluorescence,
+                                                            smooth.dr = smooth.dr,
+                                                            log.x.dr = input$log_transform_concentration_growth,
+                                                            log.y.dr = input$log_transform_response_growth,
+                                                            nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                                            nboot.fl = input$number_of_bootstrappings_growth,
+                                                            smooth.fl = input$smoothing_factor_nonparametric_growth,
+                                                            growth.thresh = input$growth_threshold_growth,
+                                                            suppress.messages = FALSE,
+                                                            neg.nan.act = FALSE,
+                                                            clean.bootstrap = TRUE,
+                                                            report = NULL,
+                                                            out.dir = NULL,
+                                                            out.nm = NULL,
+                                                            export.fig = FALSE,
+                                                            shiny = TRUE
+                        )
+    )
+    ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+    # enable(selector = "#navbar li a[data-value=Report]")
+    # enable(selector = "#navbar li a[data-value=Visualize]")
+    # enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+    # hide(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
+    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_Fluorescence]")
+    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_GrowthandFluorescence]")
+
+
+    # )},
+    # message = function(m) {
+    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
+    # },
+    # warning = function(m) {
+    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
+    # }
+
+    removeModal()
+  })
+
   ## Results ####
+  ### Growth ####
   observe({
     if(!is.null(results$growth)){
       if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Spline")
-
       }
       if(!("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Linear")
@@ -2589,7 +2704,7 @@ server <- function(input, output, session){
                                          "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
                                          "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
                                          "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2),
-                                         "Δy" = round(as.numeric(res.table.gc$dY.linfit), 3),
+                                         "ΔY" = round(as.numeric(res.table.gc$dY.linfit), 3),
                                          "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
                                          "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
                                          "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
@@ -2608,7 +2723,7 @@ server <- function(input, output, session){
                                          "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
                                          "λ" = round(as.numeric(res.table.gc$lambda.spline), 2),
                                          "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
-                                         "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
+                                         "ΔY" = round(as.numeric(res.table.gc$dY.spline), 3),
                                          "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
                                          "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F),
                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
@@ -2641,6 +2756,56 @@ server <- function(input, output, session){
                              escape = FALSE)
     table_model
   })
+  ### Fluorescence ####
+  observe({
+    if(!is.null(results$fluorescence)){
+      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Fluorescence_Spline")
+      }
+      if(!("l" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Fluorescence_Linear")
+      }
+      if(!("m" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Fluorescence_Model")
+
+      }
+    }
+  })
+
+  output$results_table_fluorescence_linear <- DT::renderDT({
+    res.table.fl <- results$fluorescence$flFit$flTable
+
+    table_linear <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
+                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slopelinfit==0 | is.na(res.table.fl$max_slopelinfit), "", ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$max_slopelinfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slopelinfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$mu2.linfit), 3), ")"))),
+                                         "t<sub>D</sub>" = ifelse(res.table.fl$max_slopelinfit==0 | is.na(res.table.fl$max_slopelinfit), "",  ifelse(is.na(res.table.fl$mu2.linfit), round(log(2)/as.numeric(res.table.fl$max_slopelinfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slopelinfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$mu2.linfit), 2), ")"))),
+                                         "λ" = round(as.numeric(res.table.fl$lambda.linfit), 2),
+                                         "ΔY" = round(as.numeric(res.table.fl$dY.linfit), 3),
+                                         "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.linfit), 3),
+                                         "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$tmax_slopestart.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax_slopestart.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmu2.start.linfit), 2), ")")),
+                                         "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$tmax_slopeend.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax_slopeend.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmu2.end.linfit), 2), ")")),
+                                         "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$r2max_slopelinfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$r2max_slopelinfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$r2mu2.linfit), 3), ")")),
+                                         stringsAsFactors = F, check.names = F),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                              escape = FALSE)
+    # table_linear <- res.table.fl
+    table_linear
+  })
+
+  output$results_table_fluorescence_spline <- DT::renderDT({
+    res.table.fl <- results$fluorescence$gcFit$gcTable
+    table_spline <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
+                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slopespline==0 | is.na(res.table.fl$max_slopespline), "", ifelse(is.na(res.table.fl$mu2.spline), round(as.numeric(res.table.fl$max_slopespline), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slopespline), 3), "</strong>", " (", round(as.numeric(res.table.fl$mu2.spline), 3), ")"))),
+                                         "t<sub>D</sub>" = ifelse(res.table.fl$max_slopespline==0 | is.na(res.table.fl$max_slopespline), "",  ifelse(is.na(res.table.fl$mu2.spline), round(log(2)/as.numeric(res.table.fl$max_slopespline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slopespline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$mu2.spline), 2), ")"))),
+                                         "λ" = round(as.numeric(res.table.fl$lambda.spline), 2),
+                                         "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.spline), 3),
+                                         "ΔY" = round(as.numeric(res.table.fl$dY.spline), 3),
+                                         "t<sub>max</sub>" = ifelse(is.na(res.table.fl$mu2.spline), round(as.numeric(res.table.fl$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmax2.spline), 2), ")")),
+                                         "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F),
+                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                              escape = FALSE)
+    table_spline
+  })
+
   # Validate ####
   ## Growth #####
 
