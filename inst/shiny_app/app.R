@@ -1186,7 +1186,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              mainPanel(
                                                                withSpinner(
                                                                  plotOutput("growth_group_plot",
-                                                                            width = "100%", height = "1000px")
+                                                                            width = "100%", height = "1000px"),
+
                                                                )
                                                              )
 
@@ -3111,6 +3112,121 @@ server <- function(input, output, session){
                    label.size = input$label.size_growth_parameter_plot
     )
   })
+
+  output$downloads_growth_group_plot <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      out.nm <- gsub(paste0("^.+", paste(.Platform$file.sep)), "", file)
+      out.dir <- gsub(paste0("[^", .Platform$file.sep, "]+$"), "", file)
+      file.format <- gsub("^.+\\.", "", file)
+
+      results <- results$growth
+      plot.grofit(results,
+                  data.type = input$data_type_growth_group_plots,
+                  names = input$select_samples_based_on_string_growth_group_plots,
+                  conc = input$select_samples_based_on_concentration_growth_group_plots,
+                  exclude.nm = input$exclude_samples_based_on_string_growth_group_plots,
+                  exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plots,
+                  mean = input$plot_group_averages_growth_group_plots,
+                  deriv = input$plot_derivative_growth_group_plots,
+                  log.y = input$log_transform_y_axis_growth_group_plots,
+                  x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
+                  y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
+                  y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
+                  y.title = input$y_axis_title_growth_group_plot,
+                  x.title = input$x_axis_title_growth_group_plot,
+                  y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
+                  lwd = input$line_width_growth_group_plot,
+                  basesize = input$base_size_growth_group_plot,
+                  shiny = TRUE,
+                  export = TRUE,
+                  out.nm = out.nm,
+                  out.dir = out.dir
+      )
+    }
+  )
+
+  output$downloads_dose_response_plot_combined_growth <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      out.nm <- gsub(paste0("^.+", paste(.Platform$file.sep)), "", file)
+      out.dir <- gsub(paste0("[^", .Platform$file.sep, "]+$"), "", file)
+      file.format <- gsub("^.+\\.", "", file)
+      results <- results$growth$drFit
+      plot.drFit(results,
+                 combine=TRUE,
+                 pch = input$shape_type_dose_response_growth_plot,
+                 cex = input$shape_size_dose_response_growth_plot,
+                 basesize = input$base_size_dose_response_growth_plot,
+                 lwd = input$line_width_dose_response_growth_plot,
+                 ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
+                 export = TRUE,
+                 out.nm = out.nm,
+                 out.dir = out.dir)
+    }
+  )
+
+  output$downloads_dose_response_plot_individual_growth <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      out.nm <- gsub(paste0("^.+", paste(.Platform$file.sep)), "", file)
+      out.dir <- gsub(paste0("[^", .Platform$file.sep, "]+$"), "", file)
+      file.format <- gsub("^.+\\.", "", file)
+      results <- results$growth$drFit$drFittedSplines[[input$individual_plots_dose_response_growth_plot]]
+      plot.drFitSpline(results,
+                       combine=FALSE,
+                       pch = input$shape_type_dose_response_growth_plot,
+                       cex = input$shape_size_dose_response_growth_plot,
+                       basesize = input$base_size_dose_response_growth_plot,
+                       lwd = input$line_width_dose_response_growth_plot,
+                       ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
+                       export = TRUE,
+                       out.nm = out.nm,
+                       out.dir = out.dir)
+    }
+  )
+
+  output$downloads_growth_parameter_plot <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      out.nm <- gsub(paste0("^.+", paste(.Platform$file.sep)), "", file)
+      out.dir <- gsub(paste0("[^", .Platform$file.sep, "]+$"), "", file)
+      file.format <- gsub("^.+\\.", "", file)
+      results <- results$growth
+
+      if (input$normalize_to_reference_growth_parameter_plot){
+        reference.conc <- as.numeric(input$reference_concentration_growth_parameter_plot)
+        reference.nm <- input$reference_condition_growth_parameter_plot
+      } else {
+        reference.conc <- NULL
+        reference.nm <- NULL
+      }
+
+      plot.parameter(results,
+                     param = input$parameter_growth_parameter_growth_plot,
+                     names = input$select_sample_based_on_string_growth_parameter_plot,
+                     conc = input$select_sample_based_on_concentration_growth_parameter_plot,
+                     exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
+                     exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
+                     reference.nm = reference.nm,
+                     reference.conc = reference.conc,
+                     shape.size = input$shape.size_growth_parameter_plot,
+                     basesize = input$basesize_growth_parameter_plot,
+                     label.size = input$label.size_growth_parameter_plot,
+                     export = TRUE,
+                     out.nm = out.nm,
+                     out.dir = out.dir
+      )
+    }
+  )
 
   ###____Download____####
   output$download_table_growth_linear <- downloadHandler(
