@@ -905,16 +905,19 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              conditionalPanel(condition = "input.biphasic_growth",
                                                                               h5("(Values in parentheses indicate parameters for secondary growth phase)")
                                                              ),
-                                                             DT::dataTableOutput('results_table_growth_linear')
+                                                             DT::dataTableOutput('results_table_growth_linear'),
+                                                             downloadButton('download_table_growth_linear',"Download table")
                                                     ),
                                                     tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
                                                              conditionalPanel(condition = "input.biphasic_growth",
                                                                               h5("(Values in parentheses indicate parameters for secondary growth phase)")
                                                              ),
-                                                             DT::dataTableOutput('results_table_growth_spline')
+                                                             DT::dataTableOutput('results_table_growth_spline'),
+                                                             downloadButton('download_table_growth_spline',"Download table")
                                                     ),
                                                     tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
-                                                             DT::dataTableOutput('results_table_growth_model')
+                                                             DT::dataTableOutput('results_table_growth_model'),
+                                                             downloadButton('downloads_table_growth_model',"Download table")
                                                     )
                                         )
                                ),
@@ -2584,7 +2587,7 @@ server <- function(input, output, session){
 
   table_growth_linear <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
-    table_linear <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+    table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                                          "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
                                          "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
                                          "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2),
@@ -2593,35 +2596,35 @@ server <- function(input, output, session){
                                          "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
                                          "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
                                          "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
-                                         stringsAsFactors = F, check.names = F),
-                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                              escape = FALSE)
+                                         stringsAsFactors = F, check.names = F)
     # table_linear <- res.table.gc
     table_linear
 
   })
 
   output$results_table_growth_linear <- DT::renderDT({
-    table_growth_linear()
+    datatable(table_growth_linear(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
   })
 
   table_growth_spline <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
-    table_spline <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
                                          "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.spline), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
                                          "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
                                          "λ" = round(as.numeric(res.table.gc$lambda.spline), 2),
                                          "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
                                          "Δy" = round(as.numeric(res.table.gc$dY.spline), 3),
                                          "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
-                                         "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F),
-                              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                              escape = FALSE)
+                                         "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
     table_spline
   })
 
   output$results_table_growth_spline <- DT::renderDT({
-    table_growth_spline()
+    datatable(table_growth_spline(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
   })
 
   table_growth_model <- reactive({
@@ -2645,15 +2648,15 @@ server <- function(input, output, session){
           table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
         }
       }
-      table_model <- datatable(table_model,
-                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                               escape = FALSE)
       table_model
     })
   })
 
   output$results_table_growth_model <- DT::renderDT({
-    table_growth_model()
+    table_model <- table_growth_model()
+    datatable(table_model,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
   })
   # Validate ####
   ## Growth #####
@@ -3108,6 +3111,34 @@ server <- function(input, output, session){
                    label.size = input$label.size_growth_parameter_plot
     )
   })
+
+  ###____Download____####
+  output$download_table_growth_linear <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(table_growth_linear(), file)
+    }
+  )
+
+  output$download_table_growth_spline <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(table_growth_linear(), file)
+    }
+  )
+
+  output$downloads_table_growth_model <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(table_growth_linear(), file)
+    }
+  )
 
   # conditional selections:
   ## Computations
