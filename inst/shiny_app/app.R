@@ -2084,6 +2084,21 @@ server <- function(input, output, session){
     sheets
   })
 
+  observe({
+    updateSelectInput(inputId = "custom_growth_sheets",
+                      choices = growth_excel_sheets()
+    )})
+
+  observe({
+    updateSelectInput(inputId = "custom_fluorescence1_sheets",
+                      choices = fluorescence1_excel_sheets()
+    )})
+
+  observe({
+    updateSelectInput(inputId = "custom_fluorescence2_sheets",
+                      choices = fluorescence2_excel_sheets()
+    )})
+
   ## Parse data
   ### Hide elements to guide user
   hide("parsed_reads_density")
@@ -2335,6 +2350,23 @@ server <- function(input, output, session){
                            escape = FALSE, rownames = T)
 
     expdesign
+  })
+
+  observe({
+    updateSelectInput(inputId = "parse_data_sheets",
+                      choices = parse_excel_sheets()
+    )})
+
+  observe({
+    if(input$mapping_included_in_parse){
+      updateSelectInput(inputId = "map_data_sheets",
+                        choices = parse_excel_sheets()
+      )
+    } else {
+      updateSelectInput(inputId = "map_data_sheets",
+                        choices = map_excel_sheets()
+      )
+    }
   })
 
   # Computation
@@ -3104,39 +3136,6 @@ server <- function(input, output, session){
     if (length(results$growth$drFit)>1) names(results$growth$drFit$drFittedSplines)
     else return("")
   })
-
-
-  observe({
-    updateSelectInput(inputId = "parse_data_sheets",
-                      choices = parse_excel_sheets()
-    )})
-
-  observe({
-    if(input$mapping_included_in_parse){
-      updateSelectInput(inputId = "map_data_sheets",
-                        choices = parse_excel_sheets()
-      )
-    } else {
-      updateSelectInput(inputId = "map_data_sheets",
-                        choices = map_excel_sheets()
-      )
-    }
-    })
-
-  observe({
-    updateSelectInput(inputId = "custom_growth_sheets",
-                      choices = growth_excel_sheets()
-    )})
-
-  observe({
-    updateSelectInput(inputId = "custom_fluorescence1_sheets",
-                      choices = fluorescence1_excel_sheets()
-    )})
-
-  observe({
-    updateSelectInput(inputId = "custom_fluorescence2_sheets",
-                      choices = fluorescence2_excel_sheets()
-    )})
 
   observe({
     updateSelectInput(inputId = "parameter_growth_parameter_growth_plot",
