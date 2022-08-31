@@ -794,9 +794,9 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
                      width = w, height = h, units = 'in', res = 300)
       print(p)
       grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
-      print(p)
-      grDevices::dev.off()
+      #grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+      #print(p)
+      #grDevices::dev.off()
       cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
     }
     if (plot == TRUE){
