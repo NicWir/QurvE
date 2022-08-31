@@ -457,6 +457,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                     ), # Navbar 1
 
                     navbarMenu('Computation', menuName = "navbarMenu_Computation", icon=icon("gears"),
+                               ##____Computation_Growth____
                                tabPanel("Growth", value = "tabPanel_Growth",
                                         fluidRow(
                                           sidebarLayout(
@@ -544,7 +545,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                       min = NA,
                                                                                       max = NA,
                                                                                     )
-                                                                   )
+                                                                   ) # conditionalPanel(condition = "input.perform_ec50_growth"
                                                                  ),
                                                                  fluidRow(
                                                                    column(12,
@@ -677,212 +678,215 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ), # Growth Tab Panel
 
                                "----",
-
-                               tabPanel("Fluorescence", id = "tabPanel_Computation_Fluorescence",
+                               ##____Computation_Fluorescence____
+                               tabPanel("Fluorescence", value = "tabPanel_Computation_Fluorescence",
                                         fluidRow(
-                                          column(4,
-                                                 mainPanel(
-                                                   h2('Fluorescence fit'),
-                                                   h4('Options'),
-                                                   checkboxInput(inputId = 'linear_regression_fluorescence',
-                                                                 label = 'linear regression'),
+                                          sidebarLayout(
+                                            column(4,
+                                                   sidebarPanel( width = 12,
+                                                                 style = 'border-color: #ADADAD',
+                                                                 wellPanel(
+                                                                   style = 'background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+                                                                   h2(strong('Fluorescence fit')),
+                                                                   h4('Options'),
+                                                                   checkboxInput(
+                                                                     inputId = 'linear_regression_fluorescence',
+                                                                     label = 'linear regression',
+                                                                     value = TRUE
+                                                                   ),
 
-                                                   checkboxInput(inputId = 'parametric_fit_fluorescence',
-                                                                 label = 'parametric fit'),
+                                                                   checkboxInput(
+                                                                     inputId = 'nonparametric_fit_fluorescence',
+                                                                     label = 'nonparametric fit',
+                                                                     value = TRUE
+                                                                   ),
 
-                                                   checkboxInput(inputId = 'nonparametric_fit_fluorescence',
-                                                                 label = 'nonparametric fit'),
+                                                                   checkboxInput(inputId = 'biphasic_fluorescence',
+                                                                                 label = 'Biphasic'),
 
-                                                   checkboxInput(inputId = 'run_interactive_mode_fluorescence',
-                                                                 label = 'run interactive mode'),
+                                                                   selectInput(
+                                                                     inputId = 'data_type_x_fluorescence', # TODO change choices based on presence of density and time
+                                                                     label = 'Data type x',
+                                                                     choices = c('density', 'time')
+                                                                   ),
 
-                                                   checkboxInput(inputId = 'biphasic_fluorescence',
-                                                                 label = 'Biphasic'),
+                                                                   checkboxInput(inputId = 'normalize_fluorescence', # TODO inactivate if no density values are present
+                                                                                 label = 'Normalize fluorescence'
+                                                                   ),
 
-                                                   selectInput(inputId = 'data_type_x_fluorescence',
-                                                               label = 'Data type x',
-                                                               choices = c('density', 'time')),
+                                                                   numericInput(
+                                                                     inputId = 'growth_threshold_in_percent_fluorescence',
+                                                                     label = 'growth threshold (in %)',
+                                                                     value = 1.5,
+                                                                     min = NA,
+                                                                     max = NA,
+                                                                   ),
 
-                                                   checkboxInput(inputId = 'normalize_fluorescence',
-                                                                 label = 'Normalize fluorescence'),
+                                                                   numericInput(
+                                                                     inputId = 'minimum_density_fluorescence', # TODO inactivate if no density values are present
+                                                                     label = 'minimum_density',
+                                                                     value = 0,
+                                                                     min = NA,
+                                                                     max = NA,
+                                                                   ),
 
-                                                   numericInput(
-                                                     inputId = 'growth_threshold_in_percent_fluorescence',
-                                                     label = 'growth threshold (in %)',
-                                                     value = 1.5,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                   numericInput(
-                                                     inputId = 'minimum_density_fluorescence',
-                                                     label = 'minimum_density',
-                                                     value = 0,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                   numericInput(
-                                                     inputId = 't0_fluorescence',
-                                                     label = 't0',
-                                                     value = 0,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                 ), # Fluorescence fit
+                                                                   numericInput(
+                                                                     inputId = 't0_fluorescence', # TODO inactivate if no time values are present
+                                                                     label = 't0',
+                                                                     value = 0,
+                                                                     min = NA,
+                                                                     max = NA,
+                                                                   ),
+                                                                 ), # Fluorescence fit
 
 
-                                                 mainPanel(
-                                                   h2('Dose-response Analysis'),
-                                                   checkboxInput(inputId = 'perform_ec50_fluorescence',
-                                                                 label = 'perform EC50 Analysis'),
+                                                                 wellPanel(style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+                                                                   h2(strong('Dose-response Analysis')),
+                                                                   checkboxInput(inputId = 'perform_ec50_fluorescence',
+                                                                                 label = 'perform dose-response analysis',
+                                                                                 value = TRUE),
+
+
+                                                                   conditionalPanel(condition = "input.perform_ec50_fluorescence",
+
+                                                                                    selectInput(inputId = "dr_method_fluorescence",
+                                                                                                label = "Method",
+                                                                                                choices = c("Biosensor response model",
+                                                                                                            "Response spline fit") # TODO tooltip with reference to Meyer et al., 2019
+                                                                                    ),
+
+                                                                                    selectInput(inputId = "response_parameter_fluorescence",
+                                                                                                label = "Response Parameter",
+                                                                                                choices = ""),
+
+                                                                                    checkboxInput(inputId = 'log_transform_concentration_fluorescence',
+                                                                                                  label = 'log transform concentration'),
+
+                                                                                    checkboxInput(inputId = 'log_transform_response_fluorescence',
+                                                                                                  label = 'log transform response'),
+
+
+                                                                                    numericInput(
+                                                                                      inputId = "smoothing_factor_fluorescence", # TODO hide if dr_method_fluorescence == "Biosensor response model"
+                                                                                      label = "smoothing factor",
+                                                                                      value = NULL,
+                                                                                      min = 0,
+                                                                                      max = 1,
+                                                                                      step = 1
+                                                                                    ),
+
+                                                                                    numericInput(
+                                                                                      inputId = 'number_of_bootrappings_fluorescence',
+                                                                                      label = 'number of bootrappings',
+                                                                                      value = 0,
+                                                                                      min = NA,
+                                                                                      max = NA,
+                                                                                    )
+                                                                   ), # conditionalPanel(condition = "input.perform_ec50_fluorescence"
+                                                                 ), # wellPanel
+                                                                 fluidRow(
+                                                                   column(12,
+                                                                          div(
+                                                                            actionButton(inputId = "run_fluorescence",
+                                                                                         label = "Run computation",
+                                                                                         icon=icon("gears"),
+                                                                                         style="padding:5px; font-size:120%"),
+                                                                            style="float:right")
+                                                                   )
+                                                                 )
+                                                   ) # sidebarPanel
+
+                                            ), # column
+                                            column(8,
+                                                   conditionalPanel(
+                                                     condition = "input.linear_regression_fluorescence",
+                                                     sidebarPanel(
+                                                       width = 4,
+                                                       style='border-color: #ADADAD; padding-top: 0',
+                                                       h3(strong('Linear fit')),
+
+                                                       numericInput(
+                                                         inputId = 'R2_threshold_fluorescence',
+                                                         label = 'R2 threshold',
+                                                         value = 0.95,
+                                                         min = NA,
+                                                         max = NA,
+                                                       ),
+
+                                                       numericInput(
+                                                         inputId = 'RSD_threshold_fluorescence',
+                                                         label = 'RSD threshold',
+                                                         value = 0.1,
+                                                         min = NA,
+                                                         max = NA,
+                                                       ),
+
+                                                       numericInput(
+                                                         inputId = 'dY_threshold_fluorescence',
+                                                         label = 'dY threshold',
+                                                         value = 0.05,
+                                                         min = NA,
+                                                         max = NA,
+                                                       ),
+
+                                                       checkboxInput(inputId = 'custom_sliding_window_size_fluorescence',
+                                                                     label = 'custom sliding window size',
+                                                                     value = FALSE),
+
+                                                       conditionalPanel(
+                                                         condition = "input.custom_sliding_window_size_fluorescence",
+                                                         numericInput(
+                                                           inputId = 'custom_sliding_window_size_value_gfluorescence',
+                                                           label = NULL,
+                                                           value = "",
+                                                           min = NA,
+                                                           max = NA,
+                                                         )
+                                                       ),
+                                                     )
+                                                   ), # conditionalPanel
 
                                                    conditionalPanel(
-                                                     condition = "input.perform_ec50_fluorescence",
-                                                     selectInput(inputId = "format_fluorescence",
-                                                                 label = "Response Parameter",
-                                                                 choices = c("max_slope_spline" = "max_slope_spline")
-                                                     ),
+                                                     condition = "input.nonparametric_fit_fluorescence",
+                                                     sidebarPanel(
+                                                       width = 4,
+                                                       style='border-color: #ADADAD; padding-top: 0',
+                                                       h3(strong('Nonparametric fit')),
 
-                                                     checkboxInput(inputId = 'log_transform_concentration_fluorescence',
-                                                                   label = 'log transform concentration'),
+                                                       numericInput(
+                                                         inputId = 'smoothing_factor_nonparametric_fluorescence',
+                                                         label = 'smoothing factor',
+                                                         value = 0.55,
+                                                         min = NA,
+                                                         max = NA,
+                                                       ),
 
-                                                     checkboxInput(inputId = 'log_transform_response_fluorescence',
-                                                                   label = 'log transform response'),
+                                                       numericInput(
+                                                         inputId = 'number_of_bootstrappings_fluorescence',
+                                                         label = 'number of bootstrappings',
+                                                         value = 0,
+                                                         min = NA,
+                                                         max = NA,
+                                                       ),
+                                                       checkboxInput(inputId = 'log_transform_data_nonparametric_fluorescence',
+                                                                     label = 'Log-transform fluorescence data'),
 
-                                                     numericInput(
-                                                       inputId = 'smoothing_factor_fluorescence',
-                                                       label = 'smoothing factor',
-                                                       value = NULL,
-                                                       min = NA,
-                                                       max = NA,
-                                                     ),
-
-                                                     numericInput(
-                                                       inputId = 'minimum_number_of_different_values_fluorescence',
-                                                       label = 'smoothing factor',
-                                                       value = 6,
-                                                       min = NA,
-                                                       max = NA,
-                                                     ),
-
-                                                     numericInput(
-                                                       inputId = 'number_of_bootrappings_fluorescence',
-                                                       label = 'number of bootrappings',
-                                                       value = 0,
-                                                       min = NA,
-                                                       max = NA,
+                                                       checkboxInput(inputId = 'log_transform_x_parametric_fluorescence',
+                                                                     label = 'Log-transform x data')
                                                      )
-                                                   )
-
-                                                   ,
-
-
-                                                   actionButton(inputId = "run_fluorescence",
-                                                                label = "Run computation")
-                                                 )
-                                          ), # Dose response analysis
-
-                                          column(4,
-                                                 mainPanel(
-                                                   h2('Linear fit'),
-
-                                                   checkboxInput(inputId = 'log_transform_x',
-                                                                 label = 'log-transform x'),
-
-                                                   checkboxInput(inputId = 'log_transform_fluorescence',
-                                                                 label = 'log-transform fluorescence'),
-
-                                                   numericInput(
-                                                     inputId = 'R2_threshold',
-                                                     label = 'R2_threshold',
-                                                     value = 0.97,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                   numericInput(
-                                                     inputId = 'RSD_threshold',
-                                                     label = 'RSD threshold',
-                                                     value = 0.05,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                   numericInput(
-                                                     inputId = 'dY_threshold',
-                                                     label = 'dY threshold',
-                                                     value = 0.05,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                   checkboxInput(inputId = 'custom_sliding_window_size',
-                                                                 label = 'custom sliding window size'),
-
-                                                   numericInput(
-                                                     inputId = 'custom_sliding_window_size_value_growth',
-                                                     label = '',
-                                                     value = 8,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-                                                 )
-
-                                          ), # Linear fit: Fluorescence
-
-                                          column(4,
-                                                 mainPanel(
-                                                   h2('Nonparametric fit'),
-
-                                                   checkboxInput(inputId = 'log_transform_x',
-                                                                 label = 'Log-transform x'),
-
-                                                   checkboxInput(inputId = 'log_transform_fluorescence',
-                                                                 label = 'Log-transform fluorescence'),
-
-                                                   numericInput(
-                                                     inputId = 'smoothing_factor',
-                                                     label = 'smoothing factor',
-                                                     value = 0.55,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                   numericInput(
-                                                     inputId = 'number_of_bootstrappings',
-                                                     label = 'number of bootstrappings',
-                                                     value = 0,
-                                                     min = NA,
-                                                     max = NA,
-                                                   ),
-
-                                                   checkboxInput(inputId = 'remove_neg_values_in_bootstrap',
-                                                                 label = 'remove negative values in bootstrapping'),
-
-                                                 ),
-
-                                                 mainPanel(
-                                                   checkboxInput(inputId = 'log_transform_data_nonparametric',
-                                                                 label = 'Log-transform data'),
-
-                                                   checkboxInput(inputId = 'log_transform_time_parametric',
-                                                                 label = 'Log-transform time')
-                                                 )
-                                          ),
-                                        ),
-                               ),
-
-
-                    ),
+                                                   )  # conditionalPanel
+                                            ) # column
+                                          ) # sidebarLayout
+                                        ) # fluidRow
+                               ), # tabPanel("Fluorescence"
+                    ), # navbarMenu('Computation'
 
                     navbarMenu(title = "Results", menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
                                tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
                                         tabsetPanel(type = "tabs", id = "tabsetPanel_Results",
                                                     tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
                                                              conditionalPanel(condition = "input.biphasic_growth",
-                                                               h5("(Values in parentheses indicate parameters for secondary growth phase)")
+                                                                              h5("(Values in parentheses indicate parameters for secondary growth phase)")
                                                              ),
                                                              DT::dataTableOutput('results_table_growth_linear')
                                                     ),
