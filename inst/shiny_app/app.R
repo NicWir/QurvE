@@ -1715,7 +1715,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    paste(input$custom_file_fluorescence1$datapath)
+    table_fluorescence_linear()
     })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
@@ -2235,7 +2235,7 @@ server <- function(input, output, session){
                                        sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) )
 
     )
-    if(exists("reads")){
+    if(exists("reads") && length(reads) > 1){
       show("parsed_reads_density")
       if(length(reads)>1) show("parsed_reads_fluorescence1")
       if(length(reads)>2) show("parsed_reads_fluorescence2")
@@ -2271,56 +2271,64 @@ server <- function(input, output, session){
   observeEvent(input$parse_data,{
 
     showModal(modalDialog("Parsing data input...", footer=NULL))
+
     if(input$mapping_included_in_parse){
-      results$parsed_data <- parse_data_shiny(
-        data.file = input$parse_file$datapath,
-        map.file = input$parse_file$datapath,
-        software = input$platereader_software,
-        convert.time = input$convert_time_values_plate_reader,
-        data.sheet = input$parse_data_sheets,
-        map.sheet = input$map_data_sheets,
-        csvsep.data =  input$separator_parse,
-        dec.data = input$decimal_separator_parse,
-        csvsep.map =  input$separator_map,
-        dec.map = input$decimal_separator_map,
-        subtract.blank = input$subtract_blank_plate_reader,
-        density.nm = input$parsed_reads_density,
-        fl1.nm = ifelse(
-          input$parsed_reads_fluorescence1 == input$parsed_reads_density,
-          NA,
-          input$parsed_reads_fluorescence1
-        ),
-        fl2.nm = ifelse(
-          input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-            input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
-          NA,
-          input$parsed_reads_fluorescence2
+      try(
+        results$parsed_data <- parse_data_shiny(
+          data.file = input$parse_file$datapath,
+          map.file = input$parse_file$datapath,
+          software = input$platereader_software,
+          convert.time = input$convert_time_values_plate_reader,
+          data.sheet = input$parse_data_sheets,
+          map.sheet = input$map_data_sheets,
+          csvsep.data =  input$separator_parse,
+          dec.data = input$decimal_separator_parse,
+          csvsep.map =  input$separator_map,
+          dec.map = input$decimal_separator_map,
+          subtract.blank = input$subtract_blank_plate_reader,
+          density.nm = input$parsed_reads_density,
+          fl1.nm = ifelse(
+            input$parsed_reads_fluorescence1 == input$parsed_reads_density,
+            NA,
+            input$parsed_reads_fluorescence1
+          ),
+          fl2.nm = ifelse(
+            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+              input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+            NA,
+            input$parsed_reads_fluorescence2
+          )
         )
       )
     } else {
-      results$parsed_data <- parse_data_shiny(
-        data.file = input$parse_file$datapath,
-        map.file = input$map_file$datapath,
-        software = input$platereader_software,
-        convert.time = input$convert_time_values_plate_reader,
-        data.sheet = input$parse_data_sheets,
-        map.sheet = input$map_data_sheets,
-        csvsep.data =  input$separator_parse,
-        dec.data = input$decimal_separator_parse,
-        csvsep.map =  input$separator_map,
-        dec.map = input$decimal_separator_map,
-        subtract.blank = input$subtract_blank_plate_reader,
-        density.nm = input$parsed_reads_density,
-        fl1.nm = ifelse(
-          input$parsed_reads_fluorescence1 == input$parsed_reads_density,
-          NA,
-          input$parsed_reads_fluorescence1
-        ),
-        fl2.nm = ifelse(
-          input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-            input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
-          NA,
-          input$parsed_reads_fluorescence1
+      if(is.null(input$map_file$datapath)){
+        showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
+      }
+      try(
+        results$parsed_data <- parse_data_shiny(
+          data.file = input$parse_file$datapath,
+          map.file = input$map_file$datapath,
+          software = input$platereader_software,
+          convert.time = input$convert_time_values_plate_reader,
+          data.sheet = input$parse_data_sheets,
+          map.sheet = input$map_data_sheets,
+          csvsep.data =  input$separator_parse,
+          dec.data = input$decimal_separator_parse,
+          csvsep.map =  input$separator_map,
+          dec.map = input$decimal_separator_map,
+          subtract.blank = input$subtract_blank_plate_reader,
+          density.nm = input$parsed_reads_density,
+          fl1.nm = ifelse(
+            input$parsed_reads_fluorescence1 == input$parsed_reads_density,
+            NA,
+            input$parsed_reads_fluorescence1
+          ),
+          fl2.nm = ifelse(
+            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+              input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+            NA,
+            input$parsed_reads_fluorescence1
+          )
         )
       )
     }
@@ -2601,6 +2609,7 @@ server <- function(input, output, session){
     # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
 
     # Choose data input
+    browser()
     if(!is.null(results$custom_data)){
       grodata <- results$custom_data
     } else if(!is.null(results$parsed_data)){
@@ -2713,7 +2722,6 @@ server <- function(input, output, session){
                                          "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
                                          "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
                                          stringsAsFactors = F, check.names = F)
-    # table_linear <- res.table.gc
     table_linear
 
   })
@@ -2783,45 +2791,53 @@ server <- function(input, output, session){
       if(!("l" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Fluorescence_Linear")
       }
-      if(!("m" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
-        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Fluorescence_Model")
-
-      }
     }
   })
-
-  output$results_table_fluorescence_linear <- DT::renderDT({
+  table_fluorescence_linear <- reactive({
     res.table.fl <- results$fluorescence$flFit$flTable
 
     table_linear <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
-                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slopelinfit==0 | is.na(res.table.fl$max_slopelinfit), "", ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$max_slopelinfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slopelinfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$mu2.linfit), 3), ")"))),
-                                         "t<sub>D</sub>" = ifelse(res.table.fl$max_slopelinfit==0 | is.na(res.table.fl$max_slopelinfit), "",  ifelse(is.na(res.table.fl$mu2.linfit), round(log(2)/as.numeric(res.table.fl$max_slopelinfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slopelinfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$mu2.linfit), 2), ")"))),
+                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slopelinfit==0 | is.na(res.table.fl$max_slopelinfit), "", ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$max_slopelinfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slopelinfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.linfit), 3), ")"))),
+                                         "t<sub>D</sub>" = ifelse(res.table.fl$max_slopelinfit==0 | is.na(res.table.fl$max_slopelinfit), "",  ifelse(is.na(res.table.fl$max_slope2.linfit), round(log(2)/as.numeric(res.table.fl$max_slopelinfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slopelinfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$max_slope2.linfit), 2), ")"))),
                                          "λ" = round(as.numeric(res.table.fl$lambda.linfit), 2),
                                          "ΔY" = round(as.numeric(res.table.fl$dY.linfit), 3),
                                          "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.linfit), 3),
-                                         "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$tmax_slopestart.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax_slopestart.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmu2.start.linfit), 2), ")")),
-                                         "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$tmax_slopeend.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax_slopeend.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmu2.end.linfit), 2), ")")),
-                                         "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.fl$mu2.linfit), round(as.numeric(res.table.fl$r2max_slopelinfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$r2max_slopelinfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$r2mu2.linfit), 3), ")")),
+                                         "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$tmax_slopestart.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax_slopestart.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmax_slope2.start.linfit), 2), ")")),
+                                         "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$tmax_slopeend.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax_slopeend.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmax_slope2.end.linfit), 2), ")")),
+                                         "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$r2max_slopelinfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$r2max_slopelinfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$r2max_slope2.linfit), 3), ")")),
                                          stringsAsFactors = F, check.names = F),
                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                               escape = FALSE)
-    # table_linear <- res.table.fl
+
     table_linear
+
   })
 
-  output$results_table_fluorescence_spline <- DT::renderDT({
+  output$results_table_growth_linear <- DT::renderDT({
+    datatable(table_fluorescence_linear(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
+  })
+
+  table_fluorescence_spline <- reactive({
     res.table.fl <- results$fluorescence$gcFit$gcTable
     table_spline <- datatable(data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
-                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slopespline==0 | is.na(res.table.fl$max_slopespline), "", ifelse(is.na(res.table.fl$mu2.spline), round(as.numeric(res.table.fl$max_slopespline), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slopespline), 3), "</strong>", " (", round(as.numeric(res.table.fl$mu2.spline), 3), ")"))),
-                                         "t<sub>D</sub>" = ifelse(res.table.fl$max_slopespline==0 | is.na(res.table.fl$max_slopespline), "",  ifelse(is.na(res.table.fl$mu2.spline), round(log(2)/as.numeric(res.table.fl$max_slopespline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slopespline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$mu2.spline), 2), ")"))),
+                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slopespline==0 | is.na(res.table.fl$max_slopespline), "", ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$max_slopespline), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slopespline), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.spline), 3), ")"))),
+                                         "t<sub>D</sub>" = ifelse(res.table.fl$max_slopespline==0 | is.na(res.table.fl$max_slopespline), "",  ifelse(is.na(res.table.fl$max_slope2.spline), round(log(2)/as.numeric(res.table.fl$max_slopespline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slopespline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$max_slope2.spline), 2), ")"))),
                                          "λ" = round(as.numeric(res.table.fl$lambda.spline), 2),
                                          "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.spline), 3),
                                          "ΔY" = round(as.numeric(res.table.fl$dY.spline), 3),
-                                         "t<sub>max</sub>" = ifelse(is.na(res.table.fl$mu2.spline), round(as.numeric(res.table.fl$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmax2.spline), 2), ")")),
+                                         "t<sub>max</sub>" = ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.fl$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.fl$tmax2.spline), 2), ")")),
                                          "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F),
                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                               escape = FALSE)
     table_spline
+  })
+
+  output$results_table_fluorescence_spline <- DT::renderDT({
+    datatable(table_fluorescence_spline(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
   })
 
   # Validate ####

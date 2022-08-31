@@ -45,6 +45,8 @@ parse_data_shiny <-
       } else {
         stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
       }
+    } else {
+      mapping <- NULL
     }
     if(any(c("Gen5", "Gen6") %in% software)){
       parsed.ls <- parse_Gen5Gen6_shiny(data = input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
