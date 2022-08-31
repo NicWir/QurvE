@@ -76,11 +76,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                     id = "navbar",
 
                     # load input file
+                    #____DATA____####
                     tabPanel('Data',
                              icon = icon("file-lines"),
                              value = "tabPanel",
                              tabsetPanel(type = "tabs", id = "tabs_data",
-
+                                         ##____CUSTOM____####
                                          tabPanel(title = "Custom",
                                                   sidebarPanel(
                                                     style='border-color: #ADADAD',
@@ -253,6 +254,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                   ),# sidebar panel
                                          ), # Custom tabPanel
 
+                                         ##____PLATE READER____####
+
                                          tabPanel(title = "Plate reader",
                                                   sidebarPanel(
                                                     style='border-color: #ADADAD',
@@ -404,6 +407,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                          ), # Plate reader tabPanel
                              ), # tabSet Panel
 
+                             ##____DATA - MAIN PANEL____####
+
                              mainPanel(
                                conditionalPanel(
                                  condition = "input.tabs_data == 'Custom'",
@@ -456,8 +461,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              ) # main panel
                     ), # Navbar 1
 
+                    #____COMPUTATION____####
+
                     navbarMenu('Computation', menuName = "navbarMenu_Computation", icon=icon("gears"),
-                               ##____Computation_Growth____
+
+                               ##____Computation_Growth____####
+
                                tabPanel("Growth", value = "tabPanel_Growth",
                                         fluidRow(
                                           sidebarLayout(
@@ -678,7 +687,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ), # Growth Tab Panel
 
                                "----",
-                               ##____Computation_Fluorescence____
+                               ##____Computation_Fluorescence____####
                                tabPanel("Fluorescence", value = "tabPanel_Computation_Fluorescence",
                                         fluidRow(
                                           sidebarLayout(
@@ -745,19 +754,20 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 
                                                                  wellPanel(style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+
                                                                    h2(strong('Dose-response Analysis')),
+
                                                                    checkboxInput(inputId = 'perform_ec50_fluorescence',
                                                                                  label = 'perform dose-response analysis',
-                                                                                 value = TRUE),
+                                                                                 value = FALSE),
 
 
-                                                                   conditionalPanel(condition = "input.perform_ec50_fluorescence",
+                                                                   conditionalPanel(condition = 'input.perform_ec50_fluorescence',
 
                                                                                     selectInput(inputId = "dr_method_fluorescence",
                                                                                                 label = "Method",
                                                                                                 choices = c("Biosensor response model",
-                                                                                                            "Response spline fit") # TODO tooltip with reference to Meyer et al., 2019
-                                                                                    ),
+                                                                                                            "Response spline fit")), # TODO tooltip with reference to Meyer et al., 2019
 
                                                                                     selectInput(inputId = "response_parameter_fluorescence",
                                                                                                 label = "Response Parameter",
@@ -768,7 +778,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                                                     checkboxInput(inputId = 'log_transform_response_fluorescence',
                                                                                                   label = 'log transform response'),
-
 
                                                                                     numericInput(
                                                                                       inputId = "smoothing_factor_fluorescence", # TODO hide if dr_method_fluorescence == "Biosensor response model"
@@ -786,8 +795,10 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                       min = NA,
                                                                                       max = NA,
                                                                                     )
-                                                                   ), # conditionalPanel(condition = "input.perform_ec50_fluorescence"
+                                                                   ) # conditionalPanel(condition = "input.perform_ec50_fluorescence"
                                                                  ), # wellPanel
+
+                                                                 # [Run Computation] button
                                                                  fluidRow(
                                                                    column(12,
                                                                           div(
@@ -885,6 +896,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ), # tabPanel("Fluorescence"
                     ), # navbarMenu('Computation'
 
+                    #____RESULTS____####
+
                     navbarMenu(title = "Results", menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
                                tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
                                         tabsetPanel(type = "tabs", id = "tabsetPanel_Results",
@@ -909,7 +922,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
                                         h1('Under construction'))
                     ),
-                    # Validate
+                    #____VALIDATE____####
                     navbarMenu("Validate", icon = icon("user-check"),
                                tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
                                         h1("Growth Fits"),
@@ -1043,7 +1056,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                         )
                                )
                     ),
-                    # Visualize
+                    #____Visualize____####
                     navbarMenu("Visualize", icon = icon("chart-line"),
                                tabPanel(title = "Growth Plots", value = "tabPanel_Visalize_Growth",
                                         h1("Growth Plots"),
@@ -1641,6 +1654,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ),
                     ),
 
+                    #____REPORT____####
+
+
                     tabPanel("Report", icon=icon("file-contract"),
                              sidebarPanel(
                                shinyDirButton("dir",
@@ -1659,6 +1675,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                              )
                     ),
 
+                    #____ABOUT US____####
+
+
                     tabPanel("About Us",
                              mainPanel(
                                h2("Authors"),
@@ -1675,6 +1694,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                 # TODO: Which plots, which options, ...
                 verbatimTextOutput("debug")
 )
+
+#____SERVER____####
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
@@ -2542,7 +2563,8 @@ server <- function(input, output, session){
     updateSelectInput(session,
                       inputId = "data_type_x_fluorescence",
                       choices = selected_inputs_fluorescence_x_types()
-    )})
+    )
+  })
 
   ## Results ####
   observe({
