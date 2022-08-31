@@ -2196,7 +2196,7 @@ server <- function(input, output, session){
   observeEvent(input$parse_data,{
 
     showModal(modalDialog("Parsing data input...", footer=NULL))
-
+    # browser()
     if(input$mapping_included_in_parse){
       results$parsed_data <- parse_data_shiny(
         data.file = input$parse_file$datapath,
@@ -2211,8 +2211,17 @@ server <- function(input, output, session){
         dec.map = input$decimal_separator_map,
         subtract.blank = input$subtract_blank_plate_reader,
         density.nm = input$parsed_reads_density,
-        fl1.nm = input$parsed_reads_fluorescence1,
-        fl2.nm = input$parsed_reads_fluorescence2
+        fl1.nm = ifelse(
+          input$parsed_reads_fluorescence1 == input$parsed_reads_density,
+          NA,
+          input$parsed_reads_fluorescence1
+        ),
+        fl2.nm = ifelse(
+          input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+            input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+          NA,
+          input$parsed_reads_fluorescence1
+        )
       )
     } else {
       results$parsed_data <- parse_data_shiny(
@@ -2228,8 +2237,17 @@ server <- function(input, output, session){
         dec.map = input$decimal_separator_map,
         subtract.blank = input$subtract_blank_plate_reader,
         density.nm = input$parsed_reads_density,
-        fl1.nm = input$parsed_reads_fluorescence1,
-        fl2.nm = input$parsed_reads_fluorescence2
+        fl1.nm = ifelse(
+          input$parsed_reads_fluorescence1 == input$parsed_reads_density,
+          NA,
+          input$parsed_reads_fluorescence1
+        ),
+        fl2.nm = ifelse(
+          input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+            input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+          NA,
+          input$parsed_reads_fluorescence1
+        )
       )
     }
     showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
