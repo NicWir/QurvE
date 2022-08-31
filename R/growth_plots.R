@@ -794,9 +794,9 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
                      width = w, height = h, units = 'in', res = 300)
       print(p)
       grDevices::dev.off()
-      #grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
-      #print(p)
-      #grDevices::dev.off()
+      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+      print(p)
+      grDevices::dev.off()
       cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
     }
     if (plot == TRUE){
@@ -2080,25 +2080,29 @@ plot.grofit <- function(grofit, ...,
   }
   out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
   if (export == TRUE){
-    if(is.null(out.nm)) out.nm <- paste0("GroupPlot")
-    if(is.null(width)){
-      w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
+    if(!shiny){
+      if(is.null(out.nm)) out.nm <- paste0("GroupPlot")
+      if(is.null(width)){
+        w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
+      } else {
+        w <- width
+      }
+      if(is.null(height)){
+        h <- ifelse(deriv==T, 9, 6)
+      } else {
+        h <- height
+      }
+      dir.create(out.dir, showWarnings = F)
+      grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
+                     width = w, height = h, units = 'in', res = 300)
+      print(p)
+      grDevices::dev.off()
+      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+      print(p)
+      grDevices::dev.off()
     } else {
-      w <- width
+
     }
-    if(is.null(height)){
-      h <- ifelse(deriv==T, 9, 6)
-    } else {
-      h <- height
-    }
-    dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
-                   width = w, height = h, units = 'in', res = 300)
-    print(p)
-    grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
-    print(p)
-    grDevices::dev.off()
   }
   if (plot == TRUE){
     print(p)
