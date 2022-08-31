@@ -56,6 +56,7 @@ read_data <-
            sheet.fluoro2 = 1,
            subtract.blank  = T)
   {
+    if(is.null(data.density)) data.density <- NA
     if(is.null(data.fluoro1)) data.fluoro1 <- NA
     if(is.null(data.fluoro2)) data.fluoro2 <- NA
 
@@ -73,13 +74,6 @@ read_data <-
       message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
     } else {
       message("Sample data are stored in rows. If they are stored in column format, please run read_data() with data.format = 'col'.")
-    }
-    if(!(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))){
-      if(data.format == "col"){
-        stop("Could not find 'time' in column 1 of data.density")
-      } else {
-        stop("Could not find 'time' in row 1 of data.density")
-      }
     }
     # Load fluorescence 1 data
     if((length(data.fluoro1) > 1 ) || !all(is.na(data.fluoro1))){
@@ -123,6 +117,15 @@ read_data <-
       }
     } else {
       fluoro2 <- NA
+    }
+    if((length(dat) > 1 && !(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))) &&
+       (length(fluoro1) > 1 && !(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))) &&
+       (length(fluoro2) > 1 && !(any(grepl("time", unlist(fluoro2[,1]), ignore.case = TRUE))))){
+      if(data.format == "col"){
+        stop("Could not find 'time' in column 1 of any provided 'data.density', 'data.fluoro1', or 'data.fluoro2'.")
+      } else {
+        stop("Could not find 'time' in row 1 of any provided 'data.density', 'data.fluoro1', or 'data.fluoro2'.")
+      }
     }
 
     # subtract blank
@@ -283,35 +286,45 @@ read_data <-
         t(apply(fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
     }
 
-  # Create time matrix
-  time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
+    # Create time matrix
+    if(length(dat) > 1) {
+      time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
+      dat.time <- dat
+    } else if(length(fluoro1) > 1){
+      time.ndx <- grep("time", unlist(fluoro1[,1]), ignore.case = TRUE)
+      dat.time <- fluoro1
+    } else if(length(fluoro2) > 1){
+      time.ndx <- grep("time", unlist(fluoro2[,1]), ignore.case = TRUE)
+      dat.time <- fluoro2
+    }
+
   if(length(time.ndx)==1){
-    time <- as.numeric(unlist(dat[time.ndx[1],4:ncol(dat)]))
+    time <- as.numeric(unlist(dat.time[time.ndx[1],4:ncol(dat.time)]))
     t.mat <- data.matrix(data.frame(matrix(
-      data = rep(time, nrow(dat)-1),
-      nrow = nrow(dat)-1,
+      data = rep(time, nrow(dat.time)-1),
+      nrow = nrow(dat.time)-1,
       byrow = T
     )))
   } else { # identify different datasets based on the occurence of multiple 'time' entities
     time <- list()
-    time[[1]] <- as.numeric(unlist(dat[time.ndx[1],4:ncol(dat)]))
+    time[[1]] <- as.numeric(unlist(dat.time[time.ndx[1],4:ncol(dat.time)]))
     t.mat <- data.matrix(data.frame(matrix(
       data = rep(time[[1]], time.ndx[2]-time.ndx[1]-1),
       nrow = time.ndx[2]-time.ndx[1]-1,
       byrow = T
     )))
     for (i in 2:(length(time.ndx))){
-      time[[i]] <- as.numeric(unlist(dat[time.ndx[i],4:ncol(dat)]))
+      time[[i]] <- as.numeric(unlist(dat.time[time.ndx[i],4:ncol(dat.time)]))
       t.mat <- rbind(t.mat,
                      data.matrix(data.frame(
                        matrix(
                          data = rep(time[[i]], times = if (is.na(time.ndx[i + 1])) {
-                           nrow(dat) - time.ndx[i]
+                           nrow(dat.time) - time.ndx[i]
                          } else {
                            time.ndx[i + 1] - time.ndx[i] - 1
                          }),
                          nrow = if (is.na(time.ndx[i + 1])) {
-                           nrow(dat) - time.ndx[i]
+                           nrow(dat.time) - time.ndx[i]
                          } else {
                            time.ndx[i + 1] - time.ndx[i] - 1
                          },
@@ -352,10 +365,23 @@ read_data <-
   if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  colnames(fluoro1.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
     if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
 
-  label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
-  condition <- dat.mat[, 1]
-  replicate <- dat.mat[, 2]
-  concentration <- dat.mat[, 3]
+  if(length(dat) > 1) {
+    label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
+    condition <- dat.mat[, 1]
+    replicate <- dat.mat[, 2]
+    concentration <- dat.mat[, 3]
+  } else if(length(data.fluoro1) > 1){
+    label <- unlist(lapply(1:nrow(fluoro1.mat), function(x) paste(fluoro1.mat[x,1], fluoro1.mat[x,2], fluoro1.mat[x,3], sep = " | ")))
+    condition <- fluoro1.mat[, 1]
+    replicate <- fluoro1.mat[, 2]
+    concentration <- fluoro1.mat[, 3]
+  } else if(length(data.fluoro2) > 1){
+    label <- unlist(lapply(1:nrow(fluoro2.mat), function(x) paste(fluoro2.mat[x,1], fluoro2.mat[x,2], fluoro2.mat[x,3], sep = " | ")))
+    condition <- fluoro2.mat[, 1]
+    replicate <- fluoro2.mat[, 2]
+    concentration <- fluoro2.mat[, 3]
+  }
+
 
   expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
 

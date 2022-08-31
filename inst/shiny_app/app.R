@@ -86,8 +86,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     style='border-color: #ADADAD',
                                                     selectInput(inputId = "custom_format",
                                                                 label = "Select Format",
-                                                                choices = c("Data in columns" = "data_in_columns",
-                                                                            "Data in rows" = "data_in_rows")),
+                                                                choices = c("Data in columns" = "col",
+                                                                            "Data in rows" = "row")),
                                                     wellPanel(
                                                       h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                       style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
@@ -721,21 +721,25 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                      min = NA,
                                                                      max = NA,
                                                                    ),
-
-                                                                   numericInput(
-                                                                     inputId = 'minimum_density_fluorescence', # TODO inactivate if no density values are present
-                                                                     label = 'minimum_density',
-                                                                     value = 0,
-                                                                     min = NA,
-                                                                     max = NA,
+                                                                   conditionalPanel(
+                                                                     condition = '"density" %in% input.data_type_x_fluorescence',
+                                                                     numericInput(
+                                                                       inputId = 'minimum_density_fluorescence', # TODO inactivate if no density values are present
+                                                                       label = 'minimum_density',
+                                                                       value = 0,
+                                                                       min = NA,
+                                                                       max = NA,
+                                                                     )
                                                                    ),
-
-                                                                   numericInput(
-                                                                     inputId = 't0_fluorescence', # TODO inactivate if no time values are present
-                                                                     label = 't0',
-                                                                     value = 0,
-                                                                     min = NA,
-                                                                     max = NA,
+                                                                   conditionalPanel(
+                                                                     condition = '"time" %in% input.data_type_x_fluorescence',
+                                                                     numericInput(
+                                                                       inputId = 't0_fluorescence', # TODO inactivate if no time values are present
+                                                                       label = 't0',
+                                                                       value = 0,
+                                                                       min = NA,
+                                                                       max = NA,
+                                                                     )
                                                                    ),
                                                                  ), # Fluorescence fit
 
@@ -1735,6 +1739,7 @@ server <- function(input, output, session){
     # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
 
 
+     # browser()
 
     ## Read data
     results$custom_data <- read_data(data.density = density.file$datapath,
@@ -1756,6 +1761,8 @@ server <- function(input, output, session){
 
     if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
       showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+      # show [Run Computation] button in Computation-Growth
+      show("run_growth")
     }
     if("fluorescence1" %in% names(results$custom_data) && length(results$custom_data$fluorescence1)>1){
       showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
@@ -2215,7 +2222,6 @@ server <- function(input, output, session){
   observeEvent(input$parse_data,{
 
     showModal(modalDialog("Parsing data input...", footer=NULL))
-    # browser()
     if(input$mapping_included_in_parse){
       results$parsed_data <- parse_data_shiny(
         data.file = input$parse_file$datapath,
@@ -2273,6 +2279,8 @@ server <- function(input, output, session){
 
     if("density" %in% names(results$parsed_data) && length(results$parsed_data$density)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+      # show [Run Computation] button in Computation-Growth
+      show("run_growth")
     }
     if("fluorescence1" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence1)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
@@ -2371,6 +2379,7 @@ server <- function(input, output, session){
 
   #### Computation ####
   #####____Growth____#####
+  hide("run_growth")
   selected_inputs_response_parameter_growth <- reactive({
     select_options <- c()
     if(input$linear_regression_growth) select_options <- c(select_options, 'mu.linfit', 'lambda.linfit', 'dY.linfit',
@@ -2405,11 +2414,12 @@ server <- function(input, output, session){
 
     ## Read data
     # grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator_custom_density, dec = input$decimal_separator_custom_density)
-
     # Choose data input
-    if(!is.null(results$custom_data)) grodata <- results$custom_data
-    else if(!is.null(results$parsed_data)) grodata <- results$parsed_data
-    else return(NULL)
+    if(!is.null(results$custom_data)){
+      grodata <- results$custom_data
+    } else if(!is.null(results$parsed_data)){
+      grodata <- results$parsed_data
+    } else return(NULL)
 
     if (input$smoothing_factor_growth == "NULL") {
       smooth.dr = NULL
@@ -2423,19 +2433,20 @@ server <- function(input, output, session){
     if(input$parametric_fit_growth){
       fit.opt <- c(fit.opt,
                    'm')
+      # combine selected models into vector
+      models <- c()
+      if(input$logistic_growth == TRUE) models <- c(models, "logistic")
+      if(input$richards_growth == TRUE) models <- c(models, "richards")
+      if(input$gompertz_growth == TRUE) models <- c(models, "gompertz")
+      if(input$extended_gompertz_growth == TRUE) models <- c(models, "gompertz.exp")
+      if(input$huang_growth == TRUE) models <- c(models, "huang")
+    } else {
+      models <- c("logistic")
     }
     if(input$nonparametric_fit_growth){
       fit.opt <- c(fit.opt,
                    's')
     }
-
-    # combine selected models into vector
-    models <- c()
-    if(input$logistic_growth == TRUE) models <- c(models, "logistic")
-    if(input$richards_growth == TRUE) models <- c(models, "richards")
-    if(input$gompertz_growth == TRUE) models <- c(models, "gompertz")
-    if(input$extended_gompertz_growth == TRUE) models <- c(models, "gompertz.exp")
-    if(input$huang_growth == TRUE) models <- c(models, "huang")
 
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
@@ -2456,7 +2467,7 @@ server <- function(input, output, session){
                                         lin.RSD = input$RSD_threshold_growth,
                                         lin.dY = input$dY_threshold_growth, ##
                                         interactive = F, ### TODO (popups)
-                                        nboot.gc = input$number_of_bootstrappings,
+                                        nboot.gc = input$number_of_bootstrappings_growth,
                                         smooth.gc = input$smoothing_factor_nonparametric_growth,
                                         model.type = models,
                                         growth.thresh = input$growth_threshold_growth,
@@ -2514,8 +2525,26 @@ server <- function(input, output, session){
     removeModal()
   })
   #####____Fluorescence____#####
+  # Create vector of x_types based on presence of data types
+  selected_inputs_fluorescence_x_types <- reactive({
+    if(is.null(results$custom_data) && is.null(results$parsed_data)) return(NULL)
+    if(!is.null(results$custom_data)) data <- results$custom_data
+    if(!is.null(results$parsed_data)) data <- results$parsed_data
 
-  #### Results ####
+    x_types <- c()
+    if(length(data$density) > 1) x_types <- c(x_types, 'density')
+    if(length(data$time) > 1) x_types <- c(x_types, 'time')
+
+    x_types
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "data_type_x_fluorescence",
+                      choices = selected_inputs_fluorescence_x_types()
+    )})
+
+  ## Results ####
   observe({
     if(!is.null(results$growth)){
       if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
@@ -2591,8 +2620,8 @@ server <- function(input, output, session){
                              escape = FALSE)
     table_model
   })
-  #### Validate ####
-  ##### Growth #####
+  # Validate ####
+  ## Growth #####
 
   #### Hide [Restore Fit] buttons when starting the app
   hide("restore_growth_linear"); hide("restore_growth_spline"); hide("restore_growth_model")
@@ -2968,12 +2997,11 @@ server <- function(input, output, session){
   })
 
 
-  ##### Fluorescence #####
+  ## Fluorescence #####
 
-  #### Visualize ####
-
-  ##### Growth Plots: #####
-  ## Group Plots ##
+  # Visualize ####
+  ## Growth Plots: #####
+  ### Group Plots ####
   output$growth_group_plot <- renderPlot({
     results <- results$growth
     plot.grofit(results,
@@ -3067,7 +3095,7 @@ server <- function(input, output, session){
   #   }
   # })
 
-  ### growth: plot.drFit
+  ### growth: plot.drFit ####
   observe({
     if(!is.null(results$growth)){
       if(!input$perform_ec50_growth){
@@ -3075,7 +3103,7 @@ server <- function(input, output, session){
       }
     }
   })
-  ### growth: plot.parameter()
+  ### growth: plot.parameter() ####
 
   selected_inputs_parameter_growth_parameter_plot <- reactive({
     results <- results$growth
@@ -3162,14 +3190,14 @@ server <- function(input, output, session){
   })
 
 
-  ## Fluorescence
+  ## Fluorescence ####
   selected_inputs_reference_condition_fluorescence_parameter_plot <- reactive({
-    results <- results$growth
+    results <- results$fluorescence
     results$expdesign$condition
   })
 
   select_inputs_reference_concentration_fluorescence_parameter_plot <- reactive({
-    results <- results$growth
+    results <- results$fluorescence
     results$expdesign$concentration
   })
 
@@ -3183,7 +3211,7 @@ server <- function(input, output, session){
                       choices = select_inputs_reference_concentration_fluorescence_parameter_plot()
     )})
 
-  # Save report
+  # Report ####
   volumes <- getVolumes() # this makes the directory at the base of your computer.
 
   #shinyDirChoose(input, 'report_folder', roots = volumes())
