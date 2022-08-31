@@ -1797,7 +1797,6 @@ server <- function(input, output, session){
     hide("parsed_reads_density")
     hide("parsed_reads_fluorescence1")
     hide("parsed_reads_fluorescence2")
-    hide("parse_data")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
@@ -3264,7 +3263,7 @@ server <- function(input, output, session){
                    file.path(home, paste(unlist(dir()$path[-1]), collapse = .Platform$file.sep), fname)
                })
   # Bug report message
-  github_url <- a("QurvE Github", href="https://github.com/NicWir/QurvE/issues")
+  github_url <- a("QurvE Github", href="https://github.com/NicWir/QurvE_issues/issues")
   output$bug_report <- renderUI({
     tagList("Please report bugs and user feedback at:", github_url)
   })
