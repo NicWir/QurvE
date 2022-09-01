@@ -3798,7 +3798,7 @@ server <- function(input, output, session){
   })
   observe({
     updateSelectInput(inputId = "individual_plots_dose_response_fluorescence_plot",
-                      choices = select_inputs_individual_plots_dose_respons_fluorescence_plot())
+                      choices = select_inputs_individual_plots_dose_response_fluorescence_plot())
   })
 
   observe({
