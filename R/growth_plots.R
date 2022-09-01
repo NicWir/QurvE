@@ -1076,7 +1076,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       # /// plot data
       points(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex)
 
-      # /// plot all gcFitSpline objects
+      # /// plot all gcFittedSpline objects
       for(i in 1:gcBootSpline$control$nboot.gc){
        plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = T,
                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex)
@@ -1206,14 +1206,14 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
+plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
                              pch=2, colData=1, colSpline="dodgerblue3", basesize=16, lwd = 0.7, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
 {
 
   # x an object of class gcFitSpline
-  if(is(gcFitSpline) != "gcFitSpline") stop("gcFitSpline needs to be an object created with growth.gcFitSpline().")
+  if(is(gcFittedSpline) != "gcFitSpline") stop("gcFittedSpline needs to be an object created with growth.gcFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -1222,68 +1222,68 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: cex")
 
   # /// check if a data fit is available
-  if ((is.na(gcFitSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE)){
+  if ((is.na(gcFittedSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE)){
     warning("plot.gcFitSpline: no data fit available!")
   }
   else{
     if (add==TRUE){
       if(spline == TRUE){
         # /// try to plot data fit
-        if ((gcFitSpline$control$log.x.gc==FALSE) && (gcFitSpline$control$log.y.spline==FALSE)){
-          try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+        if ((gcFittedSpline$control$log.x.gc==FALSE) && (gcFittedSpline$control$log.y.spline==FALSE)){
+          try( lines(gcFittedSpline$fit.time, gcFittedSpline$fit.data, sub=gcFittedSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
         }
 
-        if ((gcFitSpline$control$log.x.gc==FALSE) && (gcFitSpline$control$log.y.spline==TRUE)){
-          try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+        if ((gcFittedSpline$control$log.x.gc==FALSE) && (gcFittedSpline$control$log.y.spline==TRUE)){
+          try( lines(gcFittedSpline$fit.time, gcFittedSpline$fit.data, sub=gcFittedSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
         }
 
-        if ((gcFitSpline$control$log.x.gc==TRUE)  && (gcFitSpline$control$log.y.spline==FALSE)){
-          try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
+        if ((gcFittedSpline$control$log.x.gc==TRUE)  && (gcFittedSpline$control$log.y.spline==FALSE)){
+          try( lines(gcFittedSpline$fit.time, gcFittedSpline$fit.data, sub=gcFittedSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
         }
 
-        if ((gcFitSpline$control$log.x.gc==TRUE)  && (gcFitSpline$control$log.y.spline==TRUE)){
-          try( lines(gcFitSpline$fit.time, gcFitSpline$fit.data, sub=gcFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+        if ((gcFittedSpline$control$log.x.gc==TRUE)  && (gcFittedSpline$control$log.y.spline==TRUE)){
+          try( lines(gcFittedSpline$fit.time, gcFittedSpline$fit.data, sub=gcFittedSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
         }
         # /// add tangent at maximum slope
         if (slope==TRUE){
-          mu     <- as.numeric(gcFitSpline$parameters$mu)
-          lambda <- as.numeric(gcFitSpline$parameters$lambda)
+          mu     <- as.numeric(gcFittedSpline$parameters$mu)
+          lambda <- as.numeric(gcFittedSpline$parameters$lambda)
 
-          time <- seq(lambda, max(gcFitSpline$"fit.time"), length=200)
-          y_tangent <- gcFitSpline$parameters["b.tangent"][[1]]+time*mu
+          time <- seq(lambda, max(gcFittedSpline$"fit.time"), length=200)
+          y_tangent <- gcFittedSpline$parameters["b.tangent"][[1]]+time*mu
           try(lines(time, y_tangent, lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.85), ...))
-          try(lines(c(min(gcFitSpline$"raw.time"[1]), lambda), rep(gcFitSpline$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.7)))
+          try(lines(c(min(gcFittedSpline$"raw.time"[1]), lambda), rep(gcFittedSpline$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.7)))
         }
       }
       if (deriv  == TRUE){
-        if ((gcFitSpline$control$log.x.gc==FALSE)){
-          try( lines(gcFitSpline$spline.deriv1$x, gcFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
+        if ((gcFittedSpline$control$log.x.gc==FALSE)){
+          try( lines(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
         }
-        if ((gcFitSpline$control$log.x.gc==TRUE)){
-          try( lines(gcFitSpline$spline.deriv1$x, gcFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
+        if ((gcFittedSpline$control$log.x.gc==TRUE)){
+          try( lines(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
         }
       }
     } # if (add == TRUE)
     else {
-      coef <- gcFitSpline[["parameters"]]
+      coef <- gcFittedSpline[["parameters"]]
       lagtime <- coef["lambda"][[1]][1]
       # correct for log transformation
-      if(gcFitSpline$control$log.y.spline == TRUE){
+      if(gcFittedSpline$control$log.y.spline == TRUE){
         fit.data <-
-          c(rep(NA, length(gcFitSpline[["raw.data"]]) - length(gcFitSpline[["fit.data"]])), exp(gcFitSpline[["fit.data"]]) *
-              gcFitSpline[["data.in"]][1])
+          c(rep(NA, length(gcFittedSpline[["raw.data"]]) - length(gcFittedSpline[["fit.data"]])), exp(gcFittedSpline[["fit.data"]]) *
+              gcFittedSpline[["data.in"]][1])
       } else {
-        fit.data <- c(rep(NA, length(gcFitSpline[["raw.data"]]) - length(gcFitSpline[["fit.data"]])), gcFitSpline[["fit.data"]])
+        fit.data <- c(rep(NA, length(gcFittedSpline[["raw.data"]]) - length(gcFittedSpline[["fit.data"]])), gcFittedSpline[["fit.data"]])
       }
-      if(gcFitSpline$control$log.y.spline == TRUE){
-        df <- data.frame("time" = gcFitSpline[["raw.time"]],
-                         "data" = exp(gcFitSpline[["raw.data"]])*gcFitSpline[["data.in"]][1],
-                         "fit.time" = c(rep(NA, length(gcFitSpline[["raw.time"]])-length(gcFitSpline[["fit.time"]])), gcFitSpline[["fit.time"]]),
+      if(gcFittedSpline$control$log.y.spline == TRUE){
+        df <- data.frame("time" = gcFittedSpline[["raw.time"]],
+                         "data" = exp(gcFittedSpline[["raw.data"]])*gcFittedSpline[["data.in"]][1],
+                         "fit.time" = c(rep(NA, length(gcFittedSpline[["raw.time"]])-length(gcFittedSpline[["fit.time"]])), gcFittedSpline[["fit.time"]]),
                          "fit.data" = fit.data)
       } else{
-        df <- data.frame("time" = gcFitSpline[["raw.time"]],
-                         "data" = gcFitSpline[["raw.data"]],
-                         "fit.time" = c(rep(NA, length(gcFitSpline[["raw.time"]])-length(gcFitSpline[["fit.time"]])), gcFitSpline[["fit.time"]]),
+        df <- data.frame("time" = gcFittedSpline[["raw.time"]],
+                         "data" = gcFittedSpline[["raw.data"]],
+                         "fit.time" = c(rep(NA, length(gcFittedSpline[["raw.time"]])-length(gcFittedSpline[["fit.time"]])), gcFittedSpline[["fit.time"]]),
                          "fit.data" = fit.data)
       }
 
@@ -1294,7 +1294,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         xlab("Time") +
         ylab(label = "Growth [y(t)]") +
         theme_classic(base_size = basesize) +
-        ggtitle(gsub(" \\| NA", "", paste(gcFitSpline$gcID, collapse=" | "))) +
+        ggtitle(gsub(" \\| NA", "", paste(gcFittedSpline$gcID, collapse=" | "))) +
         theme(legend.key = element_blank(),
               legend.background=element_blank(),
               legend.title = element_blank(),
@@ -1318,7 +1318,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       p <- p +
         annotate(
           "text",
-          label = paste("t0:", gcFitSpline$control$t0, "  min.density:", gcFitSpline$control$min.density, "  smoothing:", gcFitSpline$control$smooth.gc),
+          label = paste("t0:", gcFittedSpline$control$t0, "  min.density:", gcFittedSpline$control$min.density, "  smoothing:", gcFittedSpline$control$smooth.gc),
           x = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$x.range[2],
           y = 1.2 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
           angle = 0, parse = F, size = 3.2)
@@ -1345,36 +1345,36 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       # /// add tangent at maximum slope
       if(slope == TRUE && log.y == T){
         mu     <- as.numeric(coef$mu[1])
-        if(gcFitSpline$fitFlag2){
+        if(gcFittedSpline$fitFlag2){
           lagtime2 <- coef$lambda2
-          growth.time <- gcFitSpline$fit.time[which.max(gcFitSpline$fit.data)]
+          growth.time <- gcFittedSpline$fit.time[which.max(gcFittedSpline$fit.data)]
           mu2 <- coef$mu2
-          if(lagtime2 < lagtime && lagtime2 > gcFitSpline$raw.time[1]){
+          if(lagtime2 < lagtime && lagtime2 > gcFittedSpline$raw.time[1]){
             # time values for tangent at µmax
-            time_start.ndx <- which.min(abs(gcFitSpline$fit.time-(coef$t.max-0.15*growth.time)))
-            time_start <- gcFitSpline$fit.time[time_start.ndx]
-            time <- seq(time_start, max(gcFitSpline$fit.time), length=200)
+            time_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max-0.15*growth.time)))
+            time_start <- gcFittedSpline$fit.time[time_start.ndx]
+            time <- seq(time_start, max(gcFittedSpline$fit.time), length=200)
             # y values for tangent at µmax
-            if(gcFitSpline$control$log.y.spline){
-              bla <- (exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu*time)
+            if(gcFittedSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
             } else {
               bla <- coef["b.tangent"][[1]] + (mu*time)
             }
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
             # time values for tangent at µmax2
-            time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(gcFitSpline$"fit.time"), length=200)
+            time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(gcFittedSpline$"fit.time"), length=200)
             # y values for tangent at µmax
-            if(gcFitSpline$control$log.y.spline){
-              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu2*time2)
+            if(gcFittedSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
             } else {
               bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
             }
 
             tangent.df2 <- data.frame("time" = time2,
                                       "y" = bla2)
-            df.horizontal2 <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime2),
-                                         "y" = gcFitSpline[["data.in"]][1])
+            df.horizontal2 <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime2),
+                                         "y" = gcFittedSpline[["data.in"]][1])
 
             p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
                                       xend = time[which.min(abs(y - 1.1*p.yrange.end))],
@@ -1392,24 +1392,24 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
           } # if(lagtime2 < lagtime)
           else {
             # time values for tangent at µmax
-            time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
+            time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFittedSpline$"fit.time"), length=200)
             # y values for tangent at µmax
-            if(gcFitSpline$control$log.y.spline){
-              bla <- (exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu*time)
+            if(gcFittedSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
             } else {
               bla <- coef["b.tangent"][[1]] + (mu*time)
             }
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
-            df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
-                                        "y" = gcFitSpline[["data.in"]][1])
+            df.horizontal <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime),
+                                        "y" = gcFittedSpline[["data.in"]][1])
             # time values for tangent at µmax2
-            time2_start.ndx <- which.min(abs(gcFitSpline$fit.time-(coef$t.max2-0.15*growth.time)))
-            time2_start <- gcFitSpline$fit.time[time2_start.ndx]
-            time2 <- seq(time2_start, max(gcFitSpline$"fit.time"), length=200)
+            time2_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max2-0.15*growth.time)))
+            time2_start <- gcFittedSpline$fit.time[time2_start.ndx]
+            time2 <- seq(time2_start, max(gcFittedSpline$"fit.time"), length=200)
             # y values for tangent at µmax
-            if(gcFitSpline$control$log.y.spline){
-              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu2*time2)
+            if(gcFittedSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
             } else {
               bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
             }
@@ -1430,20 +1430,20 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
                                     linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
             }
           }
-        } # if(gcFitSpline$fitFlag2)
+        } # if(gcFittedSpline$fitFlag2)
         else {
           # time values for tangent
-          time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFitSpline$"fit.time"), length=200)
+          time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFittedSpline$"fit.time"), length=200)
           # y values for tangent
-          if(gcFitSpline$control$log.y.spline){
-            bla <- (exp(coef["b.tangent"][[1]])*gcFitSpline[["data.in"]][1])*exp(mu*time)
+          if(gcFittedSpline$control$log.y.spline){
+            bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
           } else {
             bla <- coef["b.tangent"][[1]] + (mu*time)
           }
           tangent.df <- data.frame("time" = time,
                                    "y" = bla)
-          df.horizontal <- data.frame("time" = c(gcFitSpline[["raw.time"]][1], lagtime),
-                                      "y" = gcFitSpline[["data.in"]][1])
+          df.horizontal <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime),
+                                      "y" = gcFittedSpline[["data.in"]][1])
           p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
                                     xend = time[which.min(abs(y - 1.1*p.yrange.end))],
                                     yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
@@ -1452,12 +1452,12 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
             p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
                                   linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
           }
-        } # else of if(gcFitSpline$fitFlag2)
+        } # else of if(gcFittedSpline$fitFlag2)
       } # if(slope == TRUE && log.y == T)
 
       # /// add panel with growth rate over time
       if(deriv == TRUE){
-        df.mu <- data.frame(spline(gcFitSpline$spline.deriv1$x, gcFitSpline$spline.deriv1$y))
+        df.mu <- data.frame(spline(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y))
         #add missing time values due to min.density and t0
         df.mu <-
           dplyr::bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
@@ -1492,11 +1492,11 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         h <- height
         out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
         dir.create(out.dir, showWarnings = F)
-        grDevices::png(paste0(out.dir, "/", paste(gcFitSpline$gcID, collapse = "_"), "_SplineFit.png"),
+        grDevices::png(paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.png"),
                        width = w, height = h, units = 'in', res = 300)
         print(p)
         grDevices::dev.off()
-        grDevices::pdf(paste0(out.dir, "/", paste(gcFitSpline$gcID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h)
+        grDevices::pdf(paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h)
         print(p)
         grDevices::dev.off()
       }
@@ -1506,7 +1506,7 @@ plot.gcFitSpline <- function(gcFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         return(p)
       }
     } # else of if (add == TRUE)
-  } # else of if ((is.na(gcFitSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE))
+  } # else of if ((is.na(gcFittedSpline$fitFlag)==TRUE)|(gcFittedSpline$fitFlag==FALSE))
 }
 
 #' Generic plot function for \code{grofit} objects. Combine different groups of samples into a single plot

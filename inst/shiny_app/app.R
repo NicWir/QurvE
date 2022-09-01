@@ -1006,7 +1006,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                           ),
                                                                           checkboxInput(inputId = 'logy_validate_growth_plot_spline',
                                                                                         label = 'Log-transform y axis',
-                                                                                        value = FALSE)
+                                                                                        value = TRUE)
 
                                                              ),
                                                              mainPanel(width = 7,
@@ -1118,7 +1118,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                           ),
                                                                           checkboxInput(inputId = 'logy_validate_fluorescence_plot_spline',
                                                                                         label = 'Log-transform y axis',
-                                                                                        value = TRUE)
+                                                                                        value = FALSE)
 
                                                              ),
                                                              mainPanel(width = 7,
@@ -1147,9 +1147,13 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                     ),
                     #____Visualize____####
                     navbarMenu("Visualize", icon = icon("chart-line"),
+                               ## Growth Plots ####
                                tabPanel(title = "Growth Plots", value = "tabPanel_Visalize_Growth",
                                         h1("Growth Plots"),
                                         tabsetPanel(type = "tabs",
+
+                                                    ### Growth Group Plots ####
+
                                                     tabPanel(title = "Group plots",
                                                              sidebarPanel(
 
@@ -1281,6 +1285,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     ),
 
+                                                    ### Growth DR Plots ####
+
                                                     tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
                                                              sidebarPanel(
                                                                wellPanel(
@@ -1410,6 +1416,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     ),
 
+                                                    ### Growth Parameter Plots ####
+
                                                     tabPanel(title = "Parameter plots",
                                                              sidebarPanel(
                                                                selectInput(inputId = "parameter_growth_parameter_growth_plot",
@@ -1485,17 +1493,25 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     )
                                         )
                                ),
-
+                               ## Fluorescence Plots ####
                                tabPanel(title = "Fluorescence Plots",  value = "tabPabel_Visualize_Fluorescence",
                                         h1("Fluorescence Plots"),
                                         tabsetPanel(type = "tabs",
+
+                                                    ### Fluorescence Group Plots ####
+
                                                     tabPanel(title = "Group plots",
                                                              sidebarPanel(
 
                                                                selectInput(inputId = "data_type_fluorescence_group_plots",
                                                                            label = "Data type",
-                                                                           choices = c("Raw density" = "raw",
-                                                                                       "Spline fits" = "spline")
+                                                                           choices = c("Raw fluorescence 1" = "raw1",
+                                                                                       "Raw fluorescence 2" = "raw2",
+                                                                                       "Spline fits FL1" = "spline1",
+                                                                                       "Spline fits FL2" = "spline2",
+                                                                                       "Normalized FL1" = "norm.fl1",
+                                                                                       "Normalized FL2" = "norm.fl2",
+                                                                                       )
                                                                ),
 
                                                                textInput(inputId = "select_samples_based_on_string_fluorescence_group_plots",
@@ -1609,6 +1625,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     ),
 
+                                                    ### Fluorescence DR Plots ####
+
                                                     tabPanel(title = "Dose-response analysis",
                                                              sidebarPanel(
                                                                wellPanel(
@@ -1653,6 +1671,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                plotOutput("fluorescence_dose_response_plot")
                                                              )
                                                     ),
+
+                                                    ### Fluorescence Parameter Plots ####
 
                                                     tabPanel(title = "Parameter plots",
                                                              sidebarPanel(
@@ -1717,33 +1737,25 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              mainPanel(
                                                                plotOutput("fluorescence_parameter_plot")
                                                              )
-                                                             # TEST CONSOL OUTPUT
-                                                             #verbatimTextOutput('test')
-                                                    )
-                                        )
-                               ),
+                                                    ) #  tabPanel(title = "Parameter plots"
+                                        ) # tabsetPanel(type = "tabs",
+                               ), # tabPanel(title = "Fluorescence Plots"
 
-                               tabPanel(title = "Growth & Flourescence Plots", value = "tabPabel_Visualize_GrowthandFluorescence",
-                                        h1("Growth & Flourescence Plots"),
-                                        tabsetPanel(type = "tabs",
-                                                    tabPanel(title = "Group plots",
-                                                             sidebarPanel(
-                                                               # add sibar stuff
-                                                             ),
-                                                             plotOutput("growth_and_fluorescence_group_plot")),
-                                                    tabPanel(title = "Dose-response analysis",
-                                                             sidebarPanel(
-                                                               # add sibar stuff
-                                                             ),
-                                                             plotOutput("growth_and_fluorescence_dose_response_plot")),
-                                                    tabPanel(title = "Parameter plots",
-                                                             sidebarPanel(
-                                                               # add sibar stuff
-                                                             ),
-                                                             plotOutput("growth_and_fluorescence_parameter_plot"))
+                               ## Growth & Fluorescence Plots ####
+
+                               tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_GrowthandFluorescence",
+                                        h1("Growth & Flourescence Plot"),
+
+                                        sidebarPanel(
+                                          # add sibar stuff
+                                        ),
+
+                                        mainPanel(
+                                          plotOutput("growth_and_fluorescence_group_plot")
                                         )
-                               ),
-                    ),
+
+                               ) # tabPanel(title = "Growth & Flourescence Plot")
+                    ), # navbarMenu("Visualize"
 
                     #____REPORT____####
 
@@ -1791,7 +1803,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 server <- function(input, output, session){
   output$debug <- renderPrint({
     table_fluorescence1_linear()
-    })
+  })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
   # disable(selector = "#navbar li a[data-value=Visualize]")
@@ -1864,7 +1876,7 @@ server <- function(input, output, session){
     # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
 
 
-     # browser()
+    # browser()
 
     ## Read data
     results$custom_data <- read_data(data.density = density.file$datapath,
@@ -2305,9 +2317,9 @@ server <- function(input, output, session){
 
     showModal(modalDialog("Reading data file...", footer=NULL))
     try(reads <- parse_properties_Gen5Gen6(file=filename,
-                                       csvsep = input$separator_custom_density,
-                                       dec = input$decimal_separator_custom_density,
-                                       sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) )
+                                           csvsep = input$separator_custom_density,
+                                           dec = input$decimal_separator_custom_density,
+                                           sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) )
 
     )
     if(exists("reads") && length(reads) > 1){
@@ -2441,8 +2453,8 @@ server <- function(input, output, session){
                            table_density)
 
     table_density <- datatable(table_density,
-              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
+                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
 
     table_density
   })
@@ -2454,11 +2466,11 @@ server <- function(input, output, session){
     table_fl1[-(1:3), ] <- apply(apply(table_fl1[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
     rownames(table_fl1)[-(1:3)] <- ""
     table_fl1 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
-                           table_fl1)
+                       table_fl1)
 
     table_fl1 <- datatable(table_fl1,
-                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
+                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
 
     table_fl1
   })
@@ -2586,33 +2598,33 @@ server <- function(input, output, session){
     # Run growth workflow
     shiny::withProgress(message = "Computations completed",
 
-      results$growth <- growth.workflow(grodata = grodata,
-                                        ec50 = input$perform_ec50_growth,
-                                        fit.opt = fit.opt,
-                                        t0 = input$t0_growth,
-                                        min.density = input$minimum_density_growth,
-                                        log.x.gc = input$log_transform_time_growth,
-                                        log.y.model = input$log_transform_data_parametric_growth,
-                                        log.y.spline = input$log_transform_data_nonparametric_growth,
-                                        biphasic = input$biphasic_growth,
-                                        lin.h = input$custom_sliding_window_size_value_growth,
-                                        lin.R2 = input$R2_threshold_growth,
-                                        lin.RSD = input$RSD_threshold_growth,
-                                        lin.dY = input$dY_threshold_growth,
-                                        interactive = F,
-                                        nboot.gc = input$number_of_bootstrappings_growth,
-                                        smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                        model.type = models,
-                                        growth.thresh = input$growth_threshold_growth,
-                                        dr.parameter = input$response_parameter_growth,
-                                        smooth.dr = smooth.dr,
-                                        log.x.dr = input$log_transform_concentration_growth,
-                                        log.y.dr = input$log_transform_response_growth,
-                                        nboot.dr = input$number_of_bootstrappings_dr_growth,
-                                        report = NULL,
-                                        shiny = TRUE
+                        results$growth <- growth.workflow(grodata = grodata,
+                                                          ec50 = input$perform_ec50_growth,
+                                                          fit.opt = fit.opt,
+                                                          t0 = input$t0_growth,
+                                                          min.density = input$minimum_density_growth,
+                                                          log.x.gc = input$log_transform_time_growth,
+                                                          log.y.model = input$log_transform_data_parametric_growth,
+                                                          log.y.spline = input$log_transform_data_nonparametric_growth,
+                                                          biphasic = input$biphasic_growth,
+                                                          lin.h = input$custom_sliding_window_size_value_growth,
+                                                          lin.R2 = input$R2_threshold_growth,
+                                                          lin.RSD = input$RSD_threshold_growth,
+                                                          lin.dY = input$dY_threshold_growth,
+                                                          interactive = F,
+                                                          nboot.gc = input$number_of_bootstrappings_growth,
+                                                          smooth.gc = input$smoothing_factor_nonparametric_growth,
+                                                          model.type = models,
+                                                          growth.thresh = input$growth_threshold_growth,
+                                                          dr.parameter = input$response_parameter_growth,
+                                                          smooth.dr = smooth.dr,
+                                                          log.x.dr = input$log_transform_concentration_growth,
+                                                          log.y.dr = input$log_transform_response_growth,
+                                                          nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                                          report = NULL,
+                                                          shiny = TRUE
 
-      )
+                        )
     )
     ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
     # enable(selector = "#navbar li a[data-value=Report]")
@@ -2657,9 +2669,9 @@ server <- function(input, output, session){
   selected_inputs_response_parameter_fluorescence <- reactive({
     select_options <- c()
     if(input$linear_regression_fluorescence) select_options <- c(select_options, 'max_slope.linfit', 'lambda.linfit', 'dY.linfit',
-                                                           'A.linfit')
+                                                                 'A.linfit')
     if(input$nonparametric_fit_fluorescence) select_options <- c(select_options, 'max_slope.spline', 'lambda.spline',
-                                                           'A.spline', 'dY.spline', 'integral.spline')
+                                                                 'A.spline', 'dY.spline', 'integral.spline')
   })
 
   observe({
@@ -2787,15 +2799,15 @@ server <- function(input, output, session){
   table_growth_linear <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
     table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-                                         "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
-                                         "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
-                                         "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2),
-                                         "ΔY" = round(as.numeric(res.table.gc$dY.linfit), 3),
-                                         "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
-                                         "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
-                                         "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
-                                         "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
-                                         stringsAsFactors = F, check.names = F)
+                               "µ<sub>max</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "", ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.linfit), 3), ")"))),
+                               "t<sub>D</sub>" = ifelse(res.table.gc$mu.linfit==0 | is.na(res.table.gc$mu.linfit), "",  ifelse(is.na(res.table.gc$mu2.linfit), round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.linfit), 2), ")"))),
+                               "λ" = round(as.numeric(res.table.gc$lambda.linfit), 2),
+                               "ΔY" = round(as.numeric(res.table.gc$dY.linfit), 3),
+                               "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.linfit), 3),
+                               "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
+                               "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
+                               "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
+                               stringsAsFactors = F, check.names = F)
     table_linear
 
   })
@@ -2809,13 +2821,13 @@ server <- function(input, output, session){
   table_growth_spline <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-                                         "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.spline), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
-                                         "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
-                                         "λ" = round(as.numeric(res.table.gc$lambda.spline), 2),
-                                         "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
-                                         "ΔY" = round(as.numeric(res.table.gc$dY.spline), 3),
-                                         "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
-                                         "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
+                               "µ<sub>max</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "", ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$mu.spline), 3), paste0("<strong>", round(as.numeric(res.table.gc$mu.spline), 3), "</strong>", " (", round(as.numeric(res.table.gc$mu2.spline), 3), ")"))),
+                               "t<sub>D</sub>" = ifelse(res.table.gc$mu.spline==0 | is.na(res.table.gc$mu.spline), "",  ifelse(is.na(res.table.gc$mu2.spline), round(log(2)/as.numeric(res.table.gc$mu.spline), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.gc$mu.spline), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.gc$mu2.spline), 2), ")"))),
+                               "λ" = round(as.numeric(res.table.gc$lambda.spline), 2),
+                               "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
+                               "ΔY" = round(as.numeric(res.table.gc$dY.spline), 3),
+                               "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
+                               "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
     table_spline
   })
 
@@ -2871,15 +2883,15 @@ server <- function(input, output, session){
     res.table.fl <- results$fluorescence$flFit1$flTable
 
     table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
-                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.linfit==0 | is.na(res.table.fl$max_slope.linfit), "", ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$max_slope.linfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slope.linfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.linfit), 3), ")"))),
-                                         "t<sub>D</sub>" = ifelse(res.table.fl$max_slope.linfit==0 | is.na(res.table.fl$max_slope.linfit), "",  ifelse(is.na(res.table.fl$max_slope2.linfit), round(log(2)/as.numeric(res.table.fl$max_slope.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slope.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$max_slope2.linfit), 2), ")"))),
-                                         "λ" = round(as.numeric(res.table.fl$lambda.linfit), 2),
-                                         "ΔY" = round(as.numeric(res.table.fl$dY.linfit), 3),
-                                         "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.linfit), 3),
-                                         "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.start.linfit), 2), ")")),
-                                         "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.end.linfit), 2), ")")),
-                                         "R<sup>2</sup><br>(linear fit)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$r2mu.linfit), 3), ")")),
-                                         stringsAsFactors = F, check.names = F)
+                               "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.linfit==0 | is.na(res.table.fl$max_slope.linfit), "", ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$max_slope.linfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slope.linfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.linfit), 3), ")"))),
+                               "t<sub>D</sub>" = ifelse(res.table.fl$max_slope.linfit==0 | is.na(res.table.fl$max_slope.linfit), "",  ifelse(is.na(res.table.fl$max_slope2.linfit), round(log(2)/as.numeric(res.table.fl$max_slope.linfit), 2), paste0("<strong>", round(log(2)/as.numeric(res.table.fl$max_slope.linfit), 2), "</strong>", " (", round(log(2)/as.numeric(res.table.fl$max_slope2.linfit), 2), ")"))),
+                               "λ" = round(as.numeric(res.table.fl$lambda.linfit), 2),
+                               "ΔY" = round(as.numeric(res.table.fl$dY.linfit), 3),
+                               "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.linfit), 3),
+                               "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.start.linfit), 2), ")")),
+                               "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.end.linfit), 2), ")")),
+                               "R<sup>2</sup><br>(linear fit)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$r2mu.linfit), 3), ")")),
+                               stringsAsFactors = F, check.names = F)
 
     table_linear
 
@@ -2894,12 +2906,12 @@ server <- function(input, output, session){
   table_fluorescence1_spline <- reactive({
     res.table.fl <- results$fluorescence$flFit1$flTable
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
-                                         "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.spline==0 | is.na(res.table.fl$max_slope.spline), "", ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$max_slope.spline), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slope.spline), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.spline), 3), ")"))),
-                                         "λ" = round(as.numeric(res.table.fl$lambda.spline), 2),
-                                         "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.spline), 3),
-                                         "ΔY" = round(as.numeric(res.table.fl$dY.spline), 3),
-                                         "x<sub>max</sub>" = ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$x.max.spline), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.max.spline), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.max2.spline), 2), ")")),
-                                         "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F)
+                               "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.spline==0 | is.na(res.table.fl$max_slope.spline), "", ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$max_slope.spline), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slope.spline), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.spline), 3), ")"))),
+                               "λ" = round(as.numeric(res.table.fl$lambda.spline), 2),
+                               "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.spline), 3),
+                               "ΔY" = round(as.numeric(res.table.fl$dY.spline), 3),
+                               "x<sub>max</sub>" = ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$x.max.spline), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.max.spline), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.max2.spline), 2), ")")),
+                               "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F)
     table_spline
   })
 
@@ -3005,8 +3017,8 @@ server <- function(input, output, session){
                                                                         "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
         textInput('lin.h.rerun', 'Sliding window size (h)', placeholder = paste0("previously: ",
                                                                                  ifelse(!is.null(results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.h),
-                                                                                                 results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.h,
-                                                                                                 "NULL"))),
+                                                                                        results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.h,
+                                                                                        "NULL"))),
         textInput('lin.R2.rerun', 'R2 threshold', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.R2)),
         textInput('lin.RSD.rerun', 'RSD threshold for slope', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.RSD)),
         footer=tagList(
@@ -3120,37 +3132,37 @@ server <- function(input, output, session){
   # Re-run selected spline fit with user-defined parameters upon click on 'submit'
   observeEvent(input$submit.rerun.spline.growth, {
     if(!is.null(results$growth$gcFit)){
-    # store previous fit in memory
-    selected_vals_validate_growth$restore_growth_spline <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]
+      # store previous fit in memory
+      selected_vals_validate_growth$restore_growth_spline <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]
 
-    # Re-run fit and store in results object
-    actwell <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$data.in
-    acttime <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$time.in
-    control <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control
-    control_new <- control
-    gcID <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$gcID
+      # Re-run fit and store in results object
+      actwell <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$data.in
+      acttime <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$time.in
+      control <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control
+      control_new <- control
+      gcID <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$gcID
 
-    control_new$smooth.gc <- dplyr::if_else(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$lin.R2)
-    control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
-    min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
-    if(is.numeric(min.density.spline.new)){
-      if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
-        message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                       min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
-      } else if(!is.na(min.density.spline.new)){
-        control_new$min.density <- min.density.spline.new
+      control_new$smooth.gc <- dplyr::if_else(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$lin.R2)
+      control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
+      min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
+      if(is.numeric(min.density.spline.new)){
+        if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
+          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
+        } else if(!is.na(min.density.spline.new)){
+          control_new$min.density <- min.density.spline.new
+        }
       }
-    }
 
 
-    try(
-      results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]] <-
-        growth.gcFitSpline(acttime, actwell,
-                           gcID = gcID,
-                           control = control_new)
-    )
-    # Show [Restore fit] button
-    show("restore_growth_spline")
+      try(
+        results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]] <-
+          growth.gcFitSpline(acttime, actwell,
+                             gcID = gcID,
+                             control = control_new)
+      )
+      # Show [Restore fit] button
+      show("restore_growth_spline")
     }
 
     removeModal()
@@ -3267,9 +3279,9 @@ server <- function(input, output, session){
       control_new$model.type <- models
 
       try(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]] <-
-        growth.gcFitModel(acttime, actwell,
-                           gcID = gcID,
-                           control = control_new))
+            growth.gcFitModel(acttime, actwell,
+                              gcID = gcID,
+                              control = control_new))
       # Show [Restore fit] button
       show("restore_growth_model")
     }
@@ -3301,8 +3313,8 @@ server <- function(input, output, session){
 
   #------- Initialize the Memory to store settings
   selected_vals_validate_fluorescence <- reactiveValues(sample_validate_fluorescence_linear = 1,
-                                                  sample_validate_fluorescence_spline = 1
-                                                  )
+                                                        sample_validate_fluorescence_spline = 1
+  )
 
   #------ Whenever any of the inputs are changed, it only modifies the memory
   observe({
@@ -3369,12 +3381,12 @@ server <- function(input, output, session){
         textInput('t0.lin.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$t0)),
         textInput('min.density.lin.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.density)),
         textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
-                                                                        "\n",
-                                                                        "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
+                                                                                     "\n",
+                                                                                     "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
         textInput('lin.h.rerun.fluorescence', 'Sliding window size (h)', placeholder = paste0("previously: ",
-                                                                                 ifelse(!is.null(results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h),
-                                                                                        results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h,
-                                                                                        "NULL"))),
+                                                                                              ifelse(!is.null(results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h),
+                                                                                                     results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h,
+                                                                                                     "NULL"))),
         textInput('lin.R2.rerun.fluorescence', 'R2 threshold', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.R2)),
         textInput('lin.RSD.rerun.fluorescence', 'RSD threshold for slope', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.RSD)),
         footer=tagList(
@@ -3576,15 +3588,16 @@ server <- function(input, output, session){
     )
   })
 
+  ### DR Plots ####
   output$dose_response_plot_combined <- renderPlot({
     results <- results$growth$drFit
-      plot.drFit(results,
-                 combine=TRUE,
-                 pch = input$shape_type_dose_response_growth_plot,
-                 cex = input$shape_size_dose_response_growth_plot,
-                 basesize = input$base_size_dose_response_growth_plot,
-                 lwd = input$line_width_dose_response_growth_plot,
-                 ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot)
+    plot.drFit(results,
+               combine=TRUE,
+               pch = input$shape_type_dose_response_growth_plot,
+               cex = input$shape_size_dose_response_growth_plot,
+               basesize = input$base_size_dose_response_growth_plot,
+               lwd = input$line_width_dose_response_growth_plot,
+               ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot)
   })
 
   output$dose_response_plot_individual <- renderPlot({
@@ -3598,6 +3611,7 @@ server <- function(input, output, session){
                      ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot)
   })
 
+  ### Parameter Plots ####
   output$growth_parameter_plot <- renderPlot({
     results <- results$growth
 
@@ -3624,6 +3638,10 @@ server <- function(input, output, session){
                    label.size = input$label.size_growth_parameter_plot
     )
   })
+
+  ## Fluorescence Plots: #####
+
+  #____Plot Downloads____#####
 
   output$downloads_growth_group_plot <- downloadHandler(
     filename = function() {
@@ -3740,7 +3758,7 @@ server <- function(input, output, session){
     }
   )
 
-  ###____Download____####
+  #____Table Download____####
   output$download_table_growth_linear <- downloadHandler(
     filename = function() {
       paste("data-", Sys.Date(), ".csv", sep="")
