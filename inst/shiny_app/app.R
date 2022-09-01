@@ -531,7 +531,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                                   label = 'log transform response'),
 
 
-                                                                                    selectInput(inputId = "smoothing_factor_growth",
+                                                                                    selectInput(inputId = "smoothing_factor_growth_dr",
                                                                                                 label = "smoothing factor",
                                                                                                 choices = c("NULL" = "NULL",
                                                                                                             "other" = "other")),
@@ -773,20 +773,19 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                                           label = 'log transform response'),
 
                                                                                             numericInput(
-                                                                                              inputId = "smoothing_factor_fluorescence", # TODO hide if dr_method_fluorescence == "Biosensor response model"
-                                                                                              label = "smoothing factor",
-                                                                                              value = NULL,
-                                                                                              min = 0,
-                                                                                              max = 1,
-                                                                                              step = 1
-                                                                                            ),
-
-                                                                                            numericInput(
-                                                                                              inputId = 'number_of_bootrappings_fluorescence',
-                                                                                              label = 'number of bootrappings',
+                                                                                              inputId = 'number_of_bootstrappings_dr_fluorescence',
+                                                                                              label = 'Number of bootstrappings',
                                                                                               value = 0,
                                                                                               min = NA,
                                                                                               max = NA,
+                                                                                            ),
+                                                                                            conditionalPanel(
+                                                                                              condition = 'input.dr_method_fluorescence == "spline"',
+                                                                                              textInput(
+                                                                                                inputId = 'smoothing_factor_fluorescence_dr',
+                                                                                                label = 'Smoothing factor dose-response splines',
+                                                                                                value = ""
+                                                                                              )
                                                                                             )
                                                                            ) # conditionalPanel(condition = "input.perform_ec50_fluorescence"
                                                                  ), # wellPanel
@@ -2637,10 +2636,10 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(NULL)
 
-    if (is.na(input$smoothing_factor_growth) || input$smoothing_factor_growth == "NULL") {
+    if (is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL") {
       smooth.dr = NULL
     } else {
-      smooth.dr <- input$smoothing_factor_growth
+      smooth.dr <- input$smoothing_factor_growth_dr
     }
 
     fit.opt <- c()
@@ -2775,10 +2774,10 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(NULL)
 
-    if (is.na(input$smoothing_factor_fluorescence) || input$smoothing_factor_fluorescence == "NULL") {
+    if (is.na(input$smoothing_factor_fluorescence_dr) || input$smoothing_factor_fluorescence_dr == "NULL" || input$smoothing_factor_fluorescence_dr == "") {
       smooth.dr = NULL
     } else {
-      smooth.dr <- input$smoothing_factor_fluorescence
+      smooth.dr <- input$smoothing_factor_fluorescence_dr
     }
 
     fit.opt <- c()
@@ -3769,7 +3768,7 @@ server <- function(input, output, session){
     )
   })
 
-    ### DR Plots ####
+      ### DR Plots ####
 
   output$dose_response_plot_fluorescence_combined <- renderPlot({
     results <- results$fluorescence$drFit1
@@ -3786,11 +3785,20 @@ server <- function(input, output, session){
     results <- results$fluorescence$drFit1$drFittedSplines[[input$individual_plots_dose_response_fluorescence_plot]]
     plot.drFitSpline(results,
                      combine=FALSE,
-                     pch = input$shape_type_dose_response_growth_plot,
-                     cex = input$shape_size_dose_response_growth_plot,
-                     basesize = input$base_size_dose_response_growth_plot,
-                     lwd = input$line_width_dose_response_growth_plot,
+                     pch = input$shape_type_dose_response_fluorescence_plot,
+                     cex = input$shape_size_dose_response_fluorescence_plot,
+                     basesize = input$base_size_dose_response_fluorescence_plot,
+                     lwd = input$line_width_dose_response_fluorescence_plot,
                      ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot)
+  })
+
+  select_inputs_individual_plots_dose_response_fluorescence_plot<- reactive({
+    if (length(results$fluorescence$drFit1)>1) names(results$fluorescence$drFit1$drFittedSplines)
+    else return("")
+  })
+  observe({
+    updateSelectInput(inputId = "individual_plots_dose_response_fluorescence_plot",
+                      choices = select_inputs_individual_plots_dose_respons_fluorescence_plot())
   })
 
   observe({
