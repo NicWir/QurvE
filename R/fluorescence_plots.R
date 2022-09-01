@@ -875,6 +875,7 @@ plot.drFitModel <- function(drFittedModel,
 #' @param width
 #' @param out.dir
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
+#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #'
 #' @return
 #' @export
@@ -904,7 +905,8 @@ plot.flFitRes <-  function(object,
                         height = NULL,
                         width = NULL,
                         out.dir = NULL,
-                        out.nm = NULL
+                        out.nm = NULL,
+                        shiny = FALSE
 )
 {
   # Convert range  and selecting arguments
@@ -935,7 +937,7 @@ plot.flFitRes <-  function(object,
   }
   if(is(object) == "flFitRes"){
     if(data.type == "spline1" || data.type == "raw1" || data.type == "norm.fl1") flFit <- object$flFit1
-    if(data.type == "spline2" || data.type == "raw2" || data.type == "norm.fl2") flFit <- object$flFit1
+    if(data.type == "spline2" || data.type == "raw2" || data.type == "norm.fl2") flFit <- object$flFit2
     raw_data <- object$data
   } else {
     flFit <- object
@@ -1168,8 +1170,12 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
-      theme(panel.grid.major = element_blank(),
+      theme(legend.position="bottom",
+            panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
+    else p <- p + guides(fill=guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -1232,7 +1238,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
         geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-        theme(panel.grid.major = element_blank(),
+        theme(legend.position="bottom",
+              panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
       y.label.mu = if(object$control$log.y.spline == TRUE){
@@ -1289,7 +1296,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p, position = "right"))
     }
   } # if(mean == TRUE)
   else {
@@ -1334,8 +1341,12 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
-      theme(panel.grid.major = element_blank(),
+      theme(legend.position="bottom",
+            panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
+    else p <- p + guides(fill=guide_legend(ncol=2))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
@@ -1396,7 +1407,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-        theme(panel.grid.major = element_blank(),
+        theme(legend.position="bottom",
+              panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
       y.label.mu = if(object$control$log.y.spline == TRUE){
@@ -1448,7 +1460,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
     } # if(deriv)
 
   }
