@@ -7,8 +7,14 @@
 \method{plot}{flFitLinear}(
   flFittedLinear,
   log = "",
-  which = c("fit", "diagnostics"),
+  which = c("fit", "diagnostics", "fit_diagnostics"),
+  cex.point = 1,
+  cex.lab = 1.5,
+  cex.axis = 1.3,
+  lwd = 2,
   title = "Linear fit",
+  y.lim = NULL,
+  x.lim = NULL,
   plot = TRUE,
   export = FALSE,
   height = ifelse(which == "fit", 7, 5),
@@ -23,6 +29,18 @@
 \item{log}{("x" or "y") Display the x- or y-axis on a logarithmic scale.}
 
 \item{which}{("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.}
+
+\item{cex.point}{(Numeric) Size of the raw data points.}
+
+\item{cex.lab}{(Numeric) Font size of axis titles.}
+
+\item{cex.axis}{(Numeric) Font size of axis annotations.}
+
+\item{lwd}{(Numeric) Line width.}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).}
 

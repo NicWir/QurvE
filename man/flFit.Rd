@@ -4,16 +4,16 @@
 \alias{flFit}
 \title{Perform a fluorescence curve analysis on all samples in the provided dataset.}
 \usage{
-flFit(time = NULL, density = NULL, fl_data, control = fl.control(), ...)
+flFit(fl_data, time = NULL, density = NULL, control = fl.control(), ...)
 }
 \arguments{
-\item{time}{(optional) A matrix containing time values for each sample.}
-
-\item{density}{(optional) A dataframe containing density values for each sample and sample identifiers in the first three columns.}
-
 \item{fl_data}{Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
 \item a list containing a \code{'time'} matrix (for x_type == "time") or \code{'density'} dataframe (for x_type == "density") and, \code{'fluorescence1'} and \code{'fluorescence2'} (if applicable) dataframes,
 or \item a dataframe containing (normalized) fluorescence values (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).}}
+
+\item{time}{(optional) A matrix containing time values for each sample.}
+
+\item{density}{(optional) A dataframe containing density values for each sample and sample identifiers in the first three columns.}
 
 \item{control}{A \code{fl.control} object created with \code{\link{fl.control}},
 defining relevant fitting options.}

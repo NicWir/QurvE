@@ -373,7 +373,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
                               } else {
                                 fl_data
                               }, spar = control$smooth.fl, cv = NA, keep.data = FALSE))
-  if (!exists("spline",) || is.null(spline) == TRUE) {
+  if (!exists("spline") || is.null(spline)) {
     warning("flFitSpline: Spline could not be fitted to data!")
     flFitSpline <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
                         raw.x = get(ifelse(x_type == "density", "density", "time")), raw.fl = fl_data,
@@ -597,7 +597,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       if (TRUE %in% bad.values) {
         time <- time[!bad.values]
         if (control$log.y.spline == TRUE) {
-          fl_data.log <- fl_data.log(!bad.values)
+          fl_data.log <- fl_data.log[!bad.values]
         } else {
           fl_data <- fl_data[!bad.values]
         }
@@ -710,11 +710,11 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #'
 #' \code{flFit} performs all computational fluorescence fitting operations based on the user input.
 #'
-#' @param time (optional) A matrix containing time values for each sample.
-#' @param density (optional) A dataframe containing density values for each sample and sample identifiers in the first three columns.
 #' @param fl_data Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
 #'   \item a list containing a \code{'time'} matrix (for x_type == "time") or \code{'density'} dataframe (for x_type == "density") and, \code{'fluorescence1'} and \code{'fluorescence2'} (if applicable) dataframes,
 #'   or \item a dataframe containing (normalized) fluorescence values (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).}
+#' @param time (optional) A matrix containing time values for each sample.
+#' @param density (optional) A dataframe containing density values for each sample and sample identifiers in the first three columns.
 #' @param control A \code{fl.control} object created with \code{\link{fl.control}},
 #'   defining relevant fitting options.
 #' @param ... Further arguments passed to the shiny app.
@@ -736,7 +736,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' @return
 #' @export
 #'
-flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control(), ...)
+flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), ...)
 {
   # Define objects based on additional function calls
   call <- match.call()
@@ -756,17 +756,17 @@ flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control(), .
 
   x_type <- control$x_type
 
-  if(!(class(fl_data)=="list") && !(class(fl_data)=="grodata")){
+  if(!(class(fl_data) %in% c("list", "grodata"))){
     if (x_type == "time" && is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' (for x_type = 'time') or a grodata object created with read_data() or parse_data() in the 'fl_data' argument.")
-    if (x_type == "density" && is.numeric(as.matrix(data[-1:-3])) == FALSE)
+    if (x_type == "density" && is.numeric(as.matrix(density[-1:-3])) == FALSE)
       stop("Need a dataframe for 'density' (for x_type = 'density') or a grodata object created with read_data() or parse_data() in the 'fl_data' argument.")
     if (is.numeric(as.matrix(fl_data[-1:-3])) == FALSE)
       stop("Need a dataframe for 'fl_data' or a grodata object created with read_data() or parse_data() in the 'fl_data' argument.")
-  } else if(!is.null(data)){
-    time <- grodata$time
-    density <- grodata$density
-    fl_data <- grodata$fluorescence1
+  } else if(!is.null(fl_data)){
+    time <- fl_data$time
+    density <- fl_data$density
+    fl_data <- fl_data$fluorescence1
   }
   # /// check if start density values are above min.density in all samples
   if(!is.null(density)){
@@ -818,11 +818,12 @@ flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control(), .
   reliability_tag_nonpara <- NA
 
   # /// loop over all wells
+
   for (i in 1:dim(fl_data)[1]){
     # Progress indicator for shiny app
     if(exists("shiny") && shiny == TRUE){
       shiny::incProgress(
-        amount = 1/(dim(data)[1]),
+        amount = 1/(dim(fl_data)[1]),
         message = "Computations completed")
     }
 
@@ -850,12 +851,13 @@ flFit <- function(time = NULL, density = NULL, fl_data, control= fl.control(), .
     }
     else{
       # /// generate empty object
-      fitlinear <- list(raw.x = actx, raw.fl = actwell,
+      fitlinear <- list(x.in = actx, fl.in = actwell,
+                        raw.x = actx, raw.fl = actwell,
                         filt.x = actx, filt.fl = actwell,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                            x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = 0.95, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
       class(fitlinear)   <- "flFitLinear"
       fitlinear.all[[i]] <- fitlinear
     }
@@ -1185,12 +1187,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
     if(max(density) < control$growth.thresh * density[1]){
       if(control$suppress.messages==F) message(paste0("flFitLinear: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
-      flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                           filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                            x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
       class(flFitLinear) <- "flFitLinear"
       return(flFitLinear)
     }
@@ -1221,12 +1224,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
     if(length(x)<4){
       message("flFitLinear: Not enough data points above the chosen min.density.")
-      flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                           filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                            x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
       class(flFitLinear) <- "flFitLinear"
       return(flFitLinear)
     }
@@ -1237,7 +1241,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     if (TRUE %in% bad.values) {
       time <- time[!bad.values]
       if (control$log.y.lin == TRUE) {
-        fl_data.log <- fl_data.log(!bad.values)
+        fl_data.log <- fl_data.log[!bad.values]
+        fl_data.in <- fl_data[!bad.values]
       } else {
         fl_data <- fl_data[!bad.values]
       }
@@ -1248,7 +1253,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       if (TRUE %in% bad.values) {
         time <- time[!bad.values]
         if (control$log.y.lin == TRUE) {
-          fl_data.log <- fl_data.log(!bad.values)
+          fl_data.log <- fl_data.log[!bad.values]
+          fl_data.in <- fl_data[!bad.values]
         } else {
           fl_data <- fl_data[!bad.values]
         }
@@ -1257,12 +1263,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
     if(max(time) < control$t0){
       if(control$suppress.messages==F) message(paste0("flFitLinear: All time values are below the chosen 't0'."))
-      flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                           filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                            x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
       class(flFitLinear) <- "flFitLinear"
       return(flFitLinear)
     }
@@ -1287,12 +1294,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
     if(length(x)<4){
       message("flFitLinear: Not enough data points above the chosen t0.")
-      flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                           filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                            x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
       class(flFitLinear) <- "flFitLinear"
       return(flFitLinear)
     }
@@ -1400,12 +1408,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     ret <- ret[!is.na(ret[,1]), ]
 
     if(nrow(ret)<2){
-      flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+      flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                           filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                            x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                            x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
       class(flFitLinear) <- "flFitLinear"
       if(control$suppress.messages==F) message("No fl_data range in accordance with the chosen parameters identified with appropriate linearity.")
       return(flFitLinear)
@@ -1418,12 +1427,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       ret.check <- ret.check[ret.check[,"slope"]>0, ]
 
       if(nrow(ret.check)<2){
-        flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+        flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
+                            raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                             filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                             ID = ID, FUN = grow_exponential, fit = NA, par = c(
                               y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                               x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                              x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                              x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
         class(flFitLinear) <- "flFitLinear"
         if(control$suppress.messages==F) message("No fl_data range in accordance with the chosen parameters identified with appropriate linearity.")
         return(flFitLinear)
@@ -1527,18 +1537,20 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               # ndx <- seq(min(match(ret[candidates, "x"], x.in)),
               #            max(match(ret[candidates, "x"], x.in)) + h-1)
             ndx <- tp
+            ndx.in <- match(fl_data[tp], fl_data.in)
 
             slope.se <- as.numeric(p[3]) # standard error of slope
             fitFlag <- TRUE
 
           }
           else { # of if(length(candidates) > 0)
-            flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+            flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
+                                raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                                 filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                                 ID = ID, FUN = grow_exponential, fit = NA, par = c(
                                   y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                                   x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                                  x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                                  x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
             class(flFitLinear) <- "flFitLinear"
             if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", R2, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
             return(flFitLinear)
@@ -1932,6 +1944,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               x.max2_end <- ifelse(max_slope.premin > max_slope.postmin, x.max_end.premin, x.max_end.postmin)
               rsquared2 <- ifelse(max_slope.premin > max_slope.postmin, rsquared.premin, rsquared.postmin)
               ndx2 <- if(max_slope.premin > max_slope.postmin){ndx.premin} else{ndx.postmin}
+              ndx2.in <- match(fl_data[ndx2], fl_data.in)
               x.turn <- ifelse(max_slope.premin > max_slope.postmin, x.turn.premin, x.turn.postmin)
               fitFlag2 <- TRUE
             } else if (!is.na(max_slope.premin)){
@@ -1943,6 +1956,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               x.turn <- x.turn.premin
               rsquared2 <- rsquared.premin
               ndx2 <- ndx.premin
+              ndx2.in <- match(fl_data[ndx2], fl_data.in)
               fitFlag2 <- TRUE
             } else if (!is.na(max_slope.postmin)){
               max_slope2 <- max_slope.postmin
@@ -1953,6 +1967,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               x.turn <- x.turn.postmin
               rsquared2 <- rsquared.postmin
               ndx2 <- ndx.postmin
+              ndx2.in <- match(fl_data[ndx2], fl_data.in)
               fitFlag2 <- TRUE
             } else {
               max_slope2 <- NA
@@ -1963,6 +1978,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               x.turn <- NA
               rsquared2 <- NA
               ndx2 <- NA
+              ndx2.in <- NA
               fitFlag2 <- FALSE
             }
           } # if(control$biphasic)
@@ -1975,16 +1991,18 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
             x.turn <- NA
             rsquared2 <- NA
             ndx2 <- NA
+            ndx2.in <- NA
             fitFlag2 <- FALSE
           }
         } # if(any(ret.check[,5] >= R2 & ret.check[,6] <= RSD))
         else{
-          flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+          flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
+                              raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                               filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                               ID = ID, FUN = grow_exponential, fit = NA, par = c(
                                 y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                                 x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                                x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                                x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
           class(flFitLinear) <- "flFitLinear"
           if (!control$suppress.messages)
             message(
@@ -2003,12 +2021,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   } # if(N >= 3)
   else {
     message("Not enough observations in the dataset to perform linear fit. flFitLinear requires at least 3 fl_data points within the given t0 and min.density thresholds.")
-    flFitLinear <- list(raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+    flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
+                        raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
                         filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
                         ID = ID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                           x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
-                          x.max2_end = NA), ndx = NA, ndx2 = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+                          x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
     class(flFitLinear) <- "flFitLinear"
     return(flFitLinear)
   }
@@ -2016,6 +2035,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
 
   flFitLinear <- list(
+    x.in = get(ifelse(x_type == "density", "density.in", "time.in")),
+    fl.in = fl_data.in,
     raw.x = x.in,
     raw.fl = fl_data.in,
     filt.x = obs$x,
@@ -2044,7 +2065,10 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       x.max2_end = x.max2_end
     ),
     ndx = ndx,
+    ndx.in = ndx.in,
     ndx2 = ndx2,
+    ndx2.in = ndx2.in,
+    quota = quota,
     rsquared = p["r2"],
     rsquared2 = rsquared2,
     control = control,
@@ -2159,7 +2183,7 @@ fl.workflow <- function(grodata = NULL,
 
   ## remove strictly defined arguments
   call$grodata <- call$time <- call$density <- call$fl_data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <-
-    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.lin <- call$log.x.spline <- call$log.y.spline <- call$log.y.lin <- call$biphasic <- call$norm_fl <-
+    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.lin <- call$log.x.spline <- call$log.y.spline <- call$log.y.lin <- call$biphasic <- call$norm_fl <- call$x_type <-
     call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.fl <- call$smooth.fl <- call$dr.method <- call$growth.thresh <-
     call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
 
@@ -2211,9 +2235,18 @@ fl.workflow <- function(grodata = NULL,
       cat(paste("=== Performing Fits for Fluorescence 1 =================================\n"))
       cat("----------------------------------------------------\n")
     }
-    out.flFit1 <- flFit(time = time, density = density, fl_data = norm.fluorescence1, control = control)
+    if(exists("shiny") && shiny == TRUE){
+      out.flFit1 <- flFit(time = time, density = density, fl_data = norm.fluorescence1, control = control, shiny = TRUE)
+    } else {
+      out.flFit1 <- flFit(time = time, density = density, fl_data = norm.fluorescence1, control = control, shiny = FALSE)
+    }
+
   } else if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-    out.flFit1 <- flFit(time = time, density = density, fl_data = fluorescence1, control = control)
+    if(exists("shiny") && shiny == TRUE){
+      out.flFit1 <- flFit(time = time, density = density, fl_data = fluorescence1, control = control, shiny = TRUE)
+    } else {
+      out.flFit1 <- flFit(time = time, density = density, fl_data = fluorescence1, control = control, shiny = FALSE)
+    }
   }
   if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence2) && length(norm.fluorescence2) > 1 && !all(is.na(norm.fluorescence2)))){
     if ((control$suppress.messages==FALSE)){
@@ -2221,14 +2254,22 @@ fl.workflow <- function(grodata = NULL,
       cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
       cat("----------------------------------------------------\n")
     }
-    out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control)
+    if(exists("shiny") && shiny == TRUE){
+      out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control, shiny = TRUE)
+    } else {
+      out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control, shiny = FALSE)
+    }
   } else if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
     if ((control$suppress.messages==FALSE)){
       cat("\n\n")
       cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
       cat("----------------------------------------------------\n")
     }
-    out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control)
+    if(exists("shiny") && shiny == TRUE){
+      out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control, shiny = TRUE)
+    } else {
+      out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control, shiny = FALSE)
+    }
   }
 
   # /// Estimate EC50 values

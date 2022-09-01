@@ -26,6 +26,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
 {
+  if(is(gcFittedLinear) != "gcFitLinear") stop("gcFittedLinear needs to be an object created with growth.gcFitLinear().")
   which <- match.arg(which)
 
   p <- function(){
@@ -77,8 +78,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 
            },
            diagnostics = {
-             # opar <- par(no.readonly = TRUE)
-             # on.exit(par(opar))
+             opar <- par(no.readonly = TRUE)
+             on.exit(par(opar))
              par(mfrow=c(1,2))
 
              ## residuals vs. fitted
@@ -96,7 +97,6 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
              par(mai = c(0.7, 0.7, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
 
-             # par(cex.lab = cex.lab)
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab="Density",
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
              title("Linear fit", line = 2)
@@ -794,9 +794,9 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
                      width = w, height = h, units = 'in', res = 300)
       print(p)
       grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
-      print(p)
-      grDevices::dev.off()
+      #grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+      #print(p)
+      #grDevices::dev.off()
       cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
     }
     if (plot == TRUE){
@@ -2080,29 +2080,25 @@ plot.grofit <- function(grofit, ...,
   }
   out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
   if (export == TRUE){
-    if(!shiny){
-      if(is.null(out.nm)) out.nm <- paste0("GroupPlot")
-      if(is.null(width)){
-        w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
-      } else {
-        w <- width
-      }
-      if(is.null(height)){
-        h <- ifelse(deriv==T, 9, 6)
-      } else {
-        h <- height
-      }
-      dir.create(out.dir, showWarnings = F)
-      grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
-                     width = w, height = h, units = 'in', res = 300)
-      print(p)
-      grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
-      print(p)
-      grDevices::dev.off()
+    if(is.null(out.nm)) out.nm <- paste0("GroupPlot")
+    if(is.null(width)){
+      w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
     } else {
-
+      w <- width
     }
+    if(is.null(height)){
+      h <- ifelse(deriv==T, 9, 6)
+    } else {
+      h <- height
+    }
+    dir.create(out.dir, showWarnings = F)
+    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
+                   width = w, height = h, units = 'in', res = 300)
+    print(p)
+    grDevices::dev.off()
+    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+    print(p)
+    grDevices::dev.off()
   }
   if (plot == TRUE){
     print(p)
@@ -2474,18 +2470,18 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
     return(p)
   }
   if (export == TRUE){
-    if(is.null(out.nm)) out.nm <- paste0("drParameterPlot_", param)
-    w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
-    h <- height
-    out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-    dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
-                   width = w, height = h, units = 'in', res = 300)
-    print(p)
-    grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
-    print(p)
-    grDevices::dev.off()
+      if(is.null(out.nm)) out.nm <- paste0("drParameterPlot_", param)
+      w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
+      h <- height
+      out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+      dir.create(out.dir, showWarnings = F)
+      grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
+                     width = w, height = h, units = 'in', res = 300)
+      print(p)
+      grDevices::dev.off()
+      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+      print(p)
+      grDevices::dev.off()
   }
   if (plot == TRUE){
     print(p)

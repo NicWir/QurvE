@@ -5,6 +5,12 @@
 #' @param flFittedLinear A \code{flFittedLinear} object created with \code{\link{flFitLinear}} or stored within a \code{flFitRes} or \code{flFit} object created with \code{\link{fl.workflow}} or \code{\link{flFit}}, respectively.
 #' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
 #' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param cex.axis (Numeric) Font size of axis annotations.
+#' @param lwd (Numeric) Line width.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -16,87 +22,90 @@
 #' @export
 #'
 #' @examples
-plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics"), title = "Linear fit",
+plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics", "fit_diagnostics"), cex.point = 1, cex.lab = 1.5,
+                             cex.axis = 1.3, lwd = 2, title = "Linear fit", y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
   {
-  if(is(flFittedLinear) != "flFitLinear") stop("flFitLinear needs to be an object created with flFitLinear().")
+  if(is(flFittedLinear) != "flFitLinear") stop("flFittedLinear needs to be an object created with flFitLinear().")
   which <- match.arg(which)
+  control <- flFittedLinear$control
+  if(control$x_type == "time"){
+    if(control$norm_fl){
+      if(control$log.y.lin){
+        ylab = "norm. Ln[FL/FL(0)]"
+      } else {
+        ylab = "norm. FL"
+      }
+    } else {
+      if(control$log.y.lin){
+        ylab = "Ln[FL/FL(0)]"
+      } else {
+        ylab = "FL"
+      }
+    }
+  } else {
+    if(control$log.y.lin){
+      ylab = "Ln[FL/FL(0)]"
+    } else {
+      ylab = "FL"
+    }
+  }
+  if(control$x_type == "time"){
+    if(control$log.x.lin){
+      xlab <- "Ln(time + 1)"
+    } else {
+      xlab <- "Time"
+    }
+  } else {
+    if(control$log.x.lin){
+      xlab <- "Ln(density + 1)"
+    } else {
+      xlab <- "Density"
+    }
+  }
 
   p <- function(){
     switch(which,
            fit = {
-             control <- flFittedLinear$control
-             if(control$x_type == "time"){
-               if(control$norm_fl){
-                 if(control$log.y.lin){
-                   ylab = "norm. Ln[FL/FL(0)]"
-                 } else {
-                   ylab = "norm. FL"
-                 }
-               } else {
-                 if(control$log.y.lin){
-                   ylab = "Ln[FL/FL(0)]"
-                 } else {
-                   ylab = "FL"
-                 }
-               }
-             } else {
-               if(control$log.y.lin){
-                 ylab = "Ln[FL/FL(0)]"
-               } else {
-                 ylab = "FL"
-               }
-             }
-             if(control$x_type == "time"){
-               if(control$log.x.lin){
-                 xlab <- "Ln(time + 1)"
-               } else {
-                 xlab <- "Time"
-               }
-             } else {
-               if(control$log.x.lin){
-                 xlab <- "Ln(density + 1)"
-               } else {
-                 xlab <- "Density"
-               }
-             }
-             par(mar=c(5.1, 4.1 + nchar(round(max(flFittedLinear$"filt.fl")))/3.5, 4.1, 2.1), cex.lab=1.5)
-             plot(flFittedLinear$"filt.fl" ~ flFittedLinear$"filt.x", xlab=xlab, ylab = "", col = scales::alpha("black", 0.5),
-                  log=log, las=1, main = title, yaxt="n", xaxt="n", ...)
-             title(ylab = ylab, line = 3 + nchar(round(max(flFittedLinear$"filt.fl")))/4)
-             axis(1,cex.axis=1.3)
-             axis(2,cex.axis=1.3, las=1)
-             try(points(flFittedLinear$filt.fl[flFittedLinear$ndx] ~ flFittedLinear$filt.x[flFittedLinear$ndx], pch=21, col="black", bg="red"))
+
+             par(mar=c(5.1, 4.1 + nchar(round(max(flFittedLinear$"fl.in")))/3.5, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
+             plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab=xlab, ylab = "",
+                  log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
+             points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point)
+
+             title(ylab = ylab, line = 3 + nchar(round(max(flFittedLinear$"fl.in")))/4)
+             axis(1)
+             axis(2, las=1)
+             try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=21, cex = cex.point*1.15, col="black", bg="red"))
 
              ## lag phase
              lag <- flFittedLinear$par["lag"]
              coef_ <- flFittedLinear$par
 
-
              if(flFittedLinear$fitFlag2){
-               try(points(flFittedLinear$raw.fl[flFittedLinear$ndx2] ~ flFittedLinear$raw.x[flFittedLinear$ndx2], pch=21, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- flFittedLinear$par["lag2"]
-               if(lag2 < lag && lag2 > flFittedLinear$raw.x[1]){
-                 try(time2 <- seq(lag2, max(flFittedLinear$"raw.x"), length=200), silent = T)
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"raw.x"), length=200), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
-                 try(lines(c(min(flFittedLinear$"filt.x"[1]), lag2), rep(flFittedLinear$"filt.fl"[1], 2), lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
+                 try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
-                 try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"raw.x"), length=200), silent = T)
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"raw.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=2, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
 
                }
              } else if(flFittedLinear$fitFlag){
-               if(lag < flFittedLinear$raw.x[flFittedLinear$ndx[1]]){
+               if(lag < flFittedLinear$x.in[flFittedLinear$ndx.in[1]]){
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
-                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
            },
@@ -107,11 +116,75 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 
              ## residuals vs. fitted
              obs <- flFittedLinear$log.data
-             sim <- grow_linear(flFittedLinear$"raw.x", flFittedLinear$par)
+             sim <- grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
              plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals")
              abline(h=0, col="grey")
              ## normal q-q-plot
              qqnorm(flFittedLinear$fit[["residuals"]])
+             qqline(flFittedLinear$fit[["residuals"]])
+           },
+           fit_diagnostics = {
+
+             opar <- par(no.readonly = TRUE)
+             on.exit(par(opar))
+             layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
+             par(mai = c(0.7, 0.9, 0.6, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+
+             plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab=xlab, ylab = "",
+                  log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
+             points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point)
+
+             title(ylab = ylab, line = 3 + nchar(round(max(flFittedLinear$"fl.in")))/4)
+             axis(1)
+             axis(2, las=1)
+             try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=21, cex = cex.point*1.15, col="black", bg="red"))
+
+             ## lag phase
+             lag <- flFittedLinear$par["lag"]
+             coef_ <- flFittedLinear$par
+
+             if(flFittedLinear$fitFlag2){
+               try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               lag2 <- flFittedLinear$par["lag2"]
+               if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
+                 try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               } else {
+                 try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+
+               }
+             } else if(flFittedLinear$fitFlag){
+               if(lag < flFittedLinear$x.in[flFittedLinear$ndx.in[1]]){
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = T)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               } else {
+                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+               }
+             }
+             mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.5, outer = TRUE)
+             mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
+                         "   R2-thresh.:",  flFittedLinear$control$lin.R2,
+                         "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
+                         "t0:", flFittedLinear$control$t0,
+                         "  min.density:", flFittedLinear$control$min.density,
+                         "   dY-thresh.:",  flFittedLinear$control$lin.dY),
+                   side = 3, line = -3.5, adj = 0.05, outer = TRUE)
+
+             ## residuals vs. fitted
+             obs <- flFittedLinear$log.data
+             sim <- grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
+             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals", type = "n")
+             points(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), cex = cex.point)
+             abline(h=0, col="grey")
+             ## normal q-q-plot
+             qqnorm(flFittedLinear$fit[["residuals"]], cex = cex.point)
              qqline(flFittedLinear$fit[["residuals"]])
            }
     )
