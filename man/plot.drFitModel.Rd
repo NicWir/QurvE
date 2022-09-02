@@ -11,7 +11,11 @@
   pch = 1,
   colSpline = 1,
   colData = 1,
-  cex = 1,
+  cex.point = 1,
+  cex.lab = 1.5,
+  cex.axis = 1.3,
+  y.lim = NULL,
+  x.lim = NULL,
   lwd = 2,
   plot = TRUE,
   export = FALSE,
@@ -22,6 +26,26 @@
 )
 }
 \arguments{
+\item{log}{("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.}
+
+\item{pch}{(Numeric) Size of the raw data circles.}
+
+\item{colSpline}{(Numeric or Character) Color used to plot the splines.}
+
+\item{colData}{(Numeric or Character) Color used to plot the raw data.}
+
+\item{cex.point}{(Numeric) Size of the raw data points.}
+
+\item{cex.lab}{(Numeric) Font size of axis titles.}
+
+\item{cex.axis}{(Numeric) Font size of axis annotations.}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}.}
+
+\item{lwd}{(Numeric) Line width.}
+
 \item{...}{}
 }
 \description{

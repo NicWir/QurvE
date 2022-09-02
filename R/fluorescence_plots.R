@@ -528,10 +528,10 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 
 #'
 #' @param flBootSpline
-#' @param pch
-#' @param colData
+#' @param pch (Numeric) Size of the raw data circles.
 #' @param deriv
-#' @param colSpline
+#' @param colData (Numeric or Character) Color used to plot the raw data.
+#' @param colSpline (Numeric or Character) Color used to plot the splines.
 #' @param cex
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
@@ -704,11 +704,16 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 #'
 #' @param drFittedModel
 #' @param ec50line
-#' @param pch
-#' @param colSpline
-#' @param colData
-#' @param cex
-#' @param lwd
+#' @param log ("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.
+#' @param pch (Numeric) Size of the raw data circles.
+#' @param colData (Numeric or Character) Color used to plot the raw data.
+#' @param colSpline (Numeric or Character) Color used to plot the splines.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param cex.axis (Numeric) Font size of axis annotations.
+#' @param lwd (Numeric) Line width.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}.
 #' @param plot
 #' @param export
 #' @param height
@@ -720,13 +725,9 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @export
 #'
 #' @examples
-plot.drFitModel <- function(drFittedModel,
-                            ec50line = TRUE,
-                            log = c("xy"),
-                            pch = 1,
-                            colSpline = 1,
-                            colData = 1,
-                            cex = 1,
+plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch = 1,
+                            colSpline = 1, colData = 1, cex.point = 1, cex.lab = 1.5,
+                            cex.axis = 1.3, y.lim = NULL, x.lim = NULL,
                             lwd = 2, plot = TRUE, export = FALSE,
                             height = 7, width = 9, out.dir = NULL,
                             ...)
@@ -742,17 +743,18 @@ plot.drFitModel <- function(drFittedModel,
     stop("Need numeric value for: cex")
   conc <- drFittedModel$raw.conc
   p <- function(){
+    par(cex.lab = cex.lab, cex.axis = cex.axis)
     if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == TRUE)) {
       plot(
         log(conc + 1),
         log(drFittedModel$raw.test + 1),
         log = log,
-        pch = pch,
-        cex = cex,
         col = colData,
         xlab = "ln(1+concentration)",
-        ylab = "ln(1+response)"
+        ylab = "ln(1+response)",
+        type = "n", xlim = x.lim, ylim = y.lim, ...
       )
+      points(log(conc + 1), log(drFittedModel$raw.test + 1), cex = cex.point, pch = pch)
     }
     else
     {
@@ -761,12 +763,12 @@ plot.drFitModel <- function(drFittedModel,
           conc,
           log(drFittedModel$raw.test + 1),
           log = log,
-          pch = pch,
-          cex = cex,
           col = colData,
           xlab = "concentration",
-          ylab = "ln(1+response)"
+          ylab = "ln(1+response)",
+          type = "n", xlim = x.lim, ylim = y.lim, ...
         )
+        points(conc, log(drFittedModel$raw.test + 1), cex = cex.point, pch = pch)
       }
       else
       {
@@ -775,12 +777,12 @@ plot.drFitModel <- function(drFittedModel,
             log(conc + 1),
             drFittedModel$raw.test,
             log = log,
-            pch = pch,
-            cex = cex,
             col = colData,
             xlab = "Ln(1+concentration)",
-            ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), ""))
+            ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), "")),
+            type = "n", xlim = x.lim, ylim = y.lim, ...
           )
+          points(log(conc + 1), drFittedModel$raw.test, cex = cex.point, pch = pch)
         }
         else
         {
@@ -796,12 +798,12 @@ plot.drFitModel <- function(drFittedModel,
               unique(conc)[order(unique(conc))],
               mean,
               log = log,
-              pch = pch,
-              cex = cex,
               col = colData,
               xlab = "Concentration",
-              ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), ""))
+              ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), "")),
+              type = "n", xlim = x.lim, ylim = y.lim, ...
             )
+            points(unique(conc)[order(unique(conc))], mean, cex = cex.point, pch = pch)
             if(length(sd)>0){
             try(arrows(x0=unique(conc)[order(unique(conc))], y0=mean-sd,
                    x1=unique(conc)[order(unique(conc))], y1=mean+sd, code=3, angle=90, length=0.1), silent = T)
@@ -823,11 +825,11 @@ plot.drFitModel <- function(drFittedModel,
       totmin = min(min(drFittedModel$fit.conc), min(drFittedModel$fit.test))
       lines(c(drFittedModel$parameters$K, drFittedModel$parameters$K),
             c(1, drFittedModel$parameters$yEC50),
-            lty = 2)
+            lty = 2, lwd = lwd)
       #horizontal
       lines(c(ifelse(any(grep("x", log)), 0.001, -1), drFittedModel$parameters$K),
             c(drFittedModel$parameters$yEC50, drFittedModel$parameters$yEC50),
-            lty = 2)
+            lty = 2, lwd = lwd)
     }
     title(main = drFittedModel$drID)
   } # p <- function()

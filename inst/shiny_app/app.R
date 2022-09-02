@@ -1138,7 +1138,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ## Growth Plots ####
                                tabPanel(title = "Growth Plots", value = "tabPanel_Visualize_Growth",
                                         h1("Growth Plots"),
-                                        tabsetPanel(type = "tabs",
+                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Visualize_Growth",
 
                                                     ### Growth Group Plots ####
 
@@ -1166,14 +1166,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plots",
                                                                          label = "Exclude sample based on concentration (separate by ;)"
                                                                ),
-
-                                                               checkboxInput(inputId = "plot_group_averages_growth_group_plots",
-                                                                             label = "Plot group averages",
-                                                                             value = TRUE),
-
-                                                               checkboxInput(inputId = "plot_derivative_growth_group_plots",
-                                                                             label = "Plot derivative",
-                                                                             value = TRUE),
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_growth_group_plots == 'spline'",
+                                                                 checkboxInput(inputId = "plot_group_averages_growth_group_plots",
+                                                                               label = "Plot group averages",
+                                                                               value = TRUE)
+                                                               ),
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_growth_group_plots == 'spline'",
+                                                                 checkboxInput(inputId = "plot_derivative_growth_group_plots",
+                                                                               label = "Plot derivative",
+                                                                               value = TRUE)
+                                                               ),
 
                                                                h3("Customize plot appearance"),
 
@@ -1186,14 +1190,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  column(5,
                                                                         textInput(inputId = "x_range_min_growth_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
                                                                         textInput(inputId = "x_range_max_growth_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
@@ -1203,32 +1207,35 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  column(5,
                                                                         textInput(inputId = "y_range_min_growth_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
                                                                         textInput(inputId = "y_range_max_growth_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
 
-                                                               strong("y-Range (derivative)"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_derivative_growth_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "min"
-                                                                        )
-                                                                 ),
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_growth_group_plots == 'spline'",
+                                                                 strong("y-Range (derivative)"),
+                                                                 fluidRow(
+                                                                   column(5,
+                                                                          textInput(inputId = "y_range_min_derivative_growth_group_plot",
+                                                                                    label = NULL,
+                                                                                    value = "", placeholder = "min"
+                                                                          )
+                                                                   ),
 
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_derivative_growth_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "max"
-                                                                        )
+                                                                   column(5,
+                                                                          textInput(inputId = "y_range_max_derivative_growth_group_plot",
+                                                                                    label = NULL,
+                                                                                    value = "", placeholder = "max"
+                                                                          )
+                                                                   )
                                                                  )
                                                                ),
 
@@ -1241,16 +1248,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          label = "x-axis title",
                                                                          value = "Time"
                                                                ),
-
-                                                               textInput(inputId = "y_axis_title_derivative_growth_group_plot",
-                                                                         label = "y-axis title derivative",
-                                                                         value = "Growth rate"
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_growth_group_plots == 'spline'",
+                                                                 textInput(inputId = "y_axis_title_derivative_growth_group_plot",
+                                                                           label = "y-axis title derivative",
+                                                                           value = "Growth rate"
+                                                                 )
                                                                ),
 
                                                                sliderInput(inputId = "line_width_growth_group_plot",
                                                                            label = "Line width",
                                                                            min = 0.01,
-                                                                           max = 5,
+                                                                           max = 10,
                                                                            value = 1.1),
                                                                sliderInput(inputId = 'base_size_growth_group_plot',
                                                                            label = 'Base font size',
@@ -1267,8 +1276,29 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                             width = "100%", height = "1000px"),
 
                                                                ),
-                                                               downloadButton('downloads_growth_group_plot',"Download Plot")
-                                                             )
+                                                               fluidRow(
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "width_download_growth_group_plot",
+                                                                                     label = "Width (in inches)",
+                                                                                     value = 10)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "height_download_growth_group_plot",
+                                                                                     label = "Height (in inches)",
+                                                                                     value = 9)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "dpi_download_growth_group_plot",
+                                                                                     label = "DPI",
+                                                                                     value = 300)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        downloadButton('download_growth_group_plot',"Download Plot")
+                                                                 ), # column
+
+
+                                                               ) # fluidRow
+                                                             ) #  mainPanel
 
 
                                                     ),
@@ -1285,6 +1315,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                ),
 
                                                                h3('Customize plot appearance'),
+                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_growth_plot",
+                                                                             label = "Log-transform y-axis",
+                                                                             value = FALSE),
+
+                                                               checkboxInput(inputId = "log_transform_x_axis_dose_response_growth_plot",
+                                                                             label = "Log-transform x-axis",
+                                                                             value = FALSE),
+
                                                                sliderInput(inputId = 'shape_type_dose_response_growth_plot',
                                                                            label = 'Shape type',
                                                                            min = 1,
@@ -1298,17 +1336,40 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            value = 2,
                                                                            step = 0.5),
 
-                                                               sliderInput(inputId = 'base_size_dose_response_growth_plot',
-                                                                           label = 'Base font size',
-                                                                           min = 10,
-                                                                           max = 35,
-                                                                           value = 15,
-                                                                           step = 0.5),
+                                                               conditionalPanel(
+                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                 sliderInput(inputId = 'base_size_dose_response_growth_plot',
+                                                                             label = 'Base size',
+                                                                             min = 10,
+                                                                             max = 35,
+                                                                             value = 15,
+                                                                             step = 0.5)
+                                                               ),
+
+                                                               conditionalPanel(
+                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                 sliderInput(inputId = 'axis_size_dose_response_growth_plot',
+                                                                             label = 'Axis title font size',
+                                                                             min = 0.1,
+                                                                             max = 10,
+                                                                             value = 1.3,
+                                                                             step = 0.1)
+                                                               ),
+
+                                                               conditionalPanel(
+                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                 sliderInput(inputId = 'lab_size_dose_response_growth_plot',
+                                                                             label = 'Axis label font size',
+                                                                             min = 0.1,
+                                                                             max = 10,
+                                                                             value = 1.3,
+                                                                             step = 0.1)
+                                                               ),
 
                                                                sliderInput(inputId = 'line_width_dose_response_growth_plot',
                                                                            label = 'Line width',
                                                                            min = 0.01,
-                                                                           max = 5,
+                                                                           max = 10,
                                                                            value = 1),
 
                                                                checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot',
@@ -1318,16 +1379,16 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                strong("x-Range"),
                                                                fluidRow(
                                                                  column(5,
-                                                                        textInput(inputId = "x_range_min_dose_response_plot",
+                                                                        textInput(inputId = "x_range_min_dose_response_growth_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
-                                                                        textInput(inputId = "x_range_max_dose_response_plot",
+                                                                        textInput(inputId = "x_range_max_dose_response_growth_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
@@ -1335,44 +1396,28 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                strong("y-Range"),
                                                                fluidRow(
                                                                  column(5,
-                                                                        textInput(inputId = "y_range_min_dose_response_plot",
+                                                                        textInput(inputId = "y_range_min_dose_response_growth_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
-                                                                        textInput(inputId = "y_range_max_dose_response_plot",
+                                                                        textInput(inputId = "y_range_max_dose_response_growth_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
 
-                                                               strong("y-Range (derivative)"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_derivative_dose_response_plot",
-                                                                                  label = NULL,
-                                                                                  value = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_derivative_dose_response_plot",
-                                                                                  label = NULL,
-                                                                                  value = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-                                                               textInput(inputId = "y_axis_title_dose_response_plot",
+                                                               textInput(inputId = "y_axis_title_dose_response_growth_plot",
                                                                          label = "y-axis title",
-                                                                         value = "mu.linfit"
+                                                                         value = ""
                                                                ),
 
-                                                               textInput(inputId = "x_axis_title_dose_response_plot",
+                                                               textInput(inputId = "x_axis_title_dose_response_growth_plot",
                                                                          label = "x-axis title",
-                                                                         value = "Concentration"
+                                                                         value = ""
                                                                )
 
                                                              ), # sidebarPanel
@@ -1380,9 +1425,31 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
                                                                               mainPanel(
                                                                                 h3('Combined plots'),
-                                                                                plotOutput("dose_response_plot_combined",
-                                                                                           width = "100%", height = "800px")
-                                                                              )
+                                                                                plotOutput("dose_response_growth_plot_combined",
+                                                                                           width = "100%", height = "800px"),
+                                                                                fluidRow(
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "width_download_dose_response_growth_plot_combined",
+                                                                                                      label = "Width (in inches)",
+                                                                                                      value = 7)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "height_download_dose_response_growth_plot_combined",
+                                                                                                      label = "Height (in inches)",
+                                                                                                      value = 6)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "dpi_download_dose_response_growth_plot_combined",
+                                                                                                      label = "DPI",
+                                                                                                      value = 300)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         downloadButton('download_dose_response_growth_plot_combined',"Download Plot")
+                                                                                  ), # column
+
+
+                                                                                ) # fluidRow
+                                                                              ) # mainPanel
                                                              ),
 
                                                              conditionalPanel(condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
@@ -1394,9 +1461,33 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                             multiple = FALSE,
                                                                                             selectize = FALSE,
                                                                                             size = 3),
-                                                                                plotOutput("dose_response_plot_individual",
-                                                                                           width = "100%", height = "800px")
-                                                                              )
+                                                                                plotOutput("dose_response_growth_plot_individual",
+                                                                                           width = "100%", height = "800px"),
+
+                                                                                fluidRow(
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "width_download_dose_response_growth_plot_individual",
+                                                                                                      label = "Width (in inches)",
+                                                                                                      value = 7)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "height_download_dose_response_growth_plot_individual",
+                                                                                                      label = "Height (in inches)",
+                                                                                                      value = 6)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "dpi_download_dose_response_growth_plot_individual",
+                                                                                                      label = "DPI",
+                                                                                                      value = 300)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         downloadButton('download_dose_response_growth_plot_individual',"Download Plot")
+                                                                                  ), # column
+
+
+                                                                                ) # fluidRow
+                                                                              ) #  mainPanel
+
                                                              ),
 
 
@@ -1471,15 +1562,37 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                              mainPanel(
                                                                plotOutput("growth_parameter_plot",
-                                                                          width = "100%", height = "800px")
-                                                             )
+                                                                          width = "100%", height = "800px"),
+                                                               fluidRow(
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "width_download_growth_parameter_plot",
+                                                                                     label = "Width (in inches)",
+                                                                                     value = 7)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "height_download_growth_parameter_plot",
+                                                                                     label = "Height (in inches)",
+                                                                                     value = 6)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "dpi_download_growth_parameter_plot",
+                                                                                     label = "DPI",
+                                                                                     value = 300)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        downloadButton('download_growth_parameter_plot',"Download Plot")
+                                                                 ), # column
+
+
+                                                               ) # fluidRow
+                                                             ) #  mainPanel
                                                     )
                                         )
                                ),
                                ## Fluorescence Plots ####
                                tabPanel(title = "Fluorescence Plots",  value = "tabPanel_Visualize_Fluorescence",
                                         h1("Fluorescence Plots"),
-                                        tabsetPanel(type = "tabs",
+                                        tabsetPanel(type = "tabs",id = "tabsetPanel_Visualize_Fluorescence",
 
                                                     ### Fluorescence Group Plots ####
 
@@ -1513,33 +1626,39 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          label = "Exclude sample based on concentration (separate by ;)"
                                                                ),
 
-                                                               checkboxInput(inputId = "plot_group_averages_fluorescence_group_plots",
-                                                                             label = "Plot group averages",
-                                                                             value = TRUE),
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_fluorescence_group_plots == 'spline1' || input.data_type_fluorescence_group_plots == 'spline2'",
+                                                                 checkboxInput(inputId = "plot_group_averages_fluorescence_group_plots",
+                                                                               label = "Plot group averages",
+                                                                               value = TRUE)
+                                                               ),
 
-                                                               checkboxInput(inputId = "plot_derivative_fluorescence_group_plots",
-                                                                             label = "Plot derivative",
-                                                                             value = TRUE),
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_fluorescence_group_plots == 'spline1' || input.data_type_fluorescence_group_plots == 'spline2'",
+                                                                 checkboxInput(inputId = "plot_derivative_fluorescence_group_plots",
+                                                                               label = "Plot derivative",
+                                                                               value = TRUE)
+                                                               ),
 
                                                                h3("Customize plot appearance"),
 
                                                                checkboxInput(inputId = "log_transform_y_axis_fluorescence_group_plots",
                                                                              label = "Log-transform y-axis",
-                                                                             value = TRUE),
+                                                                             value = FALSE),
 
                                                                strong("x-Range"),
                                                                fluidRow(
                                                                  column(5,
                                                                         textInput(inputId = "x_range_min_fluorescence_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
                                                                         textInput(inputId = "x_range_max_fluorescence_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
@@ -1549,54 +1668,59 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  column(5,
                                                                         textInput(inputId = "y_range_min_fluorescence_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
                                                                         textInput(inputId = "y_range_max_fluorescence_group_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_fluorescence_group_plots == 'spline1' || input.data_type_fluorescence_group_plots == 'spline2'",
+                                                                 strong("y-Range (derivative)"),
+                                                                 fluidRow(
+                                                                   column(5,
+                                                                          textInput(inputId = "y_range_min_derivative_fluorescence_group_plot",
+                                                                                    label = NULL,
+                                                                                    value = "min", placeholder = "min"
+                                                                          )
+                                                                   ),
 
-                                                               strong("y-Range (derivative)"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_derivative_fluorescence_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_derivative_fluorescence_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "max"
-                                                                        )
+                                                                   column(5,
+                                                                          textInput(inputId = "y_range_max_derivative_fluorescence_group_plot",
+                                                                                    label = NULL,
+                                                                                    value = "", placeholder = "max"
+                                                                          )
+                                                                   )
                                                                  )
                                                                ),
 
                                                                textInput(inputId = "y_axis_title_fluorescence_group_plot",
                                                                          label = "y-axis title",
-                                                                         value = "Fluorescence"
+                                                                         value = ""
                                                                ),
 
                                                                textInput(inputId = "x_axis_title_fluorescence_group_plot",
                                                                          label = "x-axis title",
-                                                                         value = "Time"
+                                                                         value = ""
                                                                ),
 
-                                                               textInput(inputId = "y_axis_title_derivative_fluorescence_group_plot",
-                                                                         label = "y-axis title derivative",
-                                                                         value = "Slope"
+                                                               conditionalPanel(
+                                                                 condition = "input.data_type_fluorescence_group_plots == 'spline1' || input.data_type_fluorescence_group_plots == 'spline2'",
+                                                                 textInput(inputId = "y_axis_title_derivative_fluorescence_group_plot",
+                                                                           label = "y-axis title derivative",
+                                                                           value = ""
+                                                                 )
                                                                ),
 
                                                                sliderInput(inputId = "line_width_fluorescence_group_plot",
                                                                            label = "Line width",
                                                                            min = 0.01,
-                                                                           max = 5,
+                                                                           max = 10,
                                                                            value = 1.1),
 
                                                                sliderInput(inputId = 'base_size_fluorescence_group_plot',
@@ -1610,15 +1734,37 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                              mainPanel(
                                                                plotOutput("fluorescence_group_plot",
-                                                                          width = "100%", height = "1000px")
-                                                             )
+                                                                          width = "100%", height = "1000px"),
+                                                               fluidRow(
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "width_download_fluorescence_group_plot",
+                                                                                     label = "Width (in inches)",
+                                                                                     value = 7)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "height_download_fluorescence_group_plot",
+                                                                                     label = "Height (in inches)",
+                                                                                     value = 6)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "dpi_download_fluorescence_group_plot",
+                                                                                     label = "DPI",
+                                                                                     value = 300)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        downloadButton('download_fluorescence_group_plot',"Download Plot")
+                                                                 ), # column
+
+
+                                                               ) # fluidRow
+                                                             ) # mainPanel
 
 
                                                     ),
 
-                                                    ### Fluorescence DR Plots ####
+                                                    ### Fluorescence DR Plots Spline ####
 
-                                                    tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse",
+                                                    tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_spline",
                                                              sidebarPanel(
                                                                wellPanel(
                                                                  style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
@@ -1628,6 +1774,15 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                ),
 
                                                                h3('Customize plot appearance'),
+
+                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_fluorescence_plot",
+                                                                             label = "Log-transform y-axis",
+                                                                             value = FALSE),
+
+                                                               checkboxInput(inputId = "log_transform_x_axis_dose_response_fluorescence_plot",
+                                                                             label = "Log-transform x-axis",
+                                                                             value = FALSE),
+
                                                                sliderInput(inputId = 'shape_type_dose_response_fluorescence_plot',
                                                                            label = 'Shape type',
                                                                            min = 1,
@@ -1641,17 +1796,47 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            value = 2,
                                                                            step = 0.5),
 
-                                                               sliderInput(inputId = 'base_size_dose_response_fluorescence_plot',
-                                                                           label = 'Base font size',
-                                                                           min = 10,
-                                                                           max = 35,
-                                                                           value = 15,
-                                                                           step = 0.5),
+                                                               conditionalPanel(
+                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                 sliderInput(inputId = 'base_size_dose_response_fluorescence_plot',
+                                                                             label = 'Base font size',
+                                                                             min = 10,
+                                                                             max = 35,
+                                                                             value = 15,
+                                                                             step = 0.5)
+                                                               ),
+
+                                                               sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot',
+                                                                           label = 'Shape size',
+                                                                           min = 1,
+                                                                           max = 10,
+                                                                           value = 1,
+                                                                           step = 0.1),
+
+                                                               conditionalPanel(
+                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                 sliderInput(inputId = 'axis_size_dose_response_fluorescence_plot',
+                                                                             label = 'Axis title font size',
+                                                                             min = 0.1,
+                                                                             max = 10,
+                                                                             value = 1.5,
+                                                                             step = 0.1)
+                                                               ),
+
+                                                               conditionalPanel(
+                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                 sliderInput(inputId = 'lab_size_dose_response_fluorescence_plot',
+                                                                             label = 'Axis label font size',
+                                                                             min = 0.1,
+                                                                             max = 10,
+                                                                             value = 1.3,
+                                                                             step = 0.1)
+                                                               ),
 
                                                                sliderInput(inputId = 'line_width_dose_response_fluorescence_plot',
                                                                            label = 'Line width',
                                                                            min = 0.01,
-                                                                           max = 5,
+                                                                           max = 10,
                                                                            value = 1),
 
                                                                checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_fluorescence_plot',
@@ -1663,14 +1848,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  column(5,
                                                                         textInput(inputId = "x_range_min_dose_response_fluorescence_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
                                                                         textInput(inputId = "x_range_max_dose_response_fluorescence_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
@@ -1680,14 +1865,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  column(5,
                                                                         textInput(inputId = "y_range_min_dose_response_fluorescence_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
                                                                         textInput(inputId = "y_range_max_dose_response_fluorescence_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
@@ -1695,27 +1880,27 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                strong("y-Range (derivative)"),
                                                                fluidRow(
                                                                  column(5,
-                                                                        textInput(inputId = "y_range_min_derivative_dose_fluorescence_response_plot",
+                                                                        textInput(inputId = "y_range_min_derivative_dose_response_fluorescence_response_plot",
                                                                                   label = NULL,
-                                                                                  value = "min"
+                                                                                  value = "", placeholder = "min"
                                                                         )
                                                                  ),
 
                                                                  column(5,
-                                                                        textInput(inputId = "y_range_max_derivative_dose_fluorescence_response_plot",
+                                                                        textInput(inputId = "y_range_max_derivative_dose_response_fluorescence_response_plot",
                                                                                   label = NULL,
-                                                                                  value = "max"
+                                                                                  value = "", placeholder = "max"
                                                                         )
                                                                  )
                                                                ),
                                                                textInput(inputId = "y_axis_title_dose_response_fluorescence_plot",
                                                                          label = "y-axis title",
-                                                                         value = "mu.linfit"
+                                                                         value = ""
                                                                ),
 
                                                                textInput(inputId = "x_axis_title_dose_response_fluorescence_plot",
                                                                          label = "x-axis title",
-                                                                         value = "Concentration"
+                                                                         value = ""
                                                                )
 
                                                              ), # sidebarPanel
@@ -1724,8 +1909,31 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                               mainPanel(
                                                                                 h3('Combined plots'),
                                                                                 plotOutput("dose_response_plot_fluorescence_combined",
-                                                                                           width = "100%", height = "800px")
-                                                                              )
+                                                                                           width = "100%", height = "800px"),
+
+                                                                                fluidRow(
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "width_download_dose_response_plot_fluorescence_combined",
+                                                                                                      label = "Width (in inches)",
+                                                                                                      value = 7)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "height_download_dose_response_plot_fluorescence_combined",
+                                                                                                      label = "Height (in inches)",
+                                                                                                      value = 6)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "dpi_download_dose_response_plot_fluorescence_combined",
+                                                                                                      label = "DPI",
+                                                                                                      value = 300)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         downloadButton('download_dose_response_plot_fluorescence_combined',"Download Plot")
+                                                                                  ), # column
+
+
+                                                                                ) # fluidRow
+                                                                              ) # mainPanel
                                                              ),
 
                                                              conditionalPanel(condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
@@ -1738,10 +1946,152 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                             selectize = FALSE,
                                                                                             size = 3),
                                                                                 plotOutput("dose_response_fluorescence_plot_individual",
-                                                                                           width = "100%", height = "800px")
-                                                                              )
+                                                                                           width = "100%", height = "800px"),
+                                                                                fluidRow(
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "width_download_dose_response_fluorescence_plot_individual",
+                                                                                                      label = "Width (in inches)",
+                                                                                                      value = 7)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "height_download_dose_response_fluorescence_plot_individual",
+                                                                                                      label = "Height (in inches)",
+                                                                                                      value = 6)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "dpi_download_dose_response_fluorescence_plot_individual",
+                                                                                                      label = "DPI",
+                                                                                                      value = 300)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         downloadButton('download_dose_response_fluorescence_plot_individual',"Download Plot")
+                                                                                  ), # column
+
+
+                                                                                ) # fluidRow
+                                                                              ) # mainPanel
+
                                                              ),
                                                     ),
+
+                                                    ### Fluorescence DR Plots Model ####
+                                                    tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_model",
+                                                             sidebarPanel(
+
+                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_model_fluorescence_plot",
+                                                                             label = "Log-transform y-axis",
+                                                                             value = TRUE),
+
+                                                               checkboxInput(inputId = "log_transform_x_axis_dose_response_model_fluorescence_plot",
+                                                                             label = "Log-transform x-axis",
+                                                                             value = TRUE),
+
+                                                               h3('Customize plot appearance'),
+                                                               sliderInput(inputId = 'shape_type_dose_response_model_fluorescence_plot',
+                                                                           label = 'Shape type',
+                                                                           min = 1,
+                                                                           max = 25,
+                                                                           value = 15),
+
+                                                               sliderInput(inputId = 'shape_size_dose_response_model_fluorescence_plot',
+                                                                           label = 'Shape size',
+                                                                           min = 1,
+                                                                           max = 10,
+                                                                           value = 1,
+                                                                           step = 0.1),
+
+                                                               sliderInput(inputId = 'axis_size_dose_response_model_fluorescence_plot',
+                                                                           label = 'Axis title font size',
+                                                                           min = 0.1,
+                                                                           max = 10,
+                                                                           value = 1.5,
+                                                                           step = 0.1),
+
+                                                               sliderInput(inputId = 'lab_size_dose_response_model_fluorescence_plot',
+                                                                           label = 'Axis label font size',
+                                                                           min = 0.1,
+                                                                           max = 10,
+                                                                           value = 1.3,
+                                                                           step = 0.1),
+
+                                                               sliderInput(inputId = 'line_width_dose_response_model_fluorescence_plot',
+                                                                           label = 'Line width',
+                                                                           min = 0.01,
+                                                                           max = 10,
+                                                                           value = 1),
+
+                                                               checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_model_fluorescence_plot',
+                                                                             label = 'Show EC50 indicator lines',
+                                                                             value = TRUE),
+
+                                                               strong("x-Range"),
+                                                               fluidRow(
+                                                                 column(5,
+                                                                        textInput(inputId = "x_range_min_dose_response_model_fluorescence_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(5,
+                                                                        textInput(inputId = "x_range_max_dose_response_model_fluorescence_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+
+                                                               strong("y-Range"),
+                                                               fluidRow(
+                                                                 column(5,
+                                                                        textInput(inputId = "y_range_min_dose_response_model_fluorescence_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(5,
+                                                                        textInput(inputId = "y_range_max_dose_response_model_fluorescence_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+                                                             ), # sidebarPanel
+
+                                                             mainPanel(
+                                                               selectInput(inputId = 'individual_plots_dose_response_model_fluorescence_plot',
+                                                                           label = 'Select plot',
+                                                                           choices = "",
+                                                                           multiple = FALSE,
+                                                                           selectize = FALSE,
+                                                                           size = 3),
+                                                               plotOutput("dose_response_model_fluorescence_plot_individual",
+                                                                          width = "100%", height = "800px"),
+                                                               fluidRow(
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "width_download_dose_response_model_fluorescence_plot_individual",
+                                                                                     label = "Width (in inches)",
+                                                                                     value = 7)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "height_download_dose_response_model_fluorescence_plot_individual",
+                                                                                     label = "Height (in inches)",
+                                                                                     value = 6)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "dpi_download_dose_response_model_fluorescence_plot_individual",
+                                                                                     label = "DPI",
+                                                                                     value = 300)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        downloadButton('download_dose_response_model_fluorescence_plot_individual',"Download Plot")
+                                                                 ), # column
+
+
+                                                               ) # fluidRow
+                                                             ) # mainPanel
+                                                    ), # tabPanel(title = "Dose-response analysis",
 
                                                     ### Fluorescence Parameter Plots ####
 
@@ -1873,8 +2223,17 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 server <- function(input, output, session){
   output$debug <- renderPrint({
-    table_fluorescence1_linear()
-  })
+
+    paste(input$shape_type_dose_response_growth_plot,
+    c(input$y_range_min_dose_response_growth_plot, input$y_range_max_dose_response_growth_plot),
+    c(input$x_range_min_dose_response_growth_plot, input$x_range_max_dose_response_growth_plot),
+    input$y_axis_title_dose_response_growth_plot,
+    input$x_axis_title_dose_response_growth_plot,
+    input$shape_size_dose_response_growth_plot,
+    input$base_size_dose_response_growth_plot,
+    input$line_width_dose_response_growth_plot,
+    ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot, sep = " | ")
+    })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
   # disable(selector = "#navbar li a[data-value=Visualize]")
@@ -2385,15 +2744,15 @@ server <- function(input, output, session){
       return(NULL)
 
     filename <- inFile$datapath
-
     showModal(modalDialog("Reading data file...", footer=NULL))
     try(reads <- parse_properties_Gen5Gen6(file=filename,
                                            csvsep = input$separator_custom_density,
                                            dec = input$decimal_separator_custom_density,
-                                           sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) )
+                                           sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
+        silent = FALSE
 
     )
-    if(exists("reads") && length(reads) > 1){
+    if(exists("reads")){
       show("parsed_reads_density")
       if(length(reads)>1) show("parsed_reads_fluorescence1")
       if(length(reads)>2) show("parsed_reads_fluorescence2")
@@ -2401,7 +2760,7 @@ server <- function(input, output, session){
       removeModal()
       reads <- c(reads, "Ignore")
     } else {
-      showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software?", easyClose = T, footer=NULL))
+      showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software and sheet?", easyClose = T, footer=NULL))
     }
   })
   observe({
@@ -2460,7 +2819,7 @@ server <- function(input, output, session){
       )
     } else {
       if(is.null(input$map_file$datapath)){
-        showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
+        showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be availabel if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
       }
       try(
         results$parsed_data <- parse_data_shiny(
@@ -2793,7 +3152,6 @@ server <- function(input, output, session){
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
     # Run growth workflow
-    browser()
     try(
       shiny::withProgress(message = "Computations completed",
 
@@ -3663,72 +4021,126 @@ server <- function(input, output, session){
     )
   })
 
+  observe({
+    if(input$plot_derivative_growth_group_plots) h <- 9
+    else h <- 6
+    updateSelectInput(inputId = "height_download_growth_group_plot",
+                      selected = h
+    )
+  })
+
   output$growth_group_plot <- renderPlot({
     growth_group_plot()
   })
 
-  output$downloads_growth_group_plot <- downloadHandler(
+  output$download_growth_group_plot <- downloadHandler(
     filename = function() {
-      paste("growth_group_plot", ".png", sep="")
+      paste("growth_group_plot", ".pdf", sep="")
     },
     content = function(file) {
-      png(file=file)
-      ggsave(growth_group_plot())
-      dev.off()
+      ggsave(filename = file, width = input$width_download_growth_group_plot,
+             height = input$height_download_growth_group_plot,
+             dpi = input$dpi_download_growth_group_plot)
     }
   )
 
       ### DR Plots ####
-  dose_response_plot_combined <- reactive({
+
+  dose_response_growth_plot_combined <- reactive({
     results <- results$growth$drFit
-    plot.drFit(results,
-               combine=TRUE,
+
+    plot.drFit(drFit = results,
+               combine = TRUE,
                pch = input$shape_type_dose_response_growth_plot,
+               y.lim = c(as.numeric(input$y_range_min_dose_response_growth_plot), as.numeric(input$y_range_max_dose_response_growth_plot)),
+               x.lim = c(as.numeric(input$x_range_min_dose_response_growth_plot), as.numeric(input$x_range_max_dose_response_growth_plot)),
+               y.title = input$y_axis_title_dose_response_growth_plot,
+               x.title = input$x_axis_title_dose_response_growth_plot,
                cex = input$shape_size_dose_response_growth_plot,
                basesize = input$base_size_dose_response_growth_plot,
                lwd = input$line_width_dose_response_growth_plot,
-               ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot)
+               ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
+               log.y = input$log_transform_y_axis_dose_response_growth_plot,
+               log.x = input$log_transform_x_axis_dose_response_growth_plot
+               )
   })
 
-  output$dose_response_plot_combined <- renderPlot({
-    dose_response_plot_combined()
+  output$dose_response_growth_plot_combined <- renderPlot({
+    dose_response_growth_plot_combined()
   })
 
-  output$downloads_dose_response_plot_combined_growth <- downloadHandler(
+  output$download_dose_response_growth_plot_combined <- downloadHandler(
     filename = function() {
-      paste("dose_response_combined_plot_growth-", ".png", sep="")
+      paste("dose_response_combined_plot_growth-", ".pdf", sep="")
     },
     content = function(file) {
       png(file=file)
-      plot(dose_response_plot_combined())
+      plot(dose_response_growth_plot_combined())
       dev.off()
     }
   )
 
 
-  dose_response_plot_individual_growth <- reactive({
+  dose_response_growth_plot_individual <- reactive({
     results <- results$growth$drFit$drFittedSplines[[input$individual_plots_dose_response_growth_plot]]
-    plot.drFitSpline(results,
-                     combine=FALSE,
+
+    # Define log-transformation of axes
+    if(input$log_transform_y_axis_dose_response_growth_plot &&
+       input$log_transform_x_axis_dose_response_growth_plot){
+      log <- "xy"
+    } else if(input$log_transform_y_axis_dose_response_growth_plot){
+      log <- "y"
+    } else if(input$log_transform_x_axis_dose_response_growth_plot){
+      log <- "x"
+    } else {
+      log <- ""
+    }
+
+    # Define x- and y-axis limits
+    if(any(input$y_range_min_dose_response_growth_plot == "",
+           input$y_range_max_dose_response_growth_plot == "")){
+      ylim <- NULL
+    } else {
+      ylim <- c(as.numeric(input$y_range_min_dose_response_growth_plot),
+                as.numeric(input$y_range_max_dose_response_growth_plot))
+    }
+
+    if(any(input$x_range_min_dose_response_growth_plot == "",
+           input$x_range_max_dose_response_growth_plot == "")){
+      xlim <- NULL
+    } else {
+      xlim <- c(as.numeric(input$x_range_min_dose_response_growth_plot),
+                as.numeric(input$x_range_max_dose_response_growth_plot))
+    }
+
+    plot.drFitSpline(drFitSpline = results,
+                     combine = FALSE,
                      pch = input$shape_type_dose_response_growth_plot,
-                     cex = input$shape_size_dose_response_growth_plot,
-                     basesize = input$base_size_dose_response_growth_plot,
+                     cex.point = input$shape_size_dose_response_growth_plot,
+                     cex.lab = input$lab_size_dose_response_growth_plot,
+                     cex.axis = input$axis_size_dose_response_growth_plot,
+                     y.title = input$y_axis_title_dose_response_growth_plot,
+                     x.title = input$x_axis_title_dose_response_growth_plot,
+                     log = log,
                      lwd = input$line_width_dose_response_growth_plot,
-                     ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot)
+                     ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
+                     y.lim = ylim,
+                     x.lim = xlim
+                     )
   })
 
-  output$dose_response_plot_individual <- renderPlot({
-    dose_response_plot_individual_growth()
+  output$dose_response_growth_plot_individual <- renderPlot({
+    dose_response_growth_plot_individual()
   })
 
-  output$downloads_dose_response_plot_individual_growth <- downloadHandler(
+  output$download_dose_response_growth_plot_individual <- downloadHandler(
     filename = function() {
-      paste("dose_response_individual_growth_plot", ".png", sep="")
+      paste("dose_response_individual_plot", ".pdf", sep="")
     },
     content = function(file) {
-      png(file=file)
-      plot(dose_response_plot_individual_growth())
-      dev.off()
+      ggsave(filename = file, width = input$width_download_dose_response_growth_plot_individual,
+             height = input$height_download_dose_response_growth_plot_individual,
+             dpi = input$dpi_download_dose_response_growth_plot_individual)
     }
   )
 
@@ -3762,7 +4174,18 @@ server <- function(input, output, session){
     growth_parameter_plot()
   })
 
-  output$downloads_growth_parameter_plot <- downloadHandler(
+  output$download_growth_parameter_plot <- downloadHandler(
+    filename = function() {
+      paste("dose_response_individual_plot", ".pdf", sep="")
+    },
+    content = function(file) {
+      ggsave(filename = file, width = input$width_download_growth_parameter_plot,
+             height = input$height_download_growth_parameter_plot,
+             dpi = input$dpi_download_growth_parameter_plot)
+    }
+  )
+
+  output$download_growth_parameter_plot <- downloadHandler(
     filename = function() {
       paste("dose_response_growth_plt",".png", sep="")
     },
@@ -3828,7 +4251,18 @@ server <- function(input, output, session){
     )
   })
 
-      ### DR Plots ####
+      ### DR Plots Spline ####
+  # Hide Spline dose-response plot if dr.method != "spline"
+  observe({
+    if(!input$perform_ec50_fluorescence ||
+       input$dr_method_fluorescence != "spline" ||
+       length(results$fluorescence$drFit1$drFittedSplines) < 2){
+      hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_spline")
+    } else {
+      showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_spline")
+    }
+
+  })
 
   output$dose_response_plot_fluorescence_combined <- renderPlot({
     results <- results$fluorescence$drFit1
@@ -3838,18 +4272,61 @@ server <- function(input, output, session){
                cex = input$shape_size_dose_response_fluorescence_plot,
                basesize = input$base_size_dose_response_fluorescence_plot,
                lwd = input$line_width_dose_response_fluorescence_plot,
-               ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot)
+               ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot,
+               y.lim = c(as.numeric(input$x_range_min_dose_response_fluorescence_plot), as.numeric(input$y_range_max_dose_response_fluorescence_plot)),
+               x.lim = c(as.numeric(input$x_range_min_dose_response_fluorescence_plot), as.numeric(input$x_range_max_dose_response_fluorescence_plot)),
+               y.title = input$y_axis_title_dose_response_fluorescence_plot,
+               x.title = input$x_axis_title_dose_response_fluorescence_plot,
+               log.y = input$log_transform_y_axis_dose_response_fluorescence_plot,
+               log.x = input$log_transform_x_axis_dose_response_fluorescence_plot
+    )
   })
 
   output$dose_response_fluorescence_plot_individual <- renderPlot({
     results <- results$fluorescence$drFit1$drFittedSplines[[input$individual_plots_dose_response_fluorescence_plot]]
+
+    # Define log-transformation of axes
+    if(input$log_transform_y_axis_dose_response_fluorescence_plot &&
+       input$log_transform_x_axis_dose_response_fluorescence_plot){
+      log <- "xy"
+    } else if(input$log_transform_y_axis_dose_response_fluorescence_plot){
+      log <- "y"
+    } else if(input$log_transform_x_axis_dose_response_fluorescence_plot){
+      log <- "x"
+    } else {
+      log <- ""
+    }
+
+    # Define x- and y-axis limits
+    if(any(input$y_range_min_dose_response_fluorescence_plot == "",
+           input$y_range_max_dose_response_fluorescence_plot == "")){
+      ylim <- NULL
+    } else {
+      ylim <- c(as.numeric(input$y_range_min_dose_response_fluorescence_plot),
+                as.numeric(input$y_range_max_dose_response_fluorescence_plot))
+    }
+
+    if(any(input$x_range_min_dose_response_fluorescence_plot == "",
+           input$x_range_max_dose_response_fluorescence_plot == "")){
+      xlim <- NULL
+    } else {
+      xlim <- c(as.numeric(input$x_range_min_dose_response_fluorescence_plot),
+                as.numeric(input$x_range_max_dose_response_fluorescence_plot))
+    }
+
     plot.drFitSpline(results,
                      combine=FALSE,
                      pch = input$shape_type_dose_response_fluorescence_plot,
-                     cex = input$shape_size_dose_response_fluorescence_plot,
-                     basesize = input$base_size_dose_response_fluorescence_plot,
+                     cex.point = input$shape_size_dose_response_fluorescence_plot,
                      lwd = input$line_width_dose_response_fluorescence_plot,
-                     ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot)
+                     ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot,
+                     cex.lab = input$lab_size_dose_response_fluorescence_plot,
+                     cex.axis = input$axis_size_dose_response_fluorescence_plot,
+                     y.title = input$y_axis_title_dose_response_fluorescence_plot,
+                     x.title = input$x_axis_title_dose_response_fluorescence_plot,
+                     log = log,
+                     y.lim = ylim,
+                     x.lim = xlim)
   })
 
   select_inputs_individual_plots_dose_response_fluorescence_plot<- reactive({
@@ -3861,14 +4338,72 @@ server <- function(input, output, session){
                       choices = select_inputs_individual_plots_dose_response_fluorescence_plot())
   })
 
-  observe({
-    if(!is.null(results$fluorescence)){
-      if(!input$perform_ec50_fluorescence){
-        hideTab(inputId = "tabPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse")
-      }
+  output$dose_response_model_fluorescence_plot_individual <- renderPlot({
+    results <- results$fluorescence$drFit1$drFittedModels[[input$individual_plots_dose_response_model_fluorescence_plot]]
+
+    # Define log-transformation of axes
+    if(input$log_transform_y_axis_dose_response_model_fluorescence_plot &&
+       input$log_transform_x_axis_dose_response_model_fluorescence_plot){
+      log <- "xy"
+    } else if(input$log_transform_y_axis_dose_response_model_fluorescence_plot){
+      log <- "y"
+    } else if(input$log_transform_x_axis_dose_response_model_fluorescence_plot){
+      log <- "x"
+    } else {
+      log <- ""
     }
+
+    # Define x- and y-axis limits
+    if(any(input$y_range_min_dose_response_model_fluorescence_plot == "",
+       input$y_range_max_dose_response_model_fluorescence_plot == "")){
+      ylim <- NULL
+    } else {
+      ylim <- c(as.numeric(input$y_range_min_dose_response_model_fluorescence_plot),
+                as.numeric(input$y_range_max_dose_response_model_fluorescence_plot))
+    }
+
+    if(any(input$x_range_min_dose_response_model_fluorescence_plot == "",
+           input$x_range_max_dose_response_model_fluorescence_plot == "")){
+      xlim <- NULL
+    } else {
+      xlim <- c(as.numeric(input$x_range_min_dose_response_model_fluorescence_plot),
+                as.numeric(input$x_range_max_dose_response_model_fluorescence_plot))
+    }
+
+    plot.drFitModel(results,
+                    pch = input$shape_type_dose_response_model_fluorescence_plot,
+                    cex.point = input$shape_size_dose_response_model_fluorescence_plot,
+                    lwd = input$line_width_dose_response_model_fluorescence_plot,
+                    ec50line = input$show_ec50_indicator_lines_dose_response_model_fluorescence_plot,
+                    log = log,
+                    cex.lab = input$lab_size_dose_response_model_fluorescence_plot,
+                    cex.axis = input$axis_size_dose_response_model_fluorescence_plot,
+                    y.lim = ylim,
+                    x.lim = xlim
+    )
   })
 
+  select_inputs_individual_plots_dose_response_model_fluorescence_plot<- reactive({
+    if (length(results$fluorescence$drFit1)>1) names(results$fluorescence$drFit1$drFittedModels)
+    else return("")
+  })
+  observe({
+    updateSelectInput(inputId = "individual_plots_dose_response_model_fluorescence_plot",
+                      choices = select_inputs_individual_plots_dose_response_model_fluorescence_plot())
+  })
+
+  ### DR Plots Model ####
+  # Hide Model dose-response plot if dr.method != "spline"
+  observe({
+    if(!input$perform_ec50_fluorescence ||
+       input$dr_method_fluorescence != "model" ||
+       length(results$fluorescence$drFit1$drFittedModels) < 2){
+      hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
+    } else {
+      showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
+    }
+
+  })
 
   #____Table Download____####
   output$download_table_growth_linear <- downloadHandler(
@@ -3889,7 +4424,7 @@ server <- function(input, output, session){
     }
   )
 
-  output$downloads_table_growth_model <- downloadHandler(
+  output$download_table_growth_model <- downloadHandler(
     filename = function() {
       paste("data-", Sys.Date(), ".csv", sep="")
     },
@@ -3921,11 +4456,11 @@ server <- function(input, output, session){
 
   ### growth: plot.drFit ####
   observe({
-    if(!is.null(results$growth)){
       if(!input$perform_ec50_growth){
         hideTab(inputId = "tabPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
+      } else {
+        showTab(inputId = "tabPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
       }
-    }
   })
   ### growth: plot.parameter() ####
 

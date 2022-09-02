@@ -624,7 +624,7 @@ plot.drBootSpline <- function (drBootSpline,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
 plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
-                       y.lim = NULL, x.lim = NULL, y.title = NULL, x.title = NULL,
+                       y.lim = NULL, x.lim = NULL, y.title = NULL, x.title = NULL, log.y = FALSE, log.x = FALSE,
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   # x an object of class drFit
@@ -688,6 +688,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     CI.R <- mean + error #right confidence interval
 
     raw.df <- data.frame(Condition = as.vector(names), conc = as.vector(conc), mean = as.vector(mean), CI.L = as.vector(CI.L), CI.R = as.vector(CI.R))
+    if(log.x == TRUE) raw.df[raw.df[, "conc"] == 0, "conc"] <- 0.001
     # raw.df$Condition <- factor(raw.df$Condition, levels = raw.df$Condition)
     # raw.df$group <- gsub(" \\|.+", "", raw.df$name)
     # raw.df$mean[is.na(raw.df$mean)] <- 0
@@ -705,40 +706,90 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
                                                                  Condition = rep(names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
     spline.df <- do.call("rbind", spline.df)
 
+    if(log.x == TRUE) spline.df[spline.df[, "x"] == 0, "x"] <- 0.001
+
     nrow <- ceiling(length(drFit$drFittedSplines)/2)
     p <- ggplot(data = raw.df, aes(conc, mean, colour = Condition)) +
       geom_point(size=cex, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
       geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
       geom_line(data = spline.df, aes(x, y, colour = Condition), size = lwd) +
       theme_classic(base_size = basesize) +
-      xlab(ifelse(drFit$control$log.x.dr == TRUE, "Ln(concentration + 1)", "Concentration")) +
-      ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, ")"), paste0(drFit$control$dr.parameter)))+
       theme(legend.position="bottom") +
       ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
 
-    if(!is.null(y.lim)){
-      p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
+    if(log.y == TRUE){
+      if(!is.null(y.lim)){
+        p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = "log10")
+      } else {
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = "log10")
+      }
     } else {
-      p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+      if(!is.null(y.lim)){
+        p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
+      } else {
+        p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+      }
+    }
+
+    if(is.null(y.title) || y.title == ""){
+      p <- p + ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, ")"), paste0(drFit$control$dr.parameter)))
+    } else {
+      p <- p + ylab(label = y.title)
+    }
+
+    if(is.null(x.title) || x.title == ""){
+      p <- p + xlab(ifelse(drFit$control$log.x.dr == TRUE, "Ln(concentration + 1)", "Concentration"))
+    } else {
+      p <- p + xlab(label = x.title)
     }
 
     if(ec50line){
       plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
       plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
-      p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = 1) +
-        geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd) +
-        scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+      p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd) +
+        geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd)
 
-      if(!is.null(x.lim)){
-        p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+      if(log.y == TRUE){
+        if(!is.null(y.lim)){
+          p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = scales::pretty_breaks(), trans = "log10")
+        } else {
+          p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+        }
       } else {
-        p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+        if(!is.null(y.lim)){
+          p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = scales::pretty_breaks())
+        } else {
+          p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+        }
       }
-    } else {
-      if(!is.null(x.lim)){
-        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks())
+
+      if(log.x == TRUE){
+        if(!is.null(x.lim)){
+          p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+        } else {
+          p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+        }
       } else {
-        p <- p + scale_x_continuous(breaks = scales::pretty_breaks())
+        if(!is.null(x.lim)){
+          p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+        } else {
+          p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+        }
+      }
+
+    } else {
+      if(log.x == TRUE){
+        if(!is.null(x.lim)){
+          p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(), trans = "log10")
+        } else {
+          p <- p + scale_x_continuous(breaks = scales::pretty_breaks(), trans = "log10")
+        }
+      } else {
+        if(!is.null(x.lim)){
+          p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks())
+        } else {
+          p <- p + scale_x_continuous(breaks = scales::pretty_breaks())
+        }
       }
     }
 
@@ -814,10 +865,13 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
 #' @param drFitSpline object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.drBootSpline}}.
 #' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).
+#' @param log ("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.
 #' @param pch (Numeric) Shape of the raw data symbols.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param colSpline (Numeric or character) Spline line colour.
-#' @param cex (Numeric) Size of the raw data symbols.
+#' @param cex.point (Numeric) Size of the raw data symbols.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param cex.axis (Numeric) Font size of axis annotations.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.title (Character) Optional: Provide a title for the y-axis.
@@ -837,10 +891,11 @@ plot.drFitSpline <-
   function (drFitSpline,
             add = FALSE,
             ec50line = TRUE,
+            log = "",
             pch = 16,
             colSpline = 1,
             colData = 1,
-            cex = 1,
+            cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
             y.lim = NULL, x.lim = NULL,
             y.title = NULL, x.title = NULL,
             lwd = 2, plot = TRUE, export = FALSE,
@@ -856,18 +911,20 @@ plot.drFitSpline <-
       stop("Need logical value for: ec50line")
     if (is.numeric(pch) == FALSE)
       stop("Need numeric value for: pch")
-    if (is.numeric(cex) == FALSE)
-      stop("Need numeric value for: cex")
+    if (is.numeric(cex.point) == FALSE)
+      stop("Need numeric value for: cex.point")
     p <- function(){
       if (add == FALSE) {
+        par(cex.lab = cex.lab, cex.axis = cex.axis)
         if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == TRUE)) {
-          xlab = ifelse(!is.null(x.title), x.title, "ln(1+concentration)")
-          ylab = ifelse(!is.null(y.title), y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
+          xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "ln(1+concentration)")
+          ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
           plot(
             log(drFitSpline$raw.conc + 1),
             log(drFitSpline$raw.test + 1),
+            log = log,
             pch = pch, bg = colData,
-            cex = cex,
+            cex = cex.point,
             col = colData,
             xlab = xlab,
             ylab = ylab, xlim = x.lim, ylim = y.lim
@@ -876,13 +933,14 @@ plot.drFitSpline <-
         else
         {
           if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == TRUE)) {
-            xlab = ifelse(!is.null(x.title), x.title, "concentration")
-            ylab = ifelse(!is.null(y.title), y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
+            xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "concentration")
+            ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
             plot(
               drFitSpline$raw.conc,
               log(drFitSpline$raw.test + 1),
+              log = log,
               pch = pch, bg = colData,
-              cex = cex,
+              cex = cex.point,
               col = colData,
               xlab = xlab,
               ylab = ylab, xlim = x.lim, ylim = y.lim
@@ -891,13 +949,14 @@ plot.drFitSpline <-
           else
           {
             if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == FALSE)) {
-              xlab = ifelse(!is.null(x.title), x.title, "ln(1+concentration)")
-              ylab = ifelse(!is.null(y.title), y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
+              xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "ln(1+concentration)")
+              ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
               plot(
                 log(drFitSpline$raw.conc + 1),
                 drFitSpline$raw.test,
+                log = log,
                 pch = pch, bg = colData,
-                cex = cex,
+                cex = cex.point,
                 col = colData,
                 xlab = xlab,
                 ylab = ylab, xlim = x.lim, ylim = y.lim
@@ -906,13 +965,14 @@ plot.drFitSpline <-
             else
             {
               if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == FALSE)) {
-                xlab = ifelse(!is.null(x.title), x.title, "Concentration")
-                ylab = ifelse(!is.null(y.title), y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
+                xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "Concentration")
+                ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
                 plot(
                   drFitSpline$raw.conc,
                   drFitSpline$raw.test,
+                  log = log,
                   pch = pch, bg = colData,
-                  cex = cex,
+                  cex = cex.point,
                   col = colData,
                   xlab = xlab,
                   ylab = ylab, xlim = x.lim, ylim = y.lim
@@ -928,7 +988,7 @@ plot.drFitSpline <-
             log(drFitSpline$raw.conc + 1),
             log(drFitSpline$raw.test + 1),
             pch = pch, bg = colData,
-            cex = cex,
+            cex = cex.point,
             col = colData
           )
         }
@@ -938,7 +998,7 @@ plot.drFitSpline <-
               drFitSpline$raw.conc,
               log(drFitSpline$raw.test + 1),
               pch = pch, bg = colData,
-              cex = cex,
+              cex = cex.point,
               col = colData
             )
           }
@@ -949,7 +1009,7 @@ plot.drFitSpline <-
                 log(drFitSpline$raw.conc + 1),
                 drFitSpline$raw.test,
                 pch = pch, bg = colData,
-                cex = cex,
+                cex = cex.point,
                 col = colData
               )
             }
@@ -960,7 +1020,7 @@ plot.drFitSpline <-
                   drFitSpline$raw.conc,
                   drFitSpline$raw.test,
                   pch = pch, bg = colData,
-                  cex = cex,
+                  cex = cex.point,
                   col = colData
                 )
               }
@@ -1212,7 +1272,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                              out.dir = NULL, ...)
 {
 
-  # x an object of class gcFitSpline
+  # x an object of class gcFittedSpline
   if(is(gcFittedSpline) != "gcFitSpline") stop("gcFittedSpline needs to be an object created with growth.gcFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
@@ -1222,7 +1282,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: cex")
 
   # /// check if a data fit is available
-  if ((is.na(gcFittedSpline$fitFlag)==TRUE)|(gcFitSpline$fitFlag==FALSE)){
+  if ((is.na(gcFittedSpline$fitFlag)==TRUE)|(gcFittedSpline$fitFlag==FALSE)){
     warning("plot.gcFitSpline: no data fit available!")
   }
   else{
@@ -1646,7 +1706,7 @@ plot.grofit <- function(grofit, ...,
   if(!is.null(conc) && length(conc) > 0){
     if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)  && length(conc) > 0){
+  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
       names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]

@@ -29,11 +29,14 @@
   height = NULL,
   width = NULL,
   out.dir = NULL,
-  out.nm = NULL
+  out.nm = NULL,
+  shiny = FALSE
 )
 }
 \arguments{
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
+
+\item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 }
 \description{
 Title
