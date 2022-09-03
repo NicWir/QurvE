@@ -739,8 +739,8 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
     stop("Need logical value for: ec50line")
   if (is.numeric(pch) == FALSE)
     stop("Need numeric value for: pch")
-  if (is.numeric(cex) == FALSE)
-    stop("Need numeric value for: cex")
+  if (is.numeric(cex.point) == FALSE)
+    stop("Need numeric value for: cex.point")
   conc <- drFittedModel$raw.conc
   p <- function(){
     par(cex.lab = cex.lab, cex.axis = cex.axis)
@@ -1170,8 +1170,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       geom_line(size=lwd) +
       geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
+      xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
       theme(legend.position="bottom",
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
@@ -1249,7 +1249,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       } else {
         paste0("Slope [dF/d", xlab.title,"]")
       }
-      if(is.null(y.title.deriv)){
+      if(is.null(y.title.deriv) || y.title.deriv == ""){
         p.deriv <- p.deriv + ylab(label = y.label.mu)
       } else {
         p.deriv <- p.deriv + ylab(label = y.title.deriv)
@@ -1341,8 +1341,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
     p <- ggplot(df, aes(x=time, y=y, col = name)) +
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
+      xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
       theme(legend.position="bottom",
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
@@ -1419,7 +1419,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
         paste0("Slope [dF/d", xlab.title,"]")
       }
 
-      if(is.null(y.title.deriv)){
+      if(is.null(y.title.deriv) || y.title.deriv == ""){
         p.deriv <- p.deriv + ylab(label = y.label.mu)
       } else {
         p.deriv <- p.deriv + ylab(label = y.title.deriv)
@@ -1507,14 +1507,12 @@ plot.flFit <- plot.grodata <- plot.flFitRes
 #' @param mean
 #' @param log.y.density
 #' @param log.y.fl
-#' @param deriv
 #' @param n.ybreaks
 #' @param colors
 #' @param basesize
 #' @param y.lim.density
 #' @param y.lim.fl
 #' @param x.lim
-#' @param y.title
 #' @param x.title
 #' @param y.title.density
 #' @param y.title.fl
@@ -1539,14 +1537,12 @@ plot.dual <-  function(object,
                            exclude.conc = NULL,
                            log.y.density = F,
                            log.y.fl = F,
-                           deriv = F,
                            n.ybreaks = 6,
                            colors = NULL,
                            basesize = 20,
                            y.lim.density = NULL,
                            y.lim.fl = NULL,
                            x.lim = NULL,
-                           y.title = NULL,
                            x.title = NULL,
                            y.title.density = NULL,
                            y.title.fl = NULL,
@@ -1556,7 +1552,8 @@ plot.dual <-  function(object,
                            height = NULL,
                            width = NULL,
                            out.dir = NULL,
-                           out.nm = NULL
+                           out.nm = NULL,
+                           shiny = FALSE
 )
 {
   # Convert range  and selecting arguments
@@ -1590,6 +1587,8 @@ plot.dual <-  function(object,
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
 
+  conc <- as.numeric(conc)
+  exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates
   if(any(is(object) %in% c("flFit","flFitRes"))){
@@ -1605,7 +1604,7 @@ plot.dual <-  function(object,
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
       names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
-      nm <- nm[grep(paste(names, collapse="|"), nm)]
+      nm <- nm[grep(paste(names, collapse="|"), gsub(" \\| .+", "", nm))]
     }
   }
   if(!is.null(conc) && length(conc) > 0){
@@ -1621,7 +1620,7 @@ plot.dual <-  function(object,
     if(!is.na(exclude.conc)) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
-    stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
+    stop("Please run plot.dual() with valid 'names' or 'conc' argument.")
   }
   # remove conditions with fitFlag = FALSE in all replicates
   # Store each condition with its replicate indices in list filter.ls
@@ -1647,7 +1646,6 @@ plot.dual <-  function(object,
 
     # Create lists for each selected condition, with density values and (normalized) fluorescence, respectively. Each list item represents one condition with their average and SD
     plotdata.ls <- list()
-    deriv.ls <- list()
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
@@ -1720,8 +1718,12 @@ plot.dual <-  function(object,
 
     # replace negative lower ribbon boundaries with 0 for log10 transformation
     if(log.y.density==TRUE){
-      df$lower[df$lower<0] <- 0
+      df$dens.lower[df$dens.lower<0] <- 0
     }
+    if(log.y.fl==TRUE){
+      df$fl.lower[df$fl.lower<0] <- 0
+    }
+
     xlab.title <- "Time"
     ylab.title.dens <- "Density"
 
@@ -1729,10 +1731,13 @@ plot.dual <-  function(object,
       geom_line(size=lwd) +
       geom_ribbon(aes(ymin=dens.lower,ymax=dens.upper, fill=name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-      ylab(ifelse(is.null(y.title), ylab.title.dens, y.title)) +
+      xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title.density) || y.title.density == "", ylab.title.dens, y.title.density)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
+    else p <- p + guides(fill=guide_legend(ncol=2))
 
     if(log.y.density == TRUE){
       if(!is.null(y.lim.density)){
@@ -1785,26 +1790,38 @@ plot.dual <-  function(object,
         )
       }
     }
-      # /// add panel with growth rate over time
-    ylab.title.fl <- "fluorescence"
+      # /// add panel with fluorescence over time
       p.fl <- ggplot(df, aes(x=time, y=fl.mean, col = name)) +
         geom_line(size=lwd) +
         geom_ribbon(aes(ymin=fl.lower,ymax=fl.upper, fill=name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
-        xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-        ylab(ifelse(is.null(y.title), ylab.title.dens, y.title)) +
+        xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
+
+      if(log.y.fl == TRUE){
+        if(!is.null(y.lim.fl)){
+          p.fl <- p.fl + scale_y_log10(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        } else {
+          p.fl <- p.fl + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        }
+      } else {
+        if(!is.null(y.lim.fl)){
+          p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        } else {
+          p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        }
+      }
 
       ylab.title.fl = if(any(grep("norm", fluorescence))){
         paste0("Normalized fluorescence")
       } else {
         paste0("Fluorescence")
       }
-      if(is.null(ylab.title.fl)){
-        p.fl <- p.fl + ylab(label = y.label.mu)
-      } else {
+      if(is.null(y.title.fl) || y.title.fl == ""){
         p.fl <- p.fl + ylab(label = ylab.title.fl)
+      } else {
+        p.fl <- p.fl + ylab(label = y.title.fl)
       }
 
       if(!is.null(x.lim)){
@@ -1850,7 +1867,7 @@ plot.dual <-  function(object,
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
   } # if(mean == TRUE)
   else {
     df <- data.frame()
@@ -1871,10 +1888,13 @@ plot.dual <-  function(object,
     p <- ggplot(df, aes(x=time, y=density, col = name)) +
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
+      xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title.density) || y.title.density == "", ylab.title, y.title.density)) +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
+    else p <- p + guides(fill=guide_legend(ncol=2))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
@@ -1934,7 +1954,7 @@ plot.dual <-  function(object,
       "Fluorescence"
     }
 
-      if(is.null(y.title.fl)){
+      if(is.null(y.title.fl) || y.title.fl == ""){
         p.fl <- p.fl + ylab(label = ylab.title)
       } else {
         p.fl <- p.fl + ylab(label = y.title.fl)
@@ -1977,7 +1997,7 @@ plot.dual <-  function(object,
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "right")
+      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
   }
   if(export == FALSE && plot == FALSE){
     return(p)
@@ -1991,7 +2011,7 @@ plot.dual <-  function(object,
       w <- width
     }
     if(is.null(height)){
-      h <- ifelse(deriv==T, 9, 6)
+      h <- 9
     } else {
       h <- height
     }

@@ -160,3 +160,14 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
 
   return(list(data.ls, read.data))
 }
+
+write.csv.utf8.BOM <- function(df, filename)
+{
+  con <- file(filename, "w")
+  tryCatch({
+    for (i in 1:ncol(df))
+      df[,i] = iconv(df[,i], to = "UTF-8")
+    writeChar(iconv("\ufeff", to = "UTF-8"), con, eos = NULL)
+    write.csv(df, file = con)
+  },finally = {close(con)})
+}
