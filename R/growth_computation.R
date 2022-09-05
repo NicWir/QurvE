@@ -242,7 +242,7 @@ read_data <-
     # remove blank columns from dataset
     remove_blank <- function(df){
       blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
-      if(length(blank.ndx)>1){
+      if(length(blank.ndx)>0){
         df <- df[-blank.ndx, ]
       }
       return(df)
@@ -1075,251 +1075,414 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
   reliability_tag_param <- NA
   reliability_tag_nonpara <- NA
 
-  # /// loop over all wells
-  for (i in 1:dim(data)[1]){
-    # Progress indicator for shiny app
-    if(exists("shiny") && shiny == TRUE){
-      shiny::incProgress(
-        amount = 1/(dim(data)[1]),
-        message = "Computations completed")
-    }
-    # /// conversion, to handle even data.frame inputs
-    acttime    <-
-      as.numeric(as.matrix(time[i, ]))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
-    actwell <-
-      as.numeric(as.matrix((data[i, -1:-3])))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
+  if(control$interactive == FALSE &&
+     1:dim(data)[1] > 30 &&
+     (
+       ("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ||
+       ("s" %in% control$fit.opt && control$nboot.gc > 0)
+     )
+  ){
+    times.ls    <- lapply(1:nrow(time), function(x) time[x, ][!is.na(time[x, ])][!is.na(data[x, -1:-3])])
+    wells.ls <- lapply(1:nrow(data), function(x) as.numeric(data[x, -1:-3][!is.na(time[x, ])][!is.na(data[x, -1:-3])]))
+    gcIDs.ls    <- lapply(1:nrow(data), function(x) as.matrix(data[x, 1:3]))
+    wellnames.ls <- lapply(1:nrow(data), function(x) paste(as.character(data[x,1]), as.character(data[x,2]),as.character(data[x,3]), sep=" | "))
 
-    gcID    <- as.matrix(data[i,1:3])
-    wellname <- paste(as.character(data[i,1]), as.character(data[i,2]),as.character(data[i,3]), sep=" | ")
-    if ((control$suppress.messages==FALSE)){
-      cat("\n\n")
-      cat(paste("=== ", as.character(i), ". [", wellname, "] growth curve =================================\n", sep=""))
-      cat("----------------------------------------------------\n")
-    }
-    # /// Linear regression on log-transformed data
+    # Set up computing clusters (all available processor cores - 1)
+    cl <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE)-1)
+    doParallel::registerDoParallel(cl)
+
+    # Perform linear fits in parallel
     if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
-      fitlinear          <- growth.gcFitLinear(acttime, actwell, gcID = gcID, control = control)
-      fitlinear.all[[i]] <- fitlinear
-    }
-    else{
-      # /// generate empty object
-      fitlinear          <- list(raw.time = acttime, raw.data = actwell, filt.time = NA, filt.data = NA,
-                                 log.data = NA, gcID = gcID, FUN = NA, fit = NA, par = c(
-                                   y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
-                                   t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                                   tmax2_end = NA), ndx = NA, ndx2 = NA, quota = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
-      class(fitlinear)   <- "gcFitLinear"
-      fitlinear.all[[i]] <- fitlinear
-    }
-    # /// plot linear fit
-    if ((control$interactive == TRUE)) {
-      if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)) {
-          answer_satisfied <- "n"
-          reliability_tag_linear <- NA
-          while ("n" %in% answer_satisfied) {
-            try(plot(fitlinear, log = "y"))
-            mtext(side = 3, line = 0, adj = 0,
-                  outer = F,
-                  cex = 1,
-                  wellname)
-            answer_satisfied <- readline("Are you satisfied with the linear fit (y/n)?\n\n")
-            if ("n" %in% answer_satisfied) {
-              test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
-              if ("n" %in% test_answer) {
-                cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
-                reliability_tag_linear              <- FALSE
-                fitlinear$reliable <- FALSE
-                fitlinear.all[[i]]$reliable    <- FALSE
-                answer_satisfied <- "y"
-              } # end if ("n" %in% test_answer)
-              else {
-                new_params <- unlist(strsplit(test_answer, split = ","))
-                t0_new <- ifelse(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
-                h_new <- dplyr::if_else(!is.na(as.numeric(new_params[2])), as.numeric(new_params[2]), control$lin.h)
-                quota_new <- ifelse(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
-                min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
-                R2_new <- dplyr::if_else(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
-                RSD_new <- dplyr::if_else(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
-                control_new <- control
-                control_new$t0 <- t0_new
-                if(!is.na(h_new)) control_new$lin.h <- h_new
-                control_new$lin.R2 <- R2_new
-                control_new$lin.RSD <- RSD_new
-                if(is.numeric(min.density_new)){
-                  if(!is.na(min.density_new) && all(as.vector(actwell) < min.density_new)){
-                    message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                                min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
-                  } else if(!is.na(min.density_new)){
-                    control_new$min.density <- min.density_new
-                  }
-                }
-                fitlinear <- growth.gcFitLinear(acttime, actwell, gcID = gcID, control = control_new, quota = quota_new)
-                fitlinear.all[[i]] <- fitlinear
-              } #end else
-            } # end if ("n" %in% test_answer)
-            else{
-              reliability_tag_linear <- TRUE
-              fitlinear$reliable <- TRUE
-              fitlinear.all[[i]]$reliable <- TRUE
-              cat("Sample was (more or less) o.k.\n")
-            } # end else
-          } # end while ("n" %in% answer_satisfied)
-      } # end if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt))
-    } # end if ((control$interactive == TRUE))
-    else {
-      reliability_tag_linear <- TRUE
-      fitlinear$reliable <- TRUE
-      fitlinear.all[[i]]$reliable <- TRUE
-    }
-    # /// Parametric fit
-    if (("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
-      fitpara          <- growth.gcFitModel(acttime, actwell, gcID, control)
-      fitpara.all[[i]] <- fitpara
-    }
-    else{
-      # /// generate empty object
-      fitpara          <- list(time.in =  acttime, data.in = actwell, raw.time = acttime, raw.data = actwell, gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A=NA, mu=NA, lambda=NA, integral=NA),
-                               model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
-      class(fitpara)   <- "gcFitModel"
-      fitpara.all[[i]] <- fitpara
+      fitlinear.all <- foreach::foreach(i = 1:dim(data)[1]
+      ) %dopar% {
+        QurvE::growth.gcFitLinear(times.ls[[i]], wells.ls[[i]], gcID = gcIDs.ls[[i]], control = control)
+      }
+    } else {
+      # /// generate list with empty objects
+      fitlinear.all <- lapply(1:nrow(data), function(x) list(raw.time = times.ls[[x]],
+                                                             raw.data = wells.ls[[x]],
+                                                             filt.time = NA,
+                                                             filt.data = NA,
+                                                             log.data = NA,
+                                                             gcID = gcIDs.ls[[x]],
+                                                             FUN = NA,
+                                                             fit = NA,
+                                                             par = c(y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
+                                                               t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
+                                                               tmax2_end = NA),
+                                                             ndx = NA, ndx2 = NA,
+                                                             quota = NA,
+                                                             rsquared = NA, rsquared2 = NA,
+                                                             control = control,
+                                                             fitFlag = FALSE, fitFlag2 = FALSE)
+                              )
     }
 
-    # /// Non parametric fit
-    if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
-      nonpara             <- growth.gcFitSpline(acttime, actwell, gcID, control)
-      fitnonpara.all[[i]] <- nonpara
+    # # Perform model fits in parallel
+    # if (("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+    #   fitpara.all <- foreach::foreach(i = 1:dim(data)[1]
+    #   ) %dopar% {
+    #     QurvE::growth.gcFitModel(times.ls[[i]], wells.ls[[i]], gcID = gcIDs.ls[[i]], control = control)
+    #   }
+    # } else {
+    #   # /// generate list with empty objects
+    #   fitpara.all <- lapply(1:nrow(data), function(x) list(time.in = times.ls[[x]],
+    #                                                        data.in = wells.ls[[x]],
+    #                                                        raw.time = times.ls[[x]],
+    #                                                        raw.data = wells.ls[[x]],
+    #                                                        gcID = gcIDs.ls[[x]],
+    #                                                        fit.time = NA,
+    #                                                        fit.data = NA,
+    #                                                        parameters = list(A=NA, mu=NA, lambda=NA, integral=NA),
+    #                                                        model = NA,
+    #                                                        nls = NA,
+    #                                                        reliable=NULL,
+    #                                                        fitFlag=FALSE,
+    #                                                        control = control)
+    #                         )
+    # }
+    #
+    # # Perform spline fits in parallel
+    # if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+    #   fitnonpara.all <- foreach::foreach(i = 1:dim(data)[1]
+    #   ) %dopar% {
+    #     QurvE::growth.gcFitSpline(times.ls[[i]], wells.ls[[i]], gcID = gcIDs.ls[[i]], control = control)
+    #   }
+    # } else {
+    #   # /// generate list with empty objects
+    #   fitnonpara.all <- lapply(1:nrow(data), function(x) list(raw.time = times.ls[[x]],
+    #                                                           raw.data = wells.ls[[x]],
+    #                                                           gcID = gcIDs.ls[[x]],
+    #                                                           fit.time = NA, fit.data = NA,
+    #                                                           parameters = list(A = NA, dY = NA, mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
+    #                                                                             lambda2 = NA, b.tangent2 = NA, integral = NA),
+    #                                                           spline = NA,
+    #                                                           parametersLowess = list(A = NA, mu = NA, lambda = NA),
+    #                                                           reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+    #                                                           control = control)
+    #                            )
+    #
+    # }
+
+    # Perform spline bootstrappings in parallel
+    if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
+        (control$nboot.gc > 10) ){
+      boot.all <- foreach::foreach(i = 1:dim(data)[1]
+      ) %dopar% {
+        QurvE::growth.gcBootSpline(times.ls[[i]], wells.ls[[i]], gcIDs.ls[[i]], control)
+      }
     }
     else{
-      # /// generate empty object
-      nonpara             <- list(raw.time = acttime, raw.data = actwell, gcID = gcID, fit.time = NA, fit.data = NA,
-                                  parameters = list(A = NA, dY = NA, mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                    lambda2 = NA, b.tangent2 = NA, integral = NA),
-                                  spline = NA, parametersLowess = list(A = NA, mu = NA, lambda = NA),
-                                  spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                                  control = control)
-      class(nonpara)      <- "gcFitSpline"
-      fitnonpara.all[[i]] <- nonpara
+      # /// create empty gcBootSpline  object
+      boot.all            <- lapply(1:nrow(data), function(x) list(raw.time=times.ls[[x]],
+                                                                   raw.data=wells.ls[[x]],
+                                                                   gcID =gcIDs.ls[[x]],
+                                                                   boot.x=NA,
+                                                                   boot.y=NA,
+                                                                   boot.gcSpline=NA,
+                                                                   lambda=NA, mu=NA, A=NA, integral=NA,
+                                                                   bootFlag=FALSE, control=control
+                                                                   )
+      )
     }
-    # /// plotting parametric fit
-    if ((control$interactive == TRUE)) {
-      if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt))) {
-        if (fitpara$fitFlag == TRUE) {
-          plot.gcFitModel(fitpara, colData=1, colModel=2, colLag = 3, cex=1.0, raw=T)
-          legend(x="bottomright", legend=fitpara$model, col="red", lty=1)
-          title("Parametric fit")
-          mtext(line = 0.5, side=3, outer = F, cex=1, wellname)
-          }
-        # /// here a manual reliability tag is set in the interactive mode
-        reliability_tag_paarm <- NA
-        answer <- readline("Are you satisfied with the model fit (y/n)?\n\n")
-        if ("n" %in% answer) {
-          cat("\n Tagged the parametric fit of this sample as unreliable !\n\n")
-          reliability_tag_param              <- FALSE
-          fitpara$reliable <- FALSE
-          fitpara.all[[i]]$reliable    <- FALSE
+    parallel::stopCluster(cl = cl)
+
+    # Assign classes to list elements
+    for(i in 1:length(fitlinear.all)){
+      class(fitlinear.all[[i]]) <- "gcFitLinear"
+    }
+    # for(i in 1:length(fitpara.all)){
+    #   class(fitpara.all[[i]]) <- "gcFitModel"
+    # }
+    # for(i in 1:length(fitnonpara.all)){
+    #   class(fitnonpara.all[[i]]) <- "gcFitSpline"
+    # }
+    for(i in 1:length(boot.all)){
+      class(boot.all[[i]]) <- "gcBootSpline"
+    }
+  }
+
+  # /// loop over all wells
+    for (i in 1:dim(data)[1]){
+      # Progress indicator for shiny app
+      if(exists("shiny") && shiny == TRUE){
+        shiny::incProgress(
+          amount = 1/(dim(data)[1]),
+          message = "Computations completed")
+      }
+      # /// conversion, to handle even data.frame inputs
+      acttime    <-
+        as.numeric(as.matrix(time[i, ]))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
+      actwell <-
+        as.numeric(as.matrix((data[i, -1:-3])))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
+
+      gcID    <- as.matrix(data[i,1:3])
+      wellname <- paste(as.character(data[i,1]), as.character(data[i,2]),as.character(data[i,3]), sep=" | ")
+      if ((control$suppress.messages==FALSE)){
+        cat("\n\n")
+        cat(paste("=== ", as.character(i), ". [", wellname, "] growth curve =================================\n", sep=""))
+        cat("----------------------------------------------------\n")
+      }
+      if(control$interactive == TRUE ||
+         1:dim(data)[1] <= 30 ||
+         !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
+         ){
+        # /// Linear regression on log-transformed data
+        if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+          fitlinear          <- growth.gcFitLinear(acttime, actwell, gcID = gcID, control = control)
+          fitlinear.all[[i]] <- fitlinear
         }
         else{
-          reliability_tag_param <- TRUE
-          fitpara$reliable <- TRUE
-          fitpara.all[[i]]$reliable    <- TRUE
-          cat("Sample was (more or less) o.k.\n")
+          # /// generate empty object
+          fitlinear          <- list(raw.time = acttime, raw.data = actwell, filt.time = NA, filt.data = NA,
+                                     log.data = NA, gcID = gcID, FUN = NA, fit = NA, par = c(
+                                       y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
+                                       t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
+                                       tmax2_end = NA), ndx = NA, ndx2 = NA, quota = NA, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+          class(fitlinear)   <- "gcFitLinear"
+          fitlinear.all[[i]] <- fitlinear
         }
-      } # if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) && fitpara$fitFlag == TRUE)
-      else {
-        reliability_tag_param <- FALSE
-        fitpara$reliable <- FALSE
-        fitpara.all[[i]]$reliable    <- FALSE
-      }
-      # /// plotting nonparametric fit
-      if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt)) {
-        if (nonpara$fitFlag == TRUE) {
-          answer_satisfied <- "n"
-          reliability_tag_nonpara <- NA
-          while ("n" %in% answer_satisfied) {
-            plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE,slope = T, colData=1, cex=1, plot=T, export=F)
-            answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
-            if ("n" %in% answer_satisfied) {
-                  test_answer <- readline("Enter: smooth.gc, t0, min.density                                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.density (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
-                  if ("n" %in% test_answer) {
-                    cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
-                    reliability_tag_nonpara              <- FALSE
-                    nonpara$reliable <- FALSE
-                    fitnonpara.all[[i]]$reliable    <- FALSE
-                    fitnonpara.all[[i]]$FitFlag    <- FALSE
-                    answer_satisfied <- "y"
-                  } # end if ("n" %in% test_answer)
-                  else{
+        # /// plot linear fit
+        if ((control$interactive == TRUE)) {
+          if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)) {
+            answer_satisfied <- "n"
+            reliability_tag_linear <- NA
+            while ("n" %in% answer_satisfied) {
+              try(plot(fitlinear, log = "y"))
+              mtext(side = 3, line = 0, adj = 0,
+                    outer = F,
+                    cex = 1,
+                    wellname)
+              answer_satisfied <- readline("Are you satisfied with the linear fit (y/n)?\n\n")
+              if ("n" %in% answer_satisfied) {
+                test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
+                if ("n" %in% test_answer) {
+                  cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
+                  reliability_tag_linear              <- FALSE
+                  fitlinear$reliable <- FALSE
+                  fitlinear.all[[i]]$reliable    <- FALSE
+                  answer_satisfied <- "y"
+                } # end if ("n" %in% test_answer)
+                else {
                   new_params <- unlist(strsplit(test_answer, split = ","))
-                  if(!is.na(as.numeric(new_params[2])) && as.numeric(new_params[2]) != ""){
-                    t0_new <- as.numeric(new_params[2])
-                  } else {
-                    t0_new <- control$t0
-                  }
-                  smooth.gc_new <- as.numeric(new_params[1])
+                  t0_new <- ifelse(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
+                  h_new <- dplyr::if_else(!is.na(as.numeric(new_params[2])), as.numeric(new_params[2]), control$lin.h)
+                  quota_new <- ifelse(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
+                  min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
+                  R2_new <- dplyr::if_else(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
+                  RSD_new <- dplyr::if_else(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
                   control_new <- control
-                  if(!is.na(smooth.gc_new) && smooth.gc_new != ""){
-                    control_new$smooth.gc <- smooth.gc_new
-                  }
                   control_new$t0 <- t0_new
-                  min.density_new <- as.numeric(new_params[3])
-                  if(!is.na(min.density_new)){
-                    if(is.numeric(min.density_new) && min.density_new != 0 && all(as.vector(actwell) < min.density_new)){
-                      message(paste0("Start density values need to be below 'min.density'.\nThe minimum start value in your dataset is: ",
-                                     min(as.vector(data[,4])),". 'min.density' was not adjusted."), call. = FALSE)
+                  if(!is.na(h_new)) control_new$lin.h <- h_new
+                  control_new$lin.R2 <- R2_new
+                  control_new$lin.RSD <- RSD_new
+                  if(is.numeric(min.density_new)){
+                    if(!is.na(min.density_new) && all(as.vector(actwell) < min.density_new)){
+                      message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                                     min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
                     } else if(!is.na(min.density_new)){
                       control_new$min.density <- min.density_new
                     }
                   }
-                  nonpara <- growth.gcFitSpline(acttime, actwell, gcID, control_new)
-                  fitnonpara.all[[i]] <- nonpara
+                  fitlinear <- growth.gcFitLinear(acttime, actwell, gcID = gcID, control = control_new, quota = quota_new)
+                  fitlinear.all[[i]] <- fitlinear
                 } #end else
-              } # end if ("n" %in% answer_satisfied)
+              } # end if ("n" %in% test_answer)
               else{
-                reliability_tag_nonpara <- TRUE
-                nonpara$reliable <- TRUE
-                fitnonpara.all[[i]]$reliable <- TRUE
-                fitnonpara.all[[i]]$FitFlag <- TRUE
+                reliability_tag_linear <- TRUE
+                fitlinear$reliable <- TRUE
+                fitlinear.all[[i]]$reliable <- TRUE
                 cat("Sample was (more or less) o.k.\n")
               } # end else
             } # end while ("n" %in% answer_satisfied)
-          } # end if (nonpara$fitFlag == TRUE)
-        } # end if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) )
-    } # end of if((control$interactive == TRUE))
-    else{
-      reliability_tag_param <- TRUE
-      reliability_tag_nonpara <- TRUE
-    }
-    # /// Beginn Bootstrap
-    if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
-        (control$nboot.gc > 0) && (reliability_tag_nonpara ==TRUE) && nonpara$fitFlag == TRUE){
-      bt            <- growth.gcBootSpline(acttime, actwell, gcID, control)
-      boot.all[[i]] <- bt
-    } # /// end of if (control$nboot.gc ...)
-    else{
-      # /// create empty gcBootSpline  object
-      bt            <- list(raw.time=acttime, raw.data=actwell, gcID =gcID, boot.x=NA, boot.y=NA, boot.gcSpline=NA,
-                            lambda=NA, mu=NA, A=NA, integral=NA, bootFlag=FALSE, control=control)
-      class(bt)     <- "gcBootSpline"
-      boot.all[[i]] <- bt
-    }
-    reliability_tag <- any(reliability_tag_linear, reliability_tag_nonpara, reliability_tag_param)
-    # create output table
-    description     <- data.frame(TestId=data[i,1], AddId=data[i,2],concentration=data[i,3],
-                                  reliability_tag=reliability_tag, used.model=fitpara$model,
-                                  log.x=control$log.x.gc, log.y=control$log.y.spline, nboot.gc=control$nboot.gc)
+          } # end if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt))
+        } # end if ((control$interactive == TRUE))
+        else {
+          reliability_tag_linear <- TRUE
+          fitlinear$reliable <- TRUE
+          fitlinear.all[[i]]$reliable <- TRUE
+        }
+      } # control$interactive == TRUE || 1:dim(data)[1] <= 30
+      # /// Parametric fit
+      if (("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+        fitpara          <- growth.gcFitModel(acttime, actwell, gcID, control)
+        fitpara.all[[i]] <- fitpara
+      }
+      else{
+        # /// generate empty object
+        fitpara          <- list(time.in =  acttime, data.in = actwell, raw.time = acttime, raw.data = actwell, gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A=NA, mu=NA, lambda=NA, integral=NA),
+                                 model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
+        class(fitpara)   <- "gcFitModel"
+        fitpara.all[[i]] <- fitpara
+      }
 
-    fitted          <- cbind(description, summary.gcFitLinear(fitlinear), summary.gcFitModel(fitpara), summary.gcFitSpline(nonpara), summary.gcBootSpline(bt))
+      # /// Non parametric fit
+      if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+        nonpara             <- growth.gcFitSpline(acttime, actwell, gcID, control)
+        fitnonpara.all[[i]] <- nonpara
+      }
+      else{
+        # /// generate empty object
+        nonpara             <- list(raw.time = acttime, raw.data = actwell, gcID = gcID, fit.time = NA, fit.data = NA,
+                                    parameters = list(A = NA, dY = NA, mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
+                                                      lambda2 = NA, b.tangent2 = NA, integral = NA),
+                                    parametersLowess = list(A = NA, mu = NA, lambda = NA),
+                                    spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                                    control = control)
+        class(nonpara)      <- "gcFitSpline"
+        fitnonpara.all[[i]] <- nonpara
+      }
+      # /// plotting parametric fit
+      if ((control$interactive == TRUE)) {
+        if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt))) {
+          if (fitpara$fitFlag == TRUE) {
+            plot.gcFitModel(fitpara, colData=1, colModel=2, colLag = 3, cex=1.0, raw=T)
+            legend(x="bottomright", legend=fitpara$model, col="red", lty=1)
+            title("Parametric fit")
+            mtext(line = 0.5, side=3, outer = F, cex=1, wellname)
+            }
+          # /// here a manual reliability tag is set in the interactive mode
+          reliability_tag_paarm <- NA
+          answer <- readline("Are you satisfied with the model fit (y/n)?\n\n")
+          if ("n" %in% answer) {
+            cat("\n Tagged the parametric fit of this sample as unreliable !\n\n")
+            reliability_tag_param              <- FALSE
+            fitpara$reliable <- FALSE
+            fitpara.all[[i]]$reliable    <- FALSE
+          }
+          else{
+            reliability_tag_param <- TRUE
+            fitpara$reliable <- TRUE
+            fitpara.all[[i]]$reliable    <- TRUE
+            cat("Sample was (more or less) o.k.\n")
+          }
+        } # if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) && fitpara$fitFlag == TRUE)
+        else {
+          reliability_tag_param <- FALSE
+          fitpara$reliable <- FALSE
+          fitpara.all[[i]]$reliable    <- FALSE
+        }
+        # /// plotting nonparametric fit
+        if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt)) {
+          if (nonpara$fitFlag == TRUE) {
+            answer_satisfied <- "n"
+            reliability_tag_nonpara <- NA
+            while ("n" %in% answer_satisfied) {
+              plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE,slope = T, colData=1, cex=1, plot=T, export=F)
+              answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
+              if ("n" %in% answer_satisfied) {
+                    test_answer <- readline("Enter: smooth.gc, t0, min.density                                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.density (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
+                    if ("n" %in% test_answer) {
+                      cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
+                      reliability_tag_nonpara              <- FALSE
+                      nonpara$reliable <- FALSE
+                      fitnonpara.all[[i]]$reliable    <- FALSE
+                      fitnonpara.all[[i]]$FitFlag    <- FALSE
+                      answer_satisfied <- "y"
+                    } # end if ("n" %in% test_answer)
+                    else{
+                    new_params <- unlist(strsplit(test_answer, split = ","))
+                    if(!is.na(as.numeric(new_params[2])) && as.numeric(new_params[2]) != ""){
+                      t0_new <- as.numeric(new_params[2])
+                    } else {
+                      t0_new <- control$t0
+                    }
+                    smooth.gc_new <- as.numeric(new_params[1])
+                    control_new <- control
+                    if(!is.na(smooth.gc_new) && smooth.gc_new != ""){
+                      control_new$smooth.gc <- smooth.gc_new
+                    }
+                    control_new$t0 <- t0_new
+                    min.density_new <- as.numeric(new_params[3])
+                    if(!is.na(min.density_new)){
+                      if(is.numeric(min.density_new) && min.density_new != 0 && all(as.vector(actwell) < min.density_new)){
+                        message(paste0("Start density values need to be below 'min.density'.\nThe minimum start value in your dataset is: ",
+                                       min(as.vector(data[,4])),". 'min.density' was not adjusted."), call. = FALSE)
+                      } else if(!is.na(min.density_new)){
+                        control_new$min.density <- min.density_new
+                      }
+                    }
+                    nonpara <- growth.gcFitSpline(acttime, actwell, gcID, control_new)
+                    fitnonpara.all[[i]] <- nonpara
+                  } #end else
+                } # end if ("n" %in% answer_satisfied)
+                else{
+                  reliability_tag_nonpara <- TRUE
+                  nonpara$reliable <- TRUE
+                  fitnonpara.all[[i]]$reliable <- TRUE
+                  fitnonpara.all[[i]]$FitFlag <- TRUE
+                  cat("Sample was (more or less) o.k.\n")
+                } # end else
+              } # end while ("n" %in% answer_satisfied)
+            } # end if (nonpara$fitFlag == TRUE)
+          } # end if (("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) )
+      } # end of if((control$interactive == TRUE))
+      else{
+        reliability_tag_param <- TRUE
+        reliability_tag_nonpara <- TRUE
+      }
+      if(control$interactive == TRUE ||
+         1:dim(data)[1] <= 30 ||
+         !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
+      ){
+        # /// Beginn Bootstrap
+        if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
+            (control$nboot.gc > 0) && (reliability_tag_nonpara ==TRUE) && nonpara$fitFlag == TRUE){
+          bt            <- growth.gcBootSpline(acttime, actwell, gcID, control)
+          boot.all[[i]] <- bt
+        } # /// end of if (control$nboot.gc ...)
+        else{
+          # /// create empty gcBootSpline  object
+          bt            <- list(raw.time=acttime, raw.data=actwell, gcID =gcID, boot.x=NA, boot.y=NA, boot.gcSpline=NA,
+                                lambda=NA, mu=NA, A=NA, integral=NA, bootFlag=FALSE, control=control)
+          class(bt)     <- "gcBootSpline"
+          boot.all[[i]] <- bt
+        }
+      } # if(interactive == TRUE || 1:dim(data)[1] <= 30 ||
+      reliability_tag <- any(reliability_tag_linear, reliability_tag_nonpara, reliability_tag_param)
+      # create output table
+      # description     <- data.frame(TestId=data[i,1], AddId=data[i,2],concentration=data[i,3],
+      #                               reliability_tag=reliability_tag, used.model=fitpara$model,
+      #                               log.x=control$log.x.gc, log.y=control$log.y.spline, nboot.gc=control$nboot.gc)
 
-    out.table       <- rbind(out.table, fitted)
-    class(out.table) <- c("data.frame", "gcTable")
+      # fitted          <- cbind(description, summary.gcFitLinear(fitlinear), summary.gcFitModel(fitpara), summary.gcFitSpline(nonpara), summary.gcBootSpline(bt))
 
-  } # /// end of for (i in 1:dim(data)[1])
-  names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
-  # out.table <- data.frame(as.matrix(out.table))
+      # out.table       <- rbind(out.table, fitted)
+      # class(out.table) <- c("data.frame", "gcTable")
+
+    } # /// end of for (i in 1:dim(data)[1])
+  # Assign names to list elements
+  names(fitlinear.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
+
+  # create output table
+  description     <- lapply(1:nrow(data), function(x) data.frame(TestId = data[x,1], AddId = data[x,2],concentration = data[x,3],
+                                                                 used.model = fitpara.all[[x]]$model,
+                                                                 log.x = control$log.x.gc,
+                                                                 log.y.spline = control$log.y.spline,
+                                                                 log.y.model = control$log.y.model,
+                                                                 nboot.gc = control$nboot.gc,
+                                                                 reliability_tag = NA))
+
+  fitted          <- lapply(1:length(fitlinear.all), function(x) cbind(description[[x]],
+                                                                       summary.gcFitLinear(fitlinear.all[[x]]),
+                                                                       summary.gcFitModel(fitpara.all[[x]]),
+                                                                       summary.gcFitSpline(fitnonpara.all[[x]]),
+                                                                       summary.gcBootSpline(boot.all[[x]])
+                                                                       )
+  )
+
+  out.table       <- do.call(rbind, fitted)
+  class(out.table) <- c("data.frame", "gcTable")
+  # Combine results into list 'gcFit'
   gcFit           <- list(raw.time = time, raw.data = data, gcTable = out.table, gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all, gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all, control=control)
-
   class(gcFit)    <- "gcFit"
-  gcFit
+  return(gcFit)
+  # names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
+  # out.table <- data.frame(as.matrix(out.table))
+  # gcFit           <- list(raw.time = time, raw.data = data, gcTable = out.table, gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all, gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all, control=control)
+  #
+  # class(gcFit)    <- "gcFit"
+  # gcFit
 }
 
 #' Fit nonlinear growth models to density data

@@ -817,6 +817,87 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
   reliability_tag_linear <- NA
   reliability_tag_nonpara <- NA
 
+  if(control$interactive == FALSE &&
+     1:dim(fl_data)[1] > 30 &&
+     (
+       ("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ||
+       ("s" %in% control$fit.opt && control$nboot.fl > 0)
+     )
+  ){
+    x.ls    <- lapply(1:nrow(x), function(j) x[j, ][!is.na(x[j, ])][!is.na(fl_data[j, -1:-3])])
+    wells.ls <- lapply(1:nrow(fl_data), function(j) as.numeric(fl_data[j, -1:-3][!is.na(x[j, ])][!is.na(fl_data[j, -1:-3])]))
+    IDs.ls    <- lapply(1:nrow(fl_data), function(j) as.matrix(fl_data[j, 1:3]))
+    wellnames.ls <- lapply(1:nrow(fl_data), function(j) paste(as.character(fl_data[j,1]), as.character(fl_data[j,2]),as.character(fl_data[j,3]), sep=" | "))
+
+    # Set up computing clusters (all available processor cores - 1)
+    cl <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE)-1)
+    doParallel::registerDoParallel(cl)
+
+    # Perform linear fits in parallel
+    if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+      fitlinear.all <- foreach::foreach(i = 1:dim(fl_data)[1]
+      ) %dopar% {
+        QurvE::flFitLinear(x.ls[[i]], wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+      }
+    } else {
+      # /// generate list with empty objects
+      fitlinear.all <- lapply(1:nrow(fl_data), function(j) list(raw.x = x.ls[[j]],
+                                                             raw.fl_data = wells.ls[[j]],
+                                                             filt.x = NA,
+                                                             filt.fl_data = NA,
+                                                             log.fl_data = NA,
+                                                             ID = IDs.ls[[j]],
+                                                             FUN = NA,
+                                                             fit = NA,
+                                                             par = c(y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
+                                                                     t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
+                                                                     tmax2_end = NA),
+                                                             ndx = NA, ndx2 = NA,
+                                                             quota = NA,
+                                                             rsquared = NA, rsquared2 = NA,
+                                                             control = control,
+                                                             fitFlag = FALSE, fitFlag2 = FALSE)
+      )
+    }
+
+    # Perform spline bootstrappings in parallel
+    if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
+        (control$nboot.fl > 10) ){
+      boot.all <- foreach::foreach(i = 1:dim(fl_data)[1]
+      ) %dopar% {
+        QurvE::flBootSpline(x.ls[[i]], wells.ls[[i]], IDs.ls[[i]], control)
+      }
+    }
+    else{
+      # /// create empty gcBootSpline  object
+      boot.all            <- lapply(1:nrow(fl_data), function(j) list(raw.x=x.ls[[j]],
+                                                                   raw.fl_data=wells.ls[[j]],
+                                                                   ID =IDs.ls[[j]],
+                                                                   boot.x=NA,
+                                                                   boot.y=NA,
+                                                                   boot.gcSpline=NA,
+                                                                   lambda=NA, mu=NA, A=NA, integral=NA,
+                                                                   bootFlag=FALSE, control=control
+      )
+      )
+    }
+    parallel::stopCluster(cl = cl)
+
+    # Assign classes to list elements
+    for(i in 1:length(fitlinear.all)){
+      class(fitlinear.all[[i]]) <- "gcFitLinear"
+    }
+    # for(i in 1:length(fitpara.all)){
+    #   class(fitpara.all[[i]]) <- "gcFitModel"
+    # }
+    # for(i in 1:length(fitnonpara.all)){
+    #   class(fitnonpara.all[[i]]) <- "gcFitSpline"
+    # }
+    for(i in 1:length(boot.all)){
+      class(boot.all[[i]]) <- "gcBootSpline"
+    }
+  }
+
   # /// loop over all wells
 
   for (i in 1:dim(fl_data)[1]){
@@ -840,98 +921,104 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
       cat(paste("=== ", as.character(i), ". [", wellname, "] growth curve =================================\n", sep=""))
       cat("----------------------------------------------------\n")
     }
-    # /// Linear regression fl_data
-    if ("l" %in% control$fit.opt){
-      if(control$x_type == "density"){
-        fitlinear          <- flFitLinear(density = actx, fl_data = actwell, ID = ID, control = control)
-      } else {
-        fitlinear          <- flFitLinear(time = actx, fl_data = actwell, ID = ID, control = control)
+    if(control$interactive == TRUE ||
+       1:dim(fl_data)[1] <= 30 ||
+       !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
+    ){
+      # /// Linear regression fl_data
+      if ("l" %in% control$fit.opt){
+        if(control$x_type == "density"){
+          fitlinear          <- flFitLinear(density = actx, fl_data = actwell, ID = ID, control = control)
+        } else {
+          fitlinear          <- flFitLinear(time = actx, fl_data = actwell, ID = ID, control = control)
+        }
+        fitlinear.all[[i]] <- fitlinear
       }
-      fitlinear.all[[i]] <- fitlinear
-    }
-    else{
-      # /// generate empty object
-      fitlinear <- list(x.in = actx, fl.in = actwell,
-                        raw.x = actx, raw.fl = actwell,
-                        filt.x = actx, filt.fl = actwell,
+      else{
+        # /// generate empty object
+        fitlinear <- list(x.in = actx, fl.in = actwell,
+                          raw.x = actx, raw.fl = actwell,
+                          filt.x = actx, filt.fl = actwell,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
                             x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = 0.95, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
-      class(fitlinear)   <- "flFitLinear"
-      fitlinear.all[[i]] <- fitlinear
-    }
-    # /// plot linear fit
-    if ((control$interactive == TRUE)) {
-      if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)) {
-        answer_satisfied <- "n"
-        reliability_tag_linear <- NA
-        while ("n" %in% answer_satisfied) {
-          try(plot(fitlinear, log = ""))
-          mtext(side = 3, line = 0, adj = 0,
-                outer = F,
-                cex = 1,
-                wellname)
-          answer_satisfied <- readline("Are you satisfied with the linear fit (y/n)?\n\n")
-          if ("n" %in% answer_satisfied) {
-            test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?flFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
-            if ("n" %in% test_answer) {
-              cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
-              reliability_tag_linear              <- FALSE
-              fitlinear$reliable <- FALSE
-              fitlinear.all[[i]]$reliable    <- FALSE
-              answer_satisfied <- "y"
-            } # end if ("n" %in% test_answer)
-            else {
-              new_params <- unlist(strsplit(test_answer, split = ","))
-              t0_new <- ifelse(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
-              h_new <- if(!is.na(as.numeric(new_params[2]))){
-                as.numeric(new_params[2])
-              } else {
-                control$lin.h
-              }
-              quota_new <- ifelse(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
-              min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
-              R2_new <- ifelse(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
-              RSD_new <- ifelse(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
-              control_new <- control
-              control_new$t0 <- t0_new
-              control_new$lin.h <- h_new
-              control_new$lin.R2 <- R2_new
-              control_new$lin.RSD <- RSD_new
-              if(is.numeric(min.density_new)){
-                if(!is.na(min.density_new) && all(as.vector(actwell) < min.density_new)){
-                  message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                                 min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
-                } else if(!is.na(min.density_new)){
-                  control_new$min.density <- min.density_new
-                }
-              }
-              if ("l" %in% control$fit.opt){
-                if(control$x_type == "density"){
-                  fitlinear          <- flFitLinear(density = actx, fl_data = actwell, ID = ID, control = control_new, quota = quota_new)
+        class(fitlinear)   <- "flFitLinear"
+        fitlinear.all[[i]] <- fitlinear
+      }
+      # /// plot linear fit
+      if ((control$interactive == TRUE)) {
+        if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)) {
+          answer_satisfied <- "n"
+          reliability_tag_linear <- NA
+          while ("n" %in% answer_satisfied) {
+            try(plot(fitlinear, log = ""))
+            mtext(side = 3, line = 0, adj = 0,
+                  outer = F,
+                  cex = 1,
+                  wellname)
+            answer_satisfied <- readline("Are you satisfied with the linear fit (y/n)?\n\n")
+            if ("n" %in% answer_satisfied) {
+              test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?flFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
+              if ("n" %in% test_answer) {
+                cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
+                reliability_tag_linear              <- FALSE
+                fitlinear$reliable <- FALSE
+                fitlinear.all[[i]]$reliable    <- FALSE
+                answer_satisfied <- "y"
+              } # end if ("n" %in% test_answer)
+              else {
+                new_params <- unlist(strsplit(test_answer, split = ","))
+                t0_new <- ifelse(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
+                h_new <- if(!is.na(as.numeric(new_params[2]))){
+                  as.numeric(new_params[2])
                 } else {
-                  fitlinear          <- flFitLinear(time = actx, fl_data = actwell, ID = ID, control = control_new, quota = quota_new)
+                  control$lin.h
+                }
+                quota_new <- ifelse(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
+                min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
+                R2_new <- ifelse(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
+                RSD_new <- ifelse(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
+                control_new <- control
+                control_new$t0 <- t0_new
+                control_new$lin.h <- h_new
+                control_new$lin.R2 <- R2_new
+                control_new$lin.RSD <- RSD_new
+                if(is.numeric(min.density_new)){
+                  if(!is.na(min.density_new) && all(as.vector(actwell) < min.density_new)){
+                    message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                                   min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
+                  } else if(!is.na(min.density_new)){
+                    control_new$min.density <- min.density_new
+                  }
+                }
+                if ("l" %in% control$fit.opt){
+                  if(control$x_type == "density"){
+                    fitlinear          <- flFitLinear(density = actx, fl_data = actwell, ID = ID, control = control_new, quota = quota_new)
+                  } else {
+                    fitlinear          <- flFitLinear(time = actx, fl_data = actwell, ID = ID, control = control_new, quota = quota_new)
+                  }
+                  fitlinear.all[[i]] <- fitlinear
                 }
                 fitlinear.all[[i]] <- fitlinear
-              }
-              fitlinear.all[[i]] <- fitlinear
-            } #end else
-          } # end if ("n" %in% test_answer)
-          else{
-            reliability_tag_linear <- TRUE
-            fitlinear$reliable <- TRUE
-            fitlinear.all[[i]]$reliable <- TRUE
-            cat("Sample was (more or less) o.k.\n")
-          } # end else
-        } # end while ("n" %in% answer_satisfied)
-      } # end if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt))
-    } # end if ((control$interactive == TRUE))
-    else {
-      reliability_tag_linear <- TRUE
-      fitlinear$reliable <- TRUE
-      fitlinear.all[[i]]$reliable <- TRUE
-    }
+              } #end else
+            } # end if ("n" %in% test_answer)
+            else{
+              reliability_tag_linear <- TRUE
+              fitlinear$reliable <- TRUE
+              fitlinear.all[[i]]$reliable <- TRUE
+              cat("Sample was (more or less) o.k.\n")
+            } # end else
+          } # end while ("n" %in% answer_satisfied)
+        } # end if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt))
+      } # end if ((control$interactive == TRUE))
+      else {
+        reliability_tag_linear <- TRUE
+        fitlinear$reliable <- TRUE
+        fitlinear.all[[i]]$reliable <- TRUE
+      }
+    } # # control$interactive == TRUE || 1:dim(fl_data)[1] <= 30
+
 
     # /// Non parametric fit
     if ("s" %in% control$fit.opt){
@@ -1017,20 +1104,26 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     else{
       reliability_tag_nonpara <- TRUE
     }
-    # /// Beginn Bootstrap
-    if ((("s" %in% control$fit.opt) ) &&
-        (control$nboot.fl > 0) && (reliability_tag_nonpara ==TRUE) && nonpara$fitFlag == TRUE){
-      if(control$x_type == "density")   bt <- flBootSpline(density = actx, fl_data = actwell, ID = ID, control = control)
-      if(control$x_type == "time")      bt <- flBootSpline(time = actx, fl_data = actwell, ID = ID, control = control)
-      boot.all[[i]] <- bt
-    } # /// end of if (control$nboot.fl ...)
-    else{
-      # /// create empty flBootSpline  object
-      bt            <- list(raw.x=actx, raw.fl=actwell, ID =ID, boot.x=NA, boot.y=NA, boot.flSpline=NA,
-                            lambda=NA, mu=NA, A=NA, integral=NA, bootFlag=FALSE, control=control)
-      class(bt)     <- "flBootSpline"
-      boot.all[[i]] <- bt
-    }
+
+    if(control$interactive == TRUE ||
+       1:dim(fl_data)[1] <= 30 ||
+       !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
+    ){
+      # /// Beginn Bootstrap
+      if ((("s" %in% control$fit.opt) ) &&
+          (control$nboot.fl > 0) && (reliability_tag_nonpara ==TRUE) && nonpara$fitFlag == TRUE){
+        if(control$x_type == "density")   bt <- flBootSpline(density = actx, fl_data = actwell, ID = ID, control = control)
+        if(control$x_type == "time")      bt <- flBootSpline(time = actx, fl_data = actwell, ID = ID, control = control)
+        boot.all[[i]] <- bt
+      } # /// end of if (control$nboot.fl ...)
+      else{
+        # /// create empty flBootSpline  object
+        bt            <- list(raw.x=actx, raw.fl=actwell, ID =ID, boot.x=NA, boot.y=NA, boot.flSpline=NA,
+                              lambda=NA, mu=NA, A=NA, integral=NA, bootFlag=FALSE, control=control)
+        class(bt)     <- "flBootSpline"
+        boot.all[[i]] <- bt
+      }
+    } # if(interactive == TRUE || 1:dim(fl_data)[1] <= 30 ||
     reliability_tag <- any(reliability_tag_linear, reliability_tag_nonpara)
     # create output table
     description     <- data.frame(TestId=fl_data[i,1], AddId=fl_data[i,2],concentration=fl_data[i,3],

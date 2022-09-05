@@ -68,6 +68,21 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   #          }'
                   #
                   # ),
+
+                  # Create object input$dimension as c(width, height) with the app window size
+                  tags$head(tags$script('
+                                var dimension = [0, 0];
+                                $(document).on("shiny:connected", function(e) {
+                                    dimension[0] = window.innerWidth;
+                                    dimension[1] = window.innerHeight;
+                                    Shiny.onInputChange("dimension", dimension);
+                                });
+                                $(window).resize(function(e) {
+                                    dimension[0] = window.innerWidth;
+                                    dimension[1] = window.innerHeight;
+                                    Shiny.onInputChange("dimension", dimension);
+                                });
+                            ')),
                   useShinyjs(),
                   shinyjs::extendShinyjs(text = jscode, functions = c("disableTab","enableTab")),
                   shinyjs::inlineCSS(css),
@@ -2486,16 +2501,17 @@ server <- function(input, output, session){
   output$debug <- renderPrint({
 
     paste(
-      input$select_samples_based_on_string_dual_plot,
-      input$select_samples_based_on_concentration_dual_plot,
-      input$exclude_samples_based_on_string_dual_plot,
-      input$exclude_samples_based_on_concentration_dual_plot, sep = " | ")
+      input$dimension)
     })
   # # Disable navbar menus before running computations
   # disable(selector = "#navbar li a[data-value=Report]")
   # disable(selector = "#navbar li a[data-value=Visualize]")
   # disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
 
+  # sidePanel_width <- reactive({
+  #   if(as.numeric(input$dimension[1]) < 1000) return(TRUE)
+  #   else return(6)
+  # })
 
   results <- reactiveValues()
 
@@ -2566,46 +2582,53 @@ server <- function(input, output, session){
     # browser()
 
     ## Read data
-    results$custom_data <- read_data(data.density = density.file$datapath,
-                                     data.fluoro1 = fl1.file$datapath,
-                                     data.fluoro2 = fl2.file$datapath,
-                                     data.format = input$custom_format,
-                                     sheet.density = input$custom_growth_sheets,
-                                     sheet.fluoro1 = input$custom_fluorescence1_sheets,
-                                     sheet.fluoro2 = input$custom_fluorescence2_sheets,
-                                     csvsep = input$separator_custom_density,
-                                     dec = input$decimal_separator_custom_density,
-                                     csvsep.fl1 = input$separator_custom_density,
-                                     dec.fl1 = input$decimal_separator_custom_density,
-                                     csvsep.fl2 = input$separator_custom_density,
-                                     dec.fl2 = input$decimal_separator_custom_density,
-                                     subtract.blank = input$subtract_blank_custom)
+    try(
+      results$custom_data <- read_data(data.density = density.file$datapath,
+                                       data.fluoro1 = fl1.file$datapath,
+                                       data.fluoro2 = fl2.file$datapath,
+                                       data.format = input$custom_format,
+                                       sheet.density = input$custom_growth_sheets,
+                                       sheet.fluoro1 = input$custom_fluorescence1_sheets,
+                                       sheet.fluoro2 = input$custom_fluorescence2_sheets,
+                                       csvsep = input$separator_custom_density,
+                                       dec = input$decimal_separator_custom_density,
+                                       csvsep.fl1 = input$separator_custom_density,
+                                       dec.fl1 = input$decimal_separator_custom_density,
+                                       csvsep.fl2 = input$separator_custom_density,
+                                       dec.fl2 = input$decimal_separator_custom_density,
+                                       subtract.blank = input$subtract_blank_custom)
+    )
 
-    showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+    if(length(results$custom_data)<2){
+      showModal(modalDialog("Data coult not be extracted from the provided file. Did you correctly format your custom data?", easyClose = T, footer=NULL))
+    } else {
 
-    if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
-      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
-      # show [Run Computation] button in Computation-Growth
-      show("run_growth")
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+
+      if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
+        showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+        # show [Run Computation] button in Computation-Growth
+        show("run_growth")
+      }
+      if("fluorescence1" %in% names(results$custom_data) && length(results$custom_data$fluorescence1)>1){
+        showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
+      }
+      if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+        showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+      }
+
+      # Remove eventually pre-loaded parsed data
+      results$parse_data <- NULL
+      hide("parsed_reads_density")
+      hide("parsed_reads_fluorescence1")
+      hide("parsed_reads_fluorescence2")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+      removeModal()
     }
-    if("fluorescence1" %in% names(results$custom_data) && length(results$custom_data$fluorescence1)>1){
-      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
-    }
-    if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
-      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
-    }
-
-    # Remove eventually pre-loaded parsed data
-    results$parse_data <- NULL
-    hide("parsed_reads_density")
-    hide("parsed_reads_fluorescence1")
-    hide("parsed_reads_fluorescence2")
-    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
-    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
-    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
-
-    removeModal()
   })
 
   ### Render custom density table
@@ -4472,7 +4495,6 @@ server <- function(input, output, session){
       reference.conc <- NULL
       reference.nm <- NULL
     }
-
     plot.parameter(results,
                    param = input$parameter_growth_parameter_growth_plot,
                    names = input$select_sample_based_on_string_growth_parameter_plot,
