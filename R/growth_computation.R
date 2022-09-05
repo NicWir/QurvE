@@ -1076,7 +1076,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
   reliability_tag_nonpara <- NA
 
   if(control$interactive == FALSE &&
-     1:dim(data)[1] > 30 &&
+     dim(data)[1] > 30 &&
      (
        ("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ||
        ("s" %in% control$fit.opt && control$nboot.gc > 0)
@@ -1202,6 +1202,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
     }
   }
 
+  reliability_tag <- c()
   # /// loop over all wells
     for (i in 1:dim(data)[1]){
       # Progress indicator for shiny app
@@ -1224,7 +1225,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
         cat("----------------------------------------------------\n")
       }
       if(control$interactive == TRUE ||
-         1:dim(data)[1] <= 30 ||
+         dim(data)[1] <= 30 ||
          !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
          ){
         # /// Linear regression on log-transformed data
@@ -1302,7 +1303,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
           fitlinear$reliable <- TRUE
           fitlinear.all[[i]]$reliable <- TRUE
         }
-      } # control$interactive == TRUE || 1:dim(data)[1] <= 30
+      } # control$interactive == TRUE || dim(data)[1] <= 30
       # /// Parametric fit
       if (("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
         fitpara          <- growth.gcFitModel(acttime, actwell, gcID, control)
@@ -1422,7 +1423,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
         reliability_tag_nonpara <- TRUE
       }
       if(control$interactive == TRUE ||
-         1:dim(data)[1] <= 30 ||
+         dim(data)[1] <= 30 ||
          !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
       ){
         # /// Beginn Bootstrap
@@ -1439,7 +1440,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
           boot.all[[i]] <- bt
         }
       } # if(interactive == TRUE || 1:dim(data)[1] <= 30 ||
-      reliability_tag <- any(reliability_tag_linear, reliability_tag_nonpara, reliability_tag_param)
+      reliability_tag <- c(reliability_tag, any(reliability_tag_linear, reliability_tag_nonpara, reliability_tag_param))
       # create output table
       # description     <- data.frame(TestId=data[i,1], AddId=data[i,2],concentration=data[i,3],
       #                               reliability_tag=reliability_tag, used.model=fitpara$model,
@@ -1452,16 +1453,18 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
 
     } # /// end of for (i in 1:dim(data)[1])
   # Assign names to list elements
-  names(fitlinear.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
+  names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <-  paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
 
   # create output table
   description     <- lapply(1:nrow(data), function(x) data.frame(TestId = data[x,1], AddId = data[x,2],concentration = data[x,3],
+                                                                 reliability_tag = reliability_tag[x],
                                                                  used.model = fitpara.all[[x]]$model,
                                                                  log.x = control$log.x.gc,
                                                                  log.y.spline = control$log.y.spline,
                                                                  log.y.model = control$log.y.model,
-                                                                 nboot.gc = control$nboot.gc,
-                                                                 reliability_tag = NA))
+                                                                 nboot.gc = control$nboot.gc
+                                                                 )
+                            )
 
   fitted          <- lapply(1:length(fitlinear.all), function(x) cbind(description[[x]],
                                                                        summary.gcFitLinear(fitlinear.all[[x]]),

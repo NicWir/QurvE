@@ -818,7 +818,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
   reliability_tag_nonpara <- NA
 
   if(control$interactive == FALSE &&
-     1:dim(fl_data)[1] > 30 &&
+     dim(fl_data)[1] > 30 &&
      (
        ("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ||
        ("s" %in% control$fit.opt && control$nboot.fl > 0)
@@ -1017,7 +1017,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
         fitlinear$reliable <- TRUE
         fitlinear.all[[i]]$reliable <- TRUE
       }
-    } # # control$interactive == TRUE || 1:dim(fl_data)[1] <= 30
+    } # # control$interactive == TRUE || dim(fl_data)[1] <= 30
 
 
     # /// Non parametric fit
@@ -1106,7 +1106,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     }
 
     if(control$interactive == TRUE ||
-       1:dim(fl_data)[1] <= 30 ||
+       dim(fl_data)[1] <= 30 ||
        !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
     ){
       # /// Beginn Bootstrap
@@ -1123,7 +1123,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
         class(bt)     <- "flBootSpline"
         boot.all[[i]] <- bt
       }
-    } # if(interactive == TRUE || 1:dim(fl_data)[1] <= 30 ||
+    } # if(interactive == TRUE || dim(fl_data)[1] <= 30 ||
     reliability_tag <- any(reliability_tag_linear, reliability_tag_nonpara)
     # create output table
     description     <- data.frame(TestId=fl_data[i,1], AddId=fl_data[i,2],concentration=fl_data[i,3],

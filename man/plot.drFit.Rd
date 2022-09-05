@@ -19,6 +19,8 @@
   x.lim = NULL,
   y.title = NULL,
   x.title = NULL,
+  log.y = FALSE,
+  log.x = FALSE,
   plot = TRUE,
   export = FALSE,
   height = NULL,

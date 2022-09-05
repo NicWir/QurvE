@@ -14,14 +14,12 @@
   exclude.conc = NULL,
   log.y.density = F,
   log.y.fl = F,
-  deriv = F,
   n.ybreaks = 6,
   colors = NULL,
   basesize = 20,
   y.lim.density = NULL,
   y.lim.fl = NULL,
   x.lim = NULL,
-  y.title = NULL,
   x.title = NULL,
   y.title.density = NULL,
   y.title.fl = NULL,
@@ -31,7 +29,8 @@
   height = NULL,
   width = NULL,
   out.dir = NULL,
-  out.nm = NULL
+  out.nm = NULL,
+  shiny = FALSE
 )
 }
 \arguments{

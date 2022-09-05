@@ -12,6 +12,7 @@ library(readxl)
 library(tidyverse)
 library(shinythemes)
 library(DT)
+library(doParallel)
 
 # Define icon set from custom SVG files
 # iconset <- icons::icon_set("icons/")
@@ -69,20 +70,20 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   #
                   # ),
 
-                  # Create object input$dimension as c(width, height) with the app window size
-                  tags$head(tags$script('
-                                var dimension = [0, 0];
-                                $(document).on("shiny:connected", function(e) {
-                                    dimension[0] = window.innerWidth;
-                                    dimension[1] = window.innerHeight;
-                                    Shiny.onInputChange("dimension", dimension);
-                                });
-                                $(window).resize(function(e) {
-                                    dimension[0] = window.innerWidth;
-                                    dimension[1] = window.innerHeight;
-                                    Shiny.onInputChange("dimension", dimension);
-                                });
-                            ')),
+                  # # Create object input$dimension as c(width, height) with the app window size
+                  # tags$head(tags$script('
+                  #               var dimension = [0, 0];
+                  #               $(document).on("shiny:connected", function(e) {
+                  #                   dimension[0] = window.innerWidth;
+                  #                   dimension[1] = window.innerHeight;
+                  #                   Shiny.onInputChange("dimension", dimension);
+                  #               });
+                  #               $(window).resize(function(e) {
+                  #                   dimension[0] = window.innerWidth;
+                  #                   dimension[1] = window.innerHeight;
+                  #                   Shiny.onInputChange("dimension", dimension);
+                  #               });
+                  #           ')),
                   useShinyjs(),
                   shinyjs::extendShinyjs(text = jscode, functions = c("disableTab","enableTab")),
                   shinyjs::inlineCSS(css),
@@ -962,6 +963,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
                                         h1("Growth Fits"),
                                         tabsetPanel(type = "tabs",
+                                                    ###___Linear Fits___####
                                                     tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_linearFits",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_growth_linear",
@@ -993,10 +995,41 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                              # icon=icon("gears"),
                                                                                              style="padding:5px; font-size:120%")
                                                                          )
-                                                                       )
-                                                             )
+                                                                       ),
 
-                                                    ),
+                                                                       HTML("<br>"),
+                                                                       h3(strong("Export plot")),
+
+                                                                       fluidRow(
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "width_download_growth_validate_linear",
+                                                                                             label = "Width (in inches)",
+                                                                                             value = 10)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "height_download_growth_validate_linear",
+                                                                                             label = "Height (in inches)",
+                                                                                             value = 9)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "dpi_download_growth_validate_linear",
+                                                                                             label = "DPI",
+                                                                                             value = 300)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                downloadButton('download_growth_validate_linear',"Download Plot"),
+                                                                                radioButtons("format_download_growth_validate_linear",
+                                                                                             label = NULL,
+                                                                                             choices = c("PNG" = ".png",
+                                                                                                         "PDF" = ".pdf"),
+                                                                                             selected = ".png",
+                                                                                             inline = TRUE)
+                                                                         ) # column
+                                                                       ) # fluidRow
+                                                             ) #mainPanel
+
+                                                    ), #tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_linearFits",
+                                                    ###___Spline Fits___####
                                                     tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_growth_spline",
@@ -1028,10 +1061,43 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                              # icon=icon("gears"),
                                                                                              style="padding:5px; font-size:120%")
                                                                          )
-                                                                       )
-                                                             )
+                                                                       ),
 
-                                                    ),
+                                                                       HTML("<br>"),
+
+                                                                       h3(strong("Export plot")),
+
+                                                                       fluidRow(
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "width_download_growth_validate_spline",
+                                                                                             label = "Width (in inches)",
+                                                                                             value = 10)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "height_download_growth_validate_spline",
+                                                                                             label = "Height (in inches)",
+                                                                                             value = 9)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "dpi_download_growth_validate_spline",
+                                                                                             label = "DPI",
+                                                                                             value = 300)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                downloadButton('download_growth_validate_spline',"Download Plot"),
+
+                                                                                radioButtons("format_download_growth_validate_spline",
+                                                                                             label = NULL,
+                                                                                             choices = c("PNG" = ".png",
+                                                                                                         "PDF" = ".pdf"),
+                                                                                             selected = ".png",
+                                                                                             inline = TRUE)
+                                                                         ) # column
+                                                                       ) # fluidRow
+                                                             ) # mainPanel
+
+                                                    ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
+                                                    ###___Model Fits___####
                                                     tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
                                                              sidebarPanel(width = 5,
                                                                           wellPanel(
@@ -1064,12 +1130,43 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                              # icon=icon("gears"),
                                                                                              style="padding:5px; font-size:120%")
                                                                          )
-                                                                       )
-                                                             )
+                                                                       ),
 
-                                                    )
-                                        )
-                               ),
+                                                                       HTML("<br>"),
+
+                                                                       h3(strong("Export plot")),
+
+                                                                       fluidRow(
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "width_download_growth_validate_model",
+                                                                                             label = "Width (in inches)",
+                                                                                             value = 10)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "height_download_growth_validate_model",
+                                                                                             label = "Height (in inches)",
+                                                                                             value = 9)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "dpi_download_growth_validate_model",
+                                                                                             label = "DPI",
+                                                                                             value = 300)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                downloadButton('download_growth_validate_model',"Download Plot"),
+
+                                                                                radioButtons("format_download_growth_validate_model",
+                                                                                             label = NULL,
+                                                                                             choices = c("PNG" = ".png",
+                                                                                                         "PDF" = ".pdf"),
+                                                                                             selected = ".png",
+                                                                                             inline = TRUE)
+                                                                         ) # column
+                                                                       ) # fluidRow
+                                                             ) # mainPanel
+                                                    ) # tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
+                                        ) # tabsetPanel(type = "tabs",
+                               ), # tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
                                ##____Validate_Fluorescence____####
                                tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
                                         h1("Fluorescence Fits"),
@@ -1140,14 +1237,13 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                              label = "Restore fit",
                                                                                              # icon=icon("gears"),
                                                                                              style="padding:5px; font-size:120%")
-                                                                         )
-                                                                       )
-                                                             )
-
-                                                    )
-                                        )
-                               )
-                    ),
+                                                                         ) # column
+                                                                       ) # fluidRow
+                                                             ) # mainPanel
+                                                    ) # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
+                                        ) # tabsetPanel(type = "tabs",
+                               ) # tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
+                    ), # navbarMenu("Validate", icon = icon("user-check"),
                     #____Visualize____####
                     navbarMenu("Visualize", icon = icon("chart-line"),
                                ## Growth Plots ####
@@ -1290,6 +1386,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                             width = "100%", height = "1000px"),
 
                                                                ),
+                                                               h3(strong("Export plot")),
+
                                                                fluidRow(
                                                                  column(width = 4,
                                                                         numericInput(inputId = "width_download_growth_group_plot",
@@ -1315,13 +1413,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                                  "PDF" = ".pdf"),
                                                                                      selected = ".png",
                                                                                      inline = TRUE)
-                                                                 ), # column
-
-
+                                                                 ) # column
                                                                ) # fluidRow
                                                              ) #  mainPanel
-
-
                                                     ),
 
                                                     ### Growth DR Plots ####
@@ -1465,6 +1559,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                 h3('Combined plots'),
                                                                                 plotOutput("dose_response_growth_plot_combined",
                                                                                            width = "100%", height = "800px"),
+
+                                                                                h3(strong("Export plot")),
+
                                                                                 fluidRow(
                                                                                   column(width = 4,
                                                                                          numericInput(inputId = "width_download_dose_response_growth_plot_combined",
@@ -1509,6 +1606,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                 plotOutput("dose_response_growth_plot_individual",
                                                                                            width = "100%", height = "800px"),
 
+                                                                                h3(strong("Export plot")),
+
                                                                                 fluidRow(
                                                                                   column(width = 4,
                                                                                          numericInput(inputId = "width_download_dose_response_growth_plot_individual",
@@ -1535,8 +1634,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                                       selected = ".png",
                                                                                                       inline = TRUE)
                                                                                   ), # column
-
-
                                                                                 ) # fluidRow
                                                                               ) #  mainPanel
 
@@ -1617,6 +1714,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              mainPanel(
                                                                plotOutput("growth_parameter_plot",
                                                                           width = "100%", height = "800px"),
+
+                                                               h3(strong("Export plot")),
+
                                                                fluidRow(
                                                                  column(width = 4,
                                                                         numericInput(inputId = "width_download_growth_parameter_plot",
@@ -1797,6 +1897,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              mainPanel(
                                                                plotOutput("fluorescence_group_plot",
                                                                           width = "100%", height = "1000px"),
+
+                                                               h3(strong("Export plot")),
+
                                                                fluidRow(
                                                                  column(width = 4,
                                                                         numericInput(inputId = "width_download_fluorescence_group_plot",
@@ -1996,6 +2099,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                 plotOutput("dose_response_plot_fluorescence_combined",
                                                                                            width = "100%", height = "800px"),
 
+                                                                                h3(strong("Export plot")),
+
                                                                                 fluidRow(
                                                                                   column(width = 4,
                                                                                          numericInput(inputId = "width_download_dose_response_plot_fluorescence_combined",
@@ -2037,8 +2142,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                             multiple = FALSE,
                                                                                             selectize = FALSE,
                                                                                             size = 3),
+
                                                                                 plotOutput("dose_response_fluorescence_plot_individual",
                                                                                            width = "100%", height = "800px"),
+
+                                                                                h3(strong("Export plot")),
+
                                                                                 fluidRow(
                                                                                   column(width = 4,
                                                                                          numericInput(inputId = "width_download_dose_response_fluorescence_plot_individual",
@@ -2165,6 +2274,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                            size = 3),
                                                                plotOutput("dose_response_model_fluorescence_plot_individual",
                                                                           width = "100%", height = "800px"),
+
+                                                               h3(strong("Export plot")),
+
                                                                fluidRow(
                                                                  column(width = 4,
                                                                         numericInput(inputId = "width_download_dose_response_model_fluorescence_plot_individual",
@@ -2263,6 +2375,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              mainPanel(
                                                                plotOutput("fluorescence_parameter_plot",
                                                                           width = "100%", height = "800px"),
+
+                                                               h3(strong("Export plot")),
+
                                                                fluidRow(
                                                                  column(width = 4,
                                                                         numericInput(inputId = "width_download_fluorescence_parameter_plot",
@@ -2422,6 +2537,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                         mainPanel(
                                           plotOutput("dual_plot",
                                                      width = "100%", height = "1000px"),
+
+                                          h3(strong("Export plot")),
+
                                           fluidRow(
                                             column(width = 4,
                                                    numericInput(inputId = "width_download_dual_plot",
@@ -3331,6 +3449,7 @@ server <- function(input, output, session){
                                                           log.x.dr = input$log_transform_concentration_growth,
                                                           log.y.dr = input$log_transform_response_growth,
                                                           nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                                          suppress.messages = T,
                                                           report = NULL,
                                                           shiny = TRUE
 
@@ -3461,7 +3580,7 @@ server <- function(input, output, session){
                                                               nboot.fl = input$number_of_bootstrappings_fluorescence,
                                                               smooth.fl = input$smoothing_factor_nonparametric_fluorescence,
                                                               growth.thresh = input$growth_threshold_in_percent_fluorescence,
-                                                              suppress.messages = FALSE,
+                                                              suppress.messages = T,
                                                               neg.nan.act = FALSE,
                                                               clean.bootstrap = TRUE,
                                                               report = NULL,
@@ -3848,6 +3967,19 @@ server <- function(input, output, session){
     hide("restore_growth_linear")
   })
 
+  output$download_growth_validate_linear <- downloadHandler(
+    filename = function() {
+      paste("linear_fit_",  selected_vals_validate_growth$sample_validate_growth_linear, input$format_download_growth_validate_linear, sep="")
+    },
+    content = function(file) {
+      ggsave(filename = file, width = input$width_download_growth_validate_linear,
+             height = input$height_download_growth_validate_linear,
+             dpi = input$dpi_download_growth_validate_linear)
+    },
+    contentType = ifelse(input$format_download_growth_validate_linear == ".pdf", "image/pdf", "image/png")
+
+  )
+
       ### Spline Fits ####
   selected_inputs_validate_growth_spline_sample <- reactive({
     results <- results$growth
@@ -3943,6 +4075,19 @@ server <- function(input, output, session){
     results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]] <- selected_vals_validate_growth$restore_growth_spline
     hide("restore_growth_spline")
   })
+
+  output$download_growth_validate_spline <- downloadHandler(
+    filename = function() {
+      paste("spline_fit_",  selected_vals_validate_growth$sample_validate_growth_spline, input$format_download_growth_validate_spline, sep="")
+    },
+    content = function(file) {
+      ggsave(filename = file, width = input$width_download_growth_validate_spline,
+             height = input$height_download_growth_validate_spline,
+             dpi = input$dpi_download_growth_validate_spline)
+    },
+    contentType = ifelse(input$format_download_growth_validate_spline == ".pdf", "image/pdf", "image/png")
+
+  )
 
       ### Model Fits ####
   selected_inputs_validate_growth_model_sample <- reactive({
@@ -4064,6 +4209,19 @@ server <- function(input, output, session){
     results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]] <- selected_vals_validate_growth$restore_growth_model
     hide("restore_growth_model")
   })
+
+  output$download_growth_validate_model <- downloadHandler(
+    filename = function() {
+      paste("spline_fit_",  selected_vals_validate_growth$sample_validate_growth_model, input$format_download_growth_validate_model, sep="")
+    },
+    content = function(file) {
+      ggsave(filename = file, width = input$width_download_growth_validate_model,
+             height = input$height_download_growth_validate_model,
+             dpi = input$dpi_download_growth_validate_model)
+    },
+    contentType = ifelse(input$format_download_growth_validate_model == ".pdf", "image/pdf", "image/png")
+
+  )
 
 
     ## Fluorescence #####

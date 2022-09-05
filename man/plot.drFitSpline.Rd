@@ -8,10 +8,13 @@
   drFitSpline,
   add = FALSE,
   ec50line = TRUE,
+  log = "",
   pch = 16,
   colSpline = 1,
   colData = 1,
-  cex = 1,
+  cex.point = 1,
+  cex.lab = 1.5,
+  cex.axis = 1.3,
   y.lim = NULL,
   x.lim = NULL,
   y.title = NULL,
@@ -32,13 +35,19 @@
 
 \item{ec50line}{(Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).}
 
+\item{log}{("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.}
+
 \item{pch}{(Numeric) Shape of the raw data symbols.}
 
 \item{colSpline}{(Numeric or character) Spline line colour.}
 
 \item{colData}{(Numeric or character) Contour color of the raw data circles.}
 
-\item{cex}{(Numeric) Size of the raw data symbols.}
+\item{cex.point}{(Numeric) Size of the raw data symbols.}
+
+\item{cex.lab}{(Numeric) Font size of axis titles.}
+
+\item{cex.axis}{(Numeric) Font size of axis annotations.}
 
 \item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
