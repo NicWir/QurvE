@@ -2571,21 +2571,47 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
 
                     tabPanel("Report", icon=icon("file-contract"),
-                             sidebarPanel(
-                               shinyDirButton("dir",
+                             sidebarPanel(width = 6,
+                               shinyDirButton("report_dir",
                                               "Choose destination for saving",
                                               "Choose destination for saving"),
 
-                               verbatimTextOutput("dir", placeholder = TRUE),
+                               verbatimTextOutput("report_dir", placeholder = TRUE),
 
-                               textInput(inputId = 'report_file_name',
+                               textInput(inputId = 'report_filename',
                                          label = 'Choose file name',
                                          value = 'GrowthReport'),
 
-                               selectInput(inputId = 'report_file_type',
+                               selectInput(inputId = 'report_filetype',
                                            label = 'Choose file type',
-                                           choices = c('PDF' = 'pdf', 'HTML' = 'html'))
-                             )
+                                           choices = c('PDF' = 'pdf', 'HTML' = 'html')),
+
+                               conditionalPanel(condition = "input.report_filetype == 'pdf'",
+                                                fluidRow(
+                                                  column(12,
+                                                         div(
+                                                           actionButton(inputId = "render_report_pdf",
+                                                                        label = "Render report",
+                                                                        icon=icon("file-pdf"),
+                                                                        style="padding:5px; font-size:120%"),
+                                                           style="float:right")
+                                                  )
+                                                )
+                               ),
+                               conditionalPanel(condition = "input.report_filetype == 'html'",
+                                                fluidRow(
+                                                  column(12,
+                                                         div(
+                                                           actionButton(inputId = "render_report_html",
+                                                                        label = "Render report",
+                                                                        icon=icon("file-code"),
+                                                                        style="padding:5px; font-size:120%"),
+                                                           style="float:right")
+                                                  )
+                                                )
+                               )
+                             ),
+
                     ),
 
                     #____ABOUT US____####
@@ -5246,30 +5272,60 @@ server <- function(input, output, session){
   #shinyDirChoose(input, 'report_folder', roots = volumes())
   shinyDirChoose(
     input,
-    'dir',
+    'report_dir',
     roots = c(home = '~'),
     filetypes = c('', 'txt', 'bigWig', "tsv", "csv", "bw")
   )
 
-  global <- reactiveValues(datapath = getwd())
+  global <- reactiveValues(report_datapath = getwd())
 
-  dir <- reactive(input$dir)
+  report_dir <- reactive(input$report_dir)
 
-  output$dir <- renderText({
-    global$datapath
+  output$report_dir <- renderText({
+    global$report_datapath
   })
 
+  # Assemble report file path
   observeEvent(ignoreNULL = TRUE,
                eventExpr = {
-                 input$dir
+                 input$report_dir
                },
                handlerExpr = {
-                 if (!"path" %in% names(dir())) return()
+                 if (!"path" %in% names(report_dir())) return()
                  home <- normalizePath("~")
-                 fname <-paste(input$report_file_name, input$report_file_type, sep = '.')
-                 global$datapath <-
-                   file.path(home, paste(unlist(dir()$path[-1]), collapse = .Platform$file.sep), fname)
-               })
+                 global$report_filename <- input$report_filename
+                 global$report_datapath <-
+                   file.path(home, paste(unlist(report_dir()$path[-1]), collapse = .Platform$file.sep))
+               }
+  )
+
+  observeEvent(input$render_report_pdf, {
+    showModal(modalDialog("Rendering report...", footer=NULL))
+
+    try(growth.report(grofit = results$growth,
+                  out.dir = global$report_datapath,
+                  out.nm = global$report_filename,
+                  ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                  format = input$report_filetype,
+                  export = FALSE)
+    )
+    removeModal()
+  })
+
+  observeEvent(input$render_report_html, {
+    showModal(modalDialog("Rendering report...", footer=NULL))
+
+    try(growth.report(grofit = results$growth,
+                          out.dir = global$report_datapath,
+                          out.nm = global$report_filename,
+                          ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                          format = input$report_filetype,
+                          export = FALSE)
+    )
+    removeModal()
+  })
+
+
   # Bug report message
   github_url <- a("QurvE Github", href="https://github.com/NicWir/QurvE_issues/issues")
   output$bug_report <- renderUI({

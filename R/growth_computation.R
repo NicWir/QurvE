@@ -892,12 +892,12 @@ growth.workflow <- function (grodata = NULL,
 #' @param grofit A \code{grofit} object created with \code{\link{growth.workflow}}.
 #' @param out.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.
-#' @param ... Further arguments passed to create a report. Currently required:
+#' @param ec50 (Logical) Was a dose-response analysis performed in \code{\link{growth.workflow}} \code{TRUE} or not \code{FALSE}?
+#' @param export (Logical) Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
+#' @param ... Further arguments passed to create a report. Currently supported:
 #' \itemize{
-#'    \item \code{ec50}: \code{TRUE} or \code{FALSE}: Was a dose-response analysis performed in \code{\link{growth.workflow}}?
 #'    \item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{"all"}, a string vector, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
-#'    \item \code{export}: Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
 #' }
 #' @param ec50 (Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
 #' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
@@ -918,10 +918,23 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
   # results an object of class grofit
   if(class(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
 
-  args <- list(...)
-  for(i in 1:length(args)){
-    assign(names(args)[i], args[[i]])
+  # Define objects based on additional function calls
+  call <- match.call()
+  ## remove strictly defined arguments
+  call$grofit <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- NULL
+
+  arglist <- sapply(call, function(x) x)
+  arglist <- unlist(arglist)[-1]
+  ## Assign additional arguments (...) as R objects
+  if(length(arglist) > 0){
+    for(i in 1:length(arglist)){
+      assign(names(arglist)[i], arglist[[i]])
+    }
   }
+
+  if(!exists("mean.grp")) mean.grp <- NA
+  if(!exists("mean.conc")) mean.conc <- NA
+
   gcFit <- grofit$gcFit
   drFit <- grofit$drFit
   control <- grofit$control
