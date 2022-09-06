@@ -907,7 +907,6 @@ growth.workflow <- function (grodata = NULL,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-#' @importFrom doParallel registerDoParallel
 #' @import foreach
 #' @import kableExtra
 #' @import knitr
@@ -1012,7 +1011,6 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
 #'   ggplot_build ggplot ggtitle labs position_dodge scale_color_manual scale_fill_brewer
 #'   scale_color_brewer scale_fill_manual scale_x_continuous scale_y_continuous
 #'   scale_y_log10 theme theme_classic theme_minimal xlab ylab
-#' @importFrom doParallel registerDoParallel
 #' @import foreach
 growth.gcFit <- function(time, data, control= growth.control(), ...)
 {

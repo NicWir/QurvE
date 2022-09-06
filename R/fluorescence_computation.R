@@ -736,7 +736,6 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' @return
 #' @export
 #'
-#' @importFrom doParallel registerDoParallel
 #' @import foreach
 flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), ...)
 {
@@ -2492,7 +2491,6 @@ fl.workflow <- function(grodata = NULL,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-#' @importFrom doParallel registerDoParallel
 #' @import foreach
 #' @import kableExtra
 #' @import knitr
