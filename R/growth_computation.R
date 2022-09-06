@@ -907,7 +907,7 @@ growth.workflow <- function (grodata = NULL,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-#' @import foreach
+#' @importFrom foreach %dopar%
 #' @import kableExtra
 #' @import knitr
 #' @import plyr
@@ -1011,7 +1011,7 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
 #'   ggplot_build ggplot ggtitle labs position_dodge scale_color_manual scale_fill_brewer
 #'   scale_color_brewer scale_fill_manual scale_x_continuous scale_y_continuous
 #'   scale_y_log10 theme theme_classic theme_minimal xlab ylab
-#' @import foreach
+#' @importFrom foreach %dopar%
 growth.gcFit <- function(time, data, control= growth.control(), ...)
 {
   # Define objects based on additional function calls

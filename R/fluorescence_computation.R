@@ -736,7 +736,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' @return
 #' @export
 #'
-#' @import foreach
+#' @importFrom foreach %dopar%
 flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), ...)
 {
   # Define objects based on additional function calls
@@ -838,7 +838,11 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
       fitlinear.all <- foreach::foreach(i = 1:dim(fl_data)[1]
       ) %dopar% {
-        QurvE::flFitLinear(x.ls[[i]], wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+        if(control$x_type == "density"){
+          QurvE::flFitLinear(density = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+        } else {
+          QurvE::flFitLinear(time = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+        }
       }
     } else {
       # /// generate list with empty objects
@@ -2491,7 +2495,7 @@ fl.workflow <- function(grodata = NULL,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-#' @import foreach
+#' @importFrom foreach %dopar%
 #' @import kableExtra
 #' @import knitr
 #' @import plyr
