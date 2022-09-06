@@ -736,6 +736,8 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' @return
 #' @export
 #'
+#' @importFrom doParallel registerDoParallel
+#' @import foreach
 flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), ...)
 {
   # Define objects based on additional function calls
@@ -1576,7 +1578,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
           #consider only candidate windows next to index.max.ret
           candidate_intervals <- split(candidates, cumsum(c(1, diff(candidates) != 1)))
-          if(index.max.ret %in% unlist(candidate_intervals)){
+          if(any(index.max.ret %in% unlist(candidate_intervals))){
             candidates <-
               candidate_intervals[as.numeric(which(
                 sapply(

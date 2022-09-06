@@ -1012,6 +1012,8 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
 #'   ggplot_build ggplot ggtitle labs position_dodge scale_color_manual scale_fill_brewer
 #'   scale_color_brewer scale_fill_manual scale_x_continuous scale_y_continuous
 #'   scale_y_log10 theme theme_classic theme_minimal xlab ylab
+#' @importFrom doParallel registerDoParallel
+#' @import foreach
 growth.gcFit <- function(time, data, control= growth.control(), ...)
 {
   # Define objects based on additional function calls
@@ -2471,7 +2473,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
           }
           #consider only candidate windows next to index.max.ret
           candidate_intervals <- split(candidates, cumsum(c(1, diff(candidates) != 1)))
-          if(index.max.ret %in% unlist(candidate_intervals)){
+          if(any(index.max.ret %in% unlist(candidate_intervals))){
             candidates <-
               candidate_intervals[as.numeric(which(
                 sapply(
@@ -3614,7 +3616,7 @@ lm_window <- function (x, y, i0, h = 5)
 {
   x <- x[i0 - 1 + (1:h)]
   y <- y[i0 - 1 + (1:h)]
-  m <- lm(y ~ x)
+  m <- theil_sen_regression(y ~ x)
   return(m)
 }
 
