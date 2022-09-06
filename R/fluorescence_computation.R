@@ -903,6 +903,8 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     }
   }
 
+  reliability_tag <- c()
+
   # /// loop over all wells
 
   for (i in 1:dim(fl_data)[1]){
@@ -927,7 +929,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
       cat("----------------------------------------------------\n")
     }
     if(control$interactive == TRUE ||
-       1:dim(fl_data)[1] <= 30 ||
+       dim(fl_data)[1] <= 30 ||
        !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
     ){
       # /// Linear regression fl_data
@@ -1129,21 +1131,43 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
         boot.all[[i]] <- bt
       }
     } # if(interactive == TRUE || dim(fl_data)[1] <= 30 ||
-    reliability_tag <- any(reliability_tag_linear, reliability_tag_nonpara)
+    reliability_tag <- c(reliability_tag, any(reliability_tag_linear, reliability_tag_nonpara))
     # create output table
-    description     <- data.frame(TestId=fl_data[i,1], AddId=fl_data[i,2],concentration=fl_data[i,3],
-                                  reliability_tag=reliability_tag,
-                                  log.x.spline=control$log.x.spline, log.y.spline=control$log.y.spline,
-                                  log.x.lin=control$log.x.lin, log.y.spline=control$log.y.lin, nboot.fl=control$nboot.fl)
-
-    fitted          <- cbind(description, summary.flFitLinear(fitlinear), summary.flFitSpline(nonpara), summary.flBootSpline(bt))
-
-    out.table       <- rbind(out.table, fitted)
-    class(out.table) <- c("data.frame", "flTable")
+    # description     <- data.frame(TestId=fl_data[i,1], AddId=fl_data[i,2],concentration=fl_data[i,3],
+    #                               reliability_tag=reliability_tag,
+    #                               log.x.spline=control$log.x.spline, log.y.spline=control$log.y.spline,
+    #                               log.x.lin=control$log.x.lin, log.y.spline=control$log.y.lin, nboot.fl=control$nboot.fl)
+    #
+    # fitted          <- cbind(description, summary.flFitLinear(fitlinear), summary.flFitSpline(nonpara), summary.flBootSpline(bt))
+    #
+    # out.table       <- rbind(out.table, fitted)
+    # class(out.table) <- c("data.frame", "flTable")
 
   } # /// end of for (i in 1:dim(fl_data)[1])
+
+  # Assign names to list elements
   names(fitlinear.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(fl_data[,1]), " | ", as.character(fl_data[,2]), " | ", as.character(fl_data[,3]))
 
+  # create output table
+  description     <- lapply(1:nrow(fl_data), function(x) data.frame(TestId = fl_data[x,1], AddId = fl_data[x,2],concentration = fl_data[x,3],
+                                                                 reliability_tag = reliability_tag[x],
+                                                                 log.x.spline = control$log.x.spline,
+                                                                 log.y.spline = control$log.y.spline,
+                                                                 log.x.lin = control$log.x.lin,
+                                                                 log.y.lin  =control$log.y.lin,
+                                                                 nboot.fl = control$nboot.fl
+  )
+  )
+
+  fitted          <- lapply(1:length(fitlinear.all), function(x) cbind(description[[x]],
+                                                                       summary.flFitLinear(fitlinear.all[[x]]),
+                                                                       summary.flFitSpline(fitnonpara.all[[x]]),
+                                                                       summary.flBootSpline(boot.all[[x]])
+                                                                       )
+  )
+
+  out.table       <- do.call(rbind, fitted)
+  class(out.table) <- c("data.frame", "flTable")
   flFit           <- list(raw.x = x, raw.fl = fl_data, flTable = out.table, flFittedLinear = fitlinear.all, flFittedSplines = fitnonpara.all, flBootSplines = boot.all, control=control)
 
   class(flFit)    <- "flFit"
