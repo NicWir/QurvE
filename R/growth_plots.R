@@ -732,7 +732,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     }
 
     if(is.null(y.title) || y.title == ""){
-      p <- p + ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, ")"), paste0(drFit$control$dr.parameter)))
+      p <- p + ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, " + 1)"), paste0(drFit$control$dr.parameter)))
     } else {
       p <- p + ylab(label = y.title)
     }
@@ -915,10 +915,15 @@ plot.drFitSpline <-
       stop("Need numeric value for: cex.point")
     p <- function(){
       if (add == FALSE) {
+        opar <- par(no.readonly = TRUE)
+        on.exit(par(opar))
+
+        par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1))
         par(cex.lab = cex.lab, cex.axis = cex.axis)
+
         if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == TRUE)) {
-          xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "ln(1+concentration)")
-          ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
+          xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "ln(1+concentration)")
+          ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
           plot(
             log(drFitSpline$raw.conc + 1),
             log(drFitSpline$raw.test + 1),
@@ -933,8 +938,8 @@ plot.drFitSpline <-
         else
         {
           if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == TRUE)) {
-            xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "concentration")
-            ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
+            xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "concentration")
+            ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
             plot(
               drFitSpline$raw.conc,
               log(drFitSpline$raw.test + 1),
@@ -949,8 +954,8 @@ plot.drFitSpline <-
           else
           {
             if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == FALSE)) {
-              xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "ln(1+concentration)")
-              ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
+              xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "ln(1+concentration)")
+              ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
               plot(
                 log(drFitSpline$raw.conc + 1),
                 drFitSpline$raw.test,
@@ -965,8 +970,8 @@ plot.drFitSpline <-
             else
             {
               if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == FALSE)) {
-                xlab = ifelse(!is.null(x.title) || x.title == "", x.title, "Concentration")
-                ylab = ifelse(!is.null(y.title) || y.title == "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
+                xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "Concentration")
+                ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
                 plot(
                   drFitSpline$raw.conc,
                   drFitSpline$raw.test,
@@ -1713,7 +1718,7 @@ plot.grofit <- function(grofit, ...,
     }
   }
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
-    if(!is.na(exclude.conc)) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+    if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
@@ -2284,7 +2289,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     }
   }
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
-    if(!is.na(exclude.conc)) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+    if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
@@ -2330,7 +2335,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     ref.ndx <- grep(gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", gsub("\\?", "\\\\?", reference.nm))), labels)
     if (length(ref.ndx) > 1){
       if(!is.null(reference.conc)){
-        refconc.ndx <- which(reference.conc == str_extract(labels, "[:alnum:]+$"))
+        refconc.ndx <- which(reference.conc == as.numeric(str_extract(labels, "[:graph:]+$")))
         ref.ndx <- intersect(refconc.ndx, ref.ndx)
       } else {
         ref.ndx <- ref.ndx[1]

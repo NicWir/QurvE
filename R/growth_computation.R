@@ -546,7 +546,7 @@ parse_data <-
 #'
 #' @return Generates a list with all arguments described above as entries.
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
 #'
@@ -1003,7 +1003,7 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
 #' @family growth fitting functions
 #' @family dose-response analysis functions
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text
@@ -1519,7 +1519,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
 #' \item{fitFlag}{(Logical) Indicates whether a parametric model was successfully fitted on the data.}
 #' \item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @family growth fitting functions
 #'
@@ -1845,7 +1845,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
 #'
 #' @family growth fitting functions
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
 #'
@@ -2206,7 +2206,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #'
 #' The algorithm works as follows:
 #' \enumerate{
-#'   \item Fit linear regressions to all subsets of \code{h} consecutive, log-transformed data
+#'   \item Fit linear regressions (Theil-Sen estimator) to all subsets of \code{h} consecutive, log-transformed data
 #'     points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear regression to points
 #'     1 \dots 5, 2 \dots 6, 3 \dots 7 and so on.
 #'   \item Find the subset with the highest slope \eqn{mu_{max}}. Does the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} value of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
@@ -2276,8 +2276,9 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #' \item{fitFlag2}{(Logical) Indicates whether a second growth phase was identified.}
 #' \item{reliable}{(Logical) Indicates whether the performed fit is reliable (to be set manually).}
 #'
-#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
-#' Petzoldt T (2022). _growthrates: Estimate Growth Rates from Experimental Data_. R package version 0.8.3, <https://CRAN.R-project.org/package=growthrates>.
+#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. _Mol. Biol. Evol._ 31: 232-38, DOI: 10.1093/molbev/mst187
+#' @references Petzoldt T (2022). growthrates: Estimate Growth Rates from Experimental Data. R package version 0.8.3, <https://CRAN.R-project.org/package=growthrates>.
+#' @references Theil, H.(1992). A rank-invariant method of linear and polynomial regression analysis. In: Henri Theil’s contributions to economics and econometrics. Springer, pp. 345–381. DOI: 10.1007/978-94-011-2546-8_20
 #'
 #' @family growth fitting functions
 #'
@@ -2983,7 +2984,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 #' \item{bootFlag}{(Logical) Indicates the success of the bootstrapping operation.}
 #' \item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
 #'
@@ -3129,7 +3130,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
 #' \item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
 #'
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
 #'
@@ -3258,7 +3259,7 @@ growth.drFit <- function (gcTable, control = growth.control())
 #'   a response parameter value of 0 and pairs at concentration values before
 #'   zero-response parameter values.
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
 #'
@@ -3449,7 +3450,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
 #' \item{BootFlag}{(Logical) Indicates the success of the bootstrapping operation.}
 #' \item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
 #'
-#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
 #'

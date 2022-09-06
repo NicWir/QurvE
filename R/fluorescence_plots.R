@@ -743,6 +743,10 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
     stop("Need numeric value for: cex.point")
   conc <- drFittedModel$raw.conc
   p <- function(){
+    opar <- par(no.readonly = TRUE)
+    on.exit(par(opar))
+
+    par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1))
     par(cex.lab = cex.lab, cex.axis = cex.axis)
     if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == TRUE)) {
       plot(
@@ -983,16 +987,16 @@ plot.flFitRes <-  function(object,
     }
   }
   if(!is.null(conc) && length(conc) > 0){
-    if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+    if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)  && length(conc) > 0){
+  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
       names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
     }
   }
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
-    if(!is.na(exclude.conc)) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+    if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.flFitRes() with valid 'names' or 'conc' argument.")
@@ -1608,16 +1612,16 @@ plot.dual <-  function(object,
     }
   }
   if(!is.null(conc) && length(conc) > 0){
-    if(!is.na(conc)) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+    if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)  && length(conc) > 0){
+  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
       names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
     }
   }
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
-    if(!is.na(exclude.conc)) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+    if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
     stop("Please run plot.dual() with valid 'names' or 'conc' argument.")
@@ -1830,12 +1834,6 @@ plot.dual <-  function(object,
         p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
       }
 
-      if(!is.null(y.lim.fl)){
-        p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-      } else {
-        p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-      }
-
       if(is.null(colors)){
         if (length(plotdata.ls) <= 8) {
           p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
@@ -1942,11 +1940,11 @@ plot.dual <-  function(object,
       }
     }
     p.fl <- ggplot(df, aes(x=time, y=fl, col = name)) +
-        geom_line(size=lwd) +
-        theme_classic(base_size = basesize) +
-        xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank())
+      geom_line(size=lwd) +
+      theme_classic(base_size = basesize) +
+      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+      theme(panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
 
     ylab.title <- if(any(grep("norm", fluorescence))){
       "Normalized fluorescence"
@@ -1954,50 +1952,58 @@ plot.dual <-  function(object,
       "Fluorescence"
     }
 
-      if(is.null(y.title.fl) || y.title.fl == ""){
-        p.fl <- p.fl + ylab(label = ylab.title)
-      } else {
-        p.fl <- p.fl + ylab(label = y.title.fl)
-      }
-
+    if(log.y.fl == TRUE){
       if(!is.null(y.lim.fl)){
-        p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = 10, bounds = FALSE))
+        p.fl <- p.fl + scale_y_log10(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
-        p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = 10, bounds = FALSE))
+        p.fl <- p.fl + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
-
-      if(!is.null(x.lim)){
-        p.fl <- p.fl + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      if(!is.null(y.lim.fl)){
+        p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
-        p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+        p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
+    }
 
-      if(is.null(colors)){
-        if (length(ndx.keep) <= 8) {
-          p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else if (length(ndx.keep) <= 12) {
-          p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-        } else if (length(ndx.keep) <=50){
-          p.fl <- p.fl + scale_fill_manual(name = "Condition",
-                                                 values = c(
-                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                                 )
-          ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
-          )
-        }
+    if(is.null(y.title.fl) || y.title.fl == ""){
+      p.fl <- p.fl + ylab(label = ylab.title)
+    } else {
+      p.fl <- p.fl + ylab(label = y.title.fl)
+    }
+
+    if(!is.null(x.lim)){
+      p.fl <- p.fl + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+    }
+
+    if(is.null(colors)){
+      if (length(ndx.keep) <= 8) {
+        p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+      } else if (length(ndx.keep) <= 12) {
+        p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
+      } else if (length(ndx.keep) <=50){
+        p.fl <- p.fl + scale_fill_manual(name = "Condition",
+                                         values = c(
+                                           "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                           "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                           "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                           "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                           "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                         )
+        ) + scale_color_manual(name = "Condition",
+                               values = c(
+                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                               )
+        )
       }
-      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+    }
+    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
   }
   if(export == FALSE && plot == FALSE){
     return(p)

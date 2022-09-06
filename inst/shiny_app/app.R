@@ -1171,6 +1171,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
                                         h1("Fluorescence Fits"),
                                         tabsetPanel(type = "tabs",
+                                                    ###___Linear Fits___####
                                                     tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Fluorescence_linearFits",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_fluorescence_linear",
@@ -1206,6 +1207,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              )
 
                                                     ),
+                                                    ###___Spline Fits___####
                                                     tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_fluorescence_spline",
@@ -1366,11 +1368,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  )
                                                                ),
 
+                                                               sliderInput(inputId = "nbreaks_growth_group_plot",
+                                                                           label = "Number of breaks on y-axis",
+                                                                           min = 1,
+                                                                           max = 20,
+                                                                           value = 6),
+
                                                                sliderInput(inputId = "line_width_growth_group_plot",
                                                                            label = "Line width",
                                                                            min = 0.01,
                                                                            max = 10,
                                                                            value = 1.1),
+
                                                                sliderInput(inputId = 'base_size_growth_group_plot',
                                                                            label = 'Base font size',
                                                                            min = 10,
@@ -1429,20 +1438,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                value = TRUE)
                                                                ),
 
-                                                               textInput(inputId = "select_samples_based_on_string_growth_dose_response_growth_plot",
-                                                                         label = "Select sample based on string (separate by ;)"
+                                                               conditionalPanel(
+                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                 textInput(inputId = "select_samples_based_on_string_dose_response_growth_plot",
+                                                                           label = "Select sample based on string (separate by ;)"
+                                                                 )
                                                                ),
 
-                                                               textInput(inputId = "select_samples_based_on_concentration_dose_response_growth_plot",
-                                                                         label = "Select sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_string_dose_response_growth_plot",
-                                                                         label = "Exclude sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_concentration_dose_response_growth_plot",
-                                                                         label = "Exclude sample based on concentration (separate by ;)"
+                                                               conditionalPanel(
+                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                 textInput(inputId = "exclude_samples_based_on_string_dose_response_growth_plot",
+                                                                           label = "Exclude sample based on string (separate by ;)"
+                                                                 )
                                                                ),
 
                                                                h3('Customize plot appearance'),
@@ -1879,6 +1886,12 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  )
                                                                ),
 
+                                                               sliderInput(inputId = "nbreaks_fluorescence_group_plot",
+                                                                           label = "Number of breaks on y-axis",
+                                                                           min = 1,
+                                                                           max = 20,
+                                                                           value = 6),
+
                                                                sliderInput(inputId = "line_width_fluorescence_group_plot",
                                                                            label = "Line width",
                                                                            min = 0.01,
@@ -1945,20 +1958,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                value = TRUE)
                                                                ),
 
-                                                               textInput(inputId = "select_samples_based_on_string_growth_dose_response_fluorescence_plot",
-                                                                         label = "Select sample based on string (separate by ;)"
+                                                               conditionalPanel(
+                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                 textInput(inputId = "select_samples_based_on_string_dose_response_fluorescence_plot",
+                                                                           label = "Select sample based on string (separate by ;)"
+                                                                 )
                                                                ),
 
-                                                               textInput(inputId = "select_samples_based_on_concentration_dose_response_fluorescence_plot",
-                                                                         label = "Select sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_string_dose_response_fluorescence_plot",
-                                                                         label = "Exclude sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_concentration_dose_response_fluorescence_plot",
-                                                                         label = "Exclude sample based on concentration (separate by ;)"
+                                                               conditionalPanel(
+                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                 textInput(inputId = "exclude_samples_based_on_string_dose_response_fluorescence_plot",
+                                                                           label = "Exclude sample based on string (separate by ;)"
+                                                                 )
                                                                ),
 
                                                                h3('Customize plot appearance'),
@@ -1993,13 +2004,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                              value = 15,
                                                                              step = 0.5)
                                                                ),
-
-                                                               sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot',
-                                                                           label = 'Shape size',
-                                                                           min = 1,
-                                                                           max = 10,
-                                                                           value = 1,
-                                                                           step = 0.1),
 
                                                                conditionalPanel(
                                                                  condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
@@ -2065,22 +2069,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  )
                                                                ),
 
-                                                               strong("y-Range (derivative)"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_derivative_dose_response_fluorescence_response_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_derivative_dose_response_fluorescence_response_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
                                                                textInput(inputId = "y_axis_title_dose_response_fluorescence_plot",
                                                                          label = "y-axis title",
                                                                          value = ""
@@ -2521,11 +2509,18 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     value = ""
                                           ),
 
+                                          sliderInput(inputId = "nbreaks_dual_plot",
+                                                      label = "Number of breaks on y-axis",
+                                                      min = 1,
+                                                      max = 20,
+                                                      value = 6),
+
                                           sliderInput(inputId = "line_width_dual_plot",
                                                       label = "Line width",
                                                       min = 0.01,
                                                       max = 10,
                                                       value = 1.1),
+
                                           sliderInput(inputId = 'base_size_dual_plot',
                                                       label = 'Base font size',
                                                       min = 10,
@@ -4042,7 +4037,7 @@ server <- function(input, output, session){
       control_new <- control
       gcID <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$gcID
 
-      control_new$smooth.gc <- dplyr::if_else(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$lin.R2)
+      control_new$smooth.gc <- dplyr::if_else(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$smooth.gc)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
       min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
       if(is.numeric(min.density.spline.new)){
@@ -4424,7 +4419,7 @@ server <- function(input, output, session){
         tags$h2('Please enter adjusted parameters'),
         textInput('t0.spline.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]$control$t0)),
         textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]$control$min.density)),
-        textInput('smooth.gc.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]$control$smooth.gc)),
+        textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]$control$smooth.fl)),
         footer=tagList(
           actionButton('submit.rerun.spline.fluorescence', 'Submit'),
           modalButton('cancel')
@@ -4446,7 +4441,7 @@ server <- function(input, output, session){
       control_new <- control
       ID <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$ID
 
-      control_new$smooth.gc <- dplyr::if_else(!is.na(as.numeric(input$smooth.gc.rerun.fluorescence)), as.numeric(input$smooth.gc.rerun.fluorescence), control$lin.R2)
+      control_new$smooth.fl <- dplyr::if_else(!is.na(as.numeric(input$smooth.fl.rerun.fluorescence)), as.numeric(input$smooth.fl.rerun.fluorescence), control$smooth.fl)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun.fluorescence)), as.numeric(input$t0.spline.rerun.fluorescence), control$t0)
       min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun.fluorescence)), as.numeric(input$min.density.spline.rerun.fluorescence), control$min.density)
       if(is.numeric(min.density.spline.new)){
@@ -4509,6 +4504,7 @@ server <- function(input, output, session){
                 y.title = input$y_axis_title_growth_group_plot,
                 x.title = input$x_axis_title_growth_group_plot,
                 y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
+                n.ybreaks = input$nbreaks_growth_group_plot,
                 lwd = input$line_width_growth_group_plot,
                 basesize = input$base_size_growth_group_plot,
                 shiny = TRUE
@@ -4547,6 +4543,8 @@ server <- function(input, output, session){
     plot.drFit(drFit = results,
                combine = TRUE,
                pch = input$shape_type_dose_response_growth_plot,
+               names = input$select_samples_based_on_string_dose_response_growth_plot,
+               exclude.nm = input$exclude_samples_based_on_string_dose_response_growth_plot,
                y.lim = c(as.numeric(input$y_range_min_dose_response_growth_plot), as.numeric(input$y_range_max_dose_response_growth_plot)),
                x.lim = c(as.numeric(input$x_range_min_dose_response_growth_plot), as.numeric(input$x_range_max_dose_response_growth_plot)),
                y.title = input$y_axis_title_dose_response_growth_plot,
@@ -4614,8 +4612,8 @@ server <- function(input, output, session){
                      combine = FALSE,
                      pch = input$shape_type_dose_response_growth_plot,
                      cex.point = input$shape_size_dose_response_growth_plot,
-                     cex.lab = input$lab_size_dose_response_growth_plot,
-                     cex.axis = input$axis_size_dose_response_growth_plot,
+                     cex.lab = input$axis_size_dose_response_growth_plot,
+                     cex.axis = input$lab_size_dose_response_growth_plot,
                      y.title = input$y_axis_title_dose_response_growth_plot,
                      x.title = input$x_axis_title_dose_response_growth_plot,
                      log = log,
@@ -4790,6 +4788,7 @@ server <- function(input, output, session){
                 y.title.deriv = input$y_axis_title_derivative_fluorescence_group_plot,
                 lwd = input$line_width_fluorescence_group_plot,
                 basesize = input$base_size_fluorescence_group_plot,
+                n.ybreaks = input$nbreaks_fluorescence_group_plot,
                 shiny = TRUE
     )
   })
@@ -4861,12 +4860,14 @@ server <- function(input, output, session){
     results <- results$fluorescence$drFit1
     plot.drFit(results,
                combine=TRUE,
+               names = input$select_samples_based_on_string_dose_response_fluorescence_plot,
+               exclude.nm = input$exclude_samples_based_on_string_dose_response_fluorescence_plot,
                pch = input$shape_type_dose_response_fluorescence_plot,
                cex = input$shape_size_dose_response_fluorescence_plot,
                basesize = input$base_size_dose_response_fluorescence_plot,
                lwd = input$line_width_dose_response_fluorescence_plot,
                ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot,
-               y.lim = c(as.numeric(input$x_range_min_dose_response_fluorescence_plot), as.numeric(input$y_range_max_dose_response_fluorescence_plot)),
+               y.lim = c(as.numeric(input$y_range_min_dose_response_fluorescence_plot), as.numeric(input$y_range_max_dose_response_fluorescence_plot)),
                x.lim = c(as.numeric(input$x_range_min_dose_response_fluorescence_plot), as.numeric(input$x_range_max_dose_response_fluorescence_plot)),
                y.title = input$y_axis_title_dose_response_fluorescence_plot,
                x.title = input$x_axis_title_dose_response_fluorescence_plot,
@@ -4921,15 +4922,14 @@ server <- function(input, output, session){
           xlim <- c(as.numeric(input$x_range_min_dose_response_fluorescence_plot),
                     as.numeric(input$x_range_max_dose_response_fluorescence_plot))
         }
-
         plot.drFitSpline(results,
                          combine=FALSE,
                          pch = input$shape_type_dose_response_fluorescence_plot,
                          cex.point = input$shape_size_dose_response_fluorescence_plot,
                          lwd = input$line_width_dose_response_fluorescence_plot,
                          ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot,
-                         cex.lab = input$lab_size_dose_response_fluorescence_plot,
-                         cex.axis = input$axis_size_dose_response_fluorescence_plot,
+                         cex.lab = input$axis_size_dose_response_fluorescence_plot,
+                         cex.axis = input$lab_size_dose_response_fluorescence_plot,
                          y.title = input$y_axis_title_dose_response_fluorescence_plot,
                          x.title = input$x_axis_title_dose_response_fluorescence_plot,
                          log = log,
@@ -4959,7 +4959,7 @@ server <- function(input, output, session){
                           choices = select_inputs_individual_plots_dose_response_fluorescence_plot())
       })
 
-      ### DR Plots Model ####
+      ### DR Plots Model individual ####
 
       output$dose_response_model_fluorescence_plot_individual <- renderPlot({
         results <- results$fluorescence$drFit1$drFittedModels[[input$individual_plots_dose_response_model_fluorescence_plot]]
@@ -4999,8 +4999,8 @@ server <- function(input, output, session){
                         lwd = input$line_width_dose_response_model_fluorescence_plot,
                         ec50line = input$show_ec50_indicator_lines_dose_response_model_fluorescence_plot,
                         log = log,
-                        cex.lab = input$lab_size_dose_response_model_fluorescence_plot,
-                        cex.axis = input$axis_size_dose_response_model_fluorescence_plot,
+                        cex.lab = input$axis_size_dose_response_model_fluorescence_plot,
+                        cex.axis = input$lab_size_dose_response_model_fluorescence_plot,
                         y.lim = ylim,
                         x.lim = xlim
         )
@@ -5051,7 +5051,6 @@ server <- function(input, output, session){
           reference.conc <- NULL
           reference.nm <- NULL
         }
-
         plot.parameter(results,
                        param = input$parameter_fluorescence_parameter_fluorescence_plot,
                        names = input$select_sample_based_on_string_fluorescence_parameter_plot,
@@ -5129,11 +5128,6 @@ server <- function(input, output, session){
         results$expdesign$concentration
       })
 
-      select_inputs_individual_plots_dose_response_fluorescence_plot<- reactive({
-        if (length(results$fluorescence$drFit1)>1) names(results$fluorescence$drFit1$drFit1tedSplines)
-        else return("")
-      })
-
       observe({
         updateSelectInput(inputId = "parameter_fluorescence_parameter_fluorescence_plot",
                           choices = selected_inputs_parameter_fluorescence_parameter_plot()
@@ -5174,6 +5168,7 @@ server <- function(input, output, session){
                     y.title.fl = input$y_axis_title_fluorescence_dual_plot,
                     y.title.density = input$y_axis_title_density_dual_plot,
                     x.title = input$x_axis_title_dual_plot,
+                    n.ybreaks = input$nbreaks_dual_plot,
                     lwd = input$line_width_dual_plot,
                     basesize = input$base_size_dual_plot,
                     shiny = TRUE

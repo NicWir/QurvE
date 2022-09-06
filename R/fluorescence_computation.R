@@ -33,7 +33,7 @@
 #'
 #' @return Generates a list with all arguments described above as entries.
 #'
-#' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). \doi{10.1038/s41589-018-0168-3}
+#' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
 #' @export
 #'
@@ -890,7 +890,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
 
     # Assign classes to list elements
     for(i in 1:length(fitlinear.all)){
-      class(fitlinear.all[[i]]) <- "gcFitLinear"
+      class(fitlinear.all[[i]]) <- "flFitLinear"
     }
     # for(i in 1:length(fitpara.all)){
     #   class(fitpara.all[[i]]) <- "gcFitModel"
@@ -899,7 +899,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     #   class(fitnonpara.all[[i]]) <- "gcFitSpline"
     # }
     for(i in 1:length(boot.all)){
-      class(boot.all[[i]]) <- "gcBootSpline"
+      class(boot.all[[i]]) <- "flBootSpline"
     }
   }
 
@@ -1226,8 +1226,8 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
 #' \item{fitFlag2}{(Logical) Indicates whether a second phase was identified.}
 #' \item{reliable}{(Logical) Indicates whether the performed fit is reliable (to be set manually).}
 #'
-#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
-#' Petzoldt T (2022). _growthrates: Estimate Growth Rates from Experimental Data_. R package version 0.8.3, <https://CRAN.R-project.org/package=growthrates>.
+#' @references Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, DOI: 10.1093/molbev/mst187
+#' @references Petzoldt T (2022). _growthrates: Estimate Growth Rates from Experimental Data_. R package version 0.8.3, <https://CRAN.R-project.org/package=growthrates>.
 #'
 #' @export
 #'
@@ -2616,7 +2616,7 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50, format = c(
 #'
 #' @export
 #'
-#' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). \doi{10.1038/s41589-018-0168-3}
+#' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
 fl.drFit <- function(FitData, control = fl.control())
 {
@@ -2733,7 +2733,7 @@ fl.drFit <- function(FitData, control = fl.control())
 #'
 #' @export
 #'
-#' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). \doi{10.1038/s41589-018-0168-3}
+#' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
 fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control())
 {
