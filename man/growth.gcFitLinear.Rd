@@ -86,7 +86,7 @@ Hall et al. (2013).
 \details{
 The algorithm works as follows:
 \enumerate{
-\item Fit linear regressions to all subsets of \code{h} consecutive, log-transformed data
+\item Fit linear regressions (Theil-Sen estimator) to all subsets of \code{h} consecutive, log-transformed data
 points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear regression to points
 1 \dots 5, 2 \dots 6, 3 \dots 7 and so on.
 \item Find the subset with the highest slope \eqn{mu_{max}}. Does the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} value of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
@@ -104,8 +104,11 @@ If \code{biphasic = TRUE}, the following steps are performed to define a second 
 }
 }
 \references{
-Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
-Petzoldt T (2022). \emph{growthrates: Estimate Growth Rates from Experimental Data}. R package version 0.8.3, \url{https://CRAN.R-project.org/package=growthrates}.
+Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. \emph{Mol. Biol. Evol.} 31: 232-38, DOI: 10.1093/molbev/mst187
+
+Petzoldt T (2022). growthrates: Estimate Growth Rates from Experimental Data. R package version 0.8.3, \url{https://CRAN.R-project.org/package=growthrates}.
+
+Theil, H.(1992). A rank-invariant method of linear and polynomial regression analysis. In: Henri Theil’s contributions to economics and econometrics. Springer, pp. 345–381. DOI: 10.1007/978-94-011-2546-8_20
 }
 \seealso{
 Other growth fitting functions: 

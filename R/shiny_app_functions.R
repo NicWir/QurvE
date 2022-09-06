@@ -55,16 +55,20 @@ parse_data_shiny <-
     } # if("Gen5" %in% software)
     # Convert time values to hours
     if(convert.time){
-      for(i in 1:length(data.ls[!is.na(data.ls)])){
-        data.ls[[i]][2:nrow(data.ls[[1]]),1] <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])*24
+      for(i in 1:length(data.ls)){
+        if(length(data.ls[[i]]) > 1) data.ls[[i]][2:nrow(data.ls[[i]]),1] <- as.numeric(data.ls[[i]][2:nrow(data.ls[[i]]),1])*24
       }
     }
     noNA.ndx <- which(!is.na(data.ls))
 
     # Remove any columns between time and 'A1'
-    A1.ndx <- match("A1", data.ls[[1]][1,])
+    A1.ndx <- match("A1", data.ls[[noNA.ndx[1]]][1,])
     if(A1.ndx>2){
-      data.ls <- lapply(noNA.ndx, function(x) data.ls[[x]][ ,c(1,A1.ndx:ncol(read.data[[x]]))])
+      for(i in 1:length(data.ls)){
+        if(length(data.ls[[i]]) > 1){
+          data.ls[[i]] <- data.ls[[i]][ ,c(1,A1.ndx:ncol(read.data[[i]]))]
+        }
+      }
     }
     # apply identifiers specified in mapping file
     for(i in noNA.ndx){
@@ -88,16 +92,9 @@ parse_data_shiny <-
         data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
       }
     }
-    if(length(data.ls)==1){
-      names(data.ls) <- "density"
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = NA, data.fluoro2 = NA, subtract.blank = subtract.blank)
-    } else if(length(data.ls)==2){
-      names(data.ls) <- c("density", "fluorescence1")
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = NA, subtract.blank = subtract.blank)
-    } else {
-      names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank)
-    }
+    names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
+    grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank)
+
     return(grodata)
   }
 
@@ -136,24 +133,24 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
   if (!is.null(density.nm) && density.nm != "Ignore")
     density <- read.data[[match(density.nm, reads)]]
   else
-    density <-  read.data[[match(density.nm, reads)]] <- NULL
+    density  <- NA
 
   if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
     fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
     fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
   }
   else
-    fluorescence1 <- NULL
+    fluorescence1 <- NA
 
   if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
     fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
     fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
   }
   else
-    fluorescence2 <- NULL
+    fluorescence2 <- NA
 
 
-  density <- read.data[[1]]
+  # density <- read.data[[1]]
   data.ls[[1]] <- density
   data.ls[[2]] <- fluorescence1
   data.ls[[3]] <- fluorescence2

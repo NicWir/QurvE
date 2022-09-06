@@ -184,8 +184,8 @@ read_data <-
         return(df)
       }
       if(length(dat)>1)             dat <- subtract_blank(dat)
-      if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1 <- subtract_blank(df=fluoro1)
-      if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- subtract_blank(df=fluoro2)
+      if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1 <- subtract_blank(df=fluoro1)
+      if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- subtract_blank(df=fluoro2)
     }
 
     ### Combine technical replicates
@@ -235,8 +235,8 @@ read_data <-
       return(df)
     }
     if(length(dat)>1)              dat <- combine_techrep(dat)
-    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- combine_techrep(df=fluoro1)
-    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- combine_techrep(df=fluoro2)
+    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- combine_techrep(df=fluoro1)
+    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- combine_techrep(df=fluoro2)
 
 
     # remove blank columns from dataset
@@ -248,23 +248,23 @@ read_data <-
       return(df)
     }
     if(length(dat)>1)              dat <- remove_blank(dat)
-    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- remove_blank(df=fluoro1)
-    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
+    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- remove_blank(df=fluoro1)
+    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
 
     # Remove columns with NA measurements in all samples
     if(length(dat)>1)              dat <- dat[, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
-    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- fluoro1[, which(unlist(lapply(4:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))]
-    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))]
+    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- fluoro1[, which(unlist(lapply(4:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))]
+    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))]
 
     # add minimum negative value + 1 to all fluorescence data
-    if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)){
+    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1)){
       num.fluoro1 <- t(apply(fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)], 1, as.numeric))
       min.F1 <- unique(num.fluoro1[which(num.fluoro1 == min(num.fluoro1, na.rm = TRUE), arr.ind = TRUE)])
       if(min.F1 <=0){
         fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)] <- num.fluoro1+(-min.F1)+1
       }
     }
-    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){
+    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){
       num.fluoro2 <- t(apply(fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)], 1, as.numeric))
       min.F2 <- unique(num.fluoro2[which(num.fluoro2 == min(num.fluoro2, na.rm = TRUE), arr.ind = TRUE)])
       if(min.F2 <=0){
@@ -273,13 +273,13 @@ read_data <-
     }
 
     # normalize fluorescence
-    if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){
+    if(((length(fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){
       fluoro1.norm <- fluoro1
       time.ndx <- grep("time", unlist(fluoro1.norm[,1]), ignore.case = TRUE)
       fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)] <-
         t(apply(fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
     }
-    if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){
+    if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){
       fluoro2.norm <- fluoro1
       time.ndx <- grep("time", unlist(fluoro2.norm[,1]), ignore.case = TRUE)
       fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)] <-
@@ -354,28 +354,28 @@ read_data <-
     return(df.mat)
   }
   if(length(dat)>1){dat.mat <- create_datmat(dat, time.ndx=time.ndx); dat.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{dat.mat <- NA}
-  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx);  fluoro1.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro1.mat <- NA}
-  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx);  fluoro2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro2.mat <- NA}
-  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx);  fluoro1.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro1.norm.mat <- NA}
-  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx);  fluoro2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{fluoro2.norm.mat <- NA}
+  if((length(fluoro1) > 1 ) || !is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx);  fluoro1.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro1.mat[,1])}else{fluoro1.mat <- NA}
+  if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx);  fluoro2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.mat[,1])}else{fluoro2.mat <- NA}
+  if(((length(fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx);  fluoro1.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro1.norm.mat[,1])}else{fluoro1.norm.mat <- NA}
+  if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx);  fluoro2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.norm.mat[,1])}else{fluoro2.norm.mat <- NA}
 
   if(length(dat)>1)             colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  colnames(fluoro1.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))    colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(((length(fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  colnames(fluoro1.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+    if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
 
   if(length(dat) > 1) {
     label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
     condition <- dat.mat[, 1]
     replicate <- dat.mat[, 2]
     concentration <- dat.mat[, 3]
-  } else if(length(data.fluoro1) > 1){
+  } else if(length(fluoro1) > 1){
     label <- unlist(lapply(1:nrow(fluoro1.mat), function(x) paste(fluoro1.mat[x,1], fluoro1.mat[x,2], fluoro1.mat[x,3], sep = " | ")))
     condition <- fluoro1.mat[, 1]
     replicate <- fluoro1.mat[, 2]
     concentration <- fluoro1.mat[, 3]
-  } else if(length(data.fluoro2) > 1){
+  } else if(length(fluoro2) > 1){
     label <- unlist(lapply(1:nrow(fluoro2.mat), function(x) paste(fluoro2.mat[x,1], fluoro2.mat[x,2], fluoro2.mat[x,3], sep = " | ")))
     condition <- fluoro2.mat[, 1]
     replicate <- fluoro2.mat[, 2]

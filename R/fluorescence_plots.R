@@ -1865,7 +1865,7 @@ plot.dual <-  function(object,
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
   } # if(mean == TRUE)
   else {
     df <- data.frame()
@@ -2003,7 +2003,7 @@ plot.dual <-  function(object,
         )
       }
     }
-    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
   }
   if(export == FALSE && plot == FALSE){
     return(p)

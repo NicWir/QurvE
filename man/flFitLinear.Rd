@@ -73,6 +73,7 @@ Determine maximum slopes from using a heuristic approach similar to the ``growth
 Hall et al. (2013).
 }
 \references{
-Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, \doi{10.1093/molbev/mst187}
+Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. Mol. Biol. Evol. 31: 232-38, DOI: 10.1093/molbev/mst187
+
 Petzoldt T (2022). \emph{growthrates: Estimate Growth Rates from Experimental Data}. R package version 0.8.3, \url{https://CRAN.R-project.org/package=growthrates}.
 }

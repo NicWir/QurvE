@@ -44,5 +44,5 @@ Use \code{\link{plot.drFitModel}} to visualize the model fit.
 \code{fl.drFitModel} fits the biosensor model proposed by Meyer et al. (2019) to the provided response (e.g., \code{max_slope.spline} vs. concentration data to determine the leakiness, sensitivity, induction fold-change, and cooperativity.
 }
 \references{
-Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. \emph{Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors.} Nat Chem Biol 15, 196–204 (2019). \doi{10.1038/s41589-018-0168-3}
+Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. \emph{Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors.} Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 }

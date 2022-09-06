@@ -37,7 +37,7 @@ physiological parameters.
 \code{growth.gcBootSpline} resamples the density-time value pairs in a dataset with replacement and performs a spline fit for each bootstrap sample.
 }
 \references{
-Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. \doi{10.18637/jss.v033.i07}
+Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }
 \seealso{
 Other growth fitting functions: 

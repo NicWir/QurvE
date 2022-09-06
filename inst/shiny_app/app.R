@@ -50,6 +50,12 @@ cursor: not-allowed !important;
 border-color: #aaa !important;
 }"
 
+load_data <- function() {
+  Sys.sleep(2)
+  hide("loading_page")
+  show("main_content")
+}
+
 ui <- fluidPage(theme = shinytheme('sandstone'),
                 tagList(
                   # tags$style(type = 'text/css', '.navbar {
@@ -87,7 +93,14 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                   useShinyjs(),
                   shinyjs::extendShinyjs(text = jscode, functions = c("disableTab","enableTab")),
                   shinyjs::inlineCSS(css),
-                  navbarPage(
+                  div(
+                    id = "loading_page",
+                    h1("Initializing...")
+                  ),
+                  hidden(
+                    div(
+                      id = "main_content",
+                      navbarPage(
                     'QurvE',
                     id = "navbar",
 
@@ -239,7 +252,8 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     ),
 
                                                     checkboxInput(inputId = 'subtract_blank_custom',
-                                                                  label = 'Subtract blank'),
+                                                                  label = 'Subtract blank',
+                                                                  value = TRUE),
 
                                                     checkboxInput(inputId = 'calibration',
                                                                   label = 'Calibration (under construction)'),
@@ -915,6 +929,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                     #____RESULTS____####
 
                     navbarMenu(title = "Results", menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
+                               ##____Results_Growth___####
                                tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
                                         tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Growth",
                                                     tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
@@ -937,7 +952,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     )
                                         )
                                ),
-
+                               ##____Results_Fluorescence___####
                                tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
                                         tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Fluorescence",
                                                     tabPanel(title = "Linear Fit", value = "tabPanel_Results_Fluorescence_Linear",
@@ -958,13 +973,13 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                )
                     ),
                     #____VALIDATE____####
-                    navbarMenu("Validate", icon = icon("user-check"),
+                    navbarMenu("Validate",  menuName = "navbarMenu_Validate", icon = icon("user-check"),
                                ##____Validate_Growth____####
                                tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
                                         h1("Growth Fits"),
-                                        tabsetPanel(type = "tabs",
+                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Validate_Growth",
                                                     ###___Linear Fits___####
-                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_linearFits",
+                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_Linear",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_growth_linear",
                                                                                       label = "Sample:",
@@ -1030,7 +1045,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     ), #tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_linearFits",
                                                     ###___Spline Fits___####
-                                                    tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
+                                                    tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_Spline",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_growth_spline",
                                                                                       label = "Sample:",
@@ -1098,7 +1113,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
                                                     ###___Model Fits___####
-                                                    tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
+                                                    tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_Model",
                                                              sidebarPanel(width = 5,
                                                                           wellPanel(
                                                                             style='background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
@@ -1170,9 +1185,9 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ##____Validate_Fluorescence____####
                                tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
                                         h1("Fluorescence Fits"),
-                                        tabsetPanel(type = "tabs",
+                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Validate_Fluorescence",
                                                     ###___Linear Fits___####
-                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Fluorescence_linearFits",
+                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Fluorescence_Linear",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_fluorescence_linear",
                                                                                       label = "Sample:",
@@ -1208,7 +1223,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
 
                                                     ),
                                                     ###___Spline Fits___####
-                                                    tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
+                                                    tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_Spline",
                                                              sidebarPanel(width = 5,
                                                                           selectInput(inputId = "sample_validate_fluorescence_spline",
                                                                                       label = "Sample:",
@@ -1247,7 +1262,7 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                ) # tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
                     ), # navbarMenu("Validate", icon = icon("user-check"),
                     #____Visualize____####
-                    navbarMenu("Visualize", icon = icon("chart-line"),
+                    navbarMenu("Visualize",  menuName = "navbarMenu_Visualize", icon = icon("chart-line"),
                                ## Growth Plots ####
                                tabPanel(title = "Growth Plots", value = "tabPanel_Visualize_Growth",
                                         h1("Growth Plots"),
@@ -2394,183 +2409,183 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                  ), # column
                                                                ) # fluidRow
                                                              ) # mainPanel
-                                                    ) #  tabPanel(title = "Parameter plots"
+                                                    ), #  tabPanel(title = "Parameter plots"
+                                                    ## Growth & Fluorescence Plots ####
+
+                                                    tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_Dual",
+                                                             h1("Growth & Flourescence Plot"),
+
+                                                             sidebarPanel(
+
+                                                               selectInput(inputId = "fluorescence_type_dual_plot",
+                                                                           label = "Fluorescence type",
+                                                                           choices = c("Fluorescence 1" = "fl1",
+                                                                                       "Fluorescence 1" = "fl2",
+                                                                                       "Normalized fluorescence 1" = "norm.fl1",
+                                                                                       "Normalized fluorescence 2" = "norm.fl2")
+                                                               ),
+
+                                                               textInput(inputId = "select_samples_based_on_string_dual_plot",
+                                                                         label = "Select sample based on string (separate by ;)"
+                                                               ),
+
+                                                               textInput(inputId = "select_samples_based_on_concentration_dual_plot",
+                                                                         label = "Select sample based on concentration (separate by ;)"
+                                                               ),
+
+                                                               textInput(inputId = "exclude_samples_based_on_string_dual_plot",
+                                                                         label = "Exclude sample based on string (separate by ;)"
+                                                               ),
+
+                                                               textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
+                                                                         label = "Exclude sample based on concentration (separate by ;)"
+                                                               ),
+
+                                                               checkboxInput(inputId = "plot_group_averages_dual_plot",
+                                                                             label = "Plot group averages",
+                                                                             value = TRUE),
+
+                                                               h3("Customize plot appearance"),
+
+                                                               checkboxInput(inputId = "log_transform_y_axis_density_dual_plot",
+                                                                             label = "Log-transform y-axis (Density)",
+                                                                             value = FALSE),
+
+                                                               checkboxInput(inputId = "log_transform_y_axis_fluorescence_dual_plot",
+                                                                             label = "Log-transform y-axis (Fluorescence)",
+                                                                             value = FALSE),
+
+                                                               strong("x-Range"),
+                                                               fluidRow(
+                                                                 column(5,
+                                                                        textInput(inputId = "x_range_min_dual_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(5,
+                                                                        textInput(inputId = "x_range_max_dual_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+
+                                                               strong("y-Range (Density)"),
+                                                               fluidRow(
+                                                                 column(5,
+                                                                        textInput(inputId = "y_range_min_density_dual_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(5,
+                                                                        textInput(inputId = "y_range_max_density_dual_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+
+                                                               strong("y-Range (Fluorescence"),
+                                                               fluidRow(
+                                                                 column(5,
+                                                                        textInput(inputId = "y_range_min_fluorescence_dual_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "min"
+                                                                        )
+                                                                 ),
+
+                                                                 column(5,
+                                                                        textInput(inputId = "y_range_max_fluorescence_dual_plot",
+                                                                                  label = NULL,
+                                                                                  value = "", placeholder = "max"
+                                                                        )
+                                                                 )
+                                                               ),
+
+                                                               textInput(inputId = "y_axis_title_density_dual_plot",
+                                                                         label = "y-axis title (Density)",
+                                                                         value = ""
+                                                               ),
+
+                                                               textInput(inputId = "y_axis_title_fluorescence_dual_plot",
+                                                                         label = "y-axis title (Fluorescence)",
+                                                                         value = ""
+                                                               ),
+
+                                                               textInput(inputId = "x_axis_title_dual_plot",
+                                                                         label = "x-axis title",
+                                                                         value = ""
+                                                               ),
+
+                                                               sliderInput(inputId = "nbreaks_dual_plot",
+                                                                           label = "Number of breaks on y-axis",
+                                                                           min = 1,
+                                                                           max = 20,
+                                                                           value = 6),
+
+                                                               sliderInput(inputId = "line_width_dual_plot",
+                                                                           label = "Line width",
+                                                                           min = 0.01,
+                                                                           max = 10,
+                                                                           value = 1.1),
+
+                                                               sliderInput(inputId = 'base_size_dual_plot',
+                                                                           label = 'Base font size',
+                                                                           min = 10,
+                                                                           max = 35,
+                                                                           value = 20,
+                                                                           step = 0.5)
+                                                             ),
+
+                                                             mainPanel(
+                                                               plotOutput("dual_plot",
+                                                                          width = "100%", height = "1000px"),
+
+                                                               h3(strong("Export plot")),
+
+                                                               fluidRow(
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "width_download_dual_plot",
+                                                                                     label = "Width (in inches)",
+                                                                                     value = 7)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "height_download_dual_plot",
+                                                                                     label = "Height (in inches)",
+                                                                                     value = 6)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "dpi_download_dual_plot",
+                                                                                     label = "DPI",
+                                                                                     value = 300)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        downloadButton('download_dual_plot',"Download Plot"),
+
+                                                                        radioButtons("format_download_dual_plot",
+                                                                                     label = NULL,
+                                                                                     choices = c("PNG" = ".png",
+                                                                                                 "PDF" = ".pdf"),
+                                                                                     selected = ".png",
+                                                                                     inline = TRUE)
+                                                                 ), # column
+                                                               ) # fluidRow
+                                                             ) # mainPanel
+                                                    ) # tabPanel(title = "Growth & Flourescence Plot")
                                         ) # tabsetPanel(type = "tabs",
                                ), # tabPanel(title = "Fluorescence Plots"
 
-                               ## Growth & Fluorescence Plots ####
 
-                               tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_Dual",
-                                        h1("Growth & Flourescence Plot"),
-
-                                        sidebarPanel(
-
-                                          selectInput(inputId = "fluorescence_type_dual_plot",
-                                                      label = "Fluorescence type",
-                                                      choices = c("Fluorescence 1" = "fl1",
-                                                                  "Fluorescence 1" = "fl2",
-                                                                  "Normalized fluorescence 1" = "norm.fl1",
-                                                                  "Normalized fluorescence 2" = "norm.fl2")
-                                          ),
-
-                                          textInput(inputId = "select_samples_based_on_string_dual_plot",
-                                                    label = "Select sample based on string (separate by ;)"
-                                          ),
-
-                                          textInput(inputId = "select_samples_based_on_concentration_dual_plot",
-                                                    label = "Select sample based on concentration (separate by ;)"
-                                          ),
-
-                                          textInput(inputId = "exclude_samples_based_on_string_dual_plot",
-                                                    label = "Exclude sample based on string (separate by ;)"
-                                          ),
-
-                                          textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
-                                                    label = "Exclude sample based on concentration (separate by ;)"
-                                          ),
-
-                                          checkboxInput(inputId = "plot_group_averages_dual_plot",
-                                                        label = "Plot group averages",
-                                                        value = TRUE),
-
-                                          h3("Customize plot appearance"),
-
-                                          checkboxInput(inputId = "log_transform_y_axis_density_dual_plot",
-                                                        label = "Log-transform y-axis (Density)",
-                                                        value = TRUE),
-
-                                          checkboxInput(inputId = "log_transform_y_axis_fluorescence_dual_plot",
-                                                        label = "Log-transform y-axis (Fluorescence)",
-                                                        value = TRUE),
-
-                                          strong("x-Range"),
-                                          fluidRow(
-                                            column(5,
-                                                   textInput(inputId = "x_range_min_dual_plot",
-                                                             label = NULL,
-                                                             value = "", placeholder = "min"
-                                                   )
-                                            ),
-
-                                            column(5,
-                                                   textInput(inputId = "x_range_max_dual_plot",
-                                                             label = NULL,
-                                                             value = "", placeholder = "max"
-                                                   )
-                                            )
-                                          ),
-
-                                          strong("y-Range (Density)"),
-                                          fluidRow(
-                                            column(5,
-                                                   textInput(inputId = "y_range_min_density_dual_plot",
-                                                             label = NULL,
-                                                             value = "", placeholder = "min"
-                                                   )
-                                            ),
-
-                                            column(5,
-                                                   textInput(inputId = "y_range_max_density_dual_plot",
-                                                             label = NULL,
-                                                             value = "", placeholder = "max"
-                                                   )
-                                            )
-                                          ),
-
-                                          strong("y-Range (Fluorescence"),
-                                          fluidRow(
-                                            column(5,
-                                                   textInput(inputId = "y_range_min_fluorescence_dual_plot",
-                                                             label = NULL,
-                                                             value = "", placeholder = "min"
-                                                   )
-                                            ),
-
-                                            column(5,
-                                                   textInput(inputId = "y_range_max_fluorescence_dual_plot",
-                                                             label = NULL,
-                                                             value = "", placeholder = "max"
-                                                   )
-                                            )
-                                          ),
-
-                                          textInput(inputId = "y_axis_title_density_dual_plot",
-                                                    label = "y-axis title (Density)",
-                                                    value = ""
-                                          ),
-
-                                          textInput(inputId = "y_axis_title_fluorescence_dual_plot",
-                                                    label = "y-axis title (Fluorescence)",
-                                                    value = ""
-                                          ),
-
-                                          textInput(inputId = "x_axis_title_dual_plot",
-                                                    label = "x-axis title",
-                                                    value = ""
-                                          ),
-
-                                          sliderInput(inputId = "nbreaks_dual_plot",
-                                                      label = "Number of breaks on y-axis",
-                                                      min = 1,
-                                                      max = 20,
-                                                      value = 6),
-
-                                          sliderInput(inputId = "line_width_dual_plot",
-                                                      label = "Line width",
-                                                      min = 0.01,
-                                                      max = 10,
-                                                      value = 1.1),
-
-                                          sliderInput(inputId = 'base_size_dual_plot',
-                                                      label = 'Base font size',
-                                                      min = 10,
-                                                      max = 35,
-                                                      value = 20,
-                                                      step = 0.5)
-                                        ),
-
-                                        mainPanel(
-                                          plotOutput("dual_plot",
-                                                     width = "100%", height = "1000px"),
-
-                                          h3(strong("Export plot")),
-
-                                          fluidRow(
-                                            column(width = 4,
-                                                   numericInput(inputId = "width_download_dual_plot",
-                                                                label = "Width (in inches)",
-                                                                value = 7)
-                                            ), # column
-                                            column(width = 4,
-                                                   numericInput(inputId = "height_download_dual_plot",
-                                                                label = "Height (in inches)",
-                                                                value = 6)
-                                            ), # column
-                                            column(width = 4,
-                                                   numericInput(inputId = "dpi_download_dual_plot",
-                                                                label = "DPI",
-                                                                value = 300)
-                                            ), # column
-                                            column(width = 4,
-                                                   downloadButton('download_dual_plot',"Download Plot"),
-
-                                                   radioButtons("format_download_dual_plot",
-                                                                label = NULL,
-                                                                choices = c("PNG" = ".png",
-                                                                            "PDF" = ".pdf"),
-                                                                selected = ".png",
-                                                                inline = TRUE)
-                                            ), # column
-                                          ) # fluidRow
-                                        ) # mainPanel
-
-                               ) # tabPanel(title = "Growth & Flourescence Plot")
                     ), # navbarMenu("Visualize"
 
                     #____REPORT____####
 
 
-                    tabPanel("Report", icon=icon("file-contract"),
+                    tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
                              sidebarPanel(width = 6,
                                shinyDirButton("report_dir",
                                               "Choose destination for saving",
@@ -2633,19 +2648,49 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                 # TODO: Which plots, which options, ...
                 verbatimTextOutput("debug")
 )
+)
+)
 
 #____SERVER____####
 
 server <- function(input, output, session){
+  load_data()
   output$debug <- renderPrint({
 
     paste(
       input$dimension)
     })
-  # # Disable navbar menus before running computations
-  # disable(selector = "#navbar li a[data-value=Report]")
-  # disable(selector = "#navbar li a[data-value=Visualize]")
-  # disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+  # Disable navbar menus before running computations
+  shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Report]")
+  shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
+  shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
+  shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+  shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
+  # Disable menus based on the type of computations run
+  observe({
+    if(is.null(results$growth)){
+      shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Results_Growth]")
+      shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Validate_Growth]")
+      shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Visualize_Growth]")
+    } else {
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Results_Growth]")
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Validate_Growth]")
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Visualize_Growth]")
+    }
+
+    if(is.null(results$fluorescence)){
+      shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
+      shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Validate_Fluorescence]")
+      shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Visualize_Fluorescence]")
+      shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Visualize_GrowthandFluorescence]")
+    } else {
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Validate_Fluorescence]")
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Visualize_Fluorescence]")
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Visualize_GrowthandFluorescence]")
+    }
+  })
+
 
   # sidePanel_width <- reactive({
   #   if(as.numeric(input$dimension[1]) < 1000) return(TRUE)
@@ -2718,7 +2763,7 @@ server <- function(input, output, session){
     # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
 
 
-    # browser()
+    browser()
 
     ## Read data
     try(
@@ -2739,7 +2784,7 @@ server <- function(input, output, session){
     )
 
     if(length(results$custom_data)<2){
-      showModal(modalDialog("Data coult not be extracted from the provided file. Did you correctly format your custom data?", easyClose = T, footer=NULL))
+      showModal(modalDialog("Data could not be extracted from the provided file. Did you correctly format your custom data?", easyClose = T, footer=NULL))
     } else {
 
       showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
@@ -2765,6 +2810,8 @@ server <- function(input, output, session){
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
 
       removeModal()
     }
@@ -3207,7 +3254,6 @@ server <- function(input, output, session){
   observeEvent(input$parse_data,{
 
     showModal(modalDialog("Parsing data input...", footer=NULL))
-
     if(input$mapping_included_in_parse){
       try(
         results$parsed_data <- parse_data_shiny(
@@ -3287,6 +3333,8 @@ server <- function(input, output, session){
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
 
     removeModal()
   })
@@ -3476,13 +3524,11 @@ server <- function(input, output, session){
 
                         )
     )
-    ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
-    # enable(selector = "#navbar li a[data-value=Report]")
-    # enable(selector = "#navbar li a[data-value=Visualize]")
-    # enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
-    # hide(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
-    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_Fluorescence]")
-    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_GrowthandFluorescence]")
+    # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
 
 
     # )},
@@ -3568,13 +3614,11 @@ server <- function(input, output, session){
       fit.opt <- c(fit.opt,
                    's')
     }
-    # browser()
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
     # Run growth workflow
     try(
       shiny::withProgress(message = "Computations completed",
-
                           results$fluorescence <- fl.workflow(grodata = grodata,
                                                               ec50 = input$perform_ec50_fluorescence,
                                                               fit.opt = fit.opt,
@@ -3613,12 +3657,11 @@ server <- function(input, output, session){
       )
     )
     ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
-    # enable(selector = "#navbar li a[data-value=Report]")
-    # enable(selector = "#navbar li a[data-value=Visualize]")
-    # enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
-    # hide(selector = "#navbar li a[data-value=tabPanel_Results_Fluorescence]")
-    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_Fluorescence]")
-    # hide(selector = "#navbar li a[data-value=tabPabel_Visualize_GrowthandFluorescence]")
+    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
+
 
 
     # )},
@@ -3636,13 +3679,13 @@ server <- function(input, output, session){
   observe({
     if(!is.null(results$growth)){
       if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
-        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Spline")
+        hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline")
       }
       if(!("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
-        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Linear")
+        hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Linear")
       }
       if(!("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
-        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Growth_Model")
+        hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Model")
 
       }
     }
@@ -3757,10 +3800,10 @@ server <- function(input, output, session){
   observe({
     if(!is.null(results$fluorescence)){
       if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
-        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Fluorescence_Spline")
+        hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline")
       }
       if(!("l" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
-        hideTab(inputId = "tabsetPanel_Results", target = "tabPanel_Results_Fluorescence_Linear")
+        hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Linear")
       }
     }
   })
@@ -3831,6 +3874,20 @@ server <- function(input, output, session){
 
   # Validate ####
     ## Growth #####
+  observe({
+    if(!is.null(results$growth)){
+      if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Spline")
+      }
+      if(!("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Linear")
+      }
+      if(!("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Model")
+
+      }
+    }
+  })
 
   #### Hide [Restore Fit] buttons when starting the app
   hide("restore_growth_linear"); hide("restore_growth_spline"); hide("restore_growth_model")
@@ -4246,7 +4303,16 @@ server <- function(input, output, session){
 
 
     ## Fluorescence #####
-
+  observe({
+    if(!is.null(results$fluorescence)){
+      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Spline")
+      }
+      if(!("l" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
+        hideTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Linear")
+      }
+    }
+  })
   #### Hide [Restore Fit] buttons when starting the app
   hide("restore_fluorescence_linear"); hide("restore_fluorescence_spline")
   #### Hide [Restore Fit] buttons whenever a sample is changed
@@ -4562,6 +4628,13 @@ server <- function(input, output, session){
   )
 
       ### DR Plots ####
+  observe({
+    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1){
+      showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
+    } else {
+      hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
+    }
+  })
 
   dose_response_growth_plot_combined <- reactive({
     results <- results$growth$drFit
@@ -4872,12 +4945,12 @@ server <- function(input, output, session){
       ### DR Plots Spline ####
   # Hide Spline dose-response plot if dr.method != "spline"
   observe({
-    if(!input$perform_ec50_fluorescence ||
-       input$dr_method_fluorescence != "spline" ||
-       length(results$fluorescence$drFit1$drFittedSplines) < 2){
-      hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_spline")
-    } else {
+    if(length(results$fluorescence$drFit1) > 1 &&
+       length(results$fluorescence$drFit1$drTable) > 1 &&
+       input$dr_method_fluorescence == "spline"){
       showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_spline")
+    } else {
+      hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_spline")
     }
 
   })
@@ -5056,12 +5129,12 @@ server <- function(input, output, session){
       ### DR Plots Model ####
       # Hide Model dose-response plot if dr.method != "spline"
       observe({
-        if(!input$perform_ec50_fluorescence ||
-           input$dr_method_fluorescence != "model" ||
-           length(results$fluorescence$drFit1$drFittedModels) < 2){
-          hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
-        } else {
+        if(length(results$fluorescence$drFit1) > 1 &&
+           length(results$fluorescence$drFit1$drTable) > 1 &&
+           input$dr_method_fluorescence == "model"){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
+        } else {
+          hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
         }
 
       })
@@ -5176,6 +5249,13 @@ server <- function(input, output, session){
 
 
     ## Dual Plot ####
+      observe({
+        if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence) > 1){
+          showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
+        } else {
+          hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
+        }
+      })
 
       dual_plot <- reactive({
         results <- results$fluorescence
@@ -5216,35 +5296,6 @@ server <- function(input, output, session){
         },
         contentType = ifelse(input$format_download_dual_plot == ".pdf", "image/pdf", "image/png")
       )
-  ## Computations ####
-  # observe({
-  #   if(is.null(results$growth)){
-  #   shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Results]")
-  #   shinyjs::disable(selector = "#navbar li a[data-value=Report]")
-  #   }
-  # })
-  # observeEvent(input$run_fluorescence, {
-  #   shinyjs::enable(selector = "#navbar li a[data-value=Results]")
-  #   shinyjs::enable(selector = "#navbar li a[data-value=Report]")
-  # })
-
-  # observe({
-  #   if (output$computation_type == "fluorescence") {
-  #     shinyjs::enable("tabPanel_Results_Fluorescence")
-  #   } else {
-  #     shinyjs::disable("tabPanel_Results_Fluorescence")
-  #   }
-  # })
-
-  ### growth: plot.drFit ####
-  observe({
-      if(!input$perform_ec50_growth){
-        hideTab(inputId = "tabPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
-      } else {
-        showTab(inputId = "tabPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
-      }
-  })
-
   ## Fluorescence ####
   selected_inputs_reference_condition_fluorescence_parameter_plot <- reactive({
     results <- results$fluorescence

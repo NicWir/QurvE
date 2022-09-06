@@ -24,7 +24,7 @@
 #' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
 #' @param biphasic (Logical) Shall \code{\link{flFitLinear}} and \code{\link{flFitSpline}} try to extract fluorescence parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages) (\code{TRUE}) or not (\code{FALSE})?
 #' @param interactive (Logical) Controls whether the fit for each sample and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
-#' @param nboot.fl (Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
+#' @param nboot.fl (Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.fl = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.fl (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param suppress.messages (Logical) Indicates whether messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
@@ -770,7 +770,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     fl_data <- fl_data$fluorescence1
   }
   # /// check if start density values are above min.density in all samples
-  if(!is.null(density)){
+  if(!is.null(density) && !is.na(density)){
     max.density <- unlist(lapply(1:nrow(density), function (x) max(as.numeric(as.matrix(density[x,-1:-3]))[!is.na(as.numeric(as.matrix(density[x,-1:-3])))])))
     if(is.numeric(control$min.density) && control$min.density != 0){
       if(!is.na(control$min.density) && all(as.numeric(max.density) < control$min.density)){
@@ -930,7 +930,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     }
     if(control$interactive == TRUE ||
        dim(fl_data)[1] <= 30 ||
-       !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
+       !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.fl > 10))
     ){
       # /// Linear regression fl_data
       if ("l" %in% control$fit.opt){
@@ -1114,7 +1114,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
 
     if(control$interactive == TRUE ||
        dim(fl_data)[1] <= 30 ||
-       !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
+       !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.fl > 10))
     ){
       # /// Beginn Bootstrap
       if ((("s" %in% control$fit.opt) ) &&
@@ -2236,7 +2236,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
 #' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
-#' @param nboot.fl (Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
+#' @param nboot.fl (Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.fl = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.fl (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param suppress.messages (Logical) Indicates whether messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
@@ -2319,6 +2319,7 @@ fl.workflow <- function(grodata = NULL,
     }
   }
 
+
   if(!is.null(grodata) && !(class(grodata)=="list") && !(class(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
@@ -2345,7 +2346,7 @@ fl.workflow <- function(grodata = NULL,
                         smooth.dr = smooth.dr, log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = nboot.dr,
                         biphasic = biphasic, interactive = interactive, nboot.fl = nboot.fl, dr.parameter = dr.parameter, dr.method = dr.method, clean.bootstrap = clean.bootstrap,
                         smooth.fl = smooth.fl, growth.thresh = growth.thresh, suppress.messages = suppress.messages, neg.nan.act = neg.nan.act)
-  nboot.gc <- control$nboot.gc
+  nboot.fl <- control$nboot.fl
   nboot.dr <- control$nboot.dr
   out.flFit <- NA
   out.drFit <- NA
