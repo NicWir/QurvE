@@ -946,6 +946,10 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              DT::dataTableOutput('results_table_growth_spline'),
                                                              downloadButton('download_table_growth_spline',"Download table")
                                                     ),
+                                                    tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Growth_Spline_bt",
+                                                             DT::dataTableOutput('results_table_growth_spline_bt'),
+                                                             downloadButton('download_table_growth_spline_bt',"Download table")
+                                                    ),
                                                     tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
                                                              DT::dataTableOutput('results_table_growth_model'),
                                                              downloadButton('download_table_growth_model',"Download table")
@@ -968,7 +972,11 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                              ),
                                                              DT::dataTableOutput('results_table_fluorescence1_spline'),
                                                              downloadButton('download_table_fluorescence1_spline',"Download table")
-                                                    )
+                                                    ),
+                                                    tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Fluorescence_Spline_bt",
+                                                             DT::dataTableOutput('results_table_fluorescence1_spline_bt'),
+                                                             downloadButton('download_table_fluorescence1_spline_bt',"Download table")
+                                                    ),
                                         )
                                )
                     ),
@@ -1179,7 +1187,150 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          ) # column
                                                                        ) # fluidRow
                                                              ) # mainPanel
-                                                    ) # tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
+                                                    ), # tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
+                                                    ### Growth Boostrapping Spline Plots ####
+                                                    tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Growth_Spline_bt",
+                                                             sidebarPanel(width = 4,
+                                                                          selectInput(inputId = "sample_validate_growth_spline_bt",
+                                                                                      label = "Sample:",
+                                                                                      width = "fit-content",
+                                                                                      choices = "",
+                                                                                      multiple = FALSE,
+                                                                                      selectize = FALSE,
+                                                                                      size = 5,
+                                                                          ),
+
+                                                                          checkboxInput(inputId = "plot_derivative_growth_spline_bt",
+                                                                                        label = "Plot derivative",
+                                                                                        value = TRUE),
+
+                                                                          h3('Customize plot appearance'),
+
+
+                                                                          sliderInput(inputId = 'shape_type_validate_growth_spline_bt',
+                                                                                      label = 'Shape type',
+                                                                                      min = 1,
+                                                                                      max = 25,
+                                                                                      value = 1),
+
+                                                                          sliderInput(inputId = 'shape_size_validate_growth_spline_bt',
+                                                                                      label = 'Shape size',
+                                                                                      min = 1,
+                                                                                      max = 10,
+                                                                                      value = 2,
+                                                                                      step = 0.5),
+
+
+
+                                                                          sliderInput(inputId = 'axis_size_validate_growth_spline_bt',
+                                                                                      label = 'Axis title font size',
+                                                                                      min = 0.1,
+                                                                                      max = 10,
+                                                                                      value = 1.9,
+                                                                                      step = 0.1),
+
+                                                                          sliderInput(inputId = 'lab_size_validate_growth_spline_bt',
+                                                                                      label = 'Axis label font size',
+                                                                                      min = 0.1,
+                                                                                      max = 10,
+                                                                                      value = 1.7,
+                                                                                      step = 0.1),
+
+                                                                          sliderInput(inputId = 'line_width_validate_growth_spline_bt',
+                                                                                      label = 'Line width',
+                                                                                      min = 0.01,
+                                                                                      max = 10,
+                                                                                      value = 0.5),
+
+
+                                                                          strong("x-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_min_validate_growth_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_max_validate_growth_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                                          strong("y-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_min_validate_growth_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_max_validate_growth_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+                                                                          strong("y-Range (derivative)"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_min_derivative_validate_growth_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_max_derivative_validate_growth_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                             ), # sidebarPanel
+
+                                                             mainPanel(width = 8,
+
+                                                               plotOutput("validate_growth_plot_spline_bt",
+                                                                          width = "100%", height = "1000px"),
+
+                                                               HTML("<br>"),
+                                                               h3(strong("Export plot")),
+
+                                                               fluidRow(
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "width_download_growth_validate_spline_bt",
+                                                                                     label = "Width (in inches)",
+                                                                                     value = 10)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "height_download_growth_validate_spline_bt",
+                                                                                     label = "Height (in inches)",
+                                                                                     value = 9)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        numericInput(inputId = "dpi_download_growth_validate_spline_bt",
+                                                                                     label = "DPI",
+                                                                                     value = 300)
+                                                                 ), # column
+                                                                 column(width = 4,
+                                                                        downloadButton('download_growth_validate_spline_bt',"Download Plot"),
+                                                                        radioButtons("format_download_growth_validate_spline_bt",
+                                                                                     label = NULL,
+                                                                                     choices = c("PNG" = ".png",
+                                                                                                 "PDF" = ".pdf"),
+                                                                                     selected = ".png",
+                                                                                     inline = TRUE)
+                                                                 ) # column
+                                                               ) # fluidRow
+                                                             ) # mainPanel
+                                                    ) # tabPanel(title = "Bootstrapping Spline"
                                         ) # tabsetPanel(type = "tabs",
                                ), # tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
                                ##____Validate_Fluorescence____####
@@ -1665,7 +1816,6 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                     ), # tabPanel(title = "Dose-response analysis"
 
                                                     ### Growth Parameter Plots ####
-
                                                     tabPanel(title = "Parameter plots",
                                                              sidebarPanel(
                                                                selectInput(inputId = "parameter_growth_parameter_growth_plot",
@@ -2689,6 +2839,21 @@ server <- function(input, output, session){
       shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Visualize_Fluorescence]")
       shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Visualize_GrowthandFluorescence]")
     }
+
+    if(!is.null(results$custom_data)){
+      grodata <- results$custom_data
+    } else if(!is.null(results$parsed_data)){
+      grodata <- results$parsed_data
+    } else {
+      grodata <- NULL
+    }
+    if(!is.null(grodata)){
+      if(length(grodata$fluorescence1) < 2){
+        shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Computation_Fluorescence]")
+      } else {
+        shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Computation_Fluorescence]")
+      }
+    }
   })
 
 
@@ -2748,22 +2913,6 @@ server <- function(input, output, session){
     fl2.file <- input$custom_file_fluorescence2
 
     if(is.null(density.file) && is.null(fl1.file) && is.null(fl2.file)) return(NULL)
-
-    # withCallingHandlers({
-    #
-    #   shinyjs::html(id = "text", html = '<br>', add = TRUE)
-    # # Activate menus
-    # enable(selector = "#navbar li:nth-child(3)")
-    # enable(selector = "#navbar li:nth-child(4)")
-    # enable(selector = "#navbar li:nth-child(5)")
-    #
-    # # Inactivate Fluorescence menus
-    # disable(selector = "#navbar li:nth-child(3) li:nth-child(2)")
-    # disable(selector = "#navbar li:nth-child(4) li:nth-child(2)")
-    # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
-
-
-    browser()
 
     ## Read data
     try(
@@ -3438,20 +3587,6 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$run_growth,{
-    # withCallingHandlers({
-    #
-    #   shinyjs::html(id = "text", html = '<br>', add = TRUE)
-    # # Activate menus
-    # enable(selector = "#navbar li:nth-child(3)")
-    # enable(selector = "#navbar li:nth-child(4)")
-    # enable(selector = "#navbar li:nth-child(5)")
-    #
-    # # Inactivate Fluorescence menus
-    # disable(selector = "#navbar li:nth-child(3) li:nth-child(2)")
-    # disable(selector = "#navbar li:nth-child(4) li:nth-child(2)")
-    # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
-
-
 
     ## Read data
     # grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator_custom_density, dec = input$decimal_separator_custom_density)
@@ -3680,6 +3815,7 @@ server <- function(input, output, session){
     if(!is.null(results$growth)){
       if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline")
+        hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
       }
       if(!("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Linear")
@@ -3687,6 +3823,9 @@ server <- function(input, output, session){
       if(!("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Model")
 
+      }
+      if(input$number_of_bootstrappings_growth <= 1){
+        hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
       }
     }
   })
@@ -3728,6 +3867,54 @@ server <- function(input, output, session){
 
   output$results_table_growth_spline <- DT::renderDT({
     datatable(table_growth_spline(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
+  })
+
+  table_growth_spline_bt <- reactive({
+    res.table.gc <- results$growth$gcFit$gcTable
+    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                               "µ<sub>max</sub>" = ifelse(res.table.gc$mu.bt==0 | is.na(res.table.gc$mu.bt),
+                                                                    "",
+                                                                    paste0(round(as.numeric(res.table.gc$mu.bt), 3) ,
+                                                                           " \u00B1 ",
+                                                                           round(as.numeric(res.table.gc$stdmu.bt), 3)
+                                                                          )
+                                                                    ),
+                               "t<sub>D</sub>" = ifelse(res.table.gc$mu.bt==0 | is.na(res.table.gc$mu.bt),
+                                                                  "",
+                                                                  paste0(round(log(2)/as.numeric(res.table.gc$mu.bt), 3) ,
+                                                                         " \u00B1 ",
+                                                                         round(log(2)/as.numeric(res.table.gc$stdmu.bt), 3)
+                                                                        )
+                                                                  ),
+                               "λ" = ifelse(res.table.gc$lambda.bt==0 | is.na(res.table.gc$lambda.bt),
+                                            "",
+                                            paste0(round(as.numeric(res.table.gc$lambda.bt), 3) ,
+                                                   " \u00B1 ",
+                                                   round(as.numeric(res.table.gc$stdlambda.bt ), 3)
+                                            )
+                               ),
+                               "y<sub>max</sub>" = ifelse(res.table.gc$lambda.bt==0 | is.na(res.table.gc$lambda.bt),
+                                                          "",
+                                                          paste0(round(as.numeric(res.table.gc$lambda.bt), 3) ,
+                                                                 " \u00B1 ",
+                                                                 round(as.numeric(res.table.gc$stdlambda.bt ), 3)
+                                                          )
+                               ),
+                               "ΔY" = ifelse(res.table.gc$dY.bt==0 | is.na(res.table.gc$dY.bt),
+                                             "",
+                                             paste0(round(as.numeric(res.table.gc$dY.bt), 3) ,
+                                                    " \u00B1 ",
+                                                    round(as.numeric(res.table.gc$stddY.bt ), 3)
+                                             )
+                               ),
+                               "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
+    table_spline
+  })
+
+  output$results_table_growth_spline_bt <- DT::renderDT({
+    datatable(table_growth_spline_bt(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -3786,6 +3973,17 @@ server <- function(input, output, session){
     }
   )
 
+  output$download_table_growth_spline_bt <- downloadHandler(
+    filename = function() {
+      paste("growth_results_spline_bootstrappings", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_growth_spline_bt()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
   output$download_table_growth_model <- downloadHandler(
     filename = function() {
       paste("growth_results_model_fits", ".csv", sep="")
@@ -3801,9 +3999,13 @@ server <- function(input, output, session){
     if(!is.null(results$fluorescence)){
       if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline")
+        hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Growth_Fluorescence_bt")
       }
       if(!("l" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Linear")
+      }
+      if(input$number_of_bootstrappings_fluorescence <= 1){
+        hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
       }
     }
   })
@@ -3849,6 +4051,54 @@ server <- function(input, output, session){
               escape = FALSE)
   })
 
+  table_fluorescence1_spline_bt <- reactive({
+    res.table.fl <- results$fluorescence$flFit1$flTable
+    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
+                               "µ<sub>max</sub>" = ifelse(res.table.gc$max_slope.bt==0 | is.na(res.table.gc$max_slope.bt),
+                                                          "",
+                                                          paste0(round(as.numeric(res.table.gc$max_slope.bt), 3) ,
+                                                                 " \u00B1 ",
+                                                                 round(as.numeric(res.table.gc$stdmax_slope.bt), 3)
+                                                          )
+                               ),
+                               "t<sub>D</sub>" = ifelse(res.table.gc$max_slope.bt==0 | is.na(res.table.gc$max_slope.bt),
+                                                        "",
+                                                        paste0(round(log(2)/as.numeric(res.table.gc$max_slope.bt), 3) ,
+                                                               " \u00B1 ",
+                                                               round(log(2)/as.numeric(res.table.gc$stdmax_slope.bt), 3)
+                                                        )
+                               ),
+                               "λ" = ifelse(res.table.gc$lambda.bt==0 | is.na(res.table.gc$lambda.bt),
+                                            "",
+                                            paste0(round(as.numeric(res.table.gc$lambda.bt), 3) ,
+                                                   " \u00B1 ",
+                                                   round(as.numeric(res.table.gc$stdlambda.bt ), 3)
+                                            )
+                               ),
+                               "y<sub>max</sub>" = ifelse(res.table.gc$lambda.bt==0 | is.na(res.table.gc$lambda.bt),
+                                                          "",
+                                                          paste0(round(as.numeric(res.table.gc$lambda.bt), 3) ,
+                                                                 " \u00B1 ",
+                                                                 round(as.numeric(res.table.gc$stdlambda.bt ), 3)
+                                                          )
+                               ),
+                               "ΔY" = ifelse(res.table.gc$dY.bt==0 | is.na(res.table.gc$dY.bt),
+                                             "",
+                                             paste0(round(as.numeric(res.table.gc$dY.bt), 3) ,
+                                                    " \u00B1 ",
+                                                    round(as.numeric(res.table.gc$stddY.bt ), 3)
+                                             )
+                               ),
+                               "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
+    table_spline
+  })
+
+  output$results_table_fluorescence1_spline_bt <- DT::renderDT({
+    datatable(table_fluorescence1_spline_bt(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
+  })
+
   ###____Table Download____####
   output$download_table_fluorescence1_linear <- downloadHandler(
     filename = function() {
@@ -3872,19 +4122,40 @@ server <- function(input, output, session){
     }
   )
 
+  output$download_table_fluorescence1_spline_bt <- downloadHandler(
+    filename = function() {
+      paste("fluorescence_results_spline_bootstrappings", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_fluorescence1_spline_bt()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
   # Validate ####
     ## Growth #####
   observe({
     if(!is.null(results$growth)){
       if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Spline")
+      } else {
+        showTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Spline")
       }
       if(!("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Linear")
+      } else {
+        showTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Linear")
       }
       if(!("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Model")
-
+      } else {
+        showTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Model")
+      }
+      if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt) || results$growth$control$nboot.gc <=1){
+        hideTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Spline_bt")
+      } else {
+        showTab(inputId = "tabsetPanel_Validate_Growth", target = "tabPanel_Validate_Growth_Spline_bt")
       }
     }
   })
@@ -3906,7 +4177,8 @@ server <- function(input, output, session){
   #------- Initialize the Memory to store settings
   selected_vals_validate_growth <- reactiveValues(sample_validate_growth_linear = 1,
                                                   sample_validate_growth_spline = 1,
-                                                  sample_validate_growth_model = 1)
+                                                  sample_validate_growth_model = 1,
+                                                  sample_validate_growth_spline_bt = 1)
 
   #------ Whenever any of the inputs are changed, it only modifies the memory
   observe({
@@ -3948,8 +4220,7 @@ server <- function(input, output, session){
     else return("")
   })
 
-
-  output$validate_growth_plot_linear <- renderPlot({
+  validate_growth_plot_linear <- reactive({
     results <- results$growth
     if(length(results$gcFit$gcFittedLinear[[input$sample_validate_growth_linear]]) > 1){
 
@@ -3966,6 +4237,12 @@ server <- function(input, output, session){
         )
       }
     }
+  }
+
+  )
+
+  output$validate_growth_plot_linear <- renderPlot({
+    validate_growth_plot_linear()
   })
 
   lin.rerun.param <- reactiveValues()
@@ -4050,9 +4327,36 @@ server <- function(input, output, session){
       paste("linear_fit_",  selected_vals_validate_growth$sample_validate_growth_linear, input$format_download_growth_validate_linear, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_growth_validate_linear,
-             height = input$height_download_growth_validate_linear,
-             dpi = input$dpi_download_growth_validate_linear)
+      if(input$format_download_growth_validate_linear == ".pdf"){
+        pdf(file = file,
+            width = input$width_download_growth_validate_linear,
+            height = input$height_download_growth_validate_linear)
+      } else {
+        png(file = file,
+            width = input$width_download_growth_validate_linear,
+            height = input$height_download_growth_validate_linear,
+            units = "in",
+            res = input$dpi_download_growth_validate_linear)
+      }
+      if(input$logy_validate_growth_plot_linear) log <- "y"
+      else  log <- ""
+      results <- results$growth
+      if(length(results$gcFit$gcFittedLinear[[input$sample_validate_growth_linear]]) > 1){
+
+
+        plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+                         log = log
+                         # ADD FURTHER INPUT (see Notion)
+        )
+        if(input$diagnostics_validate_growth_plot_linear){
+          plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+                           which = "fit_diagnostics",
+                           log = log
+                           # ADD FURTHER INPUT (see Notion)
+          )
+        }
+      }
+      dev.off()
     },
     contentType = ifelse(input$format_download_growth_validate_linear == ".pdf", "image/pdf", "image/png")
 
@@ -4290,7 +4594,7 @@ server <- function(input, output, session){
 
   output$download_growth_validate_model <- downloadHandler(
     filename = function() {
-      paste("spline_fit_",  selected_vals_validate_growth$sample_validate_growth_model, input$format_download_growth_validate_model, sep="")
+      paste("model_fit_",  selected_vals_validate_growth$sample_validate_growth_model, input$format_download_growth_validate_model, sep="")
     },
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_validate_model,
@@ -4302,14 +4606,158 @@ server <- function(input, output, session){
   )
 
 
+      ### Spline Fits BT ####
+  # observe({
+  #   if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1){
+  #     showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
+  #   } else {
+  #     hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
+  #   }
+  # })
+
+  selected_inputs_sample_validate_growth_spline_bt <- reactive({
+    results <- results$growth
+    if(is.null(results)) return("")
+    if(("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt) && results$control$nboot.gc > 1){
+      select_samples <- names(results$gcFit$gcBootSplines)
+    } else {
+      return("")
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "sample_validate_growth_spline_bt",
+                      choices = selected_inputs_sample_validate_growth_spline_bt(),
+                      selected = selected_vals_validate_growth$sample_validate_growth_spline_bt
+    )})
+
+  validate_growth_plot_spline_bt <- reactive({
+    results <- results$growth$gcFit$gcBootSplines[[ifelse(input$sample_validate_growth_spline_bt == "1" || is.null(input$sample_validate_growth_spline_bt), 1, input$sample_validate_growth_spline_bt)]]
+
+
+    # Define x- and y-axis limits
+    if(any(input$y_range_min_validate_growth_spline_bt == "",
+           input$y_range_max_validate_growth_spline_bt == "")){
+      ylim <- NULL
+    } else {
+      ylim <- c(as.numeric(input$y_range_min_validate_growth_spline_bt),
+                as.numeric(input$y_range_max_validate_growth_spline_bt))
+    }
+
+    if(any(input$y_range_min_derivative_validate_growth_spline_bt == "",
+           input$y_range_max_derivative_validate_growth_spline_bt == "")){
+      ylim.deriv <- NULL
+    } else {
+      ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_growth_spline_bt),
+                as.numeric(input$y_range_max_derivative_validate_growth_spline_bt))
+    }
+
+    if(any(input$x_range_min_validate_growth_spline_bt == "",
+           input$x_range_max_validate_growth_spline_bt == "")){
+      xlim <- NULL
+    } else {
+      xlim <- c(as.numeric(input$x_range_min_validate_growth_spline_bt),
+                as.numeric(input$x_range_max_validate_growth_spline_bt))
+    }
+
+    plot.gcBootSpline(gcBootSpline = results,
+                     pch = input$shape_type_validate_growth_spline_bt,
+                     cex.point = input$shape_size_validate_growth_spline_bt,
+                     cex.lab = input$axis_size_validate_growth_spline_bt,
+                     cex.axis = input$lab_size_validate_growth_spline_bt,
+                     lwd = input$line_width_validate_growth_spline_bt,
+                     y.lim = ylim,
+                     x.lim = xlim,
+                     y.lim.deriv = ylim.deriv,
+                     deriv = input$plot_derivative_growth_spline_bt,
+                     shiny = TRUE
+    )
+  })
+
+  output$validate_growth_plot_spline_bt <- renderPlot({
+    validate_growth_plot_spline_bt()
+  })
+
+  output$download_growth_validate_spline_bt <- downloadHandler(
+    filename = function() {
+      paste("spline_fit_bootstrap_",  input$sample_validate_growth_spline_bt, input$format_download_growth_validate_spline_bt, sep="")
+    },
+    content = function(file) {
+      if(input$format_download_growth_validate_spline_bt == ".pdf"){
+        pdf(file = file,
+            width = input$width_download_growth_validate_spline_bt,
+            height = input$height_download_growth_validate_spline_bt)
+      } else {
+        png(file = file,
+            width = input$width_download_growth_validate_spline_bt,
+            height = input$height_download_growth_validate_spline_bt,
+            units = "in",
+            res = input$dpi_download_growth_validate_spline_bt)
+      }
+      # Generate plot
+      results <- results$growth$gcFit$gcBootSplines[[ifelse(input$sample_validate_growth_spline_bt == "1" || is.null(input$sample_validate_growth_spline_bt), 1, input$sample_validate_growth_spline_bt)]]
+
+      ## Define x- and y-axis limits
+      if(any(input$y_range_min_validate_growth_spline_bt == "",
+             input$y_range_max_validate_growth_spline_bt == "")){
+        ylim <- NULL
+      } else {
+        ylim <- c(as.numeric(input$y_range_min_validate_growth_spline_bt),
+                  as.numeric(input$y_range_max_validate_growth_spline_bt))
+      }
+
+      if(any(input$y_range_min_derivative_validate_growth_spline_bt == "",
+             input$y_range_max_derivative_validate_growth_spline_bt == "")){
+        ylim.deriv <- NULL
+      } else {
+        ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_growth_spline_bt),
+                        as.numeric(input$y_range_max_derivative_validate_growth_spline_bt))
+      }
+
+      if(any(input$x_range_min_validate_growth_spline_bt == "",
+             input$x_range_max_validate_growth_spline_bt == "")){
+        xlim <- NULL
+      } else {
+        xlim <- c(as.numeric(input$x_range_min_validate_growth_spline_bt),
+                  as.numeric(input$x_range_max_validate_growth_spline_bt))
+      }
+
+      plot.gcBootSpline(gcBootSpline = results,
+                        pch = input$shape_type_validate_growth_spline_bt,
+                        cex.point = input$shape_size_validate_growth_spline_bt,
+                        cex.lab = input$axis_size_validate_growth_spline_bt,
+                        cex.axis = input$lab_size_validate_growth_spline_bt,
+                        lwd = input$line_width_validate_growth_spline_bt,
+                        y.lim = ylim,
+                        x.lim = xlim,
+                        y.lim.deriv = ylim.deriv,
+                        deriv = input$plot_derivative_growth_spline_bt,
+                        shiny = TRUE
+      )
+
+      dev.off()
+    },
+    contentType = ifelse(input$format_download_growth_validate_spline_bt == ".pdf", "image/pdf", "image/png")
+  )
     ## Fluorescence #####
   observe({
     if(!is.null(results$fluorescence)){
       if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Spline")
+      } else {
+        showTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Spline")
       }
       if(!("l" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Linear")
+      } else {
+        showTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Linear")
+      }
+      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt) || results$growth$control$nboot.fl <=1){
+        hideTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Spline_bt")
+      } else {
+        showTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Spline_bt")
       }
     }
   })

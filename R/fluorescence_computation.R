@@ -627,6 +627,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   max_slope <- NA
   lambda <- NA
   integral <- NA
+  dY = NA
   boot.y <- array(NA, c(control$nboot.fl, length(x)))
   boot.x <- array(NA, c(control$nboot.fl, length(x)))
   nonpara <- list()
@@ -660,17 +661,20 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
         max_slope[j] <- nonpara[[j]]$parameters$max_slope
         A[j] <- nonpara[[j]]$parameters$A
         integral[j] <- nonpara[[j]]$parameters$integral
+        dY[j] <- nonpara[[j]]$parameters$dY
       }
     }
     lambda[which(!is.finite(lambda))] <- NA
     max_slope[which(!is.finite(lambda))] <- NA
     A[which(!is.finite(lambda))] <- NA
     integral[which(!is.finite(lambda))] <- NA
+    dY[which(!is.finite(dY))] <- NA
     # remove negative values which occured during bootstrap
     lambda[which(lambda < 0)] <- NA
     max_slope[which(max_slope < 0)] <- NA
     A[which(A < 0)] <- NA
     integral[which(integral < 0)] <- NA
+    dY[which(dY < 0)] <- NA
   }
   if (control$log.x.spline == TRUE) {
     bad.values <- (x < 0)
@@ -698,6 +702,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     lambda = lambda,
     max_slope = max_slope,
     A = A,
+    dY = dY,
     integral = integral,
     bootFlag = TRUE,
     control = control

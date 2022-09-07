@@ -1081,12 +1081,19 @@ plot.drFitSpline <-
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param deriv (Logical) Show the derivatives (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param colSpline (Numeric or character) Spline line colour.
-#' @param pch (Numeric) Size of the raw data circles.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param cex.axis (Numeric) Font size of axis annotations.
+#' @param lwd (Numeric) Spline line width.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #' @param ...
 #'
 #' @export plot.gcBootSpline
@@ -1094,33 +1101,36 @@ plot.drFitSpline <-
 #'
 plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
                               colSpline=ggplot2::alpha("dodgerblue3", 0.2),
-                              cex=1, plot = TRUE, export = FALSE,
-                              height = 7, width = 9, out.dir = NULL, ...)
+                              cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
+                              lwd = 2, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
+                              plot = TRUE, export = FALSE,
+                              height = 7, width = 9, out.dir = NULL, shiny = FALSE, ...)
 {
   # gcBootSpline an object of class gcBootSpline
   if(is(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot <- function(text="Empty plot",main=""){
-    plot(c(0,1,0,1,0),c(0,1,1,0,0), type="l", axes=FALSE, xlab="", ylab="", lwd=1, col="gray",main=main)
-    lines(c(0,0),c(0,1), type="l", lwd=1, col="gray")
-    lines(c(1,1),c(1,0), type="l", lwd=1, col="gray")
+    plot(c(0,1,0,1,0),c(0,1,1,0,0), type="l", axes=FALSE, xlab="", ylab="", lwd=lwd, col="gray",main=main)
+    lines(c(0,0),c(0,1), type="l", lwd=lwd, col="gray")
+    lines(c(1,1),c(1,0), type="l", lwd=lwd, col="gray")
     text(0.5,0.1,text, col="gray")
   }
 
   # /// check input parameters
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
+  if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex")
   if (gcBootSpline$bootFlag==FALSE){
     empty.plot()
   }
   else{
     p1 <- function()
       {
-      par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
+      par(cex.lab = cex.lab, cex.axis = cex.axis)
+      par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
       colSpline <- rep(colSpline, (gcBootSpline$control$nboot.gc%/%length(colSpline))+1)
 
-      log.x     <- gcBootSpline$control$log.x.gc
-      log.y     <- gcBootSpline$control$log.y.spline
+      fit.log.x     <- gcBootSpline$control$log.x.gc
+      fit.log.y     <- gcBootSpline$control$log.y.spline
 
       global.minx <- min(min(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
       global.maxx <- max(max(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
@@ -1129,55 +1139,61 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 
       # initialize plot
       if(deriv == TRUE){
-        layout(mat = matrix(c(1, 2), nrow = 2, ncol = 1),
-               heights = c(2, 1.3), # Heights of the two rows
-               widths = c(1, 1)) # Widths of the two columns
+        if(!shiny){
+          layout(mat = matrix(c(1, 2), nrow = 2, ncol = 1),
+                 heights = c(2, 1.3), # Heights of the two rows
+                 widths = c(1, 1)) # Widths of the two columns
+        }
         par(mai=c(0.35,0.8,0.5,0))
       } else {
         par(mai=c(0.7,0.8,0.5,0))
       }
-      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="")
+      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim)
 
       # /// plot data
-      points(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex)
+      points(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex.point)
 
       # /// plot all gcFittedSpline objects
       for(i in 1:gcBootSpline$control$nboot.gc){
-       plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = T,
-                        deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex)
+       plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd=lwd,
+                        deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
       }
       # add plot title
       title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
       #add axis titles
-      if (log.y==FALSE){
-        title(ylab = "Growth y(t) ", line = 2.3, cex.lab = 1.2)
+      if (fit.log.y==FALSE){
+        title(ylab = "Growth y(t) ", line = 2.3, cex.lab = cex.lab)
       }
-      else if (log.y==TRUE){
-        title(ylab = "Growth [Ln(y(t)/y0)]", line = 2.3, cex.lab = 1.2)
+      else if (fit.log.y==TRUE){
+        title(ylab = "Growth [Ln(y(t)/y0)]", line = 2.3, cex.lab = cex.lab)
       }
       # add second plot with slope over time
       if(deriv == TRUE){
+        par(cex.axis = cex.axis)
         par(mai=c(0.7,0.8,0.2,0))
         y.max <- ceiling(max(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) max(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
         y.min <- floor(min(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) min(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
+        if(is.null(y.lim.deriv)){
+          y.lim.deriv <- c(y.min, y.max)
+        }
         if ((gcBootSpline$control$log.x.gc==FALSE)){
           try( plot(gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y,
-                    xlab="", ylab="", type = "l", col = colSpline, ylim = c(y.min, y.max) ) )
+                    xlab="", ylab="", type = "l", lwd=lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
         }
         if ((gcBootSpline$control$log.x.gc==TRUE)){
-          try( lines(gcBootSpline$boot.gcSpline[[1]]$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y, xlab="Ln(1+time)", ylab="Growth rate", type = "l") )
+          try( lines(gcBootSpline$boot.gcSpline[[1]]$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y, lwd=lwd, xlab="Ln(1+time)", ylab="Growth rate", type = "l") )
         }
         for(i in 2:gcBootSpline$control$nboot.gc){
-          plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F,
-                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex)
+          plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd=lwd, xlim = x.lim,
+                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
         }
-        title(ylab = "Growth rate", line = 2.3, cex.lab = 1.2)
+        title(ylab = "Growth rate", line = 2.3, cex.lab = cex.lab)
       }
-      if (log.x==TRUE){
-        title(xlab = "Ln(1+time)", line = 2.3, cex.lab = 1.2)
+      if (fit.log.x==TRUE){
+        title(xlab = "Ln(1+time)", line = 2.3, cex.lab = cex.lab)
       }
-      else if(log.x==FALSE){
-        title(xlab = "Time", line = 2.3, cex.lab = 1.2)
+      else if(fit.log.x==FALSE){
+        title(xlab = "Time", line = 2.3, cex.lab = cex.lab)
       }
       par(mfrow=c(1,1))
     } # p1 <- function()
@@ -1185,25 +1201,116 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       {
       lambda    <- gcBootSpline$lambda
       mu        <- gcBootSpline$mu
-      A         <- gcBootSpline$A
+      dY         <- gcBootSpline$dY
       integral  <- gcBootSpline$integral
 
       # /// plot histograms of growth parameters
       par(mfrow=c(2,2))
+
       if (sum(!is.na(lambda))>1){
-        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda)))
+        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda), cex.lab = cex.lab, cex.axis = cex.axis))
       }
       else{
         empty.plot("Empty plot!")
       }
 
-      if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu))) } else { empty.plot("Empty plot!", main=expression(mu)) }
-      if (sum(!is.na(A))>1){ try(hist(A, col="gray", xlab="A", main=expression(A))) } else { empty.plot("Empty plot!", main=expression(A)) }
-      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral))) } else { empty.plot("Empty plot!", main=expression(Integral))}
+      if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(mu)) }
+      if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="dY", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
+      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
       mtext(paste(gcBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p2 <- function()
+    p3 <- function()
+    {
+      if(deriv) layout(matrix(c(1,2,3,5,1,2,4,6), nrow = 4, ncol = 2))
+      else layout(matrix(c(1,2,4,1,3,5), nrow = 3, ncol = 2))
+
+      par(cex.lab = cex.lab, cex.axis = cex.axis)
+      par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
+      colSpline <- rep(colSpline, (gcBootSpline$control$nboot.gc%/%length(colSpline))+1)
+
+      fit.log.x     <- gcBootSpline$control$log.x.gc
+      fit.log.y     <- gcBootSpline$control$log.y.spline
+
+      global.minx <- min(min(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
+      global.maxx <- max(max(gcBootSpline$boot.time,na.rm=TRUE),na.rm=TRUE)
+      global.miny <- min(min(gcBootSpline$boot.data,na.rm=TRUE),na.rm=TRUE)
+      global.maxy <- max(max(gcBootSpline$boot.data,na.rm=TRUE),na.rm=TRUE)
+
+      # initialize plot
+      if(deriv == TRUE){
+        par(mai=c(0.35,0.8,0.5,0))
+      } else {
+        par(mai=c(0.7,0.8,0.5,0))
+      }
+      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim)
+
+      # /// plot data
+      points(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex.point)
+
+      # /// plot all gcFittedSpline objects
+      for(i in 1:gcBootSpline$control$nboot.gc){
+        plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd=lwd,
+                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+      }
+      # add plot title
+      title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
+      #add axis titles
+      if (fit.log.y==FALSE){
+        title(ylab = "Growth y(t) ", line = 2.3, cex.lab = cex.lab)
+      }
+      else if (fit.log.y==TRUE){
+        title(ylab = "Growth [Ln(y(t)/y0)]", line = 2.3, cex.lab = cex.lab)
+      }
+      # add second plot with slope over time
+      if(deriv == TRUE){
+        par(cex.axis = cex.axis)
+        par(mai=c(0.7,0.8,0.2,0))
+        y.max <- ceiling(max(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) max(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
+        y.min <- floor(min(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) min(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
+        if(is.null(y.lim.deriv)){
+          y.lim.deriv <- c(y.min, y.max)
+        }
+        if ((gcBootSpline$control$log.x.gc==FALSE)){
+          try( plot(gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y,
+                    xlab="", ylab="", type = "l", lwd=lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
+        }
+        if ((gcBootSpline$control$log.x.gc==TRUE)){
+          try( lines(gcBootSpline$boot.gcSpline[[1]]$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y, lwd=lwd, xlab="Ln(1+time)", ylab="Growth rate", type = "l") )
+        }
+        for(i in 2:gcBootSpline$control$nboot.gc){
+          plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd=lwd, xlim = x.lim,
+                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+        }
+        title(ylab = "Growth rate", line = 2.3, cex.lab = cex.lab)
+      }
+      if (fit.log.x==TRUE){
+        title(xlab = "Ln(1+time)", line = 2.3, cex.lab = cex.lab)
+      }
+      else if(fit.log.x==FALSE){
+        title(xlab = "Time", line = 2.3, cex.lab = cex.lab)
+      }
+
+      lambda    <- gcBootSpline$lambda
+      mu        <- gcBootSpline$mu
+      dY         <- gcBootSpline$dY
+      integral  <- gcBootSpline$integral
+
+      # /// plot histograms of growth parameters
+      if (sum(!is.na(lambda))>1){
+        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda), cex.lab = cex.lab, cex.axis = cex.axis))
+      }
+      else{
+        empty.plot("Empty plot!")
+      }
+
+      if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(mu)) }
+      if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="dY", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
+      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
+      par(mfrow=c(1,1))
+      par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
+    } # p3 <- function()
   }
   if (export == TRUE){
     w1 <- width
@@ -1230,9 +1337,14 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
   }
 
   if (plot == TRUE){
-    p1()
-    dev.new()
-    p2()
+    if(!shiny){
+      p1()
+      dev.new()
+      p2()
+    } else {
+      p3()
+    }
+
   }
   # restore standard plot parameters
   par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
@@ -1284,7 +1396,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
   if (is.logical(deriv)==FALSE) stop("Need logical value for: deriv")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: cex")
+  if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
 
   # /// check if a data fit is available
   if ((is.na(gcFittedSpline$fitFlag)==TRUE)|(gcFittedSpline$fitFlag==FALSE)){
@@ -1317,15 +1429,15 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
           time <- seq(lambda, max(gcFittedSpline$"fit.time"), length=200)
           y_tangent <- gcFittedSpline$parameters["b.tangent"][[1]]+time*mu
           try(lines(time, y_tangent, lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.85), ...))
-          try(lines(c(min(gcFittedSpline$"raw.time"[1]), lambda), rep(gcFittedSpline$"raw.data"[1], 2), lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.7)))
+          try(lines(c(min(gcFittedSpline$"raw.time"[1]), lambda), rep(gcFittedSpline$"raw.data"[1], 2), lty=2, lwd=2.8*lwd, col=ggplot2::alpha(colSpline, 0.7)))
         }
       }
       if (deriv  == TRUE){
         if ((gcFittedSpline$control$log.x.gc==FALSE)){
-          try( lines(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
+          try( lines(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y, lwd=2.8*lwd, xlab="", ylab="", col = colSpline) )
         }
         if ((gcFittedSpline$control$log.x.gc==TRUE)){
-          try( lines(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
+          try( lines(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y, lwd=2.8*lwd, xlab="", ylab="", col = colSpline) )
         }
       }
     } # if (add == TRUE)

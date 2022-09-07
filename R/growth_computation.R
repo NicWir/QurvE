@@ -1263,7 +1263,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
             reliability_tag_linear <- NA
             while ("n" %in% answer_satisfied) {
               try(plot(fitlinear, log = "y"))
-              mtext(side = 3, line = 0, adj = 0,
+              mtext(side = 3, line = 3, adj = 0,
                     outer = F,
                     cex = 1,
                     wellname)
@@ -3038,6 +3038,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
   mu <- NA
   lambda <- NA
   integral <- NA
+  dY <- NA
   boot.y <- array(NA, c(control$nboot.gc, length(time)))
   boot.x <- array(NA, c(control$nboot.gc, length(time)))
   nonpara <- list()
@@ -3067,17 +3068,20 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
         mu[j] <- nonpara[[j]]$parameters$mu
         A[j] <- nonpara[[j]]$parameters$A
         integral[j] <- nonpara[[j]]$parameters$integral
+        dY[j] <- nonpara[[j]]$parameters$dY
       }
     }
     lambda[which(!is.finite(lambda))] <- NA
     mu[which(!is.finite(lambda))] <- NA
     A[which(!is.finite(lambda))] <- NA
     integral[which(!is.finite(lambda))] <- NA
+    dY[which(!is.finite(dY))] <- NA
     if (control$clean.bootstrap == TRUE) {
       lambda[which(lambda < 0)] <- NA
       mu[which(mu < 0)] <- NA
       A[which(A < 0)] <- NA
       integral[which(integral < 0)] <- NA
+      dY[which(dY < 0)] <- NA
     }
   }
   if (control$log.x.gc == TRUE) {
@@ -3114,6 +3118,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
     lambda = lambda,
     mu = mu,
     A = A,
+    dY = dY,
     integral = integral,
     bootFlag = TRUE,
     control = control
@@ -3611,7 +3616,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
 
 lm_parms <- function (m)
 {
-  sm <- summary(m)
+  suppressWarnings(sm <- summary(m))
   if(dim(sm$coefficients)[1] >1 ){
     a <- sm$coefficients[1, 1]
     b <- sm$coefficients[2, 1]

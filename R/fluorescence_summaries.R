@@ -63,7 +63,8 @@ summary.flFitLinear <- function(object,...)
 summary.flBootSpline <- function(object, ...)
 {
   # object of class gcBootSpline
-  contents.bootstrap        <- c("max_slope.bt", "lambda.bt", "A.bt", "integral.bt", "stdmu.bt", "stdlambda.bt", "stdA.bt", "stdintegral.bt",
+  contents.bootstrap        <- c("max_slope.bt", "lambda.bt", "A.bt", "dY.bt", "integral.bt",
+                                 "stdmax_slope.bt", "stdlambda.bt", "stdA.bt", "stddY.bt", "stdintegral.bt",
                                  "reliable_fit.bt",
                                  "ci90.mu.bt.lo", "ci90.mu.bt.up", "ci90.lambda.bt.lo", "ci90.lambda.bt.up",
                                  "ci90.A.bt.lo", "ci90.A.bt.up", "ci90.integral.bt.lo", "ci90.integral.bt.up",
@@ -78,14 +79,17 @@ summary.flBootSpline <- function(object, ...)
     mu          <- mean(object$max_slope, na.rm=TRUE)
     lambda      <- mean(object$lambda, na.rm=TRUE)
     A           <- mean(object$A, na.rm=TRUE)
+    dY          <- mean(object$dY, na.rm=TRUE)
     integral    <- mean(object$integral, na.rm=TRUE)
 
     mu.sd       <- sd(object$max_slope, na.rm=TRUE)
     lambda.sd   <- sd(object$lambda, na.rm=TRUE)
     A.sd        <- sd(object$A, na.rm=TRUE)
+    dY.sd       <- sd(object$dY, na.rm=TRUE)
     integral.sd <- sd(object$integral, na.rm=TRUE)
 
-    table <- c(mu, lambda, A, integral, mu.sd, lambda.sd, A.sd, integral.sd,
+    table <- c(mu, lambda, A, dY, integral,
+               mu.sd, lambda.sd, A.sd, dY.sd, integral.sd,
                as.character(object$bootFlag),
                mu-1.645*mu.sd, mu+1.645*mu.sd, lambda-1.645*lambda.sd,     lambda+1.645*lambda.sd,
                A-1.645*A.sd,   A+1.645*A.sd,   integral-1.645*integral.sd, integral+1.645*integral.sd,
