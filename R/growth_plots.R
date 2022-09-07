@@ -5,6 +5,7 @@
 #' @param gcFittedLinear A \code{gcFittedLinear} object created with \code{\link{growth.gcFitLinear}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
 #' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
+#' @param pch (Numeric) Shape of the raw data symbols.
 #' @param cex.point (Numeric) Size of the raw data points.
 #' @param cex.lab (Numeric) Font size of axis titles.
 #' @param cex.axis (Numeric) Font size of axis annotations.
@@ -21,7 +22,7 @@
 #' @export plot.gcFitLinear
 #' @export
 #'
-plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics", "fit_diagnostics"), cex.point = 1, cex.lab = 1.5,
+plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
                              cex.axis = 1.3, lwd = 2, y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
@@ -33,13 +34,16 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
     switch(which,
            fit = {
 
-             par(cex.lab = cex.lab, cex.axis = cex.axis)
-             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab="Density",
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
+
+             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
+             title(ylab = "Density", line = 2+cex.lab)
+             title(xlab = "Time", line = 1+cex.lab)
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point)
              axis(1)
              axis(2, las=1)
-             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=21, cex = cex.point*1.15, col="black", bg="red"))
+             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
              ## lag phase
              lag <- gcFittedLinear$par["lag"]
@@ -47,7 +51,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 
 
              if(gcFittedLinear$fitFlag2){
-               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=pch, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- gcFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > gcFittedLinear$raw.time[1]){
                  try(time2 <- seq(lag2, max(gcFittedLinear$"raw.time"), length=200), silent = T)
@@ -80,12 +84,12 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
            diagnostics = {
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
-             par(mfrow=c(1,2))
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis, mfrow=c(1,2))
 
              ## residuals vs. fitted
              obs <- gcFittedLinear$log.data
              sim <- gcFittedLinear$FUN(gcFittedLinear$"raw.time", gcFittedLinear$par)
-             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals")
+             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals", pch = pch)
              abline(h=0, col="grey")
              ## normal q-q-plot
              qqnorm(gcFittedLinear$fit[["residuals"]])
@@ -95,15 +99,18 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
-             par(mai = c(0.7, 0.7, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7, 0.7, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
 
-             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="Time", ylab="Density",
+             plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
              title("Linear fit", line = 2)
-             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point)
+             title(ylab = "Density", line = 2+cex.lab)
+             title(xlab = "Time", line = 1+cex.lab)
+
+             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
              axis(1)
              axis(2, las=1)
-             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=21, cex = cex.point*1.15, col="black", bg="red"))
+             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
              ## lag phase
              lag <- gcFittedLinear$par["lag"]
@@ -111,7 +118,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 
 
              if(gcFittedLinear$fitFlag2){
-               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx2] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx2], pch=pch, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- gcFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > gcFittedLinear$raw.time[1]){
                  try(time2 <- seq(lag2, max(gcFittedLinear$"raw.time"), length=200), silent = T)
@@ -151,8 +158,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              ## residuals vs. fitted
              obs <- gcFittedLinear$log.data
              sim <- gcFittedLinear$FUN(gcFittedLinear$"raw.time", gcFittedLinear$par)
-             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals", type = "n")
-             points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point)
+             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals", type = "n", pch = pch)
+             points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
              ## normal q-q-plot
              qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point)
@@ -797,7 +804,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
     }
     if(length(nm)==0){
-      stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
+      stop("Please run plot.drFit() with valid 'names' or 'conc' argument.")
     }
     raw.x <- raw.x[nm]
     raw.y <- raw.y[nm]
@@ -1488,14 +1495,16 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
 #' @param log.y (Logical) Log-transform the y-axis (\code{TRUE}) or not (\code{FALSE}).
-#' @param pch (Numeric) Size of the raw data circles.
+#' @param pch (Numeric) Symbol used to plot data points.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param colSpline (Numeric or character) Spline line colour.
 #' @param basesize (Numeric) Base font size.
+#' @param cex.point (Numeric) Size of the raw data points.
 #' @param lwd (Numeric) Spline line width.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -1510,7 +1519,8 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
-                             pch=2, colData=1, colSpline="dodgerblue3", basesize=16, lwd = 0.7, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
+                             pch=1, cex.point = 2, colData=1, colSpline="dodgerblue3", basesize=16, lwd = 0.7,
+                             y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL, n.ybreaks = 6,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
 {
@@ -1523,6 +1533,13 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
   if (is.logical(deriv)==FALSE) stop("Need logical value for: deriv")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
+
+  suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
+  if(all(is.na(x.lim))) x.lim <- NULL
+  suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
+  if(all(is.na(y.lim))) y.lim <- NULL
+  suppressWarnings(assign("y.lim.deriv" ,as.numeric(y.lim.deriv)))
+  if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
 
   # /// check if a data fit is available
   if ((is.na(gcFittedSpline$fitFlag)==TRUE)|(gcFittedSpline$fitFlag==FALSE)){
@@ -1592,7 +1609,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 
 
       p <- ggplot(df, aes(x=time, y=data)) +
-        geom_point(shape=1, size = pch,alpha = 0.6, stroke=0.15*pch, color = colData) +
+        geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData) +
         geom_line(aes(x=fit.time, y = fit.data, color = "spline"), size = lwd) +
         xlab("Time") +
         ylab(label = "Growth [y(t)]") +
@@ -1628,15 +1645,15 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = 'log')
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
         }
       } else {
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks))
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
         }
       }
 
@@ -1886,9 +1903,6 @@ plot.grofit <- function(grofit, ...,
   conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
   exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
   exclude.conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.conc)), pattern = ";"))
-  x.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", x.lim)), pattern = ";"))
-  y.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim)), pattern = ";"))
-  y.lim.deriv <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.deriv)), pattern = ";"))
   suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
   if(all(is.na(x.lim))) x.lim <- NULL
   suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))

@@ -5,6 +5,7 @@
 #' @param flFittedLinear A \code{flFittedLinear} object created with \code{\link{flFitLinear}} or stored within a \code{flFitRes} or \code{flFit} object created with \code{\link{fl.workflow}} or \code{\link{flFit}}, respectively.
 #' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
 #' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
+#' @param pch (Numeric) Shape of the raw data symbols.
 #' @param cex.point (Numeric) Size of the raw data points.
 #' @param cex.lab (Numeric) Font size of axis titles.
 #' @param cex.axis (Numeric) Font size of axis annotations.
@@ -22,7 +23,7 @@
 #' @export
 #'
 #' @examples
-plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics", "fit_diagnostics"), cex.point = 1, cex.lab = 1.5,
+plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
                              cex.axis = 1.3, lwd = 2, title = "Linear fit", y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
@@ -68,23 +69,24 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
   p <- function(){
     switch(which,
            fit = {
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
-             par(mar=c(5.1, 4.1 + nchar(round(max(flFittedLinear$"fl.in")))/3.5, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
-             plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab=xlab, ylab = "",
+             plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab="", ylab = "", pch = pch,
                   log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point)
+             points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point, pch=pch)
 
-             title(ylab = ylab, line = 3 + nchar(round(max(flFittedLinear$"fl.in")))/4)
+             title(ylab = "Density", line = 2+cex.lab)
+             title(xlab = xlab, line = 1+cex.lab)
              axis(1)
              axis(2, las=1)
-             try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=21, cex = cex.point*1.15, col="black", bg="red"))
+             try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
              ## lag phase
              lag <- flFittedLinear$par["lag"]
              coef_ <- flFittedLinear$par
 
              if(flFittedLinear$fitFlag2){
-               try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=pch, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- flFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
                  try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
@@ -112,12 +114,12 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
            diagnostics = {
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
-             par(mfrow=c(1,2))
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis, mfrow=c(1,2))
 
              ## residuals vs. fitted
              obs <- flFittedLinear$log.data
              sim <- grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
-             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals")
+             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals", pch = pch)
              abline(h=0, col="grey")
              ## normal q-q-plot
              qqnorm(flFittedLinear$fit[["residuals"]])
@@ -128,23 +130,24 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
-             par(mai = c(0.7, 0.9, 0.6, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7, 0.7, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
 
-             plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab=xlab, ylab = "",
-                  log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point)
+             plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab="", ylab = "",
+                  log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, pch = pch, ...)
+             points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point, pch=pch)
 
-             title(ylab = ylab, line = 3 + nchar(round(max(flFittedLinear$"fl.in")))/4)
+             title(ylab = "Density", line = 2+cex.lab)
+             title(xlab = xlab, line = 1+cex.lab)
              axis(1)
              axis(2, las=1)
-             try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=21, cex = cex.point*1.15, col="black", bg="red"))
+             try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
              ## lag phase
              lag <- flFittedLinear$par["lag"]
              coef_ <- flFittedLinear$par
 
              if(flFittedLinear$fitFlag2){
-               try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=21, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
+               try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=pch, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- flFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
                  try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
@@ -180,8 +183,8 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
              ## residuals vs. fitted
              obs <- flFittedLinear$log.data
              sim <- grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
-             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals", type = "n")
-             points(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), cex = cex.point)
+             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals", pch = pch, type = "n")
+             points(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
              ## normal q-q-plot
              qqnorm(flFittedLinear$fit[["residuals"]], cex = cex.point)
@@ -247,6 +250,13 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
+
+  suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
+  if(all(is.na(x.lim))) x.lim <- NULL
+  suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
+  if(all(is.na(y.lim))) y.lim <- NULL
+  suppressWarnings(assign("y.lim.deriv" ,as.numeric(y.lim.deriv)))
+  if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
 
   # /// check if a data fit is available
   if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE)){

@@ -1002,7 +1002,80 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                                         value = TRUE),
                                                                           checkboxInput(inputId = 'diagnostics_validate_growth_plot_linear',
                                                                                         label = 'Show diagnostics',
-                                                                                        value = FALSE)
+                                                                                        value = FALSE),
+
+                                                                          h3('Customize plot appearance'),
+
+
+                                                                          sliderInput(inputId = 'shape_type_validate_growth_plot_linear',
+                                                                                      label = 'Shape type',
+                                                                                      min = 1,
+                                                                                      max = 25,
+                                                                                      value = 1),
+
+                                                                          sliderInput(inputId = 'shape_size_validate_growth_plot_linear',
+                                                                                      label = 'Shape size',
+                                                                                      min = 1,
+                                                                                      max = 10,
+                                                                                      value = 2,
+                                                                                      step = 0.5),
+
+
+
+                                                                          sliderInput(inputId = 'axis_size_validate_growth_plot_linear',
+                                                                                      label = 'Axis title font size',
+                                                                                      min = 0.1,
+                                                                                      max = 10,
+                                                                                      value = 1.9,
+                                                                                      step = 0.1),
+
+                                                                          sliderInput(inputId = 'lab_size_validate_growth_plot_linear',
+                                                                                      label = 'Axis label font size',
+                                                                                      min = 0.1,
+                                                                                      max = 10,
+                                                                                      value = 1.7,
+                                                                                      step = 0.1),
+
+                                                                          sliderInput(inputId = 'line_width_validate_growth_plot_linear',
+                                                                                      label = 'Line width',
+                                                                                      min = 0.01,
+                                                                                      max = 10,
+                                                                                      value = 0.5),
+
+
+                                                                          strong("x-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_min_validate_growth_plot_linear",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_max_validate_growth_plot_linear",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                                          strong("y-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_min_validate_growth_plot_linear",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_max_validate_growth_plot_linear",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
 
                                                              ),
                                                              mainPanel(width = 7,
@@ -1065,7 +1138,81 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                           ),
                                                                           checkboxInput(inputId = 'logy_validate_growth_plot_spline',
                                                                                         label = 'Log-transform y axis',
-                                                                                        value = TRUE)
+                                                                                        value = TRUE),
+
+                                                                          strong("x-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_min_validate_growth_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_max_validate_growth_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                                          strong("y-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_min_validate_growth_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_max_validate_growth_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                                          conditionalPanel(
+                                                                            condition = "input.logy_validate_growth_plot_spline",
+                                                                            strong("y-Range (derivative)"),
+                                                                            fluidRow(
+                                                                              column(5,
+                                                                                     textInput(inputId = "y_range_min_derivative_validate_growth_plot_spline",
+                                                                                               label = NULL,
+                                                                                               value = "", placeholder = "min"
+                                                                                     )
+                                                                              ),
+
+                                                                              column(5,
+                                                                                     textInput(inputId = "y_range_max_derivative_validate_growth_plot_spline",
+                                                                                               label = NULL,
+                                                                                               value = "", placeholder = "max"
+                                                                                     )
+                                                                              )
+                                                                            )
+                                                                          ),
+
+                                                                          sliderInput(inputId = 'shape_size_validate_growth_plot_spline',
+                                                                                      label = 'Shape size',
+                                                                                      min = 1,
+                                                                                      max = 10,
+                                                                                      value = 2,
+                                                                                      step = 0.5),
+
+                                                                          sliderInput(inputId = "line_width_validate_growth_plot_spline",
+                                                                                      label = "Line width",
+                                                                                      min = 0.01,
+                                                                                      max = 10,
+                                                                                      value = 1.1),
+
+                                                                          sliderInput(inputId = 'base_size_validate_growth_plot_spline',
+                                                                                      label = 'Base font size',
+                                                                                      min = 10,
+                                                                                      max = 35,
+                                                                                      value = 20,
+                                                                                      step = 0.5)
 
                                                              ),
                                                              mainPanel(width = 7,
@@ -1386,7 +1533,74 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                           ),
                                                                           checkboxInput(inputId = 'logy_validate_fluorescence_plot_spline',
                                                                                         label = 'Log-transform y axis',
-                                                                                        value = FALSE)
+                                                                                        value = FALSE),
+
+                                                                          strong("x-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_min_validate_fluorescence_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_max_validate_fluorescence_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                                          strong("y-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_min_validate_fluorescence_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_max_validate_fluorescence_plot_spline",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                                          conditionalPanel(
+                                                                            condition = "input.logy_validate_growth_plot_spline",
+                                                                            strong("y-Range (derivative)"),
+                                                                            fluidRow(
+                                                                              column(5,
+                                                                                     textInput(inputId = "y_range_min_derivative_validate_fluorescence_plot_spline",
+                                                                                               label = NULL,
+                                                                                               value = "", placeholder = "min"
+                                                                                     )
+                                                                              ),
+
+                                                                              column(5,
+                                                                                     textInput(inputId = "y_range_max_derivative_validate_fluorescence_plot_spline",
+                                                                                               label = NULL,
+                                                                                               value = "", placeholder = "max"
+                                                                                     )
+                                                                              )
+                                                                            )
+                                                                          ),
+
+                                                                          sliderInput(inputId = "line_width_validate_fluorescence_plot_spline",
+                                                                                      label = "Line width",
+                                                                                      min = 0.01,
+                                                                                      max = 10,
+                                                                                      value = 1.1),
+
+                                                                          sliderInput(inputId = 'base_size_validate_fluorescence_plot_spline',
+                                                                                      label = 'Base font size',
+                                                                                      min = 10,
+                                                                                      max = 35,
+                                                                                      value = 20,
+                                                                                      step = 0.5)
 
                                                              ),
                                                              mainPanel(width = 7,
@@ -4166,8 +4380,8 @@ server <- function(input, output, session){
                                 "Model" = res.table.gc$used.model,
                                 "µ<sub>max</sub>" = ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(as.numeric(res.table.gc$mu.model), 3),"\u00B1", round(as.numeric(res.table.gc$stdmu.model),3))),
                                 "t<sub>D</sub>" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
-                                "λ" = paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3)),
-                                "A" = paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3)),
+                                "λ" = ifelse(res.table.gc$lambda.model==0 | is.na(res.table.gc$lambda.model), "", paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3))),
+                                "A" = ifelse(res.table.gc$A.model==0 | is.na(res.table.gc$A.model), "", paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3))),
                                 stringsAsFactors = F, check.names = F)
       if(!is.null(res.table.gc)){
         if ( "richards" %in% res.table.gc$used.model  ){
@@ -4299,43 +4513,43 @@ server <- function(input, output, session){
 
   table_fluorescence1_spline_bt <- reactive({
     res.table.fl <- results$fluorescence$flFit1$flTable
-    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
-                               "µ<sub>max</sub>" = ifelse(res.table.gc$max_slope.bt==0 | is.na(res.table.gc$max_slope.bt),
+    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
+                               "µ<sub>max</sub>" = ifelse(res.table.fl$max_slope.bt==0 | is.na(res.table.fl$max_slope.bt),
                                                           "",
-                                                          paste0(round(as.numeric(res.table.gc$max_slope.bt), 3) ,
+                                                          paste0(round(as.numeric(res.table.fl$max_slope.bt), 3) ,
                                                                  " \u00B1 ",
-                                                                 round(as.numeric(res.table.gc$stdmax_slope.bt), 3)
+                                                                 round(as.numeric(res.table.fl$stdmax_slope.bt), 3)
                                                           )
                                ),
-                               "t<sub>D</sub>" = ifelse(res.table.gc$max_slope.bt==0 | is.na(res.table.gc$max_slope.bt),
+                               "t<sub>D</sub>" = ifelse(res.table.fl$max_slope.bt==0 | is.na(res.table.fl$max_slope.bt),
                                                         "",
-                                                        paste0(round(log(2)/as.numeric(res.table.gc$max_slope.bt), 3) ,
+                                                        paste0(round(log(2)/as.numeric(res.table.fl$max_slope.bt), 3) ,
                                                                " \u00B1 ",
-                                                               round(log(2)/as.numeric(res.table.gc$stdmax_slope.bt), 3)
+                                                               round(log(2)/as.numeric(res.table.fl$stdmax_slope.bt), 3)
                                                         )
                                ),
-                               "λ" = ifelse(res.table.gc$lambda.bt==0 | is.na(res.table.gc$lambda.bt),
+                               "λ" = ifelse(res.table.fl$lambda.bt==0 | is.na(res.table.fl$lambda.bt),
                                             "",
-                                            paste0(round(as.numeric(res.table.gc$lambda.bt), 3) ,
+                                            paste0(round(as.numeric(res.table.fl$lambda.bt), 3) ,
                                                    " \u00B1 ",
-                                                   round(as.numeric(res.table.gc$stdlambda.bt ), 3)
+                                                   round(as.numeric(res.table.fl$stdlambda.bt ), 3)
                                             )
                                ),
-                               "y<sub>max</sub>" = ifelse(res.table.gc$lambda.bt==0 | is.na(res.table.gc$lambda.bt),
+                               "y<sub>max</sub>" = ifelse(res.table.fl$lambda.bt==0 | is.na(res.table.fl$lambda.bt),
                                                           "",
-                                                          paste0(round(as.numeric(res.table.gc$lambda.bt), 3) ,
+                                                          paste0(round(as.numeric(res.table.fl$lambda.bt), 3) ,
                                                                  " \u00B1 ",
-                                                                 round(as.numeric(res.table.gc$stdlambda.bt ), 3)
+                                                                 round(as.numeric(res.table.fl$stdlambda.bt ), 3)
                                                           )
                                ),
-                               "ΔY" = ifelse(res.table.gc$dY.bt==0 | is.na(res.table.gc$dY.bt),
+                               "ΔY" = ifelse(res.table.fl$dY.bt==0 | is.na(res.table.fl$dY.bt),
                                              "",
-                                             paste0(round(as.numeric(res.table.gc$dY.bt), 3) ,
+                                             paste0(round(as.numeric(res.table.fl$dY.bt), 3) ,
                                                     " \u00B1 ",
-                                                    round(as.numeric(res.table.gc$stddY.bt ), 3)
+                                                    round(as.numeric(res.table.fl$stddY.bt ), 3)
                                              )
                                ),
-                               "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
+                               "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F)
     table_spline
   })
 
@@ -4468,18 +4682,52 @@ server <- function(input, output, session){
 
   validate_growth_plot_linear <- reactive({
     results <- results$growth
+    # Define x- and y-axis limits
+    if(any(input$y_range_min_validate_growth_plot_linear == "",
+           input$y_range_max_validate_growth_plot_linear == "")){
+      ylim <- NULL
+    } else {
+      ylim <- c(as.numeric(input$y_range_min_validate_growth_plot_linear),
+                as.numeric(input$y_range_max_validate_growth_plot_linear))
+    }
+
+    if(any(input$y_range_min_derivative_validate_growth_plot_linear == "",
+           input$y_range_max_derivative_validate_growth_plot_linear == "")){
+      ylim.deriv <- NULL
+    } else {
+      ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_growth_plot_linear),
+                      as.numeric(input$y_range_max_derivative_validate_growth_plot_linear))
+    }
+
+    if(any(input$x_range_min_validate_growth_plot_linear == "",
+           input$x_range_max_validate_growth_plot_linear == "")){
+      xlim <- NULL
+    } else {
+      xlim <- c(as.numeric(input$x_range_min_validate_growth_plot_linear),
+                as.numeric(input$x_range_max_validate_growth_plot_linear))
+    }
+
+
     if(length(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]]) > 1){
-
-
-      plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
-                       log = logy_validate_growth_plot_linear()
-                       # ADD FURTHER INPUT (see Notion)
+      plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
+                       pch = input$shape_type_validate_growth_plot_linear,
+                       log = logy_validate_growth_plot_linear(),
+                       cex.point = input$shape_size_validate_growth_plot_linear,
+                       cex.lab = input$axis_size_validate_growth_plot_linear,
+                       cex.axis = input$lab_size_validate_growth_plot_linear,
+                       lwd = input$line_width_validate_growth_plot_linear,
+                       y.lim = ylim,
+                       x.lim = xlim
       )
       if(input$diagnostics_validate_growth_plot_linear){
         plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
                          which = "fit_diagnostics",
-                         log = logy_validate_growth_plot_linear()
-                         # ADD FURTHER INPUT (see Notion)
+                         pch = input$shape_type_validate_growth_plot_linear,
+                         log = logy_validate_growth_plot_linear(),
+                         cex.point = input$shape_size_validate_growth_plot_linear,
+                         cex.lab = input$axis_size_validate_growth_plot_linear,
+                         cex.axis = input$lab_size_validate_growth_plot_linear,
+                         lwd = input$line_width_validate_growth_plot_linear
         )
       }
     }
@@ -4632,8 +4880,15 @@ server <- function(input, output, session){
     results <- results$growth
     if(length(results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.gcFitSpline(results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]],
-                       log.y = input$logy_validate_growth_plot_spline, colData = 1
+      try(plot.gcFitSpline(gcFittedSpline = results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]],
+                           log.y = input$logy_validate_growth_plot_spline,
+                           x.lim = c(input$x_range_min_validate_growth_plot_spline, input$x_range_max_validate_growth_plot_spline),
+                           y.lim = c(input$y_range_min_validate_growth_plot_spline,input$y_range_max_validate_growth_plot_spline),
+                           y.lim.deriv = c(input$y_range_min_derivative_validate_growth_plot_spline, input$y_range_max_derivative_validate_growth_plot_spline),
+                           lwd = input$line_width_validate_growth_plot_spline,
+                           cex.point = input$shape_size_validate_growth_plot_spline,
+                           basesize = input$base_size_validate_growth_plot_spline
+      )
       )
       removeModal()
     }
@@ -5191,7 +5446,12 @@ server <- function(input, output, session){
     if(length(results$flFit1$flFittedSplines[[ifelse(input$sample_validate_fluorescence_spline == "1" || is.null(input$sample_validate_fluorescence_spline), 1, input$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
       plot.flFitSpline(results$flFit1$flFittedSplines[[ifelse(input$sample_validate_fluorescence_spline == "1" || is.null(input$sample_validate_fluorescence_spline), 1, input$sample_validate_fluorescence_spline)]],
-                       log.y = input$logy_validate_fluorescence_plot_spline, colData = 1
+                       log.y = input$logy_validate_fluorescence_plot_spline,
+                       x.lim = c(input$x_range_min_validate_fluorescence_plot_spline, input$x_range_max_validate_fluorescence_plot_spline),
+                       y.lim = c(input$y_range_min_validate_fluorescence_plot_spline,input$y_range_max_validate_fluorescence_plot_spline),
+                       y.lim.deriv = c(input$y_range_min_derivative_validate_fluorescence_plot_spline, input$y_range_max_derivative_validate_fluorescence_plot_spline),
+                       lwd = input$line_width_validate_fluorescence_plot_spline,
+                       basesize = input$base_size_validate_fluorescence_plot_spline
       )
       removeModal()
     }
