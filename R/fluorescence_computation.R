@@ -588,20 +588,6 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     if (TRUE %in% bad.values) {
       density <- density[!bad.values]
       fl_data <- fl_data[!bad.values]
-    } else {
-      ndx.max <- which.max(time)
-      time <- time[1:ndx.max]
-      fl_data <- fl_data[1:ndx.max]
-      bad.values <- (is.na(time)) | (is.na(fl_data)) |
-        (!is.numeric(time)) | (!is.numeric(fl_data) )
-      if (TRUE %in% bad.values) {
-        time <- time[!bad.values]
-        if (control$log.y.spline == TRUE) {
-          fl_data.log <- fl_data.log[!bad.values]
-        } else {
-          fl_data <- fl_data[!bad.values]
-        }
-      }
     }
     if (control$log.x.spline == TRUE) {
       bad.values <- (density < 0)
@@ -610,6 +596,29 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
         fl_data <- fl_data[!bad.values]
       }
       density.log <- log(density/density[1])
+    }
+  }
+  if(x_type == "time"){
+    ndx.max <- which.max(time)
+    time <- time[1:ndx.max]
+    fl_data <- fl_data[1:ndx.max]
+    bad.values <- (is.na(time)) | (is.na(fl_data)) |
+      (!is.numeric(time)) | (!is.numeric(fl_data) )
+    if (TRUE %in% bad.values) {
+      time <- time[!bad.values]
+      if (control$log.y.spline == TRUE) {
+        fl_data.log <- fl_data.log[!bad.values]
+      } else {
+        fl_data <- fl_data[!bad.values]
+      }
+    }
+    if (control$log.x.spline == TRUE) {
+      bad.values <- (time < 0)
+      if (TRUE %in% bad.values) {
+        time <- time[!bad.values]
+        fl_data <- fl_data[!bad.values]
+      }
+      time.log <- log(time+1)
     }
   }
 
@@ -775,7 +784,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     fl_data <- fl_data$fluorescence1
   }
   # /// check if start density values are above min.density in all samples
-  if(!is.null(density) && !is.na(density)){
+  if(!is.null(density) && length(density) > 1){
     max.density <- unlist(lapply(1:nrow(density), function (x) max(as.numeric(as.matrix(density[x,-1:-3]))[!is.na(as.numeric(as.matrix(density[x,-1:-3])))])))
     if(is.numeric(control$min.density) && control$min.density != 0){
       if(!is.na(control$min.density) && all(as.numeric(max.density) < control$min.density)){

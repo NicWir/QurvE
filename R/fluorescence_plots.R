@@ -570,7 +570,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 
   # /// check input parameters
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
+  if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex.point")
   if (flBootSpline$bootFlag==FALSE){
     empty.plot()
   }
@@ -605,7 +605,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 
       # /// plot all flFitSpline objects
       for(i in 1:flBootSpline$control$nboot.fl){
-        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T,
+        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd = lwd,
                          deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
       }
       # add plot title
@@ -627,13 +627,13 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         if ((flBootSpline$control$log.x.spline==FALSE)){
           try( plot(flBootSpline$boot.flSpline[[1]]$spline.deriv1$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y,
-                    xlab="", ylab="", type = "l", col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
+                    xlab="", ylab="", type = "l", lwd = lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
         }
         if ((flBootSpline$control$log.x.spline==TRUE)){
-          try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
+          try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, lwd = lwd, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
         }
         for(i in 2:flBootSpline$control$nboot.fl){
-          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, xlim = x.lim,
+          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
         }
         title(ylab = "First derivative", line = 2.3, cex.lab = cex.lab)
@@ -709,7 +709,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 
       # /// plot all flFitSpline objects
       for(i in 1:flBootSpline$control$nboot.fl){
-        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T,
+        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd = lwd,
                          deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
       }
       # add plot title
@@ -731,13 +731,13 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         if ((flBootSpline$control$log.x.spline==FALSE)){
           try( plot(flBootSpline$boot.flSpline[[1]]$spline.deriv1$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y,
-                    xlab="", ylab="", type = "l", col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
+                    xlab="", ylab="", type = "l", lwd = lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
         }
         if ((flBootSpline$control$log.x.spline==TRUE)){
-          try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
+          try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, lwd = lwd, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
         }
         for(i in 2:flBootSpline$control$nboot.fl){
-          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, xlim = x.lim,
+          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
         }
         title(ylab = "First derivative", line = 2.3, cex.lab = cex.lab)

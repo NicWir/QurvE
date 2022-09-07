@@ -1408,7 +1408,150 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                          ) # column
                                                                        ) # fluidRow
                                                              ) # mainPanel
-                                                    ) # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
+                                                    ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
+
+                                                    tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Fluorescence_Spline_bt",
+                                                             sidebarPanel(width = 4,
+                                                                          selectInput(inputId = "sample_validate_fluorescence_spline_bt",
+                                                                                      label = "Sample:",
+                                                                                      width = "fit-content",
+                                                                                      choices = "",
+                                                                                      multiple = FALSE,
+                                                                                      selectize = FALSE,
+                                                                                      size = 5,
+                                                                          ),
+
+                                                                          checkboxInput(inputId = "plot_derivative_fluorescence_spline_bt",
+                                                                                        label = "Plot derivative",
+                                                                                        value = TRUE),
+
+                                                                          h3('Customize plot appearance'),
+
+
+                                                                          sliderInput(inputId = 'shape_type_validate_fluorescence_spline_bt',
+                                                                                      label = 'Shape type',
+                                                                                      min = 1,
+                                                                                      max = 25,
+                                                                                      value = 1),
+
+                                                                          sliderInput(inputId = 'shape_size_validate_fluorescence_spline_bt',
+                                                                                      label = 'Shape size',
+                                                                                      min = 1,
+                                                                                      max = 10,
+                                                                                      value = 2,
+                                                                                      step = 0.5),
+
+
+
+                                                                          sliderInput(inputId = 'axis_size_validate_fluorescence_spline_bt',
+                                                                                      label = 'Axis title font size',
+                                                                                      min = 0.1,
+                                                                                      max = 10,
+                                                                                      value = 1.9,
+                                                                                      step = 0.1),
+
+                                                                          sliderInput(inputId = 'lab_size_validate_fluorescence_spline_bt',
+                                                                                      label = 'Axis label font size',
+                                                                                      min = 0.1,
+                                                                                      max = 10,
+                                                                                      value = 1.7,
+                                                                                      step = 0.1),
+
+                                                                          sliderInput(inputId = 'line_width_validate_fluorescence_spline_bt',
+                                                                                      label = 'Line width',
+                                                                                      min = 0.01,
+                                                                                      max = 10,
+                                                                                      value = 0.5),
+
+
+                                                                          strong("x-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_min_validate_fluorescence_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "x_range_max_validate_fluorescence_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                                          strong("y-Range"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_min_validate_fluorescence_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_max_validate_fluorescence_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+                                                                          strong("y-Range (derivative)"),
+                                                                          fluidRow(
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_min_derivative_validate_fluorescence_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "min"
+                                                                                   )
+                                                                            ),
+
+                                                                            column(5,
+                                                                                   textInput(inputId = "y_range_max_derivative_validate_fluorescence_spline_bt",
+                                                                                             label = NULL,
+                                                                                             value = "", placeholder = "max"
+                                                                                   )
+                                                                            )
+                                                                          ),
+
+                                                             ), # sidebarPanel
+
+                                                             mainPanel(width = 8,
+
+                                                                       plotOutput("validate_fluorescence_plot_spline_bt",
+                                                                                  width = "100%", height = "1000px"),
+
+                                                                       HTML("<br>"),
+                                                                       h3(strong("Export plot")),
+
+                                                                       fluidRow(
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "width_download_fluorescence_validate_spline_bt",
+                                                                                             label = "Width (in inches)",
+                                                                                             value = 10)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "height_download_fluorescence_validate_spline_bt",
+                                                                                             label = "Height (in inches)",
+                                                                                             value = 9)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                numericInput(inputId = "dpi_download_fluorescence_validate_spline_bt",
+                                                                                             label = "DPI",
+                                                                                             value = 300)
+                                                                         ), # column
+                                                                         column(width = 4,
+                                                                                downloadButton('download_fluorescence_validate_spline_bt',"Download Plot"),
+                                                                                radioButtons("format_download_fluorescence_validate_spline_bt",
+                                                                                             label = NULL,
+                                                                                             choices = c("PNG" = ".png",
+                                                                                                         "PDF" = ".pdf"),
+                                                                                             selected = ".png",
+                                                                                             inline = TRUE)
+                                                                         ) # column
+                                                                       ) # fluidRow
+                                                             ) # mainPanel
+                                                    ) # tabPanel(title = "Bootstrapping Spline"
                                         ) # tabsetPanel(type = "tabs",
                                ) # tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
                     ), # navbarMenu("Validate", icon = icon("user-check"),
@@ -1811,6 +1954,96 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                                                                               ) #  mainPanel
 
                                                              ),
+
+
+                                                    ), # tabPanel(title = "Dose-response analysis"
+
+                                                    ### Growth DR Plots Bootstrap ####
+
+                                                    tabPanel(title = "Dose-response analysis (Bootstrap)", value = "tabPanel_Visualize_Growth_DoseResponse_bt",
+                                                             sidebarPanel(
+
+                                                               h3('Customize plot appearance'),
+
+
+                                                               sliderInput(inputId = 'shape_type_dose_response_growth_plot_bt',
+                                                                           label = 'Shape type',
+                                                                           min = 1,
+                                                                           max = 25,
+                                                                           value = 15),
+
+                                                               sliderInput(inputId = 'shape_size_dose_response_growth_plot_bt',
+                                                                           label = 'Shape size',
+                                                                           min = 1,
+                                                                           max = 10,
+                                                                           value = 2,
+                                                                           step = 0.5),
+
+                                                                 sliderInput(inputId = 'axis_size_dose_response_growth_plot_bt',
+                                                                             label = 'Axis title font size',
+                                                                             min = 0.1,
+                                                                             max = 10,
+                                                                             value = 1.3,
+                                                                             step = 0.1),
+
+
+                                                                 sliderInput(inputId = 'lab_size_dose_response_growth_plot_bt',
+                                                                             label = 'Axis label font size',
+                                                                             min = 0.1,
+                                                                             max = 10,
+                                                                             value = 1.3,
+                                                                             step = 0.1),
+
+                                                               sliderInput(inputId = 'line_width_dose_response_growth_plot_bt',
+                                                                           label = 'Line width',
+                                                                           min = 0.01,
+                                                                           max = 10,
+                                                                           value = 1),
+
+                                                             ), # sidebarPanel
+
+                                                                              mainPanel(
+                                                                                h3('Individual plots'),
+                                                                                selectInput(inputId = 'individual_plots_dose_response_growth_plot_bt',
+                                                                                            label = 'Select plot',
+                                                                                            choices = "",
+                                                                                            multiple = FALSE,
+                                                                                            selectize = FALSE,
+                                                                                            size = 3),
+                                                                                plotOutput("dose_response_growth_plot_individual_bt",
+                                                                                           width = "100%", height = "800px"),
+
+                                                                                h3(strong("Export plot")),
+
+                                                                                fluidRow(
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "width_download_dose_response_growth_plot_individual_bt",
+                                                                                                      label = "Width (in inches)",
+                                                                                                      value = 7)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "height_download_dose_response_growth_plot_individual_bt",
+                                                                                                      label = "Height (in inches)",
+                                                                                                      value = 6)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         numericInput(inputId = "dpi_download_dose_response_growth_plot_individual_bt",
+                                                                                                      label = "DPI",
+                                                                                                      value = 300)
+                                                                                  ), # column
+                                                                                  column(width = 4,
+                                                                                         downloadButton('download_dose_response_growth_plot_individual_bt',"Download Plot"),
+
+                                                                                         radioButtons("format_download_dose_response_growth_plot_individual_bt",
+                                                                                                      label = NULL,
+                                                                                                      choices = c("PNG" = ".png",
+                                                                                                                  "PDF" = ".pdf"),
+                                                                                                      selected = ".png",
+                                                                                                      inline = TRUE)
+                                                                                  ), # column
+                                                                                ) # fluidRow
+                                                                              ) #  mainPanel
+
 
 
                                                     ), # tabPanel(title = "Dose-response analysis"
@@ -3751,7 +3984,7 @@ server <- function(input, output, session){
     }
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
-    # Run growth workflow
+    # Run fluorescence workflow
     try(
       shiny::withProgress(message = "Computations completed",
                           results$fluorescence <- fl.workflow(grodata = grodata,
@@ -3816,16 +4049,23 @@ server <- function(input, output, session){
       if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline")
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
+      } else{
+        showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline")
       }
       if(!("l" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Linear")
+      } else {
+        showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Linear")
       }
       if(!("m" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Model")
-
+      } else {
+        showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Model")
       }
-      if(input$number_of_bootstrappings_growth <= 1){
+      if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt) || input$number_of_bootstrappings_growth <= 1){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
+      } else {
+        showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
       }
     }
   })
@@ -4000,12 +4240,18 @@ server <- function(input, output, session){
       if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline")
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Growth_Fluorescence_bt")
+      } else {
+        showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline")
       }
       if(!("l" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt)){
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Linear")
+      } else {
+        showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Linear")
       }
-      if(input$number_of_bootstrappings_fluorescence <= 1){
+      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt) || input$number_of_bootstrappings_fluorescence <= 1){
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
+      } else {
+        showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
       }
     }
   })
@@ -4222,15 +4468,15 @@ server <- function(input, output, session){
 
   validate_growth_plot_linear <- reactive({
     results <- results$growth
-    if(length(results$gcFit$gcFittedLinear[[input$sample_validate_growth_linear]]) > 1){
+    if(length(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]]) > 1){
 
 
-      plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+      plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
                        log = logy_validate_growth_plot_linear()
                        # ADD FURTHER INPUT (see Notion)
       )
       if(input$diagnostics_validate_growth_plot_linear){
-        plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+        plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
                          which = "fit_diagnostics",
                          log = logy_validate_growth_plot_linear()
                          # ADD FURTHER INPUT (see Notion)
@@ -4324,7 +4570,7 @@ server <- function(input, output, session){
 
   output$download_growth_validate_linear <- downloadHandler(
     filename = function() {
-      paste("linear_fit_",  selected_vals_validate_growth$sample_validate_growth_linear, input$format_download_growth_validate_linear, sep="")
+      paste("linear_fit_",  gsub(" \\| ", "_", selected_vals_validate_growth$sample_validate_growth_linear), input$format_download_growth_validate_linear, sep="")
     },
     content = function(file) {
       if(input$format_download_growth_validate_linear == ".pdf"){
@@ -4341,15 +4587,15 @@ server <- function(input, output, session){
       if(input$logy_validate_growth_plot_linear) log <- "y"
       else  log <- ""
       results <- results$growth
-      if(length(results$gcFit$gcFittedLinear[[input$sample_validate_growth_linear]]) > 1){
+      if(length(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]]) > 1){
 
 
-        plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+        plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
                          log = log
                          # ADD FURTHER INPUT (see Notion)
         )
         if(input$diagnostics_validate_growth_plot_linear){
-          plot.gcFitLinear(results$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]],
+          plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
                            which = "fit_diagnostics",
                            log = log
                            # ADD FURTHER INPUT (see Notion)
@@ -4384,9 +4630,9 @@ server <- function(input, output, session){
 
   output$validate_growth_plot_spline <- renderPlot({
     results <- results$growth
-    if(length(results$gcFit$gcFittedSplines[[input$sample_validate_growth_spline]]) > 1){
+    if(length(results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.gcFitSpline(results$gcFit$gcFittedSplines[[input$sample_validate_growth_spline]],
+      plot.gcFitSpline(results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]],
                        log.y = input$logy_validate_growth_plot_spline, colData = 1
       )
       removeModal()
@@ -4460,7 +4706,7 @@ server <- function(input, output, session){
 
   output$download_growth_validate_spline <- downloadHandler(
     filename = function() {
-      paste("spline_fit_",  selected_vals_validate_growth$sample_validate_growth_spline, input$format_download_growth_validate_spline, sep="")
+      paste("spline_fit_",  gsub(" \\| ", "_", selected_vals_validate_growth$sample_validate_growth_spline), input$format_download_growth_validate_spline, sep="")
     },
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_validate_spline,
@@ -4492,9 +4738,9 @@ server <- function(input, output, session){
 
   output$validate_growth_plot_model <- renderPlot({
     results <- results$growth
-    if(length(results$gcFit$gcFittedModels[[input$sample_validate_growth_model]]) > 1){
+    if(length(results$gcFit$gcFittedModels[[ifelse(input$sample_validate_growth_model == "1" || is.null(input$sample_validate_growth_model), 1, input$sample_validate_growth_model)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.gcFitModel(results$gcFit$gcFittedModels[[input$sample_validate_growth_model]],
+      plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(input$sample_validate_growth_model == "1" || is.null(input$sample_validate_growth_model), 1, input$sample_validate_growth_model)]],
                       colData=1, colModel=2, colLag = 3,
       )
       removeModal()
@@ -4594,7 +4840,7 @@ server <- function(input, output, session){
 
   output$download_growth_validate_model <- downloadHandler(
     filename = function() {
-      paste("model_fit_",  selected_vals_validate_growth$sample_validate_growth_model, input$format_download_growth_validate_model, sep="")
+      paste("model_fit_",  gsub(" \\| ", "_", selected_vals_validate_growth$sample_validate_growth_model), input$format_download_growth_validate_model, sep="")
     },
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_validate_model,
@@ -4682,7 +4928,7 @@ server <- function(input, output, session){
 
   output$download_growth_validate_spline_bt <- downloadHandler(
     filename = function() {
-      paste("spline_fit_bootstrap_",  input$sample_validate_growth_spline_bt, input$format_download_growth_validate_spline_bt, sep="")
+      paste("spline_fit_bootstrap_",  gsub(" \\| ", "_", input$sample_validate_growth_spline_bt), input$format_download_growth_validate_spline_bt, sep="")
     },
     content = function(file) {
       if(input$format_download_growth_validate_spline_bt == ".pdf"){
@@ -4754,7 +5000,7 @@ server <- function(input, output, session){
       } else {
         showTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Linear")
       }
-      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt) || results$growth$control$nboot.fl <=1){
+      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt) || results$fluorescence$control$nboot.fl <=1){
         hideTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Spline_bt")
       } else {
         showTab(inputId = "tabsetPanel_Validate_Fluorescence", target = "tabPanel_Validate_Fluorescence_Spline_bt")
@@ -4774,7 +5020,8 @@ server <- function(input, output, session){
 
   #------- Initialize the Memory to store settings
   selected_vals_validate_fluorescence <- reactiveValues(sample_validate_fluorescence_linear = 1,
-                                                        sample_validate_fluorescence_spline = 1
+                                                        sample_validate_fluorescence_spline = 1,
+                                                        sample_validate_fluorescence_spline_bt = 1
   )
 
   #------ Whenever any of the inputs are changed, it only modifies the memory
@@ -4815,15 +5062,15 @@ server <- function(input, output, session){
   # Render plot
   output$validate_fluorescence_plot_linear <- renderPlot({
     results <- results$fluorescence
-    if(length(results$flFit1$flFittedLinear[[input$sample_validate_fluorescence_linear]]) > 1){
+    if(length(results$flFit1$flFittedLinear[[ifelse(input$sample_validate_fluorescence_linear == "1" || is.null(input$sample_validate_fluorescence_linear), 1, input$sample_validate_fluorescence_linear)]]) > 1){
 
 
-      plot.flFitLinear(results$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]],
+      plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                        log = logy_validate_fluorescence_plot_linear()
                        # ADD FURTHER INPUT (see Notion)
       )
       if(input$diagnostics_validate_fluorescence_plot_linear){
-        plot.flFitLinear(results$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]],
+        plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                          which = "fit_diagnostics",
                          log = logy_validate_fluorescence_plot_linear()
                          # ADD FURTHER INPUT (see Notion)
@@ -4941,9 +5188,9 @@ server <- function(input, output, session){
 
   output$validate_fluorescence_plot_spline <- renderPlot({
     results <- results$fluorescence
-    if(length(results$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]) > 1){
+    if(length(results$flFit1$flFittedSplines[[ifelse(input$sample_validate_fluorescence_spline == "1" || is.null(input$sample_validate_fluorescence_spline), 1, input$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.flFitSpline(results$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]],
+      plot.flFitSpline(results$flFit1$flFittedSplines[[ifelse(input$sample_validate_fluorescence_spline == "1" || is.null(input$sample_validate_fluorescence_spline), 1, input$sample_validate_fluorescence_spline)]],
                        log.y = input$logy_validate_fluorescence_plot_spline, colData = 1
       )
       removeModal()
@@ -5023,6 +5270,133 @@ server <- function(input, output, session){
     hide("restore_fluorescence_spline")
   })
 
+      ### Spline Fits BT ####
+  selected_inputs_sample_validate_fluorescence_spline_bt <- reactive({
+    results <- results$fluorescence
+    if(is.null(results)) return("")
+    if(("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt) && results$control$nboot.fl > 1){
+      select_samples <- names(results$flFit1$flBootSplines)
+    } else {
+      return("")
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "sample_validate_fluorescence_spline_bt",
+                      choices = selected_inputs_sample_validate_fluorescence_spline_bt(),
+                      selected = selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt
+    )})
+
+  validate_fluorescence_plot_spline_bt <- reactive({
+    results <- results$fluorescence$flFit1$flBootSplines[[ifelse(input$sample_validate_fluorescence_spline_bt == "1" || is.null(input$sample_validate_fluorescence_spline_bt), 1, input$sample_validate_fluorescence_spline_bt)]]
+
+
+    # Define x- and y-axis limits
+    if(any(input$y_range_min_validate_fluorescence_spline_bt == "",
+           input$y_range_max_validate_fluorescence_spline_bt == "")){
+      ylim <- NULL
+    } else {
+      ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_spline_bt),
+                as.numeric(input$y_range_max_validate_fluorescence_spline_bt))
+    }
+
+    if(any(input$y_range_min_derivative_validate_fluorescence_spline_bt == "",
+           input$y_range_max_derivative_validate_fluorescence_spline_bt == "")){
+      ylim.deriv <- NULL
+    } else {
+      ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_fluorescence_spline_bt),
+                      as.numeric(input$y_range_max_derivative_validate_fluorescence_spline_bt))
+    }
+
+    if(any(input$x_range_min_validate_fluorescence_spline_bt == "",
+           input$x_range_max_validate_fluorescence_spline_bt == "")){
+      xlim <- NULL
+    } else {
+      xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_spline_bt),
+                as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
+    }
+
+    plot.flBootSpline(flBootSpline = results,
+                      pch = input$shape_type_validate_fluorescence_spline_bt,
+                      cex.point = input$shape_size_validate_fluorescence_spline_bt,
+                      cex.lab = input$axis_size_validate_fluorescence_spline_bt,
+                      cex.axis = input$lab_size_validate_fluorescence_spline_bt,
+                      lwd = input$line_width_validate_fluorescence_spline_bt,
+                      y.lim = ylim,
+                      x.lim = xlim,
+                      y.lim.deriv = ylim.deriv,
+                      deriv = input$plot_derivative_fluorescence_spline_bt,
+                      shiny = TRUE
+    )
+  })
+
+  output$validate_fluorescence_plot_spline_bt <- renderPlot({
+    validate_fluorescence_plot_spline_bt()
+  })
+
+  output$download_fluorescence_validate_spline_bt <- downloadHandler(
+    filename = function() {
+      paste("spline_fit_bootstrap_",  gsub(" \\| ", "_", input$sample_validate_fluorescence_spline_bt), input$format_download_fluorescence_validate_spline_bt, sep="")
+    },
+    content = function(file) {
+      if(input$format_download_fluorescence_validate_spline_bt == ".pdf"){
+        pdf(file = file,
+            width = input$width_download_fluorescence_validate_spline_bt,
+            height = input$height_download_fluorescence_validate_spline_bt)
+      } else {
+        png(file = file,
+            width = input$width_download_fluorescence_validate_spline_bt,
+            height = input$height_download_fluorescence_validate_spline_bt,
+            units = "in",
+            res = input$dpi_download_fluorescence_validate_spline_bt)
+      }
+      # Generate plot
+      results <- results$fluorescence$flFit1$flBootSplines[[ifelse(input$sample_validate_fluorescence_spline_bt == "1" || is.null(input$sample_validate_fluorescence_spline_bt), 1, input$sample_validate_fluorescence_spline_bt)]]
+
+
+      # Define x- and y-axis limits
+      if(any(input$y_range_min_validate_fluorescence_spline_bt == "",
+             input$y_range_max_validate_fluorescence_spline_bt == "")){
+        ylim <- NULL
+      } else {
+        ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_spline_bt),
+                  as.numeric(input$y_range_max_validate_fluorescence_spline_bt))
+      }
+
+      if(any(input$y_range_min_derivative_validate_fluorescence_spline_bt == "",
+             input$y_range_max_derivative_validate_fluorescence_spline_bt == "")){
+        ylim.deriv <- NULL
+      } else {
+        ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_fluorescence_spline_bt),
+                        as.numeric(input$y_range_max_derivative_validate_fluorescence_spline_bt))
+      }
+
+      if(any(input$x_range_min_validate_fluorescence_spline_bt == "",
+             input$x_range_max_validate_fluorescence_spline_bt == "")){
+        xlim <- NULL
+      } else {
+        xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_spline_bt),
+                  as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
+      }
+
+      plot.flBootSpline(flBootSpline = results,
+                        pch = input$shape_type_validate_fluorescence_spline_bt,
+                        cex.point = input$shape_size_validate_fluorescence_spline_bt,
+                        cex.lab = input$axis_size_validate_fluorescence_spline_bt,
+                        cex.axis = input$lab_size_validate_fluorescence_spline_bt,
+                        lwd = input$line_width_validate_fluorescence_spline_bt,
+                        y.lim = ylim,
+                        x.lim = xlim,
+                        y.lim.deriv = ylim.deriv,
+                        deriv = input$plot_derivative_fluorescence_spline_bt,
+                        shiny = TRUE
+      )
+      dev.off()
+    },
+    contentType = ifelse(input$format_download_fluorescence_validate_spline_bt == ".pdf", "image/pdf", "image/png")
+  )
   # Visualize ####
     ## Growth Plots: #####
       ### Group Plots ####
@@ -5124,7 +5498,7 @@ server <- function(input, output, session){
 
 
   dose_response_growth_plot_individual <- reactive({
-    results <- results$growth$drFit$drFittedSplines[[input$individual_plots_dose_response_growth_plot]]
+    results <- results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]
 
     # Define log-transformation of axes
     if(input$log_transform_y_axis_dose_response_growth_plot &&
@@ -5177,7 +5551,7 @@ server <- function(input, output, session){
 
   output$download_dose_response_growth_plot_individual <- downloadHandler(
     filename = function() {
-      paste("dose_response_growth_individual",  input$format_download_dose_response_growth_plot_individual, sep="")
+      paste("dose_response_growth_",  gsub(" \\| ", "_", input$individual_plots_dose_response_growth_plot), input$format_download_dose_response_growth_plot_individual, sep="")
     },
     content = function(file) {
       ggsave(filename = file, width = input$width_download_dose_response_growth_plot_individual,
@@ -5185,6 +5559,65 @@ server <- function(input, output, session){
              dpi = input$dpi_download_dose_response_growth_plot_individual)
     },
     contentType = ifelse(input$format_download_dose_response_growth_plot_individual == ".pdf", "image/pdf", "image/png")
+  )
+
+      ### DR Plots (Bootstrap) ####
+  observe({
+    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$control$nboot.dr > 1){
+      showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_bt")
+    } else {
+      hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_bt")
+    }
+  })
+
+  dose_response_growth_plot_individual_bt <- reactive({
+    results <- results$growth$drFit$drBootSplines[[ifelse(input$individual_plots_dose_response_growth_plot_bt == "1" || is.null(input$individual_plots_dose_response_growth_plot_bt), 1, input$individual_plots_dose_response_growth_plot_bt)]]
+
+    plot.drBootSpline(drBootSpline = results,
+                     pch = input$shape_type_dose_response_growth_plot_bt,
+                     cex.point = input$shape_size_dose_response_growth_plot_bt,
+                     cex.lab = input$axis_size_dose_response_growth_plot_bt,
+                     cex.axis = input$lab_size_dose_response_growth_plot_bt,
+                     lwd = input$line_width_dose_response_growth_plot_bt,
+                     shiny = TRUE
+
+    )
+  })
+
+  output$dose_response_growth_plot_individual_bt <- renderPlot({
+    dose_response_growth_plot_individual_bt()
+  })
+
+  output$download_dose_response_growth_plot_individual_bt <- downloadHandler(
+    filename = function() {
+      paste("dose_response_boot_growth_",  gsub(" \\| ", "_", input$individual_plots_dose_response_growth_plot_bt), input$format_download_dose_response_growth_plot_individual_bt, sep="")
+    },
+    content = function(file) {
+      if(input$format_download_dose_response_growth_plot_individual_bt == ".pdf"){
+        pdf(file = file,
+            width = input$width_download_dose_response_growth_plot_individual_bt,
+            height = input$height_download_dose_response_growth_plot_individual_bt)
+      } else {
+        png(file = file,
+            width = input$width_download_dose_response_growth_plot_individual_bt,
+            height = input$height_download_dose_response_growth_plot_individual_bt,
+            units = "in",
+            res = input$dpi_download_dose_response_growth_plot_individual_bt)
+      }
+      results <- results$growth$drFit$drBootSplines[[input$individual_plots_dose_response_growth_plot_bt]]
+
+      plot.drFitSpline(drFitSpline = results,
+                       combine = FALSE,
+                       pch = input$shape_type_dose_response_growth_plot_bt,
+                       cex.point = input$shape_size_dose_response_growth_plot_bt,
+                       cex.lab = input$axis_size_dose_response_growth_plot_bt,
+                       cex.axis = input$lab_size_dose_response_growth_plot_bt,
+                       lwd = input$line_width_dose_response_growth_plot_bt
+
+      )
+      dev.off()
+    },
+    contentType = ifelse(input$format_download_dose_response_growth_plot_individual_bt == ".pdf", "image/pdf", "image/png")
   )
 
       ### Parameter Plots ####
@@ -5288,8 +5721,13 @@ server <- function(input, output, session){
     results$expdesign$concentration
   })
 
-  select_inputs_individual_plots_dose_response_growth_plot<- reactive({
+  select_inputs_individual_plots_dose_response_growth_plot <- reactive({
     if (length(results$growth$drFit)>1) names(results$growth$drFit$drFittedSplines)
+    else return("")
+  })
+
+  select_inputs_individual_plots_dose_response_growth_plot_bt <- reactive({
+    if (length(results$growth$drFit)>1 && results$growth$control$nboot.dr > 1) names(results$growth$drFit$drBootSplines)
     else return("")
   })
 
@@ -5311,6 +5749,11 @@ server <- function(input, output, session){
   observe({
     updateSelectInput(inputId = "individual_plots_dose_response_growth_plot",
                       choices = select_inputs_individual_plots_dose_response_growth_plot())
+  })
+
+  observe({
+    updateSelectInput(inputId = "individual_plots_dose_response_growth_plot_bt",
+                      choices = select_inputs_individual_plots_dose_response_growth_plot_bt())
   })
 
 
@@ -5439,7 +5882,7 @@ server <- function(input, output, session){
 
 
       output$dose_response_fluorescence_plot_individual <- renderPlot({
-        results <- results$fluorescence$drFit1$drFittedSplines[[input$individual_plots_dose_response_fluorescence_plot]]
+        results <- results$fluorescence$drFit1$drFittedSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot), 1, input$individual_plots_dose_response_fluorescence_plot)]]
 
         # Define log-transformation of axes
         if(input$log_transform_y_axis_dose_response_fluorescence_plot &&
@@ -5486,7 +5929,7 @@ server <- function(input, output, session){
 
       output$download_dose_response_fluorescence_plot_individual <- downloadHandler(
         filename = function() {
-          paste("dose_response_fluorescence_individual",  input$format_download_dose_response_fluorescence_plot_individual, sep="")
+          paste("dose_response_fluorescence_",  gsub(" \\| ", "_", input$individual_plots_dose_response_fluorescence_plot), input$format_download_dose_response_fluorescence_plot_individual, sep="")
         },
         content = function(file) {
           ggsave(filename = file, width = input$width_download_dose_response_fluorescence_plot_individual,
@@ -5509,7 +5952,7 @@ server <- function(input, output, session){
       ### DR Plots Model individual ####
 
       output$dose_response_model_fluorescence_plot_individual <- renderPlot({
-        results <- results$fluorescence$drFit1$drFittedModels[[input$individual_plots_dose_response_model_fluorescence_plot]]
+        results <- results$fluorescence$drFit1$drFittedModels[[ifelse(input$individual_plots_dose_response_model_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_model_fluorescence_plot), 1, input$individual_plots_dose_response_model_fluorescence_plot)]]
 
         # Define log-transformation of axes
         if(input$log_transform_y_axis_dose_response_model_fluorescence_plot &&
@@ -5555,7 +5998,7 @@ server <- function(input, output, session){
 
       output$download_dose_response_model_fluorescence_plot_individual <- downloadHandler(
         filename = function() {
-          paste("biosensor_model_fluorescence_individual",  input$format_download_dose_response_model_fluorescence_plot_individual, sep="")
+          paste("biosensor_model_fluorescence_",  gsub(" \\| ", "_", input$individual_plots_dose_response_model_fluorescence_plot), input$format_download_dose_response_model_fluorescence_plot_individual, sep="")
         },
         content = function(file) {
           ggsave(filename = file, width = input$width_download_dose_response_model_fluorescence_plot_individual,

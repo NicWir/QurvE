@@ -419,12 +419,16 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
 #' @param pch (Numeric) Shape of the raw data symbols.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
 #' @param colSpline (Numeric or Character) Color used to plot the splines.
-#' @param cex (Numeric) Size of the raw data points.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param cex.axis (Numeric) Font size of axis annotations.
+#' @param lwd (Numeric) Spline line width.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #' @param ...
 #'
 #' @export plot.drBootSpline
@@ -434,21 +438,23 @@ plot.drBootSpline <- function (drBootSpline,
                                pch = 19,
                                colData = 1,
                                colSpline = scales::alpha("black", 0.15),
-                               cex = 1, plot = TRUE, export = FALSE,
-                               height = 7, width = 9, out.dir = NULL,
+                               cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
+                               lwd = 2, plot = TRUE, export = FALSE,
+                               height = 7, width = 9, out.dir = NULL, shiny = FALSE,
                                ...)
 {
   # drBootSpline an object of class drBootSpline
   if(is(drBootSpline) != "drBootSpline") stop("drBootSpline needs to be an object created with growth.drBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot  <- function(text = "Empty plot", main = "") {
+    par(cex.lab = cex.lab, cex.axis = cex.axis)
     plot(c(0, 1, 0, 1, 0), c(0, 1, 1, 0, 0),
-      type = "l", axes = FALSE, xlab = "", ylab = "", lwd = 1,
+      type = "l", axes = FALSE, xlab = "", ylab = "", lwd = lwd,
       col = "gray", main = main)
     lines(c(0, 0), c(0, 1),
-          type = "l", lwd = 1, col = "gray")
+          type = "l", lwd = lwd, col = "gray")
     lines(c(1, 1), c(1, 0),
-          type = "l", lwd = 1, col = "gray")
+          type = "l", lwd = lwd, col = "gray")
     text(0.5, 0.1, text, col = "gray")
   }
 
@@ -457,14 +463,16 @@ plot.drBootSpline <- function (drBootSpline,
     stop("colData needs to be numeric from 0:8 or a string from colors()")
   if (is.numeric(pch) == FALSE)
     stop("Need numeric value for: pch")
-  if (is.numeric(cex) == FALSE)
-    stop("Need numeric value for: cex")
+  if (is.numeric(cex.point) == FALSE)
+    stop("Need numeric value for: cex.point")
 
   if (drBootSpline$bootFlag == FALSE) {
     empty.plot()
   }
   else{
     p1 <- function(){
+      par(cex.lab = cex.lab, cex.axis = cex.axis)
+
       colSpline   <-
         rep(colSpline, (drBootSpline$control$nboot.dr %/% length(colSpline)) + 1)
       conc.log    <- log(drBootSpline$raw.conc + 1)
@@ -529,7 +537,7 @@ plot.drBootSpline <- function (drBootSpline,
         drBootSpline$raw.test,
         col = colData, bg = colData,
         pch = pch,
-        cex = cex
+        cex = cex.point
       )
       title(drBootSpline$drID)
 
@@ -542,8 +550,8 @@ plot.drBootSpline <- function (drBootSpline,
           pch = 0,
           colSpline = colSpline[i],
           colData = 0,
-          cex = cex,
-          lwd = 1
+          cex.point = cex.point,
+          lwd = lwd
         )
       }
     }
@@ -559,7 +567,117 @@ plot.drBootSpline <- function (drBootSpline,
       else{
         empty.plot()
       }
-    } # p <- function()
+    } # p2 <- function()
+    p3 <- function(){
+      layout(matrix(c(1,1,1,2,2, 1,1,1,3,3), nrow = 5, ncol = 2))
+
+      par(cex.lab = cex.lab, cex.axis = cex.axis)
+
+      colSpline   <-
+        rep(colSpline, (drBootSpline$control$nboot.dr %/% length(colSpline)) + 1)
+      conc.log    <- log(drBootSpline$raw.conc + 1)
+      test.log    <- log(drBootSpline$raw.test + 1)
+      conc        <- drBootSpline$raw.conc
+      test        <- drBootSpline$raw.test
+
+      global.minx <- min(min(drBootSpline$boot.conc))
+      global.maxx <- max(max(drBootSpline$boot.conc))
+      global.miny <- min(min(drBootSpline$boot.test))
+      global.maxy <- max(max(drBootSpline$boot.test))
+
+      # initialize plot
+      if ((drBootSpline$control$log.x.dr == TRUE) &&
+          (drBootSpline$control$log.y.dr == FALSE)) {
+        plot(
+          c(global.minx, global.maxx),
+          c(global.miny, global.maxy),
+          type = "n",
+          xlab = "Ln(1+concentration)",
+          ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
+        )
+      }
+      else{
+        if ((drBootSpline$control$log.x.dr == FALSE) &&
+            (drBootSpline$control$log.y.dr == FALSE)) {
+          plot(
+            c(global.minx, global.maxx),
+            c(global.miny, global.maxy),
+            type = "n",
+            xlab = "Concentration",
+            ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
+          )
+        }
+        else{
+          if ((drBootSpline$control$log.x.dr == TRUE) && (drBootSpline$control$log.y.dr == TRUE)) {
+            plot(
+              c(global.minx, global.maxx),
+              c(global.miny, global.maxy),
+              type = "n",
+              xlab = "Ln(1+Concentration)",
+              ylab = "Ln(1+Response)"
+            )
+          }
+          else{
+            if ((drBootSpline$control$log.x.dr == FALSE) && (drBootSpline$control$log.y.dr == TRUE)) {
+              plot(
+                c(global.minx, global.maxx),
+                c(global.miny, global.maxy),
+                type = "n",
+                xlab = "Concentration",
+                ylab = "Ln(1+Response)"
+              )
+            }
+          }
+        }
+      }
+
+      # /// plot raw data
+      points(
+        drBootSpline$raw.conc,
+        drBootSpline$raw.test,
+        col = colData, bg = colData,
+        pch = pch,
+        cex = cex.point
+      )
+      title(drBootSpline$drID)
+
+      # /// loop over all fitted splines and plot drFitSpline objects
+      for (i in 1:drBootSpline$control$nboot.dr) {
+        plot(
+          drBootSpline$boot.drSpline[[i]],
+          add = TRUE,
+          ec50line = FALSE,
+          pch = 0,
+          colSpline = colSpline[i],
+          colData = 0,
+          cex.point = cex.point,
+          lwd = lwd
+        )
+      }
+
+      if (sum(!is.na(drBootSpline$ec50.boot)) == length(drBootSpline$ec50.boot)) {
+        hist(
+          drBootSpline$ec50.boot,
+          col = "gray",
+          main = as.character(drBootSpline$drID),
+          xlab = "EC50"
+        )
+      }
+      else{
+        empty.plot()
+      }
+      if (sum(!is.na(drBootSpline$ec50y.boot)) == length(drBootSpline$ec50y.boot)) {
+        hist(
+          drBootSpline$ec50y.boot,
+          col = "gray",
+          main = as.character(drBootSpline$drID),
+          xlab = "yEC50"
+        )
+      }
+      else{
+        empty.plot()
+      }
+    }
     if (export == TRUE){
       w1 <- width
       h1 <- height
@@ -586,10 +704,18 @@ plot.drBootSpline <- function (drBootSpline,
     }
 
     if (plot == TRUE){
-      p1()
-      p2()
+      if(!shiny){
+        p1()
+        p2()
+      } else {
+        p3()
+      }
     }
   } # /// else of if (drBootSpline$bootFlag==FALSE){
+
+  # restore standard plot parameters
+  par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
+  par(mfrow = c(1, 1))
 }
 
 #' Generic plot function for \code{drFit} objects.
