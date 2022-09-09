@@ -2595,7 +2595,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     }
     if(length(ref.ndx) > 1){
       message("The provided combination of reference.nm = '", reference.nm, "' and reference.conc = ", reference.conc, " did not allow for the unique identification of a reference condition. The first match will be returned.")
-      ref.ndx <- refplot..ndx[1]
+      ref.ndx <- ref.ndx[1]
     }
     mean.ref <- mean[ref.ndx]
     mean <- mean/mean.ref

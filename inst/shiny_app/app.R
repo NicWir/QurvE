@@ -13,6 +13,8 @@ library(tidyverse)
 library(shinythemes)
 library(DT)
 library(doParallel)
+library(knitr)
+library(kableExtra)
 
 # Define icon set from custom SVG files
 # iconset <- icons::icon_set("icons/")
