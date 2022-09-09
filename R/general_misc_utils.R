@@ -203,6 +203,21 @@ zipFastener <- function(df1, df2, along=2)
 }
 
 
+#'
+#' @import plyr
+#' @import shiny
+#' @import shinyjs
+#' @import shinyBS
+#' @import shinycssloaders
+#' @import shinyFiles
+#' @import readxl
+#' @import tidyverse
+#' @import shinythemes
+#' @import DT
+#' @import doParallel
+#' @import knitr
+#' @import kableExtra
+#'
 run_app <- function() {
 
   # Locate all the shiny apps that exist
