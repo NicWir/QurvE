@@ -6984,7 +6984,7 @@ server <- function(input, output, session){
                  report_fluorescence_filepath_change()
                },
                handlerExpr = {
-                 if (!"path" %in% names(report_dir_fluorescence())) return()
+                 if (!"path" %in% names(report_dir_fluorescence() )) return()
                  home <- normalizePath("~")
                  global$report_filename_fluorescence <- input$report_filename_fluorescence
                  global$report_datapath_fluorescence <-

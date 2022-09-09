@@ -127,7 +127,7 @@ fl.workflow(
 \item{...}{Further arguments passed to the shiny app.}
 }
 \value{
-A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.
+A \code{flFitRes} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{fl.report}}.
 \item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided. Else, extracted from \code{grofit}).}
 \item{data}{Raw data dataframe passed to the function as \code{grodata}.}
 \item{flFit1}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence1 data.}

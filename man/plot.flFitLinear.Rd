@@ -8,6 +8,7 @@
   flFittedLinear,
   log = "",
   which = c("fit", "diagnostics", "fit_diagnostics"),
+  pch = 21,
   cex.point = 1,
   cex.lab = 1.5,
   cex.axis = 1.3,
@@ -29,6 +30,8 @@
 \item{log}{("x" or "y") Display the x- or y-axis on a logarithmic scale.}
 
 \item{which}{("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.}
+
+\item{pch}{(Numeric) Shape of the raw data symbols.}
 
 \item{cex.point}{(Numeric) Size of the raw data points.}
 

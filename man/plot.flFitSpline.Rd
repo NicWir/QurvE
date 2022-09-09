@@ -12,14 +12,16 @@
   deriv = T,
   spline = T,
   log.y = F,
+  basesize = 16,
   pch = 1,
   colData = 1,
   colSpline = "dodgerblue3",
-  cex = 1,
+  cex.point = 2,
   lwd = 0.7,
   y.lim = NULL,
   x.lim = NULL,
   y.lim.deriv = NULL,
+  n.ybreaks = 6,
   plot = TRUE,
   export = FALSE,
   width = 8,
@@ -43,13 +45,25 @@
 
 \item{log.y}{(Logical) Log-transform the y-axis (\code{TRUE}) or not (\code{FALSE}).}
 
+\item{basesize}{(Numeric) Base font size.}
+
 \item{pch}{(Numeric) Size of the raw data circles.}
 
 \item{colData}{(Numeric or character) Contour color of the raw data circles.}
 
 \item{colSpline}{(Numeric or character) Spline line colour.}
 
+\item{cex.point}{(Numeric) Size of the raw data points.}
+
 \item{lwd}{(Numeric) Spline line width.}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.lim.deriv}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 
@@ -62,8 +76,6 @@
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
 \item{...}{}
-
-\item{basesize}{(Numeric) Base font size.}
 }
 \description{
 code{plot.flFitSpline} generates the spline fit plot for a single sample.

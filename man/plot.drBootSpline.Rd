@@ -9,12 +9,16 @@
   pch = 19,
   colData = 1,
   colSpline = scales::alpha("black", 0.15),
-  cex = 1,
+  cex.point = 1,
+  cex.lab = 1.5,
+  cex.axis = 1.3,
+  lwd = 2,
   plot = TRUE,
   export = FALSE,
   height = 7,
   width = 9,
   out.dir = NULL,
+  shiny = FALSE,
   ...
 )
 }
@@ -27,7 +31,13 @@
 
 \item{colSpline}{(Numeric or Character) Color used to plot the splines.}
 
-\item{cex}{(Numeric) Size of the raw data points.}
+\item{cex.point}{(Numeric) Size of the raw data points.}
+
+\item{cex.lab}{(Numeric) Font size of axis titles.}
+
+\item{cex.axis}{(Numeric) Font size of axis annotations.}
+
+\item{lwd}{(Numeric) Spline line width.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -38,6 +48,8 @@
 \item{width}{(Numeric) Width of the exported image in inches.}
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
+
+\item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 
 \item{...}{}
 }
