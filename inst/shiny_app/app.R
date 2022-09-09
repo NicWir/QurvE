@@ -56,7 +56,7 @@ load_data <- function() {
   show("main_content")
 }
 
-ui <- fluidPage(theme = shinytheme('sandstone'),
+ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                 tagList(
                   # tags$style(type = 'text/css', '.navbar {
                   #          font-size: 200px;
@@ -101,3163 +101,3376 @@ ui <- fluidPage(theme = shinytheme('sandstone'),
                     div(
                       id = "main_content",
                       navbarPage(
-                    'QurvE',
-                    id = "navbar",
+                        'QurvE',
+                        id = "navbar",
 
-                    # load input file
-                    #____DATA____####
-                    tabPanel('Data',
-                             icon = icon("file-lines"),
-                             value = "tabPanel",
-                             tabsetPanel(type = "tabs", id = "tabs_data",
-                                         ##____CUSTOM____####
-                                         tabPanel(title = "Custom",
-                                                  sidebarPanel(
-                                                    style='border-color: #ADADAD',
-                                                    selectInput(inputId = "custom_format",
-                                                                label = "Select Format",
-                                                                choices = c("Data in columns" = "col",
-                                                                            "Data in rows" = "row")),
-                                                    wellPanel(
-                                                      h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
-                                                      style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-
-                                                      fileInput(inputId = 'custom_file_density',
-                                                                label = 'Choose growth data file',
-                                                                accept = c('.xlsx', '.xls', '.csv', 'txt', 'tsv')
-                                                      ),
-
-                                                      conditionalPanel(
-                                                        condition = "output.growthfileUploaded && output.custom_density_format == 'xlsx'",
-
-                                                        selectInput(inputId = "custom_growth_sheets",
-                                                                    label = "Select Sheet",
-                                                                    choices = "Sheet1")
-
-                                                      ), # select sheet: conditional
-                                                      conditionalPanel(
-                                                        condition = "output.growthfileUploaded && output.custom_density_format == 'csv'",
-
-                                                        selectInput(inputId = "separator_custom_density",
-                                                                    label = "Select separator",
-                                                                    choices = c("," = ",",
-                                                                                ";" = ";")
-                                                        ),
-
-                                                        selectInput(inputId = "decimal_separator_custom_density",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
-                                                        )
-                                                      ),
-                                                      conditionalPanel(
-                                                        condition = "output.growthfileUploaded && (output.custom_density_format == 'tsv' || output.custom_density_format == 'txt')",
-
-                                                        selectInput(inputId = "decimal_separator_custom_density",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
-                                                        )
-                                                      )
-                                                    ),
-                                                    #____Fluorescence 1___________
-                                                    wellPanel(
-                                                      h4(strong("Fluorescence 1 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
-                                                      style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-
-                                                      fileInput(inputId = 'custom_file_fluorescence1',
-                                                                label = 'Fluorescence data 1',
-                                                                accept = c('.xlsx', '.xls', '.csv')
-                                                      ),
-
-                                                      conditionalPanel(
-                                                        condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'xlsx'",
-
-                                                        selectInput(inputId = "custom_fluorescence1_sheets",
-                                                                    label = "Select Sheet",
-                                                                    choices = "Sheet1")
-                                                      ), # select sheet: conditional
-                                                      conditionalPanel(
-                                                        condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'csv'",
-
-                                                        selectInput(inputId = "separator_custom_fluorescence1",
-                                                                    label = "Select separator",
-                                                                    choices = c("," = ",",
-                                                                                ";" = ";")
-                                                        ),
-
-                                                        selectInput(inputId = "decimal_separator_custom_fluorescence1",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
-                                                        )
-                                                      ),
-                                                      conditionalPanel(
-                                                        condition = "output.fluorescence1fileUploaded && (output.custom_fluorescence1_format == 'tsv' || output.custom_fluorescence1_format == 'txt')",
-
-                                                        selectInput(inputId = "decimal_separator_custom_fluorescence1",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
-                                                        )
-                                                      )
-                                                    ),
-                                                    #_____Fluorescence 2___________
-                                                    wellPanel(
-                                                      h4(strong("Fluorescence 2 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
-                                                      style='background-color:#F0EBE4; padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-
-                                                      fileInput(inputId = 'custom_file_fluorescence2',
-                                                                label = 'Fluorescence data 2',
-                                                                accept = c('.xlsx', '.xls', '.csv')
-                                                      ),
-
-                                                      conditionalPanel(
-                                                        condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
+                        # load input file
+                        #____DATA____####
+                        tabPanel('Data',
+                                 icon = icon("file-lines"),
+                                 value = "tabPanel",
+                                 tabsetPanel(type = "tabs", id = "tabs_data",
+                                             ##____CUSTOM____####
+                                             tabPanel(title = "Custom",
+                                                      sidebarPanel(
+                                                        style='border-color: #ADADAD',
+                                                        selectInput(inputId = "custom_format",
+                                                                    label = "Select Format",
+                                                                    choices = c("Data in columns" = "col",
+                                                                                "Data in rows" = "row")),
                                                         wellPanel(
-                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                          selectInput(inputId = "custom_fluorescence2_sheets",
-                                                                      label = "Select Sheet",
-                                                                      choices = "Sheet1")
-                                                        )
-                                                      ), # select sheet: conditional
-                                                      conditionalPanel(
-                                                        condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'csv'",
-                                                        wellPanel(
-                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                          selectInput(inputId = "separator_custom_fluorescence2",
-                                                                      label = "Select separator",
-                                                                      choices = c("," = ",",
-                                                                                  ";" = ";")
+                                                          h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
+                                                          style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+
+                                                          fileInput(inputId = 'custom_file_density',
+                                                                    label = 'Choose growth data file',
+                                                                    accept = c('.xlsx', '.xls', '.csv', 'txt', 'tsv')
                                                           ),
 
-                                                          selectInput(inputId = "decimal_separator_custom_fluorescence2",
-                                                                      label = "Select Decimal separator",
-                                                                      choices = c("." = ".",
-                                                                                  "," = ",")
+                                                          conditionalPanel(
+                                                            condition = "output.growthfileUploaded && output.custom_density_format == 'xlsx'",
+
+                                                            selectInput(inputId = "custom_growth_sheets",
+                                                                        label = "Select Sheet",
+                                                                        choices = "Sheet1")
+
+                                                          ), # select sheet: conditional
+                                                          conditionalPanel(
+                                                            condition = "output.growthfileUploaded && output.custom_density_format == 'csv'",
+
+                                                            selectInput(inputId = "separator_custom_density",
+                                                                        label = "Select separator",
+                                                                        choices = c("," = ",",
+                                                                                    ";" = ";")
+                                                            ),
+
+                                                            selectInput(inputId = "decimal_separator_custom_density",
+                                                                        label = "Select Decimal separator",
+                                                                        choices = c("." = ".",
+                                                                                    "," = ",")
+                                                            )
+                                                          ),
+                                                          conditionalPanel(
+                                                            condition = "output.growthfileUploaded && (output.custom_density_format == 'tsv' || output.custom_density_format == 'txt')",
+
+                                                            selectInput(inputId = "decimal_separator_custom_density",
+                                                                        label = "Select Decimal separator",
+                                                                        choices = c("." = ".",
+                                                                                    "," = ",")
+                                                            )
                                                           )
-                                                        )
-                                                      ),
-                                                      conditionalPanel(
-                                                        condition = "output.fluorescence2fileUploaded && (output.custom_fluorescence2_format == 'tsv' || output.custom_fluorescence2_format == 'txt')",
+                                                        ),
+                                                        #____Fluorescence 1___________
                                                         wellPanel(
-                                                          style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                          selectInput(inputId = "decimal_separator_custom_fluorescence2",
-                                                                      label = "Select Decimal separator",
-                                                                      choices = c("." = ".",
-                                                                                  "," = ",")
-                                                          )
-                                                        )
-                                                      )
-                                                    ),
+                                                          h4(strong("Fluorescence 1 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
+                                                          style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
 
-                                                    checkboxInput(inputId = 'subtract_blank_custom',
-                                                                  label = 'Subtract blank',
-                                                                  value = TRUE),
-
-                                                    checkboxInput(inputId = 'calibration',
-                                                                  label = 'Calibration (under construction)'),
-                                                    conditionalPanel(
-                                                      condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
-                                                      fluidRow(
-                                                        column(12,
-                                                               div(
-                                                                 actionButton(inputId = "read_custom",
-                                                                              label = "Read data",
-                                                                              icon=icon("file-lines"),
-                                                                              style="padding:5px; font-size:120%"),
-                                                                 style="float:right")
-                                                        )
-                                                      )
-                                                    )
-                                                  ),# sidebar panel
-                                         ), # Custom tabPanel
-
-                                         ##____PLATE READER____####
-
-                                         tabPanel(title = "Plate reader",
-                                                  sidebarPanel(
-                                                    style='border-color: #ADADAD',
-                                                    wellPanel(
-                                                      div(style = "margin-top: -10px"),
-                                                      h3(strong("1. Load data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
-                                                      style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD;',
-                                                      # select file type
-                                                      fileInput(inputId = 'parse_file',
-                                                                label = 'Choose plate reader export file',
-                                                                accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt')),
-                                                      div(style = "margin-top: -10px"),
-                                                      conditionalPanel(
-                                                        condition = "output.parsefileUploaded && (output.parse_file_format == 'xlsx' | output.parse_file_format == 'xls')",
-                                                        selectInput(inputId = "parse_data_sheets",
-                                                                    label = "Select sheet with read data",
-                                                                    choices = "Sheet1")
-                                                      ), # select sheet: conditional
-                                                      conditionalPanel(
-                                                        condition = "output.parsefileUploaded && output.parse_file_format == 'csv'",
-                                                        selectInput(inputId = "separator_parse",
-                                                                    label = "Select separator",
-                                                                    choices = c("," = ",",
-                                                                                ";" = ";")
-                                                        ),
-
-                                                        selectInput(inputId = "decimal_separator_parse",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
-                                                        )
-                                                      ),
-                                                      conditionalPanel(
-                                                        condition = "output.parsefileUploaded && (output.parse_file_format == 'tsv' || output.parse_file_format == 'txt')",
-                                                        selectInput(inputId = "decimal_separator_parse",
-                                                                    label = "Select Decimal separator",
-                                                                    choices = c("." = ".",
-                                                                                "," = ",")
-                                                        )
-                                                      )
-                                                    ),
-                                                    div(style = "margin-top: -15px"),
-                                                    conditionalPanel(
-                                                      condition = "output.parsefileUploaded",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
-                                                        div(style = "margin-top: -10px"),
-                                                        h3(strong("2. Format"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
-                                                        selectInput(inputId = "platereader_software",
-                                                                    label = "Platereader software",
-                                                                    choices = c("Biotek - Gen5/Gen6" = "Gen5"
-                                                                    )
-                                                        )
-                                                      )
-                                                    ),
-                                                    div(style = "margin-top: -15px"),
-                                                    conditionalPanel(
-                                                      condition = "output.parsefileUploaded",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
-                                                        div(style = "margin-top: -10px"),
-                                                        h3(strong("3. Assign data type"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
-                                                        selectInput(inputId = "parsed_reads_density",
-                                                                    label = "Density data",
-                                                                    choices = ""
-                                                        ),
-
-                                                        selectInput(inputId = "parsed_reads_fluorescence1",
-                                                                    label = "Fluorescence data 1",
-                                                                    choices = ""
-                                                        ),
-
-                                                        selectInput(inputId = "parsed_reads_fluorescence2",
-                                                                    label = "Fluorescence data 2",
-                                                                    choices = ""
-                                                        )
-                                                      )
-                                                    ),
-                                                    div(style = "margin-top: -15px"),
-                                                    conditionalPanel(
-                                                      condition = "output.parsefileUploaded",
-                                                      wellPanel(
-                                                        style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
-                                                        div(style = "margin-top: -10px"),
-                                                        h3(strong("4. Load mapping"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
-                                                        checkboxInput(inputId = 'mapping_included_in_parse',
-                                                                      label = 'Included in data file (xlsx/xls)',
-                                                                      value = FALSE),
-                                                        tags$div(title = "Table with four columns: Well | Description | Replicate | Concentration",
-                                                                 fileInput(inputId = 'map_file',
-                                                                           label = 'Choose mapping file',
-                                                                           accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt'),
-                                                                           placeholder = "map file",
-                                                                 )
-                                                        ),
-                                                        conditionalPanel(
-                                                          condition = "(input.mapping_included_in_parse && (output.parse_file_format == 'xlsx' | output.parse_file_format == 'xls')) || (!input.mapping_included_in_parse && output.mapfileUploaded && (output.map_file_format == 'xlsx' | output.map_file_format == 'xls'))",
-                                                          selectInput(inputId = "map_data_sheets",
-                                                                      label = "Select sheet with mapping information",
-                                                                      choices = "Sheet1")
-                                                        ),
-                                                        conditionalPanel(
-                                                          condition = "!input.mapping_included_in_parse && output.mapfileUploaded && output.map_file_format == 'csv'",
-                                                          selectInput(inputId = "separator_map",
-                                                                      label = "Select separator",
-                                                                      choices = c("," = ",",
-                                                                                  ";" = ";")
+                                                          fileInput(inputId = 'custom_file_fluorescence1',
+                                                                    label = 'Fluorescence data 1',
+                                                                    accept = c('.xlsx', '.xls', '.csv')
                                                           ),
 
-                                                          selectInput(inputId = "decimal_separator_map",
-                                                                      label = "Select Decimal separator",
-                                                                      choices = c("." = ".",
-                                                                                  "," = ",")
+                                                          conditionalPanel(
+                                                            condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'xlsx'",
+
+                                                            selectInput(inputId = "custom_fluorescence1_sheets",
+                                                                        label = "Select Sheet",
+                                                                        choices = "Sheet1")
+                                                          ), # select sheet: conditional
+                                                          conditionalPanel(
+                                                            condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'csv'",
+
+                                                            selectInput(inputId = "separator_custom_fluorescence1",
+                                                                        label = "Select separator",
+                                                                        choices = c("," = ",",
+                                                                                    ";" = ";")
+                                                            ),
+
+                                                            selectInput(inputId = "decimal_separator_custom_fluorescence1",
+                                                                        label = "Select Decimal separator",
+                                                                        choices = c("." = ".",
+                                                                                    "," = ",")
+                                                            )
+                                                          ),
+                                                          conditionalPanel(
+                                                            condition = "output.fluorescence1fileUploaded && (output.custom_fluorescence1_format == 'tsv' || output.custom_fluorescence1_format == 'txt')",
+
+                                                            selectInput(inputId = "decimal_separator_custom_fluorescence1",
+                                                                        label = "Select Decimal separator",
+                                                                        choices = c("." = ".",
+                                                                                    "," = ",")
+                                                            )
                                                           )
                                                         ),
+                                                        #_____Fluorescence 2___________
+                                                        wellPanel(
+                                                          h4(strong("Fluorescence 2 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
+                                                          style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+
+                                                          fileInput(inputId = 'custom_file_fluorescence2',
+                                                                    label = 'Fluorescence data 2',
+                                                                    accept = c('.xlsx', '.xls', '.csv')
+                                                          ),
+
+                                                          conditionalPanel(
+                                                            condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
+                                                            wellPanel(
+                                                              style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                              selectInput(inputId = "custom_fluorescence2_sheets",
+                                                                          label = "Select Sheet",
+                                                                          choices = "Sheet1")
+                                                            )
+                                                          ), # select sheet: conditional
+                                                          conditionalPanel(
+                                                            condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'csv'",
+                                                            wellPanel(
+                                                              style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                              selectInput(inputId = "separator_custom_fluorescence2",
+                                                                          label = "Select separator",
+                                                                          choices = c("," = ",",
+                                                                                      ";" = ";")
+                                                              ),
+
+                                                              selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                                          label = "Select Decimal separator",
+                                                                          choices = c("." = ".",
+                                                                                      "," = ",")
+                                                              )
+                                                            )
+                                                          ),
+                                                          conditionalPanel(
+                                                            condition = "output.fluorescence2fileUploaded && (output.custom_fluorescence2_format == 'tsv' || output.custom_fluorescence2_format == 'txt')",
+                                                            wellPanel(
+                                                              style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                              selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                                          label = "Select Decimal separator",
+                                                                          choices = c("." = ".",
+                                                                                      "," = ",")
+                                                              )
+                                                            )
+                                                          )
+                                                        ),
+
+                                                        checkboxInput(inputId = 'subtract_blank_custom',
+                                                                      label = 'Subtract blank',
+                                                                      value = TRUE),
+
+                                                        checkboxInput(inputId = 'calibration',
+                                                                      label = 'Calibration (under construction)'),
                                                         conditionalPanel(
-                                                          condition = "!input.mapping_included_in_parse && output.mapfileUploaded && (output.map_file_format == 'tsv' || output.map_file_format == 'txt')",
-                                                          style='background-color:#F0EBE4; padding: 5px; border-color: #ADADAD; padding-bottom: 0',
-                                                          selectInput(inputId = "decimal_separator_map",
-                                                                      label = "Select Decimal separator",
-                                                                      choices = c("." = ".",
-                                                                                  "," = ",")
+                                                          condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
+                                                          fluidRow(
+                                                            column(12,
+                                                                   div(
+                                                                     actionButton(inputId = "read_custom",
+                                                                                  label = "Read data",
+                                                                                  icon=icon("file-lines"),
+                                                                                  style="padding:5px; font-size:120%"),
+                                                                     style="float:right")
+                                                            )
                                                           )
                                                         )
-                                                      )
-                                                    ),
+                                                      ),# sidebar panel
+                                             ), # Custom tabPanel
 
-                                                    checkboxInput(inputId = 'subtract_blank_plate_reader',
-                                                                  label = 'subtract blank',
-                                                                  value = TRUE),
+                                             ##____PLATE READER____####
 
-                                                    checkboxInput(inputId = 'convert_time_values_plate_reader',
-                                                                  label = 'Convert time values',
-                                                                  value = TRUE),
+                                             tabPanel(title = "Plate reader",
+                                                      sidebarPanel(
+                                                        style='border-color: #ADADAD',
+                                                        wellPanel(
+                                                          div(style = "margin-top: -10px"),
+                                                          h3(strong("1. Load data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
+                                                          style='padding: 5px; border-color: #ADADAD;',
+                                                          # select file type
+                                                          fileInput(inputId = 'parse_file',
+                                                                    label = 'Choose plate reader export file',
+                                                                    accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt')),
+                                                          div(style = "margin-top: -10px"),
+                                                          conditionalPanel(
+                                                            condition = "output.parsefileUploaded && (output.parse_file_format == 'xlsx' | output.parse_file_format == 'xls')",
+                                                            selectInput(inputId = "parse_data_sheets",
+                                                                        label = "Select sheet with read data",
+                                                                        choices = "Sheet1")
+                                                          ), # select sheet: conditional
+                                                          conditionalPanel(
+                                                            condition = "output.parsefileUploaded && output.parse_file_format == 'csv'",
+                                                            selectInput(inputId = "separator_parse",
+                                                                        label = "Select separator",
+                                                                        choices = c("," = ",",
+                                                                                    ";" = ";")
+                                                            ),
 
-                                                    checkboxInput(inputId = 'calibration_plate_reader',
-                                                                  label = 'Calibration (under construction)'),
-                                                    fluidRow(
-                                                      column(12,
-                                                             div(
-                                                               actionButton(inputId = "parse_data",
-                                                                            label = "Parse data",
-                                                                            icon=icon("file-lines"),
-                                                                            style="padding:5px; font-size:120%"),
-                                                               style="float:right")
-                                                      )
+                                                            selectInput(inputId = "decimal_separator_parse",
+                                                                        label = "Select Decimal separator",
+                                                                        choices = c("." = ".",
+                                                                                    "," = ",")
+                                                            )
+                                                          ),
+                                                          conditionalPanel(
+                                                            condition = "output.parsefileUploaded && (output.parse_file_format == 'tsv' || output.parse_file_format == 'txt')",
+                                                            selectInput(inputId = "decimal_separator_parse",
+                                                                        label = "Select Decimal separator",
+                                                                        choices = c("." = ".",
+                                                                                    "," = ",")
+                                                            )
+                                                          )
+                                                        ),
+                                                        div(style = "margin-top: -15px"),
+                                                        conditionalPanel(
+                                                          condition = "output.parsefileUploaded",
+                                                          wellPanel(
+                                                            style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                            div(style = "margin-top: -10px"),
+                                                            h3(strong("2. Format"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
+                                                            selectInput(inputId = "platereader_software",
+                                                                        label = "Platereader software",
+                                                                        choices = c("Biotek - Gen5/Gen6" = "Gen5"
+                                                                        )
+                                                            )
+                                                          )
+                                                        ),
+                                                        div(style = "margin-top: -15px"),
+                                                        conditionalPanel(
+                                                          condition = "output.parsefileUploaded",
+                                                          wellPanel(
+                                                            style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                            div(style = "margin-top: -10px"),
+                                                            h3(strong("3. Assign data type"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
+                                                            selectInput(inputId = "parsed_reads_density",
+                                                                        label = "Density data",
+                                                                        choices = ""
+                                                            ),
+
+                                                            selectInput(inputId = "parsed_reads_fluorescence1",
+                                                                        label = "Fluorescence data 1",
+                                                                        choices = ""
+                                                            ),
+
+                                                            selectInput(inputId = "parsed_reads_fluorescence2",
+                                                                        label = "Fluorescence data 2",
+                                                                        choices = ""
+                                                            )
+                                                          )
+                                                        ),
+                                                        div(style = "margin-top: -15px"),
+                                                        conditionalPanel(
+                                                          condition = "output.parsefileUploaded",
+                                                          wellPanel(
+                                                            style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                            div(style = "margin-top: -10px"),
+                                                            h3(strong("4. Load mapping"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
+                                                            checkboxInput(inputId = 'mapping_included_in_parse',
+                                                                          label = 'Included in data file (xlsx/xls)',
+                                                                          value = FALSE),
+                                                            tags$div(title = "Table with four columns: Well | Description | Replicate | Concentration",
+                                                                     fileInput(inputId = 'map_file',
+                                                                               label = 'Choose mapping file',
+                                                                               accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt'),
+                                                                               placeholder = "map file",
+                                                                     )
+                                                            ),
+                                                            conditionalPanel(
+                                                              condition = "(input.mapping_included_in_parse && (output.parse_file_format == 'xlsx' | output.parse_file_format == 'xls')) || (!input.mapping_included_in_parse && output.mapfileUploaded && (output.map_file_format == 'xlsx' | output.map_file_format == 'xls'))",
+                                                              selectInput(inputId = "map_data_sheets",
+                                                                          label = "Select sheet with mapping information",
+                                                                          choices = "Sheet1")
+                                                            ),
+                                                            conditionalPanel(
+                                                              condition = "!input.mapping_included_in_parse && output.mapfileUploaded && output.map_file_format == 'csv'",
+                                                              selectInput(inputId = "separator_map",
+                                                                          label = "Select separator",
+                                                                          choices = c("," = ",",
+                                                                                      ";" = ";")
+                                                              ),
+
+                                                              selectInput(inputId = "decimal_separator_map",
+                                                                          label = "Select Decimal separator",
+                                                                          choices = c("." = ".",
+                                                                                      "," = ",")
+                                                              )
+                                                            ),
+                                                            conditionalPanel(
+                                                              condition = "!input.mapping_included_in_parse && output.mapfileUploaded && (output.map_file_format == 'tsv' || output.map_file_format == 'txt')",
+                                                              style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
+                                                              selectInput(inputId = "decimal_separator_map",
+                                                                          label = "Select Decimal separator",
+                                                                          choices = c("." = ".",
+                                                                                      "," = ",")
+                                                              )
+                                                            )
+                                                          )
+                                                        ),
+
+                                                        checkboxInput(inputId = 'subtract_blank_plate_reader',
+                                                                      label = 'subtract blank',
+                                                                      value = TRUE),
+
+                                                        checkboxInput(inputId = 'convert_time_values_plate_reader',
+                                                                      label = 'Convert time values',
+                                                                      value = TRUE),
+
+                                                        checkboxInput(inputId = 'calibration_plate_reader',
+                                                                      label = 'Calibration (under construction)'),
+                                                        fluidRow(
+                                                          column(12,
+                                                                 div(
+                                                                   actionButton(inputId = "parse_data",
+                                                                                label = "Parse data",
+                                                                                icon=icon("file-lines"),
+                                                                                style="padding:5px; font-size:120%"),
+                                                                   style="float:right")
+                                                          )
+                                                        )
+                                                      ),# sidebar panel
+                                             ), # Plate reader tabPanel
+                                 ), # tabSet Panel
+
+                                 ##____DATA - MAIN PANEL____####
+
+                                 mainPanel(
+                                   conditionalPanel(
+                                     condition = "input.tabs_data == 'Custom'",
+                                     img(src = 'data_instruction.png',
+                                         heigt = '100%',
+                                         width = '100%')
+                                   ),
+
+                                   conditionalPanel(condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
+                                                    h1("Your Data"),
+                                                    tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
+                                                                tabPanel(title = "Density", value = "tabPanel_custom_tables_density",
+                                                                         withSpinner(
+                                                                           DT::dataTableOutput("growth_data")
+                                                                         )
+                                                                ),
+                                                                tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1",
+                                                                         withSpinner(
+                                                                           DT::dataTableOutput("custom_table_fluorescence1")
+                                                                         )
+                                                                ),
+                                                                tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
+                                                                         withSpinner(
+                                                                           DT::dataTableOutput("custom_table_fluorescence2")
+                                                                         )
+                                                                ),
+                                                                tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
+                                                                         DT::dataTableOutput('custom_data_table_expdesign')
+                                                                )
+
                                                     )
-                                                  ),# sidebar panel
-                                         ), # Plate reader tabPanel
-                             ), # tabSet Panel
+                                   ),
+                                   conditionalPanel(condition = 'output.parsefileUploaded',
+                                                    h1("Parsed Data"),
+                                                    tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
+                                                                tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
+                                                                         DT::dataTableOutput('parsed_data_table_density')
+                                                                ),
+                                                                tabPanel(title = "Fluorescence 1", value = "tabPanel_parsed_tables_fluorescence1",
+                                                                         DT::dataTableOutput('parsed_data_table_fluorescence1')
+                                                                ),
+                                                                tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
+                                                                         DT::dataTableOutput('parsed_data_table_fluorescence2')
+                                                                ),
+                                                                tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
+                                                                         DT::dataTableOutput('parsed_data_table_expdesign')
+                                                                )
+                                                    )
+                                   )
+                                 ) # main panel
+                        ), # Navbar 1
 
-                             ##____DATA - MAIN PANEL____####
+                        #____COMPUTATION____####
 
-                             mainPanel(
-                               conditionalPanel(
-                                 condition = "input.tabs_data == 'Custom'",
-                                 img(src = 'data_instruction.png',
-                                     heigt = '100%',
-                                     width = '100%')
-                               ),
+                        navbarMenu('Computation', menuName = "navbarMenu_Computation", icon=icon("gears"),
 
-                               conditionalPanel(condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
-                                                h1("Your Data"),
-                                                tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
-                                                            tabPanel(title = "Density", value = "tabPanel_custom_tables_density",
-                                                                     withSpinner(
-                                                                       DT::dataTableOutput("growth_data")
+                                   ##____Computation_Growth____####
+
+                                   tabPanel("Growth", value = "tabPanel_Growth",
+                                            fluidRow(
+                                              sidebarLayout(
+                                                column(4,
+                                                       sidebarPanel( width = 12,
+                                                                     style='border-color: #ADADAD',
+                                                                     wellPanel(
+                                                                       style='padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+                                                                       h2(strong('Growth fit')),
+                                                                       h4('Options'),
+                                                                       checkboxInput(inputId = 'linear_regression_growth',
+                                                                                     label = 'linear regression',
+                                                                                     value = TRUE),
+
+                                                                       checkboxInput(inputId = 'parametric_fit_growth',
+                                                                                     label = 'parametric fit',
+                                                                                     value = FALSE),
+
+                                                                       checkboxInput(inputId = 'nonparametric_fit_growth',
+                                                                                     label = 'non parametric fit',
+                                                                                     value = TRUE),
+
+
+                                                                       checkboxInput(inputId = 'log_transform_time_growth',
+                                                                                     label = 'Log-transform time'),
+
+                                                                       checkboxInput(inputId = 'biphasic_growth',
+                                                                                     label = 'Biphasic growth'),
+
+                                                                       numericInput(
+                                                                         inputId = 'growth_threshold_growth',
+                                                                         label = 'growth threshold',
+                                                                         value = 1.5,
+                                                                         min = NA,
+                                                                         max = NA,
+                                                                       ),
+
+                                                                       numericInput(
+                                                                         inputId = 'minimum_density_growth',
+                                                                         label = 'minimum density',
+                                                                         value = 0,
+                                                                         min = NA,
+                                                                         max = NA,
+                                                                       ),
+
+                                                                       numericInput(
+                                                                         inputId = 't0_growth',
+                                                                         label = 't0',
+                                                                         value = 0,
+                                                                         min = NA,
+                                                                         max = NA,
+                                                                       )
+                                                                     ), # Growth fit
+
+
+                                                                     wellPanel(
+                                                                       style='padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+                                                                       h2(strong('Dose-response Analysis')),
+                                                                       checkboxInput(inputId = 'perform_ec50_growth',
+                                                                                     label = 'perform EC50 Analysis',
+                                                                                     value = FALSE),
+
+
+                                                                       conditionalPanel(condition = "input.perform_ec50_growth",
+                                                                                        selectInput(inputId = "response_parameter_growth",
+                                                                                                    label = "Response Parameter",
+                                                                                                    choices = ""),
+
+                                                                                        checkboxInput(inputId = 'log_transform_concentration_growth',
+                                                                                                      label = 'log transform concentration'),
+
+                                                                                        checkboxInput(inputId = 'log_transform_response_growth',
+                                                                                                      label = 'log transform response'),
+
+                                                                                        textInput(
+                                                                                          inputId = 'smoothing_factor_growth_dr',
+                                                                                          label = 'Smoothing factor dose-response splines',
+                                                                                          value = "",
+                                                                                          placeholder = "NULL (choose automatically)"
+                                                                                        ),
+
+                                                                                        numericInput(
+                                                                                          inputId = 'number_of_bootstrappings_dr_growth',
+                                                                                          label = 'Number of bootstrappings',
+                                                                                          value = 0,
+                                                                                          min = NA,
+                                                                                          max = NA,
+                                                                                        )
+                                                                       ) # conditionalPanel(condition = "input.perform_ec50_growth"
+                                                                     ), #  wellPanel
+                                                                     fluidRow(
+                                                                       column(12,
+                                                                              div(
+                                                                                actionButton(inputId = "run_growth",
+                                                                                             label = "Run computation",
+                                                                                             icon=icon("gears"),
+                                                                                             style="padding:5px; font-size:120%"),
+                                                                                style="float:right")
+                                                                       )
                                                                      )
-                                                            ),
-                                                            tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1",
-                                                                     withSpinner(
-                                                                       DT::dataTableOutput("custom_table_fluorescence1")
-                                                                     )
-                                                            ),
-                                                            tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
-                                                                     withSpinner(
-                                                                       DT::dataTableOutput("custom_table_fluorescence2")
-                                                                     )
-                                                            ),
-                                                            tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
-                                                                     DT::dataTableOutput('custom_data_table_expdesign')
-                                                            )
+                                                       ) # sidebarPanel
 
-                                                )
-                               ),
-                               conditionalPanel(condition = 'output.parsefileUploaded',
-                                                h1("Parsed Data"),
-                                                tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
-                                                            tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
-                                                                     DT::dataTableOutput('parsed_data_table_density')
-                                                            ),
-                                                            tabPanel(title = "Fluorescence 1", value = "tabPanel_parsed_tables_fluorescence1",
-                                                                     DT::dataTableOutput('parsed_data_table_fluorescence1')
-                                                            ),
-                                                            tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
-                                                                     DT::dataTableOutput('parsed_data_table_fluorescence2')
-                                                            ),
-                                                            tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
-                                                                     DT::dataTableOutput('parsed_data_table_expdesign')
-                                                            )
-                                                )
-                               )
-                             ) # main panel
-                    ), # Navbar 1
+                                                ), # column
+                                                column(8,
+                                                       conditionalPanel(
+                                                         condition = "input.linear_regression_growth",
+                                                         sidebarPanel(
+                                                           width = 4,
+                                                           style='border-color: #ADADAD; padding-top: 0',
+                                                           h3(strong('Linear fit')),
 
-                    #____COMPUTATION____####
+                                                           numericInput(
+                                                             inputId = 'R2_threshold_growth',
+                                                             label = 'R2 threshold',
+                                                             value = 0.95,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
 
-                    navbarMenu('Computation', menuName = "navbarMenu_Computation", icon=icon("gears"),
+                                                           numericInput(
+                                                             inputId = 'RSD_threshold_growth',
+                                                             label = 'RSD threshold',
+                                                             value = 0.1,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
 
-                               ##____Computation_Growth____####
+                                                           numericInput(
+                                                             inputId = 'dY_threshold_growth',
+                                                             label = 'dY threshold',
+                                                             value = 0.05,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
 
-                               tabPanel("Growth", value = "tabPanel_Growth",
-                                        fluidRow(
-                                          sidebarLayout(
-                                            column(4,
-                                                   sidebarPanel( width = 12,
-                                                                 style='border-color: #ADADAD',
-                                                                 wellPanel(
-                                                                   style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
-                                                                   h2(strong('Growth fit')),
-                                                                   h4('Options'),
-                                                                   checkboxInput(inputId = 'linear_regression_growth',
-                                                                                 label = 'linear regression',
-                                                                                 value = TRUE),
+                                                           checkboxInput(inputId = 'custom_sliding_window_size_growth',
+                                                                         label = 'custom sliding window size',
+                                                                         value = FALSE),
 
-                                                                   checkboxInput(inputId = 'parametric_fit_growth',
-                                                                                 label = 'parametric fit',
-                                                                                 value = FALSE),
+                                                           conditionalPanel(
+                                                             condition = "input.custom_sliding_window_size_growth",
+                                                             numericInput(
+                                                               inputId = 'custom_sliding_window_size_value_growth',
+                                                               label = NULL,
+                                                               value = "",
+                                                               min = NA,
+                                                               max = NA,
+                                                             )
+                                                           ),
+                                                         )
+                                                       ), # conditionalPanel
+                                                       conditionalPanel(
+                                                         condition = "input.parametric_fit_growth",
+                                                         sidebarPanel(
+                                                           style='border-color: #ADADAD; padding-top: 0',
+                                                           h3(strong('Parametric fit')),
+                                                           wellPanel(
+                                                             h4(strong('Models:')),
+                                                             style='border-color: #ADADAD; padding: 1; padding-top: 0; padding-bottom: 0',
+                                                             checkboxInput(inputId = 'logistic_growth',
+                                                                           label = 'logistic',
+                                                                           value = TRUE),
 
-                                                                   checkboxInput(inputId = 'nonparametric_fit_growth',
-                                                                                 label = 'non parametric fit',
-                                                                                 value = TRUE),
+                                                             checkboxInput(inputId = 'richards_growth',
+                                                                           label = 'Richards',
+                                                                           value = TRUE),
 
+                                                             checkboxInput(inputId = 'gompertz_growth',
+                                                                           label = 'Gompertz',
+                                                                           value = TRUE),
 
-                                                                   checkboxInput(inputId = 'log_transform_time_growth',
-                                                                                 label = 'Log-transform time'),
+                                                             checkboxInput(inputId = 'extended_gompertz_growth',
+                                                                           label = 'extended Gompertz',
+                                                                           value = TRUE),
 
-                                                                   checkboxInput(inputId = 'biphasic_growth',
-                                                                                 label = 'Biphasic growth'),
+                                                             checkboxInput(inputId = 'huang_growth',
+                                                                           label = 'Huang',
+                                                                           value = TRUE)
+                                                           ),
+                                                           checkboxInput(inputId = 'log_transform_data_parametric_growth',
+                                                                         label = 'Log-transform data',
+                                                                         value = TRUE)
 
-                                                                   numericInput(
-                                                                     inputId = 'growth_threshold_growth',
-                                                                     label = 'growth threshold',
-                                                                     value = 1.5,
-                                                                     min = NA,
-                                                                     max = NA,
-                                                                   ),
-
-                                                                   numericInput(
-                                                                     inputId = 'minimum_density_growth',
-                                                                     label = 'minimum density',
-                                                                     value = 0,
-                                                                     min = NA,
-                                                                     max = NA,
-                                                                   ),
-
-                                                                   numericInput(
-                                                                     inputId = 't0_growth',
-                                                                     label = 't0',
-                                                                     value = 0,
-                                                                     min = NA,
-                                                                     max = NA,
-                                                                   )
-                                                                 ), # Growth fit
-
-
-                                                                 wellPanel(
-                                                                   style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
-                                                                   h2(strong('Dose-response Analysis')),
-                                                                   checkboxInput(inputId = 'perform_ec50_growth',
-                                                                                 label = 'perform EC50 Analysis',
-                                                                                 value = FALSE),
-
-
-                                                                   conditionalPanel(condition = "input.perform_ec50_growth",
-                                                                                    selectInput(inputId = "response_parameter_growth",
-                                                                                                label = "Response Parameter",
-                                                                                                choices = ""),
-
-                                                                                    checkboxInput(inputId = 'log_transform_concentration_growth',
-                                                                                                  label = 'log transform concentration'),
-
-                                                                                    checkboxInput(inputId = 'log_transform_response_growth',
-                                                                                                  label = 'log transform response'),
-
-
-                                                                                    selectInput(inputId = "smoothing_factor_growth_dr",
-                                                                                                label = "smoothing factor",
-                                                                                                choices = c("NULL" = "NULL",
-                                                                                                            "other" = "other")),
-
-                                                                                    numericInput(
-                                                                                      inputId = 'number_of_bootstrappings_dr_growth',
-                                                                                      label = 'Number of bootstrappings',
-                                                                                      value = 0,
-                                                                                      min = NA,
-                                                                                      max = NA,
-                                                                                    )
-                                                                   ) # conditionalPanel(condition = "input.perform_ec50_growth"
-                                                                 ), #  wellPanel
-                                                                 fluidRow(
-                                                                   column(12,
-                                                                          div(
-                                                                            actionButton(inputId = "run_growth",
-                                                                                         label = "Run computation",
-                                                                                         icon=icon("gears"),
-                                                                                         style="padding:5px; font-size:120%"),
-                                                                            style="float:right")
-                                                                   )
-                                                                 )
-                                                   ) # sidebarPanel
-
-                                            ), # column
-                                            column(8,
-                                                   conditionalPanel(
-                                                     condition = "input.linear_regression_growth",
-                                                     sidebarPanel(
-                                                       width = 4,
-                                                       style='border-color: #ADADAD; padding-top: 0',
-                                                       h3(strong('Linear fit')),
-
-                                                       numericInput(
-                                                         inputId = 'R2_threshold_growth',
-                                                         label = 'R2 threshold',
-                                                         value = 0.95,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-
-                                                       numericInput(
-                                                         inputId = 'RSD_threshold_growth',
-                                                         label = 'RSD threshold',
-                                                         value = 0.1,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-
-                                                       numericInput(
-                                                         inputId = 'dY_threshold_growth',
-                                                         label = 'dY threshold',
-                                                         value = 0.05,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-
-                                                       checkboxInput(inputId = 'custom_sliding_window_size_growth',
-                                                                     label = 'custom sliding window size',
-                                                                     value = FALSE),
+                                                         )
+                                                       ),  # conditionalPanel
 
                                                        conditionalPanel(
-                                                         condition = "input.custom_sliding_window_size_growth",
-                                                         numericInput(
-                                                           inputId = 'custom_sliding_window_size_value_growth',
-                                                           label = NULL,
-                                                           value = "",
-                                                           min = NA,
-                                                           max = NA,
+                                                         condition = "input.nonparametric_fit_growth",
+                                                         sidebarPanel(
+                                                           width = 4,
+                                                           style='border-color: #ADADAD; padding-top: 0',
+                                                           h3(strong('Nonparametric fit')),
+
+                                                           checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
+                                                                         label = 'Log-transform data',
+                                                                         value = TRUE),
+
+                                                           numericInput(
+                                                             inputId = 'smoothing_factor_nonparametric_growth',
+                                                             label = 'smoothing factor',
+                                                             value = 0.55,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
+
+                                                           numericInput(
+                                                             inputId = 'number_of_bootstrappings_growth',
+                                                             label = 'number of bootstrappings',
+                                                             value = 0,
+                                                             min = NA,
+                                                             max = NA,
+                                                           )
                                                          )
-                                                       ),
-                                                     )
-                                                   ), # conditionalPanel
-                                                   conditionalPanel(
-                                                     condition = "input.parametric_fit_growth",
-                                                     sidebarPanel(
-                                                       style='border-color: #ADADAD; padding-top: 0',
-                                                       h3(strong('Parametric fit')),
-                                                       wellPanel(
-                                                         h4(strong('Models:')),
-                                                         style='border-color: #ADADAD; background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
-                                                         checkboxInput(inputId = 'logistic_growth',
-                                                                       label = 'logistic',
-                                                                       value = TRUE),
+                                                       )  # conditionalPanel
+                                                ) # column
+                                              ) # sidebarLayout
+                                            ), # fluidRow
+                                            textOutput("text")
+                                   ), # Growth Tab Panel
 
-                                                         checkboxInput(inputId = 'richards_growth',
-                                                                       label = 'Richards',
-                                                                       value = TRUE),
+                                   "----",
+                                   ##____Computation_Fluorescence____####
+                                   tabPanel("Fluorescence", value = "tabPanel_Computation_Fluorescence",
+                                            fluidRow(
+                                              sidebarLayout(
+                                                column(4,
+                                                       sidebarPanel( width = 12,
+                                                                     style = 'border-color: #ADADAD',
+                                                                     wellPanel(
+                                                                       style = 'padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
+                                                                       h2(strong('Fluorescence fit')),
+                                                                       h4('Options'),
+                                                                       checkboxInput(
+                                                                         inputId = 'linear_regression_fluorescence',
+                                                                         label = 'linear regression',
+                                                                         value = TRUE
+                                                                       ),
 
-                                                         checkboxInput(inputId = 'gompertz_growth',
-                                                                       label = 'Gompertz',
-                                                                       value = TRUE),
+                                                                       checkboxInput(
+                                                                         inputId = 'nonparametric_fit_fluorescence',
+                                                                         label = 'nonparametric fit',
+                                                                         value = TRUE
+                                                                       ),
 
-                                                         checkboxInput(inputId = 'extended_gompertz_growth',
-                                                                       label = 'extended Gompertz',
-                                                                       value = TRUE),
+                                                                       checkboxInput(inputId = 'biphasic_fluorescence',
+                                                                                     label = 'Biphasic'),
 
-                                                         checkboxInput(inputId = 'huang_growth',
-                                                                       label = 'Huang',
-                                                                       value = TRUE)
-                                                       ),
-                                                       checkboxInput(inputId = 'log_transform_data_parametric_growth',
-                                                                     label = 'Log-transform data',
-                                                                     value = TRUE)
+                                                                       selectInput(
+                                                                         inputId = 'data_type_x_fluorescence', # TODO change choices based on presence of density and time
+                                                                         label = 'Data type x',
+                                                                         choices = ""
+                                                                       ),
 
-                                                     )
-                                                   ),  # conditionalPanel
+                                                                       checkboxInput(inputId = 'normalize_fluorescence', # TODO inactivate if no density values are present
+                                                                                     label = 'Normalize fluorescence'
+                                                                       ),
 
-                                                   conditionalPanel(
-                                                     condition = "input.nonparametric_fit_growth",
-                                                     sidebarPanel(
-                                                       width = 4,
-                                                       style='border-color: #ADADAD; padding-top: 0',
-                                                       h3(strong('Nonparametric fit')),
+                                                                       conditionalPanel(
+                                                                         condition = 'input.data_type_x_fluorescence.includes("density")',
+                                                                         numericInput(
+                                                                           inputId = 'growth_threshold_in_percent_fluorescence',
+                                                                           label = 'growth threshold (in %)',
+                                                                           value = 1.5,
+                                                                           min = NA,
+                                                                           max = NA,
+                                                                         )
+                                                                       ),
+                                                                       conditionalPanel(
+                                                                         condition = 'input.data_type_x_fluorescence.includes("density")',
+                                                                         numericInput(
+                                                                           inputId = 'minimum_density_fluorescence', # TODO inactivate if no density values are present
+                                                                           label = 'minimum_density',
+                                                                           value = 0,
+                                                                           min = NA,
+                                                                           max = NA,
+                                                                         )
+                                                                       ),
+                                                                       conditionalPanel(
+                                                                         condition = 'input.data_type_x_fluorescence.includes("time")',
+                                                                         numericInput(
+                                                                           inputId = 't0_fluorescence', # TODO inactivate if no time values are present
+                                                                           label = 't0',
+                                                                           value = 0,
+                                                                           min = NA,
+                                                                           max = NA,
+                                                                         )
+                                                                       ),
+                                                                     ), # wellPanel
 
-                                                       checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
-                                                                     label = 'Log-transform data',
-                                                                     value = TRUE),
 
-                                                       numericInput(
-                                                         inputId = 'smoothing_factor_nonparametric_growth',
-                                                         label = 'smoothing factor',
-                                                         value = 0.55,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
+                                                                     wellPanel(style='padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
 
-                                                       numericInput(
-                                                         inputId = 'number_of_bootstrappings_growth',
-                                                         label = 'number of bootstrappings',
-                                                         value = 0,
-                                                         min = NA,
-                                                         max = NA,
-                                                       )
-                                                     )
-                                                   )  # conditionalPanel
-                                            ) # column
-                                          ) # sidebarLayout
-                                        ), # fluidRow
-                                        textOutput("text")
-                               ), # Growth Tab Panel
+                                                                               h2(strong('Dose-response Analysis')),
 
-                               "----",
-                               ##____Computation_Fluorescence____####
-                               tabPanel("Fluorescence", value = "tabPanel_Computation_Fluorescence",
-                                        fluidRow(
-                                          sidebarLayout(
-                                            column(4,
-                                                   sidebarPanel( width = 12,
-                                                                 style = 'border-color: #ADADAD',
-                                                                 wellPanel(
-                                                                   style = 'background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
-                                                                   h2(strong('Fluorescence fit')),
-                                                                   h4('Options'),
-                                                                   checkboxInput(
-                                                                     inputId = 'linear_regression_fluorescence',
-                                                                     label = 'linear regression',
-                                                                     value = TRUE
+                                                                               checkboxInput(inputId = 'perform_ec50_fluorescence',
+                                                                                             label = 'perform dose-response analysis',
+                                                                                             value = FALSE),
+
+
+                                                                               conditionalPanel(condition = 'input.perform_ec50_fluorescence',
+
+                                                                                                selectInput(inputId = "dr_method_fluorescence",
+                                                                                                            label = "Method",
+                                                                                                            choices = c("Biosensor response model" = "model",
+                                                                                                                        "Response spline fit" = "spline")
+                                                                                                ), # TODO tooltip with reference to Meyer et al., 2019
+
+                                                                                                selectInput(inputId = "response_parameter_fluorescence",
+                                                                                                            label = "Response Parameter",
+                                                                                                            choices = ""),
+
+                                                                                                checkboxInput(inputId = 'log_transform_concentration_fluorescence',
+                                                                                                              label = 'log transform concentration'),
+
+                                                                                                checkboxInput(inputId = 'log_transform_response_fluorescence',
+                                                                                                              label = 'log transform response'),
+
+                                                                                                conditionalPanel(
+                                                                                                  condition = 'input.dr_method_fluorescence == "spline"',
+                                                                                                  numericInput(
+                                                                                                    inputId = 'number_of_bootstrappings_dr_fluorescence',
+                                                                                                    label = 'Number of bootstrappings',
+                                                                                                    value = 0,
+                                                                                                    min = NA,
+                                                                                                    max = NA,
+                                                                                                  )
+                                                                                                ),
+                                                                                                conditionalPanel(
+                                                                                                  condition = 'input.dr_method_fluorescence == "spline"',
+                                                                                                  textInput(
+                                                                                                    inputId = 'smoothing_factor_fluorescence_dr',
+                                                                                                    label = 'Smoothing factor dose-response splines',
+                                                                                                    value = "",
+                                                                                                    placeholder = "NULL (choose automaticall)"
+                                                                                                  )
+                                                                                                )
+                                                                               ) # conditionalPanel(condition = "input.perform_ec50_fluorescence"
+                                                                     ), # wellPanel
+
+                                                                     # [Run Computation] button
+                                                                     conditionalPanel(
+                                                                       condition = 'output.fluorescence_present',
+                                                                       fluidRow(
+                                                                         column(12,
+                                                                                div(
+                                                                                  actionButton(inputId = "run_fluorescence",
+                                                                                               label = "Run computation",
+                                                                                               icon=icon("gears"),
+                                                                                               style="padding:5px; font-size:120%"),
+                                                                                  style="float:right")
+                                                                         )
+                                                                       )
+                                                                     )
+                                                       ) # sidebarPanel
+                                                ), # column
+
+                                                column(8,
+                                                       conditionalPanel(
+                                                         condition = "input.linear_regression_fluorescence",
+                                                         sidebarPanel(
+                                                           width = 4,
+                                                           style='border-color: #ADADAD; padding-top: 0',
+                                                           h3(strong('Linear fit')),
+
+                                                           numericInput(
+                                                             inputId = 'R2_threshold_fluorescence',
+                                                             label = 'R2 threshold',
+                                                             value = 0.95,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
+
+                                                           numericInput(
+                                                             inputId = 'RSD_threshold_fluorescence',
+                                                             label = 'RSD threshold',
+                                                             value = 0.1,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
+
+                                                           numericInput(
+                                                             inputId = 'dY_threshold_fluorescence',
+                                                             label = 'dY threshold',
+                                                             value = 0.05,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
+                                                           checkboxInput(inputId = 'log_transform_data_linear_fluorescence',
+                                                                         label = 'Log-transform fluorescence data'),
+
+                                                           checkboxInput(inputId = 'log_transform_x_linear_fluorescence',
+                                                                         label = 'Log-transform x data'),
+
+                                                           checkboxInput(inputId = 'custom_sliding_window_size_fluorescence',
+                                                                         label = 'custom sliding window size',
+                                                                         value = FALSE),
+
+                                                           conditionalPanel(
+                                                             condition = "input.custom_sliding_window_size_fluorescence",
+                                                             numericInput(
+                                                               inputId = 'custom_sliding_window_size_value_gfluorescence',
+                                                               label = NULL,
+                                                               value = "",
+                                                               min = NA,
+                                                               max = NA,
+                                                             )
+                                                           )
+                                                         )
+                                                       ), # conditionalPanel
+
+                                                       conditionalPanel(
+                                                         condition = "input.nonparametric_fit_fluorescence",
+                                                         sidebarPanel(
+                                                           width = 4,
+                                                           style='border-color: #ADADAD; padding-top: 0',
+                                                           h3(strong('Nonparametric fit')),
+
+                                                           numericInput(
+                                                             inputId = 'smoothing_factor_nonparametric_fluorescence',
+                                                             label = 'smoothing factor',
+                                                             value = 0.75,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
+
+                                                           numericInput(
+                                                             inputId = 'number_of_bootstrappings_fluorescence',
+                                                             label = 'number of bootstrappings',
+                                                             value = 0,
+                                                             min = NA,
+                                                             max = NA,
+                                                           ),
+                                                           checkboxInput(inputId = 'log_transform_data_nonparametric_fluorescence',
+                                                                         label = 'Log-transform fluorescence data'),
+
+                                                           checkboxInput(inputId = 'log_transform_x_nonparametric_fluorescence',
+                                                                         label = 'Log-transform x data')
+                                                         )
+                                                       )  # conditionalPanel
+                                                ) # column
+                                              ) # sidebarLayout
+                                            ) # fluidRow
+                                   ), # tabPanel("Fluorescence"
+                        ), # navbarMenu('Computation'
+
+                        #____RESULTS____####
+
+                        navbarMenu(title = "Results", menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
+                                   ##____Results_Growth___####
+                                   tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
+                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Growth",
+                                                        tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
+                                                                 conditionalPanel(condition = "input.biphasic_growth",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary growth phase)")
+                                                                 ),
+                                                                 DT::dataTableOutput('results_table_growth_linear'),
+                                                                 downloadButton('download_table_growth_linear',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
+                                                                 conditionalPanel(condition = "input.biphasic_growth",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary growth phase)")
+                                                                 ),
+                                                                 DT::dataTableOutput('results_table_growth_spline'),
+                                                                 downloadButton('download_table_growth_spline',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Growth_Spline_bt",
+                                                                 DT::dataTableOutput('results_table_growth_spline_bt'),
+                                                                 downloadButton('download_table_growth_spline_bt',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
+                                                                 DT::dataTableOutput('results_table_growth_model'),
+                                                                 downloadButton('download_table_growth_model',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Growth_DR",
+                                                                 DT::dataTableOutput('results_table_growth_dr'),
+                                                                 downloadButton('download_table_growth_dr',"Download table")
+                                                        )
+                                            )
+                                   ),
+                                   ##____Results_Fluorescence___####
+                                   tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
+                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Fluorescence",
+                                                        tabPanel(title = "Linear Fit", value = "tabPanel_Results_Fluorescence_Linear",
+                                                                 conditionalPanel(condition = "input.biphasic_fluorescence",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary phase)")
+                                                                 ),
+                                                                 DT::dataTableOutput('results_table_fluorescence1_linear'),
+                                                                 downloadButton('download_table_fluorescence1_linear',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Fluorescence_Spline",
+                                                                 conditionalPanel(condition = "input.biphasic_fluorescence",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary phase)")
+                                                                 ),
+                                                                 DT::dataTableOutput('results_table_fluorescence1_spline'),
+                                                                 downloadButton('download_table_fluorescence1_spline',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Fluorescence_Spline_bt",
+                                                                 DT::dataTableOutput('results_table_fluorescence1_spline_bt'),
+                                                                 downloadButton('download_table_fluorescence1_spline_bt',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Spline",
+                                                                 DT::dataTableOutput('results_table_fluorescence1_dr_spline'),
+                                                                 downloadButton('download_table_fluorescence1_dr_spline',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Model",
+                                                                 DT::dataTableOutput('results_table_fluorescence1_dr_model'),
+                                                                 downloadButton('download_table_fluorescence1_dr_model',"Download table")
+                                                        )
+                                            )
+                                   )
+                        ),
+                        #____VALIDATE____####
+                        navbarMenu("Validate",  menuName = "navbarMenu_Validate", icon = icon("user-check"),
+                                   ##____Validate_Growth____####
+                                   tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
+                                            h1("Growth Fits"),
+                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Validate_Growth",
+                                                        ###___Linear Fits___####
+                                                        tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_Linear",
+                                                                 sidebarPanel(width = 5,
+                                                                              selectInput(inputId = "sample_validate_growth_linear",
+                                                                                          label = "Sample:",
+                                                                                          width = "fit-content",
+                                                                                          choices = "",
+                                                                                          multiple = FALSE,
+                                                                                          selectize = FALSE,
+                                                                                          size = 5
+                                                                              ),
+                                                                              checkboxInput(inputId = 'logy_validate_growth_plot_linear',
+                                                                                            label = 'Log-transform y axis',
+                                                                                            value = TRUE),
+                                                                              checkboxInput(inputId = 'diagnostics_validate_growth_plot_linear',
+                                                                                            label = 'Show diagnostics',
+                                                                                            value = FALSE),
+
+                                                                              h3('Customize plot appearance'),
+
+
+                                                                              sliderInput(inputId = 'shape_type_validate_growth_plot_linear',
+                                                                                          label = 'Shape type',
+                                                                                          min = 1,
+                                                                                          max = 25,
+                                                                                          value = 21),
+
+                                                                              sliderInput(inputId = 'shape_size_validate_growth_plot_linear',
+                                                                                          label = 'Shape size',
+                                                                                          min = 1,
+                                                                                          max = 10,
+                                                                                          value = 2,
+                                                                                          step = 0.5),
+
+
+
+                                                                              sliderInput(inputId = 'axis_size_validate_growth_plot_linear',
+                                                                                          label = 'Axis title font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.9,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'lab_size_validate_growth_plot_linear',
+                                                                                          label = 'Axis label font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.7,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'line_width_validate_growth_plot_linear',
+                                                                                          label = 'Line width',
+                                                                                          min = 0.01,
+                                                                                          max = 10,
+                                                                                          value = 3),
+
+
+                                                                              strong("x-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_min_validate_growth_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_max_validate_growth_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              strong("y-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_validate_growth_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_validate_growth_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                 ),
+                                                                 mainPanel(width = 7,
+                                                                           plotOutput("validate_growth_plot_linear", width = "100%", height = "600px"),
+                                                                           fluidRow(
+                                                                             column(6, align = "center", offset = 3,
+                                                                                    actionButton(inputId = "rerun_growth_linear",
+                                                                                                 label = "Re-run with modified parameters",
+                                                                                                 icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%"),
+                                                                                    actionButton(inputId = "restore_growth_linear",
+                                                                                                 label = "Restore fit",
+                                                                                                 # icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%")
+                                                                             )
+                                                                           ),
+
+                                                                           HTML("<br>"),
+                                                                           h3(strong("Export plot")),
+
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "width_download_growth_validate_linear",
+                                                                                                 label = "Width (in inches)",
+                                                                                                 value = 10)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "height_download_growth_validate_linear",
+                                                                                                 label = "Height (in inches)",
+                                                                                                 value = 9)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "dpi_download_growth_validate_linear",
+                                                                                                 label = "DPI",
+                                                                                                 value = 300)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_growth_validate_linear',"Download Plot"),
+                                                                                    radioButtons("format_download_growth_validate_linear",
+                                                                                                 label = NULL,
+                                                                                                 choices = c("PNG" = ".png",
+                                                                                                             "PDF" = ".pdf"),
+                                                                                                 selected = ".png",
+                                                                                                 inline = TRUE)
+                                                                             ) # column
+                                                                           ) # fluidRow
+                                                                 ) #mainPanel
+
+                                                        ), #tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_linearFits",
+                                                        ###___Spline Fits___####
+                                                        tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_Spline",
+                                                                 sidebarPanel(width = 5,
+                                                                              selectInput(inputId = "sample_validate_growth_spline",
+                                                                                          label = "Sample:",
+                                                                                          width = "fit-content",
+                                                                                          choices = "",
+                                                                                          multiple = FALSE,
+                                                                                          selectize = FALSE,
+                                                                                          size = 5,
+                                                                              ),
+                                                                              checkboxInput(inputId = 'logy_validate_growth_plot_spline',
+                                                                                            label = 'Log-transform y axis',
+                                                                                            value = TRUE),
+
+                                                                              strong("x-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_min_validate_growth_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_max_validate_growth_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              strong("y-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_validate_growth_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_validate_growth_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              conditionalPanel(
+                                                                                condition = "input.logy_validate_growth_plot_spline",
+                                                                                strong("y-Range (derivative)"),
+                                                                                fluidRow(
+                                                                                  column(5,
+                                                                                         textInput(inputId = "y_range_min_derivative_validate_growth_plot_spline",
+                                                                                                   label = NULL,
+                                                                                                   value = "", placeholder = "min"
+                                                                                         )
+                                                                                  ),
+
+                                                                                  column(5,
+                                                                                         textInput(inputId = "y_range_max_derivative_validate_growth_plot_spline",
+                                                                                                   label = NULL,
+                                                                                                   value = "", placeholder = "max"
+                                                                                         )
+                                                                                  )
+                                                                                )
+                                                                              ),
+
+                                                                              sliderInput(inputId = 'shape_size_validate_growth_plot_spline',
+                                                                                          label = 'Shape size',
+                                                                                          min = 1,
+                                                                                          max = 10,
+                                                                                          value = 2,
+                                                                                          step = 0.5),
+
+                                                                              sliderInput(inputId = "line_width_validate_growth_plot_spline",
+                                                                                          label = "Line width",
+                                                                                          min = 0.01,
+                                                                                          max = 10,
+                                                                                          value = 3),
+
+                                                                              sliderInput(inputId = 'base_size_validate_growth_plot_spline',
+                                                                                          label = 'Base font size',
+                                                                                          min = 10,
+                                                                                          max = 35,
+                                                                                          value = 20,
+                                                                                          step = 0.5),
+
+                                                                              sliderInput(inputId = "nbreaks__validate_growth_plot_spline",
+                                                                                          label = "Number of breaks on y-axis",
+                                                                                          min = 1,
+                                                                                          max = 20,
+                                                                                          value = 6),
+
+                                                                 ),
+                                                                 mainPanel(width = 7,
+                                                                           withSpinner(
+                                                                             plotOutput("validate_growth_plot_spline",
+                                                                                        width = "100%", height = "700px")
+                                                                           ),
+                                                                           fluidRow(
+                                                                             column(6, align = "center", offset = 3,
+                                                                                    actionButton(inputId = "rerun_growth_spline",
+                                                                                                 label = "Re-run with modified parameters",
+                                                                                                 icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%"),
+                                                                                    actionButton(inputId = "restore_growth_spline",
+                                                                                                 label = "Restore fit",
+                                                                                                 # icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%")
+                                                                             )
+                                                                           ),
+
+                                                                           HTML("<br>"),
+
+                                                                           h3(strong("Export plot")),
+
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "width_download_growth_validate_spline",
+                                                                                                 label = "Width (in inches)",
+                                                                                                 value = 10)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "height_download_growth_validate_spline",
+                                                                                                 label = "Height (in inches)",
+                                                                                                 value = 9)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "dpi_download_growth_validate_spline",
+                                                                                                 label = "DPI",
+                                                                                                 value = 300)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_growth_validate_spline',"Download Plot"),
+
+                                                                                    radioButtons("format_download_growth_validate_spline",
+                                                                                                 label = NULL,
+                                                                                                 choices = c("PNG" = ".png",
+                                                                                                             "PDF" = ".pdf"),
+                                                                                                 selected = ".png",
+                                                                                                 inline = TRUE)
+                                                                             ) # column
+                                                                           ) # fluidRow
+                                                                 ) # mainPanel
+
+                                                        ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
+                                                        ###___Model Fits___####
+                                                        tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_Model",
+                                                                 sidebarPanel(width = 5,
+                                                                              wellPanel(
+                                                                                style='padding: 1; padding-top: 0; padding-bottom: 0',
+                                                                                selectInput(inputId = "sample_validate_growth_model",
+                                                                                            label = "Sample:",
+                                                                                            width = "fit-content",
+                                                                                            choices = "",
+                                                                                            multiple = FALSE,
+                                                                                            selectize = FALSE,
+                                                                                            size = 5,
+                                                                                )
+                                                                              )
+
+                                                                 ),
+                                                                 mainPanel(width = 7,
+                                                                           withSpinner(
+                                                                             plotOutput("validate_growth_plot_model",
+                                                                                        width = "100%", height = "600px")
+                                                                           ),
+                                                                           fluidRow(
+                                                                             column(6, align = "center", offset = 3,
+                                                                                    actionButton(inputId = "rerun_growth_model",
+                                                                                                 label = "Re-run with modified parameters",
+                                                                                                 icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%"),
+
+                                                                                    actionButton(inputId = "restore_growth_model",
+                                                                                                 label = "Restore fit",
+                                                                                                 # icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%")
+                                                                             )
+                                                                           ),
+
+                                                                           HTML("<br>"),
+
+                                                                           h3(strong("Export plot")),
+
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "width_download_growth_validate_model",
+                                                                                                 label = "Width (in inches)",
+                                                                                                 value = 10)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "height_download_growth_validate_model",
+                                                                                                 label = "Height (in inches)",
+                                                                                                 value = 9)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "dpi_download_growth_validate_model",
+                                                                                                 label = "DPI",
+                                                                                                 value = 300)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_growth_validate_model',"Download Plot"),
+
+                                                                                    radioButtons("format_download_growth_validate_model",
+                                                                                                 label = NULL,
+                                                                                                 choices = c("PNG" = ".png",
+                                                                                                             "PDF" = ".pdf"),
+                                                                                                 selected = ".png",
+                                                                                                 inline = TRUE)
+                                                                             ) # column
+                                                                           ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ), # tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
+                                                        ### Growth Boostrapping Spline Plots ####
+                                                        tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Growth_Spline_bt",
+                                                                 sidebarPanel(width = 4,
+                                                                              selectInput(inputId = "sample_validate_growth_spline_bt",
+                                                                                          label = "Sample:",
+                                                                                          width = "fit-content",
+                                                                                          choices = "",
+                                                                                          multiple = FALSE,
+                                                                                          selectize = FALSE,
+                                                                                          size = 5,
+                                                                              ),
+
+                                                                              checkboxInput(inputId = "plot_derivative_growth_spline_bt",
+                                                                                            label = "Plot derivative",
+                                                                                            value = TRUE),
+
+                                                                              h3('Customize plot appearance'),
+
+
+                                                                              sliderInput(inputId = 'shape_type_validate_growth_spline_bt',
+                                                                                          label = 'Shape type',
+                                                                                          min = 1,
+                                                                                          max = 25,
+                                                                                          value = 1),
+
+                                                                              sliderInput(inputId = 'shape_size_validate_growth_spline_bt',
+                                                                                          label = 'Shape size',
+                                                                                          min = 1,
+                                                                                          max = 10,
+                                                                                          value = 2,
+                                                                                          step = 0.5),
+
+
+
+                                                                              sliderInput(inputId = 'axis_size_validate_growth_spline_bt',
+                                                                                          label = 'Axis title font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.9,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'lab_size_validate_growth_spline_bt',
+                                                                                          label = 'Axis label font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.7,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'line_width_validate_growth_spline_bt',
+                                                                                          label = 'Line width',
+                                                                                          min = 0.01,
+                                                                                          max = 10,
+                                                                                          value = 0.5),
+
+
+                                                                              strong("x-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_min_validate_growth_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_max_validate_growth_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              strong("y-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_validate_growth_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_validate_growth_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+                                                                              strong("y-Range (derivative)"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_derivative_validate_growth_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_derivative_validate_growth_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                 ), # sidebarPanel
+
+                                                                 mainPanel(width = 8,
+
+                                                                           plotOutput("validate_growth_plot_spline_bt",
+                                                                                      width = "100%", height = "1000px"),
+
+                                                                           HTML("<br>"),
+                                                                           h3(strong("Export plot")),
+
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "width_download_growth_validate_spline_bt",
+                                                                                                 label = "Width (in inches)",
+                                                                                                 value = 10)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "height_download_growth_validate_spline_bt",
+                                                                                                 label = "Height (in inches)",
+                                                                                                 value = 9)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "dpi_download_growth_validate_spline_bt",
+                                                                                                 label = "DPI",
+                                                                                                 value = 300)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_growth_validate_spline_bt',"Download Plot"),
+                                                                                    radioButtons("format_download_growth_validate_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 choices = c("PNG" = ".png",
+                                                                                                             "PDF" = ".pdf"),
+                                                                                                 selected = ".png",
+                                                                                                 inline = TRUE)
+                                                                             ) # column
+                                                                           ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ) # tabPanel(title = "Bootstrapping Spline"
+                                            ) # tabsetPanel(type = "tabs",
+                                   ), # tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
+                                   ##____Validate_Fluorescence____####
+                                   tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
+                                            h1("Fluorescence Fits"),
+                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Validate_Fluorescence",
+                                                        ###___Linear Fits___####
+                                                        tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Fluorescence_Linear",
+                                                                 sidebarPanel(width = 5,
+                                                                              selectInput(inputId = "sample_validate_fluorescence_linear",
+                                                                                          label = "Sample:",
+                                                                                          width = "fit-content",
+                                                                                          choices = "",
+                                                                                          multiple = FALSE,
+                                                                                          selectize = FALSE,
+                                                                                          size = 5
+                                                                              ),
+                                                                              checkboxInput(inputId = 'logy_validate_fluorescence_plot_linear',
+                                                                                            label = 'Log-transform y axis',
+                                                                                            value = FALSE),
+                                                                              checkboxInput(inputId = 'diagnostics_validate_fluorescence_plot_linear',
+                                                                                            label = 'Show diagnostics',
+                                                                                            value = FALSE),
+
+                                                                              h3('Customize plot appearance'),
+
+
+                                                                              sliderInput(inputId = 'shape_type_validate_fluorescence_plot_linear',
+                                                                                          label = 'Shape type',
+                                                                                          min = 1,
+                                                                                          max = 25,
+                                                                                          value = 21),
+
+                                                                              sliderInput(inputId = 'shape_size_validate_fluorescence_plot_linear',
+                                                                                          label = 'Shape size',
+                                                                                          min = 1,
+                                                                                          max = 10,
+                                                                                          value = 2,
+                                                                                          step = 0.5),
+
+
+
+                                                                              sliderInput(inputId = 'axis_size_validate_fluorescence_plot_linear',
+                                                                                          label = 'Axis title font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.9,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'lab_size_validate_fluorescence_plot_linear',
+                                                                                          label = 'Axis label font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.7,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'line_width_validate_fluorescence_plot_linear',
+                                                                                          label = 'Line width',
+                                                                                          min = 0.01,
+                                                                                          max = 10,
+                                                                                          value = 3),
+
+
+                                                                              strong("x-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_min_validate_fluorescence_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_max_validate_fluorescence_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              strong("y-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_validate_fluorescence_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_validate_fluorescence_plot_linear",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                 ),
+                                                                 mainPanel(width = 7,
+                                                                           plotOutput("validate_fluorescence_plot_linear", width = "100%", height = "600px"),
+                                                                           fluidRow(
+                                                                             column(6, align = "center", offset = 3,
+                                                                                    actionButton(inputId = "rerun_fluorescence_linear",
+                                                                                                 label = "Re-run with modified parameters",
+                                                                                                 icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%"),
+                                                                                    actionButton(inputId = "restore_fluorescence_linear",
+                                                                                                 label = "Restore fit",
+                                                                                                 # icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%")
+                                                                             )
+                                                                           )
+                                                                 )
+
+                                                        ),
+                                                        ###___Spline Fits___####
+                                                        tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_Spline",
+                                                                 sidebarPanel(width = 5,
+                                                                              selectInput(inputId = "sample_validate_fluorescence_spline",
+                                                                                          label = "Sample:",
+                                                                                          width = "fit-content",
+                                                                                          choices = "",
+                                                                                          multiple = FALSE,
+                                                                                          selectize = FALSE,
+                                                                                          size = 5,
+                                                                              ),
+                                                                              checkboxInput(inputId = 'logy_validate_fluorescence_plot_spline',
+                                                                                            label = 'Log-transform y axis',
+                                                                                            value = FALSE),
+
+                                                                              strong("x-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_min_validate_fluorescence_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_max_validate_fluorescence_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              strong("y-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_validate_fluorescence_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_validate_fluorescence_plot_spline",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              conditionalPanel(
+                                                                                condition = "input.logy_validate_growth_plot_spline",
+                                                                                strong("y-Range (derivative)"),
+                                                                                fluidRow(
+                                                                                  column(5,
+                                                                                         textInput(inputId = "y_range_min_derivative_validate_fluorescence_plot_spline",
+                                                                                                   label = NULL,
+                                                                                                   value = "", placeholder = "min"
+                                                                                         )
+                                                                                  ),
+
+                                                                                  column(5,
+                                                                                         textInput(inputId = "y_range_max_derivative_validate_fluorescence_plot_spline",
+                                                                                                   label = NULL,
+                                                                                                   value = "", placeholder = "max"
+                                                                                         )
+                                                                                  )
+                                                                                )
+                                                                              ),
+
+                                                                              sliderInput(inputId = 'shape_size_validate_fluorescence_plot_spline',
+                                                                                          label = 'Shape size',
+                                                                                          min = 1,
+                                                                                          max = 10,
+                                                                                          value = 2,
+                                                                                          step = 0.5),
+
+                                                                              sliderInput(inputId = "line_width_validate_fluorescence_plot_spline",
+                                                                                          label = "Line width",
+                                                                                          min = 0.01,
+                                                                                          max = 10,
+                                                                                          value = 1.1),
+
+                                                                              sliderInput(inputId = 'base_size_validate_fluorescence_plot_spline',
+                                                                                          label = 'Base font size',
+                                                                                          min = 10,
+                                                                                          max = 35,
+                                                                                          value = 20,
+                                                                                          step = 0.5),
+
+                                                                              sliderInput(inputId = "nbreaks__validate_fluorescence_plot_spline",
+                                                                                          label = "Number of breaks on y-axis",
+                                                                                          min = 1,
+                                                                                          max = 20,
+                                                                                          value = 6),
+
+                                                                 ),
+                                                                 mainPanel(width = 7,
+                                                                           #conditional if diagnostics
+                                                                           withSpinner(
+                                                                             plotOutput("validate_fluorescence_plot_spline",
+                                                                                        width = "100%", height = "700px")
+                                                                           ),
+                                                                           fluidRow(
+                                                                             column(6, align = "center", offset = 3,
+                                                                                    actionButton(inputId = "rerun_fluorescence_spline",
+                                                                                                 label = "Re-run with modified parameters",
+                                                                                                 icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%"),
+                                                                                    actionButton(inputId = "restore_fluorescence_spline",
+                                                                                                 label = "Restore fit",
+                                                                                                 # icon=icon("gears"),
+                                                                                                 style="padding:5px; font-size:120%")
+                                                                             ) # column
+                                                                           ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
+
+                                                        tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Fluorescence_Spline_bt",
+                                                                 sidebarPanel(width = 4,
+                                                                              selectInput(inputId = "sample_validate_fluorescence_spline_bt",
+                                                                                          label = "Sample:",
+                                                                                          width = "fit-content",
+                                                                                          choices = "",
+                                                                                          multiple = FALSE,
+                                                                                          selectize = FALSE,
+                                                                                          size = 5,
+                                                                              ),
+
+                                                                              checkboxInput(inputId = "plot_derivative_fluorescence_spline_bt",
+                                                                                            label = "Plot derivative",
+                                                                                            value = TRUE),
+
+                                                                              h3('Customize plot appearance'),
+
+
+                                                                              sliderInput(inputId = 'shape_type_validate_fluorescence_spline_bt',
+                                                                                          label = 'Shape type',
+                                                                                          min = 1,
+                                                                                          max = 25,
+                                                                                          value = 1),
+
+                                                                              sliderInput(inputId = 'shape_size_validate_fluorescence_spline_bt',
+                                                                                          label = 'Shape size',
+                                                                                          min = 1,
+                                                                                          max = 10,
+                                                                                          value = 2,
+                                                                                          step = 0.5),
+
+
+
+                                                                              sliderInput(inputId = 'axis_size_validate_fluorescence_spline_bt',
+                                                                                          label = 'Axis title font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.9,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'lab_size_validate_fluorescence_spline_bt',
+                                                                                          label = 'Axis label font size',
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          value = 1.7,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = 'line_width_validate_fluorescence_spline_bt',
+                                                                                          label = 'Line width',
+                                                                                          min = 0.01,
+                                                                                          max = 10,
+                                                                                          value = 0.5),
+
+
+                                                                              strong("x-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_min_validate_fluorescence_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "x_range_max_validate_fluorescence_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                              strong("y-Range"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_validate_fluorescence_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_validate_fluorescence_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+                                                                              strong("y-Range (derivative)"),
+                                                                              fluidRow(
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_min_derivative_validate_fluorescence_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "min"
+                                                                                       )
+                                                                                ),
+
+                                                                                column(5,
+                                                                                       textInput(inputId = "y_range_max_derivative_validate_fluorescence_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 value = "", placeholder = "max"
+                                                                                       )
+                                                                                )
+                                                                              ),
+
+                                                                 ), # sidebarPanel
+
+                                                                 mainPanel(width = 8,
+
+                                                                           plotOutput("validate_fluorescence_plot_spline_bt",
+                                                                                      width = "100%", height = "1000px"),
+
+                                                                           HTML("<br>"),
+                                                                           h3(strong("Export plot")),
+
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "width_download_fluorescence_validate_spline_bt",
+                                                                                                 label = "Width (in inches)",
+                                                                                                 value = 10)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "height_download_fluorescence_validate_spline_bt",
+                                                                                                 label = "Height (in inches)",
+                                                                                                 value = 9)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "dpi_download_fluorescence_validate_spline_bt",
+                                                                                                 label = "DPI",
+                                                                                                 value = 300)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_fluorescence_validate_spline_bt',"Download Plot"),
+                                                                                    radioButtons("format_download_fluorescence_validate_spline_bt",
+                                                                                                 label = NULL,
+                                                                                                 choices = c("PNG" = ".png",
+                                                                                                             "PDF" = ".pdf"),
+                                                                                                 selected = ".png",
+                                                                                                 inline = TRUE)
+                                                                             ) # column
+                                                                           ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ) # tabPanel(title = "Bootstrapping Spline"
+                                            ) # tabsetPanel(type = "tabs",
+                                   ) # tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
+                        ), # navbarMenu("Validate", icon = icon("user-check"),
+                        #____Visualize____####
+                        navbarMenu("Visualize",  menuName = "navbarMenu_Visualize", icon = icon("chart-line"),
+                                   ## Growth Plots ####
+                                   tabPanel(title = "Growth Plots", value = "tabPanel_Visualize_Growth",
+                                            h1("Growth Plots"),
+                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Visualize_Growth",
+
+                                                        ### Growth Group Plots ####
+
+                                                        tabPanel(title = "Group plots",
+                                                                 sidebarPanel(
+
+                                                                   selectInput(inputId = "data_type_growth_group_plot",
+                                                                               label = "Data type",
+                                                                               choices = c("Raw density" = "raw",
+                                                                                           "Spline fits" = "spline")
                                                                    ),
 
-                                                                   checkboxInput(
-                                                                     inputId = 'nonparametric_fit_fluorescence',
-                                                                     label = 'nonparametric fit',
-                                                                     value = TRUE
+                                                                   textInput(inputId = "select_samples_based_on_string_growth_group_plot",
+                                                                             label = "Select sample based on string (separate by ;)"
                                                                    ),
 
-                                                                   checkboxInput(inputId = 'biphasic_fluorescence',
-                                                                                 label = 'Biphasic'),
-
-                                                                   selectInput(
-                                                                     inputId = 'data_type_x_fluorescence', # TODO change choices based on presence of density and time
-                                                                     label = 'Data type x',
-                                                                     choices = ""
+                                                                   textInput(inputId = "select_samples_based_on_concentration_growth_group_plot",
+                                                                             label = "Select sample based on concentration (separate by ;)"
                                                                    ),
 
-                                                                   checkboxInput(inputId = 'normalize_fluorescence', # TODO inactivate if no density values are present
-                                                                                 label = 'Normalize fluorescence'
+                                                                   textInput(inputId = "exclude_samples_based_on_string_growth_group_plot",
+                                                                             label = "Exclude sample based on string (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plot",
+                                                                             label = "Exclude sample based on concentration (separate by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "plot_group_averages_growth_group_plot",
+                                                                                 label = "Plot group averages",
+                                                                                 value = TRUE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.data_type_growth_group_plot == 'spline'",
+                                                                     checkboxInput(inputId = "plot_derivative_growth_group_plot",
+                                                                                   label = "Plot derivative",
+                                                                                   value = TRUE)
+                                                                   ),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_growth_group_plot",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = TRUE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_growth_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_growth_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_growth_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_growth_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
                                                                    ),
 
                                                                    conditionalPanel(
-                                                                     condition = 'input.data_type_x_fluorescence.includes("density")',
-                                                                     numericInput(
-                                                                       inputId = 'growth_threshold_in_percent_fluorescence',
-                                                                       label = 'growth threshold (in %)',
-                                                                       value = 1.5,
-                                                                       min = NA,
-                                                                       max = NA,
+                                                                     condition = "input.data_type_growth_group_plot == 'spline'",
+                                                                     strong("y-Range (derivative)"),
+                                                                     fluidRow(
+                                                                       column(5,
+                                                                              textInput(inputId = "y_range_min_derivative_growth_group_plot",
+                                                                                        label = NULL,
+                                                                                        value = "", placeholder = "min"
+                                                                              )
+                                                                       ),
+
+                                                                       column(5,
+                                                                              textInput(inputId = "y_range_max_derivative_growth_group_plot",
+                                                                                        label = NULL,
+                                                                                        value = "", placeholder = "max"
+                                                                              )
+                                                                       )
+                                                                     )
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_growth_group_plot",
+                                                                             label = "y-axis title",
+                                                                             value = "Growth [y(t)]"
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_growth_group_plot",
+                                                                             label = "x-axis title",
+                                                                             value = "Time"
+                                                                   ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.data_type_growth_group_plot == 'spline'",
+                                                                     textInput(inputId = "y_axis_title_derivative_growth_group_plot",
+                                                                               label = "y-axis title derivative",
+                                                                               value = "Growth rate"
+                                                                     )
+                                                                   ),
+
+                                                                   sliderInput(inputId = "nbreaks_growth_group_plot",
+                                                                               label = "Number of breaks on y-axis",
+                                                                               min = 1,
+                                                                               max = 20,
+                                                                               value = 6),
+
+                                                                   sliderInput(inputId = "line_width_growth_group_plot",
+                                                                               label = "Line width",
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1.1),
+
+                                                                   sliderInput(inputId = 'base_size_growth_group_plot',
+                                                                               label = 'Base font size',
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 20,
+                                                                               step = 0.5)
+
+                                                                 ), # Side panel growth group plots
+
+                                                                 mainPanel(
+                                                                   withSpinner(
+                                                                     plotOutput("growth_group_plot",
+                                                                                width = "100%", height = "1000px"),
+
+                                                                   ),
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_growth_group_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 10)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_growth_group_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 9)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_growth_group_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_growth_group_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_growth_group_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ) # column
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
+                                                        ),
+
+                                                        ### Growth DR Plots ####
+
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
+                                                                 sidebarPanel(
+                                                                   wellPanel(
+                                                                     style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                     checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot',
+                                                                                   label = 'Combine conditions into a single plot',
+                                                                                   value = TRUE)
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                     textInput(inputId = "select_samples_based_on_string_dose_response_growth_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                     textInput(inputId = "exclude_samples_based_on_string_dose_response_growth_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     )
+                                                                   ),
+
+                                                                   h3('Customize plot appearance'),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_dose_response_growth_plot",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = FALSE),
+
+                                                                   checkboxInput(inputId = "log_transform_x_axis_dose_response_growth_plot",
+                                                                                 label = "Log-transform x-axis",
+                                                                                 value = FALSE),
+
+                                                                   sliderInput(inputId = 'shape_type_dose_response_growth_plot',
+                                                                               label = 'Shape type',
+                                                                               min = 1,
+                                                                               max = 25,
+                                                                               value = 15),
+
+                                                                   sliderInput(inputId = 'shape_size_dose_response_growth_plot',
+                                                                               label = 'Shape size',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2,
+                                                                               step = 0.5),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                     sliderInput(inputId = 'base_size_dose_response_growth_plot',
+                                                                                 label = 'Base size',
+                                                                                 min = 10,
+                                                                                 max = 35,
+                                                                                 value = 15,
+                                                                                 step = 0.5)
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                     sliderInput(inputId = 'axis_size_dose_response_growth_plot',
+                                                                                 label = 'Axis title font size',
+                                                                                 min = 0.1,
+                                                                                 max = 10,
+                                                                                 value = 1.3,
+                                                                                 step = 0.1)
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                     sliderInput(inputId = 'lab_size_dose_response_growth_plot',
+                                                                                 label = 'Axis label font size',
+                                                                                 min = 0.1,
+                                                                                 max = 10,
+                                                                                 value = 1.3,
+                                                                                 step = 0.1)
+                                                                   ),
+
+                                                                   sliderInput(inputId = 'line_width_dose_response_growth_plot',
+                                                                               label = 'Line width',
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1),
+
+                                                                   checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot',
+                                                                                 label = 'Show EC50 indicator lines',
+                                                                                 value = TRUE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_dose_response_growth_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_dose_response_growth_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_dose_response_growth_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_dose_response_growth_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_dose_response_growth_plot",
+                                                                             label = "y-axis title",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_dose_response_growth_plot",
+                                                                             label = "x-axis title",
+                                                                             value = ""
+                                                                   )
+
+                                                                 ), # sidebarPanel
+
+                                                                 conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                                  mainPanel(
+                                                                                    h3('Combined plots'),
+                                                                                    plotOutput("dose_response_growth_plot_combined",
+                                                                                               width = "100%", height = "800px"),
+
+                                                                                    h3(strong("Export plot")),
+
+                                                                                    fluidRow(
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "width_download_dose_response_growth_plot_combined",
+                                                                                                          label = "Width (in inches)",
+                                                                                                          value = 7)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "height_download_dose_response_growth_plot_combined",
+                                                                                                          label = "Height (in inches)",
+                                                                                                          value = 6)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "dpi_download_dose_response_growth_plot_combined",
+                                                                                                          label = "DPI",
+                                                                                                          value = 300)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             downloadButton('download_dose_response_growth_plot_combined',"Download Plot"),
+
+                                                                                             radioButtons("format_download_dose_response_growth_plot_combined",
+                                                                                                          label = NULL,
+                                                                                                          choices = c("PNG" = ".png",
+                                                                                                                      "PDF" = ".pdf"),
+                                                                                                          selected = ".png",
+                                                                                                          inline = TRUE)
+                                                                                      ), # column
+
+
+                                                                                    ) # fluidRow
+                                                                                  ) # mainPanel
+                                                                 ),
+
+                                                                 conditionalPanel(condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                                  mainPanel(
+                                                                                    h3('Individual plots'),
+                                                                                    selectInput(inputId = 'individual_plots_dose_response_growth_plot',
+                                                                                                label = 'Select plot',
+                                                                                                choices = "",
+                                                                                                multiple = FALSE,
+                                                                                                selectize = FALSE,
+                                                                                                size = 3),
+                                                                                    plotOutput("dose_response_growth_plot_individual",
+                                                                                               width = "100%", height = "800px"),
+
+                                                                                    h3(strong("Export plot")),
+
+                                                                                    fluidRow(
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "width_download_dose_response_growth_plot_individual",
+                                                                                                          label = "Width (in inches)",
+                                                                                                          value = 7)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "height_download_dose_response_growth_plot_individual",
+                                                                                                          label = "Height (in inches)",
+                                                                                                          value = 6)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "dpi_download_dose_response_growth_plot_individual",
+                                                                                                          label = "DPI",
+                                                                                                          value = 300)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             downloadButton('download_dose_response_growth_plot_individual',"Download Plot"),
+
+                                                                                             radioButtons("format_download_dose_response_growth_plot_individual",
+                                                                                                          label = NULL,
+                                                                                                          choices = c("PNG" = ".png",
+                                                                                                                      "PDF" = ".pdf"),
+                                                                                                          selected = ".png",
+                                                                                                          inline = TRUE)
+                                                                                      ), # column
+                                                                                    ) # fluidRow
+                                                                                  ) #  mainPanel
+
+                                                                 ),
+
+
+                                                        ), # tabPanel(title = "Dose-response analysis"
+
+                                                        ### Growth DR Plots Bootstrap ####
+
+                                                        tabPanel(title = "Dose-response analysis (Bootstrap)", value = "tabPanel_Visualize_Growth_DoseResponse_bt",
+                                                                 sidebarPanel(
+
+                                                                   h3('Customize plot appearance'),
+
+
+                                                                   sliderInput(inputId = 'shape_type_dose_response_growth_plot_bt',
+                                                                               label = 'Shape type',
+                                                                               min = 1,
+                                                                               max = 25,
+                                                                               value = 15),
+
+                                                                   sliderInput(inputId = 'shape_size_dose_response_growth_plot_bt',
+                                                                               label = 'Shape size',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2,
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = 'axis_size_dose_response_growth_plot_bt',
+                                                                               label = 'Axis title font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.3,
+                                                                               step = 0.1),
+
+
+                                                                   sliderInput(inputId = 'lab_size_dose_response_growth_plot_bt',
+                                                                               label = 'Axis label font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.3,
+                                                                               step = 0.1),
+
+                                                                   sliderInput(inputId = 'line_width_dose_response_growth_plot_bt',
+                                                                               label = 'Line width',
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1),
+
+                                                                 ), # sidebarPanel
+
+                                                                 mainPanel(
+                                                                   h3('Individual plots'),
+                                                                   selectInput(inputId = 'individual_plots_dose_response_growth_plot_bt',
+                                                                               label = 'Select plot',
+                                                                               choices = "",
+                                                                               multiple = FALSE,
+                                                                               selectize = FALSE,
+                                                                               size = 3),
+                                                                   plotOutput("dose_response_growth_plot_individual_bt",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_dose_response_growth_plot_individual_bt",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_dose_response_growth_plot_individual_bt",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_dose_response_growth_plot_individual_bt",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_dose_response_growth_plot_individual_bt',"Download Plot"),
+
+                                                                            radioButtons("format_download_dose_response_growth_plot_individual_bt",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
+
+
+
+                                                        ), # tabPanel(title = "Dose-response analysis"
+
+                                                        ### Growth Parameter Plots ####
+                                                        tabPanel(title = "Parameter plots",
+                                                                 sidebarPanel(
+                                                                   selectInput(inputId = "parameter_growth_parameter_growth_plot",
+                                                                               label = "Parameter",
+                                                                               choices = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
+                                                                             label = "Select sample based on string (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_concentration_growth_parameter_plot",
+                                                                             label = "Select sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_strings_growth_parameter_plot",
+                                                                             label = "Exclude sample based on strings (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_concentration_growth_parameter_plot",
+                                                                             label = "Exclude sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = 'normalize_to_reference_growth_parameter_plot',
+                                                                                 label = 'normalize to reference',
+                                                                                 value = FALSE),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   # Conditional Panel
+                                                                   conditionalPanel(condition = "input.normalize_to_reference_growth_parameter_plot",
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_condition_growth_parameter_plot',
+                                                                                                label = 'Reference condition',
+                                                                                                choices = ""
+                                                                                    ),
+
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_concentration_growth_parameter_plot',
+                                                                                                label = 'Reference concentration',
+                                                                                                choices = ""
+                                                                                    ),
+                                                                   ),
+
+                                                                   sliderInput(inputId = "shape.size_growth_parameter_plot",
+                                                                               label = "Shape size",
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2.5,
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = "basesize_growth_parameter_plot",
+                                                                               label = "Base font size",
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5),
+                                                                   sliderInput(inputId = "label.size_growth_parameter_plot",
+                                                                               label = "Label font size",
+                                                                               min = 5,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5)
+
+
+                                                                 ),
+
+                                                                 mainPanel(
+                                                                   plotOutput("growth_parameter_plot",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_growth_parameter_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_growth_parameter_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_growth_parameter_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+
+                                                                     column(width = 5,
+                                                                            downloadButton('download_growth_parameter_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_growth_parameter_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+
+
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
+                                                        )
+                                            )
+                                   ),
+                                   ## Fluorescence Plots ####
+                                   tabPanel(title = "Fluorescence Plots",  value = "tabPanel_Visualize_Fluorescence",
+                                            h1("Fluorescence Plots"),
+                                            tabsetPanel(type = "tabs",id = "tabsetPanel_Visualize_Fluorescence",
+
+                                                        ### Fluorescence Group Plots ####
+
+                                                        tabPanel(title = "Group plots",
+                                                                 sidebarPanel(
+
+                                                                   selectInput(inputId = "data_type_fluorescence_group_plot",
+                                                                               label = "Data type",
+                                                                               choices = c("Raw fluorescence 1" = "raw1",
+                                                                                           "Raw fluorescence 2" = "raw2",
+                                                                                           "Spline fits FL1" = "spline1",
+                                                                                           "Spline fits FL2" = "spline2",
+                                                                                           "Normalized FL1" = "norm.fl1",
+                                                                                           "Normalized FL2" = "norm.fl2"
+                                                                               )
+                                                                   ),
+
+                                                                   textInput(inputId = "select_samples_based_on_string_fluorescence_group_plot",
+                                                                             label = "Select sample based on string (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "select_samples_based_on_concentration_fluorescence_group_plot",
+                                                                             label = "Select sample based on concentration (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_samples_based_on_string_fluorescence_group_plot",
+                                                                             label = "Exclude sample based on string (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_samples_based_on_concentration_fluorescence_group_plot",
+                                                                             label = "Exclude sample based on concentration (separate by ;)"
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     checkboxInput(inputId = "plot_group_averages_fluorescence_group_plot",
+                                                                                   label = "Plot group averages",
+                                                                                   value = TRUE)
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     checkboxInput(inputId = "plot_derivative_fluorescence_group_plot",
+                                                                                   label = "Plot derivative",
+                                                                                   value = TRUE)
+                                                                   ),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_fluorescence_group_plot",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = FALSE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_fluorescence_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_fluorescence_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_fluorescence_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_fluorescence_group_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
                                                                      )
                                                                    ),
                                                                    conditionalPanel(
-                                                                     condition = 'input.data_type_x_fluorescence.includes("density")',
-                                                                     numericInput(
-                                                                       inputId = 'minimum_density_fluorescence', # TODO inactivate if no density values are present
-                                                                       label = 'minimum_density',
-                                                                       value = 0,
-                                                                       min = NA,
-                                                                       max = NA,
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     strong("y-Range (derivative)"),
+                                                                     fluidRow(
+                                                                       column(5,
+                                                                              textInput(inputId = "y_range_min_derivative_fluorescence_group_plot",
+                                                                                        label = NULL,
+                                                                                        value = "min", placeholder = "min"
+                                                                              )
+                                                                       ),
+
+                                                                       column(5,
+                                                                              textInput(inputId = "y_range_max_derivative_fluorescence_group_plot",
+                                                                                        label = NULL,
+                                                                                        value = "", placeholder = "max"
+                                                                              )
+                                                                       )
                                                                      )
                                                                    ),
+
+                                                                   textInput(inputId = "y_axis_title_fluorescence_group_plot",
+                                                                             label = "y-axis title",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_fluorescence_group_plot",
+                                                                             label = "x-axis title",
+                                                                             value = ""
+                                                                   ),
+
                                                                    conditionalPanel(
-                                                                     condition = 'input.data_type_x_fluorescence.includes("time")',
-                                                                     numericInput(
-                                                                       inputId = 't0_fluorescence', # TODO inactivate if no time values are present
-                                                                       label = 't0',
-                                                                       value = 0,
-                                                                       min = NA,
-                                                                       max = NA,
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     textInput(inputId = "y_axis_title_derivative_fluorescence_group_plot",
+                                                                               label = "y-axis title derivative",
+                                                                               value = ""
                                                                      )
                                                                    ),
-                                                                 ), # wellPanel
+
+                                                                   sliderInput(inputId = "nbreaks_fluorescence_group_plot",
+                                                                               label = "Number of breaks on y-axis",
+                                                                               min = 1,
+                                                                               max = 20,
+                                                                               value = 6),
+
+                                                                   sliderInput(inputId = "line_width_fluorescence_group_plot",
+                                                                               label = "Line width",
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1.1),
+
+                                                                   sliderInput(inputId = 'base_size_fluorescence_group_plot',
+                                                                               label = 'Base font size',
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 20,
+                                                                               step = 0.5)
+
+                                                                 ), # Side panel growth group plots
+
+                                                                 mainPanel(
+                                                                   plotOutput("fluorescence_group_plot",
+                                                                              width = "100%", height = "1000px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_fluorescence_group_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_fluorescence_group_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_fluorescence_group_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_fluorescence_group_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_fluorescence_group_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
 
 
-                                                                 wellPanel(style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
-
-                                                                           h2(strong('Dose-response Analysis')),
-
-                                                                           checkboxInput(inputId = 'perform_ec50_fluorescence',
-                                                                                         label = 'perform dose-response analysis',
-                                                                                         value = FALSE),
+                                                                   ) # fluidRow
+                                                                 ) # mainPanel
 
 
-                                                                           conditionalPanel(condition = 'input.perform_ec50_fluorescence',
+                                                        ),
 
-                                                                                            selectInput(inputId = "dr_method_fluorescence",
-                                                                                                        label = "Method",
-                                                                                                        choices = c("Biosensor response model" = "model",
-                                                                                                                    "Response spline fit" = "spline")
-                                                                                            ), # TODO tooltip with reference to Meyer et al., 2019
+                                                        ### Fluorescence DR Plots Spline ####
 
-                                                                                            selectInput(inputId = "response_parameter_fluorescence",
-                                                                                                        label = "Response Parameter",
-                                                                                                        choices = ""),
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_spline",
+                                                                 sidebarPanel(
+                                                                   wellPanel(
+                                                                     style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                     checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_fluorescence_plot',
+                                                                                   label = 'Combine conditions into a single plot',
+                                                                                   value = TRUE)
+                                                                   ),
 
-                                                                                            checkboxInput(inputId = 'log_transform_concentration_fluorescence',
-                                                                                                          label = 'log transform concentration'),
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                     textInput(inputId = "select_samples_based_on_string_dose_response_fluorescence_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     )
+                                                                   ),
 
-                                                                                            checkboxInput(inputId = 'log_transform_response_fluorescence',
-                                                                                                          label = 'log transform response'),
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                     textInput(inputId = "exclude_samples_based_on_string_dose_response_fluorescence_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     )
+                                                                   ),
 
-                                                                                            numericInput(
-                                                                                              inputId = 'number_of_bootstrappings_dr_fluorescence',
-                                                                                              label = 'Number of bootstrappings',
-                                                                                              value = 0,
-                                                                                              min = NA,
-                                                                                              max = NA,
-                                                                                            ),
-                                                                                            conditionalPanel(
-                                                                                              condition = 'input.dr_method_fluorescence == "spline"',
-                                                                                              textInput(
-                                                                                                inputId = 'smoothing_factor_fluorescence_dr',
-                                                                                                label = 'Smoothing factor dose-response splines',
-                                                                                                value = ""
-                                                                                              )
-                                                                                            )
-                                                                           ) # conditionalPanel(condition = "input.perform_ec50_fluorescence"
-                                                                 ), # wellPanel
+                                                                   h3('Customize plot appearance'),
 
-                                                                 # [Run Computation] button
-                                                                 conditionalPanel(
-                                                                   condition = 'output.fluorescence_present',
+                                                                   checkboxInput(inputId = "log_transform_y_axis_dose_response_fluorescence_plot",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = FALSE),
+
+                                                                   checkboxInput(inputId = "log_transform_x_axis_dose_response_fluorescence_plot",
+                                                                                 label = "Log-transform x-axis",
+                                                                                 value = FALSE),
+
+                                                                   sliderInput(inputId = 'shape_type_dose_response_fluorescence_plot',
+                                                                               label = 'Shape type',
+                                                                               min = 1,
+                                                                               max = 25,
+                                                                               value = 15),
+
+                                                                   sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot',
+                                                                               label = 'Shape size',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2,
+                                                                               step = 0.5),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                     sliderInput(inputId = 'base_size_dose_response_fluorescence_plot',
+                                                                                 label = 'Base font size',
+                                                                                 min = 10,
+                                                                                 max = 35,
+                                                                                 value = 15,
+                                                                                 step = 0.5)
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                     sliderInput(inputId = 'axis_size_dose_response_fluorescence_plot',
+                                                                                 label = 'Axis title font size',
+                                                                                 min = 0.1,
+                                                                                 max = 10,
+                                                                                 value = 1.5,
+                                                                                 step = 0.1)
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                     sliderInput(inputId = 'lab_size_dose_response_fluorescence_plot',
+                                                                                 label = 'Axis label font size',
+                                                                                 min = 0.1,
+                                                                                 max = 10,
+                                                                                 value = 1.3,
+                                                                                 step = 0.1)
+                                                                   ),
+
+                                                                   sliderInput(inputId = 'line_width_dose_response_fluorescence_plot',
+                                                                               label = 'Line width',
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1),
+
+                                                                   checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_fluorescence_plot',
+                                                                                 label = 'Show EC50 indicator lines',
+                                                                                 value = TRUE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_dose_response_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_dose_response_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_dose_response_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_dose_response_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_dose_response_fluorescence_plot",
+                                                                             label = "y-axis title",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_dose_response_fluorescence_plot",
+                                                                             label = "x-axis title",
+                                                                             value = ""
+                                                                   )
+
+                                                                 ), # sidebarPanel
+
+                                                                 conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                                  mainPanel(
+                                                                                    h3('Combined plots'),
+                                                                                    plotOutput("dose_response_plot_fluorescence_combined",
+                                                                                               width = "100%", height = "800px"),
+
+                                                                                    h3(strong("Export plot")),
+
+                                                                                    fluidRow(
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "width_download_dose_response_plot_fluorescence_combined",
+                                                                                                          label = "Width (in inches)",
+                                                                                                          value = 7)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "height_download_dose_response_plot_fluorescence_combined",
+                                                                                                          label = "Height (in inches)",
+                                                                                                          value = 6)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "dpi_download_dose_response_plot_fluorescence_combined",
+                                                                                                          label = "DPI",
+                                                                                                          value = 300)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             downloadButton('download_dose_response_plot_fluorescence_combined',"Download Plot"),
+
+                                                                                             radioButtons("format_download_dose_response_plot_fluorescence_combined",
+                                                                                                          label = NULL,
+                                                                                                          choices = c("PNG" = ".png",
+                                                                                                                      "PDF" = ".pdf"),
+                                                                                                          selected = ".png",
+                                                                                                          inline = TRUE)
+                                                                                      ), # column
+
+
+                                                                                    ) # fluidRow
+                                                                                  ) # mainPanel
+                                                                 ),
+
+                                                                 conditionalPanel(condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
+                                                                                  mainPanel(
+                                                                                    h3('Individual plots'),
+                                                                                    selectInput(inputId = 'individual_plots_dose_response_fluorescence_plot',
+                                                                                                label = 'Select plot',
+                                                                                                choices = "",
+                                                                                                multiple = FALSE,
+                                                                                                selectize = FALSE,
+                                                                                                size = 3),
+
+                                                                                    plotOutput("dose_response_fluorescence_plot_individual",
+                                                                                               width = "100%", height = "800px"),
+
+                                                                                    h3(strong("Export plot")),
+
+                                                                                    fluidRow(
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "width_download_dose_response_fluorescence_plot_individual",
+                                                                                                          label = "Width (in inches)",
+                                                                                                          value = 7)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "height_download_dose_response_fluorescence_plot_individual",
+                                                                                                          label = "Height (in inches)",
+                                                                                                          value = 6)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "dpi_download_dose_response_fluorescence_plot_individual",
+                                                                                                          label = "DPI",
+                                                                                                          value = 300)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             downloadButton('download_dose_response_fluorescence_plot_individual',"Download Plot"),
+
+                                                                                             radioButtons("format_download_dose_response_fluorescence_plot_individual",
+                                                                                                          label = NULL,
+                                                                                                          choices = c("PNG" = ".png",
+                                                                                                                      "PDF" = ".pdf"),
+                                                                                                          selected = ".png",
+                                                                                                          inline = TRUE)
+                                                                                      ), # column
+                                                                                    ) # fluidRow
+                                                                                  ) # mainPanel
+
+                                                                 ), # conditionalPanel
+                                                        ), #  tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_spline",
+
+                                                        ### Fluorescence DR Plots Model ####
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_model",
+                                                                 sidebarPanel(
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_dose_response_model_fluorescence_plot",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = TRUE),
+
+                                                                   checkboxInput(inputId = "log_transform_x_axis_dose_response_model_fluorescence_plot",
+                                                                                 label = "Log-transform x-axis",
+                                                                                 value = TRUE),
+
+                                                                   h3('Customize plot appearance'),
+                                                                   sliderInput(inputId = 'shape_type_dose_response_model_fluorescence_plot',
+                                                                               label = 'Shape type',
+                                                                               min = 1,
+                                                                               max = 25,
+                                                                               value = 15),
+
+                                                                   sliderInput(inputId = 'shape_size_dose_response_model_fluorescence_plot',
+                                                                               label = 'Shape size',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 1,
+                                                                               step = 0.1),
+
+                                                                   sliderInput(inputId = 'axis_size_dose_response_model_fluorescence_plot',
+                                                                               label = 'Axis title font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.5,
+                                                                               step = 0.1),
+
+                                                                   sliderInput(inputId = 'lab_size_dose_response_model_fluorescence_plot',
+                                                                               label = 'Axis label font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.3,
+                                                                               step = 0.1),
+
+                                                                   sliderInput(inputId = 'line_width_dose_response_model_fluorescence_plot',
+                                                                               label = 'Line width',
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1),
+
+                                                                   checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_model_fluorescence_plot',
+                                                                                 label = 'Show EC50 indicator lines',
+                                                                                 value = TRUE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_dose_response_model_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_dose_response_model_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_dose_response_model_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_dose_response_model_fluorescence_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+                                                                 ), # sidebarPanel
+
+                                                                 mainPanel(
+                                                                   selectInput(inputId = 'individual_plots_dose_response_model_fluorescence_plot',
+                                                                               label = 'Select plot',
+                                                                               choices = "",
+                                                                               multiple = FALSE,
+                                                                               selectize = FALSE,
+                                                                               size = 3),
+                                                                   plotOutput("dose_response_model_fluorescence_plot_individual",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_dose_response_model_fluorescence_plot_individual",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_dose_response_model_fluorescence_plot_individual",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_dose_response_model_fluorescence_plot_individual",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_dose_response_model_fluorescence_plot_individual',"Download Plot"),
+
+                                                                            radioButtons("format_download_dose_response_model_fluorescence_plot_individual",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+
+
+                                                                   ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ), # tabPanel(title = "Dose-response analysis",
+
+                                                        ### Fluorescence Parameter Plots ####
+
+                                                        tabPanel(title = "Parameter plots",
+                                                                 sidebarPanel(
+                                                                   selectInput(inputId = "parameter_fluorescence_parameter_fluorescence_plot",
+                                                                               label = "Parameter",
+                                                                               choices = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
+                                                                             label = "Select sample based on string (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_concentration_fluorescence_parameter_plot",
+                                                                             label = "Select sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_strings_fluorescence_parameter_plot",
+                                                                             label = "Exclude sample based on strings (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_concentration_fluorescence_parameter_plot",
+                                                                             label = "Exclude sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = 'normalize_to_reference_fluorescence_parameter_plot',
+                                                                                 label = 'normalize to reference',
+                                                                                 value = FALSE),
+
+                                                                   # Conditional Panel
+                                                                   conditionalPanel(condition = "input.normalize_to_reference_fluorescence_parameter_plot",
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_condition_fluorescence_parameter_plot',
+                                                                                                label = 'Reference condition',
+                                                                                                choices = ""
+                                                                                    ),
+
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_concentration_fluorescence_parameter_plot',
+                                                                                                label = 'Reference concentration',
+                                                                                                choices = ""
+                                                                                    ),
+                                                                   ),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   sliderInput(inputId = "shape.size_fluorescence_parameter_plot",
+                                                                               label = "Shape size",
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2.5,
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = "basesize_fluorescence_parameter_plot",
+                                                                               label = "Base font size",
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5)
+
+
+                                                                 ),
+
+                                                                 mainPanel(
+                                                                   plotOutput("fluorescence_parameter_plot",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_fluorescence_parameter_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_fluorescence_parameter_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_fluorescence_parameter_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_fluorescence_parameter_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_fluorescence_parameter_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+                                                                   ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ), #  tabPanel(title = "Parameter plots"
+                                                        ## Growth & Fluorescence Plots ####
+
+                                                        tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_Dual",
+                                                                 h1("Growth & Flourescence Plot"),
+
+                                                                 sidebarPanel(
+
+                                                                   selectInput(inputId = "fluorescence_type_dual_plot",
+                                                                               label = "Fluorescence type",
+                                                                               choices = c("Fluorescence 1" = "fl1",
+                                                                                           "Fluorescence 1" = "fl2",
+                                                                                           "Normalized fluorescence 1" = "norm.fl1",
+                                                                                           "Normalized fluorescence 2" = "norm.fl2")
+                                                                   ),
+
+                                                                   textInput(inputId = "select_samples_based_on_string_dual_plot",
+                                                                             label = "Select sample based on string (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "select_samples_based_on_concentration_dual_plot",
+                                                                             label = "Select sample based on concentration (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_samples_based_on_string_dual_plot",
+                                                                             label = "Exclude sample based on string (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
+                                                                             label = "Exclude sample based on concentration (separate by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "plot_group_averages_dual_plot",
+                                                                                 label = "Plot group averages",
+                                                                                 value = TRUE),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_density_dual_plot",
+                                                                                 label = "Log-transform y-axis (Density)",
+                                                                                 value = FALSE),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_fluorescence_dual_plot",
+                                                                                 label = "Log-transform y-axis (Fluorescence)",
+                                                                                 value = FALSE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range (Density)"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_density_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_density_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range (Fluorescence"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_fluorescence_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_fluorescence_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_density_dual_plot",
+                                                                             label = "y-axis title (Density)",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_fluorescence_dual_plot",
+                                                                             label = "y-axis title (Fluorescence)",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_dual_plot",
+                                                                             label = "x-axis title",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   sliderInput(inputId = "nbreaks_dual_plot",
+                                                                               label = "Number of breaks on y-axis",
+                                                                               min = 1,
+                                                                               max = 20,
+                                                                               value = 6),
+
+                                                                   sliderInput(inputId = "line_width_dual_plot",
+                                                                               label = "Line width",
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1.1),
+
+                                                                   sliderInput(inputId = 'base_size_dual_plot',
+                                                                               label = 'Base font size',
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 20,
+                                                                               step = 0.5)
+                                                                 ),
+
+                                                                 mainPanel(
+                                                                   plotOutput("dual_plot",
+                                                                              width = "100%", height = "1000px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_dual_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_dual_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_dual_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_dual_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_dual_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+                                                                   ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ) # tabPanel(title = "Growth & Flourescence Plot")
+                                            ) # tabsetPanel(type = "tabs",
+                                   ), # tabPanel(title = "Fluorescence Plots"
+
+
+                        ), # navbarMenu("Visualize"
+
+                        #____REPORT____####
+
+
+                        tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
+                                 tabsetPanel(type = "tabs", id = "tabsetPanel_Report",
+                                             ##____Growth report___####
+                                             tabPanel(title = "Growth", value = "tabPanel_report_growth",
+                                                      sidebarPanel(width = 6,
+                                                                   shinyDirButton("report_dir_growth",
+                                                                                  "Choose destination for saving",
+                                                                                  "Choose destination for saving"),
+
+                                                                   verbatimTextOutput("report_dir_growth", placeholder = TRUE),
+
+                                                                   textInput(inputId = 'report_filename_growth',
+                                                                             label = 'Choose file name',
+                                                                             value = 'GrowthReport'),
+
+                                                                   selectInput(inputId = 'report_filetype_growth',
+                                                                               label = 'Choose file type',
+                                                                               choices = c('PDF' = 'pdf', 'HTML' = 'html')),
+
+                                                                   conditionalPanel(condition = "input.report_filetype_growth == 'pdf'",
+                                                                                    fluidRow(
+                                                                                      column(12,
+                                                                                             div(
+                                                                                               actionButton(inputId = "render_report_growth_pdf",
+                                                                                                            label = "Render report",
+                                                                                                            icon=icon("file-pdf"),
+                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               style="float:right")
+                                                                                      )
+                                                                                    )
+                                                                   ),
+                                                                   conditionalPanel(condition = "input.report_filetype_growth == 'html'",
+                                                                                    fluidRow(
+                                                                                      column(12,
+                                                                                             div(
+                                                                                               actionButton(inputId = "render_report_growth_html",
+                                                                                                            label = "Render report",
+                                                                                                            icon=icon("file-code"),
+                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               style="float:right")
+                                                                                      )
+                                                                                    )
+                                                                   )
+                                                      ) # sidebarPanel
+                                             ), # tabPanel(title = "Growth", value = "tabs_export_data_growth",
+                                             tabPanel(title = "Fluorescence", value = "tabPanel_report_fluorescence",
+                                                      sidebarPanel(width = 6,
+                                                                   shinyDirButton("report_dir_fluorescence",
+                                                                                  "Choose destination for saving",
+                                                                                  "Choose destination for saving"),
+
+                                                                   verbatimTextOutput("report_dir_fluorescence", placeholder = TRUE),
+
+                                                                   textInput(inputId = 'report_filename_fluorescence',
+                                                                             label = 'Choose file name',
+                                                                             value = 'FluorescenceReport'),
+
+                                                                   selectInput(inputId = 'report_filetype_fluorescence',
+                                                                               label = 'Choose file type',
+                                                                               choices = c('PDF' = 'pdf', 'HTML' = 'html')),
+
+                                                                   conditionalPanel(condition = "input.report_filetype_fluorescence == 'pdf'",
+                                                                                    fluidRow(
+                                                                                      column(12,
+                                                                                             div(
+                                                                                               actionButton(inputId = "render_report_fluorescence_pdf",
+                                                                                                            label = "Render report",
+                                                                                                            icon=icon("file-pdf"),
+                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               style="float:right")
+                                                                                      )
+                                                                                    )
+                                                                   ),
+                                                                   conditionalPanel(condition = "input.report_filetype_fluorescence == 'html'",
+                                                                                    fluidRow(
+                                                                                      column(12,
+                                                                                             div(
+                                                                                               actionButton(inputId = "render_report_fluorescence_html",
+                                                                                                            label = "Render report",
+                                                                                                            icon=icon("file-code"),
+                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               style="float:right")
+                                                                                      )
+                                                                                    )
+                                                                   )
+                                                      ) # sidebarPanel
+                                             ) # tabPanel(title = "Growth", value = "tabs_export_data_fluorescence",
+                                 ) # tabsetPanel(type = "tabs", id = "tabs_report",
+                        ), # tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
+                        #___Export RData___####
+                        tabPanel('Export data',
+                                 icon = icon("file-lines"),
+                                 value = "tabPanel_Export_RData",
+                                 tabsetPanel(type = "tabs", id = "tabsetPanel_Export_Data",
+                                             ##____Growth results export____####
+                                             tabPanel(title = "Growth", value = "tabPanel_export_data_growth",
+                                                      sidebarPanel(width = 6,
+                                                                   shinyDirButton(id = "export_RData_growth_dir",
+                                                                                  label = "Choose destination for saving",
+                                                                                  title = "Choose destination for saving"),
+
+                                                                   verbatimTextOutput("export_RData_growth_dir", placeholder = TRUE),
+
+                                                                   textInput(inputId = 'export_RData_growth_filename',
+                                                                             label = 'Choose file name',
+                                                                             value = 'growth_results'),
+
                                                                    fluidRow(
                                                                      column(12,
                                                                             div(
-                                                                              actionButton(inputId = "run_fluorescence",
-                                                                                           label = "Run computation",
-                                                                                           icon=icon("gears"),
+                                                                              actionButton(inputId = "export_RData_growth",
+                                                                                           label = "Export RData file",
+                                                                                           icon=icon("file-export"),
                                                                                            style="padding:5px; font-size:120%"),
                                                                               style="float:right")
                                                                      )
                                                                    )
-                                                                 )
-                                                   ) # sidebarPanel
-                                            ), # column
-
-                                            column(8,
-                                                   conditionalPanel(
-                                                     condition = "input.linear_regression_fluorescence",
-                                                     sidebarPanel(
-                                                       width = 4,
-                                                       style='border-color: #ADADAD; padding-top: 0',
-                                                       h3(strong('Linear fit')),
-
-                                                       numericInput(
-                                                         inputId = 'R2_threshold_fluorescence',
-                                                         label = 'R2 threshold',
-                                                         value = 0.95,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-
-                                                       numericInput(
-                                                         inputId = 'RSD_threshold_fluorescence',
-                                                         label = 'RSD threshold',
-                                                         value = 0.1,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-
-                                                       numericInput(
-                                                         inputId = 'dY_threshold_fluorescence',
-                                                         label = 'dY threshold',
-                                                         value = 0.05,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-                                                       checkboxInput(inputId = 'log_transform_data_linear_fluorescence',
-                                                                     label = 'Log-transform fluorescence data'),
-
-                                                       checkboxInput(inputId = 'log_transform_x_linear_fluorescence',
-                                                                     label = 'Log-transform x data'),
-
-                                                       checkboxInput(inputId = 'custom_sliding_window_size_fluorescence',
-                                                                     label = 'custom sliding window size',
-                                                                     value = FALSE),
-
-                                                       conditionalPanel(
-                                                         condition = "input.custom_sliding_window_size_fluorescence",
-                                                         numericInput(
-                                                           inputId = 'custom_sliding_window_size_value_gfluorescence',
-                                                           label = NULL,
-                                                           value = "",
-                                                           min = NA,
-                                                           max = NA,
-                                                         )
-                                                       )
-                                                     )
-                                                   ), # conditionalPanel
-
-                                                   conditionalPanel(
-                                                     condition = "input.nonparametric_fit_fluorescence",
-                                                     sidebarPanel(
-                                                       width = 4,
-                                                       style='border-color: #ADADAD; padding-top: 0',
-                                                       h3(strong('Nonparametric fit')),
-
-                                                       numericInput(
-                                                         inputId = 'smoothing_factor_nonparametric_fluorescence',
-                                                         label = 'smoothing factor',
-                                                         value = 0.75,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-
-                                                       numericInput(
-                                                         inputId = 'number_of_bootstrappings_fluorescence',
-                                                         label = 'number of bootstrappings',
-                                                         value = 0,
-                                                         min = NA,
-                                                         max = NA,
-                                                       ),
-                                                       checkboxInput(inputId = 'log_transform_data_nonparametric_fluorescence',
-                                                                     label = 'Log-transform fluorescence data'),
-
-                                                       checkboxInput(inputId = 'log_transform_x_nonparametric_fluorescence',
-                                                                     label = 'Log-transform x data')
-                                                     )
-                                                   )  # conditionalPanel
-                                            ) # column
-                                          ) # sidebarLayout
-                                        ) # fluidRow
-                               ), # tabPanel("Fluorescence"
-                    ), # navbarMenu('Computation'
-
-                    #____RESULTS____####
-
-                    navbarMenu(title = "Results", menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
-                               ##____Results_Growth___####
-                               tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
-                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Growth",
-                                                    tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
-                                                             conditionalPanel(condition = "input.biphasic_growth",
-                                                                              h5("(Values in parentheses indicate parameters for secondary growth phase)")
-                                                             ),
-                                                             DT::dataTableOutput('results_table_growth_linear'),
-                                                             downloadButton('download_table_growth_linear',"Download table")
-                                                    ),
-                                                    tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
-                                                             conditionalPanel(condition = "input.biphasic_growth",
-                                                                              h5("(Values in parentheses indicate parameters for secondary growth phase)")
-                                                             ),
-                                                             DT::dataTableOutput('results_table_growth_spline'),
-                                                             downloadButton('download_table_growth_spline',"Download table")
-                                                    ),
-                                                    tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Growth_Spline_bt",
-                                                             DT::dataTableOutput('results_table_growth_spline_bt'),
-                                                             downloadButton('download_table_growth_spline_bt',"Download table")
-                                                    ),
-                                                    tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
-                                                             DT::dataTableOutput('results_table_growth_model'),
-                                                             downloadButton('download_table_growth_model',"Download table")
-                                                    )
-                                        )
-                               ),
-                               ##____Results_Fluorescence___####
-                               tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
-                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Fluorescence",
-                                                    tabPanel(title = "Linear Fit", value = "tabPanel_Results_Fluorescence_Linear",
-                                                             conditionalPanel(condition = "input.biphasic_fluorescence",
-                                                                              h5("(Values in parentheses indicate parameters for secondary phase)")
-                                                             ),
-                                                             DT::dataTableOutput('results_table_fluorescence1_linear'),
-                                                             downloadButton('download_table_fluorescence1_linear',"Download table")
-                                                    ),
-                                                    tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Fluorescence_Spline",
-                                                             conditionalPanel(condition = "input.biphasic_fluorescence",
-                                                                              h5("(Values in parentheses indicate parameters for secondary phase)")
-                                                             ),
-                                                             DT::dataTableOutput('results_table_fluorescence1_spline'),
-                                                             downloadButton('download_table_fluorescence1_spline',"Download table")
-                                                    ),
-                                                    tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Fluorescence_Spline_bt",
-                                                             DT::dataTableOutput('results_table_fluorescence1_spline_bt'),
-                                                             downloadButton('download_table_fluorescence1_spline_bt',"Download table")
-                                                    ),
-                                        )
-                               )
-                    ),
-                    #____VALIDATE____####
-                    navbarMenu("Validate",  menuName = "navbarMenu_Validate", icon = icon("user-check"),
-                               ##____Validate_Growth____####
-                               tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
-                                        h1("Growth Fits"),
-                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Validate_Growth",
-                                                    ###___Linear Fits___####
-                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_Linear",
-                                                             sidebarPanel(width = 5,
-                                                                          selectInput(inputId = "sample_validate_growth_linear",
-                                                                                      label = "Sample:",
-                                                                                      width = "fit-content",
-                                                                                      choices = "",
-                                                                                      multiple = FALSE,
-                                                                                      selectize = FALSE,
-                                                                                      size = 5
-                                                                          ),
-                                                                          checkboxInput(inputId = 'logy_validate_growth_plot_linear',
-                                                                                        label = 'Log-transform y axis',
-                                                                                        value = TRUE),
-                                                                          checkboxInput(inputId = 'diagnostics_validate_growth_plot_linear',
-                                                                                        label = 'Show diagnostics',
-                                                                                        value = FALSE),
-
-                                                                          h3('Customize plot appearance'),
-
-
-                                                                          sliderInput(inputId = 'shape_type_validate_growth_plot_linear',
-                                                                                      label = 'Shape type',
-                                                                                      min = 1,
-                                                                                      max = 25,
-                                                                                      value = 1),
-
-                                                                          sliderInput(inputId = 'shape_size_validate_growth_plot_linear',
-                                                                                      label = 'Shape size',
-                                                                                      min = 1,
-                                                                                      max = 10,
-                                                                                      value = 2,
-                                                                                      step = 0.5),
-
-
-
-                                                                          sliderInput(inputId = 'axis_size_validate_growth_plot_linear',
-                                                                                      label = 'Axis title font size',
-                                                                                      min = 0.1,
-                                                                                      max = 10,
-                                                                                      value = 1.9,
-                                                                                      step = 0.1),
-
-                                                                          sliderInput(inputId = 'lab_size_validate_growth_plot_linear',
-                                                                                      label = 'Axis label font size',
-                                                                                      min = 0.1,
-                                                                                      max = 10,
-                                                                                      value = 1.7,
-                                                                                      step = 0.1),
-
-                                                                          sliderInput(inputId = 'line_width_validate_growth_plot_linear',
-                                                                                      label = 'Line width',
-                                                                                      min = 0.01,
-                                                                                      max = 10,
-                                                                                      value = 0.5),
-
-
-                                                                          strong("x-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_min_validate_growth_plot_linear",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_max_validate_growth_plot_linear",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                                          strong("y-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_min_validate_growth_plot_linear",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_max_validate_growth_plot_linear",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                             ),
-                                                             mainPanel(width = 7,
-                                                                       plotOutput("validate_growth_plot_linear", width = "100%", height = "600px"),
-                                                                       fluidRow(
-                                                                         column(6, align = "center", offset = 3,
-                                                                                actionButton(inputId = "rerun_growth_linear",
-                                                                                             label = "Re-run with modified parameters",
-                                                                                             icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%"),
-                                                                                actionButton(inputId = "restore_growth_linear",
-                                                                                             label = "Restore fit",
-                                                                                             # icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%")
-                                                                         )
-                                                                       ),
-
-                                                                       HTML("<br>"),
-                                                                       h3(strong("Export plot")),
-
-                                                                       fluidRow(
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "width_download_growth_validate_linear",
-                                                                                             label = "Width (in inches)",
-                                                                                             value = 10)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "height_download_growth_validate_linear",
-                                                                                             label = "Height (in inches)",
-                                                                                             value = 9)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "dpi_download_growth_validate_linear",
-                                                                                             label = "DPI",
-                                                                                             value = 300)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                downloadButton('download_growth_validate_linear',"Download Plot"),
-                                                                                radioButtons("format_download_growth_validate_linear",
-                                                                                             label = NULL,
-                                                                                             choices = c("PNG" = ".png",
-                                                                                                         "PDF" = ".pdf"),
-                                                                                             selected = ".png",
-                                                                                             inline = TRUE)
-                                                                         ) # column
-                                                                       ) # fluidRow
-                                                             ) #mainPanel
-
-                                                    ), #tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_linearFits",
-                                                    ###___Spline Fits___####
-                                                    tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_Spline",
-                                                             sidebarPanel(width = 5,
-                                                                          selectInput(inputId = "sample_validate_growth_spline",
-                                                                                      label = "Sample:",
-                                                                                      width = "fit-content",
-                                                                                      choices = "",
-                                                                                      multiple = FALSE,
-                                                                                      selectize = FALSE,
-                                                                                      size = 5,
-                                                                          ),
-                                                                          checkboxInput(inputId = 'logy_validate_growth_plot_spline',
-                                                                                        label = 'Log-transform y axis',
-                                                                                        value = TRUE),
-
-                                                                          strong("x-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_min_validate_growth_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_max_validate_growth_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                                          strong("y-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_min_validate_growth_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_max_validate_growth_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                                          conditionalPanel(
-                                                                            condition = "input.logy_validate_growth_plot_spline",
-                                                                            strong("y-Range (derivative)"),
-                                                                            fluidRow(
-                                                                              column(5,
-                                                                                     textInput(inputId = "y_range_min_derivative_validate_growth_plot_spline",
-                                                                                               label = NULL,
-                                                                                               value = "", placeholder = "min"
-                                                                                     )
-                                                                              ),
-
-                                                                              column(5,
-                                                                                     textInput(inputId = "y_range_max_derivative_validate_growth_plot_spline",
-                                                                                               label = NULL,
-                                                                                               value = "", placeholder = "max"
-                                                                                     )
-                                                                              )
-                                                                            )
-                                                                          ),
-
-                                                                          sliderInput(inputId = 'shape_size_validate_growth_plot_spline',
-                                                                                      label = 'Shape size',
-                                                                                      min = 1,
-                                                                                      max = 10,
-                                                                                      value = 2,
-                                                                                      step = 0.5),
-
-                                                                          sliderInput(inputId = "line_width_validate_growth_plot_spline",
-                                                                                      label = "Line width",
-                                                                                      min = 0.01,
-                                                                                      max = 10,
-                                                                                      value = 1.1),
-
-                                                                          sliderInput(inputId = 'base_size_validate_growth_plot_spline',
-                                                                                      label = 'Base font size',
-                                                                                      min = 10,
-                                                                                      max = 35,
-                                                                                      value = 20,
-                                                                                      step = 0.5)
-
-                                                             ),
-                                                             mainPanel(width = 7,
-                                                                       withSpinner(
-                                                                         plotOutput("validate_growth_plot_spline",
-                                                                                    width = "100%", height = "700px")
-                                                                       ),
-                                                                       fluidRow(
-                                                                         column(6, align = "center", offset = 3,
-                                                                                actionButton(inputId = "rerun_growth_spline",
-                                                                                             label = "Re-run with modified parameters",
-                                                                                             icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%"),
-                                                                                actionButton(inputId = "restore_growth_spline",
-                                                                                             label = "Restore fit",
-                                                                                             # icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%")
-                                                                         )
-                                                                       ),
-
-                                                                       HTML("<br>"),
-
-                                                                       h3(strong("Export plot")),
-
-                                                                       fluidRow(
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "width_download_growth_validate_spline",
-                                                                                             label = "Width (in inches)",
-                                                                                             value = 10)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "height_download_growth_validate_spline",
-                                                                                             label = "Height (in inches)",
-                                                                                             value = 9)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "dpi_download_growth_validate_spline",
-                                                                                             label = "DPI",
-                                                                                             value = 300)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                downloadButton('download_growth_validate_spline',"Download Plot"),
-
-                                                                                radioButtons("format_download_growth_validate_spline",
-                                                                                             label = NULL,
-                                                                                             choices = c("PNG" = ".png",
-                                                                                                         "PDF" = ".pdf"),
-                                                                                             selected = ".png",
-                                                                                             inline = TRUE)
-                                                                         ) # column
-                                                                       ) # fluidRow
-                                                             ) # mainPanel
-
-                                                    ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
-                                                    ###___Model Fits___####
-                                                    tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_Model",
-                                                             sidebarPanel(width = 5,
-                                                                          wellPanel(
-                                                                            style='background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
-                                                                            selectInput(inputId = "sample_validate_growth_model",
-                                                                                        label = "Sample:",
-                                                                                        width = "fit-content",
-                                                                                        choices = "",
-                                                                                        multiple = FALSE,
-                                                                                        selectize = FALSE,
-                                                                                        size = 5,
-                                                                            )
-                                                                          )
-
-                                                             ),
-                                                             mainPanel(width = 7,
-                                                                       withSpinner(
-                                                                         plotOutput("validate_growth_plot_model",
-                                                                                    width = "100%", height = "600px")
-                                                                       ),
-                                                                       fluidRow(
-                                                                         column(6, align = "center", offset = 3,
-                                                                                actionButton(inputId = "rerun_growth_model",
-                                                                                             label = "Re-run with modified parameters",
-                                                                                             icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%"),
-
-                                                                                actionButton(inputId = "restore_growth_model",
-                                                                                             label = "Restore fit",
-                                                                                             # icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%")
-                                                                         )
-                                                                       ),
-
-                                                                       HTML("<br>"),
-
-                                                                       h3(strong("Export plot")),
-
-                                                                       fluidRow(
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "width_download_growth_validate_model",
-                                                                                             label = "Width (in inches)",
-                                                                                             value = 10)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "height_download_growth_validate_model",
-                                                                                             label = "Height (in inches)",
-                                                                                             value = 9)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "dpi_download_growth_validate_model",
-                                                                                             label = "DPI",
-                                                                                             value = 300)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                downloadButton('download_growth_validate_model',"Download Plot"),
-
-                                                                                radioButtons("format_download_growth_validate_model",
-                                                                                             label = NULL,
-                                                                                             choices = c("PNG" = ".png",
-                                                                                                         "PDF" = ".pdf"),
-                                                                                             selected = ".png",
-                                                                                             inline = TRUE)
-                                                                         ) # column
-                                                                       ) # fluidRow
-                                                             ) # mainPanel
-                                                    ), # tabPanel(title = "Parametric fits", value = "tabPanel_Validate_Growth_modelFits",
-                                                    ### Growth Boostrapping Spline Plots ####
-                                                    tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Growth_Spline_bt",
-                                                             sidebarPanel(width = 4,
-                                                                          selectInput(inputId = "sample_validate_growth_spline_bt",
-                                                                                      label = "Sample:",
-                                                                                      width = "fit-content",
-                                                                                      choices = "",
-                                                                                      multiple = FALSE,
-                                                                                      selectize = FALSE,
-                                                                                      size = 5,
-                                                                          ),
-
-                                                                          checkboxInput(inputId = "plot_derivative_growth_spline_bt",
-                                                                                        label = "Plot derivative",
-                                                                                        value = TRUE),
-
-                                                                          h3('Customize plot appearance'),
-
-
-                                                                          sliderInput(inputId = 'shape_type_validate_growth_spline_bt',
-                                                                                      label = 'Shape type',
-                                                                                      min = 1,
-                                                                                      max = 25,
-                                                                                      value = 1),
-
-                                                                          sliderInput(inputId = 'shape_size_validate_growth_spline_bt',
-                                                                                      label = 'Shape size',
-                                                                                      min = 1,
-                                                                                      max = 10,
-                                                                                      value = 2,
-                                                                                      step = 0.5),
-
-
-
-                                                                          sliderInput(inputId = 'axis_size_validate_growth_spline_bt',
-                                                                                      label = 'Axis title font size',
-                                                                                      min = 0.1,
-                                                                                      max = 10,
-                                                                                      value = 1.9,
-                                                                                      step = 0.1),
-
-                                                                          sliderInput(inputId = 'lab_size_validate_growth_spline_bt',
-                                                                                      label = 'Axis label font size',
-                                                                                      min = 0.1,
-                                                                                      max = 10,
-                                                                                      value = 1.7,
-                                                                                      step = 0.1),
-
-                                                                          sliderInput(inputId = 'line_width_validate_growth_spline_bt',
-                                                                                      label = 'Line width',
-                                                                                      min = 0.01,
-                                                                                      max = 10,
-                                                                                      value = 0.5),
-
-
-                                                                          strong("x-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_min_validate_growth_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_max_validate_growth_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                                          strong("y-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_min_validate_growth_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_max_validate_growth_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-                                                                          strong("y-Range (derivative)"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_min_derivative_validate_growth_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_max_derivative_validate_growth_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                             ), # sidebarPanel
-
-                                                             mainPanel(width = 8,
-
-                                                               plotOutput("validate_growth_plot_spline_bt",
-                                                                          width = "100%", height = "1000px"),
-
-                                                               HTML("<br>"),
-                                                               h3(strong("Export plot")),
-
-                                                               fluidRow(
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "width_download_growth_validate_spline_bt",
-                                                                                     label = "Width (in inches)",
-                                                                                     value = 10)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "height_download_growth_validate_spline_bt",
-                                                                                     label = "Height (in inches)",
-                                                                                     value = 9)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "dpi_download_growth_validate_spline_bt",
-                                                                                     label = "DPI",
-                                                                                     value = 300)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        downloadButton('download_growth_validate_spline_bt',"Download Plot"),
-                                                                        radioButtons("format_download_growth_validate_spline_bt",
-                                                                                     label = NULL,
-                                                                                     choices = c("PNG" = ".png",
-                                                                                                 "PDF" = ".pdf"),
-                                                                                     selected = ".png",
-                                                                                     inline = TRUE)
-                                                                 ) # column
-                                                               ) # fluidRow
-                                                             ) # mainPanel
-                                                    ) # tabPanel(title = "Bootstrapping Spline"
-                                        ) # tabsetPanel(type = "tabs",
-                               ), # tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
-                               ##____Validate_Fluorescence____####
-                               tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
-                                        h1("Fluorescence Fits"),
-                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Validate_Fluorescence",
-                                                    ###___Linear Fits___####
-                                                    tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Fluorescence_Linear",
-                                                             sidebarPanel(width = 5,
-                                                                          selectInput(inputId = "sample_validate_fluorescence_linear",
-                                                                                      label = "Sample:",
-                                                                                      width = "fit-content",
-                                                                                      choices = "",
-                                                                                      multiple = FALSE,
-                                                                                      selectize = FALSE,
-                                                                                      size = 5
-                                                                          ),
-                                                                          checkboxInput(inputId = 'logy_validate_fluorescence_plot_linear',
-                                                                                        label = 'Log-transform y axis',
-                                                                                        value = FALSE),
-                                                                          checkboxInput(inputId = 'diagnostics_validate_fluorescence_plot_linear',
-                                                                                        label = 'Show diagnostics',
-                                                                                        value = FALSE)
-
-                                                             ),
-                                                             mainPanel(width = 7,
-                                                                       plotOutput("validate_fluorescence_plot_linear", width = "100%", height = "600px"),
-                                                                       fluidRow(
-                                                                         column(6, align = "center", offset = 3,
-                                                                                actionButton(inputId = "rerun_fluorescence_linear",
-                                                                                             label = "Re-run with modified parameters",
-                                                                                             icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%"),
-                                                                                actionButton(inputId = "restore_fluorescence_linear",
-                                                                                             label = "Restore fit",
-                                                                                             # icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%")
-                                                                         )
-                                                                       )
-                                                             )
-
-                                                    ),
-                                                    ###___Spline Fits___####
-                                                    tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_Spline",
-                                                             sidebarPanel(width = 5,
-                                                                          selectInput(inputId = "sample_validate_fluorescence_spline",
-                                                                                      label = "Sample:",
-                                                                                      width = "fit-content",
-                                                                                      choices = "",
-                                                                                      multiple = FALSE,
-                                                                                      selectize = FALSE,
-                                                                                      size = 5,
-                                                                          ),
-                                                                          checkboxInput(inputId = 'logy_validate_fluorescence_plot_spline',
-                                                                                        label = 'Log-transform y axis',
-                                                                                        value = FALSE),
-
-                                                                          strong("x-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_min_validate_fluorescence_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_max_validate_fluorescence_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                                          strong("y-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_min_validate_fluorescence_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_max_validate_fluorescence_plot_spline",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                                          conditionalPanel(
-                                                                            condition = "input.logy_validate_growth_plot_spline",
-                                                                            strong("y-Range (derivative)"),
-                                                                            fluidRow(
-                                                                              column(5,
-                                                                                     textInput(inputId = "y_range_min_derivative_validate_fluorescence_plot_spline",
-                                                                                               label = NULL,
-                                                                                               value = "", placeholder = "min"
-                                                                                     )
-                                                                              ),
-
-                                                                              column(5,
-                                                                                     textInput(inputId = "y_range_max_derivative_validate_fluorescence_plot_spline",
-                                                                                               label = NULL,
-                                                                                               value = "", placeholder = "max"
-                                                                                     )
-                                                                              )
-                                                                            )
-                                                                          ),
-
-                                                                          sliderInput(inputId = "line_width_validate_fluorescence_plot_spline",
-                                                                                      label = "Line width",
-                                                                                      min = 0.01,
-                                                                                      max = 10,
-                                                                                      value = 1.1),
-
-                                                                          sliderInput(inputId = 'base_size_validate_fluorescence_plot_spline',
-                                                                                      label = 'Base font size',
-                                                                                      min = 10,
-                                                                                      max = 35,
-                                                                                      value = 20,
-                                                                                      step = 0.5)
-
-                                                             ),
-                                                             mainPanel(width = 7,
-                                                                       #conditional if diagnostics
-                                                                       withSpinner(
-                                                                         plotOutput("validate_fluorescence_plot_spline",
-                                                                                    width = "100%", height = "700px")
-                                                                       ),
-                                                                       fluidRow(
-                                                                         column(6, align = "center", offset = 3,
-                                                                                actionButton(inputId = "rerun_fluorescence_spline",
-                                                                                             label = "Re-run with modified parameters",
-                                                                                             icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%"),
-                                                                                actionButton(inputId = "restore_fluorescence_spline",
-                                                                                             label = "Restore fit",
-                                                                                             # icon=icon("gears"),
-                                                                                             style="padding:5px; font-size:120%")
-                                                                         ) # column
-                                                                       ) # fluidRow
-                                                             ) # mainPanel
-                                                    ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
-
-                                                    tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Fluorescence_Spline_bt",
-                                                             sidebarPanel(width = 4,
-                                                                          selectInput(inputId = "sample_validate_fluorescence_spline_bt",
-                                                                                      label = "Sample:",
-                                                                                      width = "fit-content",
-                                                                                      choices = "",
-                                                                                      multiple = FALSE,
-                                                                                      selectize = FALSE,
-                                                                                      size = 5,
-                                                                          ),
-
-                                                                          checkboxInput(inputId = "plot_derivative_fluorescence_spline_bt",
-                                                                                        label = "Plot derivative",
-                                                                                        value = TRUE),
-
-                                                                          h3('Customize plot appearance'),
-
-
-                                                                          sliderInput(inputId = 'shape_type_validate_fluorescence_spline_bt',
-                                                                                      label = 'Shape type',
-                                                                                      min = 1,
-                                                                                      max = 25,
-                                                                                      value = 1),
-
-                                                                          sliderInput(inputId = 'shape_size_validate_fluorescence_spline_bt',
-                                                                                      label = 'Shape size',
-                                                                                      min = 1,
-                                                                                      max = 10,
-                                                                                      value = 2,
-                                                                                      step = 0.5),
-
-
-
-                                                                          sliderInput(inputId = 'axis_size_validate_fluorescence_spline_bt',
-                                                                                      label = 'Axis title font size',
-                                                                                      min = 0.1,
-                                                                                      max = 10,
-                                                                                      value = 1.9,
-                                                                                      step = 0.1),
-
-                                                                          sliderInput(inputId = 'lab_size_validate_fluorescence_spline_bt',
-                                                                                      label = 'Axis label font size',
-                                                                                      min = 0.1,
-                                                                                      max = 10,
-                                                                                      value = 1.7,
-                                                                                      step = 0.1),
-
-                                                                          sliderInput(inputId = 'line_width_validate_fluorescence_spline_bt',
-                                                                                      label = 'Line width',
-                                                                                      min = 0.01,
-                                                                                      max = 10,
-                                                                                      value = 0.5),
-
-
-                                                                          strong("x-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_min_validate_fluorescence_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "x_range_max_validate_fluorescence_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                                          strong("y-Range"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_min_validate_fluorescence_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_max_validate_fluorescence_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-                                                                          strong("y-Range (derivative)"),
-                                                                          fluidRow(
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_min_derivative_validate_fluorescence_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "min"
-                                                                                   )
-                                                                            ),
-
-                                                                            column(5,
-                                                                                   textInput(inputId = "y_range_max_derivative_validate_fluorescence_spline_bt",
-                                                                                             label = NULL,
-                                                                                             value = "", placeholder = "max"
-                                                                                   )
-                                                                            )
-                                                                          ),
-
-                                                             ), # sidebarPanel
-
-                                                             mainPanel(width = 8,
-
-                                                                       plotOutput("validate_fluorescence_plot_spline_bt",
-                                                                                  width = "100%", height = "1000px"),
-
-                                                                       HTML("<br>"),
-                                                                       h3(strong("Export plot")),
-
-                                                                       fluidRow(
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "width_download_fluorescence_validate_spline_bt",
-                                                                                             label = "Width (in inches)",
-                                                                                             value = 10)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "height_download_fluorescence_validate_spline_bt",
-                                                                                             label = "Height (in inches)",
-                                                                                             value = 9)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                numericInput(inputId = "dpi_download_fluorescence_validate_spline_bt",
-                                                                                             label = "DPI",
-                                                                                             value = 300)
-                                                                         ), # column
-                                                                         column(width = 4,
-                                                                                downloadButton('download_fluorescence_validate_spline_bt',"Download Plot"),
-                                                                                radioButtons("format_download_fluorescence_validate_spline_bt",
-                                                                                             label = NULL,
-                                                                                             choices = c("PNG" = ".png",
-                                                                                                         "PDF" = ".pdf"),
-                                                                                             selected = ".png",
-                                                                                             inline = TRUE)
-                                                                         ) # column
-                                                                       ) # fluidRow
-                                                             ) # mainPanel
-                                                    ) # tabPanel(title = "Bootstrapping Spline"
-                                        ) # tabsetPanel(type = "tabs",
-                               ) # tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
-                    ), # navbarMenu("Validate", icon = icon("user-check"),
-                    #____Visualize____####
-                    navbarMenu("Visualize",  menuName = "navbarMenu_Visualize", icon = icon("chart-line"),
-                               ## Growth Plots ####
-                               tabPanel(title = "Growth Plots", value = "tabPanel_Visualize_Growth",
-                                        h1("Growth Plots"),
-                                        tabsetPanel(type = "tabs", id = "tabsetPanel_Visualize_Growth",
-
-                                                    ### Growth Group Plots ####
-
-                                                    tabPanel(title = "Group plots",
-                                                             sidebarPanel(
-
-                                                               selectInput(inputId = "data_type_growth_group_plot",
-                                                                           label = "Data type",
-                                                                           choices = c("Raw density" = "raw",
-                                                                                       "Spline fits" = "spline")
-                                                               ),
-
-                                                               textInput(inputId = "select_samples_based_on_string_growth_group_plot",
-                                                                         label = "Select sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "select_samples_based_on_concentration_growth_group_plot",
-                                                                         label = "Select sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_string_growth_group_plot",
-                                                                         label = "Exclude sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plot",
-                                                                         label = "Exclude sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               checkboxInput(inputId = "plot_group_averages_growth_group_plot",
-                                                                             label = "Plot group averages",
-                                                                             value = TRUE),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.data_type_growth_group_plot == 'spline'",
-                                                                 checkboxInput(inputId = "plot_derivative_growth_group_plot",
-                                                                               label = "Plot derivative",
-                                                                               value = TRUE)
-                                                               ),
-
-                                                               h3("Customize plot appearance"),
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_growth_group_plot",
-                                                                             label = "Log-transform y-axis",
-                                                                             value = TRUE),
-
-                                                               strong("x-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_min_growth_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_max_growth_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               strong("y-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_growth_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_growth_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.data_type_growth_group_plot == 'spline'",
-                                                                 strong("y-Range (derivative)"),
-                                                                 fluidRow(
-                                                                   column(5,
-                                                                          textInput(inputId = "y_range_min_derivative_growth_group_plot",
-                                                                                    label = NULL,
-                                                                                    value = "", placeholder = "min"
-                                                                          )
-                                                                   ),
-
-                                                                   column(5,
-                                                                          textInput(inputId = "y_range_max_derivative_growth_group_plot",
-                                                                                    label = NULL,
-                                                                                    value = "", placeholder = "max"
-                                                                          )
+                                                      )
+
+                                             ),
+                                             ##Fluorescence results export____####
+                                             tabPanel(title = "Fluorescence", value = "tabPanel_export_data_fluorescence",
+                                                      sidebarPanel(width = 6,
+                                                                   shinyDirButton(id = "export_RData_fluorescence_dir",
+                                                                                  label = "Choose destination for saving",
+                                                                                  title = "Choose destination for saving"),
+
+                                                                   verbatimTextOutput("export_RData_fluorescence_dir", placeholder = TRUE),
+
+                                                                   textInput(inputId = 'export_RData_fluorescence_filename',
+                                                                             label = 'Choose file name',
+                                                                             value = 'fluorescence_results'),
+
+                                                                   fluidRow(
+                                                                     column(12,
+                                                                            div(
+                                                                              actionButton(inputId = "export_RData_fluorescence",
+                                                                                           label = "Export RData file",
+                                                                                           icon=icon("file-export"),
+                                                                                           style="padding:5px; font-size:120%"),
+                                                                              style="float:right")
+                                                                     )
                                                                    )
-                                                                 )
-                                                               ),
-
-                                                               textInput(inputId = "y_axis_title_growth_group_plot",
-                                                                         label = "y-axis title",
-                                                                         value = "Growth [y(t)]"
-                                                               ),
-
-                                                               textInput(inputId = "x_axis_title_growth_group_plot",
-                                                                         label = "x-axis title",
-                                                                         value = "Time"
-                                                               ),
-                                                               conditionalPanel(
-                                                                 condition = "input.data_type_growth_group_plot == 'spline'",
-                                                                 textInput(inputId = "y_axis_title_derivative_growth_group_plot",
-                                                                           label = "y-axis title derivative",
-                                                                           value = "Growth rate"
-                                                                 )
-                                                               ),
-
-                                                               sliderInput(inputId = "nbreaks_growth_group_plot",
-                                                                           label = "Number of breaks on y-axis",
-                                                                           min = 1,
-                                                                           max = 20,
-                                                                           value = 6),
-
-                                                               sliderInput(inputId = "line_width_growth_group_plot",
-                                                                           label = "Line width",
-                                                                           min = 0.01,
-                                                                           max = 10,
-                                                                           value = 1.1),
-
-                                                               sliderInput(inputId = 'base_size_growth_group_plot',
-                                                                           label = 'Base font size',
-                                                                           min = 10,
-                                                                           max = 35,
-                                                                           value = 20,
-                                                                           step = 0.5)
-
-                                                             ), # Side panel growth group plots
-
-                                                             mainPanel(
-                                                               withSpinner(
-                                                                 plotOutput("growth_group_plot",
-                                                                            width = "100%", height = "1000px"),
-
-                                                               ),
-                                                               h3(strong("Export plot")),
-
-                                                               fluidRow(
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "width_download_growth_group_plot",
-                                                                                     label = "Width (in inches)",
-                                                                                     value = 10)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "height_download_growth_group_plot",
-                                                                                     label = "Height (in inches)",
-                                                                                     value = 9)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "dpi_download_growth_group_plot",
-                                                                                     label = "DPI",
-                                                                                     value = 300)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        downloadButton('download_growth_group_plot',"Download Plot"),
-
-                                                                        radioButtons("format_download_growth_group_plot",
-                                                                                     label = NULL,
-                                                                                     choices = c("PNG" = ".png",
-                                                                                                 "PDF" = ".pdf"),
-                                                                                     selected = ".png",
-                                                                                     inline = TRUE)
-                                                                 ) # column
-                                                               ) # fluidRow
-                                                             ) #  mainPanel
-                                                    ),
-
-                                                    ### Growth DR Plots ####
-
-                                                    tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
-                                                             sidebarPanel(
-                                                               wellPanel(
-                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                                 checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot',
-                                                                               label = 'Combine conditions into a single plot',
-                                                                               value = TRUE)
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                 textInput(inputId = "select_samples_based_on_string_dose_response_growth_plot",
-                                                                           label = "Select sample based on string (separate by ;)"
-                                                                 )
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                 textInput(inputId = "exclude_samples_based_on_string_dose_response_growth_plot",
-                                                                           label = "Exclude sample based on string (separate by ;)"
-                                                                 )
-                                                               ),
-
-                                                               h3('Customize plot appearance'),
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_growth_plot",
-                                                                             label = "Log-transform y-axis",
-                                                                             value = FALSE),
-
-                                                               checkboxInput(inputId = "log_transform_x_axis_dose_response_growth_plot",
-                                                                             label = "Log-transform x-axis",
-                                                                             value = FALSE),
-
-                                                               sliderInput(inputId = 'shape_type_dose_response_growth_plot',
-                                                                           label = 'Shape type',
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
-
-                                                               sliderInput(inputId = 'shape_size_dose_response_growth_plot',
-                                                                           label = 'Shape size',
-                                                                           min = 1,
-                                                                           max = 10,
-                                                                           value = 2,
-                                                                           step = 0.5),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                 sliderInput(inputId = 'base_size_dose_response_growth_plot',
-                                                                             label = 'Base size',
-                                                                             min = 10,
-                                                                             max = 35,
-                                                                             value = 15,
-                                                                             step = 0.5)
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                 sliderInput(inputId = 'axis_size_dose_response_growth_plot',
-                                                                             label = 'Axis title font size',
-                                                                             min = 0.1,
-                                                                             max = 10,
-                                                                             value = 1.3,
-                                                                             step = 0.1)
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                 sliderInput(inputId = 'lab_size_dose_response_growth_plot',
-                                                                             label = 'Axis label font size',
-                                                                             min = 0.1,
-                                                                             max = 10,
-                                                                             value = 1.3,
-                                                                             step = 0.1)
-                                                               ),
-
-                                                               sliderInput(inputId = 'line_width_dose_response_growth_plot',
-                                                                           label = 'Line width',
-                                                                           min = 0.01,
-                                                                           max = 10,
-                                                                           value = 1),
-
-                                                               checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot',
-                                                                             label = 'Show EC50 indicator lines',
-                                                                             value = TRUE),
-
-                                                               strong("x-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_min_dose_response_growth_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_max_dose_response_growth_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               strong("y-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_dose_response_growth_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_dose_response_growth_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               textInput(inputId = "y_axis_title_dose_response_growth_plot",
-                                                                         label = "y-axis title",
-                                                                         value = ""
-                                                               ),
-
-                                                               textInput(inputId = "x_axis_title_dose_response_growth_plot",
-                                                                         label = "x-axis title",
-                                                                         value = ""
-                                                               )
-
-                                                             ), # sidebarPanel
-
-                                                             conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                              mainPanel(
-                                                                                h3('Combined plots'),
-                                                                                plotOutput("dose_response_growth_plot_combined",
-                                                                                           width = "100%", height = "800px"),
-
-                                                                                h3(strong("Export plot")),
-
-                                                                                fluidRow(
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "width_download_dose_response_growth_plot_combined",
-                                                                                                      label = "Width (in inches)",
-                                                                                                      value = 7)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "height_download_dose_response_growth_plot_combined",
-                                                                                                      label = "Height (in inches)",
-                                                                                                      value = 6)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "dpi_download_dose_response_growth_plot_combined",
-                                                                                                      label = "DPI",
-                                                                                                      value = 300)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         downloadButton('download_dose_response_growth_plot_combined',"Download Plot"),
-
-                                                                                         radioButtons("format_download_dose_response_growth_plot_combined",
-                                                                                                      label = NULL,
-                                                                                                      choices = c("PNG" = ".png",
-                                                                                                                  "PDF" = ".pdf"),
-                                                                                                      selected = ".png",
-                                                                                                      inline = TRUE)
-                                                                                  ), # column
-
-
-                                                                                ) # fluidRow
-                                                                              ) # mainPanel
-                                                             ),
-
-                                                             conditionalPanel(condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                              mainPanel(
-                                                                                h3('Individual plots'),
-                                                                                selectInput(inputId = 'individual_plots_dose_response_growth_plot',
-                                                                                            label = 'Select plot',
-                                                                                            choices = "",
-                                                                                            multiple = FALSE,
-                                                                                            selectize = FALSE,
-                                                                                            size = 3),
-                                                                                plotOutput("dose_response_growth_plot_individual",
-                                                                                           width = "100%", height = "800px"),
-
-                                                                                h3(strong("Export plot")),
-
-                                                                                fluidRow(
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "width_download_dose_response_growth_plot_individual",
-                                                                                                      label = "Width (in inches)",
-                                                                                                      value = 7)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "height_download_dose_response_growth_plot_individual",
-                                                                                                      label = "Height (in inches)",
-                                                                                                      value = 6)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "dpi_download_dose_response_growth_plot_individual",
-                                                                                                      label = "DPI",
-                                                                                                      value = 300)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         downloadButton('download_dose_response_growth_plot_individual',"Download Plot"),
-
-                                                                                         radioButtons("format_download_dose_response_growth_plot_individual",
-                                                                                                      label = NULL,
-                                                                                                      choices = c("PNG" = ".png",
-                                                                                                                  "PDF" = ".pdf"),
-                                                                                                      selected = ".png",
-                                                                                                      inline = TRUE)
-                                                                                  ), # column
-                                                                                ) # fluidRow
-                                                                              ) #  mainPanel
-
-                                                             ),
-
-
-                                                    ), # tabPanel(title = "Dose-response analysis"
-
-                                                    ### Growth DR Plots Bootstrap ####
-
-                                                    tabPanel(title = "Dose-response analysis (Bootstrap)", value = "tabPanel_Visualize_Growth_DoseResponse_bt",
-                                                             sidebarPanel(
-
-                                                               h3('Customize plot appearance'),
-
-
-                                                               sliderInput(inputId = 'shape_type_dose_response_growth_plot_bt',
-                                                                           label = 'Shape type',
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
-
-                                                               sliderInput(inputId = 'shape_size_dose_response_growth_plot_bt',
-                                                                           label = 'Shape size',
-                                                                           min = 1,
-                                                                           max = 10,
-                                                                           value = 2,
-                                                                           step = 0.5),
-
-                                                                 sliderInput(inputId = 'axis_size_dose_response_growth_plot_bt',
-                                                                             label = 'Axis title font size',
-                                                                             min = 0.1,
-                                                                             max = 10,
-                                                                             value = 1.3,
-                                                                             step = 0.1),
-
-
-                                                                 sliderInput(inputId = 'lab_size_dose_response_growth_plot_bt',
-                                                                             label = 'Axis label font size',
-                                                                             min = 0.1,
-                                                                             max = 10,
-                                                                             value = 1.3,
-                                                                             step = 0.1),
-
-                                                               sliderInput(inputId = 'line_width_dose_response_growth_plot_bt',
-                                                                           label = 'Line width',
-                                                                           min = 0.01,
-                                                                           max = 10,
-                                                                           value = 1),
-
-                                                             ), # sidebarPanel
-
-                                                                              mainPanel(
-                                                                                h3('Individual plots'),
-                                                                                selectInput(inputId = 'individual_plots_dose_response_growth_plot_bt',
-                                                                                            label = 'Select plot',
-                                                                                            choices = "",
-                                                                                            multiple = FALSE,
-                                                                                            selectize = FALSE,
-                                                                                            size = 3),
-                                                                                plotOutput("dose_response_growth_plot_individual_bt",
-                                                                                           width = "100%", height = "800px"),
-
-                                                                                h3(strong("Export plot")),
-
-                                                                                fluidRow(
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "width_download_dose_response_growth_plot_individual_bt",
-                                                                                                      label = "Width (in inches)",
-                                                                                                      value = 7)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "height_download_dose_response_growth_plot_individual_bt",
-                                                                                                      label = "Height (in inches)",
-                                                                                                      value = 6)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "dpi_download_dose_response_growth_plot_individual_bt",
-                                                                                                      label = "DPI",
-                                                                                                      value = 300)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         downloadButton('download_dose_response_growth_plot_individual_bt',"Download Plot"),
-
-                                                                                         radioButtons("format_download_dose_response_growth_plot_individual_bt",
-                                                                                                      label = NULL,
-                                                                                                      choices = c("PNG" = ".png",
-                                                                                                                  "PDF" = ".pdf"),
-                                                                                                      selected = ".png",
-                                                                                                      inline = TRUE)
-                                                                                  ), # column
-                                                                                ) # fluidRow
-                                                                              ) #  mainPanel
-
-
-
-                                                    ), # tabPanel(title = "Dose-response analysis"
-
-                                                    ### Growth Parameter Plots ####
-                                                    tabPanel(title = "Parameter plots",
-                                                             sidebarPanel(
-                                                               selectInput(inputId = "parameter_growth_parameter_growth_plot",
-                                                                           label = "Parameter",
-                                                                           choices = ""
-                                                               ),
-
-                                                               textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
-                                                                         label = "Select sample based on string (separated by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "select_sample_based_on_concentration_growth_parameter_plot",
-                                                                         label = "Select sample based on concentration (separated by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_sample_based_on_strings_growth_parameter_plot",
-                                                                         label = "Exclude sample based on strings (separated by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_sample_based_on_concentration_growth_parameter_plot",
-                                                                         label = "Exclude sample based on concentration (separated by ;)"
-                                                               ),
-
-                                                               checkboxInput(inputId = 'normalize_to_reference_growth_parameter_plot',
-                                                                             label = 'normalize to reference',
-                                                                             value = FALSE),
-
-                                                               h3("Customize plot appearance"),
-
-                                                               # Conditional Panel
-                                                               conditionalPanel(condition = "input.normalize_to_reference_growth_parameter_plot",
-                                                                                # reactive selection
-                                                                                selectInput(inputId = 'reference_condition_growth_parameter_plot',
-                                                                                            label = 'Reference condition',
-                                                                                            choices = ""
-                                                                                ),
-
-                                                                                # reactive selection
-                                                                                selectInput(inputId = 'reference_concentration_growth_parameter_plot',
-                                                                                            label = 'Reference concentration',
-                                                                                            choices = ""
-                                                                                ),
-                                                               ),
-
-                                                               sliderInput(inputId = "shape.size_growth_parameter_plot",
-                                                                           label = "Shape size",
-                                                                           min = 1,
-                                                                           max = 10,
-                                                                           value = 2.5,
-                                                                           step = 0.5),
-
-                                                               sliderInput(inputId = "basesize_growth_parameter_plot",
-                                                                           label = "Base font size",
-                                                                           min = 10,
-                                                                           max = 35,
-                                                                           value = 12,
-                                                                           step = 0.5),
-                                                               sliderInput(inputId = "label.size_growth_parameter_plot",
-                                                                           label = "Label font size",
-                                                                           min = 5,
-                                                                           max = 35,
-                                                                           value = 12,
-                                                                           step = 0.5)
-
-
-                                                             ),
-
-                                                             mainPanel(
-                                                               plotOutput("growth_parameter_plot",
-                                                                          width = "100%", height = "800px"),
-
-                                                               h3(strong("Export plot")),
-
-                                                               fluidRow(
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "width_download_growth_parameter_plot",
-                                                                                     label = "Width (in inches)",
-                                                                                     value = 7)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "height_download_growth_parameter_plot",
-                                                                                     label = "Height (in inches)",
-                                                                                     value = 6)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "dpi_download_growth_parameter_plot",
-                                                                                     label = "DPI",
-                                                                                     value = 300)
-                                                                 ), # column
-
-                                                                 column(width = 5,
-                                                                        downloadButton('download_growth_parameter_plot',"Download Plot"),
-
-                                                                        radioButtons("format_download_growth_parameter_plot",
-                                                                                     label = NULL,
-                                                                                     choices = c("PNG" = ".png",
-                                                                                                 "PDF" = ".pdf"),
-                                                                                     selected = ".png",
-                                                                                     inline = TRUE)
-                                                                 ), # column
-
-
-                                                               ) # fluidRow
-                                                             ) #  mainPanel
-                                                    )
-                                        )
-                               ),
-                               ## Fluorescence Plots ####
-                               tabPanel(title = "Fluorescence Plots",  value = "tabPanel_Visualize_Fluorescence",
-                                        h1("Fluorescence Plots"),
-                                        tabsetPanel(type = "tabs",id = "tabsetPanel_Visualize_Fluorescence",
-
-                                                    ### Fluorescence Group Plots ####
-
-                                                    tabPanel(title = "Group plots",
-                                                             sidebarPanel(
-
-                                                               selectInput(inputId = "data_type_fluorescence_group_plot",
-                                                                           label = "Data type",
-                                                                           choices = c("Raw fluorescence 1" = "raw1",
-                                                                                       "Raw fluorescence 2" = "raw2",
-                                                                                       "Spline fits FL1" = "spline1",
-                                                                                       "Spline fits FL2" = "spline2",
-                                                                                       "Normalized FL1" = "norm.fl1",
-                                                                                       "Normalized FL2" = "norm.fl2"
-                                                                                       )
-                                                               ),
-
-                                                               textInput(inputId = "select_samples_based_on_string_fluorescence_group_plot",
-                                                                         label = "Select sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "select_samples_based_on_concentration_fluorescence_group_plot",
-                                                                         label = "Select sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_string_fluorescence_group_plot",
-                                                                         label = "Exclude sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_concentration_fluorescence_group_plot",
-                                                                         label = "Exclude sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
-                                                                 checkboxInput(inputId = "plot_group_averages_fluorescence_group_plot",
-                                                                               label = "Plot group averages",
-                                                                               value = TRUE)
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
-                                                                 checkboxInput(inputId = "plot_derivative_fluorescence_group_plot",
-                                                                               label = "Plot derivative",
-                                                                               value = TRUE)
-                                                               ),
-
-                                                               h3("Customize plot appearance"),
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_fluorescence_group_plot",
-                                                                             label = "Log-transform y-axis",
-                                                                             value = FALSE),
-
-                                                               strong("x-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_min_fluorescence_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_max_fluorescence_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               strong("y-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_fluorescence_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_fluorescence_group_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-                                                               conditionalPanel(
-                                                                 condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
-                                                                 strong("y-Range (derivative)"),
-                                                                 fluidRow(
-                                                                   column(5,
-                                                                          textInput(inputId = "y_range_min_derivative_fluorescence_group_plot",
-                                                                                    label = NULL,
-                                                                                    value = "min", placeholder = "min"
-                                                                          )
-                                                                   ),
-
-                                                                   column(5,
-                                                                          textInput(inputId = "y_range_max_derivative_fluorescence_group_plot",
-                                                                                    label = NULL,
-                                                                                    value = "", placeholder = "max"
-                                                                          )
-                                                                   )
-                                                                 )
-                                                               ),
-
-                                                               textInput(inputId = "y_axis_title_fluorescence_group_plot",
-                                                                         label = "y-axis title",
-                                                                         value = ""
-                                                               ),
-
-                                                               textInput(inputId = "x_axis_title_fluorescence_group_plot",
-                                                                         label = "x-axis title",
-                                                                         value = ""
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
-                                                                 textInput(inputId = "y_axis_title_derivative_fluorescence_group_plot",
-                                                                           label = "y-axis title derivative",
-                                                                           value = ""
-                                                                 )
-                                                               ),
-
-                                                               sliderInput(inputId = "nbreaks_fluorescence_group_plot",
-                                                                           label = "Number of breaks on y-axis",
-                                                                           min = 1,
-                                                                           max = 20,
-                                                                           value = 6),
-
-                                                               sliderInput(inputId = "line_width_fluorescence_group_plot",
-                                                                           label = "Line width",
-                                                                           min = 0.01,
-                                                                           max = 10,
-                                                                           value = 1.1),
-
-                                                               sliderInput(inputId = 'base_size_fluorescence_group_plot',
-                                                                           label = 'Base font size',
-                                                                           min = 10,
-                                                                           max = 35,
-                                                                           value = 20,
-                                                                           step = 0.5)
-
-                                                             ), # Side panel growth group plots
-
-                                                             mainPanel(
-                                                               plotOutput("fluorescence_group_plot",
-                                                                          width = "100%", height = "1000px"),
-
-                                                               h3(strong("Export plot")),
-
-                                                               fluidRow(
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "width_download_fluorescence_group_plot",
-                                                                                     label = "Width (in inches)",
-                                                                                     value = 7)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "height_download_fluorescence_group_plot",
-                                                                                     label = "Height (in inches)",
-                                                                                     value = 6)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "dpi_download_fluorescence_group_plot",
-                                                                                     label = "DPI",
-                                                                                     value = 300)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        downloadButton('download_fluorescence_group_plot',"Download Plot"),
-
-                                                                        radioButtons("format_download_fluorescence_group_plot",
-                                                                                     label = NULL,
-                                                                                     choices = c("PNG" = ".png",
-                                                                                                 "PDF" = ".pdf"),
-                                                                                     selected = ".png",
-                                                                                     inline = TRUE)
-                                                                 ), # column
-
-
-                                                               ) # fluidRow
-                                                             ) # mainPanel
-
-
-                                                    ),
-
-                                                    ### Fluorescence DR Plots Spline ####
-
-                                                    tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_spline",
-                                                             sidebarPanel(
-                                                               wellPanel(
-                                                                 style='background-color:#F0EBE4; padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                                 checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_fluorescence_plot',
-                                                                               label = 'Combine conditions into a single plot',
-                                                                               value = TRUE)
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
-                                                                 textInput(inputId = "select_samples_based_on_string_dose_response_fluorescence_plot",
-                                                                           label = "Select sample based on string (separate by ;)"
-                                                                 )
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
-                                                                 textInput(inputId = "exclude_samples_based_on_string_dose_response_fluorescence_plot",
-                                                                           label = "Exclude sample based on string (separate by ;)"
-                                                                 )
-                                                               ),
-
-                                                               h3('Customize plot appearance'),
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_fluorescence_plot",
-                                                                             label = "Log-transform y-axis",
-                                                                             value = FALSE),
-
-                                                               checkboxInput(inputId = "log_transform_x_axis_dose_response_fluorescence_plot",
-                                                                             label = "Log-transform x-axis",
-                                                                             value = FALSE),
-
-                                                               sliderInput(inputId = 'shape_type_dose_response_fluorescence_plot',
-                                                                           label = 'Shape type',
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
-
-                                                               sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot',
-                                                                           label = 'Shape size',
-                                                                           min = 1,
-                                                                           max = 10,
-                                                                           value = 2,
-                                                                           step = 0.5),
-
-                                                               conditionalPanel(
-                                                                 condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
-                                                                 sliderInput(inputId = 'base_size_dose_response_fluorescence_plot',
-                                                                             label = 'Base font size',
-                                                                             min = 10,
-                                                                             max = 35,
-                                                                             value = 15,
-                                                                             step = 0.5)
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
-                                                                 sliderInput(inputId = 'axis_size_dose_response_fluorescence_plot',
-                                                                             label = 'Axis title font size',
-                                                                             min = 0.1,
-                                                                             max = 10,
-                                                                             value = 1.5,
-                                                                             step = 0.1)
-                                                               ),
-
-                                                               conditionalPanel(
-                                                                 condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
-                                                                 sliderInput(inputId = 'lab_size_dose_response_fluorescence_plot',
-                                                                             label = 'Axis label font size',
-                                                                             min = 0.1,
-                                                                             max = 10,
-                                                                             value = 1.3,
-                                                                             step = 0.1)
-                                                               ),
-
-                                                               sliderInput(inputId = 'line_width_dose_response_fluorescence_plot',
-                                                                           label = 'Line width',
-                                                                           min = 0.01,
-                                                                           max = 10,
-                                                                           value = 1),
-
-                                                               checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_fluorescence_plot',
-                                                                             label = 'Show EC50 indicator lines',
-                                                                             value = TRUE),
-
-                                                               strong("x-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_min_dose_response_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_max_dose_response_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               strong("y-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_dose_response_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_dose_response_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               textInput(inputId = "y_axis_title_dose_response_fluorescence_plot",
-                                                                         label = "y-axis title",
-                                                                         value = ""
-                                                               ),
-
-                                                               textInput(inputId = "x_axis_title_dose_response_fluorescence_plot",
-                                                                         label = "x-axis title",
-                                                                         value = ""
-                                                               )
-
-                                                             ), # sidebarPanel
-
-                                                             conditionalPanel(condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
-                                                                              mainPanel(
-                                                                                h3('Combined plots'),
-                                                                                plotOutput("dose_response_plot_fluorescence_combined",
-                                                                                           width = "100%", height = "800px"),
-
-                                                                                h3(strong("Export plot")),
-
-                                                                                fluidRow(
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "width_download_dose_response_plot_fluorescence_combined",
-                                                                                                      label = "Width (in inches)",
-                                                                                                      value = 7)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "height_download_dose_response_plot_fluorescence_combined",
-                                                                                                      label = "Height (in inches)",
-                                                                                                      value = 6)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "dpi_download_dose_response_plot_fluorescence_combined",
-                                                                                                      label = "DPI",
-                                                                                                      value = 300)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         downloadButton('download_dose_response_plot_fluorescence_combined',"Download Plot"),
-
-                                                                                         radioButtons("format_download_dose_response_plot_fluorescence_combined",
-                                                                                                      label = NULL,
-                                                                                                      choices = c("PNG" = ".png",
-                                                                                                                  "PDF" = ".pdf"),
-                                                                                                      selected = ".png",
-                                                                                                      inline = TRUE)
-                                                                                  ), # column
-
-
-                                                                                ) # fluidRow
-                                                                              ) # mainPanel
-                                                             ),
-
-                                                             conditionalPanel(condition = "!input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
-                                                                              mainPanel(
-                                                                                h3('Individual plots'),
-                                                                                selectInput(inputId = 'individual_plots_dose_response_fluorescence_plot',
-                                                                                            label = 'Select plot',
-                                                                                            choices = "",
-                                                                                            multiple = FALSE,
-                                                                                            selectize = FALSE,
-                                                                                            size = 3),
-
-                                                                                plotOutput("dose_response_fluorescence_plot_individual",
-                                                                                           width = "100%", height = "800px"),
-
-                                                                                h3(strong("Export plot")),
-
-                                                                                fluidRow(
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "width_download_dose_response_fluorescence_plot_individual",
-                                                                                                      label = "Width (in inches)",
-                                                                                                      value = 7)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "height_download_dose_response_fluorescence_plot_individual",
-                                                                                                      label = "Height (in inches)",
-                                                                                                      value = 6)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         numericInput(inputId = "dpi_download_dose_response_fluorescence_plot_individual",
-                                                                                                      label = "DPI",
-                                                                                                      value = 300)
-                                                                                  ), # column
-                                                                                  column(width = 4,
-                                                                                         downloadButton('download_dose_response_fluorescence_plot_individual',"Download Plot"),
-
-                                                                                         radioButtons("format_download_dose_response_fluorescence_plot_individual",
-                                                                                                      label = NULL,
-                                                                                                      choices = c("PNG" = ".png",
-                                                                                                                  "PDF" = ".pdf"),
-                                                                                                      selected = ".png",
-                                                                                                      inline = TRUE)
-                                                                                  ), # column
-                                                                                ) # fluidRow
-                                                                              ) # mainPanel
-
-                                                             ), # conditionalPanel
-                                                    ), #  tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_spline",
-
-                                                    ### Fluorescence DR Plots Model ####
-                                                    tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_model",
-                                                             sidebarPanel(
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_dose_response_model_fluorescence_plot",
-                                                                             label = "Log-transform y-axis",
-                                                                             value = TRUE),
-
-                                                               checkboxInput(inputId = "log_transform_x_axis_dose_response_model_fluorescence_plot",
-                                                                             label = "Log-transform x-axis",
-                                                                             value = TRUE),
-
-                                                               h3('Customize plot appearance'),
-                                                               sliderInput(inputId = 'shape_type_dose_response_model_fluorescence_plot',
-                                                                           label = 'Shape type',
-                                                                           min = 1,
-                                                                           max = 25,
-                                                                           value = 15),
-
-                                                               sliderInput(inputId = 'shape_size_dose_response_model_fluorescence_plot',
-                                                                           label = 'Shape size',
-                                                                           min = 1,
-                                                                           max = 10,
-                                                                           value = 1,
-                                                                           step = 0.1),
-
-                                                               sliderInput(inputId = 'axis_size_dose_response_model_fluorescence_plot',
-                                                                           label = 'Axis title font size',
-                                                                           min = 0.1,
-                                                                           max = 10,
-                                                                           value = 1.5,
-                                                                           step = 0.1),
-
-                                                               sliderInput(inputId = 'lab_size_dose_response_model_fluorescence_plot',
-                                                                           label = 'Axis label font size',
-                                                                           min = 0.1,
-                                                                           max = 10,
-                                                                           value = 1.3,
-                                                                           step = 0.1),
-
-                                                               sliderInput(inputId = 'line_width_dose_response_model_fluorescence_plot',
-                                                                           label = 'Line width',
-                                                                           min = 0.01,
-                                                                           max = 10,
-                                                                           value = 1),
-
-                                                               checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_model_fluorescence_plot',
-                                                                             label = 'Show EC50 indicator lines',
-                                                                             value = TRUE),
-
-                                                               strong("x-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_min_dose_response_model_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_max_dose_response_model_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               strong("y-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_dose_response_model_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_dose_response_model_fluorescence_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-                                                             ), # sidebarPanel
-
-                                                             mainPanel(
-                                                               selectInput(inputId = 'individual_plots_dose_response_model_fluorescence_plot',
-                                                                           label = 'Select plot',
-                                                                           choices = "",
-                                                                           multiple = FALSE,
-                                                                           selectize = FALSE,
-                                                                           size = 3),
-                                                               plotOutput("dose_response_model_fluorescence_plot_individual",
-                                                                          width = "100%", height = "800px"),
-
-                                                               h3(strong("Export plot")),
-
-                                                               fluidRow(
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "width_download_dose_response_model_fluorescence_plot_individual",
-                                                                                     label = "Width (in inches)",
-                                                                                     value = 7)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "height_download_dose_response_model_fluorescence_plot_individual",
-                                                                                     label = "Height (in inches)",
-                                                                                     value = 6)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "dpi_download_dose_response_model_fluorescence_plot_individual",
-                                                                                     label = "DPI",
-                                                                                     value = 300)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        downloadButton('download_dose_response_model_fluorescence_plot_individual',"Download Plot"),
-
-                                                                        radioButtons("format_download_dose_response_model_fluorescence_plot_individual",
-                                                                                     label = NULL,
-                                                                                     choices = c("PNG" = ".png",
-                                                                                                 "PDF" = ".pdf"),
-                                                                                     selected = ".png",
-                                                                                     inline = TRUE)
-                                                                 ), # column
-
-
-                                                               ) # fluidRow
-                                                             ) # mainPanel
-                                                    ), # tabPanel(title = "Dose-response analysis",
-
-                                                    ### Fluorescence Parameter Plots ####
-
-                                                    tabPanel(title = "Parameter plots",
-                                                             sidebarPanel(
-                                                               selectInput(inputId = "parameter_fluorescence_parameter_fluorescence_plot",
-                                                                           label = "Parameter",
-                                                                           choices = ""
-                                                               ),
-
-                                                               textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
-                                                                         label = "Select sample based on string (separated by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "select_sample_based_on_concentration_fluorescence_parameter_plot",
-                                                                         label = "Select sample based on concentration (separated by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_sample_based_on_strings_fluorescence_parameter_plot",
-                                                                         label = "Exclude sample based on strings (separated by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_sample_based_on_concentration_fluorescence_parameter_plot",
-                                                                         label = "Exclude sample based on concentration (separated by ;)"
-                                                               ),
-
-                                                               checkboxInput(inputId = 'normalize_to_reference_fluorescence_parameter_plot',
-                                                                             label = 'normalize to reference',
-                                                                             value = FALSE),
-
-                                                               # Conditional Panel
-                                                               conditionalPanel(condition = "input.normalize_to_reference_fluorescence_parameter_plot",
-                                                                                # reactive selection
-                                                                                selectInput(inputId = 'reference_condition_fluorescence_parameter_plot',
-                                                                                            label = 'Reference condition',
-                                                                                            choices = ""
-                                                                                ),
-
-                                                                                # reactive selection
-                                                                                selectInput(inputId = 'reference_concentration_fluorescence_parameter_plot',
-                                                                                            label = 'Reference concentration',
-                                                                                            choices = ""
-                                                                                ),
-                                                               ),
-
-                                                               h3("Customize plot appearance"),
-
-                                                               sliderInput(inputId = "shape.size_fluorescence_parameter_plot",
-                                                                           label = "Shape size",
-                                                                           min = 1,
-                                                                           max = 10,
-                                                                           value = 2.5,
-                                                                           step = 0.5),
-
-                                                               sliderInput(inputId = "basesize_fluorescence_parameter_plot",
-                                                                           label = "Base font size",
-                                                                           min = 10,
-                                                                           max = 35,
-                                                                           value = 12,
-                                                                           step = 0.5)
-
-
-                                                             ),
-
-                                                             mainPanel(
-                                                               plotOutput("fluorescence_parameter_plot",
-                                                                          width = "100%", height = "800px"),
-
-                                                               h3(strong("Export plot")),
-
-                                                               fluidRow(
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "width_download_fluorescence_parameter_plot",
-                                                                                     label = "Width (in inches)",
-                                                                                     value = 7)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "height_download_fluorescence_parameter_plot",
-                                                                                     label = "Height (in inches)",
-                                                                                     value = 6)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "dpi_download_fluorescence_parameter_plot",
-                                                                                     label = "DPI",
-                                                                                     value = 300)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        downloadButton('download_fluorescence_parameter_plot',"Download Plot"),
-
-                                                                        radioButtons("format_download_fluorescence_parameter_plot",
-                                                                                     label = NULL,
-                                                                                     choices = c("PNG" = ".png",
-                                                                                                 "PDF" = ".pdf"),
-                                                                                     selected = ".png",
-                                                                                     inline = TRUE)
-                                                                 ), # column
-                                                               ) # fluidRow
-                                                             ) # mainPanel
-                                                    ), #  tabPanel(title = "Parameter plots"
-                                                    ## Growth & Fluorescence Plots ####
-
-                                                    tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_Dual",
-                                                             h1("Growth & Flourescence Plot"),
-
-                                                             sidebarPanel(
-
-                                                               selectInput(inputId = "fluorescence_type_dual_plot",
-                                                                           label = "Fluorescence type",
-                                                                           choices = c("Fluorescence 1" = "fl1",
-                                                                                       "Fluorescence 1" = "fl2",
-                                                                                       "Normalized fluorescence 1" = "norm.fl1",
-                                                                                       "Normalized fluorescence 2" = "norm.fl2")
-                                                               ),
-
-                                                               textInput(inputId = "select_samples_based_on_string_dual_plot",
-                                                                         label = "Select sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "select_samples_based_on_concentration_dual_plot",
-                                                                         label = "Select sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_string_dual_plot",
-                                                                         label = "Exclude sample based on string (separate by ;)"
-                                                               ),
-
-                                                               textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
-                                                                         label = "Exclude sample based on concentration (separate by ;)"
-                                                               ),
-
-                                                               checkboxInput(inputId = "plot_group_averages_dual_plot",
-                                                                             label = "Plot group averages",
-                                                                             value = TRUE),
-
-                                                               h3("Customize plot appearance"),
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_density_dual_plot",
-                                                                             label = "Log-transform y-axis (Density)",
-                                                                             value = FALSE),
-
-                                                               checkboxInput(inputId = "log_transform_y_axis_fluorescence_dual_plot",
-                                                                             label = "Log-transform y-axis (Fluorescence)",
-                                                                             value = FALSE),
-
-                                                               strong("x-Range"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_min_dual_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "x_range_max_dual_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               strong("y-Range (Density)"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_density_dual_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_density_dual_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               strong("y-Range (Fluorescence"),
-                                                               fluidRow(
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_min_fluorescence_dual_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "min"
-                                                                        )
-                                                                 ),
-
-                                                                 column(5,
-                                                                        textInput(inputId = "y_range_max_fluorescence_dual_plot",
-                                                                                  label = NULL,
-                                                                                  value = "", placeholder = "max"
-                                                                        )
-                                                                 )
-                                                               ),
-
-                                                               textInput(inputId = "y_axis_title_density_dual_plot",
-                                                                         label = "y-axis title (Density)",
-                                                                         value = ""
-                                                               ),
-
-                                                               textInput(inputId = "y_axis_title_fluorescence_dual_plot",
-                                                                         label = "y-axis title (Fluorescence)",
-                                                                         value = ""
-                                                               ),
-
-                                                               textInput(inputId = "x_axis_title_dual_plot",
-                                                                         label = "x-axis title",
-                                                                         value = ""
-                                                               ),
-
-                                                               sliderInput(inputId = "nbreaks_dual_plot",
-                                                                           label = "Number of breaks on y-axis",
-                                                                           min = 1,
-                                                                           max = 20,
-                                                                           value = 6),
-
-                                                               sliderInput(inputId = "line_width_dual_plot",
-                                                                           label = "Line width",
-                                                                           min = 0.01,
-                                                                           max = 10,
-                                                                           value = 1.1),
-
-                                                               sliderInput(inputId = 'base_size_dual_plot',
-                                                                           label = 'Base font size',
-                                                                           min = 10,
-                                                                           max = 35,
-                                                                           value = 20,
-                                                                           step = 0.5)
-                                                             ),
-
-                                                             mainPanel(
-                                                               plotOutput("dual_plot",
-                                                                          width = "100%", height = "1000px"),
-
-                                                               h3(strong("Export plot")),
-
-                                                               fluidRow(
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "width_download_dual_plot",
-                                                                                     label = "Width (in inches)",
-                                                                                     value = 7)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "height_download_dual_plot",
-                                                                                     label = "Height (in inches)",
-                                                                                     value = 6)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        numericInput(inputId = "dpi_download_dual_plot",
-                                                                                     label = "DPI",
-                                                                                     value = 300)
-                                                                 ), # column
-                                                                 column(width = 4,
-                                                                        downloadButton('download_dual_plot',"Download Plot"),
-
-                                                                        radioButtons("format_download_dual_plot",
-                                                                                     label = NULL,
-                                                                                     choices = c("PNG" = ".png",
-                                                                                                 "PDF" = ".pdf"),
-                                                                                     selected = ".png",
-                                                                                     inline = TRUE)
-                                                                 ), # column
-                                                               ) # fluidRow
-                                                             ) # mainPanel
-                                                    ) # tabPanel(title = "Growth & Flourescence Plot")
-                                        ) # tabsetPanel(type = "tabs",
-                               ), # tabPanel(title = "Fluorescence Plots"
-
-
-                    ), # navbarMenu("Visualize"
-
-                    #____REPORT____####
-
-
-                    tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
-                             sidebarPanel(width = 6,
-                               shinyDirButton("report_dir",
-                                              "Choose destination for saving",
-                                              "Choose destination for saving"),
-
-                               verbatimTextOutput("report_dir", placeholder = TRUE),
-
-                               textInput(inputId = 'report_filename',
-                                         label = 'Choose file name',
-                                         value = 'GrowthReport'),
-
-                               selectInput(inputId = 'report_filetype',
-                                           label = 'Choose file type',
-                                           choices = c('PDF' = 'pdf', 'HTML' = 'html')),
-
-                               conditionalPanel(condition = "input.report_filetype == 'pdf'",
-                                                fluidRow(
-                                                  column(12,
-                                                         div(
-                                                           actionButton(inputId = "render_report_pdf",
-                                                                        label = "Render report",
-                                                                        icon=icon("file-pdf"),
-                                                                        style="padding:5px; font-size:120%"),
-                                                           style="float:right")
-                                                  )
-                                                )
-                               ),
-                               conditionalPanel(condition = "input.report_filetype == 'html'",
-                                                fluidRow(
-                                                  column(12,
-                                                         div(
-                                                           actionButton(inputId = "render_report_html",
-                                                                        label = "Render report",
-                                                                        icon=icon("file-code"),
-                                                                        style="padding:5px; font-size:120%"),
-                                                           style="float:right")
-                                                  )
-                                                )
-                               )
-                             ),
-
-                    ),
-
-                    #____ABOUT US____####
-
-
-                    tabPanel("About Us",
-                             mainPanel(
-                               h2("Authors"),
-                               'Nicolas Wirth, Jonathan Funk',
-                               h2("Bug reports"),
-                               uiOutput("bug_report"),
-                               h2("Publications"),
-                               'featuring publications which use this tool'
-                             )
-                    )
-                  ) #  navbarPage
-                ), # tagList
-                # show plots
-                # TODO: Which plots, which options, ...
+                                                      )
+
+                                             ),
+                                 )
+                        ),
+                        #____ABOUT US____####
+
+
+                        tabPanel("About Us",
+                                 mainPanel(
+                                   h2("Authors"),
+                                   'Nicolas Wirth, Jonathan Funk',
+                                   h2("Bug reports"),
+                                   uiOutput("bug_report"),
+                                   h2("Publications"),
+                                   'featuring publications which use this tool'
+                                 )
+                        ),
+                      ) #  navbarPage
+                    ) # div(
+                  ) # hidden(
+                ), # tagList(
                 verbatimTextOutput("debug")
-)
-)
 )
 
 #____SERVER____####
 
 server <- function(input, output, session){
   load_data()
+
   output$debug <- renderPrint({
 
     paste(
-      input$dimension)
+      global$export_RData_growth_filename)
     })
   # Disable navbar menus before running computations
+  shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Report]")
   shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
   shinyjs::disable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
@@ -4044,7 +4257,7 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(NULL)
 
-    if (is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL") {
+    if (is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL" || input$smoothing_factor_growth_dr == "") {
       smooth.dr = NULL
     } else {
       smooth.dr <- input$smoothing_factor_growth_dr
@@ -4107,6 +4320,7 @@ server <- function(input, output, session){
                         )
     )
     # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
     shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
     shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
     shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
@@ -4239,6 +4453,7 @@ server <- function(input, output, session){
       )
     )
     ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
     shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
     shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
     shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
@@ -4280,6 +4495,11 @@ server <- function(input, output, session){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
       } else {
         showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
+      }
+      if(length(results$growth$drFit) >1 && length(results$growth$drFit$drTable) > 1){
+        showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_DR")
+      } else {
+        hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_DR")
       }
     }
   })
@@ -4404,6 +4624,43 @@ server <- function(input, output, session){
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
+
+  table_growth_dr_spline <- reactive({
+    try({
+      res.table.dr <- results$growth$drFit$drTable
+      table_dr_spline <- data.frame("Test" = res.table.dr$Test,
+                                "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
+                                "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
+                                "Test parameter" = res.table.dr[["test"]],
+                                stringsAsFactors = F, check.names = F)
+      if(!is.null(res.table.dr_spline)){
+        if(results$growth$control$log.x.dr){
+          table_dr <- suppressWarnings(cbind(table_dr,
+                                             data.frame("EC50 (original)" = round(as.numeric(res.table.dr[["EC50.orig"]]), 3),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+        if(results$growth$control$log.y.dr){
+          table_dr <- suppressWarnings(cbind(table_dr,
+                                             data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+        if ( results$growth$control$nboot.dr > 2 ){
+          table_dr_spline <- suppressWarnings(cbind(table_dr_spline,
+                                             data.frame("Mean EC50 (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50"]]), 3), sep = " \u00B1 "),
+                                                        "Response(EC50) (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50y"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50y"]]), 3), sep = " \u00B1 "),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+      }
+      table_dr_spline
+    })
+  })
+
+  output$results_table_growth_dr_spline <- DT::renderDT({
+    table_dr <- table_growth_dr_spline()
+    datatable(table_dr,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
+              escape = FALSE)
+  })
   ###____Table Download____####
   output$download_table_growth_linear <- downloadHandler(
     filename = function() {
@@ -4448,6 +4705,17 @@ server <- function(input, output, session){
       write.csv.utf8.BOM(table, file)
     }
   )
+
+  output$download_table_growth_dr <- downloadHandler(
+    filename = function() {
+      paste("growth_results_dose-response_analysis", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_growth_dr()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
     ## Fluorescence ####
   observe({
     if(!is.null(results$fluorescence)){
@@ -4466,6 +4734,16 @@ server <- function(input, output, session){
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
       } else {
         showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
+      }
+      if(length(results$fluorescence$drFit1) >1 && length(results$fluorescence$drFit1$drTable) > 1 && results$fluorescence$control$dr.method == "spline"){
+        showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Spline")
+      } else {
+        hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Spline")
+      }
+      if(length(results$fluorescence$drFit1) >1 && length(results$fluorescence$drFit1$drTable) > 1 && results$fluorescence$control$dr.method == "model"){
+        showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Model")
+      } else {
+        hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Model")
       }
     }
   })
@@ -4559,6 +4837,78 @@ server <- function(input, output, session){
               escape = FALSE)
   })
 
+  table_fluorescence1_dr_spline <- reactive({
+    try({
+      res.table.dr <- results$fluorescence$drFit1$drTable
+      table_dr <- data.frame("Test" = res.table.dr$Test,
+                             "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
+                             "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
+                             "Test parameter" = res.table.dr[["test"]],
+                             stringsAsFactors = F, check.names = F)
+      if(!is.null(res.table.dr)){
+        if(results$fluorescence$control$log.x.dr){
+          table_dr <- suppressWarnings(cbind(table_dr,
+                                             data.frame("EC50 (original)" = round(as.numeric(res.table.dr[["EC50.orig"]]), 3),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+        if(results$fluorescence$control$log.y.dr){
+          table_dr <- suppressWarnings(cbind(table_dr,
+                                             data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+        if ( results$fluorescence$control$nboot.dr > 2 ){
+          table_dr <- suppressWarnings(cbind(table_dr,
+                                             data.frame("Mean EC50 (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50"]]), 3), sep = " \u00B1 "),
+                                                        "Response(EC50) (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50y"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50y"]]), 3), sep = " \u00B1 "),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+      }
+      table_dr
+    })
+  })
+
+  output$results_table_fluorescence1_dr_spline <- DT::renderDT({
+    table_dr <- table_fluorescence1_dr_spline()
+    datatable(table_dr,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
+              escape = FALSE)
+  })
+
+  table_fluorescence1_dr_model <- reactive({
+    try({
+      res.table.dr <- results$fluorescence$drFit1$drTable
+      table_dr <- data.frame("Test" = res.table.dr$Test,
+                             "Leakiness (min. FL)" = round(as.numeric(res.table.dr[["y.min"]]), 3),
+                             "Sensitivity (K, EC50)" = round(as.numeric(res.table.dr[["K"]]), 3),
+                             "Fold change (fc)" = round(as.numeric(res.table.dr[["fc"]]), 3),
+                             "Cooperativity (n)" = round(as.numeric(res.table.dr[["n"]]), 3),
+                             "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
+                             "Maximum FL" = round(as.numeric(res.table.dr[["y.max"]]), 3),
+
+                             stringsAsFactors = F, check.names = F)
+      if(!is.null(res.table.dr)){
+        if(results$fluorescence$control$log.x.dr){
+          table_dr <- suppressWarnings(cbind(table_dr,
+                                             data.frame("K (original)" = round(as.numeric(res.table.dr[["K.orig"]]), 3),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+        if(results$fluorescence$control$log.y.dr){
+          table_dr <- suppressWarnings(cbind(table_dr,
+                                             data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
+                                                        stringsAsFactors = F, check.names = F)))
+        }
+      }
+      table_dr
+    })
+  })
+
+  output$results_table_fluorescence1_dr_model <- DT::renderDT({
+    table_dr_model <- table_fluorescence1_dr_model()
+    datatable(table_dr_model,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
+              escape = FALSE)
+  })
+
   ###____Table Download____####
   output$download_table_fluorescence1_linear <- downloadHandler(
     filename = function() {
@@ -4588,6 +4938,28 @@ server <- function(input, output, session){
     },
     content = function(file) {
       table <- table_fluorescence1_spline_bt()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_table_fluorescence1_dr_spline <- downloadHandler(
+    filename = function() {
+      paste("fluorescence_results_dose-response_analysis_spline", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_fluorescence1_dr_spline()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_table_fluorescence1_dr_model <- downloadHandler(
+    filename = function() {
+      paste("fluorescence_results_dose-response_analysis_model", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_fluorescence1_dr_model()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       write.csv.utf8.BOM(table, file)
     }
@@ -4887,7 +5259,8 @@ server <- function(input, output, session){
                            y.lim.deriv = c(input$y_range_min_derivative_validate_growth_plot_spline, input$y_range_max_derivative_validate_growth_plot_spline),
                            lwd = input$line_width_validate_growth_plot_spline,
                            cex.point = input$shape_size_validate_growth_plot_spline,
-                           basesize = input$base_size_validate_growth_plot_spline
+                           basesize = input$base_size_validate_growth_plot_spline,
+                           n.ybreaks = input$nbreaks_validate_growth_plot_spline,
       )
       )
       removeModal()
@@ -5013,7 +5386,7 @@ server <- function(input, output, session){
         textInput('min.density.model.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$min.density)),
         wellPanel(
           h4(strong('Models:')),
-          style='background-color:#F0EBE4; padding: 1; padding-top: 0; padding-bottom: 0',
+          style='padding: 1; padding-top: 0; padding-bottom: 0',
           checkboxInput(inputId = 'logistic_growth_rerun',
                         label = 'logistic',
                         value = ("logistic" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
@@ -5317,17 +5690,54 @@ server <- function(input, output, session){
   # Render plot
   output$validate_fluorescence_plot_linear <- renderPlot({
     results <- results$fluorescence
+    # Define x- and y-axis limits
+    if(any(input$y_range_min_validate_fluorescence_plot_linear == "",
+           input$y_range_max_validate_fluorescence_plot_linear == "")){
+      ylim <- NULL
+    } else {
+      ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_plot_linear),
+                as.numeric(input$y_range_max_validate_fluorescence_plot_linear))
+    }
+
+    if(any(input$y_range_min_derivative_validate_fluorescence_plot_linear == "",
+           input$y_range_max_derivative_validate_fluorescence_plot_linear == "")){
+      ylim.deriv <- NULL
+    } else {
+      ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_fluorescence_plot_linear),
+                      as.numeric(input$y_range_max_derivative_validate_fluorescence_plot_linear))
+    }
+
+    if(any(input$x_range_min_validate_fluorescence_plot_linear == "",
+           input$x_range_max_validate_fluorescence_plot_linear == "")){
+      xlim <- NULL
+    } else {
+      xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
+                as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
+    }
     if(length(results$flFit1$flFittedLinear[[ifelse(input$sample_validate_fluorescence_linear == "1" || is.null(input$sample_validate_fluorescence_linear), 1, input$sample_validate_fluorescence_linear)]]) > 1){
 
-
       plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                       log = logy_validate_fluorescence_plot_linear()
+                       log = logy_validate_fluorescence_plot_linear(),
+                       pch = input$shape_type_validate_fluorescence_plot_linear,
+                       cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                       cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                       cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                       lwd = input$line_width_validate_fluorescence_plot_linear,
+                       y.lim = ylim,
+                       x.lim = xlim
                        # ADD FURTHER INPUT (see Notion)
       )
       if(input$diagnostics_validate_fluorescence_plot_linear){
         plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                          which = "fit_diagnostics",
-                         log = logy_validate_fluorescence_plot_linear()
+                         log = logy_validate_fluorescence_plot_linear(),
+                         pch = input$shape_type_validate_fluorescence_plot_linear,
+                         cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                         cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                         cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                         lwd = input$line_width_validate_fluorescence_plot_linear,
+                         y.lim = ylim,
+                         x.lim = xlim
                          # ADD FURTHER INPUT (see Notion)
         )
       }
@@ -5451,7 +5861,9 @@ server <- function(input, output, session){
                        y.lim = c(input$y_range_min_validate_fluorescence_plot_spline,input$y_range_max_validate_fluorescence_plot_spline),
                        y.lim.deriv = c(input$y_range_min_derivative_validate_fluorescence_plot_spline, input$y_range_max_derivative_validate_fluorescence_plot_spline),
                        lwd = input$line_width_validate_fluorescence_plot_spline,
-                       basesize = input$base_size_validate_fluorescence_plot_spline
+                       basesize = input$base_size_validate_fluorescence_plot_spline,
+                       cex.point = input$shape_size_validate_fluorescence_plot_spline,
+                       n.ybreaks = input$nbreaks__validate_fluorescence_plot_spline
       )
       removeModal()
     }
@@ -6471,58 +6883,137 @@ server <- function(input, output, session){
   # Report ####
   volumes <- getVolumes() # this makes the directory at the base of your computer.
 
-  #shinyDirChoose(input, 'report_folder', roots = volumes())
+  observe({
+    if(!is.null(results$growth)){
+      showTab(inputId = "tabsetPanel_Report", target = "tabPanel_report_growth")
+    } else {
+      hideTab(inputId = "tabsetPanel_Report", target = "tabPanel_report_growth")
+    }
+    if(!is.null(results$fluorescence)){
+      showTab(inputId = "tabsetPanel_Report", target = "tabPanel_report_fluorescence")
+    } else {
+      hideTab(inputId = "tabsetPanel_Report", target = "tabPanel_report_fluorescence")
+    }
+  })
+
+  ## Report Growth ####
+
   shinyDirChoose(
     input,
-    'report_dir',
+    'report_dir_growth',
     roots = c(home = '~'),
     filetypes = c('', 'txt', 'bigWig', "tsv", "csv", "bw")
   )
 
-  global <- reactiveValues(report_datapath = getwd())
+  global <- reactiveValues(report_datapath_growth = getwd())
 
-  report_dir <- reactive(input$report_dir)
+  report_dir_growth <- reactive(input$report_dir_growth)
 
-  output$report_dir <- renderText({
-    global$report_datapath
+  output$report_dir_growth <- renderText({
+    global$report_datapath_growth
   })
 
   # Assemble report file path
+  report_growth_filepath_change <- reactive({
+    list(input$report_dir_growth,input$report_filename_growth)
+  })
+
   observeEvent(ignoreNULL = TRUE,
                eventExpr = {
-                 input$report_dir
+                 report_growth_filepath_change()
                },
                handlerExpr = {
-                 if (!"path" %in% names(report_dir())) return()
+                 if (!"path" %in% names(report_dir_growth())) return()
                  home <- normalizePath("~")
-                 global$report_filename <- input$report_filename
-                 global$report_datapath <-
-                   file.path(home, paste(unlist(report_dir()$path[-1]), collapse = .Platform$file.sep))
+                 global$report_filename_growth <- input$report_filename_growth
+                 global$report_datapath_growth <-
+                   file.path(home, paste(unlist(report_dir_growth()$path[-1]), collapse = .Platform$file.sep))
                }
   )
 
-  observeEvent(input$render_report_pdf, {
+  observeEvent(input$render_report_growth_pdf, {
     showModal(modalDialog("Rendering report...", footer=NULL))
 
     try(growth.report(grofit = results$growth,
-                  out.dir = global$report_datapath,
-                  out.nm = global$report_filename,
+                  out.dir = global$report_datapath_growth,
+                  out.nm = global$report_filename_growth,
                   ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                  format = input$report_filetype,
+                  format = input$report_filetype_growth,
                   export = FALSE)
     )
     removeModal()
   })
 
-  observeEvent(input$render_report_html, {
+  observeEvent(input$render_report_growth_html, {
     showModal(modalDialog("Rendering report...", footer=NULL))
 
     try(growth.report(grofit = results$growth,
-                          out.dir = global$report_datapath,
-                          out.nm = global$report_filename,
+                          out.dir = global$report_datapath_growth,
+                          out.nm = global$report_filename_growth,
                           ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                          format = input$report_filetype,
+                          format = input$report_filetype_growth,
                           export = FALSE)
+    )
+    removeModal()
+  })
+
+  ## Report Fluorescence ####
+
+  shinyDirChoose(
+    input,
+    'report_dir_fluorescence',
+    roots = c(home = '~'),
+    filetypes = c('', 'txt', 'bigWig', "tsv", "csv", "bw")
+  )
+
+  global <- reactiveValues(report_datapath_fluorescence = getwd())
+
+  report_dir_fluorescence <- reactive(input$report_dir_fluorescence)
+
+  output$report_dir_fluorescence <- renderText({
+    global$report_datapath_fluorescence
+  })
+
+  # Assemble report file path
+  report_fluorescence_filepath_change <- reactive({
+    list(input$report_dir_fluorescence,input$report_filename_fluorescence)
+  })
+
+  observeEvent(ignoreNULL = TRUE,
+               eventExpr = {
+                 report_fluorescence_filepath_change()
+               },
+               handlerExpr = {
+                 if (!"path" %in% names(report_dir_fluorescence())) return()
+                 home <- normalizePath("~")
+                 global$report_filename_fluorescence <- input$report_filename_fluorescence
+                 global$report_datapath_fluorescence <-
+                   file.path(home, paste(unlist(report_dir_fluorescence()$path[-1]), collapse = .Platform$file.sep))
+               }
+  )
+
+  observeEvent(input$render_report_fluorescence_pdf, {
+    showModal(modalDialog("Rendering report...", footer=NULL))
+
+    try(fl.report(flFitRes = results$fluorescence,
+                      out.dir = global$report_datapath_fluorescence,
+                      out.nm = global$report_filename_fluorescence,
+                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                      format = input$report_filetype_fluorescence,
+                      export = FALSE)
+    )
+    removeModal()
+  })
+
+  observeEvent(input$render_report_fluorescence_html, {
+    showModal(modalDialog("Rendering report...", footer=NULL))
+
+    try(fl.report(flFitRes = results$fluorescence,
+                      out.dir = global$report_datapath_fluorescence,
+                      out.nm = global$report_filename_fluorescence,
+                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                      format = input$report_filetype_fluorescence,
+                      export = FALSE)
     )
     removeModal()
   })
@@ -6534,6 +7025,113 @@ server <- function(input, output, session){
     tagList("Please report bugs and user feedback at:", github_url)
   })
 
+  # Export RData files
+  observe({
+    if(!is.null(results$growth)){
+      showTab(inputId = "tabsetPanel_Export_Data", target = "tabPanel_export_data_growth")
+    } else {
+      hideTab(inputId = "tabsetPanel_Export_Data", target = "tabPanel_export_data_growth")
+    }
+    if(!is.null(results$fluorescence)){
+      showTab(inputId = "tabsetPanel_Export_Data", target = "tabPanel_export_data_fluorescence")
+    } else {
+      hideTab(inputId = "tabsetPanel_Export_Data", target = "tabPanel_export_data_fluorescence")
+    }
+  })
+
+  ## RData Growth ####
+  shinyDirChoose(
+    input,
+    'export_RData_growth_dir',
+    roots = c(home = '~'),
+    filetypes = c('RData')
+  )
+
+  global <- reactiveValues(export_RData_datapath_growth = getwd())
+
+  export_RData_growth_dir <- reactive(input$export_RData_growth_dir)
+
+  output$export_RData_growth_dir <- renderText({
+    global$export_RData_datapath_growth
+  })
+
+  # Assemble RData file path
+  export_RData_growth_filepath_change <- reactive({
+    list(input$export_RData_growth_dir,input$export_RData_growth_filename)
+  })
+
+
+  observeEvent(ignoreNULL = TRUE,
+               eventExpr = {
+                 export_RData_growth_filepath_change()
+               },
+               handlerExpr = {
+                 if (!"path" %in% names(export_RData_growth_dir())) return()
+                 home <- normalizePath("~")
+                 global$export_RData_growth_filename <- input$export_RData_growth_filename
+                 global$export_RData_datapath_growth <-
+                   file.path(home, paste(unlist(export_RData_growth_dir()$path[-1]), collapse = .Platform$file.sep))
+               }
+  )
+
+  observeEvent(input$export_RData_growth, {
+    showModal(modalDialog("Exporting RData file...", footer=NULL))
+
+    try(export_RData(object = results$growth,
+                      out.dir = global$export_RData_datapath_growth,
+                      out.nm = global$export_RData_growth_filename
+                     )
+    )
+    removeModal()
+  })
+
+  ## RData Fluorescence ####
+  shinyDirChoose(
+    input,
+    'export_RData_fluorescence_dir',
+    roots = c(home = '~'),
+    filetypes = c('RData')
+  )
+
+  global <- reactiveValues(export_RData_datapath_fluorescence = getwd())
+
+  export_RData_fluorescence_dir <- reactive(input$export_RData_fluorescence_dir)
+
+  output$export_RData_fluorescence_dir <- renderText({
+    global$export_RData_datapath_fluorescence
+  })
+
+  # Assemble RData file path
+  export_RData_fluorescence_filepath_change <- reactive({
+    list(input$export_RData_fluorescence_dir,input$export_RData_fluorescence_filename)
+  })
+
+  observeEvent(ignoreNULL = TRUE,
+               eventExpr = {
+                 export_RData_fluorescence_filepath_change()
+               },
+               handlerExpr = {
+                 if (!"path" %in% names(export_RData_fluorescence_dir())) return()
+                 home <- normalizePath("~")
+                 global$export_RData_fluorescence_filename <- input$export_RData_fluorescence_filename
+                 global$export_RData_datapath_fluorescence <-
+                   file.path(home, paste(unlist(export_RData_fluorescence_dir()$path[-1]), collapse = .Platform$file.sep))
+               }
+  )
+
+  observeEvent(input$export_RData_fluorescence, {
+    showModal(modalDialog("Exporting RData file...", footer=NULL))
+
+    try(export_RData(object = results$fluorescence,
+                     out.dir = global$export_RData_datapath_fluorescence,
+                     out.nm = global$export_RData_fluorescence_filename
+    )
+    )
+    removeModal()
+  })
 }
+
+
+
 
 shinyApp(ui = ui, server = server)

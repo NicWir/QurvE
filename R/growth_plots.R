@@ -40,7 +40,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                   log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
              title(ylab = "Density", line = 2+cex.lab)
              title(xlab = "Time", line = 1+cex.lab)
-             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point)
+             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
              axis(1)
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
@@ -107,7 +107,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              title(ylab = "Density", line = 2+cex.lab)
              title(xlab = "Time", line = 1+cex.lab)
 
-             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
+             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch, pch=pch)
              axis(1)
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))

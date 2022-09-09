@@ -224,8 +224,13 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 #' @param pch (Numeric) Size of the raw data circles.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param colSpline (Numeric or character) Spline line colour.
+#' @param cex.point (Numeric) Size of the raw data points.
 #' @param basesize (Numeric) Base font size.
 #' @param lwd (Numeric) Spline line width.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -239,8 +244,9 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = F,
-                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
+plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = F, basesize = 16,
+                             pch=1, colData=1, colSpline="dodgerblue3", cex.point=2, lwd = 0.7,
+                             y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,  n.ybreaks = 6,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
   {
@@ -249,7 +255,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
+  if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex.point")
 
   suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
   if(all(is.na(x.lim))) x.lim <- NULL
@@ -332,7 +338,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         geom_line(aes(x=fit.x, y = fit.fl, color = "spline"), data = df.fit, size = lwd) +
         xlab(x.label) +
         ylab(label = y.label) +
-        theme_classic(base_size = 16) +
+        theme_classic(base_size = basesize) +
         ggtitle(gsub(" \\| NA", "", paste(flFitSpline$ID, collapse=" | "))) +
         scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
         theme(legend.key = element_blank(),
@@ -346,23 +352,31 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
       if(raw){
-        p <- p + geom_point(data = df.raw, shape=1, size = 2,alpha = 0.6, stroke=0.15)
+        p <- p + geom_point(data = df.raw, shape=1, size = cex.point, alpha = 0.6, stroke=0.15)
       }
 
 
       p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
 
+      # p <- p +
+      #   annotate(
+      #     "text",
+      #     label = paste("t0:", flFittedSpline$control$t0, "  min.density:", flFittedSpline$control$min.density, "  smoothing:", flFittedSpline$control$smooth.gc),
+      #     x = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$x.range[2],
+      #     y = 1.2 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+      #     angle = 0, parse = F, size = 3.2)
+
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = 'log')
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
         }
       } else {
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks))
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
         }
       }
 

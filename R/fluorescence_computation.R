@@ -2262,7 +2262,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #' @param ... Further arguments passed to the shiny app.
 #'
-#' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.
+#' @return A \code{flFitRes} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{fl.report}}.
 #' \item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided. Else, extracted from \code{grofit}).}
 #' \item{data}{Raw data dataframe passed to the function as \code{grodata}.}
 #' \item{flFit1}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence1 data.}
@@ -2477,7 +2477,7 @@ fl.workflow <- function(grodata = NULL,
 
     if (ec50 == TRUE) {
       if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-        if(!is.null(EC50.table1) && !is.na(EC50.table1)) {
+        if(!is.null(EC50.table1) && length(EC50.table1) > 1) {
           res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
           export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
           cat(paste0("\nResults of EC50 analysis for fluorescence 1 saved as tab-delimited in:\n",
@@ -2485,7 +2485,7 @@ fl.workflow <- function(grodata = NULL,
         }
       }
       if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-        if(!is.null(EC50.table2) && !is.na(EC50.table2)) {
+        if(!is.null(EC50.table2) && length(EC50.table2) > 1) {
           res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
           export_Table(table = res.table.dr_fl2, out.dir = wd, out.nm = "results.fl_dr2")
 

@@ -32,7 +32,7 @@ doParallel::registerDoParallel(cl)
 knitr::opts_chunk$set(dev = "pdf")
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
 knit_table <- function(df, caption){
-  if (is_html_output()) {
+  if (knitr::is_html_output()) {
     DT::datatable(df, caption = caption, filter = 'top', escape = FALSE,
          extensions = c('FixedColumns',"FixedHeader"),
           options = list(scrollX = FALSE, 
