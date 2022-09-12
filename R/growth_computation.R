@@ -2923,7 +2923,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     return(gcFitLinear)
   }
 
-
+  control$lin.h <- h
 
   gcFitLinear <- list(
     raw.time = time.in,

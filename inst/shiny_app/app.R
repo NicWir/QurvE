@@ -2,31 +2,31 @@ list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes", 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-# library(icons)
-# library(shiny)
-# library(shinyjs)
-# library(shinyBS)
-# library(shinycssloaders)
-# library(shinyFiles)
-# library(readxl)
-# library(tidyverse)
-# library(shinythemes)
-# library(DT)
-# library(doParallel)
-# library(knitr)
-# library(kableExtra)
+library(icons)
+library(shiny)
+library(shinyjs)
+library(shinyBS)
+library(shinycssloaders)
+library(shinyFiles)
+library(readxl)
+library(tidyverse)
+library(shinythemes)
+library(DT)
+library(doParallel)
+library(knitr)
+library(kableExtra)
 
 # Define icon set from custom SVG files
 # iconset <- icons::icon_set("icons/")
 
-# source("../../R/general_misc_utils.R")
-# source("../../R/growth_computation.R")
-# source("../../R/growth_plots.R")
-# source("../../R/growth_summaries.R")
-# source("../../R/fluorescence_computation.R")
-# source("../../R/fluorescence_plots.R")
-# source("../../R/fluorescence_summaries.R")
-# source("../../R/shiny_app_functions.R")
+source("../../R/general_misc_utils.R")
+source("../../R/growth_computation.R")
+source("../../R/growth_plots.R")
+source("../../R/growth_summaries.R")
+source("../../R/fluorescence_computation.R")
+source("../../R/fluorescence_plots.R")
+source("../../R/fluorescence_summaries.R")
+source("../../R/shiny_app_functions.R")
 
 jscode <- "
 shinyjs.disableTab = function(name) {
@@ -204,54 +204,54 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             )
                                                           )
                                                         ),
-                                                        #_____Fluorescence 2___________
-                                                        wellPanel(
-                                                          h4(strong("Fluorescence 2 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
-                                                          style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-
-                                                          fileInput(inputId = 'custom_file_fluorescence2',
-                                                                    label = 'Fluorescence data 2',
-                                                                    accept = c('.xlsx', '.xls', '.csv')
-                                                          ),
-
-                                                          conditionalPanel(
-                                                            condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
-                                                            wellPanel(
-                                                              style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                              selectInput(inputId = "custom_fluorescence2_sheets",
-                                                                          label = "Select Sheet",
-                                                                          choices = "Sheet1")
-                                                            )
-                                                          ), # select sheet: conditional
-                                                          conditionalPanel(
-                                                            condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'csv'",
-                                                            wellPanel(
-                                                              style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                              selectInput(inputId = "separator_custom_fluorescence2",
-                                                                          label = "Select separator",
-                                                                          choices = c("," = ",",
-                                                                                      ";" = ";")
-                                                              ),
-
-                                                              selectInput(inputId = "decimal_separator_custom_fluorescence2",
-                                                                          label = "Select Decimal separator",
-                                                                          choices = c("." = ".",
-                                                                                      "," = ",")
-                                                              )
-                                                            )
-                                                          ),
-                                                          conditionalPanel(
-                                                            condition = "output.fluorescence2fileUploaded && (output.custom_fluorescence2_format == 'tsv' || output.custom_fluorescence2_format == 'txt')",
-                                                            wellPanel(
-                                                              style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                              selectInput(inputId = "decimal_separator_custom_fluorescence2",
-                                                                          label = "Select Decimal separator",
-                                                                          choices = c("." = ".",
-                                                                                      "," = ",")
-                                                              )
-                                                            )
-                                                          )
-                                                        ),
+                                                        # #_____Fluorescence 2___________
+                                                        # wellPanel(
+                                                        #   h4(strong("Fluorescence 2 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
+                                                        #   style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+                                                        #
+                                                        #   fileInput(inputId = 'custom_file_fluorescence2',
+                                                        #             label = 'Fluorescence data 2',
+                                                        #             accept = c('.xlsx', '.xls', '.csv')
+                                                        #   ),
+                                                        #
+                                                        #   conditionalPanel(
+                                                        #     condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
+                                                        #     wellPanel(
+                                                        #       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                        #       selectInput(inputId = "custom_fluorescence2_sheets",
+                                                        #                   label = "Select Sheet",
+                                                        #                   choices = "Sheet1")
+                                                        #     )
+                                                        #   ), # select sheet: conditional
+                                                        #   conditionalPanel(
+                                                        #     condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'csv'",
+                                                        #     wellPanel(
+                                                        #       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                        #       selectInput(inputId = "separator_custom_fluorescence2",
+                                                        #                   label = "Select separator",
+                                                        #                   choices = c("," = ",",
+                                                        #                               ";" = ";")
+                                                        #       ),
+                                                        #
+                                                        #       selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                        #                   label = "Select Decimal separator",
+                                                        #                   choices = c("." = ".",
+                                                        #                               "," = ",")
+                                                        #       )
+                                                        #     )
+                                                        #   ),
+                                                        #   conditionalPanel(
+                                                        #     condition = "output.fluorescence2fileUploaded && (output.custom_fluorescence2_format == 'tsv' || output.custom_fluorescence2_format == 'txt')",
+                                                        #     wellPanel(
+                                                        #       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                        #       selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                        #                   label = "Select Decimal separator",
+                                                        #                   choices = c("." = ".",
+                                                        #                               "," = ",")
+                                                        #       )
+                                                        #     )
+                                                        #   )
+                                                        # ),
 
                                                         checkboxInput(inputId = 'subtract_blank_custom',
                                                                       label = 'Subtract blank',
@@ -349,10 +349,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                         choices = ""
                                                             ),
 
-                                                            selectInput(inputId = "parsed_reads_fluorescence2",
-                                                                        label = "Fluorescence data 2",
-                                                                        choices = ""
-                                                            )
+                                                            # selectInput(inputId = "parsed_reads_fluorescence2",
+                                                            #             label = "Fluorescence data 2",
+                                                            #             choices = ""
+                                                            # )
                                                           )
                                                         ),
                                                         div(style = "margin-top: -15px"),
@@ -451,11 +451,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            DT::dataTableOutput("custom_table_fluorescence1")
                                                                          )
                                                                 ),
-                                                                tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
-                                                                         withSpinner(
-                                                                           DT::dataTableOutput("custom_table_fluorescence2")
-                                                                         )
-                                                                ),
+                                                                # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
+                                                                #          withSpinner(
+                                                                #            DT::dataTableOutput("custom_table_fluorescence2")
+                                                                #          )
+                                                                # ),
                                                                 tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
                                                                          DT::dataTableOutput('custom_data_table_expdesign')
                                                                 )
@@ -471,9 +471,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                 tabPanel(title = "Fluorescence 1", value = "tabPanel_parsed_tables_fluorescence1",
                                                                          DT::dataTableOutput('parsed_data_table_fluorescence1')
                                                                 ),
-                                                                tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
-                                                                         DT::dataTableOutput('parsed_data_table_fluorescence2')
-                                                                ),
+                                                                # tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
+                                                                #          DT::dataTableOutput('parsed_data_table_fluorescence2')
+                                                                # ),
                                                                 tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
                                                                          DT::dataTableOutput('parsed_data_table_expdesign')
                                                                 )
@@ -488,7 +488,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                    ##____Computation_Growth____####
 
-                                   tabPanel("Growth", value = "tabPanel_Growth",
+                                   tabPanel("Growth", value = "tabPanel_Computation_Growth",
                                             fluidRow(
                                               sidebarLayout(
                                                 column(4,
@@ -736,13 +736,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                      label = 'Biphasic'),
 
                                                                        selectInput(
-                                                                         inputId = 'data_type_x_fluorescence', # TODO change choices based on presence of density and time
+                                                                         inputId = 'data_type_x_fluorescence',
                                                                          label = 'Data type x',
                                                                          choices = ""
                                                                        ),
-
-                                                                       checkboxInput(inputId = 'normalize_fluorescence', # TODO inactivate if no density values are present
-                                                                                     label = 'Normalize fluorescence'
+                                                                       conditionalPanel(
+                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present",
+                                                                         checkboxInput(inputId = 'normalize_fluorescence',
+                                                                                       label = 'Normalize fluorescence to density'
+                                                                         )
                                                                        ),
 
                                                                        conditionalPanel(
@@ -758,8 +760,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("density")',
                                                                          numericInput(
-                                                                           inputId = 'minimum_density_fluorescence', # TODO inactivate if no density values are present
-                                                                           label = 'minimum_density',
+                                                                           inputId = 'minimum_density_fluorescence',
+                                                                           label = 'minimum density',
                                                                            value = 0,
                                                                            min = NA,
                                                                            max = NA,
@@ -768,7 +770,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("time")',
                                                                          numericInput(
-                                                                           inputId = 't0_fluorescence', # TODO inactivate if no time values are present
+                                                                           inputId = 't0_fluorescence',
                                                                            label = 't0',
                                                                            value = 0,
                                                                            min = NA,
@@ -962,7 +964,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  downloadButton('download_table_growth_model',"Download table")
                                                         ),
                                                         tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Growth_DR",
-                                                                 DT::dataTableOutput('results_table_growth_dr'),
+                                                                 DT::dataTableOutput('results_table_growth_dr_spline'),
                                                                  downloadButton('download_table_growth_dr',"Download table")
                                                         )
                                             )
@@ -1233,7 +1235,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           value = 20,
                                                                                           step = 0.5),
 
-                                                                              sliderInput(inputId = "nbreaks__validate_growth_plot_spline",
+                                                                              sliderInput(inputId = "nbreaks_validate_growth_plot_spline",
                                                                                           label = "Number of breaks on y-axis",
                                                                                           min = 1,
                                                                                           max = 20,
@@ -1889,7 +1891,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         ### Growth Group Plots ####
 
-                                                        tabPanel(title = "Group plots",
+                                                        tabPanel(title = "Group Plots",
                                                                  sidebarPanel(
 
                                                                    selectInput(inputId = "data_type_growth_group_plot",
@@ -2063,7 +2065,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         ### Growth DR Plots ####
 
-                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
+                                                        tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
                                                                  sidebarPanel(
                                                                    wellPanel(
                                                                      style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
@@ -2285,7 +2287,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         ### Growth DR Plots Bootstrap ####
 
-                                                        tabPanel(title = "Dose-response analysis (Bootstrap)", value = "tabPanel_Visualize_Growth_DoseResponse_bt",
+                                                        tabPanel(title = "Dose-Response Analysis (Bootstrap)", value = "tabPanel_Visualize_Growth_DoseResponse_bt",
                                                                  sidebarPanel(
 
                                                                    h3('Customize plot appearance'),
@@ -2374,9 +2376,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ), # tabPanel(title = "Dose-response analysis"
 
                                                         ### Growth Parameter Plots ####
-                                                        tabPanel(title = "Parameter plots",
+                                                        tabPanel(title = "Parameter Plots",
                                                                  sidebarPanel(
-                                                                   selectInput(inputId = "parameter_growth_parameter_growth_plot",
+                                                                   selectInput(inputId = "parameter_parameter_growth_plot",
                                                                                label = "Parameter",
                                                                                choices = ""
                                                                    ),
@@ -2478,9 +2480,98 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    ) # fluidRow
                                                                  ) #  mainPanel
+                                                        ),
+
+                                                        # Growth DR Parameters ####
+
+                                                        tabPanel(title = "DR Parameter Plots",value = "tabPanel_Visualize_Growth_DoseResponseParameters",
+                                                                 sidebarPanel(
+                                                                   selectInput(inputId = "parameter_dr_parameter_growth_plot",
+                                                                               label = "Parameter",
+                                                                               choices = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_string_growth_dr_parameter_plot",
+                                                                             label = "Select sample based on string (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_strings_growth_dr_parameter_plot",
+                                                                             label = "Exclude sample based on strings (separated by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = 'normalize_to_reference_growth_dr_parameter_plot',
+                                                                                 label = 'normalize to reference',
+                                                                                 value = FALSE),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   # Conditional Panel
+                                                                   conditionalPanel(condition = "input.normalize_to_reference_growth_dr_parameter_plot",
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_condition_growth_dr_parameter_plot',
+                                                                                                label = 'Reference condition',
+                                                                                                choices = ""
+                                                                                    )
+                                                                   ),
+
+
+                                                                   sliderInput(inputId = "basesize_growth_dr_parameter_plot",
+                                                                               label = "Base font size",
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5),
+                                                                   sliderInput(inputId = "label.size_growth_dr_parameter_plot",
+                                                                               label = "Label font size",
+                                                                               min = 5,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5)
+
+
+                                                                 ),
+
+                                                                 mainPanel(
+                                                                   plotOutput("growth_dr_parameter_plot",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_growth_dr_parameter_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_growth_dr_parameter_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_growth_dr_parameter_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+
+                                                                     column(width = 5,
+                                                                            downloadButton('download_growth_dr_parameter_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_growth_dr_parameter_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+
+
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
                                                         )
                                             )
                                    ),
+
                                    ## Fluorescence Plots ####
                                    tabPanel(title = "Fluorescence Plots",  value = "tabPanel_Visualize_Fluorescence",
                                             h1("Fluorescence Plots"),
@@ -3469,7 +3560,7 @@ server <- function(input, output, session){
   output$debug <- renderPrint({
 
     paste(
-      global$export_RData_growth_filename)
+      output$normalized_fl_present)
     })
   # Disable navbar menus before running computations
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
@@ -3515,6 +3606,11 @@ server <- function(input, output, session){
       } else {
         shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Computation_Fluorescence]")
       }
+      if(length(grodata$density) < 2){
+        shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Computation_Growth]")
+      } else {
+        shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Computation_Growth]")
+      }
     }
   })
 
@@ -3543,7 +3639,7 @@ server <- function(input, output, session){
     ##___Custom____####
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
-  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+  # hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
 
   ### Test if custom_file_density was loaded
@@ -3561,18 +3657,18 @@ server <- function(input, output, session){
   outputOptions(output, 'fluorescence1fileUploaded', suspendWhenHidden=FALSE)
 
   ### Test if custom_file_fluorescence1 was loaded
-  output$fluorescence2fileUploaded <- reactive({
-    if(is.null(input$custom_file_fluorescence2)) return(FALSE)
-    else return(TRUE)
-  })
-  outputOptions(output, 'fluorescence2fileUploaded', suspendWhenHidden=FALSE)
+  # output$fluorescence2fileUploaded <- reactive({
+  #   if(is.null(input$custom_file_fluorescence2)) return(FALSE)
+  #   else return(TRUE)
+  # })
+  # outputOptions(output, 'fluorescence2fileUploaded', suspendWhenHidden=FALSE)
 
   # Read data upon click on [Read data]
   observeEvent(input$read_custom,{
     showModal(modalDialog("Reading data input...", footer=NULL))
     density.file <- input$custom_file_density
     fl1.file <- input$custom_file_fluorescence1
-    fl2.file <- input$custom_file_fluorescence2
+    # fl2.file <- input$custom_file_fluorescence2
 
     if(is.null(density.file) && is.null(fl1.file) && is.null(fl2.file)) return(NULL)
 
@@ -3580,17 +3676,17 @@ server <- function(input, output, session){
     try(
       results$custom_data <- read_data(data.density = density.file$datapath,
                                        data.fluoro1 = fl1.file$datapath,
-                                       data.fluoro2 = fl2.file$datapath,
+                                       # data.fluoro2 = fl2.file$datapath,
                                        data.format = input$custom_format,
                                        sheet.density = input$custom_growth_sheets,
                                        sheet.fluoro1 = input$custom_fluorescence1_sheets,
-                                       sheet.fluoro2 = input$custom_fluorescence2_sheets,
+                                       # sheet.fluoro2 = input$custom_fluorescence2_sheets,
                                        csvsep = input$separator_custom_density,
                                        dec = input$decimal_separator_custom_density,
                                        csvsep.fl1 = input$separator_custom_density,
                                        dec.fl1 = input$decimal_separator_custom_density,
-                                       csvsep.fl2 = input$separator_custom_density,
-                                       dec.fl2 = input$decimal_separator_custom_density,
+                                       # csvsep.fl2 = input$separator_custom_density,
+                                       # dec.fl2 = input$decimal_separator_custom_density,
                                        subtract.blank = input$subtract_blank_custom)
     )
 
@@ -3608,18 +3704,18 @@ server <- function(input, output, session){
       if("fluorescence1" %in% names(results$custom_data) && length(results$custom_data$fluorescence1)>1){
         showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
       }
-      if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
-        showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
-      }
+      # if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+      #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+      # }
 
       # Remove eventually pre-loaded parsed data
       results$parse_data <- NULL
       hide("parsed_reads_density")
       hide("parsed_reads_fluorescence1")
-      hide("parsed_reads_fluorescence2")
+      # hide("parsed_reads_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+      # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
@@ -3793,87 +3889,87 @@ server <- function(input, output, session){
   })
 
   ### Render custom fluorescence 2 table
-  output$custom_table_fluorescence2 <- DT::renderDT({
-    inFile <- input$custom_file_fluorescence2
-
-    if(is.null(inFile))
-      return(NULL)
-
-    filename <- inFile$datapath
-    dec <- input$decimal_separator_custom_fluorescence2
-    csvsep <- input$separator_custom_fluorescence2
-    if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
-      f2 <-
-        utils::read.csv(
-          filename,
-          dec = dec,
-          sep = csvsep,
-          header = F,
-          stringsAsFactors = F,
-          fill = T,
-          na.strings = "",
-          quote = "",
-          comment.char = "",
-          check.names = F
-        )
-    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
-               stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
-      showModal(modalDialog("Reading data file...", footer=NULL))
-      f2 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence2_sheets, progress = T)))
-      removeModal()
-    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
-      f2 <-
-        utils::read.csv(
-          filename,
-          dec = dec,
-          sep = "\t",
-          header = F,
-          stringsAsFactors = F,
-          fill = T,
-          na.strings = "",
-          quote = "",
-          comment.char = "",
-          check.names = F
-        )
-    } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
-      f2 <-
-        utils::read.table(
-          filename,
-          dec = dec,
-          sep = "\t",
-          header = F,
-          stringsAsFactors = F,
-          fill = T,
-          na.strings = "",
-          quote = "",
-          comment.char = "",
-          check.names = F
-        )
-    }
-    f2[-(1:3),] <- apply(f2[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
-
-    #### Render experimental design table
-    if(!exists("output$custom_data_table_expdesign")){
-      output$custom_data_table_expdesign <- DT::renderDT({
-
-        f2.mat <- t(f2)
-        label <- unlist(lapply(1:nrow(f2.mat), function(x) paste(f2.mat[x,1], f2.mat[x,2], f2.mat[x,3], sep = " | ")))
-        condition <- f2.mat[, 1]
-        replicate <- f2.mat[, 2]
-        concentration <- f2.mat[, 3]
-
-        expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
-
-        expdesign[-1, ]
-      })
-    }
-
-    colnames(f2)[1] <- "Time"
-    f2[1,1] <- ""
-    datatable(f2,
-              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f2)-3)))
-  })
+  # output$custom_table_fluorescence2 <- DT::renderDT({
+  #   inFile <- input$custom_file_fluorescence2
+  #
+  #   if(is.null(inFile))
+  #     return(NULL)
+  #
+  #   filename <- inFile$datapath
+  #   dec <- input$decimal_separator_custom_fluorescence2
+  #   csvsep <- input$separator_custom_fluorescence2
+  #   if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
+  #     f2 <-
+  #       utils::read.csv(
+  #         filename,
+  #         dec = dec,
+  #         sep = csvsep,
+  #         header = F,
+  #         stringsAsFactors = F,
+  #         fill = T,
+  #         na.strings = "",
+  #         quote = "",
+  #         comment.char = "",
+  #         check.names = F
+  #       )
+  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
+  #              stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
+  #     showModal(modalDialog("Reading data file...", footer=NULL))
+  #     f2 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence2_sheets, progress = T)))
+  #     removeModal()
+  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
+  #     f2 <-
+  #       utils::read.csv(
+  #         filename,
+  #         dec = dec,
+  #         sep = "\t",
+  #         header = F,
+  #         stringsAsFactors = F,
+  #         fill = T,
+  #         na.strings = "",
+  #         quote = "",
+  #         comment.char = "",
+  #         check.names = F
+  #       )
+  #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
+  #     f2 <-
+  #       utils::read.table(
+  #         filename,
+  #         dec = dec,
+  #         sep = "\t",
+  #         header = F,
+  #         stringsAsFactors = F,
+  #         fill = T,
+  #         na.strings = "",
+  #         quote = "",
+  #         comment.char = "",
+  #         check.names = F
+  #       )
+  #   }
+  #   f2[-(1:3),] <- apply(f2[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
+  #
+  #   #### Render experimental design table
+  #   if(!exists("output$custom_data_table_expdesign")){
+  #     output$custom_data_table_expdesign <- DT::renderDT({
+  #
+  #       f2.mat <- t(f2)
+  #       label <- unlist(lapply(1:nrow(f2.mat), function(x) paste(f2.mat[x,1], f2.mat[x,2], f2.mat[x,3], sep = " | ")))
+  #       condition <- f2.mat[, 1]
+  #       replicate <- f2.mat[, 2]
+  #       concentration <- f2.mat[, 3]
+  #
+  #       expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
+  #
+  #       expdesign[-1, ]
+  #     })
+  #   }
+  #
+  #   colnames(f2)[1] <- "Time"
+  #   f2[1,1] <- ""
+  #   datatable(f2,
+  #             options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+  #             escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f2)-3)))
+  # })
 
 
 
@@ -3897,15 +3993,15 @@ server <- function(input, output, session){
   })
   outputOptions(output, 'custom_fluorescence1_format', suspendWhenHidden=FALSE)
 
-  output$custom_fluorescence2_format <- reactive({
-    if(is.null(input$custom_file_fluorescence2)) return(NULL)
-
-    filename <- input$custom_file_fluorescence2$name
-
-    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
-    format
-  })
-  outputOptions(output, 'custom_fluorescence2_format', suspendWhenHidden=FALSE)
+  # output$custom_fluorescence2_format <- reactive({
+  #   if(is.null(input$custom_file_fluorescence2)) return(NULL)
+  #
+  #   filename <- input$custom_file_fluorescence2$name
+  #
+  #   format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+  #   format
+  # })
+  # outputOptions(output, 'custom_fluorescence2_format', suspendWhenHidden=FALSE)
 
   growth_excel_sheets <- reactive({
     filename <- input$custom_file_density$datapath
@@ -3925,14 +4021,14 @@ server <- function(input, output, session){
     sheets
   })
 
-  fluorescence2_excel_sheets <- reactive({
-    filename <- input$custom_file_fluorescence2$datapath
-    if(is.null(input$custom_file_fluorescence2)) return("")
-    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
-    if(format != "xlsx" && format != "xls") return("")
-    sheets <- readxl::excel_sheets(input$custom_file_fluorescence2$datapath)
-    sheets
-  })
+  # fluorescence2_excel_sheets <- reactive({
+  #   filename <- input$custom_file_fluorescence2$datapath
+  #   if(is.null(input$custom_file_fluorescence2)) return("")
+  #   format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+  #   if(format != "xlsx" && format != "xls") return("")
+  #   sheets <- readxl::excel_sheets(input$custom_file_fluorescence2$datapath)
+  #   sheets
+  # })
 
   observe({
     updateSelectInput(inputId = "custom_growth_sheets",
@@ -3944,20 +4040,20 @@ server <- function(input, output, session){
                       choices = fluorescence1_excel_sheets()
     )})
 
-  observe({
-    updateSelectInput(inputId = "custom_fluorescence2_sheets",
-                      choices = fluorescence2_excel_sheets()
-    )})
+  # observe({
+  #   updateSelectInput(inputId = "custom_fluorescence2_sheets",
+  #                     choices = fluorescence2_excel_sheets()
+  #   )})
 
     ##__Parse data____####
   ### Hide elements to guide user
   hide("parsed_reads_density")
   hide("parsed_reads_fluorescence1")
-  hide("parsed_reads_fluorescence2")
+  # hide("parsed_reads_fluorescence2")
   hide("parse_data")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
-  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+  # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
   ### Test if parse_file was loaded
@@ -4050,11 +4146,11 @@ server <- function(input, output, session){
                       choices = selected_inputs_parsed_reads()
     )
   })
-  observe({
-    updateSelectInput(inputId = "parsed_reads_fluorescence2",
-                      choices = selected_inputs_parsed_reads()
-    )
-  })
+  # observe({
+  #   updateSelectInput(inputId = "parsed_reads_fluorescence2",
+  #                     choices = selected_inputs_parsed_reads()
+  #   )
+  # })
   observeEvent(input$mapping_included_in_parse,{
     if(input$mapping_included_in_parse) hide("map_file")
     if(!input$mapping_included_in_parse) show("map_file")
@@ -4063,7 +4159,6 @@ server <- function(input, output, session){
 
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
-
     showModal(modalDialog("Parsing data input...", footer=NULL))
     if(input$mapping_included_in_parse){
       try(
@@ -4085,12 +4180,12 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence1
           ),
-          fl2.nm = ifelse(
-            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-              input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
-            NA,
-            input$parsed_reads_fluorescence2
-          )
+          # fl2.nm = ifelse(
+          #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+          #   NA,
+          #   input$parsed_reads_fluorescence2
+          # )
         )
       )
     } else {
@@ -4116,12 +4211,12 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence1
           ),
-          fl2.nm = ifelse(
-            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-              input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
-            NA,
-            input$parsed_reads_fluorescence1
-          )
+          # fl2.nm = ifelse(
+          #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+          #   NA,
+          #   input$parsed_reads_fluorescence1
+          # )
         )
       )
     }
@@ -4135,14 +4230,14 @@ server <- function(input, output, session){
     if("fluorescence1" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence1)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
     }
-    if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
-      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
-    }
+    # if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
+    #   showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+    # }
     # Remove eventually pre-loaded custom data
     results$custom_data <- NULL
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
-    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+    # hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
 
     shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
@@ -4182,22 +4277,22 @@ server <- function(input, output, session){
 
     table_fl1
   })
-  output$parsed_data_table_fluorescence2 <- DT::renderDT({
-
-    if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence2)<2) return(NULL)
-
-    table_fl2 <- t(results$parsed_data$fluorescence2)
-    table_fl2[-(1:3), ] <- apply(apply(table_fl2[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
-    rownames(table_fl2)[-(1:3)] <- ""
-    table_fl2 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
-                       table_fl2)
-
-    table_fl2 <- datatable(table_fl2,
-                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl2)-3)))
-
-    table_fl2
-  })
+  # output$parsed_data_table_fluorescence2 <- DT::renderDT({
+  #
+  #   if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence2)<2) return(NULL)
+  #
+  #   table_fl2 <- t(results$parsed_data$fluorescence2)
+  #   table_fl2[-(1:3), ] <- apply(apply(table_fl2[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+  #   rownames(table_fl2)[-(1:3)] <- ""
+  #   table_fl2 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
+  #                      table_fl2)
+  #
+  #   table_fl2 <- datatable(table_fl2,
+  #                          options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+  #                          escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl2)-3)))
+  #
+  #   table_fl2
+  # })
   output$parsed_data_table_expdesign <- DT::renderDT({
 
     if(is.null(results$parsed_data) || length(results$parsed_data$expdesign)<2) return(NULL)
@@ -4341,6 +4436,22 @@ server <- function(input, output, session){
   })
     ##____Fluorescence____#####
   # Create vector of x_types based on presence of data types
+  output$normalized_fl_present <- reactive({
+    if(!is.null(results$custom_data)){
+      grodata <- results$custom_data
+    } else if(!is.null(results$parsed_data)){
+      grodata <- results$parsed_data
+    } else return(FALSE)
+
+    if(length(grodata$norm.fluorescence1) > 1){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  })
+  outputOptions(output, 'normalized_fl_present', suspendWhenHidden=FALSE)
+
+
   selected_inputs_fluorescence_x_types <- reactive({
     if(is.null(results$custom_data) && is.null(results$parsed_data)) return(NULL)
     if(!is.null(results$custom_data)) data <- results$custom_data
@@ -4630,12 +4741,12 @@ server <- function(input, output, session){
   table_growth_dr_spline <- reactive({
     try({
       res.table.dr <- results$growth$drFit$drTable
-      table_dr_spline <- data.frame("Test" = res.table.dr$Test,
+      table_dr <- data.frame("Test" = res.table.dr$Test,
                                 "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
                                 "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
                                 "Test parameter" = res.table.dr[["test"]],
                                 stringsAsFactors = F, check.names = F)
-      if(!is.null(res.table.dr_spline)){
+      if(!is.null(res.table.dr)){
         if(results$growth$control$log.x.dr){
           table_dr <- suppressWarnings(cbind(table_dr,
                                              data.frame("EC50 (original)" = round(as.numeric(res.table.dr[["EC50.orig"]]), 3),
@@ -4647,13 +4758,13 @@ server <- function(input, output, session){
                                                         stringsAsFactors = F, check.names = F)))
         }
         if ( results$growth$control$nboot.dr > 2 ){
-          table_dr_spline <- suppressWarnings(cbind(table_dr_spline,
+          table_dr <- suppressWarnings(cbind(table_dr,
                                              data.frame("Mean EC50 (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50"]]), 3), sep = " \u00B1 "),
                                                         "Response(EC50) (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50y"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50y"]]), 3), sep = " \u00B1 "),
                                                         stringsAsFactors = F, check.names = F)))
         }
       }
-      table_dr_spline
+      table_dr
     })
   })
 
@@ -5115,7 +5226,7 @@ server <- function(input, output, session){
 
   lin.rerun.param <- reactiveValues()
 
-  observeEvent(input$rerun_growth_linear.growth, {
+  observeEvent(input$rerun_growth_linear, {
     # display a modal dialog with a header, textinput and action buttons
     showModal(
       modalDialog(
@@ -5151,8 +5262,8 @@ server <- function(input, output, session){
       control <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control
       control_new <- control
       gcID <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$gcID
-
-      lin.h.new <- dplyr::if_else(!is.na(as.numeric(input$lin.h.rerun)), as.numeric(input$lin.h.rerun), control$lin.h)
+browser()
+      lin.h.new <- dplyr::if_else(!is.na(as.numeric(input$lin.h.rerun)), as.numeric(input$lin.h.rerun), as.numeric(control$lin.h))
       if(!is.na(lin.h.new)) control_new$lin.h <- lin.h.new
       control_new$lin.R2 <- dplyr::if_else(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
       control_new$lin.RSD <- dplyr::if_else(!is.na(as.numeric(input$lin.RSD.rerun)), as.numeric(input$lin.RSD.rerun), control$lin.RSD)
@@ -5247,13 +5358,15 @@ server <- function(input, output, session){
                       inputId = "sample_validate_growth_spline",
                       choices = selected_inputs_validate_growth_spline_sample(),
                       selected = selected_vals_validate_growth$sample_validate_growth_spline
-    )})
+    )
+  })
 
 
   output$validate_growth_plot_spline <- renderPlot({
     results <- results$growth
     if(length(results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
+
       try(plot.gcFitSpline(gcFittedSpline = results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]],
                            log.y = input$logy_validate_growth_plot_spline,
                            x.lim = c(input$x_range_min_validate_growth_plot_spline, input$x_range_max_validate_growth_plot_spline),
@@ -6306,7 +6419,7 @@ server <- function(input, output, session){
       reference.nm <- NULL
     }
     plot.parameter(results,
-                   param = input$parameter_growth_parameter_growth_plot,
+                   param = input$parameter_parameter_growth_plot,
                    names = input$select_sample_based_on_string_growth_parameter_plot,
                    conc = input$select_sample_based_on_concentration_growth_parameter_plot,
                    exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
@@ -6406,7 +6519,7 @@ server <- function(input, output, session){
   })
 
   observe({
-    updateSelectInput(inputId = "parameter_growth_parameter_growth_plot",
+    updateSelectInput(inputId = "parameter_parameter_growth_plot",
                       choices = selected_inputs_parameter_growth_parameter_plot()
     )})
 
@@ -6429,6 +6542,86 @@ server <- function(input, output, session){
     updateSelectInput(inputId = "individual_plots_dose_response_growth_plot_bt",
                       choices = select_inputs_individual_plots_dose_response_growth_plot_bt())
   })
+
+  ### DR Parameter Plots ####
+  observe({
+    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1){
+      showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponseParameters")
+    } else {
+      hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponseParameters")
+    }
+  })
+
+  growth_dr_parameter_plot <- reactive({
+    results <- results$growth
+
+    if (input$normalize_to_reference_growth_dr_parameter_plot){
+      reference.nm <- input$reference_condition_growth_dr_parameter_plot
+    } else {
+      reference.nm <- NULL
+    }
+    plot.dr_parameter(results,
+                   param = input$parameter_dr_parameter_growth_plot,
+                   names = input$select_sample_based_on_string_growth_dr_parameter_plot,
+                   exclude.nm = input$exclude_sample_based_on_strings_growth_dr_parameter_plot,
+                   reference.nm = reference.nm,
+                   basesize = input$basesize_growth_dr_parameter_plot,
+                   label.size = input$label.size_growth_dr_parameter_plot
+    )
+  })
+
+  output$growth_dr_parameter_plot <- renderPlot({
+    growth_dr_parameter_plot()
+  })
+
+  output$download_growth_dr_parameter_plot <- downloadHandler(
+    filename = function() {
+      paste("growth_dr_parameter_plot",  input$format_download_growth_dr_parameter_plot, sep="")
+    },
+    content = function(file) {
+      ggsave(filename = file, width = input$width_download_growth_dr_parameter_plot,
+             height = input$height_download_growth_dr_parameter_plot,
+             dpi = input$dpi_download_growth_dr_parameter_plot)
+    },
+    contentType = ifelse(input$format_download_growth_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
+
+  )
+
+  selected_inputs_parameter_growth_dr_parameter_plot <- reactive({
+    results <- results$growth
+
+    dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50')
+    if(input$number_of_bootstrappings_dr_growth > 1){
+      dr_parameters <- c(dr_parameters, 'Response(EC50) - Bootstrap' = 'drboot.meanEC50', 'EC50 - Bootstrap' = 'drboot.meanEC50y')
+    }
+    dr_parameters
+  })
+
+  selected_inputs_reference_condition_growth_dr_parameter_plot <- reactive({
+    results <- results$growth
+    results$expdesign$condition
+  })
+
+  select_inputs_individual_plots_dose_response_growth_plot <- reactive({
+    if (length(results$growth$drFit)>1) names(results$growth$drFit$drFittedSplines)
+    else return("")
+  })
+
+  select_inputs_individual_plots_dose_response_growth_plot_bt <- reactive({
+    if (length(results$growth$drFit)>1 && results$growth$control$nboot.dr > 1) names(results$growth$drFit$drBootSplines)
+    else return("")
+  })
+
+  observe({
+    updateSelectInput(inputId = "parameter_dr_parameter_growth_plot",
+                      choices = selected_inputs_parameter_growth_dr_parameter_plot()
+    )})
+
+  observe({
+    updateSelectInput(inputId = "reference_condition_growth_dr_parameter_plot",
+                      choices = selected_inputs_reference_condition_growth_dr_parameter_plot()
+    )})
+
 
 
     ## Fluorescence Plots: #####
@@ -6506,6 +6699,33 @@ server <- function(input, output, session){
     },
     contentType = ifelse(input$format_download_fluorescence_group_plot == ".pdf", "image/pdf", "image/png")
   )
+
+  selected_inputs_fluorescence_group_plot_data_type <- reactive({
+    results <- results$fluorescence
+    selection <- c()
+    if(length(results$data$fluorescence1) > 1){
+      selection <- c(selection, "Raw fluorescence 1")
+    }
+    # if(length(results$data$fluorescence2) > 1){
+    #   selection <- c(selection, "Raw fluorescence 2")
+    # }
+    if(length(results$data$norm.fluorescence1) > 1){
+      selection <- c(selection, "Normalized FL1")
+    }
+    # if(length(results$data$norm.fluorescence2) > 1){
+    #   selection <- c(selection, "Normalized FL2")
+    # }
+    # if(length(results$data$norm.fluorescence2) > 1){
+    #   selection <- c(selection, "Normalized FL2")
+    # }
+    if(length(results$data$norm.fluorescence1) > 1 %% "s" %in% results$control$fit.opt){
+      selection <- c(selection, "Spline fits FL1")
+    }
+    # if(length(results$data$norm.fluorescence2) > 1 %% "s" %in% results$control$fit.opt){
+    #   selection <- c(selection, "Spline fits FL2")
+    # }
+    selection
+  })
 
       ### DR Plots Spline ####
   # Hide Spline dose-response plot if dr.method != "spline"
@@ -6759,7 +6979,7 @@ server <- function(input, output, session){
                                'Area under the curve (Spline)' = 'integral.spline')
           } else {
             gc_parameters <- c(gc_parameters,
-                               'increase rate (Spline)' = 'max_slope.spline',
+                               'Increase rate (Spline)' = 'max_slope.spline',
                                'Maximum fluorescence (Spline)' = 'A.spline',
                                'ΔFluorescence (Spline)' = 'dY.spline',
                                'Area under the curve (Spline)' = 'integral.spline')
@@ -6815,7 +7035,7 @@ server <- function(input, output, session){
 
     ## Dual Plot ####
       observe({
-        if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence) > 1){
+        if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence1) > 1){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
         } else {
           hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
@@ -7134,6 +7354,9 @@ server <- function(input, output, session){
 }
 
 
+
+
+shinyApp(ui = ui, server = server)
 
 
 shinyApp(ui = ui, server = server)

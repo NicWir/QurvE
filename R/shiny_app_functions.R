@@ -27,8 +27,8 @@ parse_data_shiny <-
            fl1.nm = NULL,
            fl2.nm = NULL
   ) {
-    if(is.na(fl1.nm)) fl1.nm <- NULL
-    if(is.na(fl2.nm)) fl2.nm <- NULL
+    if(!is.null(fl1.nm) && is.na(fl1.nm)) fl1.nm <- NULL
+    if(!is.null(fl2.nm) && is.na(fl2.nm)) fl2.nm <- NULL
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
     if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
@@ -116,7 +116,7 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
     read.data[[length(read.ndx)]] <- data.frame(data[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1),2:(ncol)])
     read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
   } else {
-    read.data[[1]] <- data.frame(data[read.ndx:(read.ndx + match(NA, data[read.ndx:nrow(data),3])-2),2:(ncol)])
+    read.data[[1]] <- data.frame(data[read.ndx:(read.ndx + match(NA, data[read.ndx:nrow(data),3])-2),2:(1+ncol)])
   }
   # Remove time points with NA in all samples
   for(i in 1:length(read.data))

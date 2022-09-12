@@ -1524,7 +1524,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
 {
-
+  n.ybreaks <- as.numeric(n.ybreaks)
   # x an object of class gcFittedSpline
   if(is(gcFittedSpline) != "gcFitSpline") stop("gcFittedSpline needs to be an object created with growth.gcFitSpline().")
   # /// check input parameters
@@ -1981,16 +1981,18 @@ plot.grofit <- function(grofit, ...,
   #keep only replicate indices if condition defined in nm
     # get indices of samples with selected names
     ndx.keep <- grep(paste0(
-      str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
+      str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
     ndx.filt.rep <- ndx.filt.rep[unlist(lapply(1:length(ndx.filt.rep), function(i) all(ndx.filt.rep[[i]] %in% ndx.keep)))]
 
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                           gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
-                                                                                                           ".+[[:space:]]",
-                                                                                                           unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                                                           "$")), sample.nm[ndx.filt.rep[[j]]])]))
+                                                                                                           gsub("\\)", "\\\\)",
+                                                                                                                gsub("\\(", "\\\\(",
+                                                                                                                     gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])))),
+                                                                                                                ".+[[:space:]]",
+                                                                                                                unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                                "$")), sample.nm[ndx.filt.rep[[j]]])]))
   }
   ndx.filt <- unlist(filter.ls, recursive = F)
   ndx.filt <- ndx.filt[lapply(ndx.filt,length)>0]
@@ -2006,7 +2008,7 @@ plot.grofit <- function(grofit, ...,
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0("^",
-    str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
+                          str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
 
   if(data.type == "spline"){
     # correct for log transformation
@@ -2029,7 +2031,9 @@ plot.grofit <- function(grofit, ...,
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))),
+                                             gsub("\\)", "\\\\)",
+                                                  gsub("\\(", "\\\\(",
+                                                       gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))))),
                                              " \\|.+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
@@ -2554,12 +2558,17 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))),
-                                                                            ".+[[:space:]]",
-                                                                            unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                            "$"), nm[ndx.filt.rep[[j]]])]))
+                                                                                                             gsub("\\)", "\\\\)",
+                                                                                                                  gsub("\\(", "\\\\(",
+                                                                                                                       gsub("\\?", "\\\\?",
+                                                                                                                            gsub("\\.", "\\\\.",
+                                                                                                                                 gsub("\\+", "\\\\+",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             ".+[[:space:]]",
+                                                                                                             unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
     }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+    ndx.filt <- unlist(filter.ls, recursive = F)
   ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
 
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
@@ -2584,7 +2593,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   # apply normalization to reference condition
   if(!is.null(reference.nm) && reference.nm != ""){
-    ref.ndx <- grep(gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", gsub("\\?", "\\\\?", reference.nm))), labels)
+    ref.ndx <- grep( gsub("\\)", "\\\\)",
+                          gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", gsub("\\?", "\\\\?", reference.nm))))), labels)
     if (length(ref.ndx) > 1){
       if(!is.null(reference.conc)){
         refconc.ndx <- which(reference.conc == as.numeric(str_extract(labels, "[:graph:]+$")))
@@ -2698,8 +2708,10 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #' 'y.max', 'y.min', 'fc', 'K', or 'n' for fluorescence dose-response analyses with \code{dr.type = 'model'} in the \code{control} argument,
 #' or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
 #' @param basesize (Numeric) Base font size.
 #' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
+#' @param label.size (Numeric) Font size for sample labels below x-axis.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -2710,14 +2722,16 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #' @export
 #'
 plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
-                              names = NULL, basesize = 12, reference.nm = NULL,
+                              names = NULL, exclude.nm = NULL, basesize = 12, reference.nm = NULL, label.size = NULL,
                               plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   param <- match.arg(param)
+  names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
+  exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
   # check class of object
   if(!(any(is(object) %in% c("drTable", "grofit", "drFit", "flFitRes")))) stop("object needs to be either a 'grofit', 'drTable', 'drFit', or 'flFitRes' object created with growth.workflow(), growth.drFit(), fl.workflow(), or growth.drFit().")
   if(!is.character(param) || !(param %in% c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y')))
-    stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'yEC50', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
+    stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
   #extract drTable
   if(any(is(object) %in% "drTable")){
     drTable <- object
@@ -2744,6 +2758,12 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
     names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
+  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
+    if(!is.na(exclude.nm) && exclude.nm != ""){
+      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+    }
+  }
   if(length(nm)==0){
     stop("Please run plot.parameters() with valid 'names' or 'conc' argument.")
   }
@@ -2751,17 +2771,9 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   values <- drTable[, param]
   # apply normalization to reference condition
   if(!is.null(reference.nm)){
-    ref.ndx <- grep(reference.nm, labels)
-    if (length(ref.ndx) > 1){
-      if(!is.null(reference.conc)){
-        refconc.ndx <- which(reference.conc == str_extract(labels, "[:alnum:]+$"))
-        ref.ndx <- intersect(refconc.ndx, ref.ndx)
-      } else {
-        ref.ndx <- ref.ndx[1]
-      }
-    }
+    ref.ndx <- grep(reference.nm, nm)
     if(length(ref.ndx) > 1){
-      message("The provided combination of reference.nm = '", reference.nm, "' and reference.conc = ", reference.conc, " did not allow for the unique identification of a reference condition. The first match will be returned.")
+      message("The provided combination of reference.nm = '", reference.nm, " did not allow for the unique identification of a reference condition. The first match will be returned.")
       ref.ndx <- ref.ndx[1]
     }
     value.ref <- values[ref.ndx]
@@ -2772,11 +2784,13 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   df$name <- factor(df$name, levels = df$name)
   df$values[is.na(df$values)] <- 0
 
+  if(is.null(label.size) || label.size == "") label.size <-  12-length(unique(df$name))^(1/3)
+
   p <- ggplot(df, aes(x=name, y=values)) +
     geom_bar(stat="identity", color = "black") +
     ggplot2::labs(x = "Condition", y = param) +
     theme_minimal(base_size = basesize) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12-length(unique(df$name))^(1/3)),
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = label.size),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"),
           # remove the vertical grid lines
           panel.grid.major.x = element_blank() ,

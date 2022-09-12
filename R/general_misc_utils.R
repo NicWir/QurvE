@@ -203,20 +203,11 @@ zipFastener <- function(df1, df2, along=2)
 }
 
 
+
+
+#' Run Shiny QurvE app
 #'
-#' @import plyr
-#' @import shiny
-#' @import shinyjs
-#' @import shinyBS
-#' @import shinycssloaders
-#' @import shinyFiles
-#' @import readxl
-#' @import tidyverse
-#' @import shinythemes
-#' @import DT
-#' @import doParallel
-#' @import knitr
-#' @import kableExtra
+#' @export
 #'
 run_app <- function() {
 
@@ -248,7 +239,7 @@ parse_Gen5Gen6 <- function(input)
     read.data[[length(read.ndx)]] <- data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1),2:(ncol)])
     read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
   } else {
-    read.data[[1]] <- data.frame(input[read.ndx:(read.ndx + match(NA, input[read.ndx:nrow(input),3])-2),2:(ncol)])
+    read.data[[1]] <- data.frame(input[read.ndx:(read.ndx + match(NA, input[read.ndx:nrow(input),3])-2),2:(1+ncol)])
   }
   # Remove time points with NA in all samples
   for(i in 1:length(read.data))
