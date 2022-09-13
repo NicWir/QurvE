@@ -2585,7 +2585,7 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
     res.table.fl1 <- flFitRes$flFit1$flTable
   }
   if(!exists("res.table.dr1")){
-    if(length(flFitRes$drFit1)>1 && !is.na(flFitRes$drFit1$drTable)) res.table.dr1 <- flFitRes$drFit1$drTable
+    if(length(flFitRes$drFit1)>1 && length(flFitRes$drFit1$drTable)>2) res.table.dr1 <- flFitRes$drFit1$drTable
   }
   if(!exists("res.table.gc2")){
     if(length(flFit2)>1){

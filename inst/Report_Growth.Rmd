@@ -943,7 +943,7 @@ cat(paste0("_", length(levels(grofit[["data"]][["concentration"]])), "_ differen
            paste(colFmt(levels(grofit[["data"]][["concentration"]]), 'NavyBlue'), collapse = ", ")))
 ec50.df <- data.frame()
 for(i in 1:length(grofit$drFit$drFittedSplines)){
-  ec50.df <- rbind.fill(ec50.df, data.frame("Condition" = names(grofit$drFit$drFittedSplines)[i],
+  ec50.df <- plyr::rbind.fill(ec50.df, data.frame("Condition" = names(grofit$drFit$drFittedSplines)[i],
                               "EC50" = round(grofit$drFit$drFittedSplines[[i]]$parameters$EC50, 3),
                               "Response" = round(grofit$drFit$drFittedSplines[[i]]$parameters$yEC50, 3))
   )
@@ -960,7 +960,7 @@ plot.drFit(grofit$drFit, export = export, combine = TRUE, basesize = 12)
 boot.ec50.df <- data.frame()
   for (i in 1:length(grofit$drFit$drBootSplines)){
     boot.ec50.df <-
-      rbind.fill(
+      plyr::rbind.fill(
         boot.ec50.df,
         data.frame(
           "Condition" = grofit$drFit$drTable$Test[i],

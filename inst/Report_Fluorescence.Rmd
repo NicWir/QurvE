@@ -80,23 +80,31 @@ The following parameters were used to fit the data:
 
 \pagebreak
 ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1){"Graphical overview -  Fluorescence 1"}`
-```{r dual_plot_fl1, fig.width="100%", fig.height = "100%", echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1}
-plot.dual(flFitRes, fluorescence = "fl1", export = export)
+```{r dual_plot_fl1, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1}
+suppressWarnings(
+  plot.dual(flFitRes, fluorescence = "fl1", export = export)
+)
 ```
 
 ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1){"Graphical overview -  Normalized fluorescence 1"}`
-```{r dual_plot_norm.fl1, fig.width="100%", fig.height = "100%", echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1}
-plot.dual(flFitRes, fluorescence = "norm.fl1", export = export)
+```{r dual_plot_norm.fl1, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1}
+suppressWarnings(
+  plot.dual(flFitRes, fluorescence = "norm.fl1", export = export)
+)
 ```
 
 ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1){"Graphical overview -  Fluorescence 2"}`
-```{r dual_plot_fl2, fig.width="100%", fig.height = "100%", echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1}
-plot.dual(flFitRes, fluorescence = "fl2", export = export)
+```{r dual_plot_fl2, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1}
+suppressWarnings(
+  plot.dual(flFitRes, fluorescence = "fl2", export = export)
+)
 ```
 
 ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1){"Graphical overview -  Normalized fluorescence 2"}`
-```{r dual_plot_norm.fl2, fig.width="100%", fig.height = "100%", echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1}
-plot.dual(flFitRes, fluorescence = "norm.fl2", export = export)
+```{r dual_plot_norm.fl2, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1}
+suppressWarnings(
+  plot.dual(flFitRes, fluorescence = "norm.fl2", export = export)
+)
 ```
 
 `r if((length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1)){"\\pagebreak"}`
@@ -139,9 +147,15 @@ if(any(c("l") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
-try(plot.parameter(flFitRes, param = "max_slope.linfit", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(flFitRes, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(flFitRes, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+try(suppressWarnings(
+  plot.parameter(flFitRes, param = "max_slope.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+)
+try(suppressWarnings(
+  plot.parameter(flFitRes, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+)
+try(suppressWarnings(
+  plot.parameter(flFitRes, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+)
 ```
 `r if(any(c("l") %in% control$fit.opt)){"\\clearpage"}`
 
@@ -180,9 +194,15 @@ if(any(c("s") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
-try(plot.parameter(flFitRes, param = "max_slope.spline", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(flFitRes, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(flFitRes, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
+try(suppressWarnings(
+  plot.parameter(flFitRes, param = "max_slope.spline", export = export, out.dir = paste0(wd, "/Plots")))
+)
+try(suppressWarnings(
+  plot.parameter(flFitRes, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
+)
+try(suppressWarnings(
+  plot.parameter(flFitRes, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
+)
 ```
 \clearpage
 
@@ -304,7 +324,9 @@ if(any(c("l") %in% control$fit.opt)){
     grDevices::dev.off()
   }
   if (plot == TRUE){
-    p()
+    suppressWarnings(
+      p()
+    )
   }
 }
   
@@ -609,7 +631,7 @@ if(any(c("s") %in% control$fit.opt)) {
           scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
           scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
 
-        p <- ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1))
+        p <- suppressWarnings(ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1)))
 
       }
 
@@ -630,7 +652,9 @@ if(any(c("s") %in% control$fit.opt)) {
         grDevices::dev.off()
       }
       if (plot == TRUE){
-        print(p)
+        
+          print(p)
+        
       }
     } # else of if (add == TRUE)
   } # else of if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE))
@@ -651,7 +675,9 @@ if(any(c("s") %in% control$fit.opt)) {
                 pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
                 ))))), ".pdf"))
-                plot.ggSpline()
+                suppressWarnings(
+                  plot.ggSpline()
+                )
                 invisible(dev.off())
               }
             }
@@ -663,7 +689,9 @@ if(any(c("s") %in% control$fit.opt)) {
                 pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
                 ))))),  ".pdf"))
-                plot.ggSpline()
+                suppressWarnings(
+                  plot.ggSpline()
+                )
                 invisible(dev.off())
               }
             }
@@ -689,7 +717,7 @@ cat(paste0("_", length(flFitRes$drFit1$drTable$Test), "_ conditions were identif
 cat("  \n")
 ec50.df <- data.frame()
 for(i in 1:length(flFitRes$drFit1$drFittedSplines)){
-  ec50.df <- rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit1$drFittedSplines)[i],
+  ec50.df <- plyr::rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit1$drFittedSplines)[i],
                               "EC50" = round(flFitRes$drFit1$drFittedSplines[[i]]$parameters$EC50, 3),
                               "Response" = round(flFitRes$drFit1$drFittedSplines[[i]]$parameters$yEC50, 3))
   )
@@ -699,14 +727,16 @@ knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 ```
 
 ```{r ec50_spline_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedSplines"]]) > 0}
-plot.drFit(flFitRes$drFit1, export = export)
+suppressWarnings(
+  plot.drFit(flFitRes$drFit1, export = export)
+)
 ```
 
 ```{r ec50.boot_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
 boot.ec50.df <- data.frame()
   for (i in 1:length(flFitRes$drFit1$drBootSplines)){
     boot.ec50.df <-
-      rbind.fill(
+      plyr::rbind.fill(
         boot.ec50.df,
         data.frame(
           "Condition" = flFitRes$drFit1$drTable$Test[i],
@@ -732,7 +762,7 @@ cat("  \n")
 
 ec50.df <- data.frame()
 for(i in 1:length(flFitRes$drFit1$drFittedModels)){
-  ec50.df <- rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit1$drFittedModels)[i],
+  ec50.df <- plyr::rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit1$drFittedModels)[i],
                               "K" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$K.orig, 3),
                               "y.min" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$y.min, 3),
                               "y.max" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$y.max, 3),
@@ -747,12 +777,22 @@ knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 
 ```{r ec50_model_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 1}
 for(i in 1:length(flFitRes[["drFit1"]][["drFittedModels"]])){
-  plot.drFitModel(flFitRes$drFit1$drFittedModels[[i]], export = export)
+  suppressWarnings(
+    plot.drFitModel(flFitRes$drFit1$drFittedModels[[i]], export = export)
+  )
 }
-plot.dr_parameter(flFitRes, param = "K", export = export)
-plot.dr_parameter(flFitRes, param = "fc", export = export)
-plot.dr_parameter(flFitRes, param = "y.min", export = export)
-plot.dr_parameter(flFitRes, param = "y.max", export = export)
+suppressWarnings(
+  plot.dr_parameter(flFitRes, param = "K", export = export)
+)
+suppressWarnings(
+  plot.dr_parameter(flFitRes, param = "fc", export = export)
+)
+suppressWarnings(
+  plot.dr_parameter(flFitRes, param = "y.min", export = export)
+)
+suppressWarnings(
+  plot.dr_parameter(flFitRes, param = "y.max", export = export)
+)
 ```
 
 `r if(!all(is.na(mean.grp))){"\\clearpage"}`
@@ -762,19 +802,25 @@ plot.dr_parameter(flFitRes, param = "y.max", export = export)
 if("all" %in% mean.grp){
   if(length(flFitRes$flFit1$flFittedSplines[[1]]$spline)>1){
     logy <- control$log.y.spline
-    plot.flFitRes(flFitRes, basesize = 15, export = export, log.y = logy, mean = T, out.dir = paste0(wd, "/Plots"))
+    suppressWarnings(
+      plot.flFitRes(flFitRes, basesize = 15, export = export, log.y = logy, mean = T, out.dir = paste0(wd, "/Plots"))
+    )
   }
 } else if(!all(is.na(mean.grp))){
-    for(i in 1:length(mean.grp)){
-      if(length(grep(mean.grp[i], as.character(names(flFitRes$flFit1$flFittedSplines))))>0){
+  for(i in 1:length(mean.grp)){
+    if(length(grep(mean.grp[i], as.character(names(flFitRes$flFit1$flFittedSplines))))>0){
+      suppressWarnings(
         plot.flFitRes(flFitRes, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
-      }
+      )
     }
+  }
 }
 if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
     if(length(grep(mean.conc[i], str_extract(names(flFitRes$flFit1$flFittedSplines), "[:alnum:]+$")))>0){
-      plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+      suppressWarnings(
+        plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+      )
     }
   }
 }
