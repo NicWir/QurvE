@@ -25,7 +25,8 @@ parse_data_shiny <-
            subtract.blank  = T,
            density.nm = NULL,
            fl1.nm = NULL,
-           fl2.nm = NULL
+           fl2.nm = NULL,
+           calibration = NULL
   ) {
     if(!is.null(fl1.nm) && is.na(fl1.nm)) fl1.nm <- NULL
     if(!is.null(fl2.nm) && is.na(fl2.nm)) fl2.nm <- NULL
@@ -93,7 +94,7 @@ parse_data_shiny <-
       }
     }
     names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
-    grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank)
+    grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank, calibration = calibration)
 
     return(grodata)
   }

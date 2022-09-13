@@ -257,8 +257,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                       label = 'Subtract blank',
                                                                       value = TRUE),
 
-                                                        checkboxInput(inputId = 'calibration',
-                                                                      label = 'Calibration (under construction)'),
+                                                        checkboxInput(inputId = 'calibration_custom',
+                                                                      label = 'Apply calibration'),
+
+                                                        conditionalPanel(
+                                                          condition = 'input.calibration_custom',
+                                                          textInput(inputId = "calibration_equation_custom",
+                                                                    label = "Type equation in the form 'y = function(x)'",
+                                                                    placeholder = 'y = x * 0.5 - 1'
+                                                          )
+                                                        ),
+
                                                         conditionalPanel(
                                                           condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
                                                           fluidRow(
@@ -413,7 +422,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                       value = TRUE),
 
                                                         checkboxInput(inputId = 'calibration_plate_reader',
-                                                                      label = 'Calibration (under construction)'),
+                                                                      label = 'Apply calibration'),
+
+                                                        conditionalPanel(
+                                                          condition = 'input.calibration_plate_reader',
+                                                          textInput(inputId = "calibration_equation_plate_reader",
+                                                                    label = "Type equation in the form 'y = function(x)'",
+                                                                    placeholder = 'y = x * 0.5 - 1'
+                                                          )
+                                                        ),
+
                                                         fluidRow(
                                                           column(12,
                                                                  div(
@@ -443,12 +461,22 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                     tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
                                                                 tabPanel(title = "Density", value = "tabPanel_custom_tables_density",
                                                                          withSpinner(
-                                                                           DT::dataTableOutput("growth_data")
+                                                                           DT::dataTableOutput("growth_data_rendered")
+                                                                         )
+                                                                ),
+                                                                tabPanel(title = "Density", value = "tabPanel_custom_tables_density_processed",
+                                                                         withSpinner(
+                                                                           DT::dataTableOutput("growth_data_custom_processed")
                                                                          )
                                                                 ),
                                                                 tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1",
                                                                          withSpinner(
                                                                            DT::dataTableOutput("custom_table_fluorescence1")
+                                                                         )
+                                                                ),
+                                                                tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1_processed",
+                                                                         withSpinner(
+                                                                           DT::dataTableOutput("custom_table_fluorescence1_processed")
                                                                          )
                                                                 ),
                                                                 # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
@@ -3850,7 +3878,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                     ) # div(
                   ) # hidden(
                 ), # tagList(
-                verbatimTextOutput("debug")
+                # verbatimTextOutput("debug")
 )
 
 #____SERVER____####
@@ -3858,11 +3886,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 server <- function(input, output, session){
   load_data()
 
-  output$debug <- renderPrint({
-
-    paste(
-      output$normalized_fl_present)
-    })
+  # output$debug <- renderPrint({
+  #
+  #   paste(
+  #     output$normalized_fl_present)
+  #   })
   # Disable navbar menus before running computations
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Report]")
@@ -3938,10 +3966,6 @@ server <- function(input, output, session){
   })
   outputOptions(output, 'fluorescence_present', suspendWhenHidden=FALSE)
     ##___Custom____####
-  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
-  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
-  # hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
-  hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
 
   ### Test if custom_file_density was loaded
   output$growthfileUploaded <- reactive({
@@ -3988,22 +4012,16 @@ server <- function(input, output, session){
                                        dec.fl1 = input$decimal_separator_custom_density,
                                        # csvsep.fl2 = input$separator_custom_density,
                                        # dec.fl2 = input$decimal_separator_custom_density,
-                                       subtract.blank = input$subtract_blank_custom)
+                                       subtract.blank = input$subtract_blank_custom,
+                                       calibration = input$calibration_equation_custom)
     )
 
     if(length(results$custom_data)<2){
       showModal(modalDialog("Data could not be extracted from the provided file. Did you correctly format your custom data?", easyClose = T, footer=NULL))
     } else {
-
-      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
-
       if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
-        showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
         # show [Run Computation] button in Computation-Growth
         show("run_growth")
-      }
-      if("fluorescence1" %in% names(results$custom_data) && length(results$custom_data$fluorescence1)>1){
-        showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
       }
       # if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
       #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
@@ -4026,7 +4044,7 @@ server <- function(input, output, session){
   })
 
   ### Render custom density table
-  output$growth_data <- DT::renderDT({
+  growth_data_custom <- reactive({
     inFile <- input$custom_file_density
 
     if(is.null(inFile))
@@ -4052,7 +4070,9 @@ server <- function(input, output, session){
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
       showModal(modalDialog("Reading data file...", footer=NULL))
-      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_growth_sheets, progress = T)))
+      try(
+        dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_growth_sheets, progress = T)))
+        )
       removeModal()
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
       dat <-
@@ -4083,31 +4103,79 @@ server <- function(input, output, session){
           check.names = F
         )
     }
-    dat[-(1:3),] <- apply(dat[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
+    if(exists("dat")){
+      dat[-(1:3),] <- apply(dat[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
 
-    #### Render experimental design table
-    output$custom_data_table_expdesign <- DT::renderDT({
+      colnames(dat)[1] <- "Time"
+      dat[1,1] <- ""
+      return(dat)
+    } else return(NULL)
+  })
 
-      dat.mat <- t(dat)
-      label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
-      condition <- dat.mat[, 1]
-      replicate <- dat.mat[, 2]
-      concentration <- dat.mat[, 3]
-
-      expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
-
-      expdesign[-1, ]
-    })
-
-    colnames(dat)[1] <- "Time"
-    dat[1,1] <- ""
+  output$growth_data_rendered <- DT::renderDT({
+    dat <- growth_data_custom()
     datatable(dat,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(dat)-3)))
   })
 
+  #### Render experimental design table
+  custom_data_table_expdesign <- reactive({
+    if(is.null(growth_data_custom()) && is.null(custom_table_fluorescence1())) return(NULL)
+    else if(!is.null(growth_data_custom())){
+      dat <- growth_data_custom()
+    }
+    else if(!is.null(custom_table_fluorescence1())){
+      dat <- custom_table_fluorescence1()
+    }
+
+    dat.mat <- t(dat)
+    label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
+    condition <- dat.mat[, 1]
+    replicate <- dat.mat[, 2]
+    concentration <- dat.mat[, 3]
+
+    expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
+
+    expdesign[-1, ]
+  })
+
+  output$custom_data_table_expdesign <- DT::renderDT({
+    custom_data_table_expdesign()
+  })
+
+
+  observe({
+    if(exists("growth_data_custom") && !is.null(growth_data_custom()) && is.null(growth_data_custom_processed()) ){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+    } else {
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+    }
+    if(exists("custom_table_fluorescence1") && !is.null(custom_table_fluorescence1()) && is.null(custom_table_fluorescence1_processed()) ){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1", select = TRUE)
+    } else {
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
+    }
+    if(exists("custom_data_table_expdesign") && !is.null(custom_data_table_expdesign())){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+    } else {
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
+    }
+    if(exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed())){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed", select = TRUE)
+    } else {
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed")
+    }
+    if(exists("custom_table_fluorescence1_processed") && !is.null(custom_table_fluorescence1_processed()) ){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1_processed", select = TRUE)
+    } else {
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1_processed")
+    }
+  })
+
+
   ### Render custom fluorescence 1 table
-  output$custom_table_fluorescence1 <- DT::renderDT({
+  custom_table_fluorescence1 <- reactive({
     inFile <- input$custom_file_fluorescence1
 
     if(is.null(inFile))
@@ -4133,7 +4201,9 @@ server <- function(input, output, session){
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
       showModal(modalDialog("Reading data file...", footer=NULL))
-      f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence1_sheets, progress = T)))
+      try(
+        f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence1_sheets, progress = T)))
+      )
       removeModal()
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
       f1 <-
@@ -4164,29 +4234,62 @@ server <- function(input, output, session){
           check.names = F
         )
     }
+    if(exists("f1")){
     f1[-(1:3),] <- apply(f1[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
-
-    #### Render experimental design table
-    if(!exists("output$custom_data_table_expdesign")){
-      output$custom_data_table_expdesign <- DT::renderDT({
-
-        f1.mat <- t(f1)
-        label <- unlist(lapply(1:nrow(f1.mat), function(x) paste(f1.mat[x,1], f1.mat[x,2], f1.mat[x,3], sep = " | ")))
-        condition <- f1.mat[, 1]
-        replicate <- f1.mat[, 2]
-        concentration <- f1.mat[, 3]
-
-        expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
-
-        expdesign[-1, ]
-      })
-    }
-
     colnames(f1)[1] <- "Time"
     f1[1,1] <- ""
+    return(f1)
+    } else return(NULL)
+  })
+
+  output$custom_table_fluorescence1 <- DT::renderDT({
+    f1 <- custom_table_fluorescence1()
     datatable(f1,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f1)-3)))
+  })
+
+  # Render processed density table
+  growth_data_custom_processed <- reactive({
+
+    if(is.null(results$custom_data) || length(results$custom_data$density) < 2) return(NULL)
+
+    table_density <- t(results$custom_data$density)
+    table_density[-(1:3), ] <- apply(apply(table_density[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
+    rownames(table_density)[-(1:3)] <- ""
+    table_density <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
+                           table_density)
+
+    table_density
+  })
+
+  output$growth_data_custom_processed <- DT::renderDT({
+    table_density <- growth_data_custom_processed()
+    datatable(table_density,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
+  })
+
+  # render processed fluorescence table
+  custom_table_fluorescence1_processed <- reactive({
+
+    if(is.null(results$custom_data) || length(results$custom_data$fluorescence1)<2) return(NULL)
+
+    table_fl1 <- t(results$custom_data$fluorescence1)
+    table_fl1[-(1:3), ] <- apply(apply(table_fl1[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+    rownames(table_fl1)[-(1:3)] <- ""
+    table_fl1 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
+                       table_fl1)
+
+    table_fl1 <- datatable(table_fl1,
+                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
+
+    table_fl1
+  })
+
+  output$custom_table_fluorescence1_processed <- DT::renderDT({
+    custom_table_fluorescence1_processed()
   })
 
   ### Render custom fluorescence 2 table
@@ -4481,6 +4584,7 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence1
           ),
+          calibration = input$calibration_equation_plate_reader
           # fl2.nm = ifelse(
           #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
           #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,

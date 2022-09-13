@@ -18,10 +18,12 @@
 #' @param dec.fl1 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 1 data. Default: \code{"."}
 #' @param csvsep.fl2 (Character) separator used in CSV file storing fluorescence 2 data (ignored for other file types). Default: \code{";"}
 #' @param dec.fl2 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 2 data. Default: \code{"."}
-#' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
+#' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]). If \code{calibration = TRUE}, blanks are subtracted after value conversion.
 #' @param sheet.density (Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (_optional_).
 #' @param sheet.fluoro1 (Numeric or Character) Number or name of the sheet with fluorescence 1 data in XLS or XLSX files (_optional_).
 #' @param sheet.fluoro2 (Numeric or Character) Number or name of the sheet with fluorescence 2 data in XLS or XLSX files (_optional_).
+#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
 #' @details
 #' \figure{Data_layout.png}
@@ -54,11 +56,13 @@ read_data <-
            sheet.density = 1,
            sheet.fluoro1 = 1,
            sheet.fluoro2 = 1,
-           subtract.blank  = T)
+           subtract.blank  = T,
+           calibration = NULL)
   {
     if(is.null(data.density)) data.density <- NA
     if(is.null(data.fluoro1)) data.fluoro1 <- NA
     if(is.null(data.fluoro2)) data.fluoro2 <- NA
+    if(!is.null(calibration) && calibration == "") calibration <- NULL
 
     # Load density data
     if (!is.character(data.density)) {
@@ -126,6 +130,44 @@ read_data <-
       } else {
         stop("Could not find 'time' in row 1 of any provided 'data.density', 'data.fluoro1', or 'data.fluoro2'.")
       }
+    }
+
+    if(!is.null(calibration)){
+      calibrate <- function(df){
+        #test if more than one time entity is present
+        time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
+        calib <- parse(text = calibration)
+        if(length(time.ndx)==1){
+          x <- matrix(as.numeric(unlist(df[-time.ndx, -(1:3)])), nrow = nrow(df[-time.ndx, -(1:3)]))
+          df[-time.ndx, -(1:3)] <- eval(calib)
+        } else { # identify different datasets based on the occurence of multiple 'time' entities
+          x <-  matrix(as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)])),
+                       nrow = nrow(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
+          df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)] <- eval(calib)
+          for (i in 2:(length(time.ndx))){
+            x <- matrix(as.numeric(unlist(df[if (is.na(time.ndx[i + 1])) {
+              (time.ndx[i] + 1):nrow(df)
+            } else {
+              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+            }, -(1:3)])), nrow = nrow(df[if (is.na(time.ndx[i + 1])) {
+              (time.ndx[i] + 1):nrow(df)
+            } else {
+              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+            }, -(1:3)]))
+
+            df[if (is.na(time.ndx[i + 1])) {
+              (time.ndx[i] + 1):nrow(df)
+            } else {
+              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+            }, -(1:3)] <- eval(calib)
+          } # end of for (i in 2:(length(time.ndx)))
+        } # end of else of if(length(time.ndx)==1)
+        return(df)
+      }
+      if(length(dat)>1)             dat <- calibrate(df = dat)
+      if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1 <- calibrate(df=fluoro1)
+      if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- calibrate(df=fluoro2)
+
     }
 
     # subtract blank
@@ -426,6 +468,8 @@ read_data <-
 #' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
 #' @param map.file (Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
+#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
 #' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for object structure.
 #'
@@ -442,7 +486,8 @@ parse_data <-
            dec.data = ".",
            csvsep.map = ";",
            dec.map = ".",
-           subtract.blank  = T
+           subtract.blank  = T,
+           calibration = NULL
   ) {
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
@@ -503,13 +548,13 @@ parse_data <-
     }
     if(length(data.ls)==1){
       names(data.ls) <- "density"
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = NA, data.fluoro2 = NA, subtract.blank = subtract.blank)
+      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = NA, data.fluoro2 = NA, subtract.blank = subtract.blank, calibration = calibration)
     } else if(length(data.ls)==2){
       names(data.ls) <- c("density", "fluorescence1")
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = NA, subtract.blank = subtract.blank)
+      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = NA, subtract.blank = subtract.blank, calibration = calibration)
     } else {
       names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank)
+      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank, calibration = calibration)
     }
     return(grodata)
   }
