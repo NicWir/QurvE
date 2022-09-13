@@ -945,15 +945,51 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  conditionalPanel(condition = "input.biphasic_growth",
                                                                                   h5("(Values in parentheses indicate parameters for secondary growth phase)")
                                                                  ),
-                                                                 DT::dataTableOutput('results_table_growth_linear'),
-                                                                 downloadButton('download_table_growth_linear',"Download table")
+
+                                                                 checkboxInput(inputId = 'grouped_results_growth_linear',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_linear",
+                                                                   DT::dataTableOutput('results_table_growth_linear')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_linear",
+                                                                   DT::dataTableOutput('results_table_growth_linear_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_linear",
+                                                                   downloadButton('download_table_growth_linear',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_linear",
+                                                                   downloadButton('download_table_growth_linear_group',"Download table")
+                                                                 ),
                                                         ),
                                                         tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
                                                                  conditionalPanel(condition = "input.biphasic_growth",
                                                                                   h5("(Values in parentheses indicate parameters for secondary growth phase)")
                                                                  ),
-                                                                 DT::dataTableOutput('results_table_growth_spline'),
-                                                                 downloadButton('download_table_growth_spline',"Download table")
+                                                                 checkboxInput(inputId = 'grouped_results_growth_spline',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_spline",
+                                                                   DT::dataTableOutput('results_table_growth_spline')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_spline",
+                                                                   DT::dataTableOutput('results_table_growth_spline_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_spline",
+                                                                   downloadButton('download_table_growth_spline',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_spline",
+                                                                   downloadButton('download_table_growth_spline_group',"Download table")
+                                                                 ),
                                                         ),
                                                         tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Growth_Spline_bt",
                                                                  DT::dataTableOutput('results_table_growth_spline_bt'),
@@ -976,15 +1012,49 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  conditionalPanel(condition = "input.biphasic_fluorescence",
                                                                                   h5("(Values in parentheses indicate parameters for secondary phase)")
                                                                  ),
-                                                                 DT::dataTableOutput('results_table_fluorescence1_linear'),
-                                                                 downloadButton('download_table_fluorescence1_linear',"Download table")
+                                                                 checkboxInput(inputId = 'grouped_results_fluorescence_linear',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_linear",
+                                                                   DT::dataTableOutput('results_table_fluorescence1_linear')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_linear",
+                                                                   DT::dataTableOutput('results_table_fluorescence1_linear_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_linear",
+                                                                   downloadButton('download_table_fluorescence1_linear',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_linear",
+                                                                   downloadButton('download_table_fluorescence1_linear_group',"Download table")
+                                                                 ),
                                                         ),
                                                         tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Fluorescence_Spline",
                                                                  conditionalPanel(condition = "input.biphasic_fluorescence",
                                                                                   h5("(Values in parentheses indicate parameters for secondary phase)")
                                                                  ),
-                                                                 DT::dataTableOutput('results_table_fluorescence1_spline'),
-                                                                 downloadButton('download_table_fluorescence1_spline',"Download table")
+                                                                 checkboxInput(inputId = 'grouped_results_fluorescence_spline',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_spline",
+                                                                   DT::dataTableOutput('results_table_fluorescence1_spline')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_spline",
+                                                                   DT::dataTableOutput('results_table_fluorescence1_spline_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_spline",
+                                                                   downloadButton('download_table_fluorescence1_spline',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_spline",
+                                                                   downloadButton('download_table_fluorescence1_spline_group',"Download table")
+                                                                 ),
                                                         ),
                                                         tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Fluorescence_Spline_bt",
                                                                  DT::dataTableOutput('results_table_fluorescence1_spline_bt'),
@@ -1616,7 +1686,36 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                  # icon=icon("gears"),
                                                                                                  style="padding:5px; font-size:120%")
                                                                              )
-                                                                           )
+                                                                           ),
+                                                                           HTML("<br>"),
+                                                                           h3(strong("Export plot")),
+
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "width_download_fluorescence_validate_linear",
+                                                                                                 label = "Width (in inches)",
+                                                                                                 value = 10)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "height_download_fluorescence_validate_linear",
+                                                                                                 label = "Height (in inches)",
+                                                                                                 value = 9)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "dpi_download_fluorescence_validate_linear",
+                                                                                                 label = "DPI",
+                                                                                                 value = 300)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_fluorescence_validate_linear',"Download Plot"),
+                                                                                    radioButtons("format_download_fluorescence_validate_linear",
+                                                                                                 label = NULL,
+                                                                                                 choices = c("PNG" = ".png",
+                                                                                                             "PDF" = ".pdf"),
+                                                                                                 selected = ".png",
+                                                                                                 inline = TRUE)
+                                                                             ) # column
+                                                                           ) # fluidRow
                                                                  )
 
                                                         ),
@@ -1732,6 +1831,38 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                  label = "Restore fit",
                                                                                                  # icon=icon("gears"),
                                                                                                  style="padding:5px; font-size:120%")
+                                                                             ) # column
+                                                                           ), # fluidRow
+
+                                                                           HTML("<br>"),
+
+                                                                           h3(strong("Export plot")),
+
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "width_download_fluorescence_validate_spline",
+                                                                                                 label = "Width (in inches)",
+                                                                                                 value = 10)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "height_download_fluorescence_validate_spline",
+                                                                                                 label = "Height (in inches)",
+                                                                                                 value = 9)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    numericInput(inputId = "dpi_download_fluorescence_validate_spline",
+                                                                                                 label = "DPI",
+                                                                                                 value = 300)
+                                                                             ), # column
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_fluorescence_validate_spline',"Download Plot"),
+
+                                                                                    radioButtons("format_download_fluorescence_validate_spline",
+                                                                                                 label = NULL,
+                                                                                                 choices = c("PNG" = ".png",
+                                                                                                             "PDF" = ".pdf"),
+                                                                                                 selected = ".png",
+                                                                                                 inline = TRUE)
                                                                              ) # column
                                                                            ) # fluidRow
                                                                  ) # mainPanel
@@ -2063,6 +2194,113 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  ) #  mainPanel
                                                         ),
 
+                                                        ### Growth Parameter Plots ####
+                                                        tabPanel(title = "Parameter Plots",
+                                                                 sidebarPanel(
+                                                                   selectInput(inputId = "parameter_parameter_growth_plot",
+                                                                               label = "Parameter",
+                                                                               choices = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
+                                                                             label = "Select sample based on string (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_concentration_growth_parameter_plot",
+                                                                             label = "Select sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_strings_growth_parameter_plot",
+                                                                             label = "Exclude sample based on strings (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_concentration_growth_parameter_plot",
+                                                                             label = "Exclude sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = 'normalize_to_reference_growth_parameter_plot',
+                                                                                 label = 'normalize to reference',
+                                                                                 value = FALSE),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   # Conditional Panel
+                                                                   conditionalPanel(condition = "input.normalize_to_reference_growth_parameter_plot",
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_condition_growth_parameter_plot',
+                                                                                                label = 'Reference condition',
+                                                                                                choices = ""
+                                                                                    ),
+
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_concentration_growth_parameter_plot',
+                                                                                                label = 'Reference concentration',
+                                                                                                choices = ""
+                                                                                    ),
+                                                                   ),
+
+                                                                   sliderInput(inputId = "shape.size_growth_parameter_plot",
+                                                                               label = "Shape size",
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2.5,
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = "basesize_growth_parameter_plot",
+                                                                               label = "Base font size",
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5),
+                                                                   sliderInput(inputId = "label.size_growth_parameter_plot",
+                                                                               label = "Label font size",
+                                                                               min = 5,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5)
+
+
+                                                                 ),
+
+                                                                 mainPanel(
+                                                                   plotOutput("growth_parameter_plot",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_growth_parameter_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_growth_parameter_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_growth_parameter_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+
+                                                                     column(width = 5,
+                                                                            downloadButton('download_growth_parameter_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_growth_parameter_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+
+
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
+                                                        ),
+
                                                         ### Growth DR Plots ####
 
                                                         tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
@@ -2370,119 +2608,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      ), # column
                                                                    ) # fluidRow
                                                                  ) #  mainPanel
+                                                        ), # tabPanel(title = "Dose-response analysis (Bootstrap)"
 
-
-
-                                                        ), # tabPanel(title = "Dose-response analysis"
-
-                                                        ### Growth Parameter Plots ####
-                                                        tabPanel(title = "Parameter Plots",
-                                                                 sidebarPanel(
-                                                                   selectInput(inputId = "parameter_parameter_growth_plot",
-                                                                               label = "Parameter",
-                                                                               choices = ""
-                                                                   ),
-
-                                                                   textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
-                                                                             label = "Select sample based on string (separated by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "select_sample_based_on_concentration_growth_parameter_plot",
-                                                                             label = "Select sample based on concentration (separated by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_sample_based_on_strings_growth_parameter_plot",
-                                                                             label = "Exclude sample based on strings (separated by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_sample_based_on_concentration_growth_parameter_plot",
-                                                                             label = "Exclude sample based on concentration (separated by ;)"
-                                                                   ),
-
-                                                                   checkboxInput(inputId = 'normalize_to_reference_growth_parameter_plot',
-                                                                                 label = 'normalize to reference',
-                                                                                 value = FALSE),
-
-                                                                   h3("Customize plot appearance"),
-
-                                                                   # Conditional Panel
-                                                                   conditionalPanel(condition = "input.normalize_to_reference_growth_parameter_plot",
-                                                                                    # reactive selection
-                                                                                    selectInput(inputId = 'reference_condition_growth_parameter_plot',
-                                                                                                label = 'Reference condition',
-                                                                                                choices = ""
-                                                                                    ),
-
-                                                                                    # reactive selection
-                                                                                    selectInput(inputId = 'reference_concentration_growth_parameter_plot',
-                                                                                                label = 'Reference concentration',
-                                                                                                choices = ""
-                                                                                    ),
-                                                                   ),
-
-                                                                   sliderInput(inputId = "shape.size_growth_parameter_plot",
-                                                                               label = "Shape size",
-                                                                               min = 1,
-                                                                               max = 10,
-                                                                               value = 2.5,
-                                                                               step = 0.5),
-
-                                                                   sliderInput(inputId = "basesize_growth_parameter_plot",
-                                                                               label = "Base font size",
-                                                                               min = 10,
-                                                                               max = 35,
-                                                                               value = 12,
-                                                                               step = 0.5),
-                                                                   sliderInput(inputId = "label.size_growth_parameter_plot",
-                                                                               label = "Label font size",
-                                                                               min = 5,
-                                                                               max = 35,
-                                                                               value = 12,
-                                                                               step = 0.5)
-
-
-                                                                 ),
-
-                                                                 mainPanel(
-                                                                   plotOutput("growth_parameter_plot",
-                                                                              width = "100%", height = "800px"),
-
-                                                                   h3(strong("Export plot")),
-
-                                                                   fluidRow(
-                                                                     column(width = 4,
-                                                                            numericInput(inputId = "width_download_growth_parameter_plot",
-                                                                                         label = "Width (in inches)",
-                                                                                         value = 7)
-                                                                     ), # column
-                                                                     column(width = 4,
-                                                                            numericInput(inputId = "height_download_growth_parameter_plot",
-                                                                                         label = "Height (in inches)",
-                                                                                         value = 6)
-                                                                     ), # column
-                                                                     column(width = 4,
-                                                                            numericInput(inputId = "dpi_download_growth_parameter_plot",
-                                                                                         label = "DPI",
-                                                                                         value = 300)
-                                                                     ), # column
-
-                                                                     column(width = 5,
-                                                                            downloadButton('download_growth_parameter_plot',"Download Plot"),
-
-                                                                            radioButtons("format_download_growth_parameter_plot",
-                                                                                         label = NULL,
-                                                                                         choices = c("PNG" = ".png",
-                                                                                                     "PDF" = ".pdf"),
-                                                                                         selected = ".png",
-                                                                                         inline = TRUE)
-                                                                     ), # column
-
-
-                                                                   ) # fluidRow
-                                                                 ) #  mainPanel
-                                                        ),
-
-                                                        # Growth DR Parameters ####
+                                                        ### Growth DR Parameters ####
 
                                                         tabPanel(title = "DR Parameter Plots",value = "tabPanel_Visualize_Growth_DoseResponseParameters",
                                                                  sidebarPanel(
@@ -2568,7 +2696,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    ) # fluidRow
                                                                  ) #  mainPanel
-                                                        )
+                                                        ), # tabPanel Growth_Parameter_Plots
                                             )
                                    ),
 
@@ -2585,11 +2713,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    selectInput(inputId = "data_type_fluorescence_group_plot",
                                                                                label = "Data type",
                                                                                choices = c("Raw fluorescence 1" = "raw1",
-                                                                                           "Raw fluorescence 2" = "raw2",
                                                                                            "Spline fits FL1" = "spline1",
-                                                                                           "Spline fits FL2" = "spline2",
-                                                                                           "Normalized FL1" = "norm.fl1",
-                                                                                           "Normalized FL2" = "norm.fl2"
+                                                                                           "Normalized FL1" = "norm.fl1"
                                                                                )
                                                                    ),
 
@@ -2759,8 +2884,272 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  ) # mainPanel
 
 
-                                                        ),
+                                                        ), # tabPanel Group_Plots
 
+                                                        ### Growth & Fluorescence Plots ####
+
+                                                        tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_Dual",
+                                                                 h1("Growth & Flourescence Plot"),
+
+                                                                 sidebarPanel(
+
+                                                                   selectInput(inputId = "fluorescence_type_dual_plot",
+                                                                               label = "Fluorescence type",
+                                                                               choices = c("Fluorescence 1" = "fl1",
+                                                                                           "Normalized fluorescence 1" = "norm.fl1"
+                                                                                           )
+                                                                   ),
+
+                                                                   textInput(inputId = "select_samples_based_on_string_dual_plot",
+                                                                             label = "Select sample based on string (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "select_samples_based_on_concentration_dual_plot",
+                                                                             label = "Select sample based on concentration (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_samples_based_on_string_dual_plot",
+                                                                             label = "Exclude sample based on string (separate by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
+                                                                             label = "Exclude sample based on concentration (separate by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "plot_group_averages_dual_plot",
+                                                                                 label = "Plot group averages",
+                                                                                 value = TRUE),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_density_dual_plot",
+                                                                                 label = "Log-transform y-axis (Density)",
+                                                                                 value = FALSE),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_fluorescence_dual_plot",
+                                                                                 label = "Log-transform y-axis (Fluorescence)",
+                                                                                 value = FALSE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range (Density)"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_density_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_density_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range (Fluorescence"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_fluorescence_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_fluorescence_dual_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_density_dual_plot",
+                                                                             label = "y-axis title (Density)",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_fluorescence_dual_plot",
+                                                                             label = "y-axis title (Fluorescence)",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_dual_plot",
+                                                                             label = "x-axis title",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   sliderInput(inputId = "nbreaks_dual_plot",
+                                                                               label = "Number of breaks on y-axis",
+                                                                               min = 1,
+                                                                               max = 20,
+                                                                               value = 6),
+
+                                                                   sliderInput(inputId = "line_width_dual_plot",
+                                                                               label = "Line width",
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1.1),
+
+                                                                   sliderInput(inputId = 'base_size_dual_plot',
+                                                                               label = 'Base font size',
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 20,
+                                                                               step = 0.5)
+                                                                 ),
+
+                                                                 mainPanel(
+                                                                   plotOutput("dual_plot",
+                                                                              width = "100%", height = "1000px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_dual_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_dual_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_dual_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_dual_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_dual_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+                                                                   ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ), # tabPanel(title = "Growth & Flourescence Plot")
+
+                                                        ### Fluorescence Parameter Plots ####
+
+                                                        tabPanel(title = "Parameter plots",
+                                                                 sidebarPanel(
+                                                                   selectInput(inputId = "parameter_fluorescence_parameter_fluorescence_plot",
+                                                                               label = "Parameter",
+                                                                               choices = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
+                                                                             label = "Select sample based on string (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "select_sample_based_on_concentration_fluorescence_parameter_plot",
+                                                                             label = "Select sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_strings_fluorescence_parameter_plot",
+                                                                             label = "Exclude sample based on strings (separated by ;)"
+                                                                   ),
+
+                                                                   textInput(inputId = "exclude_sample_based_on_concentration_fluorescence_parameter_plot",
+                                                                             label = "Exclude sample based on concentration (separated by ;)"
+                                                                   ),
+
+                                                                   checkboxInput(inputId = 'normalize_to_reference_fluorescence_parameter_plot',
+                                                                                 label = 'normalize to reference',
+                                                                                 value = FALSE),
+
+                                                                   # Conditional Panel
+                                                                   conditionalPanel(condition = "input.normalize_to_reference_fluorescence_parameter_plot",
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_condition_fluorescence_parameter_plot',
+                                                                                                label = 'Reference condition',
+                                                                                                choices = ""
+                                                                                    ),
+
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_concentration_fluorescence_parameter_plot',
+                                                                                                label = 'Reference concentration',
+                                                                                                choices = ""
+                                                                                    ),
+                                                                   ),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   sliderInput(inputId = "shape.size_fluorescence_parameter_plot",
+                                                                               label = "Shape size",
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2.5,
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = "basesize_fluorescence_parameter_plot",
+                                                                               label = "Base font size",
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5)
+
+
+                                                                 ),
+
+                                                                 mainPanel(
+                                                                   plotOutput("fluorescence_parameter_plot",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_fluorescence_parameter_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_fluorescence_parameter_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_fluorescence_parameter_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_fluorescence_parameter_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_fluorescence_parameter_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+                                                                   ) # fluidRow
+                                                                 ) # mainPanel
+                                                        ), #  tabPanel(title = "Parameter plots"
                                                         ### Fluorescence DR Plots Spline ####
 
                                                         tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_spline",
@@ -3111,62 +3500,137 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  ) # mainPanel
                                                         ), # tabPanel(title = "Dose-response analysis",
 
-                                                        ### Fluorescence Parameter Plots ####
+                                                        ### Growth DR Plots Bootstrap ####
 
-                                                        tabPanel(title = "Parameter plots",
+                                                        tabPanel(title = "Dose-Response Analysis (Bootstrap)", value = "tabPanel_Visualize_Fluorescence_DoseResponse_bt",
                                                                  sidebarPanel(
-                                                                   selectInput(inputId = "parameter_fluorescence_parameter_fluorescence_plot",
+
+                                                                   h3('Customize plot appearance'),
+
+
+                                                                   sliderInput(inputId = 'shape_type_dose_response_fluorescence_plot_bt',
+                                                                               label = 'Shape type',
+                                                                               min = 1,
+                                                                               max = 25,
+                                                                               value = 15),
+
+                                                                   sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot_bt',
+                                                                               label = 'Shape size',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2,
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = 'axis_size_dose_response_fluorescence_plot_bt',
+                                                                               label = 'Axis title font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.3,
+                                                                               step = 0.1),
+
+
+                                                                   sliderInput(inputId = 'lab_size_dose_response_fluorescence_plot_bt',
+                                                                               label = 'Axis label font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.3,
+                                                                               step = 0.1),
+
+                                                                   sliderInput(inputId = 'line_width_dose_response_fluorescence_plot_bt',
+                                                                               label = 'Line width',
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1),
+
+                                                                 ), # sidebarPanel
+
+                                                                 mainPanel(
+                                                                   h3('Individual plots'),
+                                                                   selectInput(inputId = 'individual_plots_dose_response_fluorescence_plot_bt',
+                                                                               label = 'Select plot',
+                                                                               choices = "",
+                                                                               multiple = FALSE,
+                                                                               selectize = FALSE,
+                                                                               size = 3),
+                                                                   plotOutput("dose_response_fluorescence_plot_individual_bt",
+                                                                              width = "100%", height = "800px"),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_dose_response_fluorescence_plot_individual_bt",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_dose_response_fluorescence_plot_individual_bt",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_dose_response_fluorescence_plot_individual_bt",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_dose_response_fluorescence_plot_individual_bt',"Download Plot"),
+
+                                                                            radioButtons("format_download_dose_response_fluorescence_plot_individual_bt",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
+                                                        ), # tabPanel(title = "Dose-response analysis (Bootstrap)"
+
+
+
+                                                        ### Growth DR Parameters ####
+
+                                                        tabPanel(title = "DR Parameter Plots",value = "tabPanel_Visualize_Fluorescence_DoseResponseParameters",
+                                                                 sidebarPanel(
+                                                                   selectInput(inputId = "parameter_dr_parameter_fluorescence_plot",
                                                                                label = "Parameter",
                                                                                choices = ""
                                                                    ),
 
-                                                                   textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
+                                                                   textInput(inputId = "select_sample_based_on_string_fluorescence_dr_parameter_plot",
                                                                              label = "Select sample based on string (separated by ;)"
                                                                    ),
 
-                                                                   textInput(inputId = "select_sample_based_on_concentration_fluorescence_parameter_plot",
-                                                                             label = "Select sample based on concentration (separated by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_sample_based_on_strings_fluorescence_parameter_plot",
+                                                                   textInput(inputId = "exclude_sample_based_on_strings_fluorescence_dr_parameter_plot",
                                                                              label = "Exclude sample based on strings (separated by ;)"
                                                                    ),
 
-                                                                   textInput(inputId = "exclude_sample_based_on_concentration_fluorescence_parameter_plot",
-                                                                             label = "Exclude sample based on concentration (separated by ;)"
-                                                                   ),
-
-                                                                   checkboxInput(inputId = 'normalize_to_reference_fluorescence_parameter_plot',
+                                                                   checkboxInput(inputId = 'normalize_to_reference_fluorescence_dr_parameter_plot',
                                                                                  label = 'normalize to reference',
                                                                                  value = FALSE),
 
-                                                                   # Conditional Panel
-                                                                   conditionalPanel(condition = "input.normalize_to_reference_fluorescence_parameter_plot",
-                                                                                    # reactive selection
-                                                                                    selectInput(inputId = 'reference_condition_fluorescence_parameter_plot',
-                                                                                                label = 'Reference condition',
-                                                                                                choices = ""
-                                                                                    ),
-
-                                                                                    # reactive selection
-                                                                                    selectInput(inputId = 'reference_concentration_fluorescence_parameter_plot',
-                                                                                                label = 'Reference concentration',
-                                                                                                choices = ""
-                                                                                    ),
-                                                                   ),
-
                                                                    h3("Customize plot appearance"),
 
-                                                                   sliderInput(inputId = "shape.size_fluorescence_parameter_plot",
-                                                                               label = "Shape size",
-                                                                               min = 1,
-                                                                               max = 10,
-                                                                               value = 2.5,
-                                                                               step = 0.5),
+                                                                   # Conditional Panel
+                                                                   conditionalPanel(condition = "input.normalize_to_reference_fluorescence_dr_parameter_plot",
+                                                                                    # reactive selection
+                                                                                    selectInput(inputId = 'reference_condition_fluorescence_dr_parameter_plot',
+                                                                                                label = 'Reference condition',
+                                                                                                choices = ""
+                                                                                    )
+                                                                   ),
 
-                                                                   sliderInput(inputId = "basesize_fluorescence_parameter_plot",
+
+                                                                   sliderInput(inputId = "basesize_fluorescence_dr_parameter_plot",
                                                                                label = "Base font size",
                                                                                min = 10,
+                                                                               max = 35,
+                                                                               value = 12,
+                                                                               step = 0.5),
+                                                                   sliderInput(inputId = "label.size_fluorescence_dr_parameter_plot",
+                                                                               label = "Label font size",
+                                                                               min = 5,
                                                                                max = 35,
                                                                                value = 12,
                                                                                step = 0.5)
@@ -3175,206 +3639,43 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  ),
 
                                                                  mainPanel(
-                                                                   plotOutput("fluorescence_parameter_plot",
+                                                                   plotOutput("fluorescence_dr_parameter_plot",
                                                                               width = "100%", height = "800px"),
 
                                                                    h3(strong("Export plot")),
 
                                                                    fluidRow(
                                                                      column(width = 4,
-                                                                            numericInput(inputId = "width_download_fluorescence_parameter_plot",
+                                                                            numericInput(inputId = "width_download_fluorescence_dr_parameter_plot",
                                                                                          label = "Width (in inches)",
                                                                                          value = 7)
                                                                      ), # column
                                                                      column(width = 4,
-                                                                            numericInput(inputId = "height_download_fluorescence_parameter_plot",
+                                                                            numericInput(inputId = "height_download_fluorescence_dr_parameter_plot",
                                                                                          label = "Height (in inches)",
                                                                                          value = 6)
                                                                      ), # column
                                                                      column(width = 4,
-                                                                            numericInput(inputId = "dpi_download_fluorescence_parameter_plot",
+                                                                            numericInput(inputId = "dpi_download_fluorescence_dr_parameter_plot",
                                                                                          label = "DPI",
                                                                                          value = 300)
                                                                      ), # column
-                                                                     column(width = 4,
-                                                                            downloadButton('download_fluorescence_parameter_plot',"Download Plot"),
 
-                                                                            radioButtons("format_download_fluorescence_parameter_plot",
+                                                                     column(width = 5,
+                                                                            downloadButton('download_fluorescence_dr_parameter_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_fluorescence_dr_parameter_plot",
                                                                                          label = NULL,
                                                                                          choices = c("PNG" = ".png",
                                                                                                      "PDF" = ".pdf"),
                                                                                          selected = ".png",
                                                                                          inline = TRUE)
                                                                      ), # column
+
+
                                                                    ) # fluidRow
-                                                                 ) # mainPanel
-                                                        ), #  tabPanel(title = "Parameter plots"
-                                                        ## Growth & Fluorescence Plots ####
-
-                                                        tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_Dual",
-                                                                 h1("Growth & Flourescence Plot"),
-
-                                                                 sidebarPanel(
-
-                                                                   selectInput(inputId = "fluorescence_type_dual_plot",
-                                                                               label = "Fluorescence type",
-                                                                               choices = c("Fluorescence 1" = "fl1",
-                                                                                           "Fluorescence 1" = "fl2",
-                                                                                           "Normalized fluorescence 1" = "norm.fl1",
-                                                                                           "Normalized fluorescence 2" = "norm.fl2")
-                                                                   ),
-
-                                                                   textInput(inputId = "select_samples_based_on_string_dual_plot",
-                                                                             label = "Select sample based on string (separate by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "select_samples_based_on_concentration_dual_plot",
-                                                                             label = "Select sample based on concentration (separate by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_samples_based_on_string_dual_plot",
-                                                                             label = "Exclude sample based on string (separate by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
-                                                                             label = "Exclude sample based on concentration (separate by ;)"
-                                                                   ),
-
-                                                                   checkboxInput(inputId = "plot_group_averages_dual_plot",
-                                                                                 label = "Plot group averages",
-                                                                                 value = TRUE),
-
-                                                                   h3("Customize plot appearance"),
-
-                                                                   checkboxInput(inputId = "log_transform_y_axis_density_dual_plot",
-                                                                                 label = "Log-transform y-axis (Density)",
-                                                                                 value = FALSE),
-
-                                                                   checkboxInput(inputId = "log_transform_y_axis_fluorescence_dual_plot",
-                                                                                 label = "Log-transform y-axis (Fluorescence)",
-                                                                                 value = FALSE),
-
-                                                                   strong("x-Range"),
-                                                                   fluidRow(
-                                                                     column(5,
-                                                                            textInput(inputId = "x_range_min_dual_plot",
-                                                                                      label = NULL,
-                                                                                      value = "", placeholder = "min"
-                                                                            )
-                                                                     ),
-
-                                                                     column(5,
-                                                                            textInput(inputId = "x_range_max_dual_plot",
-                                                                                      label = NULL,
-                                                                                      value = "", placeholder = "max"
-                                                                            )
-                                                                     )
-                                                                   ),
-
-                                                                   strong("y-Range (Density)"),
-                                                                   fluidRow(
-                                                                     column(5,
-                                                                            textInput(inputId = "y_range_min_density_dual_plot",
-                                                                                      label = NULL,
-                                                                                      value = "", placeholder = "min"
-                                                                            )
-                                                                     ),
-
-                                                                     column(5,
-                                                                            textInput(inputId = "y_range_max_density_dual_plot",
-                                                                                      label = NULL,
-                                                                                      value = "", placeholder = "max"
-                                                                            )
-                                                                     )
-                                                                   ),
-
-                                                                   strong("y-Range (Fluorescence"),
-                                                                   fluidRow(
-                                                                     column(5,
-                                                                            textInput(inputId = "y_range_min_fluorescence_dual_plot",
-                                                                                      label = NULL,
-                                                                                      value = "", placeholder = "min"
-                                                                            )
-                                                                     ),
-
-                                                                     column(5,
-                                                                            textInput(inputId = "y_range_max_fluorescence_dual_plot",
-                                                                                      label = NULL,
-                                                                                      value = "", placeholder = "max"
-                                                                            )
-                                                                     )
-                                                                   ),
-
-                                                                   textInput(inputId = "y_axis_title_density_dual_plot",
-                                                                             label = "y-axis title (Density)",
-                                                                             value = ""
-                                                                   ),
-
-                                                                   textInput(inputId = "y_axis_title_fluorescence_dual_plot",
-                                                                             label = "y-axis title (Fluorescence)",
-                                                                             value = ""
-                                                                   ),
-
-                                                                   textInput(inputId = "x_axis_title_dual_plot",
-                                                                             label = "x-axis title",
-                                                                             value = ""
-                                                                   ),
-
-                                                                   sliderInput(inputId = "nbreaks_dual_plot",
-                                                                               label = "Number of breaks on y-axis",
-                                                                               min = 1,
-                                                                               max = 20,
-                                                                               value = 6),
-
-                                                                   sliderInput(inputId = "line_width_dual_plot",
-                                                                               label = "Line width",
-                                                                               min = 0.01,
-                                                                               max = 10,
-                                                                               value = 1.1),
-
-                                                                   sliderInput(inputId = 'base_size_dual_plot',
-                                                                               label = 'Base font size',
-                                                                               min = 10,
-                                                                               max = 35,
-                                                                               value = 20,
-                                                                               step = 0.5)
-                                                                 ),
-
-                                                                 mainPanel(
-                                                                   plotOutput("dual_plot",
-                                                                              width = "100%", height = "1000px"),
-
-                                                                   h3(strong("Export plot")),
-
-                                                                   fluidRow(
-                                                                     column(width = 4,
-                                                                            numericInput(inputId = "width_download_dual_plot",
-                                                                                         label = "Width (in inches)",
-                                                                                         value = 7)
-                                                                     ), # column
-                                                                     column(width = 4,
-                                                                            numericInput(inputId = "height_download_dual_plot",
-                                                                                         label = "Height (in inches)",
-                                                                                         value = 6)
-                                                                     ), # column
-                                                                     column(width = 4,
-                                                                            numericInput(inputId = "dpi_download_dual_plot",
-                                                                                         label = "DPI",
-                                                                                         value = 300)
-                                                                     ), # column
-                                                                     column(width = 4,
-                                                                            downloadButton('download_dual_plot',"Download Plot"),
-
-                                                                            radioButtons("format_download_dual_plot",
-                                                                                         label = NULL,
-                                                                                         choices = c("PNG" = ".png",
-                                                                                                     "PDF" = ".pdf"),
-                                                                                         selected = ".png",
-                                                                                         inline = TRUE)
-                                                                     ), # column
-                                                                   ) # fluidRow
-                                                                 ) # mainPanel
-                                                        ) # tabPanel(title = "Growth & Flourescence Plot")
+                                                                 ) #  mainPanel
+                                                        ), # tabPanel Fluorescence_Parameter_Plots
                                             ) # tabsetPanel(type = "tabs",
                                    ), # tabPanel(title = "Fluorescence Plots"
 
@@ -4639,6 +4940,110 @@ server <- function(input, output, session){
               escape = FALSE)
   })
 
+  table_growth_linear_group <- reactive({
+    gcTable <- results$growth$gcFit$gcTable
+    nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
+
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    filter.ls <- list()
+    for(j in 1:length(ndx.filt.rep)){
+      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                             gsub("\\)", "\\\\)",
+                                                                                                                  gsub("\\(", "\\\\(",
+                                                                                                                       gsub("\\?", "\\\\?",
+                                                                                                                            gsub("\\.", "\\\\.",
+                                                                                                                                 gsub("\\+", "\\\\+",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             ".+[[:space:]]",
+                                                                                                             unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
+    }
+    ndx.filt <- unlist(filter.ls, recursive = F)
+    ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
+
+    names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+
+    # calculate average param values
+    mu.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
+    mu.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
+
+    tD.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
+    tD.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
+
+    lambda.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+    lambda.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+
+    dY.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+    dY.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+
+    A.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+    A.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+
+    tmu.start.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
+    tmu.start.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
+
+    tmu.end.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
+    tmu.end.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
+
+
+    labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
+
+    table_linear_group <- data.frame("Sample|Conc." = labels,
+                               "µ<sub>max</sub>" = paste0(mu.mean,
+                                                          unlist(lapply(1:length(mu.mean), function (x)
+                                                            ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
+                                                                     mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
+                                                                   "", " \u00B1 ") ) ),
+                                                          mu.sd),
+
+                               "t<sub>D</sub>" = paste0(tD.mean,
+                                                        unlist(lapply(1:length(tD.mean), function (x)
+                                                          ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
+                                                                   tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
+                                                                 "", " \u00B1 ") ) ),
+                                                        tD.sd),
+                               "λ" =  paste0(lambda.mean,
+                                             unlist(lapply(1:length(lambda.mean), function (x)
+                                               ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                        lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                      "", " \u00B1 ") ) ),
+                                             lambda.sd),
+                               "ΔY" = paste0(dY.mean,
+                                             unlist(lapply(1:length(dY.mean), function (x)
+                                               ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                        dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                      "", " \u00B1 ") ) ),
+                                             dY.sd),
+                               "y<sub>max</sub>" = paste0(A.mean,
+                                                          unlist(lapply(1:length(A.mean), function (x)
+                                                            ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                     A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                   "", " \u00B1 ") ) ),
+                                                          A.sd),
+                               "t<sub>start</sub><br>(µ<sub>max</sub>)" = paste0(tmu.start.mean,
+                                                                                 unlist(lapply(1:length(tmu.start.mean), function (x)
+                                                                                   ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
+                                                                                            tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
+                                                                                          "", " \u00B1 ") ) ),
+                                                                                 tmu.start.sd),
+
+                               "t<sub>end</sub><br>(µ<sub>max</sub>)" = paste0(tmu.end.mean,
+                                                                               unlist(lapply(1:length(tmu.end.mean), function (x)
+                                                                                 ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
+                                                                                          tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
+                                                                                        "", " \u00B1 ") ) ),
+                                                                               tmu.end.sd),
+                               stringsAsFactors = F, check.names = F)
+    table_linear_group
+
+  })
+
+  output$results_table_growth_linear_group <- DT::renderDT({
+    datatable(table_growth_linear_group(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
+  })
+
   table_growth_spline <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
@@ -4654,6 +5059,97 @@ server <- function(input, output, session){
 
   output$results_table_growth_spline <- DT::renderDT({
     datatable(table_growth_spline(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
+  })
+
+  table_growth_spline_group <- reactive({
+    gcTable <- results$growth$gcFit$gcTable
+    nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
+
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    filter.ls <- list()
+    for(j in 1:length(ndx.filt.rep)){
+      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                             gsub("\\)", "\\\\)",
+                                                                                                                  gsub("\\(", "\\\\(",
+                                                                                                                       gsub("\\?", "\\\\?",
+                                                                                                                            gsub("\\.", "\\\\.",
+                                                                                                                                 gsub("\\+", "\\\\+",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             ".+[[:space:]]",
+                                                                                                             unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
+    }
+    ndx.filt <- unlist(filter.ls, recursive = F)
+    ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
+
+    names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+
+    # calculate average param values
+    mu.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
+    mu.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
+
+    tD.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
+    tD.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
+
+    lambda.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+    lambda.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+
+    dY.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+    dY.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+
+    A.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+    A.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+
+    tmax.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
+    tmax.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
+
+    labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
+
+    table_spline_group <- data.frame("Sample|Conc." = labels,
+                               "µ<sub>max</sub>" = paste0(mu.mean,
+                                                          unlist(lapply(1:length(mu.mean), function (x)
+                                                            ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
+                                                                     mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
+                                                                   "", " \u00B1 ") ) ),
+                                                          mu.sd),
+                               "t<sub>D</sub>" = paste0(tD.mean,
+                                                        unlist(lapply(1:length(tD.mean), function (x)
+                                                          ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
+                                                                   tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
+                                                                 "", " \u00B1 ") ) ),
+                                                        tD.sd),
+                               "λ" = paste0(lambda.mean,
+                                            unlist(lapply(1:length(lambda.mean), function (x)
+                                              ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                       lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                     "", " \u00B1 ") ) ),
+                                            lambda.sd),
+                               "y<sub>max</sub>" = paste0(A.mean,
+                                                          unlist(lapply(1:length(A.mean), function (x)
+                                                            ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                     A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                   "", " \u00B1 ") ) ),
+                                                          A.sd),
+                               "ΔY" = paste0(dY.mean,
+                                             unlist(lapply(1:length(dY.mean), function (x)
+                                               ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                        dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                      "", " \u00B1 ") ) ),
+                                             dY.sd),
+                               "t<sub>max</sub>" = paste0(tmax.mean,
+                                                          unlist(lapply(1:length(tmax.mean), function (x)
+                                                            ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
+                                                                     tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
+                                                                   "", " \u00B1 ") ) ),
+                                                          tmax.sd),
+                               check.names = F)
+    table_spline_group
+  })
+
+  output$results_table_growth_spline_group <- DT::renderDT({
+    datatable(table_growth_spline_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -4786,12 +5282,34 @@ server <- function(input, output, session){
     }
   )
 
+  output$download_table_growth_linear_group <- downloadHandler(
+    filename = function() {
+      paste("growth_results_linear_fits_grouped", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_growth_linear_group()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
   output$download_table_growth_spline <- downloadHandler(
     filename = function() {
       paste("growth_results_spline_fits", ".csv", sep="")
     },
     content = function(file) {
       table <- table_growth_spline()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_table_growth_spline_group <- downloadHandler(
+    filename = function() {
+      paste("growth_results_spline_fits_grouped", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_growth_spline_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       write.csv.utf8.BOM(table, file)
     }
@@ -4824,7 +5342,7 @@ server <- function(input, output, session){
       paste("growth_results_dose-response_analysis", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_growth_dr()
+      table <- table_growth_dr_spline()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       write.csv.utf8.BOM(table, file)
     }
@@ -4869,8 +5387,8 @@ server <- function(input, output, session){
                                "λ" = round(as.numeric(res.table.fl$lambda.linfit), 2),
                                "ΔY" = round(as.numeric(res.table.fl$dY.linfit), 3),
                                "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.linfit), 3),
-                               "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.start.linfit), 2), ")")),
-                               "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.end.linfit), 2), ")")),
+                               "x<sub>start</sub><br>(slope<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.start.linfit), 2), ")")),
+                               "x<sub>end</sub><br>(slope<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.end.linfit), 2), ")")),
                                "R<sup>2</sup><br>(linear fit)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$r2mu.linfit), 3), ")")),
                                stringsAsFactors = F, check.names = F)
 
@@ -4880,6 +5398,102 @@ server <- function(input, output, session){
 
   output$results_table_fluorescence1_linear <- DT::renderDT({
     datatable(table_fluorescence1_linear(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
+  })
+
+  table_fluorescence1_linear_group <- reactive({
+
+    flTable <- results$fluorescence$flFit1$flTable
+    nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
+
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    filter.ls <- list()
+    for(j in 1:length(ndx.filt.rep)){
+      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                             gsub("\\)", "\\\\)",
+                                                                                                                  gsub("\\(", "\\\\(",
+                                                                                                                       gsub("\\?", "\\\\?",
+                                                                                                                            gsub("\\.", "\\\\.",
+                                                                                                                                 gsub("\\+", "\\\\+",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             ".+[[:space:]]",
+                                                                                                             unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
+    }
+    ndx.filt <- unlist(filter.ls, recursive = F)
+    ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
+
+    names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+    # calculate average param values
+    max_slope.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
+    max_slope.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
+
+    lambda.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+    lambda.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+
+    dY.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+    dY.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+
+    A.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+    A.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+
+    tmu.start.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
+    tmu.start.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
+
+    tmu.end.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
+    tmu.end.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
+
+    labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
+
+    table_linear_group <- data.frame("Sample|Conc." = labels,
+                                     "slope<sub>max</sub>" = paste0(max_slope.mean,
+                                                                unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                  ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                           max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                         "", " \u00B1 ") ) ),
+                                                                max_slope.sd),
+
+                                     "λ" =  paste0(lambda.mean,
+                                                   unlist(lapply(1:length(lambda.mean), function (x)
+                                                     ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                              lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                            "", " \u00B1 ") ) ),
+                                                   lambda.sd),
+                                     "ΔY" = paste0(dY.mean,
+                                                   unlist(lapply(1:length(dY.mean), function (x)
+                                                     ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                              dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                            "", " \u00B1 ") ) ),
+                                                   dY.sd),
+                                     "y<sub>max</sub>" = paste0(A.mean,
+                                                                unlist(lapply(1:length(A.mean), function (x)
+                                                                  ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                           A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                         "", " \u00B1 ") ) ),
+                                                                A.sd),
+                                     "x<sub>start</sub><br>(slope<sub>max</sub>)" = paste0(tmu.start.mean,
+                                                                                       unlist(lapply(1:length(tmu.start.mean), function (x)
+                                                                                         ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
+                                                                                                  tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
+                                                                                                "", " \u00B1 ") ) ),
+                                                                                       tmu.start.sd),
+
+                                     "x<sub>end</sub><br>(slope<sub>max</sub>)" = paste0(tmu.end.mean,
+                                                                                     unlist(lapply(1:length(tmu.end.mean), function (x)
+                                                                                       ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
+                                                                                                tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
+                                                                                              "", " \u00B1 ") ) ),
+                                                                                     tmu.end.sd),
+                                     stringsAsFactors = F, check.names = F)
+
+
+    table_linear_group
+
+  })
+
+  output$results_table_fluorescence1_linear_group <- DT::renderDT({
+    datatable(table_fluorescence1_linear_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -4898,6 +5512,90 @@ server <- function(input, output, session){
 
   output$results_table_fluorescence1_spline <- DT::renderDT({
     datatable(table_fluorescence1_spline(),
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
+  })
+
+  table_fluorescence1_spline_group <- reactive({
+    flTable <- results$fluorescence$flFit1$flTable
+
+    nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
+
+    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+    filter.ls <- list()
+    for(j in 1:length(ndx.filt.rep)){
+      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                             gsub("\\)", "\\\\)",
+                                                                                                                  gsub("\\(", "\\\\(",
+                                                                                                                       gsub("\\?", "\\\\?",
+                                                                                                                            gsub("\\.", "\\\\.",
+                                                                                                                                 gsub("\\+", "\\\\+",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             ".+[[:space:]]",
+                                                                                                             unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
+    }
+    ndx.filt <- unlist(filter.ls, recursive = F)
+    ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
+
+    names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+
+    # calculate average param values
+    max_slope.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
+    max_slope.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
+
+    lambda.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+    lambda.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+
+    dY.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+    dY.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+
+    A.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+    A.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+
+    tmax.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
+    tmax.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
+
+    labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
+
+    table_spline_group <- data.frame("Sample | Conc." = labels,
+                                     "slope<sub>max</sub>" = paste0(max_slope.mean,
+                                                                unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                  ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                           max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                         "", " \u00B1 ") ) ),
+                                                                max_slope.sd),
+                                     "λ" = paste0(lambda.mean,
+                                                  unlist(lapply(1:length(lambda.mean), function (x)
+                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                           "", " \u00B1 ") ) ),
+                                                  lambda.sd),
+                                     "y<sub>max</sub>" = paste0(A.mean,
+                                                                unlist(lapply(1:length(A.mean), function (x)
+                                                                  ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                           A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                         "", " \u00B1 ") ) ),
+                                                                A.sd),
+                                     "ΔY" = paste0(dY.mean,
+                                                   unlist(lapply(1:length(dY.mean), function (x)
+                                                     ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                              dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                            "", " \u00B1 ") ) ),
+                                                   dY.sd),
+                                     "x<sub>max</sub>" = paste0(tmax.mean,
+                                                                unlist(lapply(1:length(tmax.mean), function (x)
+                                                                  ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
+                                                                           tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
+                                                                         "", " \u00B1 ") ) ),
+                                                                tmax.sd),
+                                     check.names = F)
+
+    table_spline_group
+  })
+
+  output$results_table_fluorescence1_spline_group <- DT::renderDT({
+    datatable(table_fluorescence1_spline_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5034,12 +5732,34 @@ server <- function(input, output, session){
     }
   )
 
+  output$download_table_fluorescence1_linear_group <- downloadHandler(
+    filename = function() {
+      paste("fluorescence1_results_linear_fits_grouped", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_fluorescence1_linear_group()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
   output$download_table_fluorescence1_spline <- downloadHandler(
     filename = function() {
       paste("fluorescence1_results_spline_fits", ".csv", sep="")
     },
     content = function(file) {
       table <- table_fluorescence1_spline()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_table_fluorescence1_spline_group <- downloadHandler(
+    filename = function() {
+      paste("fluorescence1_results_spline_fits_grouped", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- table_fluorescence1_spline_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       write.csv.utf8.BOM(table, file)
     }
@@ -5262,7 +5982,6 @@ server <- function(input, output, session){
       control <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control
       control_new <- control
       gcID <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$gcID
-browser()
       lin.h.new <- dplyr::if_else(!is.na(as.numeric(input$lin.h.rerun)), as.numeric(input$lin.h.rerun), as.numeric(control$lin.h))
       if(!is.na(lin.h.new)) control_new$lin.h <- lin.h.new
       control_new$lin.R2 <- dplyr::if_else(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
@@ -5320,18 +6039,52 @@ browser()
       if(input$logy_validate_growth_plot_linear) log <- "y"
       else  log <- ""
       results <- results$growth
+      # Define x- and y-axis limits
+      if(any(input$y_range_min_validate_growth_plot_linear == "",
+             input$y_range_max_validate_growth_plot_linear == "")){
+        ylim <- NULL
+      } else {
+        ylim <- c(as.numeric(input$y_range_min_validate_growth_plot_linear),
+                  as.numeric(input$y_range_max_validate_growth_plot_linear))
+      }
+
+      if(any(input$y_range_min_derivative_validate_growth_plot_linear == "",
+             input$y_range_max_derivative_validate_growth_plot_linear == "")){
+        ylim.deriv <- NULL
+      } else {
+        ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_growth_plot_linear),
+                        as.numeric(input$y_range_max_derivative_validate_growth_plot_linear))
+      }
+
+      if(any(input$x_range_min_validate_growth_plot_linear == "",
+             input$x_range_max_validate_growth_plot_linear == "")){
+        xlim <- NULL
+      } else {
+        xlim <- c(as.numeric(input$x_range_min_validate_growth_plot_linear),
+                  as.numeric(input$x_range_max_validate_growth_plot_linear))
+      }
+
+
       if(length(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]]) > 1){
-
-
-        plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
-                         log = log
-                         # ADD FURTHER INPUT (see Notion)
+        plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
+                         pch = input$shape_type_validate_growth_plot_linear,
+                         log = log,
+                         cex.point = input$shape_size_validate_growth_plot_linear,
+                         cex.lab = input$axis_size_validate_growth_plot_linear,
+                         cex.axis = input$lab_size_validate_growth_plot_linear,
+                         lwd = input$line_width_validate_growth_plot_linear,
+                         y.lim = ylim,
+                         x.lim = xlim
         )
         if(input$diagnostics_validate_growth_plot_linear){
           plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
                            which = "fit_diagnostics",
-                           log = log
-                           # ADD FURTHER INPUT (see Notion)
+                           pch = input$shape_type_validate_growth_plot_linear,
+                           log = log,
+                           cex.point = input$shape_size_validate_growth_plot_linear,
+                           cex.lab = input$axis_size_validate_growth_plot_linear,
+                           cex.axis = input$lab_size_validate_growth_plot_linear,
+                           lwd = input$line_width_validate_growth_plot_linear
           )
         }
       }
@@ -5946,6 +6699,83 @@ browser()
     hide("restore_fluorescence_linear")
   })
 
+  output$download_fluorescence_validate_linear <- downloadHandler(
+    filename = function() {
+      paste("linear_fit_",  gsub(" \\| ", "_", selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), input$format_download_fluorescence_validate_linear, sep="")
+    },
+    content = function(file) {
+      if(input$format_download_fluorescence_validate_linear == ".pdf"){
+        pdf(file = file,
+            width = input$width_download_fluorescence_validate_linear,
+            height = input$height_download_fluorescence_validate_linear)
+      } else {
+        png(file = file,
+            width = input$width_download_fluorescence_validate_linear,
+            height = input$height_download_fluorescence_validate_linear,
+            units = "in",
+            res = input$dpi_download_fluorescence_validate_linear)
+      }
+      if(input$logy_validate_fluorescence_plot_linear) log <- "y"
+      else  log <- ""
+      results <- results$fluorescence
+      # Define x- and y-axis limits
+      if(any(input$y_range_min_validate_fluorescence_plot_linear == "",
+             input$y_range_max_validate_fluorescence_plot_linear == "")){
+        ylim <- NULL
+      } else {
+        ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_plot_linear),
+                  as.numeric(input$y_range_max_validate_fluorescence_plot_linear))
+      }
+
+      if(any(input$y_range_min_derivative_validate_fluorescence_plot_linear == "",
+             input$y_range_max_derivative_validate_fluorescence_plot_linear == "")){
+        ylim.deriv <- NULL
+      } else {
+        ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_fluorescence_plot_linear),
+                        as.numeric(input$y_range_max_derivative_validate_fluorescence_plot_linear))
+      }
+
+      if(any(input$x_range_min_validate_fluorescence_plot_linear == "",
+             input$x_range_max_validate_fluorescence_plot_linear == "")){
+        xlim <- NULL
+      } else {
+        xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
+                  as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
+      }
+      if(length(results$flFit1$flFittedLinear[[ifelse(input$sample_validate_fluorescence_linear == "1" || is.null(input$sample_validate_fluorescence_linear), 1, input$sample_validate_fluorescence_linear)]]) > 1){
+
+        plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                         log = log,
+                         pch = input$shape_type_validate_fluorescence_plot_linear,
+                         cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                         cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                         cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                         lwd = input$line_width_validate_fluorescence_plot_linear,
+                         y.lim = ylim,
+                         x.lim = xlim
+                         # ADD FURTHER INPUT (see Notion)
+        )
+        if(input$diagnostics_validate_fluorescence_plot_linear){
+          plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                           which = "fit_diagnostics",
+                           log = log,
+                           pch = input$shape_type_validate_fluorescence_plot_linear,
+                           cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                           cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                           cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                           lwd = input$line_width_validate_fluorescence_plot_linear,
+                           y.lim = ylim,
+                           x.lim = xlim
+                           # ADD FURTHER INPUT (see Notion)
+          )
+        }
+      }
+      dev.off()
+    },
+    contentType = ifelse(input$format_download_fluorescence_validate_linear == ".pdf", "image/pdf", "image/png")
+
+  )
+
       ### Spline Fits ####
   selected_inputs_validate_fluorescence_spline_sample <- reactive({
     results <- results$fluorescence
@@ -6056,6 +6886,19 @@ browser()
     results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <- selected_vals_validate_fluorescence$restore_fluorescence_spline
     hide("restore_fluorescence_spline")
   })
+
+  output$download_fluorescence_validate_spline <- downloadHandler(
+    filename = function() {
+      paste("spline_fit_",  gsub(" \\| ", "_", selected_vals_validate_fluorescence$sample_validate_fluorescence_spline), input$format_download_fluorescence_validate_spline, sep="")
+    },
+    content = function(file) {
+      ggsave(filename = file, width = input$width_download_fluorescence_validate_spline,
+             height = input$height_download_fluorescence_validate_spline,
+             dpi = input$dpi_download_fluorescence_validate_spline)
+    },
+    contentType = ifelse(input$format_download_fluorescence_validate_spline == ".pdf", "image/pdf", "image/png")
+
+  )
 
       ### Spline Fits BT ####
   selected_inputs_sample_validate_fluorescence_spline_bt <- reactive({
@@ -6190,25 +7033,27 @@ browser()
 
   growth_group_plot <- reactive({
     results <- results$growth
-    plot.grofit(results,
-                data.type = input$data_type_growth_group_plot,
-                names = input$select_samples_based_on_string_growth_group_plot,
-                conc = input$select_samples_based_on_concentration_growth_group_plot,
-                exclude.nm = input$exclude_samples_based_on_string_growth_group_plot,
-                exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plot,
-                mean = input$plot_group_averages_growth_group_plot,
-                deriv = input$plot_derivative_growth_group_plot,
-                log.y = input$log_transform_y_axis_growth_group_plot,
-                x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
-                y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
-                y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
-                y.title = input$y_axis_title_growth_group_plot,
-                x.title = input$x_axis_title_growth_group_plot,
-                y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
-                n.ybreaks = input$nbreaks_growth_group_plot,
-                lwd = input$line_width_growth_group_plot,
-                basesize = input$base_size_growth_group_plot,
-                shiny = TRUE
+    suppressWarnings(
+      plot.grofit(results,
+                  data.type = input$data_type_growth_group_plot,
+                  names = input$select_samples_based_on_string_growth_group_plot,
+                  conc = input$select_samples_based_on_concentration_growth_group_plot,
+                  exclude.nm = input$exclude_samples_based_on_string_growth_group_plot,
+                  exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plot,
+                  mean = input$plot_group_averages_growth_group_plot,
+                  deriv = input$plot_derivative_growth_group_plot,
+                  log.y = input$log_transform_y_axis_growth_group_plot,
+                  x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
+                  y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
+                  y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
+                  y.title = input$y_axis_title_growth_group_plot,
+                  x.title = input$x_axis_title_growth_group_plot,
+                  y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
+                  n.ybreaks = input$nbreaks_growth_group_plot,
+                  lwd = input$line_width_growth_group_plot,
+                  basesize = input$base_size_growth_group_plot,
+                  shiny = TRUE
+      )
     )
   })
 
@@ -6282,6 +7127,7 @@ browser()
     contentType = ifelse(input$format_download_dose_response_growth_plot_combined == ".pdf", "image/pdf", "image/png")
   )
 
+      ### DR Plots Spline Individual ####
 
 
   dose_response_growth_plot_individual <- reactive({
@@ -6341,9 +7187,63 @@ browser()
       paste("dose_response_growth_",  gsub(" \\| ", "_", input$individual_plots_dose_response_growth_plot), input$format_download_dose_response_growth_plot_individual, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_dose_response_growth_plot_individual,
-             height = input$height_download_dose_response_growth_plot_individual,
-             dpi = input$dpi_download_dose_response_growth_plot_individual)
+      if(input$format_download_dose_response_growth_plot_individual == ".pdf"){
+        pdf(file = file,
+            width = input$width_download_dose_response_growth_plot_individual,
+            height = input$height_download_dose_response_growth_plot_individual)
+      } else {
+        png(file = file,
+            width = input$width_download_dose_response_growth_plot_individual,
+            height = input$height_download_dose_response_growth_plot_individual,
+            units = "in",
+            res = input$dpi_download_dose_response_growth_plot_individual)
+      }
+      results <- results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]
+
+      # Define log-transformation of axes
+      if(input$log_transform_y_axis_dose_response_growth_plot &&
+         input$log_transform_x_axis_dose_response_growth_plot){
+        log <- "xy"
+      } else if(input$log_transform_y_axis_dose_response_growth_plot){
+        log <- "y"
+      } else if(input$log_transform_x_axis_dose_response_growth_plot){
+        log <- "x"
+      } else {
+        log <- ""
+      }
+
+      # Define x- and y-axis limits
+      if(any(input$y_range_min_dose_response_growth_plot == "",
+             input$y_range_max_dose_response_growth_plot == "")){
+        ylim <- NULL
+      } else {
+        ylim <- c(as.numeric(input$y_range_min_dose_response_growth_plot),
+                  as.numeric(input$y_range_max_dose_response_growth_plot))
+      }
+
+      if(any(input$x_range_min_dose_response_growth_plot == "",
+             input$x_range_max_dose_response_growth_plot == "")){
+        xlim <- NULL
+      } else {
+        xlim <- c(as.numeric(input$x_range_min_dose_response_growth_plot),
+                  as.numeric(input$x_range_max_dose_response_growth_plot))
+      }
+
+      plot.drFitSpline(drFitSpline = results,
+                       combine = FALSE,
+                       pch = input$shape_type_dose_response_growth_plot,
+                       cex.point = input$shape_size_dose_response_growth_plot,
+                       cex.lab = input$axis_size_dose_response_growth_plot,
+                       cex.axis = input$lab_size_dose_response_growth_plot,
+                       y.title = input$y_axis_title_dose_response_growth_plot,
+                       x.title = input$x_axis_title_dose_response_growth_plot,
+                       log = log,
+                       lwd = input$line_width_dose_response_growth_plot,
+                       ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
+                       y.lim = ylim,
+                       x.lim = xlim
+      )
+      dev.off()
     },
     contentType = ifelse(input$format_download_dose_response_growth_plot_individual == ".pdf", "image/pdf", "image/png")
   )
@@ -6393,13 +7293,13 @@ browser()
       }
       results <- results$growth$drFit$drBootSplines[[input$individual_plots_dose_response_growth_plot_bt]]
 
-      plot.drFitSpline(drFitSpline = results,
-                       combine = FALSE,
-                       pch = input$shape_type_dose_response_growth_plot_bt,
-                       cex.point = input$shape_size_dose_response_growth_plot_bt,
-                       cex.lab = input$axis_size_dose_response_growth_plot_bt,
-                       cex.axis = input$lab_size_dose_response_growth_plot_bt,
-                       lwd = input$line_width_dose_response_growth_plot_bt
+      plot.drBootSpline(drBootSpline = results,
+                        pch = input$shape_type_dose_response_growth_plot_bt,
+                        cex.point = input$shape_size_dose_response_growth_plot_bt,
+                        cex.lab = input$axis_size_dose_response_growth_plot_bt,
+                        cex.axis = input$lab_size_dose_response_growth_plot_bt,
+                        lwd = input$line_width_dose_response_growth_plot_bt,
+                        shiny = TRUE
 
       )
       dev.off()
@@ -6418,17 +7318,19 @@ browser()
       reference.conc <- NULL
       reference.nm <- NULL
     }
-    plot.parameter(results,
-                   param = input$parameter_parameter_growth_plot,
-                   names = input$select_sample_based_on_string_growth_parameter_plot,
-                   conc = input$select_sample_based_on_concentration_growth_parameter_plot,
-                   exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
-                   exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
-                   reference.nm = reference.nm,
-                   reference.conc = reference.conc,
-                   shape.size = input$shape.size_growth_parameter_plot,
-                   basesize = input$basesize_growth_parameter_plot,
-                   label.size = input$label.size_growth_parameter_plot
+    suppressWarnings(
+      plot.parameter(results,
+                     param = input$parameter_parameter_growth_plot,
+                     names = input$select_sample_based_on_string_growth_parameter_plot,
+                     conc = input$select_sample_based_on_concentration_growth_parameter_plot,
+                     exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
+                     exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
+                     reference.nm = reference.nm,
+                     reference.conc = reference.conc,
+                     shape.size = input$shape.size_growth_parameter_plot,
+                     basesize = input$basesize_growth_parameter_plot,
+                     label.size = input$label.size_growth_parameter_plot
+      )
     )
   })
 
@@ -6513,10 +7415,6 @@ browser()
     else return("")
   })
 
-  select_inputs_individual_plots_dose_response_growth_plot_bt <- reactive({
-    if (length(results$growth$drFit)>1 && results$growth$control$nboot.dr > 1) names(results$growth$drFit$drBootSplines)
-    else return("")
-  })
 
   observe({
     updateSelectInput(inputId = "parameter_parameter_growth_plot",
@@ -6543,7 +7441,7 @@ browser()
                       choices = select_inputs_individual_plots_dose_response_growth_plot_bt())
   })
 
-  ### DR Parameter Plots ####
+      ### DR Parameter Plots ####
   observe({
     if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1){
       showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponseParameters")
@@ -6560,13 +7458,15 @@ browser()
     } else {
       reference.nm <- NULL
     }
-    plot.dr_parameter(results,
-                   param = input$parameter_dr_parameter_growth_plot,
-                   names = input$select_sample_based_on_string_growth_dr_parameter_plot,
-                   exclude.nm = input$exclude_sample_based_on_strings_growth_dr_parameter_plot,
-                   reference.nm = reference.nm,
-                   basesize = input$basesize_growth_dr_parameter_plot,
-                   label.size = input$label.size_growth_dr_parameter_plot
+    suppressWarnings(
+      plot.dr_parameter(results,
+                        param = input$parameter_dr_parameter_growth_plot,
+                        names = input$select_sample_based_on_string_growth_dr_parameter_plot,
+                        exclude.nm = input$exclude_sample_based_on_strings_growth_dr_parameter_plot,
+                        reference.nm = reference.nm,
+                        basesize = input$basesize_growth_dr_parameter_plot,
+                        label.size = input$label.size_growth_dr_parameter_plot
+      )
     )
   })
 
@@ -6602,11 +7502,6 @@ browser()
     results$expdesign$condition
   })
 
-  select_inputs_individual_plots_dose_response_growth_plot <- reactive({
-    if (length(results$growth$drFit)>1) names(results$growth$drFit$drFittedSplines)
-    else return("")
-  })
-
   select_inputs_individual_plots_dose_response_growth_plot_bt <- reactive({
     if (length(results$growth$drFit)>1 && results$growth$control$nboot.dr > 1) names(results$growth$drFit$drBootSplines)
     else return("")
@@ -6628,36 +7523,37 @@ browser()
       ### Group Plots ####
   output$fluorescence_group_plot <- renderPlot({
     results <- results$fluorescence
-    plot.flFitRes(results,
-                data.type = input$data_type_fluorescence_group_plot,
-                names = input$select_samples_based_on_string_fluorescence_group_plot,
-                conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
-                exclude.nm = input$exclude_samples_based_on_string_fluorescence_group_plot,
-                exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_group_plot,
-                mean = input$plot_group_averages_fluorescence_group_plot,
-                deriv = input$plot_derivative_fluorescence_group_plot,
-                log.y = input$log_transform_y_axis_fluorescence_group_plot,
-                x.lim = c(input$x_range_min_fluorescence_group_plot, input$x_range_max_fluorescence_group_plot),
-                y.lim = c(input$y_range_min_fluorescence_group_plot,input$y_range_max_fluorescence_group_plot),
-                y.lim.deriv = c(input$y_range_min_derivative_fluorescence_group_plot, input$y_range_max_derivative_fluorescence_group_plot),
-                y.title = input$y_axis_title_fluorescence_group_plot,
-                x.title = input$x_axis_title_fluorescence_group_plot,
-                y.title.deriv = input$y_axis_title_derivative_fluorescence_group_plot,
-                lwd = input$line_width_fluorescence_group_plot,
-                basesize = input$base_size_fluorescence_group_plot,
-                n.ybreaks = input$nbreaks_fluorescence_group_plot,
-                shiny = TRUE
+    suppressWarnings(plot.flFitRes(results,
+                                   data.type = input$data_type_fluorescence_group_plot,
+                                   names = input$select_samples_based_on_string_fluorescence_group_plot,
+                                   conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
+                                   exclude.nm = input$exclude_samples_based_on_string_fluorescence_group_plot,
+                                   exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_group_plot,
+                                   mean = input$plot_group_averages_fluorescence_group_plot,
+                                   deriv = input$plot_derivative_fluorescence_group_plot,
+                                   log.y = input$log_transform_y_axis_fluorescence_group_plot,
+                                   x.lim = c(input$x_range_min_fluorescence_group_plot, input$x_range_max_fluorescence_group_plot),
+                                   y.lim = c(input$y_range_min_fluorescence_group_plot,input$y_range_max_fluorescence_group_plot),
+                                   y.lim.deriv = c(input$y_range_min_derivative_fluorescence_group_plot, input$y_range_max_derivative_fluorescence_group_plot),
+                                   y.title = input$y_axis_title_fluorescence_group_plot,
+                                   x.title = input$x_axis_title_fluorescence_group_plot,
+                                   y.title.deriv = input$y_axis_title_derivative_fluorescence_group_plot,
+                                   lwd = input$line_width_fluorescence_group_plot,
+                                   basesize = input$base_size_fluorescence_group_plot,
+                                   n.ybreaks = input$nbreaks_fluorescence_group_plot,
+                                   shiny = TRUE
+    )
     )
   })
 
   observe({
     if (length(results$fluorescence$flFit1)>1){
       if(input$data_type_fluorescence_group_plot == "raw1") y_axis <- "Fluorescence 1"
-      if(input$data_type_fluorescence_group_plot == "raw2") y_axis <- "Fluorescence 2"
+      # if(input$data_type_fluorescence_group_plot == "raw2") y_axis <- "Fluorescence 2"
       if(input$data_type_fluorescence_group_plot == "spline1") y_axis <- "Fluorescence 1"
-      if(input$data_type_fluorescence_group_plot == "spline2") y_axis <- "Fluorescence 2"
-      if(input$data_type_fluorescence_group_plot == "norm.fl1") y_axis <- "normalized fluorescence 1"
-      if(input$data_type_fluorescence_group_plot == "norm.fl2") y_axis <- "normalized fluorescence 2"
+      # if(input$data_type_fluorescence_group_plot == "spline2") y_axis <- "Fluorescence 2"
+      if(input$data_type_fluorescence_group_plot == "norm.fl1") y_axis <- "Normalized fluorescence 1"
+      # if(input$data_type_fluorescence_group_plot == "norm.fl2") y_axis <- "Normalized fluorescence 2"
     }
     else {
       y_axis <- ""
@@ -6704,13 +7600,13 @@ browser()
     results <- results$fluorescence
     selection <- c()
     if(length(results$data$fluorescence1) > 1){
-      selection <- c(selection, "Raw fluorescence 1")
+      selection <- c(selection, "Raw fluorescence 1" = "raw1")
     }
     # if(length(results$data$fluorescence2) > 1){
     #   selection <- c(selection, "Raw fluorescence 2")
     # }
     if(length(results$data$norm.fluorescence1) > 1){
-      selection <- c(selection, "Normalized FL1")
+      selection <- c(selection, "Normalized FL1" = "norm.fl1")
     }
     # if(length(results$data$norm.fluorescence2) > 1){
     #   selection <- c(selection, "Normalized FL2")
@@ -6718,13 +7614,18 @@ browser()
     # if(length(results$data$norm.fluorescence2) > 1){
     #   selection <- c(selection, "Normalized FL2")
     # }
-    if(length(results$data$norm.fluorescence1) > 1 %% "s" %in% results$control$fit.opt){
-      selection <- c(selection, "Spline fits FL1")
+    if(length(results$data$norm.fluorescence1) > 1 && "s" %in% results$control$fit.opt){
+      selection <- c(selection, "Spline fits FL1" = "spline1")
     }
-    # if(length(results$data$norm.fluorescence2) > 1 %% "s" %in% results$control$fit.opt){
+    # if(length(results$data$norm.fluorescence2) > 1 && "s" %in% results$control$fit.opt){
     #   selection <- c(selection, "Spline fits FL2")
     # }
     selection
+  })
+
+  observe({
+    updateSelectInput(inputId = "data_type_fluorescence_group_plot",
+                      choices = selected_inputs_fluorescence_group_plot_data_type())
   })
 
       ### DR Plots Spline ####
@@ -6826,9 +7727,61 @@ browser()
           paste("dose_response_fluorescence_",  gsub(" \\| ", "_", input$individual_plots_dose_response_fluorescence_plot), input$format_download_dose_response_fluorescence_plot_individual, sep="")
         },
         content = function(file) {
-          ggsave(filename = file, width = input$width_download_dose_response_fluorescence_plot_individual,
-                 height = input$height_download_dose_response_fluorescence_plot_individual,
-                 dpi = input$dpi_download_dose_response_fluorescence_plot_individual)
+          if(input$format_download_dose_response_fluorescence_plot_individual == ".pdf"){
+            pdf(file = file,
+                width = input$width_download_dose_response_fluorescence_plot_individual,
+                height = input$height_download_dose_response_fluorescence_plot_individual)
+          } else {
+            png(file = file,
+                width = input$width_download_dose_response_fluorescence_plot_individual,
+                height = input$height_download_dose_response_fluorescence_plot_individual,
+                units = "in",
+                res = input$dpi_download_dose_response_fluorescence_plot_individual)
+          }
+          results <- results$fluorescence$drFit1$drFittedSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot), 1, input$individual_plots_dose_response_fluorescence_plot)]]
+
+          # Define log-transformation of axes
+          if(input$log_transform_y_axis_dose_response_fluorescence_plot &&
+             input$log_transform_x_axis_dose_response_fluorescence_plot){
+            log <- "xy"
+          } else if(input$log_transform_y_axis_dose_response_fluorescence_plot){
+            log <- "y"
+          } else if(input$log_transform_x_axis_dose_response_fluorescence_plot){
+            log <- "x"
+          } else {
+            log <- ""
+          }
+
+          # Define x- and y-axis limits
+          if(any(input$y_range_min_dose_response_fluorescence_plot == "",
+                 input$y_range_max_dose_response_fluorescence_plot == "")){
+            ylim <- NULL
+          } else {
+            ylim <- c(as.numeric(input$y_range_min_dose_response_fluorescence_plot),
+                      as.numeric(input$y_range_max_dose_response_fluorescence_plot))
+          }
+
+          if(any(input$x_range_min_dose_response_fluorescence_plot == "",
+                 input$x_range_max_dose_response_fluorescence_plot == "")){
+            xlim <- NULL
+          } else {
+            xlim <- c(as.numeric(input$x_range_min_dose_response_fluorescence_plot),
+                      as.numeric(input$x_range_max_dose_response_fluorescence_plot))
+          }
+          plot.drFitSpline(results,
+                           combine=FALSE,
+                           pch = input$shape_type_dose_response_fluorescence_plot,
+                           cex.point = input$shape_size_dose_response_fluorescence_plot,
+                           lwd = input$line_width_dose_response_fluorescence_plot,
+                           ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot,
+                           cex.lab = input$axis_size_dose_response_fluorescence_plot,
+                           cex.axis = input$lab_size_dose_response_fluorescence_plot,
+                           y.title = input$y_axis_title_dose_response_fluorescence_plot,
+                           x.title = input$x_axis_title_dose_response_fluorescence_plot,
+                           log = log,
+                           y.lim = ylim,
+                           x.lim = xlim)
+          dev.off()
         },
         contentType = ifelse(input$format_download_dose_response_fluorescence_plot_individual == ".pdf", "image/pdf", "image/png")
       )
@@ -6844,6 +7797,18 @@ browser()
       })
 
       ### DR Plots Model individual ####
+
+      # Hide Model dose-response plot if dr.method != "model"
+      observe({
+        if(length(results$fluorescence$drFit1) > 1 &&
+           length(results$fluorescence$drFit1$drTable) > 1 &&
+           input$dr_method_fluorescence == "model"){
+          showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
+        } else {
+          hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
+        }
+
+      })
 
       output$dose_response_model_fluorescence_plot_individual <- renderPlot({
         results <- results$fluorescence$drFit1$drFittedModels[[ifelse(input$individual_plots_dose_response_model_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_model_fluorescence_plot), 1, input$individual_plots_dose_response_model_fluorescence_plot)]]
@@ -6911,18 +7876,6 @@ browser()
                           choices = select_inputs_individual_plots_dose_response_model_fluorescence_plot())
       })
 
-      ### DR Plots Model ####
-      # Hide Model dose-response plot if dr.method != "spline"
-      observe({
-        if(length(results$fluorescence$drFit1) > 1 &&
-           length(results$fluorescence$drFit1$drTable) > 1 &&
-           input$dr_method_fluorescence == "model"){
-          showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
-        } else {
-          hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
-        }
-
-      })
 
       ### Parameter Plots ####
       fluorescence_parameter_plot <- reactive({
@@ -6935,17 +7888,19 @@ browser()
           reference.conc <- NULL
           reference.nm <- NULL
         }
-        plot.parameter(results,
-                       param = input$parameter_fluorescence_parameter_fluorescence_plot,
-                       names = input$select_sample_based_on_string_fluorescence_parameter_plot,
-                       conc = input$select_sample_based_on_concentration_fluorescence_parameter_plot,
-                       exclude.nm = input$exclude_sample_based_on_strings_fluorescence_parameter_plot,
-                       exclude.conc = input$exclude_sample_based_on_concentration_fluorescence_parameter_plot,
-                       reference.nm = reference.nm,
-                       reference.conc = reference.conc,
-                       shape.size = input$shape.size_fluorescence_parameter_plot,
-                       basesize = input$basesize_fluorescence_parameter_plot,
-                       label.size = input$label.size_fluorescence_parameter_plot
+        suppressWarnings(
+          plot.parameter(results,
+                         param = input$parameter_fluorescence_parameter_fluorescence_plot,
+                         names = input$select_sample_based_on_string_fluorescence_parameter_plot,
+                         conc = input$select_sample_based_on_concentration_fluorescence_parameter_plot,
+                         exclude.nm = input$exclude_sample_based_on_strings_fluorescence_parameter_plot,
+                         exclude.conc = input$exclude_sample_based_on_concentration_fluorescence_parameter_plot,
+                         reference.nm = reference.nm,
+                         reference.conc = reference.conc,
+                         shape.size = input$shape.size_fluorescence_parameter_plot,
+                         basesize = input$basesize_fluorescence_parameter_plot,
+                         label.size = input$label.size_fluorescence_parameter_plot
+          )
         )
       })
 
@@ -7032,8 +7987,87 @@ browser()
                           choices = select_inputs_individual_plots_dose_response_fluorescence_plot())
       })
 
+      selected_inputs_reference_condition_fluorescence_parameter_plot <- reactive({
+        results <- results$fluorescence
+        results$expdesign$condition
+      })
 
-    ## Dual Plot ####
+      select_inputs_reference_concentration_fluorescence_parameter_plot <- reactive({
+        results <- results$fluorescence
+        results$expdesign$concentration
+      })
+
+      observe({
+        updateSelectInput(inputId = "reference_condition_fluorescence_parameter_plot",
+                          choices = selected_inputs_reference_condition_fluorescence_parameter_plot()
+        )})
+
+      observe({
+        updateSelectInput(inputId = "reference_concentration_fluorescence_parameter_plot",
+                          choices = select_inputs_reference_concentration_fluorescence_parameter_plot()
+        )})
+
+      ### DR Plots (Bootstrap) ####
+      observe({
+        if(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1 && results$fluorescence$control$nboot.dr > 1){
+          showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_bt")
+        } else {
+          hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_bt")
+        }
+      })
+
+      dose_response_fluorescence_plot_individual_bt <- reactive({
+        results <- results$fluorescence$drFit1$drBootSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot_bt == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot_bt), 1, input$individual_plots_dose_response_fluorescence_plot_bt)]]
+
+        plot.drBootSpline(drBootSpline = results,
+                          pch = input$shape_type_dose_response_fluorescence_plot_bt,
+                          cex.point = input$shape_size_dose_response_fluorescence_plot_bt,
+                          cex.lab = input$axis_size_dose_response_fluorescence_plot_bt,
+                          cex.axis = input$lab_size_dose_response_fluorescence_plot_bt,
+                          lwd = input$line_width_dose_response_fluorescence_plot_bt,
+                          shiny = TRUE
+
+        )
+      })
+
+      output$dose_response_fluorescence_plot_individual_bt <- renderPlot({
+        dose_response_fluorescence_plot_individual_bt()
+      })
+
+      output$download_dose_response_fluorescence_plot_individual_bt <- downloadHandler(
+        filename = function() {
+          paste("dose_response_boot_fluorescence_",  gsub(" \\| ", "_", input$individual_plots_dose_response_fluorescence_plot_bt), input$format_download_dose_response_fluorescence_plot_individual_bt, sep="")
+        },
+        content = function(file) {
+          if(input$format_download_dose_response_fluorescence_plot_individual_bt == ".pdf"){
+            pdf(file = file,
+                width = input$width_download_dose_response_fluorescence_plot_individual_bt,
+                height = input$height_download_dose_response_fluorescence_plot_individual_bt)
+          } else {
+            png(file = file,
+                width = input$width_download_dose_response_fluorescence_plot_individual_bt,
+                height = input$height_download_dose_response_fluorescence_plot_individual_bt,
+                units = "in",
+                res = input$dpi_download_dose_response_fluorescence_plot_individual_bt)
+          }
+          results <- results$fluorescence$drFit1$drBootSplines[[input$individual_plots_dose_response_fluorescence_plot_bt]]
+
+          plot.drBootSpline(drBootSpline = results,
+                            pch = input$shape_type_dose_response_fluorescence_plot_bt,
+                            cex.point = input$shape_size_dose_response_fluorescence_plot_bt,
+                            cex.lab = input$axis_size_dose_response_fluorescence_plot_bt,
+                            cex.axis = input$lab_size_dose_response_fluorescence_plot_bt,
+                            lwd = input$line_width_dose_response_fluorescence_plot_bt,
+                            shiny = TRUE
+
+          )
+          dev.off()
+        },
+        contentType = ifelse(input$format_download_dose_response_fluorescence_plot_individual_bt == ".pdf", "image/pdf", "image/png")
+      )
+
+
+      ### Dual Plot ####
       observe({
         if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence1) > 1){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
@@ -7044,8 +8078,9 @@ browser()
 
       dual_plot <- reactive({
         results <- results$fluorescence
-        plot.dual(object = results,
-                  fluorescence = input$fluorescence_type_dual_plot,
+        suppressWarnings(
+          plot.dual(object = results,
+                    fluorescence = input$fluorescence_type_dual_plot,
                     names = input$select_samples_based_on_string_dual_plot,
                     conc = input$select_samples_based_on_concentration_dual_plot,
                     exclude.nm = input$exclude_samples_based_on_string_dual_plot,
@@ -7063,6 +8098,7 @@ browser()
                     lwd = input$line_width_dual_plot,
                     basesize = input$base_size_dual_plot,
                     shiny = TRUE
+          )
         )
       })
 
@@ -7081,26 +8117,113 @@ browser()
         },
         contentType = ifelse(input$format_download_dual_plot == ".pdf", "image/pdf", "image/png")
       )
-  ## Fluorescence ####
-  selected_inputs_reference_condition_fluorescence_parameter_plot <- reactive({
-    results <- results$fluorescence
-    results$expdesign$condition
-  })
 
-  select_inputs_reference_concentration_fluorescence_parameter_plot <- reactive({
-    results <- results$fluorescence
-    results$expdesign$concentration
-  })
+      selected_inputs_fluorescence_type_dual_plot <- reactive({
+        results <- results$fluorescence
+        selection <- c()
+        if(length(results$data$fluorescence1) > 1){
+          selection <- c(selection, "Raw fluorescence 1" = "fl1")
+        }
+        # if(length(results$data$fluorescence2) > 1){
+        #   selection <- c(selection, "Raw fluorescence 2" = "fl2")
+        # }
+        if(length(results$data$norm.fluorescence1) > 1){
+          selection <- c(selection, "Normalized FL1" = "norm.fl1")
+        }
+        # if(length(results$data$norm.fluorescence2) > 1){
+        #   selection <- c(selection, "Normalized FL2" = "norm.fl2")
+        # }
+        selection
+      })
 
-  observe({
-    updateSelectInput(inputId = "reference_condition_fluorescence_parameter_plot",
-                      choices = selected_inputs_reference_condition_fluorescence_parameter_plot()
-    )})
+      observe({
+        updateSelectInput(inputId = "fluorescence_type_dual_plot",
+                          choices = selected_inputs_fluorescence_type_dual_plot())
+      })
 
-  observe({
-    updateSelectInput(inputId = "reference_concentration_fluorescence_parameter_plot",
-                      choices = select_inputs_reference_concentration_fluorescence_parameter_plot()
-    )})
+      ### DR Parameter Plots ####
+      observe({
+        if(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1){
+          showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponseParameters")
+        } else {
+          hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponseParameters")
+        }
+      })
+
+      fluorescence_dr_parameter_plot <- reactive({
+        results <- results$fluorescence
+
+        if (input$normalize_to_reference_fluorescence_dr_parameter_plot){
+          reference.nm <- input$reference_condition_fluorescence_dr_parameter_plot
+        } else {
+          reference.nm <- NULL
+        }
+        plot.dr_parameter(results,
+                          param = input$parameter_dr_parameter_fluorescence_plot,
+                          names = input$select_sample_based_on_string_fluorescence_dr_parameter_plot,
+                          exclude.nm = input$exclude_sample_based_on_strings_fluorescence_dr_parameter_plot,
+                          reference.nm = reference.nm,
+                          basesize = input$basesize_fluorescence_dr_parameter_plot,
+                          label.size = input$label.size_fluorescence_dr_parameter_plot
+        )
+      })
+
+      output$fluorescence_dr_parameter_plot <- renderPlot({
+        fluorescence_dr_parameter_plot()
+      })
+
+      output$download_fluorescence_dr_parameter_plot <- downloadHandler(
+        filename = function() {
+          paste("fluorescence_dr_parameter_plot",  input$format_download_fluorescence_dr_parameter_plot, sep="")
+        },
+        content = function(file) {
+          ggsave(filename = file, width = input$width_download_fluorescence_dr_parameter_plot,
+                 height = input$height_download_fluorescence_dr_parameter_plot,
+                 dpi = input$dpi_download_fluorescence_dr_parameter_plot)
+        },
+        contentType = ifelse(input$format_download_fluorescence_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
+
+      )
+
+      selected_inputs_parameter_fluorescence_dr_parameter_plot <- reactive({
+        results <- results$fluorescence
+
+        dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50')
+        if(input$number_of_bootstrappings_dr_fluorescence > 1){
+          dr_parameters <- c(dr_parameters, 'Response(EC50) - Bootstrap' = 'drboot.meanEC50', 'EC50 - Bootstrap' = 'drboot.meanEC50y')
+        }
+        dr_parameters
+      })
+
+      selected_inputs_reference_condition_fluorescence_dr_parameter_plot <- reactive({
+        results <- results$fluorescence
+        results$expdesign$condition
+      })
+
+      select_inputs_individual_plots_dose_response_fluorescence_plot <- reactive({
+        if (length(results$fluorescence$drFit1)>1) names(results$fluorescence$drFit1$drFittedSplines)
+        else return("")
+      })
+
+      select_inputs_individual_plots_dose_response_fluorescence_plot_bt <- reactive({
+        if (length(results$fluorescence$drFit1)>1 && results$fluorescence$control$nboot.dr > 1) names(results$fluorescence$drFit1$drBootSplines)
+        else return("")
+      })
+
+      observe({
+        updateSelectInput(inputId = "parameter_dr_parameter_fluorescence_plot",
+                          choices = selected_inputs_parameter_fluorescence_dr_parameter_plot()
+        )})
+
+      observe({
+        updateSelectInput(inputId = "reference_condition_fluorescence_dr_parameter_plot",
+                          choices = selected_inputs_reference_condition_fluorescence_dr_parameter_plot()
+        )})
+
+      observe({
+        updateSelectInput(inputId = "individual_plots_dose_response_fluorescence_plot_bt",
+                          choices = select_inputs_individual_plots_dose_response_fluorescence_plot_bt()
+        )})
 
   # Report ####
   volumes <- getVolumes() # this makes the directory at the base of your computer.
@@ -7156,12 +8279,14 @@ browser()
   observeEvent(input$render_report_growth_pdf, {
     showModal(modalDialog("Rendering report...", footer=NULL))
 
-    try(growth.report(grofit = results$growth,
-                  out.dir = global$report_datapath_growth,
-                  out.nm = global$report_filename_growth,
-                  ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                  format = input$report_filetype_growth,
-                  export = FALSE)
+    try(
+      suppressWarnings(growth.report(grofit = results$growth,
+                                     out.dir = global$report_datapath_growth,
+                                     out.nm = global$report_filename_growth,
+                                     ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                                     format = input$report_filetype_growth,
+                                     export = FALSE)
+      )
     )
     removeModal()
   })
@@ -7169,12 +8294,14 @@ browser()
   observeEvent(input$render_report_growth_html, {
     showModal(modalDialog("Rendering report...", footer=NULL))
 
-    try(growth.report(grofit = results$growth,
-                          out.dir = global$report_datapath_growth,
-                          out.nm = global$report_filename_growth,
-                          ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                          format = input$report_filetype_growth,
-                          export = FALSE)
+    try(
+      suppressWarnings(growth.report(grofit = results$growth,
+                                     out.dir = global$report_datapath_growth,
+                                     out.nm = global$report_filename_growth,
+                                     ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                                     format = input$report_filetype_growth,
+                                     export = FALSE)
+      )
     )
     removeModal()
   })

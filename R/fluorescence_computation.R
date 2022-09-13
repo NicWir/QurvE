@@ -893,7 +893,11 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
         (control$nboot.fl > 10) ){
       boot.all <- foreach::foreach(i = 1:dim(fl_data)[1]
       ) %dopar% {
-        QurvE::flBootSpline(x.ls[[i]], wells.ls[[i]], IDs.ls[[i]], control)
+        if(control$x_type == "density"){
+          QurvE::flBootSpline(density = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+        } else {
+          QurvE::flBootSpline(time = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+        }
       }
     }
     else{

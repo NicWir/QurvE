@@ -1306,9 +1306,17 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       "Normalized fluorescence 1"
     } else if(data.type == "norm.fl2"){
       "Normalized fluorescence 2"
-    } else if(data.type == "raw1" || data.type == "spline1"){
+    } else if(data.type == "raw1"){
       "Fluorescence 1"
     } else if(data.type == "raw2" || data.type == "spline2"){
+      "Fluorescence 2"
+    } else if(data.type == "spline1" && flFit$control$norm_fl){
+      "Normalized fluorescence 1"
+    } else if(data.type == "spline1" && !flFit$control$norm_fl){
+      "Fluorescence 1"
+    } else if(data.type == "spline2" && flFit$control$norm_fl){
+      "Normalized fluorescence 2"
+    } else if(data.type == "spline2" && !flFit$control$norm_fl){
       "Fluorescence 2"
     }
     p <- ggplot(df, aes(x=time, y=mean, col = name)) +
@@ -1478,9 +1486,17 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
       "Normalized fluorescence 1"
     } else if(data.type == "norm.fl2"){
       "Normalized fluorescence 2"
-    } else if(data.type == "raw1" || data.type == "spline1"){
+    } else if(data.type == "raw1"){
       "Fluorescence 1"
     } else if(data.type == "raw2" || data.type == "spline2"){
+      "Fluorescence 2"
+    } else if(data.type == "spline1" && flFit$control$norm_fl){
+      "Normalized fluorescence 1"
+    } else if(data.type == "spline1" && !flFit$control$norm_fl){
+      "Fluorescence 1"
+    } else if(data.type == "spline2" && flFit$control$norm_fl){
+      "Normalized fluorescence 2"
+    } else if(data.type == "spline2" && !flFit$control$norm_fl){
       "Fluorescence 2"
     }
     p <- ggplot(df, aes(x=time, y=y, col = name)) +
