@@ -723,7 +723,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
-#' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} and code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
+#' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} and \code{\link{growth.gcFitSpline}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
 #' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}
@@ -734,7 +734,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
-#' @param dr.parameter (Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
+#' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
@@ -3860,38 +3860,38 @@ huang <- function (time, A, mu, lambda, addpar)
 # }
 
 
-liquori <- function (time, A, mu, addpar)
-{
-  A <- A[1]
-  mu <- mu[1]
-  y0 <- addpar[1]
-  t_a1 <- addpar[2]
-  t_a2 <- addpar[3]
-  t_b1 <- addpar[4]
-  t_b2 <- addpar[5]
-  x <- addpar[6]
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(y0) == FALSE)
-    stop("Need numeric vector for: y0")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  if (is.numeric(t_a1) == FALSE)
-    stop("Need numeric vector for: addpar[2]")
-  if (is.numeric(t_a2) == FALSE)
-    stop("Need numeric vector for: addpar[3]")
-  if (is.numeric(t_b1) == FALSE)
-    stop("Need numeric vector for: addpar[4]")
-  if (is.numeric(t_b2) == FALSE)
-    stop("Need numeric vector for: addpar[5]")
-  t <- time
-  y1 <- (1-exp(-(t/t_a1)))/(1-exp(-(t/t_a1))+exp(-(t/t_a2)))
-  y2 <- (1-exp(-(t/t_b1)))/(1-exp(-(t/t_b1))+exp(-(t/t_b2)))
-  y <- y0 + A*x*y1 + A*(1-x)*y2
-  liquori <- y
-}
+# liquori <- function (time, A, mu, addpar)
+# {
+#   A <- A[1]
+#   mu <- mu[1]
+#   y0 <- addpar[1]
+#   t_a1 <- addpar[2]
+#   t_a2 <- addpar[3]
+#   t_b1 <- addpar[4]
+#   t_b2 <- addpar[5]
+#   x <- addpar[6]
+#   if (is.numeric(time) == FALSE)
+#     stop("Need numeric vector for: time")
+#   if (is.numeric(mu) == FALSE)
+#     stop("Need numeric vector for: mu")
+#   if (is.numeric(y0) == FALSE)
+#     stop("Need numeric vector for: y0")
+#   if (is.numeric(A) == FALSE)
+#     stop("Need numeric vector for: A")
+#   if (is.numeric(t_a1) == FALSE)
+#     stop("Need numeric vector for: addpar[2]")
+#   if (is.numeric(t_a2) == FALSE)
+#     stop("Need numeric vector for: addpar[3]")
+#   if (is.numeric(t_b1) == FALSE)
+#     stop("Need numeric vector for: addpar[4]")
+#   if (is.numeric(t_b2) == FALSE)
+#     stop("Need numeric vector for: addpar[5]")
+#   t <- time
+#   y1 <- (1-exp(-(t/t_a1)))/(1-exp(-(t/t_a1))+exp(-(t/t_a2)))
+#   y2 <- (1-exp(-(t/t_b1)))/(1-exp(-(t/t_b1))+exp(-(t/t_b2)))
+#   y <- y0 + A*x*y1 + A*(1-x)*y2
+#   liquori <- y
+# }
 
 richards <- function (time, A, mu, lambda, addpar)
 {
