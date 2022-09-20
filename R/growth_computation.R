@@ -622,6 +622,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             growth.thresh = 1.5)
 {
   if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
+  if(nboot.gc == "" || is.null(nboot.gc)) nboot.gc <- 0
   if ((is.character(fit.opt) == FALSE) | !any(fit.opt %in% c("l", "s", "m", "a")))
     stop("value of fit.opt must be character and contain one or more of 'l', 's', or 'm', or be 'a' (for all).")
   if (is.character(model.type) == FALSE)

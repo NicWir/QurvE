@@ -136,7 +136,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                         # load input file
                         #____DATA____####
-                        tabPanel('Data',
+                        tabPanel(span("Data", title = "Upload custom formatted data or parse results from a plate reader experiment."),
                                  icon = icon("file-lines"),
                                  value = "tabPanel",
                                  tabsetPanel(type = "tabs", id = "tabs_data",
@@ -553,7 +553,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                         #____COMPUTATION____####
 
-                        navbarMenu('Computation', menuName = "navbarMenu_Computation", icon=icon("gears"),
+                        navbarMenu(span("Computation", title = "Run a complete data analysis workflow."),
+                                   menuName = "navbarMenu_Computation", icon=icon("gears"),
 
                                    ##____Computation_Growth____####
 
@@ -1143,7 +1144,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                         #____RESULTS____####
 
-                        navbarMenu(title = "Results", menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
+                        navbarMenu(span("Results", title = "Tabular overview of computation results."),
+                                   menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
                                    ##____Results_Growth___####
                                    tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
                                             tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Growth",
@@ -1278,7 +1280,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    )
                         ),
                         #____VALIDATE____####
-                        navbarMenu("Validate",  menuName = "navbarMenu_Validate", icon = icon("user-check"),
+                        navbarMenu(span("Validation", title = "Graphical display for each fit."),
+                                   menuName = "navbarMenu_Validate", icon = icon("user-check"),
                                    ##____Validate_Growth____####
                                    tabPanel(title = "Growth Fits", value = "tabPanel_Validate_Growth",
                                             h1("Growth Fits"),
@@ -2278,7 +2281,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    ) # tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
                         ), # navbarMenu("Validate", icon = icon("user-check"),
                         #____Visualize____####
-                        navbarMenu("Visualize",  menuName = "navbarMenu_Visualize", icon = icon("chart-line"),
+                        navbarMenu(span("Visualization", title = "Visualize computation results for the entire dataset."),
+                                   menuName = "navbarMenu_Visualize", icon = icon("chart-line"),
                                    ## Growth Plots ####
                                    tabPanel(title = "Growth Plots", value = "tabPanel_Visualize_Growth",
                                             h1("Growth Plots"),
@@ -3952,7 +3956,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                         #____REPORT____####
 
 
-                        tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
+                        tabPanel(span("Report", title = "Generate a PDF or HTML report summarizing the results."),
+                                 value = "tabPanel_Report", icon=icon("file-contract"),
                                  tabsetPanel(type = "tabs", id = "tabsetPanel_Report",
                                              ##____Growth report___####
                                              tabPanel(title = "Growth", value = "tabPanel_report_growth",
@@ -4042,7 +4047,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                  ) # tabsetPanel(type = "tabs", id = "tabs_report",
                         ), # tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
                         #___Export RData___####
-                        tabPanel('Export data',
+                        tabPanel(span("Data Export", title = "Export all computation results as RData file."),
                                  icon = icon("file-lines"),
                                  value = "tabPanel_Export_RData",
                                  tabsetPanel(type = "tabs", id = "tabsetPanel_Export_Data",
@@ -4504,7 +4509,10 @@ server <- function(input, output, session){
   })
 
   output$custom_data_table_expdesign <- DT::renderDT({
-    custom_data_table_expdesign()
+    expdesign <- custom_data_table_expdesign()
+    datatable(expdesign,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+              escape = FALSE)
   })
 
 
@@ -5298,6 +5306,7 @@ server <- function(input, output, session){
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
     # Run fluorescence workflow
+    browser()
     try(
       shiny::withProgress(message = "Computations completed",
                           results$fluorescence <- fl.workflow(grodata = grodata,
@@ -8912,12 +8921,15 @@ server <- function(input, output, session){
   observeEvent(input$render_report_fluorescence_pdf, {
     showModal(modalDialog("Rendering report...", footer=NULL))
 
-    try(fl.report(flFitRes = results$fluorescence,
-                      out.dir = global$report_datapath_fluorescence,
-                      out.nm = global$report_filename_fluorescence,
-                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
-                      format = input$report_filetype_fluorescence,
-                      export = FALSE)
+    try(
+      suppressWarnings(
+        fl.report(flFitRes = results$fluorescence,
+                  out.dir = global$report_datapath_fluorescence,
+                  out.nm = global$report_filename_fluorescence,
+                  ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                  format = input$report_filetype_fluorescence,
+                  export = FALSE)
+      )
     )
     removeModal()
   })
@@ -8925,12 +8937,15 @@ server <- function(input, output, session){
   observeEvent(input$render_report_fluorescence_html, {
     showModal(modalDialog("Rendering report...", footer=NULL))
 
-    try(fl.report(flFitRes = results$fluorescence,
-                      out.dir = global$report_datapath_fluorescence,
-                      out.nm = global$report_filename_fluorescence,
-                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
-                      format = input$report_filetype_fluorescence,
-                      export = FALSE)
+    try(
+      suppressWarnings(
+        fl.report(flFitRes = results$fluorescence,
+                  out.dir = global$report_datapath_fluorescence,
+                  out.nm = global$report_filename_fluorescence,
+                  ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                  format = input$report_filetype_fluorescence,
+                  export = FALSE)
+      )
     )
     removeModal()
   })

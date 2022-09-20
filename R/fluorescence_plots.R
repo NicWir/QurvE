@@ -717,7 +717,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
       else layout(matrix(c(1,2,4,1,3,5), nrow = 3, ncol = 2))
 
       par(cex.lab = cex.lab, cex.axis = cex.axis)
-      par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
+      par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), mgp=c(3, 1, 0), las=0)
       colSpline <- rep(colSpline, (flBootSpline$control$nboot.fl%/%length(colSpline))+1)
 
       fit.log.x     <- flBootSpline$control$log.x.spline
@@ -1001,7 +1001,8 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
   }
 
   if (plot == TRUE){
-    p()
+    if(drFittedModel$fitFlag == TRUE) p()
+    else stop(paste0("Model could not be fitted to the data for: ", drFittedModel$drID, "."))
   }
 }
 

@@ -318,10 +318,10 @@ if(any(c("l") %in% control$fit.opt)){
     grDevices::png(paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.png"),
                    width = w, height = h, units = 'in', res = 300)
     p()
-    grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
+    suppressWarnings(grDevices::dev.off())
+    suppressWarnings(grDevices::pdf(paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf")))
     p()
-    grDevices::dev.off()
+    suppressWarnings(grDevices::dev.off())
   }
   if (plot == TRUE){
     suppressWarnings(
@@ -347,7 +347,7 @@ if(any(c("l") %in% control$fit.opt)){
       #         }
       for(i in 1:length(flFitRes[["flFit1"]][["flFittedLinear"]])){
         if(length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))>0 && flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6)
+                  suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
           plot.ggLinear()
           invisible(dev.off())
                  }
@@ -362,7 +362,7 @@ if(any(c("l") %in% control$fit.opt)){
     #         }
     for(i in 1:length(flFitRes[["flFit1"]][["flFittedLinear"]])){
         if(length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|\\(|\\)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6)
+                  suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|\\(|\\)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
           plot.ggLinear()
           invisible(dev.off())
                  }
@@ -646,10 +646,10 @@ if(any(c("s") %in% control$fit.opt)) {
         grDevices::png(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.png"),
                        width = w, height = h, units = 'in', res = 300)
         print(p)
-        grDevices::dev.off()
-        grDevices::pdf(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h)
+        suppressWarnings(grDevices::dev.off())
+        suppressWarnings(grDevices::pdf(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h))
         print(p)
-        grDevices::dev.off()
+        suppressWarnings(suppressWarnings(grDevices::dev.off()))
       }
       if (plot == TRUE){
         
@@ -672,9 +672,9 @@ if(any(c("s") %in% control$fit.opt)) {
       foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
-                ))))), ".pdf"))
+                ))))), ".pdf")))
                 suppressWarnings(
                   plot.ggSpline()
                 )
@@ -686,9 +686,10 @@ if(any(c("s") %in% control$fit.opt)) {
     foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
                 ))))),  ".pdf"))
+                )
                 suppressWarnings(
                   plot.ggSpline()
                 )
@@ -777,8 +778,10 @@ knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 
 ```{r ec50_model_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 1}
 for(i in 1:length(flFitRes[["drFit1"]][["drFittedModels"]])){
-  suppressWarnings(
-    plot.drFitModel(flFitRes$drFit1$drFittedModels[[i]], export = export)
+  try(
+    suppressWarnings(
+      plot.drFitModel(flFitRes$drFit1$drFittedModels[[i]], export = export)
+    )
   )
 }
 suppressWarnings(

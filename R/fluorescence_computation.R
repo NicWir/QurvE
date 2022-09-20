@@ -69,6 +69,7 @@ fl.control <- function(fit.opt = c("l", "s"),
   if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
   x_type <- match.arg(x_type)
   dr.method <- match.arg(dr.method)
+  if(nboot.fl == "" || is.null(nboot.fl)) nboot.fl <- 0
   if ((is.character(fit.opt) == FALSE | !any(fit.opt %in% c("l", "s"))))
     stop("value of fit.opt must be character and contain one of or both 'l' and 's'.")
   if ((is.character(x_type) == FALSE | !any(x_type %in% c("density", "time"))))
@@ -2735,12 +2736,13 @@ fl.drFit <- function(FitData, control = fl.control())
       names(test) <- rep(names(FitData)[dr.parameter], length(test))
       drID <- distinct[i]
       EC50[[i]] <- try(fl.drFitModel(conc, test, drID, control), silent = T)
+      description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
+                                log.y = control$log.y.dr)
       if(class(EC50[[i]]) != "try-error"){
-        description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
-                                  log.y = control$log.y.dr)
         out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
       } else {
-        out.row <- rep(NA, 12)
+        out.row <- cbind(description, data.frame("yEC50" = NA, "y.min" = NA, "y.max" = NA, "fc" = NA, "K" = NA, "n" = NA,
+                                        "yEC50.orig" = NA, "K.orig" = NA, "test" = NA))
       }
       EC50.table <- rbind(EC50.table, out.row)
 
@@ -2884,8 +2886,13 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
     if (control$suppress.messages == FALSE) {
       cat("Model could not be fitted in dose-response analysis!\n")
     }
-    fitFlag <- FALSE
-    stop("Error in fl.drFitModel")
+    drFitModel <- list(raw.conc = conc, raw.test = test, drID = drID,
+                       fit.conc = NA, fit.test = NA, model = y.model,
+                       parameters = list(yEC50 = NA, y.min = NA, y.max = NA, fc = NA, K = NA, n = NA,
+                                         yEC50.orig = NA, K.orig = NA, test = NA),
+                       fitFlag = FALSE, reliable = NULL, control = control)
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
   }
   # lines(conc.fit, biosensor.eq(x=conc.fit, y.min=coef(y.model)[1], y.max=coef(y.model)[2], K=coef(y.model)[3], n=coef(y.model)[4]), col = "red")
   m <- summary(y.model)
