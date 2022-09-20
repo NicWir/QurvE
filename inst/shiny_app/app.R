@@ -4223,13 +4223,13 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$tooltip_growth.gcFitLinear,{
-    showModal(help_modal(size = "l", idcss = "gcFitLinear",
+    showModal(QurvE:::help_modal(size = "l", idcss = "gcFitLinear",
                          htmlOutput("gcFitLinear_tooltip"), easyClose = T )
     )
   })
 
   observeEvent(input$tooltip_growth.gcFitLinear_validate,{
-    showModal(help_modal(size = "l", idcss = "gcFitLinear",
+    showModal(QurvE:::help_modal(size = "l", idcss = "gcFitLinear",
                          htmlOutput("gcFitLinear_tooltip"), easyClose = T )
     )
   })
@@ -4242,13 +4242,13 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$tooltip_growth.gcFitSpline,{
-    showModal(help_modal(size = "l", idcss = "gcFitSpline",
+    showModal(QurvE:::help_modal(size = "l", idcss = "gcFitSpline",
                          htmlOutput("gcFitSpline_tooltip"), easyClose = T )
     )
   })
 
   observeEvent(input$tooltip_growth.gcFitSpline_validate,{
-    showModal(help_modal(size = "l", idcss = "gcFitSpline",
+    showModal(QurvE:::help_modal(size = "l", idcss = "gcFitSpline",
                          htmlOutput("gcFitSpline_tooltip"), easyClose = T )
     )
   })
@@ -4261,13 +4261,13 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$tooltip_growth.gcFitModel,{
-    showModal(help_modal(size = "l", idcss = "gcFitModel",
+    showModal(QurvE:::help_modal(size = "l", idcss = "gcFitModel",
                          htmlOutput("gcFitModel_tooltip"), easyClose = T )
     )
   })
 
   observeEvent(input$tooltip_growth.gcFitModel_validate,{
-    showModal(help_modal(size = "l", idcss = "gcFitModel",
+    showModal(QurvE:::help_modal(size = "l", idcss = "gcFitModel",
                          htmlOutput("gcFitModel_tooltip"), easyClose = T )
     )
   })
@@ -4280,7 +4280,7 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$tooltip_growth_workflow,{
-    showModal(help_modal(size = "l", idcss = "growthworkflow",
+    showModal(QurvE:::help_modal(size = "l", idcss = "growthworkflow",
                          htmlOutput("tooltip_growth_workflow"), easyClose = T )
     )
   })
@@ -4293,13 +4293,13 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$tooltip_flFitLinear,{
-    showModal(help_modal(size = "l", idcss = "flFitLinear",
+    showModal(QurvE:::help_modal(size = "l", idcss = "flFitLinear",
                          htmlOutput("flFitLinear_tooltip"), easyClose = T )
     )
   })
 
   observeEvent(input$tooltip_flFitLinear_validate,{
-    showModal(help_modal(size = "l", idcss = "flFitLinear",
+    showModal(QurvE:::help_modal(size = "l", idcss = "flFitLinear",
                          htmlOutput("flFitLinear_tooltip"), easyClose = T )
     )
   })
@@ -4312,13 +4312,13 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$tooltip_flFitSpline,{
-    showModal(help_modal(size = "l", idcss = "flFitSpline",
+    showModal(QurvE:::help_modal(size = "l", idcss = "flFitSpline",
                          htmlOutput("flFitSpline_tooltip"), easyClose = T )
     )
   })
 
   observeEvent(input$tooltip_flFitSpline_validate,{
-    showModal(help_modal(size = "l", idcss = "flFitSpline",
+    showModal(QurvE:::help_modal(size = "l", idcss = "flFitSpline",
                          htmlOutput("flFitSpline_tooltip"), easyClose = T )
     )
   })
@@ -4331,7 +4331,7 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$tooltip_fl_workflow,{
-    showModal(help_modal(size = "l", idcss = "flworkflow",
+    showModal(QurvE:::help_modal(size = "l", idcss = "flworkflow",
                          htmlOutput("tooltip_fl_workflow"), easyClose = T )
     )
   })
@@ -4912,7 +4912,7 @@ server <- function(input, output, session){
 
     filename <- inFile$datapath
     showModal(modalDialog("Reading data file...", footer=NULL))
-    try(reads <- parse_properties_Gen5Gen6(file=filename,
+    try(reads <- QurvE:::parse_properties_Gen5Gen6(file=filename,
                                            csvsep = input$separator_custom_density,
                                            dec = input$decimal_separator_custom_density,
                                            sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
@@ -4954,9 +4954,10 @@ server <- function(input, output, session){
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
     showModal(modalDialog("Parsing data input...", footer=NULL))
+    # browser()
     if(input$mapping_included_in_parse){
       try(
-        results$parsed_data <- parse_data_shiny(
+        results$parsed_data <- QurvE:::parse_data_shiny(
           data.file = input$parse_file$datapath,
           map.file = input$parse_file$datapath,
           software = input$platereader_software,
@@ -4988,7 +4989,7 @@ server <- function(input, output, session){
         showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be availabel if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
       }
       try(
-        results$parsed_data <- parse_data_shiny(
+        results$parsed_data <- QurvE:::parse_data_shiny(
           data.file = input$parse_file$datapath,
           map.file = input$map_file$datapath,
           software = input$platereader_software,
@@ -5462,26 +5463,26 @@ server <- function(input, output, session){
     names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
 
     # calculate average param values
-    mu.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
-    mu.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
+    mu.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
+    mu.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
 
-    tD.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
-    tD.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
+    tD.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
+    tD.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
 
-    lambda.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
-    lambda.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+    lambda.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+    lambda.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
 
-    dY.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
-    dY.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+    dY.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+    dY.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
 
-    A.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
-    A.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+    A.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+    A.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
 
-    tmu.start.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
-    tmu.start.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
+    tmu.start.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
+    tmu.start.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
 
-    tmu.end.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
-    tmu.end.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
+    tmu.end.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
+    tmu.end.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
 
 
     labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
@@ -5585,23 +5586,23 @@ server <- function(input, output, session){
     names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
 
     # calculate average param values
-    mu.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
-    mu.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
+    mu.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
+    mu.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
 
-    tD.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
-    tD.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
+    tD.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
+    tD.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
 
-    lambda.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
-    lambda.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+    lambda.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+    lambda.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
 
-    dY.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
-    dY.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+    dY.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+    dY.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
 
-    A.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
-    A.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+    A.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+    A.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
 
-    tmax.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
-    tmax.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
+    tmax.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
+    tmax.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
 
     labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
@@ -5779,7 +5780,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_growth_linear()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -5790,7 +5791,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_growth_linear_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -5801,7 +5802,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_growth_spline()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -5812,7 +5813,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_growth_spline_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -5823,7 +5824,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_growth_spline_bt()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -5834,7 +5835,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_growth_model()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -5845,7 +5846,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_growth_dr_spline()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
     ## Fluorescence ####
@@ -5927,23 +5928,23 @@ server <- function(input, output, session){
 
     names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
     # calculate average param values
-    max_slope.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
-    max_slope.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
+    max_slope.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
+    max_slope.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
 
-    lambda.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
-    lambda.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+    lambda.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+    lambda.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
 
-    dY.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
-    dY.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+    dY.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+    dY.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
 
-    A.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
-    A.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+    A.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+    A.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
 
-    tmu.start.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
-    tmu.start.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
+    tmu.start.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
+    tmu.start.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
 
-    tmu.end.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
-    tmu.end.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
+    tmu.end.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
+    tmu.end.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
 
     labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
@@ -6042,20 +6043,20 @@ server <- function(input, output, session){
     names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
 
     # calculate average param values
-    max_slope.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
-    max_slope.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
+    max_slope.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
+    max_slope.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
 
-    lambda.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
-    lambda.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+    lambda.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+    lambda.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
 
-    dY.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
-    dY.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+    dY.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+    dY.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
 
-    A.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
-    A.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+    A.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+    A.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
 
-    tmax.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
-    tmax.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
+    tmax.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
+    tmax.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
 
     labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
@@ -6229,7 +6230,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_fluorescence1_linear()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -6240,7 +6241,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_fluorescence1_linear_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -6251,7 +6252,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_fluorescence1_spline()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -6262,7 +6263,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_fluorescence1_spline_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -6273,7 +6274,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_fluorescence1_spline_bt()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -6284,7 +6285,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_fluorescence1_dr_spline()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
@@ -6295,7 +6296,7 @@ server <- function(input, output, session){
     content = function(file) {
       table <- table_fluorescence1_dr_model()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
-      write.csv.utf8.BOM(table, file)
+      QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
