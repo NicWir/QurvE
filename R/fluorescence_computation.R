@@ -66,6 +66,7 @@ fl.control <- function(fit.opt = c("l", "s"),
                        neg.nan.act = FALSE,
                        clean.bootstrap = TRUE)
 {
+  if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
   x_type <- match.arg(x_type)
   dr.method <- match.arg(dr.method)
   if ((is.character(fit.opt) == FALSE | !any(fit.opt %in% c("l", "s"))))
@@ -139,23 +140,40 @@ fl.control <- function(fit.opt = c("l", "s"),
   fl.control
 }
 
-#' Perform a bootstrap on a dataset containing fluorescence data followed by spline fits for each resample
+#' Perform a smooth spline fit on fluorescence data
 #'
-#' \code{flBootSpline} resamples the fluorescence-'x' value pairs in a dataset with replacement and performs a spline fit for each bootstrap sample.
+#' \code{growth.gcFitSpline} performs a smooth spline fit on the dataset and determines
+#' the greatest slope as the global maximum in the first derivative of the spline.
 #'
 #' @param time Vector of the independent variable: time (if \code{x_type = 'time'} in \code{fl.control} object.
 #' @param density Vector of the independent variable: density (if \code{x_type = 'density'} in \code{fl.control} object.
 #' @param fl_data Vector of dependent variable: fluorescence.
 #' @param ID (Character) The name of the analyzed sample.
 #' @param control A \code{fl.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#' @param biphasic (Logical) Shall \code{\link{flFitLinear}} and \code{\link{flFitSpline}} try to extract fluorescence parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages) (\code{TRUE}) or not (\code{FALSE})?
+#' @param x_type (Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.
+#' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{FALSE}
+#' @param smooth.fl (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
+#' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
+#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
+#'
+#' @details If \code{biphasic = TRUE}, the following steps are performed to define a
+#'   second phase: \enumerate{ \item Determine local minima within the first
+#'   derivative of the smooth spline fit. \item Remove the 'peak' containing the highest
+#'   value of the first derivative (i.e., \eqn{mu_{max}}) that is flanked by two local
+#'   minima. \item Repeat the smooth spline fit and identification of maximum slope for
+#'   later time values than the local minimum after \eqn{mu_{max}}. \item Repeat the
+#'   smooth spline fit and identification of maximum slope for earlier time values than
+#'   the local minimum before \eqn{mu_{max}}. \item Choose the greater of the two
+#'   independently determined slopes as \eqn{mu_{max}2}. }
 #'
 #' @family fluorescence fitting functions
 #'
-#' @return A \code{gcBootSpline} object containing a distribution of growth parameters and
-#'   a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
-#'   to visualize all bootstrapping splines as well as the distribution of
-#'   physiological parameters.
-#'
+#' @return A \code{flFitSpline} object. The lag time is estimated as the intersection between the
+#'   tangent at the maximum slope and the horizontal line with \eqn{y = y_0}, where
+#'   \code{y0} is the first value of the dependent variable. Use \code{\link{plot.flFitSpline}} to
+#'   visualize the spline fit and derivative over time.
 #' \item{x.in}{Raw x values provided to the function as \code{time} or \code{density}.}
 #' \item{fl.in}{Raw fluorescence data provided to the function as \code{fl_data}.}
 #' \item{raw.x}{Filtered x values used for the spline fit.}
@@ -187,7 +205,7 @@ fl.control <- function(fit.opt = c("l", "s"),
 #' @export
 #'
 flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
-                        control = fl.control(x_type = c("density", "time"), log.x.spline = FALSE, log.y.spline = FALSE, smooth.fl = 0.75, t0 = 0, min.density = NA))
+                        control = fl.control(biphasic = FALSE, x_type = c("density", "time"), log.x.spline = FALSE, log.y.spline = FALSE, smooth.fl = 0.75, t0 = 0, min.density = NA))
 {
   x_type <- control$x_type
   if(!is.null(control$t0) && !is.na(control$t0) && control$t0 != ""){
@@ -2327,6 +2345,8 @@ fl.workflow <- function(grodata = NULL,
                         export.fig = FALSE,
                         ...)
 {
+  if(exists("lin.h") && !is.null(lin.h) && (is.na(lin.h) || lin.h == "")) lin.h <- NULL
+
   # Define objects based on additional function calls
   call <- match.call()
 

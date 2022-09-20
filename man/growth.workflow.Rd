@@ -74,7 +74,7 @@ growth.workflow(
 
 \item{log.y.model}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{model} fits. Default: \code{TRUE}}
 
-\item{biphasic}{(Logical) Shall \code{\link{growth.gcFitLinear}} and code{growth.gcFitSpline} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
+\item{biphasic}{(Logical) Shall \code{\link{growth.gcFitLinear}} and \code{\link{growth.gcFitSpline}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
 
 \item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
 
@@ -96,7 +96,7 @@ growth.workflow(
 
 \item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
-\item{dr.parameter}{(Character or numeric) The response parameter in the output table which should be used for creating a dose response curve. See \code{drFit} or \code{?summary.gcFit} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
 
 \item{smooth.dr}{(Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.}
 

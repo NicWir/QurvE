@@ -15,7 +15,8 @@ parse_data(
   dec.data = ".",
   csvsep.map = ";",
   dec.map = ".",
-  subtract.blank = T
+  subtract.blank = T,
+  calibration = NULL
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ parse_data(
 \item{dec.map}{(Character) decimal separator used in CSV, TSV or TXT mapping file.}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
+
+\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.}
 }
 \value{
 A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for object structure.

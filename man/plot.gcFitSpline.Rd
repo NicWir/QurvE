@@ -13,10 +13,10 @@
   spline = T,
   log.y = T,
   pch = 1,
-  cex.point = 2,
   colData = 1,
   colSpline = "dodgerblue3",
   basesize = 16,
+  cex.point = 2,
   lwd = 0.7,
   y.lim = NULL,
   x.lim = NULL,
@@ -45,13 +45,13 @@
 
 \item{pch}{(Numeric) Symbol used to plot data points.}
 
-\item{cex.point}{(Numeric) Size of the raw data points.}
-
 \item{colData}{(Numeric or character) Contour color of the raw data circles.}
 
 \item{colSpline}{(Numeric or character) Spline line colour.}
 
 \item{basesize}{(Numeric) Base font size.}
+
+\item{cex.point}{(Numeric) Size of the raw data points.}
 
 \item{lwd}{(Numeric) Spline line width.}
 

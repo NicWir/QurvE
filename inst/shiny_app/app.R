@@ -59,6 +59,34 @@ load_data <- function() {
 }
 
 ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.gcFitLinear { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.gcFitSpline { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.gcFitModel { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.flFitLinear { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.flFitSpline { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.flworkflow { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.growthworkflow { width: fit-content !important; }'
+                ),
                 tagList(
                   # tags$style(type = 'text/css', '.navbar {
                   #          font-size: 200px;
@@ -574,7 +602,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          min = NA,
                                                                          max = NA,
                                                                        ),
-                                                                       bsTooltip(id = "growth_threshold_growth", title = "A sample will be considered to have no growth if no density value is greater than [growth threshold] \\* start density."),
+                                                                       bsPopover(id = "growth_threshold_growth", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no density value is greater than [growth threshold] \\* start density."),
 
                                                                        numericInput(
                                                                          inputId = 'minimum_density_growth',
@@ -583,7 +611,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          min = NA,
                                                                          max = NA,
                                                                        ),
-                                                                       bsTooltip(id = "minimum_density_growth", title = "Consider only density values above [Minimum density] for the fits."),
+                                                                       bsPopover(id = "minimum_density_growth", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
 
 
                                                                        numericInput(
@@ -593,7 +621,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          min = NA,
                                                                          max = NA,
                                                                        ),
-                                                                       bsTooltip(id = "t0_growth", title = "Consider only time values above [t0] for the fits."),
+                                                                       bsPopover(id = "t0_growth", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
 
                                                                      ), # Growth fit
 
@@ -602,7 +630,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        style='padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
                                                                        h2(strong('Dose-response Analysis')),
                                                                        checkboxInput(inputId = 'perform_ec50_growth',
-                                                                                     label = 'perform EC50 Analysis',
+                                                                                     label = 'Perform EC50 Analysis',
                                                                                      value = FALSE),
 
 
@@ -610,6 +638,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                         selectInput(inputId = "response_parameter_growth",
                                                                                                     label = "Response Parameter",
                                                                                                     choices = ""),
+                                                                                        bsPopover(id = "response_parameter_growth", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve."),
 
                                                                                         checkboxInput(inputId = 'log_transform_concentration_growth',
                                                                                                       label = 'Log transform concentration'),
@@ -623,8 +652,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           value = "",
                                                                                           placeholder = "NULL (choose automatically)"
                                                                                         ),
-                                                                                        bsTooltip(id = "smoothing_factor_growth_dr", title = "'spar' argument in the R function smooth.spline()."),
-
+                                                                                        bsPopover(id = "smoothing_factor_growth_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
                                                                                         numericInput(
                                                                                           inputId = 'number_of_bootstrappings_dr_growth',
@@ -633,7 +661,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           min = NA,
                                                                                           max = NA,
                                                                                         ),
-                                                                                        bsTooltip(id = "number_of_bootstrappings_dr_growth", title = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
+                                                                                        bsPopover(id = "number_of_bootstrappings_dr_growth", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
 
                                                                        ) # conditionalPanel(condition = "input.perform_ec50_growth"
                                                                      ), #  wellPanel
@@ -644,7 +672,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              label = "Run computation",
                                                                                              icon=icon("gears"),
                                                                                              style="padding:5px; font-size:120%"),
-                                                                                style="float:right")
+                                                                                style="float:right"),
+                                                                              div(
+                                                                                actionButton(inputId = "tooltip_growth_workflow",
+                                                                                             label = "",
+                                                                                             icon=icon("question"),
+                                                                                             style="padding:2px; font-size:100%"),
+                                                                                style="float:left")
                                                                        )
                                                                      )
                                                        ) # sidebarPanel
@@ -665,7 +699,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              min = NA,
                                                              max = NA,
                                                            ),
-                                                           bsTooltip(id = "R2_threshold_growth", title = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
+                                                           bsPopover(id = "R2_threshold_growth", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
                                                            numericInput(
                                                              inputId = 'RSD_threshold_growth',
@@ -674,7 +708,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              min = NA,
                                                              max = NA,
                                                            ),
-                                                           bsTooltip(id = "RSD_threshold_growth", title = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
+                                                           bsPopover(id = "RSD_threshold_growth", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
                                                            numericInput(
                                                              inputId = 'dY_threshold_growth',
@@ -683,7 +717,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              min = NA,
                                                              max = NA,
                                                            ),
-                                                           bsTooltip(id = "dY_threshold_growth", title = "Threshold for the minimum fraction of density increase a linear regression window should cover to be considered."),
+                                                           bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of density increase a linear regression window should cover to be considered."),
 
                                                            checkboxInput(inputId = 'custom_sliding_window_size_growth',
                                                                          label = 'Custom sliding window size',
@@ -698,9 +732,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                min = NA,
                                                                max = NA,
                                                              ),
-                                                             bsTooltip(id = "custom_sliding_window_size_value_growth", title = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum density)."),
+                                                             bsPopover(id = "custom_sliding_window_size_value_growth", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum density)."),
                                                            ),
-                                                         )
+                                                           fluidRow(
+                                                             column(12,
+                                                                    div(
+                                                                      actionButton(inputId = "tooltip_growth.gcFitLinear",
+                                                                                   label = "",
+                                                                                   icon=icon("question"),
+                                                                                   style="padding:2px; font-size:100%"),
+                                                                      style="float:left")
+                                                             )
+                                                           ),
+                                                         ) # sidebarPanel
                                                        ), # conditionalPanel
                                                        conditionalPanel(
                                                          condition = "input.parametric_fit_growth",
@@ -711,31 +755,31 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              h4(strong('Models:')),
                                                              style='border-color: #ADADAD; padding: 1; padding-top: 0; padding-bottom: 0',
 
-                                                             tags$div(title="Zwietering MH, Jongenburger I, Rombouts FM, van 't Riet K. Modeling of the bacterial growth curve. Appl Environ Microbiol. 1990 Jun;56(6):1875-81. doi: 10.1128/aem.56.6.1875-1881.1990",
+                                                             tags$div(title="Reference: Zwietering MH, Jongenburger I, Rombouts FM, van 't Riet K. Modeling of the bacterial growth curve. Appl Environ Microbiol. 1990 Jun;56(6):1875-81. doi: 10.1128/aem.56.6.1875-1881.1990",
                                                                       checkboxInput(inputId = 'logistic_growth',
                                                                                     label = 'logistic',
                                                                                     value = TRUE)
                                                              ),
 
-                                                             tags$div(title="Zwietering MH, Jongenburger I, Rombouts FM, van 't Riet K. Modeling of the bacterial growth curve. Appl Environ Microbiol. 1990 Jun;56(6):1875-81. doi: 10.1128/aem.56.6.1875-1881.1990",
+                                                             tags$div(title="Reference: Zwietering MH, Jongenburger I, Rombouts FM, van 't Riet K. Modeling of the bacterial growth curve. Appl Environ Microbiol. 1990 Jun;56(6):1875-81. doi: 10.1128/aem.56.6.1875-1881.1990",
                                                                       checkboxInput(inputId = 'richards_growth',
                                                                                     label = 'Richards',
                                                                                     value = TRUE)
                                                              ),
 
-                                                             tags$div(title="Zwietering MH, Jongenburger I, Rombouts FM, van 't Riet K. Modeling of the bacterial growth curve. Appl Environ Microbiol. 1990 Jun;56(6):1875-81. doi: 10.1128/aem.56.6.1875-1881.1990",
+                                                             tags$div(title="Reference: Zwietering MH, Jongenburger I, Rombouts FM, van 't Riet K. Modeling of the bacterial growth curve. Appl Environ Microbiol. 1990 Jun;56(6):1875-81. doi: 10.1128/aem.56.6.1875-1881.1990",
                                                                       checkboxInput(inputId = 'gompertz_growth',
                                                                                     label = 'Gompertz',
                                                                                     value = TRUE)
                                                              ),
 
-                                                             tags$div(title="Kahm, M., Hasenbrink, G., Lichtenberg-Fraté, H., Ludwig, J., & Kschischo, M. (2010). grofit: Fitting Biological Growth Curves with R. Journal of Statistical Software, 33(7), 1–21. https://doi.org/10.18637/jss.v033.i07",
+                                                             tags$div(title="Reference: Kahm, M., Hasenbrink, G., Lichtenberg-Fraté, H., Ludwig, J., & Kschischo, M. (2010). grofit: Fitting Biological Growth Curves with R. Journal of Statistical Software, 33(7), 1–21. https://doi.org/10.18637/jss.v033.i07",
                                                                       checkboxInput(inputId = 'extended_gompertz_growth',
                                                                                     label = 'extended Gompertz',
                                                                                     value = TRUE)
                                                              ),
 
-                                                             tags$div(title="Huang, Lihan (2011) A new mechanistic growth model for simultaneous determination of lag phase duration and exponential growth rate and a new Belehdradek-type model for evaluating the effect of temperature on growth rate. Food Microbiology 28, 770 – 776. doi: 10.1016/j.fm.2010.05.019",
+                                                             tags$div(title="Reference: Huang, Lihan (2011) A new mechanistic growth model for simultaneous determination of lag phase duration and exponential growth rate and a new Belehdradek-type model for evaluating the effect of temperature on growth rate. Food Microbiology 28, 770 – 776. doi: 10.1016/j.fm.2010.05.019",
                                                                       checkboxInput(inputId = 'huang_growth',
                                                                                     label = 'Huang',
                                                                                     value = TRUE)
@@ -745,7 +789,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                     checkboxInput(inputId = 'log_transform_data_parametric_growth',
                                                                                   label = 'Log-transform data',
                                                                                   value = TRUE)
-                                                           )
+                                                           ),
+                                                           fluidRow(
+                                                             column(12,
+                                                                    div(
+                                                                      actionButton(inputId = "tooltip_growth.gcFitModel",
+                                                                                   label = "",
+                                                                                   icon=icon("question"),
+                                                                                   style="padding:2px; font-size:100%"),
+                                                                      style="float:left")
+                                                             )
+                                                           ),
 
                                                          )
                                                        ),  # conditionalPanel
@@ -764,22 +818,32 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                            numericInput(
                                                              inputId = 'smoothing_factor_nonparametric_growth',
-                                                             label = 'smoothing factor',
+                                                             label = 'Smoothing factor',
                                                              value = 0.55,
                                                              min = NA,
                                                              max = NA,
                                                            ),
-                                                           bsTooltip(id = "smoothing_factor_nonparametric_growth", title = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
+                                                           bsPopover(id = "smoothing_factor_nonparametric_growth", title = HTML("<em>smooth.gc</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
 
                                                            numericInput(
                                                              inputId = 'number_of_bootstrappings_growth',
-                                                             label = 'number of bootstrappings',
+                                                             label = 'Number of bootstrappings',
                                                              value = 0,
                                                              min = NA,
                                                              max = NA,
                                                            ),
-                                                           bsTooltip(id = "number_of_bootstrappings_growth", title = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
+                                                           bsPopover(id = "number_of_bootstrappings_growth", title = HTML("<em>nboot.gc</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
+                                                           fluidRow(
+                                                             column(12,
+                                                                    div(
+                                                                      actionButton(inputId = "tooltip_growth.gcFitSpline",
+                                                                                   label = "",
+                                                                                   icon=icon("question"),
+                                                                                   style="padding:2px; font-size:100%"),
+                                                                      style="float:left")
+                                                             )
+                                                           ),
                                                          )
                                                        )  # conditionalPanel
                                                 ) # column
@@ -800,30 +864,40 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        style = 'padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
                                                                        h2(strong('Fluorescence fit')),
                                                                        h4('Options'),
-                                                                       checkboxInput(
-                                                                         inputId = 'linear_regression_fluorescence',
-                                                                         label = 'linear regression',
-                                                                         value = TRUE
+                                                                       tags$div(title="Perform linear regression on log-transformed density data.",
+                                                                                checkboxInput(
+                                                                                  inputId = 'linear_regression_fluorescence',
+                                                                                  label = 'linear regression',
+                                                                                  value = TRUE
+                                                                                )
                                                                        ),
 
-                                                                       checkboxInput(
-                                                                         inputId = 'nonparametric_fit_fluorescence',
-                                                                         label = 'nonparametric fit',
-                                                                         value = TRUE
+                                                                       tags$div(title="Perform a nonparametric fit to the data using the smooth.spline() function.",
+                                                                                checkboxInput(
+                                                                                  inputId = 'nonparametric_fit_fluorescence',
+                                                                                  label = 'nonparametric fit',
+                                                                                  value = TRUE
+                                                                                )
                                                                        ),
 
-                                                                       checkboxInput(inputId = 'biphasic_fluorescence',
-                                                                                     label = 'Biphasic'),
+                                                                       tags$div(title="Extract kinetic parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages).",
+                                                                                checkboxInput(inputId = 'biphasic_fluorescence',
+                                                                                              label = 'Biphasic')
+                                                                       ),
 
                                                                        selectInput(
                                                                          inputId = 'data_type_x_fluorescence',
-                                                                         label = 'Data type x',
+                                                                         label = 'Independent variable',
                                                                          choices = ""
                                                                        ),
+                                                                       bsPopover(id = "data_type_x_fluorescence", title = HTML("<em>x_type</em>"), content = "Select the data type that is used as the independent variable for all fits."),
+
                                                                        conditionalPanel(
                                                                          condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present",
-                                                                         checkboxInput(inputId = 'normalize_fluorescence',
-                                                                                       label = 'Normalize fluorescence to density'
+                                                                         tags$div(title="Use normalized fluorescence (divided by density values) for all fits.",
+                                                                                  checkboxInput(inputId = 'normalize_fluorescence',
+                                                                                                label = 'Normalize fluorescence to density'
+                                                                                  )
                                                                          )
                                                                        ),
 
@@ -835,8 +909,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            value = 1.5,
                                                                            min = NA,
                                                                            max = NA,
-                                                                         )
+                                                                         ),
+                                                                         bsPopover(id = "growth_threshold_in_percent_fluorescence", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no density value is greater than [growth threshold] \\* start density."),
                                                                        ),
+
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("density")',
                                                                          numericInput(
@@ -845,8 +921,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            value = 0,
                                                                            min = NA,
                                                                            max = NA,
-                                                                         )
+                                                                         ),
+                                                                         bsPopover(id = "minimum_density_fluorescence", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
                                                                        ),
+
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("time")',
                                                                          numericInput(
@@ -857,6 +935,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            max = NA,
                                                                          )
                                                                        ),
+                                                                       bsPopover(id = "t0_fluorescence", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
+
                                                                      ), # wellPanel
 
 
@@ -865,7 +945,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                h2(strong('Dose-response Analysis')),
 
                                                                                checkboxInput(inputId = 'perform_ec50_fluorescence',
-                                                                                             label = 'perform dose-response analysis',
+                                                                                             label = 'Perform dose-response analysis',
                                                                                              value = FALSE),
 
 
@@ -875,11 +955,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                             label = "Method",
                                                                                                             choices = c("Biosensor response model" = "model",
                                                                                                                         "Response spline fit" = "spline")
-                                                                                                ), # TODO tooltip with reference to Meyer et al., 2019
+                                                                                                ),
+                                                                                                bsPopover(id = "dr_method_fluorescence", title = HTML("<em>dr.method</em>"), content = "Fit either a biosensor response model (Meyer et al., 2019) to response-vs.-concentration data, or apply a nonparametric (spline) fit."),
 
                                                                                                 selectInput(inputId = "response_parameter_fluorescence",
                                                                                                             label = "Response Parameter",
                                                                                                             choices = ""),
+                                                                                                bsPopover(id = "response_parameter_fluorescence", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve."),
 
                                                                                                 checkboxInput(inputId = 'log_transform_concentration_fluorescence',
                                                                                                               label = 'log transform concentration'),
@@ -895,8 +977,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                     value = 0,
                                                                                                     min = NA,
                                                                                                     max = NA,
-                                                                                                  )
+                                                                                                  ),
+                                                                                                  bsPopover(id = "number_of_bootstrappings_dr_fluorescence", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
                                                                                                 ),
+
                                                                                                 conditionalPanel(
                                                                                                   condition = 'input.dr_method_fluorescence == "spline"',
                                                                                                   textInput(
@@ -919,7 +1003,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                label = "Run computation",
                                                                                                icon=icon("gears"),
                                                                                                style="padding:5px; font-size:120%"),
-                                                                                  style="float:right")
+                                                                                  style="float:right"),
+                                                                                div(
+                                                                                  actionButton(inputId = "tooltip_fl_workflow",
+                                                                                               label = "",
+                                                                                               icon=icon("question"),
+                                                                                               style="padding:2px; font-size:100%"),
+                                                                                  style="float:left")
                                                                          )
                                                                        )
                                                                      )
@@ -941,6 +1031,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              min = NA,
                                                              max = NA,
                                                            ),
+                                                           bsPopover(id = "R2_threshold_fluorescence", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
                                                            numericInput(
                                                              inputId = 'RSD_threshold_fluorescence',
@@ -949,6 +1040,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              min = NA,
                                                              max = NA,
                                                            ),
+                                                           bsPopover(id = "RSD_threshold_fluorescence", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
                                                            numericInput(
                                                              inputId = 'dY_threshold_fluorescence',
@@ -957,11 +1049,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              min = NA,
                                                              max = NA,
                                                            ),
-                                                           checkboxInput(inputId = 'log_transform_data_linear_fluorescence',
-                                                                         label = 'Log-transform fluorescence data'),
+                                                           bsPopover(id = "dY_threshold_fluorescence", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of fluorescence increase a linear regression window should cover to be considered."),
 
-                                                           checkboxInput(inputId = 'log_transform_x_linear_fluorescence',
-                                                                         label = 'Log-transform x data'),
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on fluorescence values.",
+                                                                    checkboxInput(inputId = 'log_transform_data_linear_fluorescence',
+                                                                                  label = 'Log-transform fluorescence data')
+                                                           ),
+
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on the independent variable",
+                                                                    checkboxInput(inputId = 'log_transform_x_linear_fluorescence',
+                                                                                  label = 'Log-transform x data')
+                                                           ),
 
                                                            checkboxInput(inputId = 'custom_sliding_window_size_fluorescence',
                                                                          label = 'custom sliding window size',
@@ -970,13 +1068,24 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            conditionalPanel(
                                                              condition = "input.custom_sliding_window_size_fluorescence",
                                                              numericInput(
-                                                               inputId = 'custom_sliding_window_size_value_gfluorescence',
+                                                               inputId = 'custom_sliding_window_size_value_fluorescence',
                                                                label = NULL,
-                                                               value = "",
+                                                               value = "NULL",
                                                                min = NA,
                                                                max = NA,
+                                                             ),
+                                                             bsPopover(id = "custom_sliding_window_size_value_fluorescence", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the phase of fluorescence increase (until maximum fluorescence or density)."),
+                                                           ),
+                                                           fluidRow(
+                                                             column(12,
+                                                                    div(
+                                                                      actionButton(inputId = "tooltip_flFitLinear",
+                                                                                   label = "",
+                                                                                   icon=icon("question"),
+                                                                                   style="padding:2px; font-size:100%"),
+                                                                      style="float:left")
                                                              )
-                                                           )
+                                                           ),
                                                          )
                                                        ), # conditionalPanel
 
@@ -989,24 +1098,41 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                            numericInput(
                                                              inputId = 'smoothing_factor_nonparametric_fluorescence',
-                                                             label = 'smoothing factor',
+                                                             label = 'Smoothing factor',
                                                              value = 0.75,
                                                              min = NA,
                                                              max = NA,
                                                            ),
+                                                           bsPopover(id = "smoothing_factor_nonparametric_fluorescence", title = HTML("<em>smooth.fl</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
                                                            numericInput(
                                                              inputId = 'number_of_bootstrappings_fluorescence',
-                                                             label = 'number of bootstrappings',
+                                                             label = 'Number of bootstrappings',
                                                              value = 0,
                                                              min = NA,
                                                              max = NA,
                                                            ),
-                                                           checkboxInput(inputId = 'log_transform_data_nonparametric_fluorescence',
-                                                                         label = 'Log-transform fluorescence data'),
+                                                           bsPopover(id = "number_of_bootstrappings_fluorescence", title = HTML("<em>nboot.fl</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
 
-                                                           checkboxInput(inputId = 'log_transform_x_nonparametric_fluorescence',
-                                                                         label = 'Log-transform x data')
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on fluorescence values.",
+                                                                    checkboxInput(inputId = 'log_transform_data_nonparametric_fluorescence',
+                                                                                  label = 'Log-transform fluorescence data')
+                                                           ),
+
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on the independent variable",
+                                                                    checkboxInput(inputId = 'log_transform_x_nonparametric_fluorescence',
+                                                                                  label = 'Log-transform x data')
+                                                           ),
+                                                           fluidRow(
+                                                             column(12,
+                                                                    div(
+                                                                      actionButton(inputId = "tooltip_flFitSpline",
+                                                                                   label = "",
+                                                                                   icon=icon("question"),
+                                                                                   style="padding:2px; font-size:100%"),
+                                                                      style="float:left")
+                                                             )
+                                                           ),
                                                          )
                                                        )  # conditionalPanel
                                                 ) # column
@@ -1307,8 +1433,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           selectize = FALSE,
                                                                                           size = 5,
                                                                               ),
+
+                                                                              sliderInput(inputId = 'shape_type_validate_growth_plot_spline',
+                                                                                          label = 'Shape type',
+                                                                                          min = 1,
+                                                                                          max = 25,
+                                                                                          value = 21),
+
                                                                               checkboxInput(inputId = 'logy_validate_growth_plot_spline',
                                                                                             label = 'Log-transform y axis',
+                                                                                            value = TRUE),
+
+                                                                              checkboxInput(inputId = "plot_derivative_validate_growth_plot_spline",
+                                                                                            label = "Plot derivative",
                                                                                             value = TRUE),
 
                                                                               strong("x-Range"),
@@ -1369,14 +1506,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           label = 'Shape size',
                                                                                           min = 1,
                                                                                           max = 10,
-                                                                                          value = 2,
-                                                                                          step = 0.5),
+                                                                                          value = 3,
+                                                                                          step = 0.1),
 
                                                                               sliderInput(inputId = "line_width_validate_growth_plot_spline",
                                                                                           label = "Line width",
                                                                                           min = 0.01,
                                                                                           max = 10,
-                                                                                          value = 3),
+                                                                                          value = 1),
 
                                                                               sliderInput(inputId = 'base_size_validate_growth_plot_spline',
                                                                                           label = 'Base font size',
@@ -1457,7 +1594,44 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                             selectize = FALSE,
                                                                                             size = 5,
                                                                                 )
-                                                                              )
+                                                                              ),
+                                                                              sliderInput(inputId = 'shape_type_validate_growth_plot_model',
+                                                                                          label = 'Shape type',
+                                                                                          min = 1,
+                                                                                          max = 25,
+                                                                                          value = 21),
+                                                                              sliderInput(inputId = 'shape_size_validate_growth_plot_model',
+                                                                                          label = 'Shape size',
+                                                                                          min = 1,
+                                                                                          max = 10,
+                                                                                          value = 3,
+                                                                                          step = 0.1),
+
+                                                                              sliderInput(inputId = "line_width_validate_growth_plot_model",
+                                                                                          label = "Line width",
+                                                                                          min = 0.01,
+                                                                                          max = 10,
+                                                                                          value = 1),
+
+                                                                              sliderInput(inputId = 'base_size_validate_growth_plot_model',
+                                                                                          label = 'Base font size',
+                                                                                          min = 10,
+                                                                                          max = 35,
+                                                                                          value = 20,
+                                                                                          step = 0.5),
+
+                                                                              sliderInput(inputId = "nbreaks_validate_growth_plot_model",
+                                                                                          label = "Number of breaks on y-axis",
+                                                                                          min = 1,
+                                                                                          max = 20,
+                                                                                          value = 6),
+
+                                                                              sliderInput(inputId = "eqsize_validate_growth_plot_model",
+                                                                                          label = "Equation font size",
+                                                                                          min = 0.1,
+                                                                                          max = 10,
+                                                                                          step = 0.1,
+                                                                                          value = 1.9),
 
                                                                  ),
                                                                  mainPanel(width = 7,
@@ -1813,6 +1987,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                               checkboxInput(inputId = 'logy_validate_fluorescence_plot_spline',
                                                                                             label = 'Log-transform y axis',
                                                                                             value = FALSE),
+
+                                                                              checkboxInput(inputId = "plot_derivative_validate_fluorescence_plot_spline",
+                                                                                            label = "Plot derivative",
+                                                                                            value = TRUE),
+
+                                                                              sliderInput(inputId = 'shape_type_validate_fluorescence_plot_spline',
+                                                                                          label = 'Shape type',
+                                                                                          min = 1,
+                                                                                          max = 25,
+                                                                                          value = 21),
 
                                                                               strong("x-Range"),
                                                                               fluidRow(
@@ -2815,7 +2999,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    ),
 
                                                                    conditionalPanel(
-                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2' ||
+                                                                     input.data_type_fluorescence_group_plot == 'raw1' || input.data_type_fluorescence_group_plot == 'raw2'",
                                                                      checkboxInput(inputId = "plot_group_averages_fluorescence_group_plot",
                                                                                    label = "Plot group averages",
                                                                                    value = TRUE)
@@ -4005,6 +4190,129 @@ server <- function(input, output, session){
 
   results <- reactiveValues()
 
+  ### Function help modals ####
+
+  output$gcFitLinear_tooltip <- renderText({
+    temp = tools::Rd2HTML("../../man/growth.gcFitLinear.Rd", out = paste0(tempfile("docs_gcFitLinear"), ".txt"))
+    content = read_lines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_growth.gcFitLinear,{
+    showModal(help_modal(size = "l", idcss = "gcFitLinear",
+                         htmlOutput("gcFitLinear_tooltip"), easyClose = T )
+    )
+  })
+
+  observeEvent(input$tooltip_growth.gcFitLinear_validate,{
+    showModal(help_modal(size = "l", idcss = "gcFitLinear",
+                         htmlOutput("gcFitLinear_tooltip"), easyClose = T )
+    )
+  })
+
+  output$gcFitSpline_tooltip <- renderText({
+    temp = tools::Rd2HTML("../../man/growth.gcFitSpline.Rd", out = paste0(tempfile("docs_gcFitSpline"), ".txt"))
+    content = read_lines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_growth.gcFitSpline,{
+    showModal(help_modal(size = "l", idcss = "gcFitSpline",
+                         htmlOutput("gcFitSpline_tooltip"), easyClose = T )
+    )
+  })
+
+  observeEvent(input$tooltip_growth.gcFitSpline_validate,{
+    showModal(help_modal(size = "l", idcss = "gcFitSpline",
+                         htmlOutput("gcFitSpline_tooltip"), easyClose = T )
+    )
+  })
+
+  output$gcFitModel_tooltip <- renderText({
+    temp = tools::Rd2HTML("../../man/growth.gcFitModel.Rd", out = paste0(tempfile("docs_gcFitModel"), ".txt"))
+    content = read_lines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_growth.gcFitModel,{
+    showModal(help_modal(size = "l", idcss = "gcFitModel",
+                         htmlOutput("gcFitModel_tooltip"), easyClose = T )
+    )
+  })
+
+  observeEvent(input$tooltip_growth.gcFitModel_validate,{
+    showModal(help_modal(size = "l", idcss = "gcFitModel",
+                         htmlOutput("gcFitModel_tooltip"), easyClose = T )
+    )
+  })
+
+  output$tooltip_growth_workflow <- renderText({
+    temp = tools::Rd2HTML("../../man/growth.workflow.Rd", out = paste0(tempfile("docs_growth_workflow"), ".txt"))
+    content = read_lines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_growth_workflow,{
+    showModal(help_modal(size = "l", idcss = "growthworkflow",
+                         htmlOutput("tooltip_growth_workflow"), easyClose = T )
+    )
+  })
+
+  output$flFitLinear_tooltip <- renderText({
+    temp = tools::Rd2HTML("../../man/flFitLinear.Rd", out = paste0(tempfile("docs_flFitLinear"), ".txt"))
+    content = read_lines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_flFitLinear,{
+    showModal(help_modal(size = "l", idcss = "flFitLinear",
+                         htmlOutput("flFitLinear_tooltip"), easyClose = T )
+    )
+  })
+
+  observeEvent(input$tooltip_flFitLinear_validate,{
+    showModal(help_modal(size = "l", idcss = "flFitLinear",
+                         htmlOutput("flFitLinear_tooltip"), easyClose = T )
+    )
+  })
+
+  output$flFitSpline_tooltip <- renderText({
+    temp = tools::Rd2HTML("../../man/flFitSpline.Rd", out = paste0(tempfile("docs_flFitSpline"), ".txt"))
+    content = read_lines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_flFitSpline,{
+    showModal(help_modal(size = "l", idcss = "flFitSpline",
+                         htmlOutput("flFitSpline_tooltip"), easyClose = T )
+    )
+  })
+
+  observeEvent(input$tooltip_flFitSpline_validate,{
+    showModal(help_modal(size = "l", idcss = "flFitSpline",
+                         htmlOutput("flFitSpline_tooltip"), easyClose = T )
+    )
+  })
+
+  output$tooltip_fl_workflow <- renderText({
+    temp = tools::Rd2HTML("../../man/fl.workflow.Rd", out = paste0(tempfile("docs_fl_workflow"), ".txt"))
+    content = read_lines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_fl_workflow,{
+    showModal(help_modal(size = "l", idcss = "flworkflow",
+                         htmlOutput("tooltip_fl_workflow"), easyClose = T )
+    )
+  })
+
   #____Read data____####
   # Test if fluorescence data is contained in custom/parsed object
   output$fluorescence_present <- reactive({
@@ -4083,7 +4391,7 @@ server <- function(input, output, session){
       # }
 
       # Remove eventually pre-loaded parsed data
-      results$parse_data <- NULL
+      results$parsed_data <- NULL
       hide("parsed_reads_density")
       hide("parsed_reads_fluorescence1")
       # hide("parsed_reads_fluorescence2")
@@ -4336,15 +4644,14 @@ server <- function(input, output, session){
     table_fl1 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
                        table_fl1)
 
-    table_fl1 <- datatable(table_fl1,
-                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
-
     table_fl1
   })
 
   output$custom_table_fluorescence1_processed <- DT::renderDT({
-    custom_table_fluorescence1_processed()
+    table_fl1 <- custom_table_fluorescence1_processed()
+    datatable(table_fl1,
+                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
   })
 
   ### Render custom fluorescence 2 table
@@ -4788,6 +5095,7 @@ server <- function(input, output, session){
   # Computation ####
     ##____Growth____#####
   hide("run_growth")
+
   selected_inputs_response_parameter_growth <- reactive({
     select_options <- c()
     if(input$linear_regression_growth) select_options <- c(select_options, 'mu.linfit', 'lambda.linfit', 'dY.linfit',
@@ -4897,6 +5205,7 @@ server <- function(input, output, session){
     removeModal()
   })
     ##____Fluorescence____#####
+
   # Create vector of x_types based on presence of data types
   output$normalized_fl_present <- reactive({
     if(!is.null(results$custom_data)){
@@ -4939,6 +5248,7 @@ server <- function(input, output, session){
                                                                  'A.linfit')
     if(input$nonparametric_fit_fluorescence) select_options <- c(select_options, 'max_slope.spline', 'lambda.spline',
                                                                  'A.spline', 'dY.spline', 'integral.spline')
+    select_options
   })
 
   observe({
@@ -5382,6 +5692,9 @@ server <- function(input, output, session){
         }
         if ( "gompertz.exp" %in% res.table.gc$used.model ){
           table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
+        }
+        if ( "huang" %in% res.table.gc$used.model ){
+          table_model <- suppressWarnings(cbind(table_model, data.frame("y0" = round(as.numeric(res.table.gc$parameter_y0.model), 3), stringsAsFactors = F, check.names = F)))
         }
       }
       table_model
@@ -6124,8 +6437,23 @@ server <- function(input, output, session){
         textInput('lin.R2.rerun', 'R2 threshold', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.R2)),
         textInput('lin.RSD.rerun', 'RSD threshold for slope', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$lin.RSD)),
         footer=tagList(
-          actionButton('submit.rerun.linear.growth', 'Submit'),
-          modalButton('cancel')
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton('submit.rerun.linear.growth', 'Submit'),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right"),
+                   div(
+                     actionButton(inputId = "tooltip_growth.gcFitLinear_validate",
+                                  label = "",
+                                  icon=icon("question"),
+                                  style="padding:2px; font-size:100%"),
+                     style="float:left")
+
+            )
+          )
         )
       )
     )
@@ -6290,6 +6618,8 @@ server <- function(input, output, session){
                            cex.point = input$shape_size_validate_growth_plot_spline,
                            basesize = input$base_size_validate_growth_plot_spline,
                            n.ybreaks = input$nbreaks_validate_growth_plot_spline,
+                           pch = input$shape_type_validate_growth_plot_spline,
+                           deriv = input$plot_derivative_validate_growth_plot_spline,
       )
       )
       removeModal()
@@ -6303,12 +6633,27 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
-        textInput('t0.spline.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[input$sample_validate_growth_spline]]$control$t0)),
-        textInput('min.density.spline.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[input$sample_validate_growth_spline]]$control$min.density)),
-        textInput('smooth.gc.rerun', 'Smoothing factor', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[input$sample_validate_growth_spline]]$control$smooth.gc)),
+        textInput('t0.spline.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$t0)),
+        textInput('min.density.spline.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$min.density)),
+        textInput('smooth.gc.rerun', 'Smoothing factor', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$smooth.gc)),
         footer=tagList(
-          actionButton('submit.rerun.spline.growth', 'Submit'),
-          modalButton('cancel')
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton('submit.rerun.spline.growth', 'Submit'),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right"),
+                   div(
+                     actionButton(inputId = "tooltip_growth.gcFitSpline_validate",
+                                  label = "",
+                                  icon=icon("question"),
+                                  style="padding:2px; font-size:100%"),
+                     style="float:left")
+
+            )
+          )
         )
       )
     )
@@ -6398,7 +6743,15 @@ server <- function(input, output, session){
     if(length(results$gcFit$gcFittedModels[[ifelse(input$sample_validate_growth_model == "1" || is.null(input$sample_validate_growth_model), 1, input$sample_validate_growth_model)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
       plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(input$sample_validate_growth_model == "1" || is.null(input$sample_validate_growth_model), 1, input$sample_validate_growth_model)]],
-                      colData=1, colModel=2, colLag = 3,
+                      colData = 1,
+                      colModel = 2,
+                      colLag = 3,
+                      pch = input$shape_type_validate_growth_plot_model,
+                      basesize = input$base_size_validate_growth_plot_model,
+                      cex.point = input$shape_size_validate_growth_plot_model,
+                      lwd = input$line_width_validate_growth_plot_model,
+                      n.ybreaks = input$nbreaks_validate_growth_plot_model,
+                      eq.size = input$eqsize_validate_growth_plot_model,
       )
       removeModal()
     }
@@ -6411,34 +6764,49 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
-        textInput('t0.model.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$t0)),
-        textInput('min.density.model.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$min.density)),
+        textInput('t0.model.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$t0)),
+        textInput('min.density.model.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$min.density)),
         wellPanel(
           h4(strong('Models:')),
           style='padding: 1; padding-top: 0; padding-bottom: 0',
           checkboxInput(inputId = 'logistic_growth_rerun',
                         label = 'logistic',
-                        value = ("logistic" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+                        value = ("logistic" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type)),
 
           checkboxInput(inputId = 'richards_growth_rerun',
                         label = 'Richards',
-                        value = ("richards" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+                        value = ("richards" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type)),
 
           checkboxInput(inputId = 'gompertz_growth_rerun',
                         label = 'Gompertz',
-                        value = ("gompertz" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+                        value = ("gompertz" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type)),
 
           checkboxInput(inputId = 'extended_gompertz_growth_rerun',
                         label = 'extended Gompertz',
-                        value = ("gompertz.exp" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type)),
+                        value = ("gompertz.exp" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type)),
 
           checkboxInput(inputId = 'huang_growth_rerun',
                         label = 'Huang',
-                        value = ("huang" %in% results$growth$gcFit$gcFittedModels[[input$sample_validate_growth_model]]$control$model.type))
+                        value = ("huang" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type))
         ),
         footer=tagList(
-          actionButton('submit.rerun.model', 'Submit'),
-          modalButton('cancel')
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton('submit.rerun.model', 'Submit'),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right"),
+                   div(
+                     actionButton(inputId = "tooltip_growth.gcFitModel_validate",
+                                  label = "",
+                                  icon=icon("question"),
+                                  style="padding:2px; font-size:100%"),
+                     style="float:left")
+
+            )
+          )
         )
       )
     )
@@ -6792,8 +7160,24 @@ server <- function(input, output, session){
         textInput('lin.R2.rerun.fluorescence', 'R2 threshold', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.R2)),
         textInput('lin.RSD.rerun.fluorescence', 'RSD threshold for slope', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.RSD)),
         footer=tagList(
-          actionButton('submit.rerun.linear.fluorescence', 'Submit'),
-          modalButton('cancel')
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton(inputId = "submit.rerun.linear.fluorescence",
+                                  label = "Submit"),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right"),
+                   div(
+                     actionButton(inputId = "tooltip_flFitLinear_validate",
+                                  label = "",
+                                  icon=icon("question"),
+                                  style="padding:2px; font-size:100%"),
+                     style="float:left")
+
+            )
+          )
         )
       )
     )
@@ -6969,7 +7353,11 @@ server <- function(input, output, session){
                        lwd = input$line_width_validate_fluorescence_plot_spline,
                        basesize = input$base_size_validate_fluorescence_plot_spline,
                        cex.point = input$shape_size_validate_fluorescence_plot_spline,
-                       n.ybreaks = input$nbreaks__validate_fluorescence_plot_spline
+                       n.ybreaks = input$nbreaks__validate_fluorescence_plot_spline,
+                       deriv = input$plot_derivative_validate_fluorescence_plot_spline,
+                       pch = input$shape_type_validate_fluorescence_plot_spline,
+
+
       )
       removeModal()
     }
@@ -6982,12 +7370,27 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
-        textInput('t0.spline.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]$control$t0)),
-        textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]$control$min.density)),
-        textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[input$sample_validate_fluorescence_spline]]$control$smooth.fl)),
+        textInput('t0.spline.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$t0)),
+        textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.density)),
+        textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
         footer=tagList(
-          actionButton('submit.rerun.spline.fluorescence', 'Submit'),
-          modalButton('cancel')
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton('submit.rerun.spline.fluorescence', 'Submit'),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right"),
+                   div(
+                     actionButton(inputId = "tooltip_flFitSpline_validate",
+                                  label = "",
+                                  icon=icon("question"),
+                                  style="padding:2px; font-size:100%"),
+                     style="float:left")
+
+            )
+          )
         )
       )
     )
@@ -7775,7 +8178,7 @@ server <- function(input, output, session){
     # if(length(results$data$norm.fluorescence2) > 1){
     #   selection <- c(selection, "Normalized FL2")
     # }
-    if(length(results$data$norm.fluorescence1) > 1 && "s" %in% results$control$fit.opt){
+    if(length(results$data$fluorescence1) > 1 && "s" %in% results$control$fit.opt){
       selection <- c(selection, "Spline fits FL" = "spline1")
     }
     # if(length(results$data$norm.fluorescence2) > 1 && "s" %in% results$control$fit.opt){

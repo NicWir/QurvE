@@ -7,11 +7,15 @@
 \method{plot}{gcFitModel}(
   gcFittedModel,
   raw = TRUE,
-  slope = TRUE,
+  pch = 1,
   colData = 1,
   equation = TRUE,
+  eq.size = 1,
   colModel = ggplot2::alpha("forestgreen", 0.85),
-  base_size = 16,
+  basesize = 16,
+  cex.point = 2,
+  lwd = 0.7,
+  n.ybreaks = NULL,
   plot = TRUE,
   export = FALSE,
   height = 8,
@@ -25,7 +29,7 @@
 
 \item{raw}{(Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{slope}{(Logical) Show the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).}
+\item{pch}{(Numeric) Symbol used to plot data points.}
 
 \item{colData}{(Numeric or Character) Color used to plot the raw data.}
 
@@ -33,7 +37,13 @@
 
 \item{colModel}{(Numeric or Character) Color used to plot the fitted model.}
 
-\item{base_size}{(Numeric) Base font size.}
+\item{basesize}{(Numeric) Base font size.}
+
+\item{cex.point}{(Numeric) Size of the raw data points.}
+
+\item{lwd}{(Numeric) Spline line width.}
+
+\item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

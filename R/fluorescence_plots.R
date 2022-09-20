@@ -24,7 +24,7 @@
 #'
 #' @examples
 plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
-                             cex.axis = 1.3, lwd = 2, title = "Linear fit", y.lim = NULL, x.lim = NULL,
+                             cex.axis = 1.3, lwd = 2, title = NULL, y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
   {
@@ -110,6 +110,14 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
+             mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
+             mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
+                         "   R2-thresh.:",  flFittedLinear$control$lin.R2,
+                         "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
+                         "t0:", flFittedLinear$control$t0,
+                         "  min.density:", flFittedLinear$control$min.density,
+                         "   dY-thresh.:",  flFittedLinear$control$lin.dY),
+                   cex = cex.lab * 0.7, side = 3, line = -3.5, adj = 0.05, outer = TRUE)
            },
            diagnostics = {
              opar <- par(no.readonly = TRUE)
@@ -130,7 +138,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
-             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7, 0.7, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1, 4.1+cex.lab, 4.1, 2.1), c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab="", ylab = "",
                   log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, pch = pch, ...)
@@ -171,14 +179,14 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
-             mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.5, outer = TRUE)
+             mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
              mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
                          "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
                          "t0:", flFittedLinear$control$t0,
                          "  min.density:", flFittedLinear$control$min.density,
                          "   dY-thresh.:",  flFittedLinear$control$lin.dY),
-                   side = 3, line = -3.5, adj = 0.05, outer = TRUE)
+                   cex = cex.lab * 0.7, side = 3, line = -3.5, adj = 0.05, outer = TRUE)
 
              ## residuals vs. fitted
              obs <- flFittedLinear$log.data
@@ -352,7 +360,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
       if(raw){
-        p <- p + geom_point(data = df.raw, shape=1, size = cex.point, alpha = 0.6, stroke=0.15)
+        p <- p + geom_point(shape=pch, data = df.raw, shape=1, size = cex.point, alpha = 0.6, stroke=0.15)
       }
 
 
@@ -1123,7 +1131,8 @@ plot.flFitRes <-  function(object,
   if(data.type == "raw2") data.nm = "fluorescence2"
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
-      names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
       nm <- nm[grep(paste(names, collapse="|"), nm)]
     }
   }
@@ -1132,8 +1141,10 @@ plot.flFitRes <-  function(object,
   }
   if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
-      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
-      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+      names.excl <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                                   gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))))))
+      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                                                                      gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", nm)))))))]
     }
   }
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
@@ -1148,7 +1159,9 @@ plot.flFitRes <-  function(object,
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                           gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
+                                                                                                           gsub("\\)", "\\\\)",
+                                                                                                                gsub("\\(", "\\\\(",
+                                                                                                                     gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
                                                                                                            ".+[[:space:]]",
                                                                                                            unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), sample.nm[ndx.filt.rep[[j]]])]))
@@ -1170,8 +1183,8 @@ plot.flFitRes <-  function(object,
   }
 
   # get indices of samples with selected names
-  ndx.keep <- grep(paste0(
-    str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
+  ndx.keep <- grep(paste0("^",
+                          str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
 
   if(data.type == "spline1"  || data.type == "spline2"){
     # correct for log transformation
@@ -1197,8 +1210,10 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))),
-                                             ".+[[:space:]]",
+                                             gsub("\\)", "\\\\)",
+                                                  gsub("\\(", "\\\\(",
+                                                       gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))))),
+                                             " \\|.+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
       name <- conditions_unique[n]
@@ -1764,8 +1779,9 @@ plot.dual <-  function(object,
 
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
-      names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
-      nm <- nm[grep(paste(names, collapse="|"), gsub(" \\| .+", "", nm))]
+      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
+      nm <- nm[grep(paste(names, collapse="|"), gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", nm)))))))]
     }
   }
   if(!is.null(conc) && length(conc) > 0){
@@ -1789,16 +1805,18 @@ plot.dual <-  function(object,
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                           gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])),
-                                                                                                           ".+[[:space:]]",
-                                                                                                           unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                                                           "$"), sample.nm[ndx.filt.rep[[j]]])]))
+                                                                                                           gsub("\\)", "\\\\)",
+                                                                                                                gsub("\\(", "\\\\(",
+                                                                                                                     gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])))),
+                                                                                                                ".+[[:space:]]",
+                                                                                                                unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                                "$")), sample.nm[ndx.filt.rep[[j]]])]))
   }
   ndx.filt <- unlist(filter.ls, recursive = F)
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0(
-    str_replace_all(nm, "\\|", "\\\\|"), collapse = "|"), sample.nm)
+    str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
 
   if(mean == TRUE){
     # Combine replicates via their mean and standard deviation
@@ -1810,8 +1828,10 @@ plot.dual <-  function(object,
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))),
-                                             ".+[[:space:]]",
+                                             gsub("\\)", "\\\\)",
+                                                  gsub("\\(", "\\\\(",
+                                                       gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))))),
+                                             " \\|.+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
       name <- conditions_unique[n]

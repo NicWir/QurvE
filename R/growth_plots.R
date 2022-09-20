@@ -37,7 +37,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
-                  log=log, las=1, main = "Linear fit", yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
+                  log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
              title(ylab = "Density", line = 2+cex.lab)
              title(xlab = "Time", line = 1+cex.lab)
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
@@ -71,14 +71,14 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , line = -2, outer = TRUE)
+             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , line = -1.8+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
              mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                          "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
                          "t0:", gcFittedLinear$control$t0,
                          "  min.density:", gcFittedLinear$control$min.density,
                          "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
-                          side = 3, line = -4, adj = 0.05, outer = TRUE)
+                   cex = cex.lab*0.7, side = 3, line = -4, adj = 0.05, outer = TRUE)
 
            },
            diagnostics = {
@@ -99,15 +99,14 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
-             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7, 0.7, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1+cex.lab, 4.1 + cex.lab, 4.1, 2.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             title("Linear fit", line = 2)
              title(ylab = "Density", line = 2+cex.lab)
              title(xlab = "Time", line = 1+cex.lab)
 
-             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch, pch=pch)
+             points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
              axis(1)
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
@@ -139,14 +138,14 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.5, outer = TRUE)
+             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
              mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                          "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
                          "t0:", gcFittedLinear$control$t0,
                          "  min.density:", gcFittedLinear$control$min.density,
                          "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
-                   side = 3, line = -2.5, adj = 0.05, outer = TRUE)
+                   cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
              # mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 3 , adj = 0.95, line = -1, outer = TRUE)
              # mtext(paste("h:", gcFittedLinear$control4lin.h,
@@ -191,11 +190,14 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'
 #' @param gcFittedModel A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param raw (Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).
-#' @param slope (Logical) Show the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param pch (Numeric) Symbol used to plot data points.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
 #' @param equation (Logical) Show the equation of the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param colModel (Numeric or Character) Color used to plot the fitted model.
-#' @param base_size (Numeric) Base font size.
+#' @param basesize (Numeric) Base font size.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param lwd (Numeric) Spline line width.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -209,17 +211,18 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, equation = TRUE,
-                            colModel=ggplot2::alpha("forestgreen", 0.85), base_size=16,
-                            plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
+plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equation = TRUE, eq.size = 1,
+                            colModel=ggplot2::alpha("forestgreen", 0.85), basesize=16, cex.point = 2, lwd = 0.7,
+                            n.ybreaks = NULL, plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
 {
   # x an object of class gcFitModel
 
   # /// check input parameters
   if (is.logical(raw)==FALSE)   stop("Need logical value for: raw")
-  if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
+  # if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
   if (is.logical(equation)==FALSE)   stop("Need logical value for: equation")
-  if (is.numeric(base_size)==FALSE)   stop("Need numeric value for: base_size")
+  if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
+  if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (!(is(gcFittedModel)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
 
 
@@ -238,18 +241,18 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
                      "fit.data" = gcFittedModel[["fit.data"]])
 
     p <-    ggplot(df, aes(x=time, y=data)) +
-      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = 0.7) +
+      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = lwd) +
       xlab("Time") +
       ylab(label = ifelse(gcFittedModel$control$log.y.model == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
-      theme_classic(base_size = 16) +
+      theme_classic(base_size = basesize) +
       ggtitle(gsub(" \\| NA", "", paste(gcFittedModel$gcID, collapse=" | "))) +
       scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-      scale_y_continuous(breaks = scales::pretty_breaks()) +
+      scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks)) +
       theme(plot.title = element_text(size=15),
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
     if(raw == TRUE){
-      p <- p + geom_point(shape=1, size = 2,alpha = 0.5, stroke=0.15)
+      p <- p + geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData)
     }
     if(equation == TRUE){
       if(gcFittedModel$model == "logistic"){
@@ -258,13 +261,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           label = "y(t) == frac(A , 1+exp(frac(4 %.% mu, A) %.% (lambda - t) + 2))",
           x = 1.08 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-          angle = 90, parse = TRUE, size = 3.2) +
+          angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ),
-                   x = 1.13 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   x = (1 + 0.13+ log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = F, size = 2.5) +
+                   angle = 90, parse = F, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "logistic",
                              values=c("model" = colModel, "logistic" = colModel))
@@ -275,13 +278,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           label = "y(t) == A%.%(1.0+nu%.%italic(e)^{1+nu}%.%exp(frac(mu,A)%.%(1+nu)^(1+frac(1,nu))%.%( lambda - t )))^(-1/nu)",
           x = 1.17 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-          angle = 90, parse = TRUE, size = 3.2) +
+          angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ~~~~ nu == .(round(as.numeric(gcFittedModel$parameters$fitpar$nu[1],3)))),
-                   x = 1.22 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   x = (1 + 0.22 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = F, size = 2.5) +
+                   angle = 90, parse = F, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "richards",
                              values=c("model" = colModel, "richards" = colModel))
@@ -292,13 +295,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1))",
           x = 1.08 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-          angle = 90, parse = TRUE, size = 3.4) +
+          angle = 90, parse = TRUE, size = 3.4*eq.size) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ),
-                   x = 1.13 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   x = (1 + 0.13 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = F, size = 2.5) +
+                   angle = 90, parse = F, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "gompertz",
                              values=c("model" = colModel, "gompertz" = colModel))
@@ -310,14 +313,14 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1)) + A%.%exp(alpha%.%(t-t[shift]))",
           x = 1.16 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-          angle = 90, parse = TRUE, size = 3.2) +
+          angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ alpha == .(round(gcFittedModel$parameters$fitpar$alpha[1],3))  ~~~~
                                     t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[1],2)) ),
-                   x = 1.21 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   x = (1 + 0.21 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = F, size = 2.5) +
+                   angle = 90, parse = F, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "gompertz.exp",
                              values=c("model" = colModel, "gompertz.exp" = colModel))
@@ -328,13 +331,13 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
           label = "y(t) == y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu%.%(t+0.25%.%log(frac(1+exp(-4%.%(t-lambda)),1+exp(4%.%lambda))))) )",
           x = 1.16 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-          angle = 90, parse = TRUE, size = 3.0) +
+          angle = 90, parse = TRUE, size = 3.0*eq.size) +
            annotate("text",
                     label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
                                      lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ),
-                    x = 1.21 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                    x = (1 + 0.21 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
                     y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                    angle = 90, parse = F, size = 2.3) +
+                    angle = 90, parse = F, size = 2.3*eq.size) +
            scale_color_manual(name='Growth Model',
                               breaks = "huang",
                               values=c("model" = colModel, "huang" = colModel))
@@ -379,23 +382,23 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, slope = TRUE, colData=1, 
         clip = "off",
         expand = F
       )
-    if(slope == T){
-      # /// add tangent at maximum slope
-      mu     <- as.numeric(coef$mu[1])
-      bla    <- (gcFittedModel$fit.time)*mu
-      bla    <- bla+(-mu*lagtime)
-      tangent.df <- data.frame("time" = gcFittedModel$fit.time,
-                               "y" = bla)
-      df.horizontal <- data.frame("time" = c(gcFittedModel$fit.time[1], lagtime),
-                                  "y" = gcFittedModel[["fit.data"]][1])
-      p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
-      p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                xend = time[which.min(abs(y - p.yrange.end))],
-                                yend = y[which.min(abs(y - p.yrange.end))]),
-                            data = tangent.df, linetype = "dashed", color = colModel, size = 0.5) +
-        geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
-                     linetype = "dashed", color = colModel, size = 0.5)
-    }
+    # if(slope == T){
+    #   # /// add tangent at maximum slope
+    #   mu     <- as.numeric(coef$mu[1])
+    #   bla    <- (gcFittedModel$fit.time)*mu
+    #   bla    <- bla+(-mu*lagtime)
+    #   tangent.df <- data.frame("time" = gcFittedModel$fit.time,
+    #                            "y" = bla)
+    #   df.horizontal <- data.frame("time" = c(gcFittedModel$fit.time[1], lagtime),
+    #                               "y" = gcFittedModel[["fit.data"]][1])
+    #   p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+    #   p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+    #                             xend = time[which.min(abs(y - p.yrange.end))],
+    #                             yend = y[which.min(abs(y - p.yrange.end))]),
+    #                         data = tangent.df, linetype = "dashed", color = colModel, size = 0.5) +
+    #     geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+    #                  linetype = "dashed", color = colModel, size = 0.5)
+    # }
     if(export == FALSE && plot == FALSE){
       return(p)
     }
@@ -795,7 +798,8 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     # Get name of conditions with multiple replicates; apply selecting arguments
     if(!is.null(names)  && length(names) > 0){
       if(!is.na(names) && names != ""){
-        names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+        names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                                gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
         nm <- nm[grep(paste(names, collapse="|"), nm)]
       }
     }
@@ -1519,7 +1523,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
-                             pch=1, cex.point = 2, colData=1, colSpline="dodgerblue3", basesize=16, lwd = 0.7,
+                             pch=1, colData=1, colSpline="dodgerblue3", basesize=16, cex.point = 2, lwd = 0.7,
                              y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL, n.ybreaks = 6,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
@@ -1641,7 +1645,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
           label = paste("t0:", gcFittedSpline$control$t0, "  min.density:", gcFittedSpline$control$min.density, "  smoothing:", gcFittedSpline$control$smooth.gc),
           x = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$x.range[2],
           y = 1.2 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
-          angle = 0, parse = F, size = 3.2)
+          angle = 0, parse = F, size = basesize*3.2/12)
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
@@ -1956,8 +1960,9 @@ plot.grofit <- function(grofit, ...,
   sample.nm <- nm <- as.character(names(grofit$gcFit$gcFittedSplines))
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
-      names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
-      nm <- nm[grep(paste(names, collapse="|"), gsub(" \\| .+", "", nm))]
+      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
+      nm <- nm[grep(paste(names, collapse="|"), gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", nm)))))))]
     }
   }
   if(!is.null(conc) && length(conc) > 0){
@@ -2531,7 +2536,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
-      names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
       nm <- nm[grep(paste(names, collapse="|"), nm)]
     }
   }
@@ -2755,7 +2761,8 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(drTable[,1])
   if(!is.null(names)){
-    names <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))
+    names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
+                                                            gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
   if(!is.null(exclude.nm)  && length(exclude.nm) > 0){

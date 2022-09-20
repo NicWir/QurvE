@@ -9,8 +9,10 @@
   param = c("y.max", "y.min", "fc", "K", "n", "EC50", "yEC50", "drboot.meanEC50",
     "drboot.meanEC50y"),
   names = NULL,
+  exclude.nm = NULL,
   basesize = 12,
   reference.nm = NULL,
+  label.size = NULL,
   plot = T,
   export = F,
   height = 7,
@@ -28,9 +30,13 @@ or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.}
 
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 
+\item{exclude.nm}{(String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.}
+
 \item{basesize}{(Numeric) Base font size.}
 
 \item{reference.nm}{(Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.}
+
+\item{label.size}{(Numeric) Font size for sample labels below x-axis.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

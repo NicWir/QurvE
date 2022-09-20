@@ -88,7 +88,7 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
-      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = sheet)))
+      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = sheet, progress = TRUE)))
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
       dat <-
         utils::read.csv(

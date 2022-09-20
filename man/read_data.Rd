@@ -18,7 +18,8 @@ read_data(
   sheet.density = 1,
   sheet.fluoro1 = 1,
   sheet.fluoro2 = 1,
-  subtract.blank = T
+  subtract.blank = T,
+  calibration = NULL
 )
 }
 \arguments{
@@ -54,7 +55,10 @@ In column format, the first three table rows contain
 
 \item{sheet.fluoro2}{(Numeric or Character) Number or name of the sheet with fluorescence 2 data in XLS or XLSX files (\emph{optional}).}
 
-\item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
+\item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}). If \code{calibration = TRUE}, blanks are subtracted after value conversion.}
+
+\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.}
 }
 \value{
 An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with density and fluorescence data (if applicable),

@@ -13,7 +13,7 @@
   cex.lab = 1.5,
   cex.axis = 1.3,
   lwd = 2,
-  title = "Linear fit",
+  title = NULL,
   y.lim = NULL,
   x.lim = NULL,
   plot = TRUE,
