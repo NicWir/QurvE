@@ -2,7 +2,9 @@
 % Please edit documentation in R/fluorescence_plots.R
 \name{plot.flFitRes}
 \alias{plot.flFitRes}
-\title{Title}
+\alias{plot.flFit}
+\alias{plot.grodata}
+\title{Combine different groups of samples into a single plot}
 \usage{
 \method{plot}{flFitRes}(
   object,
@@ -32,12 +34,118 @@
   out.nm = NULL,
   shiny = FALSE
 )
+
+\method{plot}{flFit}(
+  object,
+  data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  names = NULL,
+  conc = NULL,
+  mean = TRUE,
+  exclude.nm = NULL,
+  exclude.conc = NULL,
+  log.y = F,
+  deriv = F,
+  n.ybreaks = 6,
+  colors = NULL,
+  basesize = 20,
+  y.lim = NULL,
+  x.lim = NULL,
+  y.title = NULL,
+  x.title = NULL,
+  y.lim.deriv = NULL,
+  y.title.deriv = NULL,
+  lwd = 1.1,
+  plot = TRUE,
+  export = FALSE,
+  height = NULL,
+  width = NULL,
+  out.dir = NULL,
+  out.nm = NULL,
+  shiny = FALSE
+)
+
+\method{plot}{grodata}(
+  object,
+  data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  names = NULL,
+  conc = NULL,
+  mean = TRUE,
+  exclude.nm = NULL,
+  exclude.conc = NULL,
+  log.y = F,
+  deriv = F,
+  n.ybreaks = 6,
+  colors = NULL,
+  basesize = 20,
+  y.lim = NULL,
+  x.lim = NULL,
+  y.title = NULL,
+  x.title = NULL,
+  y.lim.deriv = NULL,
+  y.title.deriv = NULL,
+  lwd = 1.1,
+  plot = TRUE,
+  export = FALSE,
+  height = NULL,
+  width = NULL,
+  out.dir = NULL,
+  out.nm = NULL,
+  shiny = FALSE
+)
 }
 \arguments{
+\item{object}{A \code{flFitRes}, \code{flFit}, or \code{grodata} object created with \code{\link{fl.workflow}} containing fluorescence data.}
+
+\item{data.type}{(Character) Indicate, which type of fluorescence data should be displayed.}
+
+\item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
+
+\item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.}
+
+\item{mean}{(Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?}
+
+\item{exclude.nm}{(String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.}
+
+\item{exclude.conc}{(Numeric or numeric vector) Define concentrations to exclude from the plot.}
+
+\item{log.y}{(Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?}
+
+\item{deriv}{(Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?}
+
+\item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
+
+\item{colors}{(vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
+
+\item{basesize}{(Numeric) Base font size.}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.title}{(Character) Optional: Provide a title for the y-axis of the fluorescence curve plot.}
+
+\item{x.title}{(Character) Optional: Provide a title for the x-axis of both fluorescence curve and derivative plots.}
+
+\item{y.lim.deriv}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.title.deriv}{(Character) Optional: Provide a title for the y-axis of the derivative plot.}
+
+\item{lwd}{(Numeric) Line width of the individual plots.}
+
+\item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
+
+\item{export}{(Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{height}{(Numeric) Height of the exported image in inches.}
+
+\item{width}{(Numeric) Width of the exported image in inches.}
+
+\item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
+
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
 
 \item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 }
 \description{
-Title
+Visualize fluorescence, normalized fluorescence, or spline fits of multiple sample groups in a single plot.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluorescence_plots.R
 \name{plot.dual}
 \alias{plot.dual}
-\title{Title}
+\title{Compare fluorescence and density over time}
 \usage{
 \method{plot}{dual}(
   object,
@@ -34,8 +34,58 @@
 )
 }
 \arguments{
+\item{object}{A \code{flFit}, \code{flFitRes}, or \code{grodata} object created with \code{\link{flFit}}, \code{\link{fl.workflow}} or \code{\link{read_data}}}
+
+\item{fluorescence}{(Character) Indicate, which type of fluorescence data should be displayed.}
+
+\item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
+
+\item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.}
+
+\item{mean}{(Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?}
+
+\item{exclude.nm}{(String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.}
+
+\item{exclude.conc}{(Numeric or numeric vector) Define concentrations to exclude from the plot.}
+
+\item{log.y.density}{(Logical) Log-transform the y-axis of the density plot (\code{TRUE}) or not (\code{FALSE})?}
+
+\item{log.y.fl}{(Logical) Log-transform the y-axis of the fluorescence plot (\code{TRUE}) or not (\code{FALSE})?}
+
+\item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
+
+\item{colors}{(vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
+
+\item{basesize}{(Numeric) Base font size.}
+
+\item{y.lim.density}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the density plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.lim.fl}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence plot as a vector in the form \code{c(l, u)}.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence and density plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{x.title}{(Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.}
+
+\item{y.title.density}{(Character) Optional: Provide a title for the y-axis of the density plot.}
+
+\item{y.title.fl}{(Character) Optional: Provide a title for the y-axis of the fluorescence plot.}
+
+\item{lwd}{(Numeric) Line width of the individual plots.}
+
+\item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
+
+\item{export}{(Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{height}{(Numeric) Height of the exported image in inches.}
+
+\item{width}{(Numeric) Width of the exported image in inches.}
+
+\item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
+
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
+
+\item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 }
 \description{
-Title
+\code{plot.dual} creates a two-panel plot in which fluorescence or density values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
 }

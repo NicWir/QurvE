@@ -35,6 +35,8 @@
 
 \item{equation}{(Logical) Show the equation of the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).}
 
+\item{eq.size}{}
+
 \item{colModel}{(Numeric or Character) Color used to plot the fitted model.}
 
 \item{basesize}{(Numeric) Base font size.}

@@ -19,16 +19,14 @@
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
-#' @return
 #' @export
 #'
-#' @examples
 plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
-                             cex.axis = 1.3, lwd = 2, title = NULL, y.lim = NULL, x.lim = NULL,
+                             cex.axis = 1.3, lwd = 2, y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
   {
-  if(is(flFittedLinear) != "flFitLinear") stop("flFittedLinear needs to be an object created with flFitLinear().")
+  if(methods::is(flFittedLinear) != "flFitLinear") stop("flFittedLinear needs to be an object created with flFitLinear().")
   which <- match.arg(which)
   control <- flFittedLinear$control
   if(control$x_type == "time"){
@@ -72,7 +70,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
              par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab="", ylab = "", pch = pch,
-                  log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
+                  log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
              points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point, pch=pch)
 
              title(ylab = "Density", line = 2+cex.lab)
@@ -110,8 +108,8 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
-             mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
-             mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
+             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
+             graphics::mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
                          "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
                          "t0:", flFittedLinear$control$t0,
@@ -141,7 +139,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
              par(mar=c(5.1, 4.1+cex.lab, 4.1, 2.1), c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab="", ylab = "",
-                  log=log, las=1, main = title, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, pch = pch, ...)
+                  log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, pch = pch, ...)
              points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point, pch=pch)
 
              title(ylab = "Density", line = 2+cex.lab)
@@ -179,8 +177,8 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
-             mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
-             mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
+             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
+             graphics::mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
                          "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
                          "t0:", flFittedLinear$control$t0,
@@ -222,10 +220,10 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 #'
 #' code{plot.flFitSpline} generates the spline fit plot for a single sample.
 #'
-#' @param flFitSpline object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.
+#' @param flFitSpline Object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.flBootSpline}}.
 #' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
-#' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
+#' @param slope (Logical) Show the slope at the maximum slope (\code{TRUE}) or not (\code{FALSE}).
 #' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
 #' @param log.y (Logical) Log-transform the y-axis (\code{TRUE}) or not (\code{FALSE}).
@@ -235,8 +233,8 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 #' @param cex.point (Numeric) Size of the raw data points.
 #' @param basesize (Numeric) Base font size.
 #' @param lwd (Numeric) Spline line width.
-#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
-#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
@@ -244,7 +242,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-#' @param ...
+#' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @export plot.flFitSpline
 #' @export
@@ -258,7 +256,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
   {
-  if(is(flFitSpline) != "flFitSpline") stop("flFitSpline needs to be an object created with flFitSpline().")
+  if(methods::is(flFitSpline) != "flFitSpline") stop("flFitSpline needs to be an object created with flFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -356,7 +354,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
               plot.title = element_text(size=15),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank()) +
-        scale_color_manual(name='Growth Model',
+        scale_color_manual(name='Fluorescence Fit',
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
       if(raw){
@@ -560,7 +558,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 
 #' Generic plot function for \code{flBootSpline} objects.
 #'
-#' @param flBootSpline
+#' @param flBootSpline Object of class \code{flBootSpline}, created with \code{\link{flBootSpline}}.
 #' @param pch (Numeric) Size of the raw data circles.
 #' @param deriv (Logical) Show the derivatives (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param colData (Numeric or Character) Color used to plot the raw data.
@@ -569,8 +567,8 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' @param cex.lab (Numeric) Font size of axis titles.
 #' @param cex.axis (Numeric) Font size of axis annotations.
 #' @param lwd (Numeric) Spline line width.
-#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
-#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
@@ -578,7 +576,7 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param shiny (Logical) Indicate if plot is generated within the shiny app.
-#' @param ...
+#' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @export plot.flBootSpline
 #' @export
@@ -591,7 +589,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
                               height = 7, width = 9, out.dir = NULL, shiny = FALSE, ...)
 {
   # flBootSpline an object of class flBootSpline
-  if(is(flBootSpline) != "flBootSpline") stop("flBootSpline needs to be an object created with flBootSpline().")
+  if(methods::is(flBootSpline) != "flBootSpline") stop("flBootSpline needs to be an object created with flBootSpline().")
   # /// initialize "Empty Plot" function
   empty.plot <- function(text="Empty plot",main=""){
     plot(c(0,1,0,1,0),c(0,1,1,0,0), type="l", axes=FALSE, xlab="", ylab="", lwd=lwd, col="gray",main=main)
@@ -638,7 +636,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
       # /// plot all flFitSpline objects
       for(i in 1:flBootSpline$control$nboot.fl){
         plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd = lwd,
-                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
       }
       # add plot title
       title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
@@ -666,7 +664,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         for(i in 2:flBootSpline$control$nboot.fl){
           plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
-                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
         }
         title(ylab = "First derivative", line = 2.3, cex.lab = cex.lab)
       }
@@ -707,7 +705,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
       if (sum(!is.na(max_slope))>1){ try(hist(max_slope , col="gray", xlab="max_slope", main=expression(max_slope), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(max_slope)) }
       if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="A", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
       if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
-      mtext(paste(flBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
+      graphics::mtext(paste(flBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p2 <- function()
@@ -742,7 +740,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
       # /// plot all flFitSpline objects
       for(i in 1:flBootSpline$control$nboot.fl){
         plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd = lwd,
-                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
       }
       # add plot title
       title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
@@ -770,7 +768,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         for(i in 2:flBootSpline$control$nboot.fl){
           plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
-                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
         }
         title(ylab = "First derivative", line = 2.3, cex.lab = cex.lab)
       }
@@ -806,7 +804,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
       if (sum(!is.na(max_slope))>1){ try(hist(max_slope , col="gray", xlab="max_slope", main=expression(max_slope), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(max_slope)) }
       if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="A", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
       if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
-      mtext(paste(flBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
+      graphics::mtext(paste(flBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p3 <- function()
@@ -849,10 +847,10 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
   par(mfrow = c(1, 1))
 }
 
-#' Title
+#' Generic plot function for \code{drFitModel} objects.
 #'
-#' @param drFittedModel
-#' @param ec50line
+#' @param drFittedModel Object of class \code{drFitModel}, created with \code{\link{fl.drFitModel}}.
+#' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).
 #' @param log ("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.
 #' @param pch (Numeric) Size of the raw data circles.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
@@ -863,17 +861,15 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param lwd (Numeric) Line width.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}.
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
-#' @param ...
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param ... Further arguments to refine the generated base R plot.
 #'
-#' @return
 #' @export
 #'
-#' @examples
 plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch = 1,
                             colSpline = 1, colData = 1, cex.point = 1, cex.lab = 1.5,
                             cex.axis = 1.3, y.lim = NULL, x.lim = NULL,
@@ -882,7 +878,7 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
                             ...)
 {
   # drFittedModel an object of class drFittedModel
-  if(is(drFittedModel) != "drFitModel") stop("drFittedModel needs to be an object created with fl.drFitModel().")
+  if(methods::is(drFittedModel) != "drFitModel") stop("drFittedModel needs to be an object created with fl.drFitModel().")
   # /// check input parameters
   if (is.logical(ec50line) == FALSE)
     stop("Need logical value for: ec50line")
@@ -1006,37 +1002,39 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
   }
 }
 
-#' Title
+#' Combine different groups of samples into a single plot
 #'
-#' @param object
-#' @param data.type
-#' @param names
-#' @param conc
-#' @param mean
-#' @param log.y
-#' @param deriv
-#' @param n.ybreaks
-#' @param colors
-#' @param basesize
-#' @param y.lim
-#' @param x.lim
-#' @param y.title
-#' @param x.title
-#' @param y.lim.deriv
-#' @param y.title.deriv
-#' @param lwd
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' Visualize fluorescence, normalized fluorescence, or spline fits of multiple sample groups in a single plot.
+#'
+#' @param object A \code{flFitRes}, \code{flFit}, or \code{grodata} object created with \code{\link{fl.workflow}} containing fluorescence data.
+#' @param data.type (Character) Indicate, which type of fluorescence data should be displayed.
+#' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
+#' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
+#' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
+#' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
+#' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
+#' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param basesize (Numeric) Base font size.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.title (Character) Optional: Provide a title for the y-axis of the fluorescence curve plot.
+#' @param x.title (Character) Optional: Provide a title for the x-axis of both fluorescence curve and derivative plots.
+#' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
+#' @param lwd (Numeric) Line width of the individual plots.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #'
-#' @return
 #' @export
 #'
-#' @examples
 plot.flFitRes <-  function(object,
                         data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
                         names = NULL,
@@ -1080,18 +1078,18 @@ plot.flFitRes <-  function(object,
   suppressWarnings(assign("y.lim.deriv" ,as.numeric(y.lim.deriv)))
   if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
 
-  if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
-  if(is(object) == "grodata" && !any(data.type %in% c("raw1", "raw2", "norm.fl1", "norm.fl2"))) stop("Raw input data can only be used to visualize data.type 'raw1', 'raw2', 'norm.fl1', or 'norm.fl2'.")
+  if(!any(methods::is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
+  if(methods::is(object) == "grodata" && !any(data.type %in% c("raw1", "raw2", "norm.fl1", "norm.fl2"))) stop("Raw input data can only be used to visualize data.type 'raw1', 'raw2', 'norm.fl1', or 'norm.fl2'.")
 
   data.type <- match.arg(data.type)
   if(data.type == "raw1" || data.type == "raw2" || data.type == "norm.fl1" || data.type == "norm.fl2" && deriv ==TRUE){
     warning("Derivatives cannot be calculated for 'raw' or 'norm.fl' data. Only the fluorescence values will be shown.")
     deriv = FALSE
   }
-  if(is(object) == "grodata"){
+  if(methods::is(object) == "grodata"){
     raw_data <- object
   }
-  if(is(object) == "flFitRes"){
+  if(methods::is(object) == "flFitRes"){
     if(data.type == "spline1" || data.type == "raw1" || data.type == "norm.fl1") flFit <- object$flFit1
     if(data.type == "spline2" || data.type == "raw2" || data.type == "norm.fl2") flFit <- object$flFit2
     raw_data <- object$data
@@ -1110,7 +1108,7 @@ plot.flFitRes <-  function(object,
   exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates
-  if(any(is(object) %in% c("flFit","flFitRes"))){
+  if(any(methods::is(object) %in% c("flFit","flFitRes"))){
     sample.nm <- nm <- as.character(names(flFit$flFittedSplines))
   } else {
     if(data.type == "norm.fl1"){
@@ -1223,7 +1221,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
         time <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.x)) %>% as.list(.)
         data <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.fl)) %>% as.list(.)
       } else {
-        if(is(object) %in% "flFitRes"){
+        if(methods::is(object) %in% "flFitRes"){
             time <- lapply(1:length(ndx), function(i) raw_data$time[ndx[i], ])
             data <- raw_data[[data.nm]][ndx, 4:ncol(raw_data[[data.nm]])]
         } else {
@@ -1478,7 +1476,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
                                               "time" = flFit$flFittedSplines[[ndx.keep[i]]][["fit.x"]],
                                               "y" = flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]))
       } else {
-        if(any(is(object) %in% c("flFit","flFitRes"))){
+        if(any(methods::is(object) %in% c("flFit","flFitRes"))){
           df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
                                                 "time" = as.vector(raw_data$time[ndx.keep[i], ]),
                                                 "y" = unlist(unname(type.convert(raw_data[[data.nm]][ndx.keep[i], 4:ncol(raw_data[[data.nm]])], as.is=T)))))
@@ -1673,38 +1671,47 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
   }
 }
 
-plot.flFit <- plot.grodata <- plot.flFitRes
+#' @rdname plot.flFitRes
+#' @export
+plot.flFit <- plot.flFitRes
 
-#' Title
+#' @rdname plot.flFitRes
+#' @export
+plot.grodata <- plot.flFitRes
+
+#' Compare fluorescence and density over time
 #'
-#' @param object
-#' @param fluorescence
-#' @param names
-#' @param conc
-#' @param mean
-#' @param log.y.density
-#' @param log.y.fl
-#' @param n.ybreaks
-#' @param colors
-#' @param basesize
-#' @param y.lim.density
-#' @param y.lim.fl
-#' @param x.lim
-#' @param x.title
-#' @param y.title.density
-#' @param y.title.fl
-#' @param lwd
-#' @param plot
-#' @param export
-#' @param height
-#' @param width
-#' @param out.dir
+#' \code{plot.dual} creates a two-panel plot in which fluorescence or density values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
+#'
+#' @param object A \code{flFit}, \code{flFitRes}, or \code{grodata} object created with \code{\link{flFit}}, \code{\link{fl.workflow}} or \code{\link{read_data}}
+#' @param fluorescence (Character) Indicate, which type of fluorescence data should be displayed.
+#' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
+#' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
+#' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
+#' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
+#' @param log.y.density (Logical) Log-transform the y-axis of the density plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param log.y.fl (Logical) Log-transform the y-axis of the fluorescence plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
+#' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param basesize (Numeric) Base font size.
+#' @param y.lim.density (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the density plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim.fl (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence plot as a vector in the form \code{c(l, u)}.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence and density plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
+#' @param y.title.density (Character) Optional: Provide a title for the y-axis of the density plot.
+#' @param y.title.fl (Character) Optional: Provide a title for the y-axis of the fluorescence plot.
+#' @param lwd (Numeric) Line width of the individual plots.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
+#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #'
-#' @return
 #' @export
 #'
-#' @examples
 plot.dual <-  function(object,
                            fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
                            names = NULL,
@@ -1744,14 +1751,14 @@ plot.dual <-  function(object,
   suppressWarnings(assign("y.lim.density" ,as.numeric(y.lim.density)))
   if(all(is.na(y.lim.density))) y.lim.density <- NULL
 
-  if(!any(is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
+  if(!any(methods::is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
   density <- density.nm <- "density"
   fluorescence <- match.arg(fluorescence)
 
-  if(is(object) == "grodata"){
+  if(methods::is(object) == "grodata"){
     raw_data <- object
   }
-  if(is(object) == "flFitRes"){
+  if(methods::is(object) == "flFitRes"){
     if(length(grep("1", fluorescence))>0) flFit <- object$flFit1
     if(length(grep("2", fluorescence))>0) flFit <- object$flFit2
     raw_data <- object$data
@@ -1768,7 +1775,7 @@ plot.dual <-  function(object,
   exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates
-  if(any(is(object) %in% c("flFit","flFitRes"))){
+  if(any(methods::is(object) %in% c("flFit","flFitRes"))){
     sample.nm <- nm <- as.character(names(flFit$flFittedSplines))
   } else {
     sample.nm <- nm <- paste(object$fluorescence1[,1], object$fluorescence1[,2], object$fluorescence1[,3], sep = " | ")
@@ -1838,7 +1845,7 @@ plot.dual <-  function(object,
       name <- conditions_unique[n]
       # Create lists for density and time values for each sample
 
-      if(is(object) %in% "flFitRes"){
+      if(methods::is(object) %in% "flFitRes"){
         time <- lapply(1:length(ndx), function(i) raw_data$time[ndx[i], ])
         dens.data <- raw_data[[density.nm]][ndx, 4:ncol(raw_data[[density.nm]])]
         fl.data <- raw_data[[fl.nm]][ndx, 4:ncol(raw_data[[fl.nm]])]

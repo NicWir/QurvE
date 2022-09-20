@@ -31,6 +31,8 @@
 )
 }
 \arguments{
+\item{gcFittedSpline}{object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.}
+
 \item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.}
 
 \item{raw}{(Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).}
@@ -73,9 +75,7 @@
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
-\item{...}{}
-
-\item{gcFitSpline}{object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.}
+\item{...}{Further arguments to refine the generated base R plot (if \code{add = TRUE}.}
 }
 \description{
 code{plot.gcFitSpline} generates the spline fit plot for a single sample.

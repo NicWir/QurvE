@@ -10,7 +10,7 @@
   names = NULL,
   exclude.nm = NULL,
   pch = 16,
-  cex = 2,
+  cex.point = 2,
   basesize = 15,
   colors = NULL,
   lwd = 0.7,
@@ -40,6 +40,8 @@
 
 \item{pch}{(Numeric) Shape of the raw data symbols.}
 
+\item{cex.point}{(Numeric) Size of the raw data points.}
+
 \item{basesize}{(Numeric) Base font size.}
 
 \item{colors}{(Numeric or character) Define colors for different conditions.}
@@ -56,6 +58,8 @@
 
 \item{x.title}{(Character) Optional: Provide a title for the x-axis.}
 
+\item{log.y}{(Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?}
+
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{export}{(Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).}
@@ -67,6 +71,8 @@
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
+
+\item{(Logical)}{Log-transform the x-axis of the plot (\code{TRUE}) or not (\code{FALSE})?}
 }
 \description{
 code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis

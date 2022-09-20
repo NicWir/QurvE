@@ -35,7 +35,7 @@ In column format, the first three table rows contain
 
 \item{data.fluoro2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
 
-\item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \link{"col"}}
+\item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}}
 
 \item{csvsep}{(Character) separator used in CSV file storing density data (ignored for other file types). Default: \code{";"}}
 

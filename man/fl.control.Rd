@@ -50,15 +50,15 @@ fl.control(
 
 \item{log.x.spline}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the independent variable for \emph{spline} fits. Default: \code{FALSE}.}
 
-\item{log.y.lin}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} fits. Default: \code{FALSE}}
+\item{log.y.lin}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the fluorescence data for \emph{linear} fits. Default: \code{FALSE}}
 
-\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{spline} fits. Default: \code{FALSE}}
+\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the fluorescence data for \emph{spline} fits. Default: \code{FALSE}}
 
-\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{\link{fl.gcFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
+\item{lin.h}{(Numeric) Manually define the size of the sliding window used in \code{\link{flFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the fluorescence increase phase of the plot.}
 
-\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{fl.gcFitLinear}}.}
+\item{lin.R2}{(Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{flFitLinear}}.}
 
-\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{fl.gcFitLinear}}.}
+\item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{flFitLinear}}.}
 
 \item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
 
@@ -86,9 +86,9 @@ fl.control(
 
 \item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 
-\item{suppress.messages}{(Logical) Indicates whether messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.}
+\item{suppress.messages}{(Logical) Indicates whether messages (information about current fluorescence curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.}
 
-\item{neg.nan.act}{(Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.}
+\item{neg.nan.act}{(Logical) Indicates whether the program should stop when negative fluorescence values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.}
 
 \item{clean.bootstrap}{(Logical) Determines if negative values which occur during bootstrap should be removed (\code{TRUE}) or kept (\code{FALSE}). Note: Infinite values are always removed. Default: \code{TRUE}.}
 }

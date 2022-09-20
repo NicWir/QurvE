@@ -244,10 +244,10 @@ Rd_fun <- function(x, topic, pkgname   = ""
 )
   {
   rdo <- NULL         # prepare the "Rd" object rdo; # is it better to check with "inherit"?
-  if(class(x) == "Rd"){  # if(inherits(file, "Rd")) ...
+  if(methods::is(x) == "Rd"){  # if(inherits(file, "Rd")) ...
     rdo <- x
   }else{
-    if(class(x) != "help_files_with_topic" ){
+    if(methods::is(x) != "help_files_with_topic" ){
       # The following comments baffle me now. Does `do.call' resolve the issues?
       #
       # help returns an object of class "help_files_with_topic" the
@@ -262,7 +262,7 @@ Rd_fun <- function(x, topic, pkgname   = ""
       #            , verbose=verbose
       #            , try.all.packages=try.all.packages)))
 
-      # cat("KUKUKUUUU: ", substitute(x), "   class(x): ", class(x), "\n\n" )
+      # cat("KUKUKUUUU: ", substitute(x), "   methods::is(x): ", methods::is(x), "\n\n" )
 
       wrk <- do.call("help",list(x, help_type=help_type
                                  , verbose=verbose
@@ -271,7 +271,7 @@ Rd_fun <- function(x, topic, pkgname   = ""
     }
     ## Check for errors! ???
 
-    if(class(x) == "help_files_with_topic"){
+    if(methods::is(x) == "help_files_with_topic"){
       # from print.help_files_with_topic in help.R
       #
       # browser <- getOption("browser")
@@ -296,7 +296,7 @@ Rd_fun <- function(x, topic, pkgname   = ""
       # cat("RdDB is: ", paste(RdDB, "rdx", sep="."),"\n")
 
       if(file.exists(paste(RdDB, "rdx", sep="."))) {
-        rdo <- tools:::fetchRdDB(RdDB, basename(file))
+        rdo <- fetchRdDB(RdDB, basename(file))
         # a debugging message, remove later!
         # cat("Class of object returned by \"tools:::fetchRdDB: ", class(rdo),"\n")
         # really returns "Rd".
@@ -307,13 +307,20 @@ Rd_fun <- function(x, topic, pkgname   = ""
     stop("rdo object is NULL!")
 
   if(is.character(keep_section) && length(keep_section)>0){
-    tags <- tools:::RdTags(rdo)
+    tags <- RdTags(rdo)
     keep_tags <- unique(c("\\title","\\name",keep_section))
     rdo[which(!(tags %in% keep_tags))] <-  NULL
   }
 
   rdo
 }
+
+fetchRdDB <- utils::getFromNamespace("fetchRdDB", "tools")
+RdTags <- utils::getFromNamespace("RdTags", "tools")
+
+
+
+
 
 help_modal <- function (..., title = NULL, footer = NULL,
                      size = c("m", "s", "l"), easyClose = TRUE, fade = TRUE, idcss = "")

@@ -2,7 +2,7 @@ list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes", 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-library(icons)
+# library(icons)
 library(shiny)
 library(shinyjs)
 library(shinyBS)
@@ -4115,7 +4115,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    h2("Bug reports"),
                                    uiOutput("bug_report"),
                                    h2("Publications"),
-                                   'featuring publications which use this tool'
+                                   ''
                                  )
                         ),
                       ) #  navbarPage
@@ -7675,7 +7675,7 @@ server <- function(input, output, session){
                x.lim = c(as.numeric(input$x_range_min_dose_response_growth_plot), as.numeric(input$x_range_max_dose_response_growth_plot)),
                y.title = input$y_axis_title_dose_response_growth_plot,
                x.title = input$x_axis_title_dose_response_growth_plot,
-               cex = input$shape_size_dose_response_growth_plot,
+               cex.point = input$shape_size_dose_response_growth_plot,
                basesize = input$base_size_dose_response_growth_plot,
                lwd = input$line_width_dose_response_growth_plot,
                ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
@@ -8221,7 +8221,7 @@ server <- function(input, output, session){
                names = input$select_samples_based_on_string_dose_response_fluorescence_plot,
                exclude.nm = input$exclude_samples_based_on_string_dose_response_fluorescence_plot,
                pch = input$shape_type_dose_response_fluorescence_plot,
-               cex = input$shape_size_dose_response_fluorescence_plot,
+               cex.point = input$shape_size_dose_response_fluorescence_plot,
                basesize = input$base_size_dose_response_fluorescence_plot,
                lwd = input$line_width_dose_response_fluorescence_plot,
                ec50line = input$show_ec50_indicator_lines_dose_response_fluorescence_plot,

@@ -69,7 +69,7 @@
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
-\item{...}{}
+\item{...}{Further arguments to refine the generated base R plot.}
 }
 \description{
 code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data

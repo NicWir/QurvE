@@ -27,7 +27,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
 {
-  if(is(gcFittedLinear) != "gcFitLinear") stop("gcFittedLinear needs to be an object created with growth.gcFitLinear().")
+  if(methods::is(gcFittedLinear) != "gcFitLinear") stop("gcFittedLinear needs to be an object created with growth.gcFitLinear().")
   which <- match.arg(which)
 
   p <- function(){
@@ -71,8 +71,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , line = -1.8+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
-             mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
+             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , line = -1.8+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+             graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                          "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
                          "t0:", gcFittedLinear$control$t0,
@@ -138,8 +138,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
-             mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
+             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+             graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                          "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
                          "t0:", gcFittedLinear$control$t0,
@@ -147,8 +147,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                          "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
                    cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
-             # mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 3 , adj = 0.95, line = -1, outer = TRUE)
-             # mtext(paste("h:", gcFittedLinear$control4lin.h,
+             # graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 3 , adj = 0.95, line = -1, outer = TRUE)
+             # graphics::mtext(paste("h:", gcFittedLinear$control4lin.h,
              #             "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
              #             "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
              #             "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
@@ -193,6 +193,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @param pch (Numeric) Symbol used to plot data points.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
 #' @param equation (Logical) Show the equation of the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).
+#' @param eq.size (Numeric) Provide a value to scale the size of the displayed equation.
 #' @param colModel (Numeric or Character) Color used to plot the fitted model.
 #' @param basesize (Numeric) Base font size.
 #' @param cex.point (Numeric) Size of the raw data points.
@@ -204,6 +205,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated \code{ggplot2} plot.
+#' @param eq.size
 #'
 #' @export plot.gcFitModel
 #' @export
@@ -223,7 +225,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
   if (is.logical(equation)==FALSE)   stop("Need logical value for: equation")
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (!(is(gcFittedModel)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
+  if (!(methods::is(gcFittedModel)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
 
 
   # /// check if a data fit is available
@@ -439,7 +441,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param shiny (Logical) Indicate if plot is generated within the shiny app.
-#' @param ...
+#' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @export plot.drBootSpline
 #' @export
@@ -454,7 +456,7 @@ plot.drBootSpline <- function (drBootSpline,
                                ...)
 {
   # drBootSpline an object of class drBootSpline
-  if(is(drBootSpline) != "drBootSpline") stop("drBootSpline needs to be an object created with growth.drBootSpline.")
+  if(methods::is(drBootSpline) != "drBootSpline") stop("drBootSpline needs to be an object created with growth.drBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot  <- function(text = "Empty plot", main = "") {
     par(cex.lab = cex.lab, cex.axis = cex.axis)
@@ -745,13 +747,15 @@ plot.drBootSpline <- function (drBootSpline,
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.title (Character) Optional: Provide a title for the y-axis.
 #' @param x.title (Character) Optional: Provide a title for the x-axis.
-
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param (Logical) Log-transform the x-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
 #'
 #' @export plot.drFit
 #' @export
@@ -759,12 +763,12 @@ plot.drBootSpline <- function (drBootSpline,
 #'   geom_point geom_segment ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
-plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
+plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex.point = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
                        y.lim = NULL, x.lim = NULL, y.title = NULL, x.title = NULL, log.y = FALSE, log.x = FALSE,
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
 {
   # x an object of class drFit
-  if(is(drFit) != "drFit") stop("drFit needs to be an object of class 'drFit', created with growth.drFit() or fl.drFit(control=fl.control(dr.method='spline').")
+  if(methods::is(drFit) != "drFit") stop("drFit needs to be an object of class 'drFit', created with growth.drFit() or fl.drFit(control=fl.control(dr.method='spline').")
   if(length(drFit) == 1) stop("drFit is NA. Please run growth.drFit() with valid data input or growth.workflow() with 'ec50 = T'.")
   n <- length(drFit$drFittedSplines)
   if(combine == FALSE || n < 2){
@@ -772,7 +776,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     for (i in 1:n) {
       try(plot(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch,
                y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
-               cex = cex, export = export,
+               cex = cex.point, export = export,
                plot = plot, height = 7, width = 9, out.dir = out.dir))
     }
   } else {
@@ -847,7 +851,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
 
     nrow <- ceiling(length(drFit$drFittedSplines)/2)
     p <- ggplot(data = raw.df, aes(conc, mean, colour = Condition)) +
-      geom_point(size=cex, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
+      geom_point(size=cex.point, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
       geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
       geom_line(data = spline.df, aes(x, y, colour = Condition), size = lwd) +
       theme_classic(base_size = basesize) +
@@ -1019,7 +1023,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-#' @param ...
+#' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @export plot.drFitSpline
 #' @export
@@ -1040,7 +1044,7 @@ plot.drFitSpline <-
             ...)
   {
     # drFitSpline an object of class drFitSpline
-    if(is(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
+    if(methods::is(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
     # /// check input parameters
     if (is.logical(add) == FALSE)
       stop("Need logical value for: add")
@@ -1231,7 +1235,7 @@ plot.drFitSpline <-
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param shiny (Logical) Indicate if plot is generated within the shiny app.
-#' @param ...
+#' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @export plot.gcBootSpline
 #' @export
@@ -1244,7 +1248,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
                               height = 7, width = 9, out.dir = NULL, shiny = FALSE, ...)
 {
   # gcBootSpline an object of class gcBootSpline
-  if(is(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
+  if(methods::is(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot <- function(text="Empty plot",main=""){
     plot(c(0,1,0,1,0),c(0,1,1,0,0), type="l", axes=FALSE, xlab="", ylab="", lwd=lwd, col="gray",main=main)
@@ -1293,7 +1297,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       # /// plot all gcFittedSpline objects
       for(i in 1:gcBootSpline$control$nboot.gc){
        plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd=lwd,
-                        deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                        deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
       }
       # add plot title
       title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
@@ -1322,7 +1326,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         for(i in 2:gcBootSpline$control$nboot.gc){
           plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd=lwd, xlim = x.lim,
-                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point=cex.point)
         }
         title(ylab = "Growth rate", line = 2.3, cex.lab = cex.lab)
       }
@@ -1354,7 +1358,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(mu)) }
       if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="dY", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
       if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
-      mtext(paste(gcBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
+      graphics::mtext(paste(gcBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p2 <- function()
@@ -1389,7 +1393,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       # /// plot all gcFittedSpline objects
       for(i in 1:gcBootSpline$control$nboot.gc){
         plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd=lwd,
-                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point=cex.point)
       }
       # add plot title
       title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
@@ -1418,7 +1422,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         for(i in 2:gcBootSpline$control$nboot.gc){
           plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd=lwd, xlim = x.lim,
-                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex=cex.point)
+                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point=cex.point)
         }
         title(ylab = "Growth rate", line = 2.3, cex.lab = cex.lab)
       }
@@ -1492,7 +1496,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'
 #' code{plot.gcFitSpline} generates the spline fit plot for a single sample.
 #'
-#' @param gcFitSpline object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.
+#' @param gcFittedSpline object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.
 #' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
 #' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
@@ -1514,10 +1518,10 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-#' @param ...
+#' @param ... Further arguments to refine the generated base R plot (if \code{add = TRUE}.
 #'
-#' @export plot.gcFitSpline
 #' @export
+#'
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
@@ -1530,7 +1534,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 {
   n.ybreaks <- as.numeric(n.ybreaks)
   # x an object of class gcFittedSpline
-  if(is(gcFittedSpline) != "gcFitSpline") stop("gcFittedSpline needs to be an object created with growth.gcFitSpline().")
+  if(methods::is(gcFittedSpline) != "gcFitSpline") stop("gcFittedSpline needs to be an object created with growth.gcFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -1851,18 +1855,17 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
 #' @param basesize (Numeric) Base font size.
-#' @param lwd (Numeric) Line width of the individual plots.
-#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
-#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
-#' @param height (Numeric) Height of the exported image in inches.
-#' @param width (Numeric) Width of the exported image in inches.
-#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.title (Character) Optional: Provide a title for the y-axis of the growth curve plot.
 #' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
 #' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
+#' @param lwd (Numeric) Line width of the individual plots.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #' @param shiny (Logical) Indicate if plot is generated within the shiny app.
@@ -1927,7 +1930,7 @@ plot.grofit <- function(grofit, ...,
   if(length(arglist) > 1){
     # combine several grofit objects for joint plotting
     lapply(arglist, function(x) {
-      if(is(x) != "grofit") stop("Input objects need to be of class 'grofit' created with growth.workflow().")
+      if(methods::is(x) != "grofit") stop("Input objects need to be of class 'grofit' created with growth.workflow().")
     })
     merged <- grofit
     for(i in 2:length(arglist)){
@@ -1944,7 +1947,7 @@ plot.grofit <- function(grofit, ...,
   }
 
   # grofit an object of class grofit
-  if(is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
+  if(methods::is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
@@ -2435,7 +2438,7 @@ plot.grofit <- function(grofit, ...,
 
 base_breaks <- function(n = 10){
   function(x) {
-    axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
+    grDevices::axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
   }
 }
 
@@ -2501,7 +2504,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   param <- match.arg(param)
   # check class of object
-  if(!(any(is(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
+  if(!(any(methods::is(object) %in% c("gcTable", "grofit", "gcFit", "flTable", "flFitRes", "flFit")))) stop("object needs to be either a 'grofit', 'gcTable', 'gcFit', 'flTable', 'flFit', or 'flFitRes' object created with growth.workflow(), growth.gcFit(), fl.workflow(), or flFit().")
   if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                             'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                                             'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
@@ -2509,17 +2512,17 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                             stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'mu2.linfit', 'lambda2.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
 
   #extract gcTable
-  if(any(is(object) %in% "gcTable")){
+  if(any(methods::is(object) %in% "gcTable")){
     gcTable <- object
-  } else if (is(object)=="gcFit"){
+  } else if (methods::is(object)=="gcFit"){
     gcTable <- object$gcTable
-  } else if (is(object)=="grofit"){
+  } else if (methods::is(object)=="grofit"){
     gcTable <- object$gcFit$gcTable
-  } else if (is(object)=="flFitRes"){
+  } else if (methods::is(object)=="flFitRes"){
     gcTable <- object$flFit1$flTable
-  } else if (any(is(object) %in% "gcTable")){
+  } else if (any(methods::is(object) %in% "gcTable")){
     gcTable <- object
-  } else if (is(object)=="flFit"){
+  } else if (methods::is(object)=="flFit"){
     gcTable <- object$flTable
   }
   #check if param exists in gcTable and has a valid value
@@ -2735,19 +2738,19 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
   exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
   # check class of object
-  if(!(any(is(object) %in% c("drTable", "grofit", "drFit", "flFitRes")))) stop("object needs to be either a 'grofit', 'drTable', 'drFit', or 'flFitRes' object created with growth.workflow(), growth.drFit(), fl.workflow(), or growth.drFit().")
+  if(!(any(methods::is(object) %in% c("drTable", "grofit", "drFit", "flFitRes")))) stop("object needs to be either a 'grofit', 'drTable', 'drFit', or 'flFitRes' object created with growth.workflow(), growth.drFit(), fl.workflow(), or growth.drFit().")
   if(!is.character(param) || !(param %in% c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y')))
     stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
   #extract drTable
-  if(any(is(object) %in% "drTable")){
+  if(any(methods::is(object) %in% "drTable")){
     drTable <- object
-  } else if (is(object)=="drFit"){
+  } else if (methods::is(object)=="drFit"){
     drTable <- object$drTable
-  } else if (is(object)=="grofit"){
+  } else if (methods::is(object)=="grofit"){
     drTable <- object$drFit$drTable
-  } else if (is(object)=="flFitRes"){
+  } else if (methods::is(object)=="flFitRes"){
     drTable <- object$drFit1$drTable
-  } else if (any(is(object) %in% "drTable")){
+  } else if (any(methods::is(object) %in% "drTable")){
     drTable <- object
   }
   drTable <- as.data.frame(drTable)

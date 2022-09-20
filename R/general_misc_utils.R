@@ -51,11 +51,11 @@ fast.write.csv <- function(dat, file, row.names = TRUE) {
     },
     error = function(e) {
       print(e)
-      write.csv(dat, file, row.names = row.names)
+      utils::write.csv(dat, file, row.names = row.names)
     },
     warning = function(w) {
       print(w)
-      write.csv(dat, file, row.names = row.names)
+      utils::write.csv(dat, file, row.names = row.names)
     }
   )
 }

@@ -9,11 +9,11 @@
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.lin (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _linear_ fits. Default: \code{FALSE}.
 #' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{FALSE}
-#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{FALSE}
-#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{fl.gcFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
-#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{fl.gcFitLinear}}.
-#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{fl.gcFitLinear}}.
+#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _linear_ fits. Default: \code{FALSE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _spline_ fits. Default: \code{FALSE}
+#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{flFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the fluorescence increase phase of the plot.
+#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{flFitLinear}}.
+#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{flFitLinear}}.
 #' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{"max_slope.spline"}, which represents the maximum slope of the spline fit Typical options include: \code{"max_slope.linfit"}, \code{"dY.linfit"}, \code{"max_slope.spline"}, and \code{"dY.spline"}.
 #' @param dr.method (Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{"spline"}) or fit a biosensor response model (proposed by Meyer et al., 2019).
@@ -27,8 +27,8 @@
 #' @param nboot.fl (Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.fl = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.fl (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
-#' @param suppress.messages (Logical) Indicates whether messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
-#' @param neg.nan.act (Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
+#' @param suppress.messages (Logical) Indicates whether messages (information about current fluorescence curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
+#' @param neg.nan.act (Logical) Indicates whether the program should stop when negative fluorescence values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (\code{TRUE}) or kept (\code{FALSE}). Note: Infinite values are always removed. Default: \code{TRUE}.
 #'
 #' @return Generates a list with all arguments described above as entries.
@@ -143,18 +143,18 @@ fl.control <- function(fit.opt = c("l", "s"),
 
 #' Perform a smooth spline fit on fluorescence data
 #'
-#' \code{growth.gcFitSpline} performs a smooth spline fit on the dataset and determines
+#' \code{flFitSpline} performs a smooth spline fit on the dataset and determines
 #' the greatest slope as the global maximum in the first derivative of the spline.
 #'
 #' @param time Vector of the independent variable: time (if \code{x_type = 'time'} in \code{fl.control} object.
 #' @param density Vector of the independent variable: density (if \code{x_type = 'density'} in \code{fl.control} object.
 #' @param fl_data Vector of dependent variable: fluorescence.
 #' @param ID (Character) The name of the analyzed sample.
-#' @param control A \code{fl.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#' @param control A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.
 #' @param biphasic (Logical) Shall \code{\link{flFitLinear}} and \code{\link{flFitSpline}} try to extract fluorescence parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages) (\code{TRUE}) or not (\code{FALSE})?
 #' @param x_type (Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.
 #' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{FALSE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _spline_ fits. Default: \code{FALSE}
 #' @param smooth.fl (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
@@ -406,7 +406,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   } # if(!exists("spline") || is.null(spline) == TRUE)
   else {
     # Perform spline fit and extract parameters
-    deriv1 <- predict(spline, x, deriv = 1)
+    deriv1 <- stats::predict(spline, x, deriv = 1)
     # find maximum in deriv1, exclude maxima at beginning of fit, if x_type is "time"
     deriv1.test <- deriv1
     spline.test <- spline
@@ -438,7 +438,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     spline <- spline.test
     max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index]) # index of data point with maximum slope in spline fit
     x.max <- deriv1$x[max_slope.index] # x of maximum slope
-    max_slope <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
+    max_slope <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
     y.max <- spline$y[max_slope.index.spl] # cell density at x of max slope
     b.spl <- y.max - max_slope * x.max # the y-intercept of the tangent at µmax
     lambda.spl <- -b.spl/max_slope  # lag x
@@ -478,7 +478,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
         max_slope2.index <- which.max(deriv1.2$y) # index of data point with maximum slope in first derivative fit
         max_slope2.index.spl <- which(spline$x == deriv1.2$x[max_slope2.index]) # index of data point with maximum slope in spline fit
         x.max2 <- deriv1.2$x[max_slope2.index] # x of maximum slope
-        max_slope2 <- max(deriv1.2$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
+        max_slope2 <- max(deriv1.2$y) # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
         y.max2 <- spline$y[max_slope2.index.spl] # cell density at x of max slope
         b.spl2 <- y.max2 - max_slope2 * x.max2 # the y-intercept of the tangent at µmax
         lambda.spl2 <- -b.spl2/max_slope2  # lag x
@@ -555,10 +555,10 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' @param density Vector of the independent variable: density (if \code{x_type = 'density'} in \code{fl.control} object.
 #' @param fl_data Vector of dependent variable: fluorescence.
 #' @param ID (Character) The name of the analyzed sample.
-#' @param control A \code{fl.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#' @param control A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.
 #'
-#' @return A \code{gcBootSpline} object containing a distribution of growth parameters and
-#'   a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
+#' @return A \code{gcBootSpline} object containing a distribution of fluorescence parameters and
+#'   a \code{flFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
 #'   to visualize all bootstrapping splines as well as the distribution of
 #'   physiological parameters.
 #' \item{raw.x}{Raw time values provided to the function as \code{time}.}
@@ -670,7 +670,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       }
       x.cur <- x[choose]
       fl.cur <- fl_data[choose]
-      if(IQR(x.cur) > 0){
+      if(stats::IQR(x.cur) > 0){
         if(x_type == "density"){
           nonpara[[j]] <- flFitSpline(density = x.cur, fl_data = fl.cur, ID = ID, control = control.change)
         } else {
@@ -756,7 +756,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #'   various plotting functions of the QurvE package.
 #' \item{raw.x}{Raw x matrix passed to the function as \code{time} (for x_type = 'time') or \code{density} (for x_type = 'density').}
 #' \item{raw.fl}{Raw density dataframe passed to the function as \code{data}.}
-#' \item{flTable}{Table with growth parameters and related statistics for each growth curve evaluation performed by the function. This table, which is also returned by the generic \code{\link{summary.flFit}} method applied to a \code{flFit} object, is used as an input for \code{\link{fl.drFit}}.}
+#' \item{flTable}{Table with fluorescence parameters and related statistics for each fluorescence curve evaluation performed by the function. This table, which is also returned by the generic \code{summary.flFit} method applied to a \code{flFit} object, is used as an input for \code{\link{fl.drFit}}.}
 #' \item{flFittedLinear}{List of all \code{flFitLinear} objects, generated by the call of \code{\link{flFitLinear}}. Note: access to each object in the list via double brace: flFittedLinear[[#n]].}
 #' \item{flFittedSplines}{List of all \code{flFitSpline} objects, generated by the call of \code{\link{flFitSpline}}. Note: access to each object via double brace: flFittedSplines[[#n]].}
 #' \item{flBootSplines}{List of all \code{flBootSpline} objects, generated by the call of \code{\link{flBootSpline}}. Note: access to each object via double brace: flFittedSplines[[#n]].}
@@ -770,7 +770,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #'   various plotting functions of the QurvE package.
 #' \item{raw.x}{Raw x dataframe passed to the function as \code{time} or \code{density}. If both arguments are used, \code{x} will be defined by 'x_type' in the \code{\link{fl.control}} object.}
 #' \item{raw.fl}{Raw fluorescence dataframe passed to the function as \code{fl_data}.}
-#' \item{flTable}{Table with fitted parameters and related statistics for each curve evaluation performed by the function. This table, which is also returned by the generic \code{\link{summary.flFit}} method applied to a \code{flFit} object, is used as an input for \code{\link{growth.drFit}} or \code{\link{fl.drFit}}.}
+#' \item{flTable}{Table with fitted parameters and related statistics for each curve evaluation performed by the function. This table, which is also returned by the generic \code{summary.flFit} method applied to a \code{flFit} object, is used as an input for \code{\link{growth.drFit}} or \code{\link{fl.drFit}}.}
 #' \item{flFittedLinear}{List of all \code{flFitLinear} objects, generated by the call of \code{\link{flFitLinear}}. Note: access to each object in the list via double brace: flFittedLinear[[#n]].}
 #' \item{flFittedSplines}{List of all \code{flFitSpline} objects, generated by the call of \code{\link{flFitSpline}}. Note: access to each object via double brace: flFittedSplines[[#n]].}
 #' \item{flBootSplines}{List of all \code{flBootSpline} objects, generated by the call of \code{\link{flBootSpline}}. Note: access to each object via double brace: flFittedSplines[[#n]].}
@@ -971,7 +971,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     wellname <- paste(as.character(fl_data[i,1]), as.character(fl_data[i,2]),as.character(fl_data[i,3]), sep=" | ")
     if ((control$suppress.messages==FALSE)){
       cat("\n\n")
-      cat(paste("=== ", as.character(i), ". [", wellname, "] growth curve =================================\n", sep=""))
+      cat(paste("=== ", as.character(i), ". [", wellname, "] fluorescence curve =================================\n", sep=""))
       cat("----------------------------------------------------\n")
     }
     if(control$interactive == TRUE ||
@@ -1243,7 +1243,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
 #' \item{ID}{(Character) Identifies the tested sample.}
 #' \item{FUN}{Linear _function_ used for plotting the tangent at mumax.}
 #' \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
-#' \item{par}{List of determined growth parameters.}
+#' \item{par}{List of determined fluorescence parameters.}
 #' \itemize{
 #' \item \code{y0}: {Minimum fluorescence value considered for the heuristic linear method.}
 #' \item \code{dY}: {Difference in maximum fluorescence and minimum fluorescence}
@@ -1473,7 +1473,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       return(flFitLinear)
     }
   } # if(x_type == "time")
-  # extract period of growth (from defined t0)
+  # extract period of fluorescence increase (from defined t0)
   x.in = get(ifelse(x_type == "density", "density.in", "time.in"))
   end <- FALSE
   step <- 0
@@ -1891,7 +1891,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                   y0_lm.postmin    <- unname(coef(m.postmin)[1]) # y-intercept of tangent
                   max_slope.postmin <- unname(coef(m.postmin)[2])
 
-                  ## estimate lag phase between first and second growth phase
+                  ## estimate lag phase between first and second phase
                   if (control$log.y.lin == TRUE) {
                     lambda.postmin <- (obs$ylog[1] - y0_lm.postmin) / max_slope.postmin
                   } else {
@@ -2032,7 +2032,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                     y0_lm.premin    <- unname(coef(m.premin)[1]) # y-intercept of tangent
                     max_slope.premin <- unname(coef(m.premin)[2])
 
-                    ## estimate lag phase between first and second growth phase
+                    ## estimate lag phase between first and second phase
                     if (control$log.y.lin == TRUE) {
                       lambda.premin <- (obs$ylog[1] - y0_lm.premin) / max_slope.premin
                     } else {
@@ -2103,7 +2103,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               fitFlag.premin = FALSE
             }
 
-            # Choose regression before or after max_slope as second growth phase based on second slope
+            # Choose regression before or after max_slope as second phase based on second slope
             if(!is.na(max_slope.premin) && !is.na(max_slope.postmin)){
               max_slope2 <- ifelse(max_slope.premin > max_slope.postmin, max_slope.premin, max_slope.postmin)
               y0_2 <- ifelse(max_slope.premin > max_slope.postmin, y0_lm.premin, y0_lm.postmin)
@@ -2255,7 +2255,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #'
 #' @param grodata A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, containing fluorescence data and data for the independent variable (i.e., time or density).
 #' @param time (optional) A matrix containing time values for each sample (if a \code{fl_data} dataframe is provided as separate argument).
-#' @param fl_data (optional) A dataframe containing growth data (if a \code{fl_data} matrix is provided as separate argument).
+#' @param density (optional) A dataframe containing growth data (if a \code{fl_data} matrix is provided as separate argument).
 #' @param fl_data (optional) A dataframe containing fluorescence data (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).
 #' @param ec50 (Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
 #' @param mean.grp (\code{"all"}, a string vector, or a list of string vectors) Define groups to combine into common plots in the final report based on sample identifiers (if \code{report == TRUE}). Partial matches with sample/group names are accepted. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
@@ -2267,11 +2267,11 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.lin (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _linear_ fits. Default: \code{FALSE}.
 #' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{FALSE}
-#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{FALSE}
-#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{fl.gcFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
-#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{fl.gcFitLinear}}.
-#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{fl.gcFitLinear}}.
+#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _linear_ fits. Default: \code{FALSE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _spline_ fits. Default: \code{FALSE}
+#' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{flFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the fluorescence increase phase of the plot.
+#' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{flFitLinear}}.
+#' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{flFitLinear}}.
 #' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param biphasic (Logical) Shall \code{\link{flFitLinear}} and \code{\link{flFitSpline}} try to extract fluorescence parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages) (\code{TRUE}) or not (\code{FALSE})?
 #' @param interactive (Logical) Controls whether the fit for each sample and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
@@ -2285,12 +2285,12 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' @param nboot.fl (Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.fl = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.fl (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
-#' @param suppress.messages (Logical) Indicates whether messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
-#' @param neg.nan.act (Logical) Indicates whether the program should stop when negative growth values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
+#' @param suppress.messages (Logical) Indicates whether messages (information about current fluorescence curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
+#' @param neg.nan.act (Logical) Indicates whether the program should stop when negative fluorescence values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (\code{TRUE}) or kept (\code{FALSE}). Note: Infinite values are always removed. Default: \code{TRUE}.
 #' @param report (Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})
-#' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.
-#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.
+#' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.
+#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "Fluorescenceeport_" and the current date and time.
 #' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #' @param ... Further arguments passed to the shiny app.
 #'
@@ -2553,6 +2553,7 @@ fl.workflow <- function(grodata = NULL,
 #' @param out.dir (Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "FluorescenceReport_" and the current date and time.
 #' @param ec50 (Logical) Was a dose-response analysis performed in \code{\link{fl.workflow}} \code{TRUE} or not \code{FALSE}?
+#' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
 #' @param export (Logical) Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
 #' @param ... Further arguments passed to create a report. Currently required:
 #' \itemize{
@@ -2569,6 +2570,7 @@ fl.workflow <- function(grodata = NULL,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 #' @importFrom foreach %dopar%
+#' @importFrom DT datatable
 #' @import kableExtra
 #' @import knitr
 #' @import plyr
@@ -2767,7 +2769,7 @@ fl.drFit <- function(FitData, control = fl.control())
 #' @param conc Vector of concentration values.
 #' @param test Vector of response parameter values of the same length as \code{conc}.
 #' @param drID (Character) The name of the analyzed condition
-#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#' @param control A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.
 #'
 #' @return A \code{drFitSpline} object.
 #' \item{raw.conc}{Raw data provided to the function as \code{conc}.}
@@ -2775,7 +2777,7 @@ fl.drFit <- function(FitData, control = fl.control())
 #' \item{drID}{(Character) Identifies the tested condition}
 #' \item{fit.conc}{Fitted concentration values.}
 #' \item{fit.test}{Fitted response values.}
-#' \item{model}{\code{nls} object generated by the \code{\link{minpack.lm::nlsLM}} function.}
+#' \item{model}{\code{nls} object generated by the \code{\link{nlsLM}} function.}
 #' \item{parameters}{List of parameters estimated from dose response curve fit.}
 #' \itemize{
 #' \item \code{yEC50}: {Response value related to EC50.}
@@ -2794,6 +2796,7 @@ fl.drFit <- function(FitData, control = fl.control())
 #' Use \code{\link{plot.drFitModel}} to visualize the model fit.
 #'
 #' @export
+#' @importFrom minpack.lm nlsLM
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
@@ -2834,7 +2837,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
     return(drFitModel)
   }
   if (length(test) < control$dr.have.atleast) {
-    warning("drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
+    warning("drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See fl.control().")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,

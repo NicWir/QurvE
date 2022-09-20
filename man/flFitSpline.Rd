@@ -22,7 +22,7 @@ flFitSpline(
 
 \item{ID}{(Character) The name of the analyzed sample.}
 
-\item{control}{A \code{fl.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
+\item{control}{A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.}
 
 \item{biphasic}{(Logical) Shall \code{\link{flFitLinear}} and \code{\link{flFitSpline}} try to extract fluorescence parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages) (\code{TRUE}) or not (\code{FALSE})?}
 
@@ -30,7 +30,7 @@ flFitSpline(
 
 \item{log.x.spline}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the independent variable for \emph{spline} fits. Default: \code{FALSE}.}
 
-\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{spline} fits. Default: \code{FALSE}}
+\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the fluorescence data for \emph{spline} fits. Default: \code{FALSE}}
 
 \item{smooth.fl}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}}
 
@@ -72,7 +72,7 @@ visualize the spline fit and derivative over time.
 \item{control}{Object of class \code{fl.control} containing list of options passed to the function as \code{control}.}
 }
 \description{
-\code{growth.gcFitSpline} performs a smooth spline fit on the dataset and determines
+\code{flFitSpline} performs a smooth spline fit on the dataset and determines
 the greatest slope as the global maximum in the first derivative of the spline.
 }
 \details{

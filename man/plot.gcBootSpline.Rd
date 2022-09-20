@@ -63,7 +63,7 @@
 
 \item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 
-\item{...}{}
+\item{...}{Further arguments to refine the generated base R plot.}
 }
 \description{
 Generic plot function for \code{gcBootSpline} objects.

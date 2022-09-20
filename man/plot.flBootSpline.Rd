@@ -27,6 +27,8 @@
 )
 }
 \arguments{
+\item{flBootSpline}{Object of class \code{flBootSpline}, created with \code{\link{flBootSpline}}.}
+
 \item{pch}{(Numeric) Size of the raw data circles.}
 
 \item{colData}{(Numeric or Character) Color used to plot the raw data.}
@@ -43,9 +45,9 @@
 
 \item{lwd}{(Numeric) Spline line width.}
 
-\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
-\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
 \item{y.lim.deriv}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
@@ -61,7 +63,7 @@
 
 \item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 
-\item{...}{}
+\item{...}{Further arguments to refine the generated base R plot.}
 }
 \description{
 Generic plot function for \code{flBootSpline} objects.

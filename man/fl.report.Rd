@@ -23,6 +23,8 @@ fl.report(
 
 \item{ec50}{(Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
+\item{format}{(Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})}
+
 \item{export}{(Logical) Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?}
 
 \item{...}{Further arguments passed to create a report. Currently required:

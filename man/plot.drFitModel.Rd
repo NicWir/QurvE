@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluorescence_plots.R
 \name{plot.drFitModel}
 \alias{plot.drFitModel}
-\title{Title}
+\title{Generic plot function for \code{drFitModel} objects.}
 \usage{
 \method{plot}{drFitModel}(
   drFittedModel,
@@ -26,6 +26,10 @@
 )
 }
 \arguments{
+\item{drFittedModel}{Object of class \code{drFitModel}, created with \code{\link{fl.drFitModel}}.}
+
+\item{ec50line}{(Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).}
+
 \item{log}{("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.}
 
 \item{pch}{(Numeric) Size of the raw data circles.}
@@ -46,8 +50,18 @@
 
 \item{lwd}{(Numeric) Line width.}
 
-\item{...}{}
+\item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{export}{(Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{height}{(Numeric) Height of the exported image in inches.}
+
+\item{width}{(Numeric) Width of the exported image in inches.}
+
+\item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
+
+\item{...}{Further arguments to refine the generated base R plot.}
 }
 \description{
-Title
+Generic plot function for \code{drFitModel} objects.
 }

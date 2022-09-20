@@ -31,13 +31,13 @@
 )
 }
 \arguments{
-\item{flFitSpline}{object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.}
+\item{flFitSpline}{Object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.}
 
 \item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.flBootSpline}}.}
 
 \item{raw}{(Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{slope}{(Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).}
+\item{slope}{(Logical) Show the slope at the maximum slope (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{deriv}{(Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -57,9 +57,9 @@
 
 \item{lwd}{(Numeric) Spline line width.}
 
-\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
-\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
 \item{y.lim.deriv}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
@@ -75,7 +75,7 @@
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
-\item{...}{}
+\item{...}{Further arguments to refine the generated base R plot.}
 }
 \description{
 code{plot.flFitSpline} generates the spline fit plot for a single sample.

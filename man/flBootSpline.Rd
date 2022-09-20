@@ -21,11 +21,11 @@ flBootSpline(
 
 \item{ID}{(Character) The name of the analyzed sample.}
 
-\item{control}{A \code{fl.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
+\item{control}{A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.}
 }
 \value{
-A \code{gcBootSpline} object containing a distribution of growth parameters and
-a \code{gcFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
+A \code{gcBootSpline} object containing a distribution of fluorescence parameters and
+a \code{flFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBootSpline}}
 to visualize all bootstrapping splines as well as the distribution of
 physiological parameters.
 \item{raw.x}{Raw time values provided to the function as \code{time}.}
