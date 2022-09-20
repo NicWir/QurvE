@@ -2,10 +2,10 @@
 % Please edit documentation in R/general_misc_utils.R
 \name{run_app}
 \alias{run_app}
-\title{Run Shiny QurvE app}
+\title{Run Shiny QurvE App}
 \usage{
 run_app()
 }
 \description{
-Run Shiny QurvE app
+Run Shiny QurvE App
 }
