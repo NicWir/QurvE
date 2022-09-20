@@ -3,7 +3,15 @@ list.of.packages <- c("shiny", "shinythemes", "shinyFiles", "shinyjs", "shinyBS"
 #list of packages required
 new_packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 #install missing packages
-if(length(new_packages)) install.packages(new.packages)
+for( i in new_packages ){
+  #  require returns TRUE invisibly if it was able to load package
+  if( ! require( i , character.only = TRUE ) ){
+    #  If package was not able to be loaded then re-install
+    install.packages( i , dependencies = TRUE )
+    #  Load package after installing
+    require( i , character.only = TRUE )
+  }
+}
 
 # library(icons)
 # library(shiny)
