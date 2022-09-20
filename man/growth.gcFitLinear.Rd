@@ -9,8 +9,8 @@ growth.gcFitLinear(
   data,
   gcID = "undefined",
   quota = 0.95,
-  control = growth.control(t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.97,
-    lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE)
+  control = growth.control(t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD
+    = 0.1, lin.dY = 0.05, biphasic = FALSE)
 )
 }
 \arguments{
