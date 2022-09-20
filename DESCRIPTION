@@ -36,11 +36,11 @@ Imports:
     readxl,
     rmarkdown,
     scales,
+    shiny,
     stats,
     tinytex,
     utils
 Suggests:
-    shiny,
     shinyBS,
     shinycssloaders,
     shinyFiles,

@@ -205,10 +205,15 @@ zipFastener <- function(df1, df2, along=2)
 
 
 
-#' Run Shiny QurvE app
+#' Run Shiny QurvE App
 #'
 #' @export
 #'
+#' @importFrom DT dataTableOutput renderDT datatable
+#' @importFrom readxl read_excel excel_sheets
+#' @importFrom shinythemes shinytheme
+#'
+#' @import shiny shinyjs shinyBS shinycssloaders shinyFiles doParallel knitr kableExtra
 run_app <- function() {
 
   # Locate all the shiny apps that exist

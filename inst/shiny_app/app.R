@@ -1,20 +1,30 @@
-list.of.packages <- c("ggplot2", "shiny", "readxl", "tidyverse", "shinythemes", "shinyFiles", "shinyjs", "shinyBS", "shinycssloaders")
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
+#list of packages required
+list.of.packages <- c("shiny", "shinythemes", "shinyFiles", "shinyjs", "shinyBS", "shinycssloaders", "QurvE")
+#list of packages required
+new_packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+#install missing packages
+if(length(new_packages)) install.packages(new.packages)
 
 # library(icons)
-library(shiny)
-library(shinyjs)
-library(shinyBS)
-library(shinycssloaders)
-library(shinyFiles)
-library(readxl)
-library(tidyverse)
-library(shinythemes)
-library(DT)
-library(doParallel)
-library(knitr)
-library(kableExtra)
+# library(shiny)
+# library(shinyjs)
+# library(shinyBS)
+# library(shinycssloaders)
+# library(shinyFiles)
+# library(readxl)
+# library(tidyverse)
+# library(shinythemes)
+# library(DT)
+# library(doParallel)
+# library(knitr)
+# library(kableExtra)
+library(shiny, quietly = T)
+library(QurvE, quietly = T)
+library(shinyBS, quietly = T)
+library(shinycssloaders, quietly = T)
+library(shinyFiles, quietly = T)
+library(shinyjs, quietly = T)
+library(shinythemes, quietly = T)
 
 # Define icon set from custom SVG files
 # iconset <- icons::icon_set("icons/")
@@ -4482,7 +4492,7 @@ server <- function(input, output, session){
 
   # output$growth_data_rendered <- DT::renderDT({
   #   dat <- growth_data_custom()
-  #   datatable(dat,
+  #   DT::datatable(dat,
   #             options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
   #             escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(dat)-3)))
   # })
@@ -4510,7 +4520,7 @@ server <- function(input, output, session){
 
   output$custom_data_table_expdesign <- DT::renderDT({
     expdesign <- custom_data_table_expdesign()
-    datatable(expdesign,
+    DT::datatable(expdesign,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -4615,7 +4625,7 @@ server <- function(input, output, session){
 
   output$custom_table_fluorescence1 <- DT::renderDT({
     f1 <- custom_table_fluorescence1()
-    datatable(f1,
+    DT::datatable(f1,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f1)-3)))
   })
@@ -4636,7 +4646,7 @@ server <- function(input, output, session){
 
   output$growth_data_custom_processed <- DT::renderDT({
     table_density <- growth_data_custom_processed()
-    datatable(table_density,
+    DT::datatable(table_density,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
   })
@@ -4657,7 +4667,7 @@ server <- function(input, output, session){
 
   output$custom_table_fluorescence1_processed <- DT::renderDT({
     table_fl1 <- custom_table_fluorescence1_processed()
-    datatable(table_fl1,
+    DT::datatable(table_fl1,
                            options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                            escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
   })
@@ -5032,7 +5042,7 @@ server <- function(input, output, session){
     table_density <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
                            table_density)
 
-    table_density <- datatable(table_density,
+    table_density <- DT::datatable(table_density,
                                options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                                escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
 
@@ -5048,7 +5058,7 @@ server <- function(input, output, session){
     table_fl1 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
                        table_fl1)
 
-    table_fl1 <- datatable(table_fl1,
+    table_fl1 <- DT::datatable(table_fl1,
                            options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                            escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
 
@@ -5064,7 +5074,7 @@ server <- function(input, output, session){
   #   table_fl2 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
   #                      table_fl2)
   #
-  #   table_fl2 <- datatable(table_fl2,
+  #   table_fl2 <- DT::datatable(table_fl2,
   #                          options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
   #                          escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl2)-3)))
   #
@@ -5076,7 +5086,7 @@ server <- function(input, output, session){
 
     expdesign <- results$parsed_data$expdesign
 
-    expdesign <- datatable(expdesign,
+    expdesign <- DT::datatable(expdesign,
                            options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                            escape = FALSE, rownames = T)
 
@@ -5415,7 +5425,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_growth_linear <- DT::renderDT({
-    datatable(table_growth_linear(),
+    DT::datatable(table_growth_linear(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5519,7 +5529,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_growth_linear_group <- DT::renderDT({
-    datatable(table_growth_linear_group(),
+    DT::datatable(table_growth_linear_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5538,7 +5548,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_growth_spline <- DT::renderDT({
-    datatable(table_growth_spline(),
+    DT::datatable(table_growth_spline(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5629,7 +5639,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_growth_spline_group <- DT::renderDT({
-    datatable(table_growth_spline_group(),
+    DT::datatable(table_growth_spline_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5677,7 +5687,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_growth_spline_bt <- DT::renderDT({
-    datatable(table_growth_spline_bt(),
+    DT::datatable(table_growth_spline_bt(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5712,7 +5722,7 @@ server <- function(input, output, session){
 
   output$results_table_growth_model <- DT::renderDT({
     table_model <- table_growth_model()
-    datatable(table_model,
+    DT::datatable(table_model,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5749,7 +5759,7 @@ server <- function(input, output, session){
 
   output$results_table_growth_dr_spline <- DT::renderDT({
     table_dr <- table_growth_dr_spline()
-    datatable(table_dr,
+    DT::datatable(table_dr,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
               escape = FALSE)
   })
@@ -5880,7 +5890,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_fluorescence1_linear <- DT::renderDT({
-    datatable(table_fluorescence1_linear(),
+    DT::datatable(table_fluorescence1_linear(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5976,7 +5986,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_fluorescence1_linear_group <- DT::renderDT({
-    datatable(table_fluorescence1_linear_group(),
+    DT::datatable(table_fluorescence1_linear_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -5994,7 +6004,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_fluorescence1_spline <- DT::renderDT({
-    datatable(table_fluorescence1_spline(),
+    DT::datatable(table_fluorescence1_spline(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -6078,7 +6088,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_fluorescence1_spline_group <- DT::renderDT({
-    datatable(table_fluorescence1_spline_group(),
+    DT::datatable(table_fluorescence1_spline_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -6126,7 +6136,7 @@ server <- function(input, output, session){
   })
 
   output$results_table_fluorescence1_spline_bt <- DT::renderDT({
-    datatable(table_fluorescence1_spline_bt(),
+    DT::datatable(table_fluorescence1_spline_bt(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
@@ -6163,7 +6173,7 @@ server <- function(input, output, session){
 
   output$results_table_fluorescence1_dr_spline <- DT::renderDT({
     table_dr <- table_fluorescence1_dr_spline()
-    datatable(table_dr,
+    DT::datatable(table_dr,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
               escape = FALSE)
   })
@@ -6198,7 +6208,7 @@ server <- function(input, output, session){
 
   output$results_table_fluorescence1_dr_model <- DT::renderDT({
     table_dr_model <- table_fluorescence1_dr_model()
-    datatable(table_dr_model,
+    DT::datatable(table_dr_model,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
               escape = FALSE)
   })
