@@ -37,14 +37,14 @@ library(shinythemes, quietly = T)
 # Define icon set from custom SVG files
 # iconset <- icons::icon_set("icons/")
 
-source("../../R/general_misc_utils.R")
-source("../../R/growth_computation.R")
-source("../../R/growth_plots.R")
-source("../../R/growth_summaries.R")
-source("../../R/fluorescence_computation.R")
-source("../../R/fluorescence_plots.R")
-source("../../R/fluorescence_summaries.R")
-source("../../R/shiny_app_functions.R")
+# source("../../R/general_misc_utils.R")
+# source("../../R/growth_computation.R")
+# source("../../R/growth_plots.R")
+# source("../../R/growth_summaries.R")
+# source("../../R/fluorescence_computation.R")
+# source("../../R/fluorescence_plots.R")
+# source("../../R/fluorescence_summaries.R")
+# source("../../R/shiny_app_functions.R")
 
 jscode <- "
 shinyjs.disableTab = function(name) {
