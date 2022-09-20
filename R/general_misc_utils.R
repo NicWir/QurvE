@@ -213,7 +213,7 @@ zipFastener <- function(df1, df2, along=2)
 #' @importFrom readxl read_excel excel_sheets
 #' @importFrom shinythemes shinytheme
 #'
-#' @import shiny shinyjs shinyBS shinycssloaders shinyFiles doParallel knitr kableExtra
+#' @import shiny shinyjs shinycssloaders shinyFiles doParallel knitr kableExtra
 run_app <- function() {
 
   # Locate all the shiny apps that exist
