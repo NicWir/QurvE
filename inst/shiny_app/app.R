@@ -76,7 +76,13 @@ load_data <- function() {
   show("main_content")
 }
 
+widePopover <-
+  '<div class="popover popover-lg" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+
 ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
+                tags$head(
+                  tags$style(HTML(".popover.popover-lg {width: 600px; max-width: 600px;}"))
+                ),
                 tags$style(
                   type = 'text/css',
                   '.modal-dialog.gcFitLinear { width: fit-content !important; }'
@@ -162,10 +168,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                              tabPanel(value = "Custom", span("Custom", title="Upload manually formatted data. Data from different experiments can be added. In column format, the first three table rows contain (see figure):\n1. sample description\n2. replicate number (optional: followed by a letter to indicate technical replicates)\n3. concentration value (optional, for dose-response analysis)"),
                                                       sidebarPanel(
                                                         style='border-color: #ADADAD',
-                                                        selectInput(inputId = "custom_format",
-                                                                    label = "Select Format",
-                                                                    choices = c("Data in columns" = "col",
-                                                                                "Data in rows" = "row")),
                                                         wellPanel(
                                                           h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                           style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
@@ -508,21 +510,63 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                  ##____DATA - MAIN PANEL____####
 
                                  mainPanel(
-                                   conditionalPanel(
-                                     condition = "input.tabs_data == 'Custom'",
-                                     img(src = 'data_instruction.png',
-                                         heigt = '100%',
-                                         width = '100%')
+                                   div(
+                                     id = "data_instruction",
+                                     conditionalPanel(
+                                       condition = "input.tabs_data == 'Custom'",
+                                       img(src = 'data_instruction.png',
+                                           width = '100%')
+                                     )
+                                   ),
+                                   bsPopover(id = "data_instruction", title = "Custom data layout",
+                                             content = paste("Please format your data in the format shown in the figure:",
+                                                               paste0(
+                                                                 "<ul>",
+                                                                 "<li>The first row contains \\'Time\\' and \\'Blank\\', as well as sample identifiers \\(identical for replicates\\).</li>",
+                                                                 "<li>The second row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
+                                                                 "<li>The third row contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
+                                                                 "</ul>"
+                                                               ),
+                                                               "Details:",
+                                                               paste0(
+                                                                 "<ul>",
+                                                                 "<li>Different experiments with differing time values and experiment-specific blanks are distinguished by an individual \\'Time\\' column to the left of each dataset.</li>",
+                                                                 "<li>Blank values \\(for each experiment\\) are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected.</li>",
+                                                                 "</ul>"
+                                                               ),
+                                                              sep = "<br>"),
+                                             trigger = "hover", options = list(container = "body", template = widePopover)
+                                   ),
+                                   div(
+                                     id = "mapping_layout",
+                                     conditionalPanel(
+                                       condition = "input.tabs_data != 'Custom' && output.parsefileUploaded",
+                                       img(src = 'mapping_layout.png',
+                                           width = '60%')
+                                     )
+                                   ),
+                                   bsPopover(id = "mapping_layout", title = "Mapping layout",
+                                             content = paste("Please format a table providing sample information in the format shown in the figure:",
+                                                              paste0(
+                                                                "<ul>",
+                                                                "<li>The first column contains the <i>well</i> number in the plate.</li>",
+                                                                "<li>The second column contains the <i>ID</i> \\(i.e., organism, condition, etc.\\) of each sample. The ID needs to be identical for replicates. .</li>",
+                                                                "<li>The third column row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
+                                                                "<li>The fourth column contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
+                                                                "</ul>"
+                                                              ),
+                                                              "Details:",
+                                                              paste0(
+                                                                "The values in \\'Blank\\' samples are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected."
+                                                              ),
+                                                              sep = "<br>"),
+                                             trigger = "hover", options = list(container = "body", template = widePopover)
                                    ),
 
-                                   conditionalPanel(condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
+                                   div(id = 'Custom_Data_Tables',
                                                     h1("Your Data"),
                                                     tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
-                                                                # tabPanel(title = "Density", value = "tabPanel_custom_tables_density",
-                                                                #          withSpinner(
-                                                                #            DT::dataTableOutput("growth_data_rendered")
-                                                                #          )
-                                                                # ),
+
                                                                 tabPanel(title = "Density", value = "tabPanel_custom_tables_density_processed",
                                                                          withSpinner(
                                                                            DT::dataTableOutput("growth_data_custom_processed")
@@ -549,7 +593,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                     )
                                    ),
-                                   conditionalPanel(condition = 'output.parsefileUploaded',
+                                   div(id = 'Parsed_Data_Tables',
                                                     h1("Parsed Data"),
                                                     tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
                                                                 tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
@@ -4352,6 +4396,7 @@ server <- function(input, output, session){
   outputOptions(output, 'fluorescence_present', suspendWhenHidden=FALSE)
     ##___Custom____####
 
+  hide("Custom_Data_Tables")
   ### Test if custom_file_density was loaded
   output$growthfileUploaded <- reactive({
     if(is.null(input$custom_file_density)) return(FALSE)
@@ -4387,7 +4432,7 @@ server <- function(input, output, session){
       results$custom_data <- read_data(data.density = density.file$datapath,
                                        data.fluoro1 = fl1.file$datapath,
                                        # data.fluoro2 = fl2.file$datapath,
-                                       data.format = input$custom_format,
+                                       data.format = "col",
                                        sheet.density = input$custom_growth_sheets,
                                        sheet.fluoro1 = input$custom_fluorescence1_sheets,
                                        # sheet.fluoro2 = input$custom_fluorescence2_sheets,
@@ -4405,6 +4450,9 @@ server <- function(input, output, session){
     if(length(results$custom_data)<2){
       showModal(modalDialog("Data could not be extracted from the provided file. Did you correctly format your custom data?", easyClose = T, footer=NULL))
     } else {
+      hide("data_instruction")
+      show("Custom_Data_Tables")
+      hide("Parsed_Data_Tables")
       if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
         # show [Run Computation] button in Computation-Growth
         show("run_growth")
@@ -4841,6 +4889,7 @@ server <- function(input, output, session){
 
     ##__Parse data____####
   ### Hide elements to guide user
+  hide("Parsed_Data_Tables")
   hide("parsed_reads_density")
   hide("parsed_reads_fluorescence1")
   # hide("parsed_reads_fluorescence2")
@@ -5017,7 +5066,9 @@ server <- function(input, output, session){
       )
     }
     showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
-
+    hide("mapping_layout")
+    hide("Custom_Data_Tables")
+    show("Parsed_Data_Tables")
     if("density" %in% names(results$parsed_data) && length(results$parsed_data$density)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
       # show [Run Computation] button in Computation-Growth
@@ -9080,12 +9131,10 @@ server <- function(input, output, session){
     )
     removeModal()
   })
+
 }
 
 
-
-
-shinyApp(ui = ui, server = server)
 
 
 shinyApp(ui = ui, server = server)
