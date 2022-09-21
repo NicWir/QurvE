@@ -19,6 +19,7 @@
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
+#' @export plot.flFitLinear
 #' @export
 #'
 plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
@@ -218,7 +219,7 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 
 #' Generic plot function for \code{flFitSpline} objects.
 #'
-#' code{plot.flFitSpline} generates the spline fit plot for a single sample.
+#' \code{plot.flFitSpline} generates the spline fit plot for a single sample.
 #'
 #' @param flFitSpline Object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.flBootSpline}}.
@@ -868,6 +869,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
+#' @export plot.drFitModel
 #' @export
 #'
 plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch = 1,
@@ -1033,6 +1035,7 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #'
+#' @export plot.flFitRes
 #' @export
 #'
 plot.flFitRes <-  function(object,
@@ -1343,8 +1346,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
-    else p <- p + guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -1522,8 +1525,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
-    else p <- p + guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
@@ -1672,10 +1675,12 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
 }
 
 #' @rdname plot.flFitRes
+#' @export plot.flFit
 #' @export
 plot.flFit <- plot.flFitRes
 
 #' @rdname plot.flFitRes
+#' @export plot.grodata
 #' @export
 plot.grodata <- plot.flFitRes
 
@@ -1710,6 +1715,7 @@ plot.grodata <- plot.flFitRes
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #'
+#' @export plot.dual
 #' @export
 #'
 plot.dual <-  function(object,
@@ -1925,8 +1931,8 @@ plot.dual <-  function(object,
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
-    else p <- p + guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
 
     if(log.y.density == TRUE){
       if(!is.null(y.lim.density)){
@@ -2076,8 +2082,8 @@ plot.dual <-  function(object,
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
-    else p <- p + guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))

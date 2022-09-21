@@ -210,7 +210,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @export plot.gcFitModel
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equation = TRUE, eq.size = 1,
@@ -760,7 +760,7 @@ plot.drBootSpline <- function (drBootSpline,
 #' @export plot.drFit
 #' @export
 #' @importFrom ggplot2 aes element_text geom_errorbar geom_line
-#'   geom_point geom_segment ggplot ggtitle labs
+#'   geom_point geom_segment ggplot ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
 plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex.point = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
@@ -1520,10 +1520,11 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot (if \code{add = TRUE}.
 #'
+#' @export plot.gcFitSpline
 #' @export
 #'
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
@@ -1873,7 +1874,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 #' @export plot.grofit
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab xlim ylim
 #'
@@ -2143,8 +2144,8 @@ plot.grofit <- function(grofit, ...,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
-    else p <- p + guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -2294,8 +2295,8 @@ plot.grofit <- function(grofit, ...,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + guides(fill=guide_legend(ncol=4))
-    else p <- p + guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -2471,7 +2472,7 @@ base_breaks <- function(n = 10){
 #' @export plot.parameter
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
-#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab geom_hline geom_col
 plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
@@ -2728,6 +2729,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
 #'
+#' @export plot.dr_parameter
 #' @export
 #'
 plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),

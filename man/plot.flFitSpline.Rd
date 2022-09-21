@@ -78,5 +78,5 @@
 \item{...}{Further arguments to refine the generated base R plot.}
 }
 \description{
-code{plot.flFitSpline} generates the spline fit plot for a single sample.
+\code{plot.flFitSpline} generates the spline fit plot for a single sample.
 }
