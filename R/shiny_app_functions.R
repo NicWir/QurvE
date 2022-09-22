@@ -347,37 +347,3 @@ help_modal <- function (..., title = NULL, footer = NULL,
     tags$script("$('#shiny-modal').modal().focus();"))
 }
 
-jscode <- "
-shinyjs.disableTab = function(name) {
-var tab = $('.nav li a[data-value=' + name + ']');
-tab.bind('click.tab', function(e) {
-e.preventDefault();
-return false;
-});
-tab.addClass('disabled');
-}
-
-shinyjs.enableTab = function(name) {
-var tab = $('.nav li a[data-value=' + name + ']');
-tab.unbind('click.tab');
-tab.removeClass('disabled');
-}
-"
-css <- "
-.nav li a.disabled {
-background-color: #65675F !important;
-color: #333 !important;
-cursor: not-allowed !important;
-border-color: #aaa !important;
-}"
-
-load_data <- function() {
-  Sys.sleep(2)
-  hide("loading_page")
-  show("main_content")
-}
-
-widePopover <-
-  '<div class="popover popover-lg" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
-
-

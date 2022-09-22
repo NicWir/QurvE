@@ -13,19 +13,7 @@ for( i in new_packages ){
   }
 }
 
-# library(icons)
-# library(shiny)
-# library(shinyjs)
-# library(shinyBS)
-# library(shinycssloaders)
-# library(shinyFiles)
-# library(readxl)
-# library(tidyverse)
-# library(shinythemes)
-# library(DT)
-# library(doParallel)
-# library(knitr)
-# library(kableExtra)
+
 library(shiny, quietly = T)
 library(QurvE, quietly = T)
 library(shinyBS, quietly = T)
@@ -33,18 +21,10 @@ library(shinycssloaders, quietly = T)
 library(shinyFiles, quietly = T)
 library(shinyjs, quietly = T)
 library(shinythemes, quietly = T)
+library(ggplot2, quietly = T)
 
 # Define icon set from custom SVG files
 # iconset <- icons::icon_set("icons/")
-
-# source("../../R/general_misc_utils.R")
-# source("../../R/growth_computation.R")
-# source("../../R/growth_plots.R")
-# source("../../R/growth_summaries.R")
-# source("../../R/fluorescence_computation.R")
-# source("../../R/fluorescence_plots.R")
-# source("../../R/fluorescence_summaries.R")
-# source("../../R/shiny_app_functions.R")
 
 jscode <- "
 shinyjs.disableTab = function(name) {
@@ -4190,7 +4170,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 #____SERVER____####
 
 server <- function(input, output, session){
-  load_data()
 
   # output$debug <- renderPrint({
   #
@@ -9131,6 +9110,17 @@ server <- function(input, output, session){
     )
     removeModal()
   })
+
+  # Show content after initializing ####
+  load_data()
+
+  # Close the app when the session completes ####
+  if(!interactive()) {
+    session$onSessionEnded(function() {
+      stopApp()
+      q("no")
+    })
+  }
 
 }
 

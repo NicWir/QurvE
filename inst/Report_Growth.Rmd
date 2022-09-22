@@ -22,6 +22,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(doParallel)
+library(foreach)
 dir.create(paste0(tempdir(),"/Plots"), showWarnings = F)
 wd.plots <- paste0(wd,"/Plots")
 if(export == T){
@@ -41,12 +43,12 @@ knit_table <- function(df, caption){
                          fixedHeader=TRUE))
   } else {
      colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "µ<sub>max</sub>", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "t<sub>start</sub>", "$t_{start}$") %>% str_replace_all(., "t<sub>D</sub>", "$t_{D}$") %>% str_replace_all(., "t<sub>end</sub>", "$t_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "t<sub>shift</sub>", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "t<sub>max</sub>", "t$_{max}$") 
-     colnames(df) <- linebreak(colnames(df), align = "c")
+     colnames(df) <- kableExtra::linebreak(colnames(df), align = "c")
      for(i in 2:ncol(df)){
        df[,i] <- df[,i] %>% str_replace_all(., "^<b>", "\\\\textbf\\{") %>% str_replace_all(., "</b>", "\\}") 
      }
      df[,1] <- str_replace_all(df[,1], "_", "\\\\char`_") %>% str_replace_all(., "%", "\\\\%") 
-     df %>% kable("latex", align = "c", booktabs = T, escape = F, linesep = "",  caption = caption, longtable = TRUE) %>% kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = F, position = "center", font_size = 8)
+     df %>% knitr::kable("latex", align = "c", booktabs = T, escape = F, linesep = "",  caption = caption, longtable = TRUE) %>% kableExtra::kable_styling(latex_options = c("hold_position", "repeat_header", "striped"), full_width = F, position = "center", font_size = 8)
    }
 }
 ```
@@ -108,10 +110,10 @@ if(any(c("a", "l") %in% control$fit.opt)){
                                stringsAsFactors = F, check.names = F)
     table_linear <- as.data.frame(apply(table_linear, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_linear[is.na(table_linear)] <- ""
-    if (is_html_output()) {
+    if (knitr::is_html_output()) {
       knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit"))
     } else {
-      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% column_spec(column=1, width = "4cm")
+      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
     }
   }
 }
@@ -143,10 +145,10 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     }
     table_model <- as.data.frame(apply(table_model, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_model[is.na(table_model)] <- ""
-    if (is_html_output()) {
+    if (knitr::is_html_output()) {
       knit_table(table_model, caption = "Parametric Fit")
     } else {
-      knit_table(table_model, caption = "Parametric Fit") %>% column_spec(column=1, width = "4cm")
+      knit_table(table_model, caption = "Parametric Fit") %>% kableExtra::column_spec(column=1, width = "4cm")
     }
   }
 }
@@ -184,10 +186,10 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
     }
   table_spline <- as.data.frame(apply(table_spline, 2, function(x) str_replace_all(x, "NA ± NA", "")))
   table_spline[is.na(table_spline)] <- ""
-  if (is_html_output()) {
+  if (knitr::is_html_output()) {
       knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"))
     } else {
-      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% column_spec(column=1, width = "4cm")
+      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
     }
   }
 }
