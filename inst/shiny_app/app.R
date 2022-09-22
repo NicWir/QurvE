@@ -4240,7 +4240,7 @@ server <- function(input, output, session){
 
   output$gcFitLinear_tooltip <- renderText({
     temp = tools::Rd2HTML("../../man/growth.gcFitLinear.Rd", out = paste0(tempfile("docs_gcFitLinear"), ".txt"))
-    content = read_lines(temp)
+    content = readLines(temp)
     file.remove(temp)
     content
   })
@@ -4259,7 +4259,7 @@ server <- function(input, output, session){
 
   output$gcFitSpline_tooltip <- renderText({
     temp = tools::Rd2HTML("../../man/growth.gcFitSpline.Rd", out = paste0(tempfile("docs_gcFitSpline"), ".txt"))
-    content = read_lines(temp)
+    content = readLines(temp)
     file.remove(temp)
     content
   })
@@ -4278,7 +4278,7 @@ server <- function(input, output, session){
 
   output$gcFitModel_tooltip <- renderText({
     temp = tools::Rd2HTML("../../man/growth.gcFitModel.Rd", out = paste0(tempfile("docs_gcFitModel"), ".txt"))
-    content = read_lines(temp)
+    content = readLines(temp)
     file.remove(temp)
     content
   })
@@ -4297,7 +4297,7 @@ server <- function(input, output, session){
 
   output$tooltip_growth_workflow <- renderText({
     temp = tools::Rd2HTML("../../man/growth.workflow.Rd", out = paste0(tempfile("docs_growth_workflow"), ".txt"))
-    content = read_lines(temp)
+    content = readLines(temp)
     file.remove(temp)
     content
   })
@@ -4310,7 +4310,7 @@ server <- function(input, output, session){
 
   output$flFitLinear_tooltip <- renderText({
     temp = tools::Rd2HTML("../../man/flFitLinear.Rd", out = paste0(tempfile("docs_flFitLinear"), ".txt"))
-    content = read_lines(temp)
+    content = readLines(temp)
     file.remove(temp)
     content
   })
@@ -4329,7 +4329,7 @@ server <- function(input, output, session){
 
   output$flFitSpline_tooltip <- renderText({
     temp = tools::Rd2HTML("../../man/flFitSpline.Rd", out = paste0(tempfile("docs_flFitSpline"), ".txt"))
-    content = read_lines(temp)
+    content = readLines(temp)
     file.remove(temp)
     content
   })
@@ -4348,7 +4348,7 @@ server <- function(input, output, session){
 
   output$tooltip_fl_workflow <- renderText({
     temp = tools::Rd2HTML("../../man/fl.workflow.Rd", out = paste0(tempfile("docs_fl_workflow"), ".txt"))
-    content = read_lines(temp)
+    content = readLines(temp)
     file.remove(temp)
     content
   })

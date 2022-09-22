@@ -22,8 +22,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-library(doParallel)
-library(foreach)
+library(doParallel, quietly =  TRUE)
+library(foreach, quietly =  TRUE)
 dir.create(paste0(tempdir(),"/Plots"), showWarnings = F)
 wd.plots <- paste0(wd,"/Plots")
 if(export == T){
