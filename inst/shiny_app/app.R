@@ -5220,7 +5220,6 @@ server <- function(input, output, session){
     }
 
     showModal(modalDialog("Running computations...", footer=NULL))
-    browser()
     # Run growth workflow
     shiny::withProgress(message = "Computations completed",
 
