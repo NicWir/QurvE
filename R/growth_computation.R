@@ -2617,7 +2617,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             }
             #consider only candidate windows next to index.max.ret
             candidate_intervals.ext <- split(candidates.ext, cumsum(c(1, diff(candidates.ext) != 1)))
-            if(index.max.ret %in% unlist(candidate_intervals.ext)){
+            if(any(index.max.ret %in% unlist(unname(candidate_intervals.ext)))){
               candidates.ext <-
                 candidate_intervals.ext[as.numeric(which(
                   sapply(
@@ -2697,7 +2697,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                   ret.postmin[, 7] >= t0), 1]
               #consider only candidate windows next to index.max.ret.postmin
               candidate_intervals.postmin <- split(candidates.postmin, cumsum(c(1, diff(candidates.postmin) != 1)))
-              if (index.max.ret.postmin %in% unlist(candidate_intervals.postmin)) {
+              if (any(index.max.ret.postmin %in% unlist(candidate_intervals.postmin))) {
                 candidates.postmin <- candidate_intervals.postmin[
                   as.numeric(which(sapply(candidate_intervals.postmin,FUN = function(X) index.max.ret.postmin %in% X)))][[1]]
               }

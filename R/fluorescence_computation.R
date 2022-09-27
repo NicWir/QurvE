@@ -1770,7 +1770,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
             }
             #consider only candidate windows next to index.max.ret
             candidate_intervals.ext <- split(candidates.ext, cumsum(c(1, diff(candidates.ext) != 1)))
-            if(index.max.ret %in% unlist(candidate_intervals.ext)){
+            if(any(index.max.ret %in% unlist(candidate_intervals.ext))){
               candidates.ext <-
                 candidate_intervals.ext[as.numeric(which(
                   sapply(
@@ -1852,7 +1852,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 }
                 #consider only candidate windows next to index.max.ret.postmin
                 candidate_intervals.postmin <- split(candidates.postmin, cumsum(c(1, diff(candidates.postmin) != 1)))
-                if (index.max.ret.postmin %in% unlist(candidate_intervals.postmin)) {
+                if (any(index.max.ret.postmin %in% unlist(candidate_intervals.postmin))) {
                   candidates.postmin <- candidate_intervals.postmin[
                     as.numeric(which(sapply(candidate_intervals.postmin,FUN = function(X) index.max.ret.postmin %in% X)))][[1]]
                 }
@@ -1992,7 +1992,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
                   #consider only candidate windows next to index.max.ret.premin
                   candidate_intervals.premin <-split(candidates.premin, cumsum(c(1, diff(candidates.premin) != 1)))
-                  if (index.max.ret.premin %in% unlist(candidate_intervals.premin)) {
+                  if (any(index.max.ret.premin %in% unlist(candidate_intervals.premin))) {
                     candidates.premin <- candidate_intervals.premin[
                       as.numeric(which(sapply(candidate_intervals.premin,FUN = function(X) index.max.ret.premin %in% X)))][[1]]
                   }

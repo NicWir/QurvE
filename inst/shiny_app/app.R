@@ -154,7 +154,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                           fileInput(inputId = 'custom_file_density',
                                                                     label = 'Choose growth data file',
-                                                                    accept = c('.xlsx', '.xls', '.csv', 'txt', 'tsv')
+                                                                    accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
                                                           ),
 
                                                           conditionalPanel(
@@ -197,7 +197,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                           fileInput(inputId = 'custom_file_fluorescence1',
                                                                     label = 'Fluorescence data 1',
-                                                                    accept = c('.xlsx', '.xls', '.csv')
+                                                                    accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
                                                           ),
 
                                                           conditionalPanel(
@@ -239,7 +239,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         #
                                                         #   fileInput(inputId = 'custom_file_fluorescence2',
                                                         #             label = 'Fluorescence data 2',
-                                                        #             accept = c('.xlsx', '.xls', '.csv')
+                                                        #             accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
                                                         #   ),
                                                         #
                                                         #   conditionalPanel(
@@ -5220,6 +5220,7 @@ server <- function(input, output, session){
     }
 
     showModal(modalDialog("Running computations...", footer=NULL))
+    browser()
     # Run growth workflow
     shiny::withProgress(message = "Computations completed",
 
