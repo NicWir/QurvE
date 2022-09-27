@@ -233,6 +233,7 @@ parse_Gen5Gen6 <- function(input)
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
   read.ndx <- time.ndx[!is.na(reads)]
   reads <- reads[!is.na(reads)]
+
   read.data <- list()
   ncol <- length(input[read.ndx[1],][!is.na(input[read.ndx[1],])])
   if(length(read.ndx)>1){

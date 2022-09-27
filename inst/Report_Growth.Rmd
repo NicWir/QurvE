@@ -42,7 +42,7 @@ knit_table <- function(df, caption){
                          pageLength = 15,
                          fixedHeader=TRUE))
   } else {
-     colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "µ<sub>max</sub>", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "t<sub>start</sub>", "$t_{start}$") %>% str_replace_all(., "t<sub>D</sub>", "$t_{D}$") %>% str_replace_all(., "t<sub>end</sub>", "$t_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "t<sub>shift</sub>", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "t<sub>max</sub>", "t$_{max}$") 
+     colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "µ<sub>max</sub>", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "t<sub>start</sub>", "$t_{start}$") %>% str_replace_all(., "y<sub>0</sub>", "$y_{0}$") %>% str_replace_all(., "t<sub>D</sub>", "$t_{D}$") %>% str_replace_all(., "t<sub>end</sub>", "$t_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "t<sub>shift</sub>", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "t<sub>max</sub>", "t$_{max}$") 
      colnames(df) <- kableExtra::linebreak(colnames(df), align = "c")
      for(i in 2:ncol(df)){
        df[,i] <- df[,i] %>% str_replace_all(., "^<b>", "\\\\textbf\\{") %>% str_replace_all(., "</b>", "\\}") 
@@ -142,6 +142,9 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     }
     if ( "gompertz.exp" %in% res.table.gc$used.model ){
       table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
+    }
+    if ( "baranyi" %in% res.table.gc$used.model || "huang" %in% res.table.gc$used.model ){
+      table_model <- suppressWarnings(cbind(table_model, data.frame("y<sub>0</sub>" = round(as.numeric(res.table.gc$parameter_y0.model), 3), stringsAsFactors = F, check.names = F)))
     }
     table_model <- as.data.frame(apply(table_model, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_model[is.na(table_model)] <- ""
@@ -455,6 +458,24 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
            scale_color_manual(name='Growth Model',
                        breaks = "logistic",
                        values=c("model" = ggplot2::alpha("forestgreen", 0.85), "logistic" = ggplot2::alpha("forestgreen", 0.85)))
+       }
+       if(x$model == "baranyi"){
+        p <- p + annotate(
+          "text",
+          label = "atop(B == t + frac(1,mu) %.% log(symbol(e)^{-mu%.%time} + symbol(e)^{-mu%.%lambda} - symbol(e)^{-mu%.%(time + lambda)}),
+          y == y0 + mu%.%B - log(1 + (symbol(e)^{mu %.% B} - 1)/symbol(e)^{A - y0}))",
+           x = 1.14 * x$raw.time[length(x$raw.time)],
+                y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                angle = 90, parse = TRUE, size = 3.2) +
+          annotate("text",
+                  label = bquote(A == .(round(x$parameters$A[1],3)) ~~~~ mu == .(round(x$parameters$mu[1],3)) ~~~~
+                                   lambda == .(round(x$parameters$lambda[1],3)) ),
+                  x = 1.22 * x$raw.time[length(x$raw.time)],
+                y = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
+                angle = 90, parse = F, size = 2.5) + 
+          scale_color_manual(name='Growth Model',
+                             breaks = "baranyi",
+                             values=c("model" = ggplot2::alpha("forestgreen", 0.85), "baranyi" = ggplot2::alpha("forestgreen", 0.85)))
       }
       if(x$model == "richards"){
         p <- p + annotate(

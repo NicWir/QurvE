@@ -1,12 +1,17 @@
 ---
-title: "Vignette Title"
+title: "Quantitiative Growth Curve Evaluation with Package `QurvE`"
 author: "Nicolas T. Wirth"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Quantitiative Growth Curve Evaluation with Package `QurvE`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+csl: https://raw.githubusercontent.com/citation-style-language/styles/master/research-institute-for-nature-and-forest.csl
+link-citations: true
+lang: en-US
+zotero: true
+bibliography: references.bib
 ---
 
 ```{r setup, include = FALSE}
@@ -16,19 +21,32 @@ knitr::opts_chunk$set(
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+<strong>Please note:</strong> This vignette will be updated from time to time when new features are implemented. Please find the most recent version at the [QurvE GitHub repository](https://github.com/NicWir/QurvE).
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+# Introduction
 
-## Vignette Info
+In virtually all disciplines of biology dealing with living organisms, from classical microbiology to applied biotechnology, it is routine to characterize the **growth** of the species under study. `QurvE` provides a suite of analysis tools to make such growth profiling quick, efficient, and reproducible. In addition, it allows the characterization of **fluorescence** data for, e.g., biosensor characterization in plate reader experiments (further discussed in the vignette *Quantitiative Fluorescence Curve Evaluation with Package `QurvE`)*. All computational steps to obtain an in-depth characterization are combined into user-friendly *workflow* functions and a range of plotting functions allow the visualization of fits and the comparison of organism performances.
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, density increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
 
-## Styles
+The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. With consideration for `R` novices, it establishes a framework in which a complete, detailed growth curve analysis can be performed in two simple steps:
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+1.  *Read data* in custom format or parse data from a plate reader experiment.
+
+2.  *Run workflow*, including fitting of growth curves, dose-response analysis, and rendering a report that summarizes the results.
+
+All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fitting by defining thresholds and quality criteria, adds
+
+# Growth profiling methods
+
+Three methods are available to characterize growth curves:
+
+1.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total density increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]
+2.  Perform a smooth spline fit on (log-transformed) growth data and extract µ~max~ as the maximum value of the first derivative^1^.
+
+[^1]: For linear and nonparametric (i.e, smooth spline) fits, the lag time is calculated as the intersect of the tangent at µ~max~ and a horizontal line at the first data point (y~0~). For the analysis of biphasic growth curves, the lag time is extracted as the lower of the two obtained values.
+
+<!-- -->
 
     output: 
       rmarkdown::html_vignette:
@@ -36,7 +54,7 @@ The `html_vignette` template includes a basic CSS theme. To override this theme 
 
 ## Figures
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+The figure sizes have been customised so that you can easily put two images side-by-side.
 
 ```{r, fig.show='hold'}
 plot(1:10)
@@ -53,7 +71,9 @@ Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr*
 
 ## More Examples
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes[^2], and tables, e.g. using `knitr::kable()`.
+
+[^2]: A footnote here.
 
 ```{r, echo=FALSE, results='asis'}
 knitr::kable(head(mtcars, 10))
@@ -61,5 +81,4 @@ knitr::kable(head(mtcars, 10))
 
 Also a quote using `>`:
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+> "He who gives up [code] safety for [code] speed deserves neither." ([via](https://twitter.com/hadleywickham/status/504368538874703872))

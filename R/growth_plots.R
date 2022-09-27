@@ -215,7 +215,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equation = TRUE, eq.size = 1,
                             colModel=ggplot2::alpha("forestgreen", 0.85), basesize=16, cex.point = 2, lwd = 0.7,
-                            n.ybreaks = NULL, plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
+                            n.ybreaks = 6, plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
 {
   # x an object of class gcFitModel
 
@@ -291,6 +291,26 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
                              breaks = "richards",
                              values=c("model" = colModel, "richards" = colModel))
       }
+      if(gcFittedModel$model == "baranyi"){
+        p <- p + annotate(
+          "text",
+          label = "atop(B == t + frac(1,mu) %.% log(symbol(e)^{-mu%.%time} + symbol(e)^{-mu%.%lambda} - symbol(e)^{-mu%.%(time + lambda)}),
+          y == y0 + mu%.%B - log(1 + (symbol(e)^{mu %.% B} - 1)/symbol(e)^{A - y0}))",
+          x = 1.17 * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+          y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
+          angle = 90, parse = TRUE, size = 3.2*eq.size) +
+          annotate("text",
+                  label = bquote(y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ~~~~
+                                   A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~
+                                   mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
+                                   lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ),
+                  x = (1 + 0.25 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                  y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
+                  angle = 90, parse = F, size = 2.5*eq.size) +
+          scale_color_manual(name='Growth Model',
+                             breaks = "baranyi",
+                             values=c("model" = colModel, "baranyi" = colModel))
+      }
       if(gcFittedModel$model == "gompertz"){
         p <- p + annotate(
           "text",
@@ -335,8 +355,10 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.0*eq.size) +
            annotate("text",
-                    label = bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
-                                     lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ),
+                    label = bquote(y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ~~~~
+                                     A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~
+                                     mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
+                                     lambda == .(round(gcFittedModel$parameters$lambda[1],2))),
                     x = (1 + 0.21 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
                     y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                     angle = 90, parse = F, size = 2.3*eq.size) +

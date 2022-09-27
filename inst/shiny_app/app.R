@@ -826,6 +826,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                       checkboxInput(inputId = 'huang_growth',
                                                                                     label = 'Huang',
                                                                                     value = TRUE)
+                                                             ),
+                                                             tags$div(title="Reference: Baranyi and Roberts (1994) Mathematics of predictive food microbiology. Food Microbiology 26(2), 199 – 218. doi: 10.1016/0168-1605(94)00121-L",
+                                                                      checkboxInput(inputId = 'baranyi_growth',
+                                                                                    label = 'Baranyi and Roberts',
+                                                                                    value = TRUE)
                                                              )
                                                            ),
                                                            tags$div(title="Perform a Ln(y/y0) transformation on density values.",
@@ -5202,6 +5207,7 @@ server <- function(input, output, session){
       if(input$gompertz_growth == TRUE) models <- c(models, "gompertz")
       if(input$extended_gompertz_growth == TRUE) models <- c(models, "gompertz.exp")
       if(input$huang_growth == TRUE) models <- c(models, "huang")
+      if(input$baranyi_growth == TRUE) models <- c(models, "baranyi")
     } else {
       models <- c("logistic")
     }

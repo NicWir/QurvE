@@ -612,7 +612,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             interactive = FALSE,
                             nboot.gc = 0,
                             smooth.gc = 0.55,
-                            model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"),
+                            model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
                             dr.have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
                             dr.parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
                             smooth.dr = NULL,
@@ -786,7 +786,7 @@ growth.workflow <- function (grodata = NULL,
                              interactive = FALSE,
                              nboot.gc = 0,
                              smooth.gc = 0.55,
-                             model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"),
+                             model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
                              growth.thresh = 1.5,
                              dr.have.atleast = 6,
                              dr.parameter = 34,
@@ -979,8 +979,8 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
     }
   }
 
-  if(!exists("mean.grp")) mean.grp <- NA
-  if(!exists("mean.conc")) mean.conc <- NA
+  if(!exists("mean.grp") || mean.grp==mean.grp) mean.grp <- NA
+  if(!exists("mean.conc") || mean.conc==mean.conc) mean.conc <- NA
 
   gcFit <- grofit$gcFit
   drFit <- grofit$drFit
@@ -1397,9 +1397,9 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
         if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt))) {
           if (fitpara$fitFlag == TRUE) {
             plot.gcFitModel(fitpara, colData=1, colModel=2, colLag = 3, cex.point=1.0, raw=T)
-            legend(x="bottomright", legend=fitpara$model, col="red", lty=1)
-            title("Parametric fit")
-            graphics::mtext(line = 0.5, side=3, outer = F, cex=1, wellname)
+            # legend(x="bottomright", legend=fitpara$model, col="red", lty=1)
+            # title("Parametric fit")
+            # graphics::mtext(line = 0.5, side=3, outer = F, cex=1, wellname)
             }
           # /// here a manual reliability tag is set in the interactive mode
           reliability_tag_paarm <- NA
@@ -1591,8 +1591,8 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
   if (!any(c("m","a") %in% control$fit.opt)) stop("Fit option is not set for a model fit. See growth.control()")
 
   # /// conversion to handle even data.frame inputs
-  time <- as.vector(as.numeric(as.matrix(time)))
-  data    <- as.vector(as.numeric(as.matrix(data)))
+  time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
+  data    <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
 
   # /// check length of input data
   if (length(time)!=length(data)) stop("gcFitModel: length of time and data input vectors differ!")
@@ -1717,11 +1717,11 @@ grofit.param <- function(time, data, gcID = "undefined", control)
                   lambda = lambda.start
                 ))
 
-      try(y.model <-
-            nls(formulamodel, start = init.model), silent = TRUE)
+      y.model <-
+        try(nls(formulamodel, start = init.model), silent = TRUE)
 
-      if (!(TRUE %in% is.null(y.model))) {
-        AIC       <- AIC(y.model)
+      if (methods::is(y.model) == "nls") {
+        AIC       <- stats::AIC(y.model)
       }
 
       if (control$suppress.messages == FALSE) {
@@ -1742,7 +1742,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
                   " ERROR in nls(). For further information see help(growth.gcFitModel)")
         }
       }
-      if (FALSE %in% is.null(AIC)) {
+      if (exists("AIC", inherits = FALSE) && FALSE %in% is.null(AIC)) {
         if (is.null(best) || AIC < bestAIC) {
           bestAIC <- AIC
           best    <- y.model
@@ -1777,8 +1777,9 @@ grofit.param <- function(time, data, gcID = "undefined", control)
         fitparbest <- list(alpha = fitparbest[1,], t_shift = fitparbest[2,])
       } else if (summary(best)[["formula"]][[3]][[1]] == "huang"){
         fitparbest <- list(y0 = as.data.frame(t(fitparbest)))
+      } else if (summary(best)[["formula"]][[3]][[1]] == "baranyi"){
+        fitparbest <- list(y0 = as.data.frame(t(fitparbest)))
       }
-
     }
     fitFlag    <- TRUE
     lambdabest <- summary(best)$parameters["lambda", 1:2]
@@ -1922,8 +1923,8 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
   if(length(data[data<0]) > 0){
     data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
   }
-  time.in <- time <- as.vector(as.numeric(as.matrix(time)))
-  data.in <- data <- as.vector(as.numeric(as.matrix(data)))
+  time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
+  data.in <- data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
 
   if (length(time) != length(data))
     stop("gcFitSpline: length of input vectors differ!")
@@ -3052,8 +3053,8 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
     stop("control must be of class grofit.control!")
   if (control$nboot.gc == 0)
     stop("Number of bootstrap samples is zero! See growth.control()")
-  time <- as.vector(as.numeric(as.matrix(time)))
-  data <- as.vector(as.numeric(as.matrix(data)))
+  time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
+  data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
   if (length(time) != length(data))
     stop("gcBootSpline: length of input vectors differ!")
   if(control$log.y.spline == TRUE){
@@ -3821,43 +3822,43 @@ huang <- function (time, A, mu, lambda, addpar)
   huang <- y
 }
 
-# baranyi <- function(time, A, mu, lambda, addpar)
-# {
-#   A <- A[1]
-#   mu <- mu[1]
-#   lambda <- lambda[1]
-#   y0 <- addpar[1]
-#   if (is.numeric(time) == FALSE)
-#     stop("Need numeric vector for: time")
-#   if (is.numeric(mu) == FALSE)
-#     stop("Need numeric vector for: mu")
-#   if (is.numeric(lambda) == FALSE)
-#     stop("Need numeric vector for: lambda")
-#   if (is.numeric(A) == FALSE)
-#     stop("Need numeric vector for: A")
-#   B <- time + 1/mu * log(exp(-mu * time) + exp(-mu * lambda) - exp(-mu * (time + lambda)))
-#   y <- y0 + mu * B - log(1 + (exp(mu * B) - 1)/exp(A - y0))
-#   baranyi <- y
-# }
-#
-# initbaranyi <- function(time, y, A, mu, lambda)
-# {
-#   if (is.numeric(time) == FALSE)
-#     stop("Need numeric vector for: time")
-#   if (is.numeric(y) == FALSE)
-#     stop("Need numeric vector for: y")
-#   if (is.numeric(mu) == FALSE)
-#     stop("Need numeric vector for: mu")
-#   if (is.numeric(lambda) == FALSE)
-#     stop("Need numeric vector for: lambda")
-#   if (is.numeric(A) == FALSE)
-#     stop("Need numeric vector for: A")
-#   y0 <- y[1]
-#   A <- max(y)
-#   mu <- mu[1]
-#   lambda <- lambda[1]
-#   initbaranyi <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
-# }
+ baranyi <- function(time, A, mu, lambda, addpar)
+ {
+   A <- A[1]
+   mu <- mu[1]
+   lambda <- lambda[1]
+   y0 <- addpar[1]
+   if (is.numeric(time) == FALSE)
+     stop("Need numeric vector for: time")
+   if (is.numeric(mu) == FALSE)
+     stop("Need numeric vector for: mu")
+   if (is.numeric(lambda) == FALSE)
+     stop("Need numeric vector for: lambda")
+   if (is.numeric(A) == FALSE)
+     stop("Need numeric vector for: A")
+   B <- time + 1/mu * log(exp(-mu * time) + exp(-mu * lambda) - exp(-mu * (time + lambda)))
+   y <- y0 + mu * B - log(1 + (exp(mu * B) - 1)/exp(A - y0))
+   baranyi <- y
+ }
+
+ initbaranyi <- function(time, y, A, mu, lambda)
+ {
+   if (is.numeric(time) == FALSE)
+     stop("Need numeric vector for: time")
+   if (is.numeric(y) == FALSE)
+     stop("Need numeric vector for: y")
+   if (is.numeric(mu) == FALSE)
+     stop("Need numeric vector for: mu")
+   if (is.numeric(lambda) == FALSE)
+     stop("Need numeric vector for: lambda")
+   if (is.numeric(A) == FALSE)
+     stop("Need numeric vector for: A")
+   y0 <- y[1]
+   A <- max(y)
+   mu <- mu[1]
+   lambda <- lambda[1]
+   initbaranyi <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
+ }
 
 
 # liquori <- function (time, A, mu, addpar)
