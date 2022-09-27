@@ -28,7 +28,7 @@ growth.workflow(
   interactive = FALSE,
   nboot.gc = 0,
   smooth.gc = 0.55,
-  model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang"),
+  model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
   growth.thresh = 1.5,
   dr.have.atleast = 6,
   dr.parameter = 34,

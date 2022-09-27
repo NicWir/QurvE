@@ -15,7 +15,7 @@
   basesize = 16,
   cex.point = 2,
   lwd = 0.7,
-  n.ybreaks = NULL,
+  n.ybreaks = 6,
   plot = TRUE,
   export = FALSE,
   height = 8,
