@@ -35,7 +35,7 @@ The package is build on the foundation of the two R packages from @kahm2010 and 
 
 2.  *Run workflow*, including fitting of growth curves, dose-response analysis, and rendering a report that summarizes the results.
 
-All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fitting by defining thresholds and quality criteria, adds
+All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fits by defining thresholds and quality criteria, adds
 
 # Growth profiling methods
 

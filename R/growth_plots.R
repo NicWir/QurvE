@@ -614,10 +614,10 @@ plot.drBootSpline <- function (drBootSpline,
       conc        <- drBootSpline$raw.conc
       test        <- drBootSpline$raw.test
 
-      global.minx <- min(min(drBootSpline$boot.conc))
-      global.maxx <- max(max(drBootSpline$boot.conc))
-      global.miny <- min(min(drBootSpline$boot.test))
-      global.maxy <- max(max(drBootSpline$boot.test))
+      global.minx <- min(drBootSpline$boot.conc[!is.na(drBootSpline$boot.conc)])
+      global.maxx <- max(drBootSpline$boot.conc[!is.na(drBootSpline$boot.conc)])
+      global.miny <- min(drBootSpline$boot.test[!is.na(drBootSpline$boot.test)])
+      global.maxy <- max(drBootSpline$boot.test[!is.na(drBootSpline$boot.test)])
 
       # initialize plot
       if ((drBootSpline$control$log.x.dr == TRUE) &&
@@ -689,7 +689,7 @@ plot.drBootSpline <- function (drBootSpline,
         )
       }
 
-      if (sum(!is.na(drBootSpline$ec50.boot)) == length(drBootSpline$ec50.boot)) {
+      if (sum(!is.na(drBootSpline$ec50.boot)) > 5) {
         hist(
           drBootSpline$ec50.boot,
           col = "gray",
@@ -700,7 +700,7 @@ plot.drBootSpline <- function (drBootSpline,
       else{
         empty.plot()
       }
-      if (sum(!is.na(drBootSpline$ec50y.boot)) == length(drBootSpline$ec50y.boot)) {
+      if (sum(!is.na(drBootSpline$ec50y.boot)) > 5) {
         hist(
           drBootSpline$ec50y.boot,
           col = "gray",
@@ -798,7 +798,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     for (i in 1:n) {
       try(plot(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch,
                y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
-               cex = cex.point, export = export,
+               cex.point = cex.point, export = export,
                plot = plot, height = 7, width = 9, out.dir = out.dir))
     }
   } else {

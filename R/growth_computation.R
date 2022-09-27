@@ -3403,7 +3403,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
 
   try(spltest.smooth <- smooth.spline(spltest.low$x, spltest.low$y, spar = control$smooth.dr, keep.data = FALSE, w = weights), silent = T)
 
-  if (is.null(spltest.smooth) == TRUE) {
+  if (!exists("spltest.smooth") || is.null(spltest.smooth) == TRUE) {
     cat("Spline could not be fitted in dose-response analysis!\n")
     fitFlag <- FALSE
     if (is.null(control$smooth.dr) == TRUE) {

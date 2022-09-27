@@ -2620,11 +2620,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
                                                                  sidebarPanel(
-                                                                   wellPanel(
-                                                                     style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                                     checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot',
-                                                                                   label = 'Combine conditions into a single plot',
-                                                                                   value = TRUE)
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_one_drfit",
+                                                                     wellPanel(
+                                                                       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                       checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot',
+                                                                                     label = 'Combine conditions into a single plot',
+                                                                                     value = FALSE)
+                                                                     )
                                                                    ),
 
                                                                    conditionalPanel(
@@ -7717,6 +7720,12 @@ server <- function(input, output, session){
       hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
     }
   })
+
+  output$more_than_one_drfit <- reactive({
+    if(length(results$growth$drFit$drFittedSplines) > 1) return(TRUE)
+    else return(FALSE)
+  })
+  outputOptions(output, 'more_than_one_drfit', suspendWhenHidden=FALSE)
 
   dose_response_growth_plot_combined <- reactive({
     results <- results$growth$drFit
