@@ -1402,7 +1402,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
             # graphics::mtext(line = 0.5, side=3, outer = F, cex=1, wellname)
             }
           # /// here a manual reliability tag is set in the interactive mode
-          reliability_tag_paarm <- NA
+          reliability_tag_param <- NA
           answer <- readline("Are you satisfied with the model fit (y/n)?\n\n")
           if ("n" %in% answer) {
             cat("\n Tagged the parametric fit of this sample as unreliable !\n\n")
@@ -1480,6 +1480,10 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
       else{
         reliability_tag_param <- TRUE
         reliability_tag_nonpara <- TRUE
+        nonpara$reliable <- TRUE
+        fitpara$reliable <- TRUE
+        fitnonpara.all[[i]]$reliable <- TRUE
+        fitpara.all[[i]]$reliable <- TRUE
       }
       if(control$interactive == TRUE ||
          dim(data)[1] <= 30 ||
@@ -1517,7 +1521,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
   # create output table
   description     <- lapply(1:nrow(data), function(x) data.frame(TestId = data[x,1], AddId = data[x,2],concentration = data[x,3],
                                                                  reliability_tag = reliability_tag[x],
-                                                                 used.model = fitpara.all[[x]]$model,
+                                                                 used.model = ifelse(is.null(fitpara.all[[x]]$model), NA, fitpara.all[[x]]$model),
                                                                  log.x = control$log.x.gc,
                                                                  log.y.spline = control$log.y.spline,
                                                                  log.y.model = control$log.y.model,
@@ -2268,7 +2272,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #'   \item Fit linear regressions (Theil-Sen estimator) to all subsets of \code{h} consecutive, log-transformed data
 #'     points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear regression to points
 #'     1 \dots 5, 2 \dots 6, 3 \dots 7 and so on.
-#'   \item Find the subset with the highest slope \eqn{mu_{max}}. Does the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} value of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
+#'   \item Find the subset with the highest slope \eqn{mu_{max}}. Do the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} and relative standard deviation (RSD) values of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
 #'   \item Include also the data points of adjacent subsets that have a slope of at least \eqn{quota \cdot mu{max}}, e.g., all regression windows that have at least 95% of the maximum slope.
 #'   \item Fit a new linear model to the extended data window identified in step 3.
 #' }

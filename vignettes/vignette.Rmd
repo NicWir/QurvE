@@ -35,16 +35,54 @@ The package is build on the foundation of the two R packages from @kahm2010 and 
 
 2.  *Run workflow*, including fitting of growth curves, dose-response analysis, and rendering a report that summarizes the results.
 
-All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fits by defining thresholds and quality criteria, allows the direct parsing of data from plate reader result files, and calculates parameters for additional growth phases (bi-phasic growth).
+All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fits by defining thresholds and quality criteria, allows the direct parsing of data from plate reader result files, and calculates parameters for an additional growth phase (bi-phasic growth).
 
 # Growth profiling methods
 
 Three methods are available to characterize growth curves:
 
-1.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total density increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]
-2.  Perform a smooth spline fit on (log-transformed) growth data and extract µ~max~ as the maximum value of the first derivative^1^.
+1.  Fit parametric growth models to (log-transformed) growth data
 
-[^1]: For linear and nonparametric (i.e, smooth spline) fits, the lag time is calculated as the intersect of the tangent at µ~max~ and a horizontal line at the first data point (y~0~). For the analysis of biphasic growth curves, the lag time is extracted as the lower of the two obtained values.
+2.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total density increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]\
+    The algorithm works as follows:
+
+    i.  Fit linear regressions [with the Theil-Sen estimator [@sen1968; @theil1992]] to all subsets of `h` consecutive, log-transformed data points (sliding window of size `h`). If, for example, `h=5`, fit a linear regression to points 1 $\dots$ 5, 2 $\dots$ 6, 3 $\dots$ 7 and so forth.
+
+    ii. Find the subset with the highest slope $\mu_{max}$. Do the R^2^ and RSD values of the regression meet the defined thresholds and do the data points within the regression window account for at least a defined fraction of the total density increase? If not, evaluate the regression with the second highest slope, and so forth.
+
+    iii. Include also the data points of adjacent subsets that have a slope of at least a $defined \space quota \times \mu_{max}$, e.g., all regression windows that have at least 95% of the maximum slope.
+
+    iv. Fit a new linear model to the extended data window identified in step iii.
+
+    If `biphasic = TRUE`, the following steps are performed to define a second growth phase:
+
+    i.  Perform a smooth spline fit on the data with a smoothing factor of 0.5.
+
+    ii. Calculate the second derivative of the spline fit and perform a smooth spline fit of the derivative with a smoothing factor of 0.4.
+
+    iii. Determine local maxima and minima in the second derivative.
+
+    iv. Find the local minimum following $\mu_{max}$ and repeat the heuristic linear method for later time values.
+
+    v.  Find the local maximum before $\mu_{max}$ and repeat the heuristic linear method for earlier time values.
+
+    vi. Choose the greater of the two independently determined slopes as $\mu_{max}2$.
+
+3.  Perform a smooth spline fit on (log-transformed) growth data and extract µ~max~ as the maximum value of the first derivative^1^.
+
+    If `biphasic = TRUE`, the following steps are performed to define a second growth phase:
+
+    i.  Determine local minima within the first derivative of the smooth spline fit.
+
+    ii. Remove the *'peak'* containing the highest value of the first derivative (i.e., $\mu_{max}$) that is flanked by two local minima.
+
+    iii. Repeat the smooth spline fit and identification of maximum slope for later time values than the local minimum after $\mu_{max}$.
+
+    iv. Repeat the smooth spline fit and identification of maximum slope for earlier time values than the local minimum before $\mu_{max}$.
+
+    v.  Choose the greater of the two independently determined slopes as $\mu_{max}2$.
+
+[^1]: For linear and nonparametric (i.e, smooth spline) fits, the lag time is calculated as the intersect of the tangent at µ~max~ and a horizontal line at the first data point (y~0~). For the analysis of bi-phasic growth curves, the lag time is extracted as the lower of the two obtained $\lambda$ values.
 
 <!-- -->
 

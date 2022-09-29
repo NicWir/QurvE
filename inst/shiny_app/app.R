@@ -5760,7 +5760,7 @@ server <- function(input, output, session){
         if ( "gompertz.exp" %in% res.table.gc$used.model ){
           table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
         }
-        if ( "huang" %in% res.table.gc$used.model ){
+        if ("baranyi" %in% res.table.gc$used.model ||  "huang" %in% res.table.gc$used.model ){
           table_model <- suppressWarnings(cbind(table_model, data.frame("y0" = round(as.numeric(res.table.gc$parameter_y0.model), 3), stringsAsFactors = F, check.names = F)))
         }
       }
