@@ -294,9 +294,9 @@ read_data <-
     if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
 
     # Remove columns with NA measurements in all samples
-    if(length(dat)>1)              dat <- dat[, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))]
-    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- fluoro1[, which(unlist(lapply(4:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))]
-    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))]
+    if(length(dat)>1)              dat <- dat[, c(1:3, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))+3)]
+    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- fluoro1[, c(1:3, which(unlist(lapply(4:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))+3)]
+    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, c(1:3, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))+3)]
 
     # add minimum negative value + 1 to all fluorescence data
     if((length(fluoro1) > 1 ) || !is.na(data.fluoro1)){

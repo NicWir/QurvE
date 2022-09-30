@@ -1010,6 +1010,7 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
 #'
 #' @param object A \code{flFitRes}, \code{flFit}, or \code{grodata} object created with \code{\link{fl.workflow}} containing fluorescence data.
 #' @param data.type (Character) Indicate, which type of fluorescence data should be displayed.
+#' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
@@ -1040,6 +1041,7 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
 #'
 plot.flFitRes <-  function(object,
                         data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+                        IDs = NULL,
                         names = NULL,
                         conc = NULL,
                         mean = TRUE,
@@ -1131,24 +1133,40 @@ plot.flFitRes <-  function(object,
   if(data.type == "norm.fl2") data.nm = "norm.fluorescence2"
   if(data.type == "raw1") data.nm = "fluorescence1"
   if(data.type == "raw2") data.nm = "fluorescence2"
-  if(!is.null(names)  && length(names) > 0){
-    if(!is.na(names) && names != ""){
-      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
-      nm <- nm[grep(paste(names, collapse="|"), nm)]
+
+  if(!is.null(IDs)){
+    # Check if IDs refer to samples or conditions
+    if(any(grep(" \\| ", IDs))){
+      nm <- nm[
+        grepl(x = nm,
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
+    } else {
+      nm <- nm[
+        grepl(x = gsub(" \\| .+", "", nm),
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
     }
   }
+  else {
+    if(!is.null(names)  && length(names) > 0){
+      if(!is.na(names) && names != ""){
+        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",  names)
+        nm <- nm[grep(paste(names, collapse="|"), nm)]
+      }
+    }
+    if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
+      if(!is.na(exclude.nm) && exclude.nm != ""){
+        names.excl <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", exclude.nm)
+        nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm))]
+      }
+    }
+  }
+
   if(!is.null(conc) && length(conc) > 0){
     if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
-    if(!is.na(exclude.nm) && exclude.nm != ""){
-      names.excl <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                                   gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))))))
-      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                                                                      gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", nm)))))))]
-    }
-  }
+
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
     if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
@@ -1161,9 +1179,7 @@ plot.flFitRes <-  function(object,
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                           gsub("\\)", "\\\\)",
-                                                                                                                gsub("\\(", "\\\\(",
-                                                                                                                     gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
                                                                                                            ".+[[:space:]]",
                                                                                                            unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), sample.nm[ndx.filt.rep[[j]]])]))
@@ -1186,7 +1202,7 @@ plot.flFitRes <-  function(object,
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0("^",
-                          str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
+                          gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), "$", collapse = "|"), sample.nm)
 
   if(data.type == "spline1"  || data.type == "spline2"){
     # correct for log transformation
@@ -1212,9 +1228,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\)", "\\\\)",
-                                                  gsub("\\(", "\\\\(",
-                                                       gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))))),
+                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(conditions_unique[n], " \\| "))[1]),
                                              " \\|.+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
@@ -1690,6 +1704,7 @@ plot.grodata <- plot.flFitRes
 #'
 #' @param object A \code{flFit}, \code{flFitRes}, or \code{grodata} object created with \code{\link{flFit}}, \code{\link{fl.workflow}} or \code{\link{read_data}}
 #' @param fluorescence (Character) Indicate, which type of fluorescence data should be displayed.
+#' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
@@ -1719,31 +1734,32 @@ plot.grodata <- plot.flFitRes
 #' @export
 #'
 plot.dual <-  function(object,
-                           fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
-                           names = NULL,
-                           conc = NULL,
-                           mean = TRUE,
-                           exclude.nm = NULL,
-                           exclude.conc = NULL,
-                           log.y.density = F,
-                           log.y.fl = F,
-                           n.ybreaks = 6,
-                           colors = NULL,
-                           basesize = 20,
-                           y.lim.density = NULL,
-                           y.lim.fl = NULL,
-                           x.lim = NULL,
-                           x.title = NULL,
-                           y.title.density = NULL,
-                           y.title.fl = NULL,
-                           lwd = 1.1,
-                           plot = TRUE,
-                           export = FALSE,
-                           height = NULL,
-                           width = NULL,
-                           out.dir = NULL,
-                           out.nm = NULL,
-                           shiny = FALSE
+                       fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
+                       IDs = NULL,
+                       names = NULL,
+                       conc = NULL,
+                       mean = TRUE,
+                       exclude.nm = NULL,
+                       exclude.conc = NULL,
+                       log.y.density = F,
+                       log.y.fl = F,
+                       n.ybreaks = 6,
+                       colors = NULL,
+                       basesize = 20,
+                       y.lim.density = NULL,
+                       y.lim.fl = NULL,
+                       x.lim = NULL,
+                       x.title = NULL,
+                       y.title.density = NULL,
+                       y.title.fl = NULL,
+                       lwd = 1.1,
+                       plot = TRUE,
+                       export = FALSE,
+                       height = NULL,
+                       width = NULL,
+                       out.dir = NULL,
+                       out.nm = NULL,
+                       shiny = FALSE
 )
 {
   # Convert range  and selecting arguments
@@ -1791,22 +1807,39 @@ plot.dual <-  function(object,
   if(fluorescence == "norm.fl1") fl.nm = "norm.fluorescence1"
   if(fluorescence == "norm.fl2") fl.nm = "norm.fluorescence2"
 
-  if(!is.null(names)  && length(names) > 0){
-    if(!is.na(names) && names != ""){
-      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
-      nm <- nm[grep(paste(names, collapse="|"), gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", nm)))))))]
+  if(!is.null(IDs)){
+    # Check if IDs refer to samples or conditions
+    if(any(grep(" \\| ", IDs))){
+      nm <- nm[
+        grepl(x = nm,
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
+    } else {
+      nm <- nm[
+        grepl(x = gsub(" \\| .+", "", nm),
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
     }
   }
+  else {
+    if(!is.null(names)  && length(names) > 0){
+      if(!is.na(names) && names != ""){
+        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+        nm <- nm[grep(paste(names, collapse="|"), gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm))]
+      }
+    }
+    if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
+      if(!is.na(exclude.nm) && exclude.nm != ""){
+        names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+        nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+      }
+    }
+  }
+
   if(!is.null(conc) && length(conc) > 0){
     if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
-    if(!is.na(exclude.nm) && exclude.nm != ""){
-      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
-      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
-    }
-  }
+
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
     if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
@@ -1819,18 +1852,16 @@ plot.dual <-  function(object,
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                           gsub("\\)", "\\\\)",
-                                                                                                                gsub("\\(", "\\\\(",
-                                                                                                                     gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])))),
-                                                                                                                ".+[[:space:]]",
-                                                                                                                unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                                                                "$")), sample.nm[ndx.filt.rep[[j]]])]))
+                                                                                                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), sample.nm[ndx.filt.rep[[j]]])]))
   }
   ndx.filt <- unlist(filter.ls, recursive = F)
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0(
-    str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
+    gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), collapse = "|"), sample.nm)
 
   if(mean == TRUE){
     # Combine replicates via their mean and standard deviation
@@ -1842,9 +1873,7 @@ plot.dual <-  function(object,
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\)", "\\\\)",
-                                                  gsub("\\(", "\\\\(",
-                                                       gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))))),
+                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(conditions_unique[n], " \\| "))[1]),
                                              " \\|.+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
@@ -1873,14 +1902,14 @@ plot.dual <-  function(object,
           for(j in 1:length(get(paste0("time.missing_", i)))){
             # extract density values into a separate list
             dens.data[[i]] <- append(dens.data[[i]],
-                                values = NA,
-                                after = match(get(paste0("time.missing_", i))[j],
-                                              time.all) - 1)
-            # extract fl values into a separate list
-            fl.data[[i]] <- append(fl.data[[i]],
                                      values = NA,
                                      after = match(get(paste0("time.missing_", i))[j],
                                                    time.all) - 1)
+            # extract fl values into a separate list
+            fl.data[[i]] <- append(fl.data[[i]],
+                                   values = NA,
+                                   after = match(get(paste0("time.missing_", i))[j],
+                                                 time.all) - 1)
             # extract time values into a separate list
             time[[i]] <-
               append(time[[i]],
@@ -1985,86 +2014,86 @@ plot.dual <-  function(object,
         )
       }
     }
-      # /// add panel with fluorescence over time
-      p.fl <- ggplot(df, aes(x=time, y=fl.mean, col = name)) +
-        geom_line(size=lwd) +
-        geom_ribbon(aes(ymin=fl.lower,ymax=fl.upper, fill=name), alpha = 0.3, colour = NA) +
-        theme_classic(base_size = basesize) +
-        xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank())
+    # /// add panel with fluorescence over time
+    p.fl <- ggplot(df, aes(x=time, y=fl.mean, col = name)) +
+      geom_line(size=lwd) +
+      geom_ribbon(aes(ymin=fl.lower,ymax=fl.upper, fill=name), alpha = 0.3, colour = NA) +
+      theme_classic(base_size = basesize) +
+      xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
+      theme(panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
 
-      if(log.y.fl == TRUE){
-        if(!is.null(y.lim.fl)){
-          p.fl <- p.fl + scale_y_log10(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-        } else {
-          p.fl <- p.fl + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-        }
+    if(log.y.fl == TRUE){
+      if(!is.null(y.lim.fl)){
+        p.fl <- p.fl + scale_y_log10(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
-        if(!is.null(y.lim.fl)){
-          p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-        } else {
-          p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
-        }
+        p.fl <- p.fl + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
+    } else {
+      if(!is.null(y.lim.fl)){
+        p.fl <- p.fl + scale_y_continuous(limits = y.lim.fl, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      } else {
+        p.fl <- p.fl + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      }
+    }
 
-      ylab.title.fl = if(any(grep("norm", fluorescence))){
-        paste0("Normalized fluorescence")
-      } else {
-        paste0("Fluorescence")
-      }
-      if(is.null(y.title.fl) || y.title.fl == ""){
-        p.fl <- p.fl + ylab(label = ylab.title.fl)
-      } else {
-        p.fl <- p.fl + ylab(label = y.title.fl)
-      }
+    ylab.title.fl = if(any(grep("norm", fluorescence))){
+      paste0("Normalized fluorescence")
+    } else {
+      paste0("Fluorescence")
+    }
+    if(is.null(y.title.fl) || y.title.fl == ""){
+      p.fl <- p.fl + ylab(label = ylab.title.fl)
+    } else {
+      p.fl <- p.fl + ylab(label = y.title.fl)
+    }
 
-      if(!is.null(x.lim)){
-        p.fl <- p.fl + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
-      } else {
-        p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
-      }
+    if(!is.null(x.lim)){
+      p.fl <- p.fl + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+    } else {
+      p.fl <- p.fl + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+    }
 
-      if(is.null(colors)){
-        if (length(plotdata.ls) <= 8) {
-          p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else if (length(plotdata.ls) <=50){
-          p.fl <- p.fl + scale_fill_manual(name = "Condition",
-                                                 values = c(
-                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                                 )
-          ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
-          )
-        }
+    if(is.null(colors)){
+      if (length(plotdata.ls) <= 8) {
+        p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+      } else if (length(plotdata.ls) <=50){
+        p.fl <- p.fl + scale_fill_manual(name = "Condition",
+                                         values = c(
+                                           "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                           "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                           "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                           "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                           "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                           "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                           "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                           "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                           "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                         )
+        ) + scale_color_manual(name = "Condition",
+                               values = c(
+                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                               )
+        )
       }
-      p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+    }
+    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
   } # if(mean == TRUE)
   else {
     df <- data.frame()
     for(i in 1:length(ndx.keep)){
-          df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
-                                                "time" = as.vector(raw_data$time[ndx.keep[i], ]),
-                                                "density" = unlist(unname(type.convert(raw_data[[density.nm]][ndx.keep[i], 4:ncol(raw_data[[density.nm]])], as.is=T))),
-                                                "fl" = unlist(unname(type.convert(raw_data[[fl.nm]][ndx.keep[i], 4:ncol(raw_data[[fl.nm]])], as.is=T)))))
+      df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
+                                            "time" = as.vector(raw_data$time[ndx.keep[i], ]),
+                                            "density" = unlist(unname(type.convert(raw_data[[density.nm]][ndx.keep[i], 4:ncol(raw_data[[density.nm]])], as.is=T))),
+                                            "fl" = unlist(unname(type.convert(raw_data[[fl.nm]][ndx.keep[i], 4:ncol(raw_data[[fl.nm]])], as.is=T)))))
 
     }
     df <- df[df[["density"]]>0, ]

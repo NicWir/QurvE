@@ -824,8 +824,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     # Get name of conditions with multiple replicates; apply selecting arguments
     if(!is.null(names)  && length(names) > 0){
       if(!is.na(names) && names != ""){
-        names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                                gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
+        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
         nm <- nm[grep(paste(names, collapse="|"), nm)]
       }
     }
@@ -1868,6 +1867,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 #' @param grofit A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.
 #' @param ... (_optional_) Additional \code{grofit} objects created in separate workflows.
 #' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
+#' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
@@ -1902,6 +1902,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 #'
 plot.grofit <- function(grofit, ...,
                         data.type = c("spline", "raw"),
+                        IDs = NULL,
                         names = NULL,
                         conc = NULL,
                         exclude.nm = NULL,
@@ -1942,7 +1943,7 @@ plot.grofit <- function(grofit, ...,
 
   call <- match.call()
   # remove all function arguments from call to leave only multiple grofit objects
-  call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <-
+  call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <-
     call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
     call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- NULL
 
@@ -1984,21 +1985,36 @@ plot.grofit <- function(grofit, ...,
 
   # Get name of conditions with multiple replicates; apply selecting arguments
   sample.nm <- nm <- as.character(names(grofit$gcFit$gcFittedSplines))
-  if(!is.null(names)  && length(names) > 0){
-    if(!is.na(names) && names != ""){
-      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
-      nm <- nm[grep(paste(names, collapse="|"), gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)", gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", nm)))))))]
+  if(!is.null(IDs)){
+    # Check if IDs refer to samples or conditions
+    if(any(grep(" \\| ", IDs))){
+      nm <- nm[
+        grepl(x = nm,
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+        ]
+    } else {
+      nm <- nm[
+        grepl(x = gsub(" \\| .+", "", nm),
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
+    }
+  }
+  else {
+    if(!is.null(names)  && length(names) > 0){
+      if(!is.na(names) && names != ""){
+        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+        nm <- nm[grep(paste(names, collapse="|"), gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm))]
+      }
+    }
+    if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
+      if(!is.na(exclude.nm) && exclude.nm != ""){
+        names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+        nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+      }
     }
   }
   if(!is.null(conc) && length(conc) > 0){
     if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
-  }
-  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
-    if(!is.na(exclude.nm) && exclude.nm != ""){
-      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
-      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
-    }
   }
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
     if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
@@ -2009,21 +2025,20 @@ plot.grofit <- function(grofit, ...,
   # remove conditions with fitFlag = FALSE in all replicates
   # Store each condition with its replicate indices in list filter.ls
   ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i) which(gsub(" \\| .+ \\| ", "_", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1], "_", unlist(str_split(sample.nm[i], " \\| "))[3])))))
-  #keep only replicate indices if condition defined in nm
+  if(mean==TRUE){
+    #keep only replicate indices if condition defined in nm
     # get indices of samples with selected names
     ndx.keep <- grep(paste0(
-      str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), collapse = "|"), sample.nm)
+      gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), collapse = "|"), sample.nm)
     ndx.filt.rep <- ndx.filt.rep[unlist(lapply(1:length(ndx.filt.rep), function(i) all(ndx.filt.rep[[i]] %in% ndx.keep)))]
-
+  }
   filter.ls <- list()
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                           gsub("\\)", "\\\\)",
-                                                                                                                gsub("\\(", "\\\\(",
-                                                                                                                     gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1])))),
+                                                                                                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
                                                                                                                 ".+[[:space:]]",
                                                                                                                 unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                                                                "$")), sample.nm[ndx.filt.rep[[j]]])]))
+                                                                                                                "$"), sample.nm[ndx.filt.rep[[j]]])]))
   }
   ndx.filt <- unlist(filter.ls, recursive = F)
   ndx.filt <- ndx.filt[lapply(ndx.filt,length)>0]
@@ -2039,7 +2054,7 @@ plot.grofit <- function(grofit, ...,
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0("^",
-                          str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(str_replace_all(nm, "\\)", "\\\\)"), "\\(", "\\\\("), "\\+", "\\\\+"), "\\-", "\\\\-"), "\\?", "\\\\?"), "\\|", "\\\\|"), "\\.", "\\\\."), "$", collapse = "|"), sample.nm)
+                          gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), "$", collapse = "|"), sample.nm)
 
   if(data.type == "spline"){
     # correct for log transformation
@@ -2062,9 +2077,7 @@ plot.grofit <- function(grofit, ...,
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
       ndx <- intersect(ndx.keep, grep(paste0("^",
-                                             gsub("\\)", "\\\\)",
-                                                  gsub("\\(", "\\\\(",
-                                                       gsub("\\?", "\\\\?", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", unlist(str_split(conditions_unique[n], " \\| "))[1]))))),
+                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(conditions_unique[n], " \\| "))[1]),
                                              " \\|.+[[:space:]]",
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
@@ -2562,8 +2575,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
   if(!is.null(names)  && length(names) > 0){
     if(!is.na(names) && names != ""){
-      names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                              gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
+      names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
       nm <- nm[grep(paste(names, collapse="|"), nm)]
     }
   }
@@ -2572,7 +2584,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   }
   if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
-      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+      names.excl <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", exclude.nm)
       nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
     }
   }
@@ -2590,12 +2602,8 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                             gsub("\\)", "\\\\)",
-                                                                                                                  gsub("\\(", "\\\\(",
-                                                                                                                       gsub("\\?", "\\\\?",
-                                                                                                                            gsub("\\.", "\\\\.",
-                                                                                                                                 gsub("\\+", "\\\\+",
-                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
                                                                                                              ".+[[:space:]]",
                                                                                                              unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                              "$"), nm[ndx.filt.rep[[j]]])]))
@@ -2625,8 +2633,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   # apply normalization to reference condition
   if(!is.null(reference.nm) && reference.nm != ""){
-    ref.ndx <- grep( gsub("\\)", "\\\\)",
-                          gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", gsub("\\?", "\\\\?", reference.nm))))), labels)
+    ref.ndx <- grep( gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", reference.nm), labels)
     if (length(ref.ndx) > 1){
       if(!is.null(reference.conc)){
         refconc.ndx <- which(reference.conc == as.numeric(str_extract(labels, "[:graph:]+$")))
@@ -2788,8 +2795,7 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(drTable[,1])
   if(!is.null(names)){
-    names <- gsub("\\[", "\\\\[", gsub("\\]", "\\\\]", gsub("\\)", "\\\\)",
-                                                            gsub("\\(", "\\\\(", gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", names))))))
+    names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
     nm <- nm[grep(paste(names, collapse="|"), nm)]
   }
   if(!is.null(exclude.nm)  && length(exclude.nm) > 0){

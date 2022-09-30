@@ -405,9 +405,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             div(style = "margin-top: -10px"),
                                                             h3(strong("4. Load mapping"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
                                                             tags$div(title="A table with mapping information is stored within the same Excel file that contains experimental data as separate sheet.",
-                                                            checkboxInput(inputId = 'mapping_included_in_parse',
-                                                                          label = 'Included in data file (xlsx/xls)',
-                                                                          value = FALSE)
+                                                                     checkboxInput(inputId = 'mapping_included_in_parse',
+                                                                                   label = 'Included in data file (xlsx/xls)',
+                                                                                   value = FALSE)
                                                             ),
                                                             tags$div(title = "Table with four columns: Well | Description | Replicate | Concentration",
                                                                      fileInput(inputId = 'map_file',
@@ -500,21 +500,21 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    ),
                                    bsPopover(id = "data_instruction", title = "Custom data layout",
                                              content = paste("Please format your data in the format shown in the figure:",
-                                                               paste0(
-                                                                 "<ul>",
-                                                                 "<li>The first row contains \\'Time\\' and \\'Blank\\', as well as sample identifiers \\(identical for replicates\\).</li>",
-                                                                 "<li>The second row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
-                                                                 "<li>The third row contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
-                                                                 "</ul>"
-                                                               ),
-                                                               "Details:",
-                                                               paste0(
-                                                                 "<ul>",
-                                                                 "<li>Different experiments with differing time values and experiment-specific blanks are distinguished by an individual \\'Time\\' column to the left of each dataset.</li>",
-                                                                 "<li>Blank values \\(for each experiment\\) are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected.</li>",
-                                                                 "</ul>"
-                                                               ),
-                                                              sep = "<br>"),
+                                                             paste0(
+                                                               "<ul>",
+                                                               "<li>The first row contains \\'Time\\' and \\'Blank\\', as well as sample identifiers \\(identical for replicates\\).</li>",
+                                                               "<li>The second row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
+                                                               "<li>The third row contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
+                                                               "</ul>"
+                                                             ),
+                                                             "Details:",
+                                                             paste0(
+                                                               "<ul>",
+                                                               "<li>Different experiments with differing time values and experiment-specific blanks are distinguished by an individual \\'Time\\' column to the left of each dataset.</li>",
+                                                               "<li>Blank values \\(for each experiment\\) are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected.</li>",
+                                                               "</ul>"
+                                                             ),
+                                                             sep = "<br>"),
                                              trigger = "hover", options = list(container = "body", template = widePopover)
                                    ),
                                    div(
@@ -527,68 +527,68 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    ),
                                    bsPopover(id = "mapping_layout", title = "Mapping layout",
                                              content = paste("Please format a table providing sample information in the format shown in the figure:",
-                                                              paste0(
-                                                                "<ul>",
-                                                                "<li>The first column contains the <i>well</i> number in the plate.</li>",
-                                                                "<li>The second column contains the <i>ID</i> \\(i.e., organism, condition, etc.\\) of each sample. The ID needs to be identical for replicates. .</li>",
-                                                                "<li>The third column row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
-                                                                "<li>The fourth column contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
-                                                                "</ul>"
-                                                              ),
-                                                              "Details:",
-                                                              paste0(
-                                                                "The values in \\'Blank\\' samples are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected."
-                                                              ),
-                                                              sep = "<br>"),
+                                                             paste0(
+                                                               "<ul>",
+                                                               "<li>The first column contains the <i>well</i> number in the plate.</li>",
+                                                               "<li>The second column contains the <i>ID</i> \\(i.e., organism, condition, etc.\\) of each sample. The ID needs to be identical for replicates. .</li>",
+                                                               "<li>The third column row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
+                                                               "<li>The fourth column contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
+                                                               "</ul>"
+                                                             ),
+                                                             "Details:",
+                                                             paste0(
+                                                               "The values in \\'Blank\\' samples are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected."
+                                                             ),
+                                                             sep = "<br>"),
                                              trigger = "hover", options = list(container = "body", template = widePopover)
                                    ),
 
                                    div(id = 'Custom_Data_Tables',
-                                                    h1("Your Data"),
-                                                    tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
+                                       h1("Your Data"),
+                                       tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
 
-                                                                tabPanel(title = "Density", value = "tabPanel_custom_tables_density_processed",
-                                                                         withSpinner(
-                                                                           DT::dataTableOutput("growth_data_custom_processed")
-                                                                         )
-                                                                ),
-                                                                # tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1",
-                                                                #          withSpinner(
-                                                                #            DT::dataTableOutput("custom_table_fluorescence1")
-                                                                #          )
-                                                                # ),
-                                                                tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence1_processed",
-                                                                         withSpinner(
-                                                                           DT::dataTableOutput("custom_table_fluorescence1_processed")
-                                                                         )
-                                                                ),
-                                                                # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
-                                                                #          withSpinner(
-                                                                #            DT::dataTableOutput("custom_table_fluorescence2")
-                                                                #          )
-                                                                # ),
-                                                                tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
-                                                                         DT::dataTableOutput('custom_data_table_expdesign')
-                                                                )
+                                                   tabPanel(title = "Density", value = "tabPanel_custom_tables_density_processed",
+                                                            withSpinner(
+                                                              DT::dataTableOutput("growth_data_custom_processed")
+                                                            )
+                                                   ),
+                                                   # tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1",
+                                                   #          withSpinner(
+                                                   #            DT::dataTableOutput("custom_table_fluorescence1")
+                                                   #          )
+                                                   # ),
+                                                   tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence1_processed",
+                                                            withSpinner(
+                                                              DT::dataTableOutput("custom_table_fluorescence1_processed")
+                                                            )
+                                                   ),
+                                                   # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
+                                                   #          withSpinner(
+                                                   #            DT::dataTableOutput("custom_table_fluorescence2")
+                                                   #          )
+                                                   # ),
+                                                   tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
+                                                            DT::dataTableOutput('custom_data_table_expdesign')
+                                                   )
 
-                                                    )
+                                       )
                                    ),
                                    div(id = 'Parsed_Data_Tables',
-                                                    h1("Parsed Data"),
-                                                    tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
-                                                                tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
-                                                                         DT::dataTableOutput('parsed_data_table_density')
-                                                                ),
-                                                                tabPanel(title = "Fluorescence", value = "tabPanel_parsed_tables_fluorescence1",
-                                                                         DT::dataTableOutput('parsed_data_table_fluorescence1')
-                                                                ),
-                                                                # tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
-                                                                #          DT::dataTableOutput('parsed_data_table_fluorescence2')
-                                                                # ),
-                                                                tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
-                                                                         DT::dataTableOutput('parsed_data_table_expdesign')
-                                                                )
-                                                    )
+                                       h1("Parsed Data"),
+                                       tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
+                                                   tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
+                                                            DT::dataTableOutput('parsed_data_table_density')
+                                                   ),
+                                                   tabPanel(title = "Fluorescence", value = "tabPanel_parsed_tables_fluorescence1",
+                                                            DT::dataTableOutput('parsed_data_table_fluorescence1')
+                                                   ),
+                                                   # tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
+                                                   #          DT::dataTableOutput('parsed_data_table_fluorescence2')
+                                                   # ),
+                                                   tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
+                                                            DT::dataTableOutput('parsed_data_table_expdesign')
+                                                   )
+                                       )
                                    )
                                  ) # main panel
                         ), # Navbar 1
@@ -1336,13 +1336,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ###___Linear Fits___####
                                                         tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Growth_Linear",
                                                                  sidebarPanel(width = 5,
-                                                                              selectInput(inputId = "sample_validate_growth_linear",
-                                                                                          label = "Sample:",
-                                                                                          width = "fit-content",
-                                                                                          choices = "",
-                                                                                          multiple = FALSE,
-                                                                                          selectize = FALSE,
-                                                                                          size = 5
+                                                                              selectizeInput(inputId = "sample_validate_growth_linear",
+                                                                                             label = "Sample:",
+                                                                                             width = "100%",
+                                                                                             choices = "",
+                                                                                             multiple = FALSE,
+                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
                                                                               ),
                                                                               checkboxInput(inputId = 'logy_validate_growth_plot_linear',
                                                                                             label = 'Log-transform y axis',
@@ -1475,13 +1474,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ###___Spline Fits___####
                                                         tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_Spline",
                                                                  sidebarPanel(width = 5,
-                                                                              selectInput(inputId = "sample_validate_growth_spline",
-                                                                                          label = "Sample:",
-                                                                                          width = "fit-content",
-                                                                                          choices = "",
-                                                                                          multiple = FALSE,
-                                                                                          selectize = FALSE,
-                                                                                          size = 5,
+                                                                              selectizeInput(inputId = "sample_validate_growth_spline",
+                                                                                             label = "Sample:",
+                                                                                             width = "100%",
+                                                                                             choices = "",
+                                                                                             multiple = FALSE,
+                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
                                                                               ),
 
                                                                               sliderInput(inputId = 'shape_type_validate_growth_plot_spline',
@@ -1636,14 +1634,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  sidebarPanel(width = 5,
                                                                               wellPanel(
                                                                                 style='padding: 1; padding-top: 0; padding-bottom: 0',
-                                                                                selectInput(inputId = "sample_validate_growth_model",
-                                                                                            label = "Sample:",
-                                                                                            width = "fit-content",
-                                                                                            choices = "",
-                                                                                            multiple = FALSE,
-                                                                                            selectize = FALSE,
-                                                                                            size = 5,
-                                                                                )
+                                                                                selectizeInput(inputId = "sample_validate_growth_model",
+                                                                                               label = "Sample:",
+                                                                                               width = "100%",
+                                                                                               choices = "",
+                                                                                               multiple = FALSE,
+                                                                                               options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                ),
                                                                               ),
                                                                               sliderInput(inputId = 'shape_type_validate_growth_plot_model',
                                                                                           label = 'Shape type',
@@ -1739,13 +1736,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ### Growth Boostrapping Spline Plots ####
                                                         tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Growth_Spline_bt",
                                                                  sidebarPanel(width = 4,
-                                                                              selectInput(inputId = "sample_validate_growth_spline_bt",
-                                                                                          label = "Sample:",
-                                                                                          width = "fit-content",
-                                                                                          choices = "",
-                                                                                          multiple = FALSE,
-                                                                                          selectize = FALSE,
-                                                                                          size = 5,
+                                                                              selectizeInput(inputId = "sample_validate_growth_spline_bt",
+                                                                                             label = "Sample:",
+                                                                                             width = "100%",
+                                                                                             choices = "",
+                                                                                             multiple = FALSE,
+                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
                                                                               ),
 
                                                                               checkboxInput(inputId = "plot_derivative_growth_spline_bt",
@@ -1888,13 +1884,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ###___Linear Fits___####
                                                         tabPanel(title = "Linear Fits", value = "tabPanel_Validate_Fluorescence_Linear",
                                                                  sidebarPanel(width = 5,
-                                                                              selectInput(inputId = "sample_validate_fluorescence_linear",
-                                                                                          label = "Sample:",
-                                                                                          width = "fit-content",
-                                                                                          choices = "",
-                                                                                          multiple = FALSE,
-                                                                                          selectize = FALSE,
-                                                                                          size = 5
+                                                                              selectizeInput(inputId = "sample_validate_fluorescence_linear",
+                                                                                             label = "Sample:",
+                                                                                             width = "100%",
+                                                                                             choices = "",
+                                                                                             multiple = FALSE,
+                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
                                                                               ),
                                                                               checkboxInput(inputId = 'logy_validate_fluorescence_plot_linear',
                                                                                             label = 'Log-transform y axis',
@@ -2026,13 +2021,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ###___Spline Fits___####
                                                         tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_Spline",
                                                                  sidebarPanel(width = 5,
-                                                                              selectInput(inputId = "sample_validate_fluorescence_spline",
-                                                                                          label = "Sample:",
-                                                                                          width = "fit-content",
-                                                                                          choices = "",
-                                                                                          multiple = FALSE,
-                                                                                          selectize = FALSE,
-                                                                                          size = 5,
+                                                                              selectizeInput(inputId = "sample_validate_fluorescence_spline",
+                                                                                             label = "Sample:",
+                                                                                             width = "100%",
+                                                                                             choices = "",
+                                                                                             multiple = FALSE,
+                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
                                                                               ),
                                                                               checkboxInput(inputId = 'logy_validate_fluorescence_plot_spline',
                                                                                             label = 'Log-transform y axis',
@@ -2184,13 +2178,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Fluorescence_Spline_bt",
                                                                  sidebarPanel(width = 4,
-                                                                              selectInput(inputId = "sample_validate_fluorescence_spline_bt",
-                                                                                          label = "Sample:",
-                                                                                          width = "fit-content",
-                                                                                          choices = "",
-                                                                                          multiple = FALSE,
-                                                                                          selectize = FALSE,
-                                                                                          size = 5,
+                                                                              selectizeInput(inputId = "sample_validate_fluorescence_spline_bt",
+                                                                                             label = "Sample:",
+                                                                                             width = "100%",
+                                                                                             choices = "",
+                                                                                             multiple = FALSE,
+                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
                                                                               ),
 
                                                                               checkboxInput(inputId = "plot_derivative_fluorescence_spline_bt",
@@ -2346,16 +2339,37 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                            "Spline fits" = "spline")
                                                                    ),
 
-                                                                   textInput(inputId = "select_samples_based_on_string_growth_group_plot",
-                                                                             label = "Select sample based on string (separate by ;)"
+                                                                   checkboxInput(inputId = "select_string_visualize_growth_group",
+                                                                                 label = "(De-)select samples based on string",
+                                                                                 value = FALSE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_growth_group",
+                                                                     selectizeInput(inputId = "samples_visualize_growth_group",
+                                                                                    label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(maxOptions = 15,
+                                                                                                   closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.select_string_visualize_growth_group",
+                                                                     textInput(inputId = "select_samples_based_on_string_growth_group_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_samples_based_on_string_growth_group_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     ),
+
                                                                    ),
 
                                                                    textInput(inputId = "select_samples_based_on_concentration_growth_group_plot",
                                                                              label = "Select sample based on concentration (separate by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_samples_based_on_string_growth_group_plot",
-                                                                             label = "Exclude sample based on string (separate by ;)"
                                                                    ),
 
                                                                    textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plot",
@@ -3216,7 +3230,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = "Fluorescence type",
                                                                                choices = c("Fluorescence" = "fl1",
                                                                                            "Normalized fluorescence" = "norm.fl1"
-                                                                                           )
+                                                                               )
                                                                    ),
 
                                                                    textInput(inputId = "select_samples_based_on_string_dual_plot",
@@ -4172,7 +4186,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                     ) # div(
                   ) # hidden(
                 ), # tagList(
-                # verbatimTextOutput("debug")
+                verbatimTextOutput("debug")
 )
 
 #____SERVER____####
@@ -5811,7 +5825,7 @@ server <- function(input, output, session){
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
               escape = FALSE)
   })
-  ###____Table Download____####
+      ###____Table Download____####
   output$download_table_growth_linear <- downloadHandler(
     filename = function() {
       paste("growth_results_linear_fits", ".csv", sep="")
@@ -6261,7 +6275,7 @@ server <- function(input, output, session){
               escape = FALSE)
   })
 
-  ###____Table Download____####
+      ###____Table Download____####
   output$download_table_fluorescence1_linear <- downloadHandler(
     filename = function() {
       paste("fluorescence1_results_linear_fits", ".csv", sep="")
@@ -6989,7 +7003,7 @@ server <- function(input, output, session){
       ylim.deriv <- NULL
     } else {
       ylim.deriv <- c(as.numeric(input$y_range_min_derivative_validate_growth_spline_bt),
-                as.numeric(input$y_range_max_derivative_validate_growth_spline_bt))
+                      as.numeric(input$y_range_max_derivative_validate_growth_spline_bt))
     }
 
     if(any(input$x_range_min_validate_growth_spline_bt == "",
@@ -7001,16 +7015,16 @@ server <- function(input, output, session){
     }
 
     plot.gcBootSpline(gcBootSpline = results,
-                     pch = input$shape_type_validate_growth_spline_bt,
-                     cex.point = input$shape_size_validate_growth_spline_bt,
-                     cex.lab = input$axis_size_validate_growth_spline_bt,
-                     cex.axis = input$lab_size_validate_growth_spline_bt,
-                     lwd = input$line_width_validate_growth_spline_bt,
-                     y.lim = ylim,
-                     x.lim = xlim,
-                     y.lim.deriv = ylim.deriv,
-                     deriv = input$plot_derivative_growth_spline_bt,
-                     shiny = TRUE
+                      pch = input$shape_type_validate_growth_spline_bt,
+                      cex.point = input$shape_size_validate_growth_spline_bt,
+                      cex.lab = input$axis_size_validate_growth_spline_bt,
+                      cex.axis = input$lab_size_validate_growth_spline_bt,
+                      lwd = input$line_width_validate_growth_spline_bt,
+                      y.lim = ylim,
+                      x.lim = xlim,
+                      y.lim.deriv = ylim.deriv,
+                      deriv = input$plot_derivative_growth_spline_bt,
+                      shiny = TRUE
     )
   })
 
@@ -7180,29 +7194,29 @@ server <- function(input, output, session){
     }
     if(length(results$flFit1$flFittedLinear[[ifelse(input$sample_validate_fluorescence_linear == "1" || is.null(input$sample_validate_fluorescence_linear), 1, input$sample_validate_fluorescence_linear)]]) > 1){
 
-      plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                       log = logy_validate_fluorescence_plot_linear(),
-                       pch = input$shape_type_validate_fluorescence_plot_linear,
-                       cex.point = input$shape_size_validate_fluorescence_plot_linear,
-                       cex.lab = input$axis_size_validate_fluorescence_plot_linear,
-                       cex.axis = input$lab_size_validate_fluorescence_plot_linear,
-                       lwd = input$line_width_validate_fluorescence_plot_linear,
-                       y.lim = ylim,
-                       x.lim = xlim
-                       # ADD FURTHER INPUT (see Notion)
+      QurvE::plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                              log = logy_validate_fluorescence_plot_linear(),
+                              pch = input$shape_type_validate_fluorescence_plot_linear,
+                              cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                              cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                              cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                              lwd = input$line_width_validate_fluorescence_plot_linear,
+                              y.lim = ylim,
+                              x.lim = xlim
+                              # ADD FURTHER INPUT (see Notion)
       )
       if(input$diagnostics_validate_fluorescence_plot_linear){
-        plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                         which = "fit_diagnostics",
-                         log = logy_validate_fluorescence_plot_linear(),
-                         pch = input$shape_type_validate_fluorescence_plot_linear,
-                         cex.point = input$shape_size_validate_fluorescence_plot_linear,
-                         cex.lab = input$axis_size_validate_fluorescence_plot_linear,
-                         cex.axis = input$lab_size_validate_fluorescence_plot_linear,
-                         lwd = input$line_width_validate_fluorescence_plot_linear,
-                         y.lim = ylim,
-                         x.lim = xlim
-                         # ADD FURTHER INPUT (see Notion)
+        QurvE::plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                                which = "fit_diagnostics",
+                                log = logy_validate_fluorescence_plot_linear(),
+                                pch = input$shape_type_validate_fluorescence_plot_linear,
+                                cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                                cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                                cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                                lwd = input$line_width_validate_fluorescence_plot_linear,
+                                y.lim = ylim,
+                                x.lim = xlim
+                                # ADD FURTHER INPUT (see Notion)
         )
       }
     }
@@ -7662,30 +7676,76 @@ server <- function(input, output, session){
     ## Growth Plots: #####
       ### Group Plots ####
 
+  selected_inputs_visualize_growth_group <- reactive({
+    results <- results$growth
+    if(is.null(results)) return("")
+    if(input$plot_group_averages_growth_group_plot){
+      select_samples <- results$expdesign$condition
+    } else {
+      select_samples <- results$expdesign$label
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "samples_visualize_growth_group",
+                      choices = selected_inputs_visualize_growth_group()
+    )
+  })
+
   growth_group_plot <- reactive({
     results <- results$growth
-    suppressWarnings(
-      plot.grofit(results,
-                  data.type = input$data_type_growth_group_plot,
-                  names = input$select_samples_based_on_string_growth_group_plot,
-                  conc = input$select_samples_based_on_concentration_growth_group_plot,
-                  exclude.nm = input$exclude_samples_based_on_string_growth_group_plot,
-                  exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plot,
-                  mean = input$plot_group_averages_growth_group_plot,
-                  deriv = input$plot_derivative_growth_group_plot,
-                  log.y = input$log_transform_y_axis_growth_group_plot,
-                  x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
-                  y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
-                  y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
-                  y.title = input$y_axis_title_growth_group_plot,
-                  x.title = input$x_axis_title_growth_group_plot,
-                  y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
-                  n.ybreaks = input$nbreaks_growth_group_plot,
-                  lwd = input$line_width_growth_group_plot,
-                  basesize = input$base_size_growth_group_plot,
-                  shiny = TRUE
+    if(input$select_string_visualize_growth_group){
+      suppressWarnings(
+        plot.grofit(results,
+                    data.type = input$data_type_growth_group_plot,
+                    IDs = NULL,
+                    names = input$select_samples_based_on_string_growth_group_plot,
+                    conc = input$select_samples_based_on_concentration_growth_group_plot,
+                    exclude.nm = input$exclude_samples_based_on_string_growth_group_plot,
+                    exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plot,
+                    mean = input$plot_group_averages_growth_group_plot,
+                    deriv = input$plot_derivative_growth_group_plot,
+                    log.y = input$log_transform_y_axis_growth_group_plot,
+                    x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
+                    y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
+                    y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
+                    y.title = input$y_axis_title_growth_group_plot,
+                    x.title = input$x_axis_title_growth_group_plot,
+                    y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
+                    n.ybreaks = input$nbreaks_growth_group_plot,
+                    lwd = input$line_width_growth_group_plot,
+                    basesize = input$base_size_growth_group_plot,
+                    shiny = TRUE
+        )
       )
-    )
+    }
+    else{
+      suppressWarnings(
+        plot.grofit(results,
+                    data.type = input$data_type_growth_group_plot,
+                    IDs = input$samples_visualize_growth_group,
+                    names = NULL,
+                    conc = input$select_samples_based_on_concentration_growth_group_plot,
+                    exclude.nm = NULL,
+                    exclude.conc = input$exclude_samples_based_on_concentration_growth_group_plot,
+                    mean = input$plot_group_averages_growth_group_plot,
+                    deriv = input$plot_derivative_growth_group_plot,
+                    log.y = input$log_transform_y_axis_growth_group_plot,
+                    x.lim = c(input$x_range_min_growth_group_plot, input$x_range_max_growth_group_plot),
+                    y.lim = c(input$y_range_min_growth_group_plot,input$y_range_max_growth_group_plot),
+                    y.lim.deriv = c(input$y_range_min_derivative_growth_group_plot, input$y_range_max_derivative_growth_group_plot),
+                    y.title = input$y_axis_title_growth_group_plot,
+                    x.title = input$x_axis_title_growth_group_plot,
+                    y.title.deriv = input$y_axis_title_derivative_growth_group_plot,
+                    n.ybreaks = input$nbreaks_growth_group_plot,
+                    lwd = input$line_width_growth_group_plot,
+                    basesize = input$base_size_growth_group_plot,
+                    shiny = TRUE
+        )
+      )
+    }
   })
 
   output$growth_group_plot <- renderPlot({
@@ -7745,7 +7805,7 @@ server <- function(input, output, session){
                ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
                log.y = input$log_transform_y_axis_dose_response_growth_plot,
                log.x = input$log_transform_x_axis_dose_response_growth_plot
-               )
+    )
   })
 
   output$dose_response_growth_plot_combined <- renderPlot({
@@ -8882,7 +8942,7 @@ server <- function(input, output, session){
     }
   })
 
-  ## Report Growth ####
+    ## Report Growth ####
 
   shinyDirChoose(
     input,
@@ -8947,7 +9007,7 @@ server <- function(input, output, session){
     removeModal()
   })
 
-  ## Report Fluorescence ####
+    ## Report Fluorescence ####
 
   shinyDirChoose(
     input,
@@ -9035,7 +9095,7 @@ server <- function(input, output, session){
     }
   })
 
-  ## RData Growth ####
+  # RData Growth ####
   shinyDirChoose(
     input,
     'export_RData_growth_dir',
@@ -9081,7 +9141,7 @@ server <- function(input, output, session){
     removeModal()
   })
 
-  ## RData Fluorescence ####
+  # RData Fluorescence ####
   shinyDirChoose(
     input,
     'export_RData_fluorescence_dir',
