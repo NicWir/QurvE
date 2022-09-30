@@ -8772,7 +8772,7 @@ server <- function(input, output, session){
         if(input$select_string_visualize_parameter_fluorescence_plot){
           suppressWarnings(
             plot.parameter(results,
-                           param = input$parameter_parameter_fluorescence_plot,
+                           param = input$parameter_fluorescence_parameter_fluorescence_plot,
                            IDs = NULL,
                            names = input$select_sample_based_on_string_fluorescence_parameter_plot,
                            conc = input$select_sample_based_on_concentration_fluorescence_parameter_plot,
@@ -8788,7 +8788,7 @@ server <- function(input, output, session){
         } else {
           suppressWarnings(
             plot.parameter(results,
-                           param = input$parameter_parameter_fluorescence_plot,
+                           param = input$parameter_fluorescence_parameter_fluorescence_plot,
                            IDs = input$samples_visualize_parameter_fluorescence_plot,
                            names = NULL,
                            conc = input$select_sample_based_on_concentration_fluorescence_parameter_plot,
