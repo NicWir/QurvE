@@ -2367,13 +2367,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      ),
 
                                                                    ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.plot_group_averages_growth_group_plot || input.select_string_visualize_growth_group",
+                                                                     textInput(inputId = "select_samples_based_on_concentration_growth_group_plot",
+                                                                               label = "Select sample based on concentration (separate by ;)"
+                                                                     ),
 
-                                                                   textInput(inputId = "select_samples_based_on_concentration_growth_group_plot",
-                                                                             label = "Select sample based on concentration (separate by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plot",
-                                                                             label = "Exclude sample based on concentration (separate by ;)"
+                                                                     textInput(inputId = "exclude_samples_based_on_concentration_growth_group_plot",
+                                                                               label = "Exclude sample based on concentration (separate by ;)"
+                                                                     )
                                                                    ),
 
                                                                    checkboxInput(inputId = "plot_group_averages_growth_group_plot",
@@ -2531,20 +2533,41 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                choices = ""
                                                                    ),
 
-                                                                   textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
-                                                                             label = "Select sample based on string (separated by ;)"
+                                                                   checkboxInput(inputId = "select_string_visualize_parameter_growth_plot",
+                                                                                 label = "(De-)select samples based on string",
+                                                                                 value = FALSE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_parameter_growth_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_parameter_growth_plot",
+                                                                                    label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(maxOptions = 15,
+                                                                                                   closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.select_string_visualize_parameter_growth_plot",
+                                                                     textInput(inputId = "select_sample_based_on_string_growth_parameter_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_sample_based_on_strings_growth_parameter_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     ),
+
                                                                    ),
 
                                                                    textInput(inputId = "select_sample_based_on_concentration_growth_parameter_plot",
-                                                                             label = "Select sample based on concentration (separated by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_sample_based_on_strings_growth_parameter_plot",
-                                                                             label = "Exclude sample based on strings (separated by ;)"
+                                                                             label = "Select sample based on concentration (separate by ;)"
                                                                    ),
 
                                                                    textInput(inputId = "exclude_sample_based_on_concentration_growth_parameter_plot",
-                                                                             label = "Exclude sample based on concentration (separated by ;)"
+                                                                             label = "Exclude sample based on concentration (separate by ;)"
                                                                    ),
 
                                                                    checkboxInput(inputId = 'normalize_to_reference_growth_parameter_plot',
@@ -3050,20 +3073,43 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                )
                                                                    ),
 
-                                                                   textInput(inputId = "select_samples_based_on_string_fluorescence_group_plot",
-                                                                             label = "Select sample based on string (separate by ;)"
+                                                                   checkboxInput(inputId = "select_string_visualize_fluorescence_group",
+                                                                                 label = "(De-)select samples based on string",
+                                                                                 value = FALSE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_fluorescence_group",
+                                                                     selectizeInput(inputId = "samples_visualize_fluorescence_group",
+                                                                                    label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(maxOptions = 15,
+                                                                                                   closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
                                                                    ),
 
-                                                                   textInput(inputId = "select_samples_based_on_concentration_fluorescence_group_plot",
-                                                                             label = "Select sample based on concentration (separate by ;)"
-                                                                   ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.select_string_visualize_fluorescence_group",
+                                                                     textInput(inputId = "select_samples_based_on_string_fluorescence_group_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     ),
 
-                                                                   textInput(inputId = "exclude_samples_based_on_string_fluorescence_group_plot",
-                                                                             label = "Exclude sample based on string (separate by ;)"
-                                                                   ),
+                                                                     textInput(inputId = "exclude_samples_based_on_string_fluorescence_group_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     ),
 
-                                                                   textInput(inputId = "exclude_samples_based_on_concentration_fluorescence_group_plot",
-                                                                             label = "Exclude sample based on concentration (separate by ;)"
+                                                                   ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.plot_group_averages_fluorescence_group_plot || input.select_string_visualize_fluorescence_group",
+                                                                     textInput(inputId = "select_samples_based_on_concentration_fluorescence_group_plot",
+                                                                               label = "Select sample based on concentration (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_samples_based_on_concentration_fluorescence_group_plot",
+                                                                               label = "Exclude sample based on concentration (separate by ;)"
+                                                                     )
                                                                    ),
 
                                                                    conditionalPanel(
@@ -3233,20 +3279,43 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                )
                                                                    ),
 
-                                                                   textInput(inputId = "select_samples_based_on_string_dual_plot",
-                                                                             label = "Select sample based on string (separate by ;)"
+                                                                   checkboxInput(inputId = "select_string_visualize_dual_plot",
+                                                                                 label = "(De-)select samples based on string",
+                                                                                 value = FALSE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_dual_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_dual_plot",
+                                                                                    label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(maxOptions = 15,
+                                                                                                   closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
                                                                    ),
 
-                                                                   textInput(inputId = "select_samples_based_on_concentration_dual_plot",
-                                                                             label = "Select sample based on concentration (separate by ;)"
-                                                                   ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.select_string_visualize_dual_plot",
+                                                                     textInput(inputId = "select_samples_based_on_string_dual_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     ),
 
-                                                                   textInput(inputId = "exclude_samples_based_on_string_dual_plot",
-                                                                             label = "Exclude sample based on string (separate by ;)"
-                                                                   ),
+                                                                     textInput(inputId = "exclude_samples_based_on_string_dual_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     ),
 
-                                                                   textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
-                                                                             label = "Exclude sample based on concentration (separate by ;)"
+                                                                   ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.plot_group_averages_dual_plot || input.select_string_visualize_dual_plot",
+                                                                     textInput(inputId = "select_samples_based_on_concentration_dual_plot",
+                                                                               label = "Select sample based on concentration (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_samples_based_on_concentration_dual_plot",
+                                                                               label = "Exclude sample based on concentration (separate by ;)"
+                                                                     )
                                                                    ),
 
                                                                    checkboxInput(inputId = "plot_group_averages_dual_plot",
@@ -3393,21 +3462,41 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = "Parameter",
                                                                                choices = ""
                                                                    ),
+                                                                   checkboxInput(inputId = "select_string_visualize_parameter_fluorescence_plot",
+                                                                                 label = "(De-)select samples based on string",
+                                                                                 value = FALSE),
 
-                                                                   textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
-                                                                             label = "Select sample based on string (separated by ;)"
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_parameter_fluorescence_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_parameter_fluorescence_plot",
+                                                                                    label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(maxOptions = 15,
+                                                                                                   closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.select_string_visualize_parameter_fluorescence_plot",
+                                                                     textInput(inputId = "select_sample_based_on_string_fluorescence_parameter_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_sample_based_on_strings_fluorescence_parameter_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     ),
+
                                                                    ),
 
                                                                    textInput(inputId = "select_sample_based_on_concentration_fluorescence_parameter_plot",
-                                                                             label = "Select sample based on concentration (separated by ;)"
-                                                                   ),
-
-                                                                   textInput(inputId = "exclude_sample_based_on_strings_fluorescence_parameter_plot",
-                                                                             label = "Exclude sample based on strings (separated by ;)"
+                                                                             label = "Select sample based on concentration (separate by ;)"
                                                                    ),
 
                                                                    textInput(inputId = "exclude_sample_based_on_concentration_fluorescence_parameter_plot",
-                                                                             label = "Exclude sample based on concentration (separated by ;)"
+                                                                             label = "Exclude sample based on concentration (separate by ;)"
                                                                    ),
 
                                                                    checkboxInput(inputId = 'normalize_to_reference_fluorescence_parameter_plot',
@@ -5004,7 +5093,6 @@ server <- function(input, output, session){
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
     showModal(modalDialog("Parsing data input...", footer=NULL))
-    # browser()
     if(input$mapping_included_in_parse){
       try(
         results$parsed_data <- QurvE:::parse_data_shiny(
@@ -5378,7 +5466,6 @@ server <- function(input, output, session){
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
     # Run fluorescence workflow
-    browser()
     try(
       shiny::withProgress(message = "Computations completed",
                           results$fluorescence <- fl.workflow(grodata = grodata,
@@ -8005,6 +8092,21 @@ server <- function(input, output, session){
   )
 
       ### Parameter Plots ####
+  selected_inputs_visualize_parameter_growth_plot <- reactive({
+    results <- results$growth
+    if(is.null(results)) return("")
+
+    select_samples <- results$expdesign$condition
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "samples_visualize_parameter_growth_plot",
+                      choices = selected_inputs_visualize_parameter_growth_plot()
+    )
+  })
+
   growth_parameter_plot <- reactive({
     results <- results$growth
 
@@ -8015,20 +8117,39 @@ server <- function(input, output, session){
       reference.conc <- NULL
       reference.nm <- NULL
     }
-    suppressWarnings(
-      plot.parameter(results,
-                     param = input$parameter_parameter_growth_plot,
-                     names = input$select_sample_based_on_string_growth_parameter_plot,
-                     conc = input$select_sample_based_on_concentration_growth_parameter_plot,
-                     exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
-                     exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
-                     reference.nm = reference.nm,
-                     reference.conc = reference.conc,
-                     shape.size = input$shape.size_growth_parameter_plot,
-                     basesize = input$basesize_growth_parameter_plot,
-                     label.size = input$label.size_growth_parameter_plot
+    if(input$select_string_visualize_parameter_growth_plot){
+      suppressWarnings(
+        plot.parameter(results,
+                       param = input$parameter_parameter_growth_plot,
+                       IDs = NULL,
+                       names = input$select_sample_based_on_string_growth_parameter_plot,
+                       conc = input$select_sample_based_on_concentration_growth_parameter_plot,
+                       exclude.nm = input$exclude_sample_based_on_strings_growth_parameter_plot,
+                       exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
+                       reference.nm = reference.nm,
+                       reference.conc = reference.conc,
+                       shape.size = input$shape.size_growth_parameter_plot,
+                       basesize = input$basesize_growth_parameter_plot,
+                       label.size = input$label.size_growth_parameter_plot
+        )
       )
-    )
+    } else {
+      suppressWarnings(
+        plot.parameter(results,
+                       param = input$parameter_parameter_growth_plot,
+                       IDs = input$samples_visualize_parameter_growth_plot,
+                       names = NULL,
+                       conc = input$select_sample_based_on_concentration_growth_parameter_plot,
+                       exclude.nm = NULL,
+                       exclude.conc = input$exclude_sample_based_on_concentration_growth_parameter_plot,
+                       reference.nm = reference.nm,
+                       reference.conc = reference.conc,
+                       shape.size = input$shape.size_growth_parameter_plot,
+                       basesize = input$basesize_growth_parameter_plot,
+                       label.size = input$label.size_growth_parameter_plot
+        )
+      )
+    }
   })
 
   output$growth_parameter_plot <- renderPlot({
@@ -8217,30 +8338,78 @@ server <- function(input, output, session){
 
 
     ## Fluorescence Plots: #####
-      ### Group Plots ####
+  ### Group Plots ####
+  selected_inputs_visualize_fluorescence_group <- reactive({
+    results <- results$fluorescence
+    if(is.null(results)) return("")
+    if(input$plot_group_averages_fluorescence_group_plot){
+      select_samples <- results$expdesign$condition
+    } else {
+      select_samples <- results$expdesign$label
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "samples_visualize_fluorescence_group",
+                      choices = selected_inputs_visualize_fluorescence_group()
+    )
+  })
+
   output$fluorescence_group_plot <- renderPlot({
     results <- results$fluorescence
-    suppressWarnings(plot.flFitRes(results,
-                                   data.type = input$data_type_fluorescence_group_plot,
-                                   names = input$select_samples_based_on_string_fluorescence_group_plot,
-                                   conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
-                                   exclude.nm = input$exclude_samples_based_on_string_fluorescence_group_plot,
-                                   exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_group_plot,
-                                   mean = input$plot_group_averages_fluorescence_group_plot,
-                                   deriv = input$plot_derivative_fluorescence_group_plot,
-                                   log.y = input$log_transform_y_axis_fluorescence_group_plot,
-                                   x.lim = c(input$x_range_min_fluorescence_group_plot, input$x_range_max_fluorescence_group_plot),
-                                   y.lim = c(input$y_range_min_fluorescence_group_plot,input$y_range_max_fluorescence_group_plot),
-                                   y.lim.deriv = c(input$y_range_min_derivative_fluorescence_group_plot, input$y_range_max_derivative_fluorescence_group_plot),
-                                   y.title = input$y_axis_title_fluorescence_group_plot,
-                                   x.title = input$x_axis_title_fluorescence_group_plot,
-                                   y.title.deriv = input$y_axis_title_derivative_fluorescence_group_plot,
-                                   lwd = input$line_width_fluorescence_group_plot,
-                                   basesize = input$base_size_fluorescence_group_plot,
-                                   n.ybreaks = input$nbreaks_fluorescence_group_plot,
-                                   shiny = TRUE
-    )
-    )
+    if(input$select_string_visualize_growth_group){
+      suppressWarnings(
+        plot.flFitRes(
+          results,
+          data.type = input$data_type_fluorescence_group_plot,
+          IDs = NULL,
+          names = input$select_samples_based_on_string_fluorescence_group_plot,
+          conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
+          exclude.nm = input$exclude_samples_based_on_string_fluorescence_group_plot,
+          exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_group_plot,
+          mean = input$plot_group_averages_fluorescence_group_plot,
+          deriv = input$plot_derivative_fluorescence_group_plot,
+          log.y = input$log_transform_y_axis_fluorescence_group_plot,
+          x.lim = c(input$x_range_min_fluorescence_group_plot, input$x_range_max_fluorescence_group_plot),
+          y.lim = c(input$y_range_min_fluorescence_group_plot,input$y_range_max_fluorescence_group_plot),
+          y.lim.deriv = c(input$y_range_min_derivative_fluorescence_group_plot, input$y_range_max_derivative_fluorescence_group_plot),
+          y.title = input$y_axis_title_fluorescence_group_plot,
+          x.title = input$x_axis_title_fluorescence_group_plot,
+          y.title.deriv = input$y_axis_title_derivative_fluorescence_group_plot,
+          lwd = input$line_width_fluorescence_group_plot,
+          basesize = input$base_size_fluorescence_group_plot,
+          n.ybreaks = input$nbreaks_fluorescence_group_plot,
+          shiny = TRUE
+        )
+      )
+    } else {
+      suppressWarnings(
+        plot.flFitRes(
+          results,
+          data.type = input$data_type_fluorescence_group_plot,
+          IDs = input$samples_visualize_fluorescence_group,
+          names = NULL,
+          conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
+          exclude.nm = NULL,
+          exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_group_plot,
+          mean = input$plot_group_averages_fluorescence_group_plot,
+          deriv = input$plot_derivative_fluorescence_group_plot,
+          log.y = input$log_transform_y_axis_fluorescence_group_plot,
+          x.lim = c(input$x_range_min_fluorescence_group_plot, input$x_range_max_fluorescence_group_plot),
+          y.lim = c(input$y_range_min_fluorescence_group_plot,input$y_range_max_fluorescence_group_plot),
+          y.lim.deriv = c(input$y_range_min_derivative_fluorescence_group_plot, input$y_range_max_derivative_fluorescence_group_plot),
+          y.title = input$y_axis_title_fluorescence_group_plot,
+          x.title = input$x_axis_title_fluorescence_group_plot,
+          y.title.deriv = input$y_axis_title_derivative_fluorescence_group_plot,
+          lwd = input$line_width_fluorescence_group_plot,
+          basesize = input$base_size_fluorescence_group_plot,
+          n.ybreaks = input$nbreaks_fluorescence_group_plot,
+          shiny = TRUE
+        )
+      )
+    }
   })
 
   observe({
@@ -8575,6 +8744,21 @@ server <- function(input, output, session){
 
 
       ### Parameter Plots ####
+      selected_inputs_visualize_parameter_fluorescence_plot <- reactive({
+        results <- results$fluorescence
+        if(is.null(results)) return("")
+
+        select_samples <- results$expdesign$condition
+        select_samples
+      })
+
+      observe({
+        updateSelectInput(session,
+                          inputId = "samples_visualize_parameter_fluorescence_plot",
+                          choices = selected_inputs_visualize_parameter_fluorescence_plot()
+        )
+      })
+
       fluorescence_parameter_plot <- reactive({
         results <- results$fluorescence
 
@@ -8585,20 +8769,39 @@ server <- function(input, output, session){
           reference.conc <- NULL
           reference.nm <- NULL
         }
-        suppressWarnings(
-          plot.parameter(results,
-                         param = input$parameter_fluorescence_parameter_fluorescence_plot,
-                         names = input$select_sample_based_on_string_fluorescence_parameter_plot,
-                         conc = input$select_sample_based_on_concentration_fluorescence_parameter_plot,
-                         exclude.nm = input$exclude_sample_based_on_strings_fluorescence_parameter_plot,
-                         exclude.conc = input$exclude_sample_based_on_concentration_fluorescence_parameter_plot,
-                         reference.nm = reference.nm,
-                         reference.conc = reference.conc,
-                         shape.size = input$shape.size_fluorescence_parameter_plot,
-                         basesize = input$basesize_fluorescence_parameter_plot,
-                         label.size = input$label.size_fluorescence_parameter_plot
+        if(input$select_string_visualize_parameter_fluorescence_plot){
+          suppressWarnings(
+            plot.parameter(results,
+                           param = input$parameter_parameter_fluorescence_plot,
+                           IDs = NULL,
+                           names = input$select_sample_based_on_string_fluorescence_parameter_plot,
+                           conc = input$select_sample_based_on_concentration_fluorescence_parameter_plot,
+                           exclude.nm = input$exclude_sample_based_on_strings_fluorescence_parameter_plot,
+                           exclude.conc = input$exclude_sample_based_on_concentration_fluorescence_parameter_plot,
+                           reference.nm = reference.nm,
+                           reference.conc = reference.conc,
+                           shape.size = input$shape.size_fluorescence_parameter_plot,
+                           basesize = input$basesize_fluorescence_parameter_plot,
+                           label.size = input$label.size_fluorescence_parameter_plot
+            )
           )
-        )
+        } else {
+          suppressWarnings(
+            plot.parameter(results,
+                           param = input$parameter_parameter_fluorescence_plot,
+                           IDs = input$samples_visualize_parameter_fluorescence_plot,
+                           names = NULL,
+                           conc = input$select_sample_based_on_concentration_fluorescence_parameter_plot,
+                           exclude.nm = NULL,
+                           exclude.conc = input$exclude_sample_based_on_concentration_fluorescence_parameter_plot,
+                           reference.nm = reference.nm,
+                           reference.conc = reference.conc,
+                           shape.size = input$shape.size_fluorescence_parameter_plot,
+                           basesize = input$basesize_fluorescence_parameter_plot,
+                           label.size = input$label.size_fluorescence_parameter_plot
+            )
+          )
+        }
       })
 
       output$fluorescence_parameter_plot <- renderPlot({
@@ -8765,6 +8968,24 @@ server <- function(input, output, session){
 
 
       ### Dual Plot ####
+      selected_inputs_visualize_dual_plot <- reactive({
+        results <- results$fluorescence
+        if(is.null(results)) return("")
+        if(input$plot_group_averages_dual_plot){
+          select_samples <- results$expdesign$condition
+        } else {
+          select_samples <- results$expdesign$label
+        }
+        select_samples
+      })
+
+      observe({
+        updateSelectInput(session,
+                          inputId = "samples_visualize_dual_plot",
+                          choices = selected_inputs_visualize_dual_plot()
+        )
+      })
+
       observe({
         if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence1) > 1){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
@@ -8775,8 +8996,10 @@ server <- function(input, output, session){
 
       dual_plot <- reactive({
         results <- results$fluorescence
+        if(input$select_string_visualize_growth_group){
         suppressWarnings(
           plot.dual(object = results,
+                    IDs = NULL,
                     fluorescence = input$fluorescence_type_dual_plot,
                     names = input$select_samples_based_on_string_dual_plot,
                     conc = input$select_samples_based_on_concentration_dual_plot,
@@ -8797,6 +9020,31 @@ server <- function(input, output, session){
                     shiny = TRUE
           )
         )
+        } else {
+          suppressWarnings(
+            plot.dual(object = results,
+                      fluorescence = input$fluorescence_type_dual_plot,
+                      IDs = input$samples_visualize_dual_plot,
+                      names = NULL,
+                      conc = input$select_samples_based_on_concentration_dual_plot,
+                      exclude.nm = NULL,
+                      exclude.conc = input$exclude_samples_based_on_concentration_dual_plot,
+                      mean = input$plot_group_averages_dual_plot,
+                      log.y.density = input$log_transform_y_axis_density_dual_plot,
+                      log.y.fl = input$log_transform_y_axis_fluorescence_dual_plot,
+                      x.lim = c(input$x_range_min_dual_plot, input$x_range_max_dual_plot),
+                      y.lim.density = c(input$y_range_min_density_dual_plot,input$y_range_max_density_dual_plot),
+                      y.lim.fl = c(input$y_range_min_fluorescence_dual_plot,input$y_range_max_fluorescence_dual_plot),
+                      y.title.fl = input$y_axis_title_fluorescence_dual_plot,
+                      y.title.density = input$y_axis_title_density_dual_plot,
+                      x.title = input$x_axis_title_dual_plot,
+                      n.ybreaks = input$nbreaks_dual_plot,
+                      lwd = input$line_width_dual_plot,
+                      basesize = input$base_size_dual_plot,
+                      shiny = TRUE
+            )
+          )
+        }
       })
 
       output$dual_plot <- renderPlot({

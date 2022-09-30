@@ -2488,6 +2488,7 @@ base_breaks <- function(n = 10){
 #' 'mu.model', 'lambda.model', 'A.model',
 #' 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
 #' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
+#' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
@@ -2515,6 +2516,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                                              'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                              'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
+                           IDs = NULL,
                            names = NULL,
                            conc = NULL,
                            basesize = 12,
@@ -2573,21 +2575,40 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
-  if(!is.null(names)  && length(names) > 0){
-    if(!is.na(names) && names != ""){
-      names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-      nm <- nm[grep(paste(names, collapse="|"), nm)]
+
+  if(!is.null(IDs)){
+    # Check if IDs refer to samples or conditions
+    if(any(grep(" \\| ", IDs))){
+      nm <- nm[
+        grepl(x = nm,
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
+    } else {
+      nm <- nm[
+        grepl(x = gsub(" \\| .+", "", nm),
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
     }
   }
+  else {
+    if(!is.null(names)  && length(names) > 0){
+      if(!is.na(names) && names != ""){
+        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+        nm <- nm[grep(paste(names, collapse="|"), nm)]
+      }
+    }
+    if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
+      if(!is.na(exclude.nm) && exclude.nm != ""){
+        names.excl <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", exclude.nm)
+        nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+      }
+    }
+  }
+
   if(!is.null(conc) && length(conc) > 0){
     if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
   }
-  if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
-    if(!is.na(exclude.nm) && exclude.nm != ""){
-      names.excl <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", exclude.nm)
-      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
-    }
-  }
+
   if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
     if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
