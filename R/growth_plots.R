@@ -1309,10 +1309,10 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
       #add axis titles
       if (fit.log.y==FALSE){
-        title(ylab = "Growth y(t) ", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Growth y(t) ", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       else if (fit.log.y==TRUE){
-        title(ylab = "Growth [Ln(y(t)/y0)]", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Growth [Ln(y(t)/y0)]", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       # add second plot with slope over time
       if(deriv == TRUE){
@@ -1422,7 +1422,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
       #add axis titles
       if (fit.log.y==FALSE){
-        title(ylab = "Growth y(t)", line = 1 + 0.5*cex.lab, cex.lab = cex.lab)
+        title(ylab = "Growth y(t)", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       else if (fit.log.y==TRUE){
         title(ylab = "Growth [Ln(y(t)/y0)]", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)

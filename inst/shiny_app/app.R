@@ -4213,24 +4213,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                  tabsetPanel(type = "tabs", id = "tabsetPanel_Export_Data",
                                              ##____Growth results export____####
                                              tabPanel(title = "Growth", value = "tabPanel_export_data_growth",
-                                                      sidebarPanel(width = 6,
-                                                                   shinyDirButton(id = "export_RData_growth_dir",
-                                                                                  label = "Choose destination for saving",
-                                                                                  title = "Choose destination for saving"),
-
-                                                                   verbatimTextOutput("export_RData_growth_dir", placeholder = TRUE),
-
-                                                                   textInput(inputId = 'export_RData_growth_filename',
-                                                                             label = 'Choose file name',
-                                                                             value = 'growth_results'),
-
+                                                      sidebarPanel(width = 3,
                                                                    fluidRow(
                                                                      column(12,
                                                                             div(
-                                                                              actionButton(inputId = "export_RData_growth",
-                                                                                           label = "Export RData file",
-                                                                                           icon=icon("file-export"),
-                                                                                           style="padding:5px; font-size:120%"),
+                                                                              downloadButton(outputId = 'export_RData_growth',
+                                                                                             label = "Export RData file",
+                                                                                             icon = icon("file-export"),
+                                                                                             style="padding:5px; font-size:120%"),
                                                                               style="float:right")
                                                                      )
                                                                    )
@@ -4239,24 +4229,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                              ),
                                              ##Fluorescence results export____####
                                              tabPanel(title = "Fluorescence", value = "tabPanel_export_data_fluorescence",
-                                                      sidebarPanel(width = 6,
-                                                                   shinyDirButton(id = "export_RData_fluorescence_dir",
-                                                                                  label = "Choose destination for saving",
-                                                                                  title = "Choose destination for saving"),
-
-                                                                   verbatimTextOutput("export_RData_fluorescence_dir", placeholder = TRUE),
-
-                                                                   textInput(inputId = 'export_RData_fluorescence_filename',
-                                                                             label = 'Choose file name',
-                                                                             value = 'fluorescence_results'),
-
+                                                      sidebarPanel(width = 3,
                                                                    fluidRow(
                                                                      column(12,
                                                                             div(
-                                                                              actionButton(inputId = "export_RData_fluorescence",
-                                                                                           label = "Export RData file",
-                                                                                           icon=icon("file-export"),
-                                                                                           style="padding:5px; font-size:120%"),
+                                                                              downloadButton(outputId = 'export_RData_fluorescence',
+                                                                                             label = "Export RData file",
+                                                                                             icon = icon("file-export"),
+                                                                                             style="padding:5px; font-size:120%"),
                                                                               style="float:right")
                                                                      )
                                                                    )
@@ -9471,95 +9451,44 @@ server <- function(input, output, session){
   })
 
   # RData Growth ####
-  shinyDirChoose(
-    input,
-    'export_RData_growth_dir',
-    roots = c(home = '~'),
-    filetypes = c('RData')
+  output$export_RData_growth <- downloadHandler(
+    filename = function() {
+      paste0("GrowthResults.RData")
+    },
+    content = function(file) {
+      try(
+        suppressWarnings(
+          suppressMessages(
+            QurvE:::export_RData(object = results$growth,
+                         out.dir = gsub("\\\\file.+$", "", file),
+                         out.nm = gsub("^.+\\\\", "", file)
+            )
+          )
+        )
+      )
+    },
+    contentType = paste0(".RData")
   )
-
-  global <- reactiveValues(export_RData_datapath_growth = getwd())
-
-  export_RData_growth_dir <- reactive(input$export_RData_growth_dir)
-
-  output$export_RData_growth_dir <- renderText({
-    global$export_RData_datapath_growth
-  })
-
-  # Assemble RData file path
-  export_RData_growth_filepath_change <- reactive({
-    list(input$export_RData_growth_dir,input$export_RData_growth_filename)
-  })
-
-
-  observeEvent(ignoreNULL = TRUE,
-               eventExpr = {
-                 export_RData_growth_filepath_change()
-               },
-               handlerExpr = {
-                 if (!"path" %in% names(export_RData_growth_dir())) return()
-                 home <- normalizePath("~")
-                 global$export_RData_growth_filename <- input$export_RData_growth_filename
-                 global$export_RData_datapath_growth <-
-                   file.path(home, paste(unlist(export_RData_growth_dir()$path[-1]), collapse = .Platform$file.sep))
-               }
-  )
-
-  observeEvent(input$export_RData_growth, {
-    showModal(modalDialog("Exporting RData file...", footer=NULL))
-
-    try(export_RData(object = results$growth,
-                      out.dir = global$export_RData_datapath_growth,
-                      out.nm = global$export_RData_growth_filename
-                     )
-    )
-    removeModal()
-  })
 
   # RData Fluorescence ####
-  shinyDirChoose(
-    input,
-    'export_RData_fluorescence_dir',
-    roots = c(home = '~'),
-    filetypes = c('RData')
+  output$export_RData_fluorescence <- downloadHandler(
+    filename = function() {
+      paste0("FluorescenceResults.RData")
+    },
+    content = function(file) {
+      try(
+        suppressWarnings(
+          suppressMessages(
+            QurvE:::export_RData(object = results$fluorescence,
+                         out.dir = gsub("\\\\file.+$", "", file),
+                         out.nm = gsub("^.+\\\\", "", file)
+            )
+          )
+        )
+      )
+    },
+    contentType = paste0(".RData")
   )
-
-  global <- reactiveValues(export_RData_datapath_fluorescence = getwd())
-
-  export_RData_fluorescence_dir <- reactive(input$export_RData_fluorescence_dir)
-
-  output$export_RData_fluorescence_dir <- renderText({
-    global$export_RData_datapath_fluorescence
-  })
-
-  # Assemble RData file path
-  export_RData_fluorescence_filepath_change <- reactive({
-    list(input$export_RData_fluorescence_dir,input$export_RData_fluorescence_filename)
-  })
-
-  observeEvent(ignoreNULL = TRUE,
-               eventExpr = {
-                 export_RData_fluorescence_filepath_change()
-               },
-               handlerExpr = {
-                 if (!"path" %in% names(export_RData_fluorescence_dir())) return()
-                 home <- normalizePath("~")
-                 global$export_RData_fluorescence_filename <- input$export_RData_fluorescence_filename
-                 global$export_RData_datapath_fluorescence <-
-                   file.path(home, paste(unlist(export_RData_fluorescence_dir()$path[-1]), collapse = .Platform$file.sep))
-               }
-  )
-
-  observeEvent(input$export_RData_fluorescence, {
-    showModal(modalDialog("Exporting RData file...", footer=NULL))
-
-    try(export_RData(object = results$fluorescence,
-                     out.dir = global$export_RData_datapath_fluorescence,
-                     out.nm = global$export_RData_fluorescence_filename
-    )
-    )
-    removeModal()
-  })
 
   # Show content after initializing ####
   load_data()
