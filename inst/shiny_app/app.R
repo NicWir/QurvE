@@ -2344,9 +2344,22 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                  value = FALSE),
 
                                                                    conditionalPanel(
-                                                                     condition = "!input.select_string_visualize_growth_group",
+                                                                     condition = "!input.select_string_visualize_growth_group && !input.plot_group_averages_growth_group_plot",
                                                                      selectizeInput(inputId = "samples_visualize_growth_group",
                                                                                     label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(maxOptions = 15,
+                                                                                                   closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_growth_group && input.plot_group_averages_growth_group_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_growth_group",
+                                                                                    label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
@@ -2540,7 +2553,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    conditionalPanel(
                                                                      condition = "!input.select_string_visualize_parameter_growth_plot",
                                                                      selectizeInput(inputId = "samples_visualize_parameter_growth_plot",
-                                                                                    label = "Samples:",
+                                                                                    label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
@@ -3078,9 +3091,22 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                  value = FALSE),
 
                                                                    conditionalPanel(
-                                                                     condition = "!input.select_string_visualize_fluorescence_group",
+                                                                     condition = "!input.select_string_visualize_fluorescence_group && !input.plot_group_averages_fluorescence_group_plot",
                                                                      selectizeInput(inputId = "samples_visualize_fluorescence_group",
                                                                                     label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(maxOptions = 15,
+                                                                                                   closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_fluorescence_group && input.plot_group_averages_fluorescence_group_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_growth_group",
+                                                                                    label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
@@ -3469,7 +3495,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    conditionalPanel(
                                                                      condition = "!input.select_string_visualize_parameter_fluorescence_plot",
                                                                      selectizeInput(inputId = "samples_visualize_parameter_fluorescence_plot",
-                                                                                    label = "Samples:",
+                                                                                    label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
@@ -4115,15 +4141,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                              ##____Growth report___####
                                              tabPanel(title = "Growth", value = "tabPanel_report_growth",
                                                       sidebarPanel(width = 6,
-                                                                   shinyDirButton("report_dir_growth",
-                                                                                  "Choose destination for saving",
-                                                                                  "Choose destination for saving"),
-
-                                                                   verbatimTextOutput("report_dir_growth", placeholder = TRUE),
-
-                                                                   textInput(inputId = 'report_filename_growth',
-                                                                             label = 'Choose file name',
-                                                                             value = 'GrowthReport'),
 
                                                                    selectInput(inputId = 'report_filetype_growth',
                                                                                label = 'Choose file type',
@@ -4133,10 +4150,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     fluidRow(
                                                                                       column(12,
                                                                                              div(
-                                                                                               actionButton(inputId = "render_report_growth_pdf",
-                                                                                                            label = "Render report",
-                                                                                                            icon=icon("file-pdf"),
-                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               downloadButton(outputId = 'download_report_growth_pdf',
+                                                                                                              label = "Render Report",
+                                                                                                              icon = icon("file-pdf"),
+                                                                                                              style="padding:5px; font-size:120%"),
                                                                                                style="float:right")
                                                                                       )
                                                                                     )
@@ -4145,28 +4162,18 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     fluidRow(
                                                                                       column(12,
                                                                                              div(
-                                                                                               actionButton(inputId = "render_report_growth_html",
-                                                                                                            label = "Render report",
-                                                                                                            icon=icon("file-code"),
-                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               downloadButton(outputId = 'download_report_growth_html',
+                                                                                                              label = "Render Report",
+                                                                                                              icon = icon("file-code"),
+                                                                                                              style="padding:5px; font-size:120%"),
                                                                                                style="float:right")
                                                                                       )
                                                                                     )
-                                                                   )
+                                                                   ),
                                                       ) # sidebarPanel
                                              ), # tabPanel(title = "Growth", value = "tabs_export_data_growth",
                                              tabPanel(title = "Fluorescence", value = "tabPanel_report_fluorescence",
                                                       sidebarPanel(width = 6,
-                                                                   shinyDirButton("report_dir_fluorescence",
-                                                                                  "Choose destination for saving",
-                                                                                  "Choose destination for saving"),
-
-                                                                   verbatimTextOutput("report_dir_fluorescence", placeholder = TRUE),
-
-                                                                   textInput(inputId = 'report_filename_fluorescence',
-                                                                             label = 'Choose file name',
-                                                                             value = 'FluorescenceReport'),
-
                                                                    selectInput(inputId = 'report_filetype_fluorescence',
                                                                                label = 'Choose file type',
                                                                                choices = c('PDF' = 'pdf', 'HTML' = 'html')),
@@ -4175,10 +4182,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     fluidRow(
                                                                                       column(12,
                                                                                              div(
-                                                                                               actionButton(inputId = "render_report_fluorescence_pdf",
-                                                                                                            label = "Render report",
-                                                                                                            icon=icon("file-pdf"),
-                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               downloadButton(outputId = 'download_report_fluorescence_pdf',
+                                                                                                              label = "Render Report",
+                                                                                                              icon = icon("file-pdf"),
+                                                                                                              style="padding:5px; font-size:120%"),
                                                                                                style="float:right")
                                                                                       )
                                                                                     )
@@ -4187,16 +4194,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     fluidRow(
                                                                                       column(12,
                                                                                              div(
-                                                                                               actionButton(inputId = "render_report_fluorescence_html",
-                                                                                                            label = "Render report",
-                                                                                                            icon=icon("file-code"),
-                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               downloadButton(outputId = 'download_report_fluorescence_html',
+                                                                                                              label = "Render Report",
+                                                                                                              icon = icon("file-code"),
+                                                                                                              style="padding:5px; font-size:120%"),
                                                                                                style="float:right")
                                                                                       )
                                                                                     )
-                                                                   )
+                                                                   ),
                                                       ) # sidebarPanel
-                                             ) # tabPanel(title = "Growth", value = "tabs_export_data_fluorescence",
+                                             ) # tabPanel(title = "fluorescence", value = "tabs_export_data_fluorescence",
                                  ) # tabsetPanel(type = "tabs", id = "tabs_report",
                         ), # tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
                         #___Export RData___####
@@ -6500,6 +6507,10 @@ server <- function(input, output, session){
     req(input$sample_validate_growth_model)
     selected_vals_validate_growth$sample_validate_growth_model <- input$sample_validate_growth_model
   })
+  observe({
+    req(input$sample_validate_growth_model)
+    selected_vals_validate_growth$sample_validate_growth_spline_bt <- input$sample_validate_growth_spline_bt
+  })
 
       ### Linear Fits ####
 
@@ -6555,26 +6566,51 @@ server <- function(input, output, session){
     }
 
 
-    if(length(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]]) > 1){
-      plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
-                       pch = input$shape_type_validate_growth_plot_linear,
-                       log = logy_validate_growth_plot_linear(),
-                       cex.point = input$shape_size_validate_growth_plot_linear,
-                       cex.lab = input$axis_size_validate_growth_plot_linear,
-                       cex.axis = input$lab_size_validate_growth_plot_linear,
-                       lwd = input$line_width_validate_growth_plot_linear,
-                       y.lim = ylim,
-                       x.lim = xlim
+
+    if (length(results$gcFit$gcFittedLinear[[ifelse(
+      selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+      is.null(
+        selected_vals_validate_growth$sample_validate_growth_linear
+      ) ||
+      selected_vals_validate_growth$sample_validate_growth_linear == "" ,
+      1,
+      selected_vals_validate_growth$sample_validate_growth_linear
+    )]]) > 1) {
+      plot.gcFitLinear(
+        gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(
+          selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+            is.null(
+              selected_vals_validate_growth$sample_validate_growth_linear
+            ),
+          1,
+          selected_vals_validate_growth$sample_validate_growth_linear
+        )]],
+        pch = input$shape_type_validate_growth_plot_linear,
+
+        log = logy_validate_growth_plot_linear(),
+        cex.point = input$shape_size_validate_growth_plot_linear,
+        cex.lab = input$axis_size_validate_growth_plot_linear,
+        cex.axis = input$lab_size_validate_growth_plot_linear,
+        lwd = input$line_width_validate_growth_plot_linear,
+        y.lim = ylim,
+        x.lim = xlim
       )
       if(input$diagnostics_validate_growth_plot_linear){
-        plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
-                         which = "fit_diagnostics",
-                         pch = input$shape_type_validate_growth_plot_linear,
-                         log = logy_validate_growth_plot_linear(),
-                         cex.point = input$shape_size_validate_growth_plot_linear,
-                         cex.lab = input$axis_size_validate_growth_plot_linear,
-                         cex.axis = input$lab_size_validate_growth_plot_linear,
-                         lwd = input$line_width_validate_growth_plot_linear
+        plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
+          selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+            is.null(
+              selected_vals_validate_growth$sample_validate_growth_linear
+            ),
+          1,
+          selected_vals_validate_growth$sample_validate_growth_linear
+        )]],
+        which = "fit_diagnostics",
+        pch = input$shape_type_validate_growth_plot_linear,
+        log = logy_validate_growth_plot_linear(),
+        cex.point = input$shape_size_validate_growth_plot_linear,
+        cex.lab = input$axis_size_validate_growth_plot_linear,
+        cex.axis = input$lab_size_validate_growth_plot_linear,
+        lwd = input$line_width_validate_growth_plot_linear
         )
       }
     }
@@ -6722,8 +6758,15 @@ server <- function(input, output, session){
       }
 
 
-      if(length(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]]) > 1){
-        plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
+      if (length(results$gcFit$gcFittedLinear[[ifelse(
+        selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+        is.null(
+          selected_vals_validate_growth$sample_validate_growth_linear
+        ),
+        1,
+        selected_vals_validate_growth$sample_validate_growth_linear
+      )]]) > 1) {
+        plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(selected_vals_validate_growth$sample_validate_growth_linear == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_linear), 1, selected_vals_validate_growth$sample_validate_growth_linear)]],
                          pch = input$shape_type_validate_growth_plot_linear,
                          log = log,
                          cex.point = input$shape_size_validate_growth_plot_linear,
@@ -6734,14 +6777,21 @@ server <- function(input, output, session){
                          x.lim = xlim
         )
         if(input$diagnostics_validate_growth_plot_linear){
-          plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(input$sample_validate_growth_linear == "1" || is.null(input$sample_validate_growth_linear), 1, input$sample_validate_growth_linear)]],
-                           which = "fit_diagnostics",
-                           pch = input$shape_type_validate_growth_plot_linear,
-                           log = log,
-                           cex.point = input$shape_size_validate_growth_plot_linear,
-                           cex.lab = input$axis_size_validate_growth_plot_linear,
-                           cex.axis = input$lab_size_validate_growth_plot_linear,
-                           lwd = input$line_width_validate_growth_plot_linear
+          plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
+            selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+              is.null(
+                selected_vals_validate_growth$sample_validate_growth_linear
+              ),
+            1,
+            selected_vals_validate_growth$sample_validate_growth_linear
+          )]],
+          which = "fit_diagnostics",
+          pch = input$shape_type_validate_growth_plot_linear,
+          log = log,
+          cex.point = input$shape_size_validate_growth_plot_linear,
+          cex.lab = input$axis_size_validate_growth_plot_linear,
+          cex.axis = input$lab_size_validate_growth_plot_linear,
+          lwd = input$line_width_validate_growth_plot_linear
           )
         }
       }
@@ -6774,20 +6824,43 @@ server <- function(input, output, session){
 
   output$validate_growth_plot_spline <- renderPlot({
     results <- results$growth
-    if(length(results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]]) > 1){
-      showModal(modalDialog("Creating plot...", footer=NULL))
+    if(length(results$gcFit$gcFittedSplines[[ifelse(
+      selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
+      selected_vals_validate_growth$sample_validate_growth_spline == "" ||
+      is.null(selected_vals_validate_growth$sample_validate_growth_spline),
+      1,
+      selected_vals_validate_growth$sample_validate_growth_spline
+    )]]) > 1) {
+      showModal(modalDialog("Creating plot...", footer = NULL))
 
-      try(plot.gcFitSpline(gcFittedSpline = results$gcFit$gcFittedSplines[[ifelse(input$sample_validate_growth_spline == "1" || is.null(input$sample_validate_growth_spline), 1, input$sample_validate_growth_spline)]],
-                           log.y = input$logy_validate_growth_plot_spline,
-                           x.lim = c(input$x_range_min_validate_growth_plot_spline, input$x_range_max_validate_growth_plot_spline),
-                           y.lim = c(input$y_range_min_validate_growth_plot_spline,input$y_range_max_validate_growth_plot_spline),
-                           y.lim.deriv = c(input$y_range_min_derivative_validate_growth_plot_spline, input$y_range_max_derivative_validate_growth_plot_spline),
-                           lwd = input$line_width_validate_growth_plot_spline,
-                           cex.point = input$shape_size_validate_growth_plot_spline,
-                           basesize = input$base_size_validate_growth_plot_spline,
-                           n.ybreaks = input$nbreaks_validate_growth_plot_spline,
-                           pch = input$shape_type_validate_growth_plot_spline,
-                           deriv = input$plot_derivative_validate_growth_plot_spline,
+      try(plot.gcFitSpline(
+        gcFittedSpline = results$gcFit$gcFittedSplines[[ifelse(
+          selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
+            is.null(
+              selected_vals_validate_growth$sample_validate_growth_spline
+            ),
+          1,
+          selected_vals_validate_growth$sample_validate_growth_spline
+        )]],
+        log.y = input$logy_validate_growth_plot_spline,
+        x.lim = c(
+          input$x_range_min_validate_growth_plot_spline,
+          input$x_range_max_validate_growth_plot_spline
+        ),
+        y.lim = c(
+          input$y_range_min_validate_growth_plot_spline,
+          input$y_range_max_validate_growth_plot_spline
+        ),
+        y.lim.deriv = c(
+          input$y_range_min_derivative_validate_growth_plot_spline,
+          input$y_range_max_derivative_validate_growth_plot_spline
+        ),
+        lwd = input$line_width_validate_growth_plot_spline,
+        cex.point = input$shape_size_validate_growth_plot_spline,
+        basesize = input$base_size_validate_growth_plot_spline,
+        n.ybreaks = input$nbreaks_validate_growth_plot_spline,
+        pch = input$shape_type_validate_growth_plot_spline,
+        deriv = input$plot_derivative_validate_growth_plot_spline,
       )
       )
       removeModal()
@@ -6908,9 +6981,11 @@ server <- function(input, output, session){
 
   output$validate_growth_plot_model <- renderPlot({
     results <- results$growth
-    if(length(results$gcFit$gcFittedModels[[ifelse(input$sample_validate_growth_model == "1" || is.null(input$sample_validate_growth_model), 1, input$sample_validate_growth_model)]]) > 1){
+    if(length(results$gcFit$gcFittedModels[[ifelse(selected_vals_validate_growth$sample_validate_growth_model == "1"||
+                                                   selected_vals_validate_growth$sample_validate_growth_model == "" ||
+                                                   is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(input$sample_validate_growth_model == "1" || is.null(input$sample_validate_growth_model), 1, input$sample_validate_growth_model)]],
+      plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(selected_vals_validate_growth$sample_validate_growth_model == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]],
                       colData = 1,
                       colModel = 2,
                       colLag = 3,
@@ -6920,6 +6995,7 @@ server <- function(input, output, session){
                       lwd = input$line_width_validate_growth_plot_model,
                       n.ybreaks = input$nbreaks_validate_growth_plot_model,
                       eq.size = input$eqsize_validate_growth_plot_model,
+                      export = FALSE
       )
       removeModal()
     }
@@ -7073,8 +7149,7 @@ server <- function(input, output, session){
     )})
 
   validate_growth_plot_spline_bt <- reactive({
-    results <- results$growth$gcFit$gcBootSplines[[ifelse(input$sample_validate_growth_spline_bt == "1" || is.null(input$sample_validate_growth_spline_bt), 1, input$sample_validate_growth_spline_bt)]]
-
+    results <- results$growth
 
     # Define x- and y-axis limits
     if(any(input$y_range_min_validate_growth_spline_bt == "",
@@ -7100,19 +7175,25 @@ server <- function(input, output, session){
       xlim <- c(as.numeric(input$x_range_min_validate_growth_spline_bt),
                 as.numeric(input$x_range_max_validate_growth_spline_bt))
     }
+    if(length(results$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
+                                                  selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
+                                                  is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]]) > 1){
 
-    plot.gcBootSpline(gcBootSpline = results,
-                      pch = input$shape_type_validate_growth_spline_bt,
-                      cex.point = input$shape_size_validate_growth_spline_bt,
-                      cex.lab = input$axis_size_validate_growth_spline_bt,
-                      cex.axis = input$lab_size_validate_growth_spline_bt,
-                      lwd = input$line_width_validate_growth_spline_bt,
-                      y.lim = ylim,
-                      x.lim = xlim,
-                      y.lim.deriv = ylim.deriv,
-                      deriv = input$plot_derivative_growth_spline_bt,
-                      shiny = TRUE
-    )
+      plot.gcBootSpline(gcBootSpline = results$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
+                                                                             selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
+                                                                             is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]],
+                        pch = input$shape_type_validate_growth_spline_bt,
+                        cex.point = input$shape_size_validate_growth_spline_bt,
+                        cex.lab = input$axis_size_validate_growth_spline_bt,
+                        cex.axis = input$lab_size_validate_growth_spline_bt,
+                        lwd = input$line_width_validate_growth_spline_bt,
+                        y.lim = ylim,
+                        x.lim = xlim,
+                        y.lim.deriv = ylim.deriv,
+                        deriv = input$plot_derivative_growth_spline_bt,
+                        shiny = TRUE
+      )
+    }
   })
 
   output$validate_growth_plot_spline_bt <- renderPlot({
@@ -7136,7 +7217,10 @@ server <- function(input, output, session){
             res = input$dpi_download_growth_validate_spline_bt)
       }
       # Generate plot
-      results <- results$growth$gcFit$gcBootSplines[[ifelse(input$sample_validate_growth_spline_bt == "1" || is.null(input$sample_validate_growth_spline_bt), 1, input$sample_validate_growth_spline_bt)]]
+      results <- results$growth$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1" ||
+                                                              is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt),
+                                                            1,
+                                                            selected_vals_validate_growth$sample_validate_growth_spline_bt)]]
 
       ## Define x- and y-axis limits
       if(any(input$y_range_min_validate_growth_spline_bt == "",
@@ -7279,9 +7363,11 @@ server <- function(input, output, session){
       xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
                 as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
     }
-    if(length(results$flFit1$flFittedLinear[[ifelse(input$sample_validate_fluorescence_linear == "1" || is.null(input$sample_validate_fluorescence_linear), 1, input$sample_validate_fluorescence_linear)]]) > 1){
+    if(length(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
+                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
+                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
 
-      QurvE::plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+      plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                               log = logy_validate_fluorescence_plot_linear(),
                               pch = input$shape_type_validate_fluorescence_plot_linear,
                               cex.point = input$shape_size_validate_fluorescence_plot_linear,
@@ -7293,7 +7379,10 @@ server <- function(input, output, session){
                               # ADD FURTHER INPUT (see Notion)
       )
       if(input$diagnostics_validate_fluorescence_plot_linear){
-        QurvE::plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+        plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
+                                                                        is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
+                                                                      1,
+                                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                                 which = "fit_diagnostics",
                                 log = logy_validate_fluorescence_plot_linear(),
                                 pch = input$shape_type_validate_fluorescence_plot_linear,
@@ -7455,7 +7544,11 @@ server <- function(input, output, session){
         xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
                   as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
       }
-      if(length(results$flFit1$flFittedLinear[[ifelse(input$sample_validate_fluorescence_linear == "1" || is.null(input$sample_validate_fluorescence_linear), 1, input$sample_validate_fluorescence_linear)]]) > 1){
+      if(length(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
+                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
+                                                      is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
+                                                      1,
+                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
 
         plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                          log = log,
@@ -7469,7 +7562,9 @@ server <- function(input, output, session){
                          # ADD FURTHER INPUT (see Notion)
         )
         if(input$diagnostics_validate_fluorescence_plot_linear){
-          plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+          plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
+                                                                   selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == ""||
+                                                                   is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                            which = "fit_diagnostics",
                            log = log,
                            pch = input$shape_type_validate_fluorescence_plot_linear,
@@ -7511,9 +7606,16 @@ server <- function(input, output, session){
 
   output$validate_fluorescence_plot_spline <- renderPlot({
     results <- results$fluorescence
-    if(length(results$flFit1$flFittedSplines[[ifelse(input$sample_validate_fluorescence_spline == "1" || is.null(input$sample_validate_fluorescence_spline), 1, input$sample_validate_fluorescence_spline)]]) > 1){
+    if(length(results$flFit1$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1"||
+                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "" ||
+                                                     is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                     1,
+                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.flFitSpline(results$flFit1$flFittedSplines[[ifelse(input$sample_validate_fluorescence_spline == "1" || is.null(input$sample_validate_fluorescence_spline), 1, input$sample_validate_fluorescence_spline)]],
+      plot.flFitSpline(results$flFit1$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+                                                                is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                              1,
+                                                              input$sample_validate_fluorescence_spline)]],
                        log.y = input$logy_validate_fluorescence_plot_spline,
                        x.lim = c(input$x_range_min_validate_fluorescence_plot_spline, input$x_range_max_validate_fluorescence_plot_spline),
                        y.lim = c(input$y_range_min_validate_fluorescence_plot_spline,input$y_range_max_validate_fluorescence_plot_spline),
@@ -7652,7 +7754,11 @@ server <- function(input, output, session){
     )})
 
   validate_fluorescence_plot_spline_bt <- reactive({
-    results <- results$fluorescence$flFit1$flBootSplines[[ifelse(input$sample_validate_fluorescence_spline_bt == "1" || is.null(input$sample_validate_fluorescence_spline_bt), 1, input$sample_validate_fluorescence_spline_bt)]]
+    results <- results$fluorescence$flFit1$flBootSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == "1"||
+                                                                   selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == ""  ||
+                                                                   is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt),
+                                                                 1,
+                                                                 selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt)]]
 
 
     # Define x- and y-axis limits
@@ -7715,7 +7821,15 @@ server <- function(input, output, session){
             res = input$dpi_download_fluorescence_validate_spline_bt)
       }
       # Generate plot
-      results <- results$fluorescence$flFit1$flBootSplines[[ifelse(input$sample_validate_fluorescence_spline_bt == "1" || is.null(input$sample_validate_fluorescence_spline_bt), 1, input$sample_validate_fluorescence_spline_bt)]]
+      results <-
+        results$fluorescence$flFit1$flBootSplines[[ifelse(
+          selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == "1" ||
+            is.null(
+              selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt
+            ),
+          1,
+          selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt
+        )]]
 
 
       # Define x- and y-axis limits
@@ -7869,7 +7983,7 @@ server <- function(input, output, session){
   })
 
   output$more_than_one_drfit <- reactive({
-    if(length(results$growth$drFit$drFittedSplines) > 1) return(TRUE)
+    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drFittedSplines) > 1) return(TRUE)
     else return(FALSE)
   })
   outputOptions(output, 'more_than_one_drfit', suspendWhenHidden=FALSE)
@@ -9192,144 +9306,101 @@ server <- function(input, output, session){
 
     ## Report Growth ####
 
-  shinyDirChoose(
-    input,
-    'report_dir_growth',
-    roots = c(home = '~'),
-    filetypes = c('', 'txt', 'bigWig', "tsv", "csv", "bw")
+  output$download_report_growth_pdf <- downloadHandler(
+    filename = function() {
+      paste0("GrowthReport.", input$report_filetype_growth)
+    },
+    content = function(file) {
+      try(
+        suppressWarnings(
+          suppressMessages(
+            growth.report(grofit = results$growth,
+                          out.dir = gsub("\\\\file.+$", "", file),
+                          out.nm = gsub("^.+\\\\", "", file),
+                          ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                          format = input$report_filetype_growth,
+                          export = FALSE)
+          )
+        )
+      )
+    },
+    contentType = paste0(".", input$report_filetype_growth)
   )
 
-  global <- reactiveValues(report_datapath_growth = getwd())
-
-  report_dir_growth <- reactive(input$report_dir_growth)
-
-  output$report_dir_growth <- renderText({
-    global$report_datapath_growth
-  })
-
-  # Assemble report file path
-  report_growth_filepath_change <- reactive({
-    list(input$report_dir_growth,input$report_filename_growth)
-  })
-
-  observeEvent(ignoreNULL = TRUE,
-               eventExpr = {
-                 report_growth_filepath_change()
-               },
-               handlerExpr = {
-                 if (!"path" %in% names(report_dir_growth())) return()
-                 home <- normalizePath("~")
-                 global$report_filename_growth <- input$report_filename_growth
-                 global$report_datapath_growth <-
-                   file.path(home, paste(unlist(report_dir_growth()$path[-1]), collapse = .Platform$file.sep))
-               }
+  output$download_report_growth_html <- downloadHandler(
+    filename = function() {
+      paste0("GrowthReport.", input$report_filetype_growth)
+    },
+    content = function(file) {
+      try(
+        suppressWarnings(
+          suppressMessages(
+            growth.report(grofit = results$growth,
+                          out.dir = gsub("\\\\file.+$", "", file),
+                          out.nm = gsub("^.+\\\\", "", file),
+                          ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                          format = input$report_filetype_growth,
+                          export = FALSE)
+          )
+        )
+      )
+    },
+    contentType = paste0(".", input$report_filetype_growth)
   )
 
-  observeEvent(input$render_report_growth_pdf, {
-    showModal(modalDialog("Rendering report...", footer=NULL))
 
-    try(
-      suppressWarnings(growth.report(grofit = results$growth,
-                                     out.dir = global$report_datapath_growth,
-                                     out.nm = global$report_filename_growth,
-                                     ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                                     format = input$report_filetype_growth,
-                                     export = FALSE)
-      )
-    )
-    removeModal()
-  })
-
-  observeEvent(input$render_report_growth_html, {
-    showModal(modalDialog("Rendering report...", footer=NULL))
-
-    try(
-      suppressWarnings(growth.report(grofit = results$growth,
-                                     out.dir = global$report_datapath_growth,
-                                     out.nm = global$report_filename_growth,
-                                     ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                                     format = input$report_filetype_growth,
-                                     export = FALSE)
-      )
-    )
-    removeModal()
-  })
 
     ## Report Fluorescence ####
 
-  shinyDirChoose(
-    input,
-    'report_dir_fluorescence',
-    roots = c(home = '~'),
-    filetypes = c('', 'txt', 'bigWig', "tsv", "csv", "bw")
+  output$download_report_fluorescence_pdf <- downloadHandler(
+    filename = function() {
+      paste0("FluorescenceReport.", input$report_filetype_fluorescence)
+    },
+    content = function(file) {
+      try(
+        suppressWarnings(
+          suppressMessages(
+            fl.report(flFitRes = results$fluorescence,
+                      out.dir = gsub("\\\\file.+$", "", file),
+                      out.nm = gsub("^.+\\\\", "", file),
+                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                      format = input$report_filetype_fluorescence,
+                      export = FALSE)
+          )
+        )
+      )
+    },
+    contentType = paste0(".", input$report_filetype_fluorescence)
   )
 
-  global <- reactiveValues(report_datapath_fluorescence = getwd())
-
-  report_dir_fluorescence <- reactive(input$report_dir_fluorescence)
-
-  output$report_dir_fluorescence <- renderText({
-    global$report_datapath_fluorescence
-  })
-
-  # Assemble report file path
-  report_fluorescence_filepath_change <- reactive({
-    list(input$report_dir_fluorescence,input$report_filename_fluorescence)
-  })
-
-  observeEvent(ignoreNULL = TRUE,
-               eventExpr = {
-                 report_fluorescence_filepath_change()
-               },
-               handlerExpr = {
-                 if (!"path" %in% names(report_dir_fluorescence() )) return()
-                 home <- normalizePath("~")
-                 global$report_filename_fluorescence <- input$report_filename_fluorescence
-                 global$report_datapath_fluorescence <-
-                   file.path(home, paste(unlist(report_dir_fluorescence()$path[-1]), collapse = .Platform$file.sep))
-               }
+  output$download_report_fluorescence_html <- downloadHandler(
+    filename = function() {
+      paste0("FluorescenceReport.", input$report_filetype_fluorescence)
+    },
+    content = function(file) {
+      try(
+        suppressWarnings(
+          suppressMessages(
+            fl.report(flFitRes = results$fluorescence,
+                      out.dir = gsub("\\\\file.+$", "", file),
+                      out.nm = gsub("^.+\\\\", "", file),
+                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                      format = input$report_filetype_fluorescence,
+                      export = FALSE)
+          )
+        )
+      )
+    },
+    contentType = paste0(".", input$report_filetype_fluorescence)
   )
 
-  observeEvent(input$render_report_fluorescence_pdf, {
-    showModal(modalDialog("Rendering report...", footer=NULL))
-
-    try(
-      suppressWarnings(
-        fl.report(flFitRes = results$fluorescence,
-                  out.dir = global$report_datapath_fluorescence,
-                  out.nm = global$report_filename_fluorescence,
-                  ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
-                  format = input$report_filetype_fluorescence,
-                  export = FALSE)
-      )
-    )
-    removeModal()
-  })
-
-  observeEvent(input$render_report_fluorescence_html, {
-    showModal(modalDialog("Rendering report...", footer=NULL))
-
-    try(
-      suppressWarnings(
-        fl.report(flFitRes = results$fluorescence,
-                  out.dir = global$report_datapath_fluorescence,
-                  out.nm = global$report_filename_fluorescence,
-                  ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
-                  format = input$report_filetype_fluorescence,
-                  export = FALSE)
-      )
-    )
-    removeModal()
-  })
-
-
-  # Bug report message
+  # Bug report message ####
   github_url <- a("QurvE Github", href="https://github.com/NicWir/QurvE_issues/issues")
   output$bug_report <- renderUI({
     tagList("Please report bugs and user feedback at:", github_url)
   })
 
-  # Export RData files
+  # Export RData files ####
   observe({
     if(!is.null(results$growth)){
       showTab(inputId = "tabsetPanel_Export_Data", target = "tabPanel_export_data_growth")

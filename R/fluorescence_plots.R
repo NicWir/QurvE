@@ -68,17 +68,18 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
   p <- function(){
     switch(which,
            fit = {
-             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
              points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point, pch=pch)
 
-             title(ylab = "Density", line = 2+cex.lab)
-             title(xlab = xlab, line = 1+cex.lab)
-             axis(1)
-             axis(2, las=1)
+             title(ylab = ylab, line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = xlab, line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
+
              try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
 
              ## lag phase
              lag <- flFittedLinear$par["lag"]
@@ -90,33 +91,33 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
                  try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(time2, QurvE:::grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
                  try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
                  try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time2, QurvE:::grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
 
                }
              } else if(flFittedLinear$fitFlag){
                if(lag < flFittedLinear$x.in[flFittedLinear$ndx.in[1]]){
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
                  try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
-             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
+             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
              graphics::mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
                          "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
                          "t0:", flFittedLinear$control$t0,
                          "  min.density:", flFittedLinear$control$min.density,
                          "   dY-thresh.:",  flFittedLinear$control$lin.dY),
-                   cex = cex.lab * 0.7, side = 3, line = -3.5, adj = 0.05, outer = TRUE)
+                         cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
            },
            diagnostics = {
              opar <- par(no.readonly = TRUE)
@@ -125,29 +126,40 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
 
              ## residuals vs. fitted
              obs <- flFittedLinear$log.data
-             sim <- grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
-             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals", pch = pch)
+             sim <- QurvE:::grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
+             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
+             points(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
+             title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
              ## normal q-q-plot
-             qqnorm(flFittedLinear$fit[["residuals"]])
+             qqnorm(flFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              qqline(flFittedLinear$fit[["residuals"]])
+             title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
+             title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
            },
            fit_diagnostics = {
 
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
-             par(mar=c(5.1, 4.1+cex.lab, 4.1, 2.1), c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1, 4.1+cex.lab, 4.1, 3.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.5), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", xlab="", ylab = "",
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, pch = pch, ...)
              points(flFittedLinear$"fl.in" ~ flFittedLinear$"x.in", cex = cex.point, pch=pch)
 
-             title(ylab = "Density", line = 2+cex.lab)
-             title(xlab = xlab, line = 1+cex.lab)
-             axis(1)
-             axis(2, las=1)
+             title(ylab = ylab, line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = xlab, line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
+
              try(points(flFittedLinear$fl.in[flFittedLinear$ndx.in] ~ flFittedLinear$x.in[flFittedLinear$ndx.in], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
 
              ## lag phase
              lag <- flFittedLinear$par["lag"]
@@ -159,43 +171,52 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
                  try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(time2, QurvE:::grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
                  try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
                  try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time2, QurvE:::grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
 
                }
              } else if(flFittedLinear$fitFlag){
                if(lag < flFittedLinear$x.in[flFittedLinear$ndx.in[1]]){
                  try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                } else {
                  try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(lines(time, QurvE:::grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
-             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
+             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
              graphics::mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
                          "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
                          "t0:", flFittedLinear$control$t0,
                          "  min.density:", flFittedLinear$control$min.density,
                          "   dY-thresh.:",  flFittedLinear$control$lin.dY),
-                   cex = cex.lab * 0.7, side = 3, line = -3.5, adj = 0.05, outer = TRUE)
+                         cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
              ## residuals vs. fitted
              obs <- flFittedLinear$log.data
-             sim <- grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
-             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="fitted", ylab="residuals", pch = pch, type = "n")
+             sim <- QurvE:::grow_linear(flFittedLinear$"x.in", flFittedLinear$par)
+             plot(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
              points(flFittedLinear$fit[["residuals"]] ~ fitted(flFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
+             title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
              ## normal q-q-plot
-             qqnorm(flFittedLinear$fit[["residuals"]], cex = cex.point)
+             qqnorm(flFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              qqline(flFittedLinear$fit[["residuals"]])
+             title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
+             title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
            }
     )
   }
@@ -625,11 +646,12 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
         layout(mat = matrix(c(1, 2), nrow = 2, ncol = 1),
                heights = c(2, 1.3), # Heights of the two rows
                widths = c(1, 1)) # Widths of the two columns
-        par(mai=c(0.35,0.8,0.5,0))
+        par(mai=c(0.35 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       } else {
-        par(mai=c(0.7,0.8,0.5,0))
+        par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       }
-      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim)
 
       # /// plot data
       points(flBootSpline$raw.x, flBootSpline$raw.fl, col=colData, pch=pch, cex=cex.point)
@@ -640,17 +662,18 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
                          deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
       }
       # add plot title
-      title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
+      title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
       #add axis titles
       if (fit.log.y==FALSE){
-        title(ylab = "Fluorescence", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Fluorescence", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       else if (fit.log.y==TRUE){
-        title(ylab = "Fluorescence [Ln(y(t)/y0)]", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Fluorescence [Ln(y(t)/y0)]", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       # add second plot with slope over time
       if(deriv == TRUE){
-        par(mai=c(0.7,0.8,0.2,0))
+        par(cex.axis = cex.axis)
+        par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.2,0))
         y.max <- ceiling(max(unlist(lapply(1:length(flBootSpline$boot.flSpline), function(x) max(flBootSpline$boot.flSpline[[x]]$spline.deriv1$y))))*10)/10
         y.min <- floor(min(unlist(lapply(1:length(flBootSpline$boot.flSpline), function(x) min(flBootSpline$boot.flSpline[[x]]$spline.deriv1$y))))*10)/10
         if(is.null(y.lim.deriv)){
@@ -658,7 +681,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         if ((flBootSpline$control$log.x.spline==FALSE)){
           try( plot(flBootSpline$boot.flSpline[[1]]$spline.deriv1$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y,
-                    xlab="", ylab="", type = "l", lwd = lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
+                    xlab="", ylab="", type = "l", lwd = lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim, xaxt = "n") )
         }
         if ((flBootSpline$control$log.x.spline==TRUE)){
           try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, lwd = lwd, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
@@ -667,23 +690,24 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
           plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
         }
-        title(ylab = "First derivative", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "First derivative", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       if(flBootSpline$control$x_type == "density"){
         if (fit.log.x==TRUE){
-          title(xlab = "Density [Ln(x(t)/x0)]", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Density [Ln(x(t)/x0)]", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
         }
         else if(fit.log.x==FALSE){
-          title(xlab = "Density", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Density", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
         }
       } else {
         if (fit.log.x==TRUE){
-          title(xlab = "Ln(1+time)", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Ln(1+time)", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
         else if(fit.log.x==FALSE){
-          title(xlab = "Time", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Time", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
       }
+      axis(1, mgp=c(3,1+0.5*cex.axis,0))
 
       par(mfrow=c(1,1))
     } # p1 <- function()
@@ -697,15 +721,29 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
       # /// plot histograms of growth parameters
       par(mfrow=c(2,2))
       if (sum(!is.na(lambda))>1){
-        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda), cex.lab = cex.lab, cex.axis = cex.axis))
-      }
-      else{
-        empty.plot("Empty plot!")
-      }
-
-      if (sum(!is.na(max_slope))>1){ try(hist(max_slope , col="gray", xlab="max_slope", main=expression(max_slope), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(max_slope)) }
-      if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="A", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
-      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
+        try(hist(lambda, col="gray",main=expression(bold(lambda)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "lambda", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else{ empty.plot("Empty plot!") }
+      if (sum(!is.na(max_slope))>1){
+        try(hist(max_slope , col="gray", main=expression(bold(max_slope)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "max_slope", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(max_slope)) }
+      if (sum(!is.na(dY))>1){
+        try(hist(dY, col="gray", main=expression(bold(dY)),cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "dY", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(dY)) }
+      if (sum(!is.na(integral))>1){
+        try(hist(integral, col="gray", main=expression(bold(Integral)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "integral", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(Integral))}
       graphics::mtext(paste(flBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
@@ -729,11 +767,12 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 
       # initialize plot
       if(deriv == TRUE){
-        par(mai=c(0.35,0.8,0.5,0))
+        par(mai=c(0.35 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       } else {
-        par(mai=c(0.7,0.8,0.5,0))
+        par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       }
-      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim)
 
       # /// plot data
       points(flBootSpline$raw.x, flBootSpline$raw.fl, col=colData, pch=pch, cex=cex.point)
@@ -744,17 +783,18 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
                          deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
       }
       # add plot title
-      title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
+      title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
       #add axis titles
       if (fit.log.y==FALSE){
-        title(ylab = "Fluorescence", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Fluorescence", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       else if (fit.log.y==TRUE){
-        title(ylab = "Fluorescence [Ln(y(t)/y0)]", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Fluorescence [Ln(y(t)/y0)]", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       # add second plot with slope over time
       if(deriv == TRUE){
-        par(mai=c(0.7,0.8,0.2,0))
+        par(cex.axis = cex.axis)
+        par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.2,0))
         y.max <- ceiling(max(unlist(lapply(1:length(flBootSpline$boot.flSpline), function(x) max(flBootSpline$boot.flSpline[[x]]$spline.deriv1$y))))*10)/10
         y.min <- floor(min(unlist(lapply(1:length(flBootSpline$boot.flSpline), function(x) min(flBootSpline$boot.flSpline[[x]]$spline.deriv1$y))))*10)/10
         if(is.null(y.lim.deriv)){
@@ -762,7 +802,7 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         if ((flBootSpline$control$log.x.spline==FALSE)){
           try( plot(flBootSpline$boot.flSpline[[1]]$spline.deriv1$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y,
-                    xlab="", ylab="", type = "l", lwd = lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
+                    xlab="", ylab="", type = "l", lwd = lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim, xaxt = "n" ) )
         }
         if ((flBootSpline$control$log.x.spline==TRUE)){
           try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, lwd = lwd, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
@@ -771,23 +811,24 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
           plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
         }
-        title(ylab = "First derivative", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "First derivative", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       if(flBootSpline$control$x_type == "density"){
         if (fit.log.x==TRUE){
-          title(xlab = "Density [Ln(x(t)/x0)]", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Density [Ln(x(t)/x0)]", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
         else if(fit.log.x==FALSE){
-          title(xlab = "Density", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Density", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
       } else {
         if (fit.log.x==TRUE){
-          title(xlab = "Ln(1+time)", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Ln(1+time)", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
         else if(fit.log.x==FALSE){
-          title(xlab = "Time", line = 2.3, cex.lab = cex.lab)
+          title(xlab = "Time", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
       }
+      axis(1, mgp=c(3,1+0.5*cex.axis,0))
 
       lambda    <- flBootSpline$lambda
       max_slope <- flBootSpline$max_slope
@@ -795,16 +836,32 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
       integral  <- flBootSpline$integral
 
       # /// plot histograms of growth parameters
-      if (sum(!is.na(lambda))>1){
-        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda), cex.lab = cex.lab, cex.axis = cex.axis))
-      }
-      else{
-        empty.plot("Empty plot!")
-      }
+      par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.2*cex.lab,0))
 
-      if (sum(!is.na(max_slope))>1){ try(hist(max_slope , col="gray", xlab="max_slope", main=expression(max_slope), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(max_slope)) }
-      if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="A", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
-      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
+      if (sum(!is.na(lambda))>1){
+        try(hist(lambda, col="gray",main=expression(bold(lambda)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "lambda", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else{ empty.plot("Empty plot!") }
+      if (sum(!is.na(max_slope))>1){
+        try(hist(max_slope , col="gray", main=expression(bold(max_slope)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "max_slope", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(max_slope)) }
+      if (sum(!is.na(dY))>1){
+        try(hist(dY, col="gray", main=expression(bold(dY)),cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "dY", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(dY)) }
+      if (sum(!is.na(integral))>1){
+        try(hist(integral, col="gray", main=expression(bold(Integral)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "integral", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(Integral))}
       graphics::mtext(paste(flBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)

@@ -34,14 +34,15 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
     switch(which,
            fit = {
 
-             par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             title(ylab = "Density", line = 2+cex.lab)
-             title(xlab = "Time", line = 1+cex.lab)
+             title(ylab = "Density", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Time", line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
+
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
-             axis(1)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
@@ -65,20 +66,21 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                  try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                  try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
                  try(lines(time2, gcFittedLinear$FUN(time2, parms = unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+
                }
              } else {
                try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = T)
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , line = -1.8+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
              graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
-                         "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
-                         "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
-                         "t0:", gcFittedLinear$control$t0,
-                         "  min.density:", gcFittedLinear$control$min.density,
-                         "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
-                   cex = cex.lab*0.7, side = 3, line = -4, adj = 0.05, outer = TRUE)
+                                   "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
+                                   "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
+                                   "t0:", gcFittedLinear$control$t0,
+                                   "  min.density:", gcFittedLinear$control$min.density,
+                                   "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
+                             cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
            },
            diagnostics = {
@@ -89,25 +91,35 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              ## residuals vs. fitted
              obs <- gcFittedLinear$log.data
              sim <- gcFittedLinear$FUN(gcFittedLinear$"raw.time", gcFittedLinear$par)
-             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals", pch = pch)
+             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
+             points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
+             title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
              ## normal q-q-plot
-             qqnorm(gcFittedLinear$fit[["residuals"]])
+             qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              qqline(gcFittedLinear$fit[["residuals"]])
+             title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
+             title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
            },
            fit_diagnostics = {
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
-             par(mar=c(5.1+cex.lab, 4.1 + cex.lab, 4.1, 2.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(5.1+cex.lab, 4.1 + cex.lab, 4.1, 3.1), mai = c(0.7 + 0.05*cex.lab + 0.07*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.5), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             title(ylab = "Density", line = 2+cex.lab)
-             title(xlab = "Time", line = 1+cex.lab)
+             title(ylab = "Density", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Time", line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
 
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
-             axis(1)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
@@ -138,7 +150,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -1.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.85, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
              graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                          "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
@@ -157,12 +169,21 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              ## residuals vs. fitted
              obs <- gcFittedLinear$log.data
              sim <- gcFittedLinear$FUN(gcFittedLinear$"raw.time", gcFittedLinear$par)
-             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="fitted", ylab="residuals", type = "n", pch = pch)
+             plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
              points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
+             title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
              ## normal q-q-plot
-             qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point)
+             qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              qqline(gcFittedLinear$fit[["residuals"]])
+             title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
+             title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(2, las=1)
            }
     )
   }
@@ -436,11 +457,11 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
       p()
       grDevices::dev.off()
       grDevices::pdf(paste0(out.dir, "/", paste(gcFittedModel$gcID, collapse = "_"), "_ModelFitPlot.pdf"))
-      suppress_warnings( {print(p)}, "is.na" )
+      suppressWarnings( {print(p)}, "is.na" )
       grDevices::dev.off()
     }
     if (plot == TRUE){
-      suppress_warnings( {print(p)}, "is.na" )
+      suppressWarnings( {print(p)}, "is.na" )
     } else {
       return(p)
     }
@@ -525,10 +546,10 @@ plot.drBootSpline <- function (drBootSpline,
         plot(
           c(global.minx, global.maxx),
           c(global.miny, global.maxy),
-          type = "n",
-          xlab = "Ln(1+concentration)",
-          ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
-        )
+          type = "n", xlab="", ylab="", xaxt="n", main="")
+
+        title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        title(xlab = "Ln(1+concentration)", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       else{
         if ((drBootSpline$control$log.x.dr == FALSE) &&
@@ -536,34 +557,36 @@ plot.drBootSpline <- function (drBootSpline,
           plot(
             c(global.minx, global.maxx),
             c(global.miny, global.maxy),
-            type = "n",
-            xlab = "Concentration",
-            ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
-          )
+            type = "n", xlab="", ylab="", xaxt="n", main="")
+
+          title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+          title(xlab = "Concentration", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
         }
         else{
           if ((drBootSpline$control$log.x.dr == TRUE) && (drBootSpline$control$log.y.dr == TRUE)) {
             plot(
               c(global.minx, global.maxx),
               c(global.miny, global.maxy),
-              type = "n",
-              xlab = "Ln(1+Concentration)",
-              ylab = "Ln(1+Response)"
-            )
+              type = "n", xlab="", ylab="", xaxt="n", main="")
+
+            title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+            title(xlab = "Ln(1+Concentration)", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
           }
           else{
             if ((drBootSpline$control$log.x.dr == FALSE) && (drBootSpline$control$log.y.dr == TRUE)) {
               plot(
                 c(global.minx, global.maxx),
                 c(global.miny, global.maxy),
-                type = "n",
-                xlab = "Concentration",
-                ylab = "Ln(1+Response)"
-              )
+                type = "n", xlab="", ylab="", xaxt="n", main="")
+
+              title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+              title(xlab = "Concentration", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
             }
           }
         }
       }
+      axis(1, mgp=c(3,1+0.5*cex.axis,0))
+
 
       # /// plot raw data
       points(
@@ -573,7 +596,7 @@ plot.drBootSpline <- function (drBootSpline,
         pch = pch,
         cex = cex.point
       )
-      title(drBootSpline$drID)
+      title(drBootSpline$drID, line = 1, cex.main = cex.lab)
 
       # /// loop over all fitted splines and plot drFitSpline objects
       for (i in 1:drBootSpline$control$nboot.dr) {
@@ -590,13 +613,29 @@ plot.drBootSpline <- function (drBootSpline,
       }
     }
     p2 <- function(){
-      if (sum(!is.na(drBootSpline$ec50.boot)) == length(drBootSpline$ec50.boot)) {
+      layout(matrix(c(1,2), nrow = 1, ncol = 2))
+      if (sum(!is.na(drBootSpline$ec50.boot)) > 5) {
         hist(
           drBootSpline$ec50.boot,
           col = "gray",
-          main = as.character(drBootSpline$drID),
-          xlab = "EC50"
+          xaxt = "n",xlab="",ylab="", main=""
         )
+        title(xlab = "EC50", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      }
+      else{
+        empty.plot()
+      }
+      if (sum(!is.na(drBootSpline$ec50y.boot)) > 5) {
+        hist(
+          drBootSpline$ec50y.boot,
+          col = "gray",
+          xaxt = "n",xlab="",ylab="", main=""
+        )
+        title(xlab = "yEC50", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
       }
       else{
         empty.plot()
@@ -606,6 +645,8 @@ plot.drBootSpline <- function (drBootSpline,
       layout(matrix(c(1,1,1,2,2, 1,1,1,3,3), nrow = 5, ncol = 2))
 
       par(cex.lab = cex.lab, cex.axis = cex.axis)
+      par(mar=c(5.1, 4.1, 4.1, 2.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), mgp=c(3, 1, 0), las=0)
+
 
       colSpline   <-
         rep(colSpline, (drBootSpline$control$nboot.dr %/% length(colSpline)) + 1)
@@ -625,10 +666,10 @@ plot.drBootSpline <- function (drBootSpline,
         plot(
           c(global.minx, global.maxx),
           c(global.miny, global.maxy),
-          type = "n",
-          xlab = "Ln(1+concentration)",
-          ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
-        )
+          type = "n", xlab="", ylab="", xaxt="n", main="")
+
+        title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        title(xlab = "Ln(1+concentration)", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
       }
       else{
         if ((drBootSpline$control$log.x.dr == FALSE) &&
@@ -636,34 +677,36 @@ plot.drBootSpline <- function (drBootSpline,
           plot(
             c(global.minx, global.maxx),
             c(global.miny, global.maxy),
-            type = "n",
-            xlab = "Concentration",
-            ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")")
-          )
+            type = "n", xlab="", ylab="", xaxt="n", main="")
+
+          title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+          title(xlab = "Concentration", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
         else{
           if ((drBootSpline$control$log.x.dr == TRUE) && (drBootSpline$control$log.y.dr == TRUE)) {
             plot(
               c(global.minx, global.maxx),
               c(global.miny, global.maxy),
-              type = "n",
-              xlab = "Ln(1+Concentration)",
-              ylab = "Ln(1+Response)"
-            )
+              type = "n", xlab="", ylab="", xaxt="n", main="")
+
+            title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+            title(xlab = "Ln(1+Concentration)", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
           }
           else{
             if ((drBootSpline$control$log.x.dr == FALSE) && (drBootSpline$control$log.y.dr == TRUE)) {
               plot(
                 c(global.minx, global.maxx),
                 c(global.miny, global.maxy),
-                type = "n",
-                xlab = "Concentration",
-                ylab = "Ln(1+Response)"
-              )
+                type = "n", xlab="", ylab="", xaxt="n", main="")
+
+              title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+              title(xlab = "Concentration", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
             }
           }
         }
       }
+      axis(1, mgp=c(3,1+0.5*cex.axis,0))
+
 
       # /// plot raw data
       points(
@@ -673,7 +716,7 @@ plot.drBootSpline <- function (drBootSpline,
         pch = pch,
         cex = cex.point
       )
-      title(drBootSpline$drID)
+      title(drBootSpline$drID, line = 1, cex.main = cex.lab)
 
       # /// loop over all fitted splines and plot drFitSpline objects
       for (i in 1:drBootSpline$control$nboot.dr) {
@@ -693,9 +736,11 @@ plot.drBootSpline <- function (drBootSpline,
         hist(
           drBootSpline$ec50.boot,
           col = "gray",
-          main = as.character(drBootSpline$drID),
-          xlab = "EC50"
+          xaxt = "n",xlab="",ylab="", main=""
         )
+        title(xlab = "EC50", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
       }
       else{
         empty.plot()
@@ -704,9 +749,11 @@ plot.drBootSpline <- function (drBootSpline,
         hist(
           drBootSpline$ec50y.boot,
           col = "gray",
-          main = as.character(drBootSpline$drID),
-          xlab = "yEC50"
+          xaxt = "n",xlab="",ylab="", main=""
         )
+        title(xlab = "yEC50", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
       }
       else{
         empty.plot()
@@ -1076,124 +1123,64 @@ plot.drFitSpline <-
     if (is.numeric(cex.point) == FALSE)
       stop("Need numeric value for: cex.point")
     p <- function(){
+      if(drFitSpline$control$log.x.dr == TRUE){
+        x_data <- log(drFitSpline$raw.conc + 1)
+      } else {
+        x_data <- drFitSpline$raw.conc
+      }
+
+      if(drFitSpline$control$log.y.dr == TRUE){
+        y_data <- log(drFitSpline$raw.test + 1)
+      } else {
+        y_data <- drFitSpline$raw.test
+      }
+
       if (add == FALSE) {
         opar <- par(no.readonly = TRUE)
         on.exit(par(opar))
 
-        par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1))
+        par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7 + 0.09*cex.lab + 0.11*cex.axis, 0.7 + 0.05*cex.axis + 0.2*cex.lab, 0.2 + 0.2*cex.lab, 0.3), mgp=c(3, 1, 0), las=0)
         par(cex.lab = cex.lab, cex.axis = cex.axis)
 
-        if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == TRUE)) {
+        if(drFitSpline$control$log.x.dr == TRUE){
           xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "ln(1+concentration)")
+        } else {
+          xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "concentration")
+        }
+
+        if(drFitSpline$control$log.y.dr == TRUE){
           ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
-          plot(
-            log(drFitSpline$raw.conc + 1),
-            log(drFitSpline$raw.test + 1),
-            log = log,
-            pch = pch, bg = colData,
-            cex = cex.point,
-            col = colData,
-            xlab = xlab,
-            ylab = ylab, xlim = x.lim, ylim = y.lim
-          )
+        } else {
+          ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
         }
-        else
-        {
-          if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == TRUE)) {
-            xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "concentration")
-            ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
-            plot(
-              drFitSpline$raw.conc,
-              log(drFitSpline$raw.test + 1),
-              log = log,
-              pch = pch, bg = colData,
-              cex = cex.point,
-              col = colData,
-              xlab = xlab,
-              ylab = ylab, xlim = x.lim, ylim = y.lim
-            )
-          }
-          else
-          {
-            if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == FALSE)) {
-              xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "ln(1+concentration)")
-              ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
-              plot(
-                log(drFitSpline$raw.conc + 1),
-                drFitSpline$raw.test,
-                log = log,
-                pch = pch, bg = colData,
-                cex = cex.point,
-                col = colData,
-                xlab = xlab,
-                ylab = ylab, xlim = x.lim, ylim = y.lim
-              )
-            }
-            else
-            {
-              if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == FALSE)) {
-                xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "Concentration")
-                ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
-                plot(
-                  drFitSpline$raw.conc,
-                  drFitSpline$raw.test,
-                  log = log,
-                  pch = pch, bg = colData,
-                  cex = cex.point,
-                  col = colData,
-                  xlab = xlab,
-                  ylab = ylab, xlim = x.lim, ylim = y.lim
-                )
-              }
-            }
-          }
-        }
+
+
+        plot(
+          x_data,
+          y_data,
+          log = log,
+          pch = pch, bg = colData,
+          cex = cex.point,
+          col = colData, xlab="", ylab="", xaxt="n")
+
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+
+        title(xlab = xlab, line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = ylab, line = 1 + 0.5*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+
+
+        title(main = drFitSpline$drID, line = 1, cex.main = cex.lab)
       }
       else{
-        if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == TRUE)) {
-          points(
-            log(drFitSpline$raw.conc + 1),
-            log(drFitSpline$raw.test + 1),
-            pch = pch, bg = colData,
-            cex = cex.point,
-            col = colData
-          )
-        }
-        else{
-          if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == TRUE)) {
-            points(
-              drFitSpline$raw.conc,
-              log(drFitSpline$raw.test + 1),
-              pch = pch, bg = colData,
-              cex = cex.point,
-              col = colData
-            )
-          }
-          else
-          {
-            if ((drFitSpline$control$log.x.dr == TRUE) && (drFitSpline$control$log.y.dr == FALSE)) {
-              points(
-                log(drFitSpline$raw.conc + 1),
-                drFitSpline$raw.test,
-                pch = pch, bg = colData,
-                cex = cex.point,
-                col = colData
-              )
-            }
-            else
-            {
-              if ((drFitSpline$control$log.x.dr == FALSE) && (drFitSpline$control$log.y.dr == FALSE)) {
-                points(
-                  drFitSpline$raw.conc,
-                  drFitSpline$raw.test,
-                  pch = pch, bg = colData,
-                  cex = cex.point,
-                  col = colData
-                )
-              }
-            }
-          }
-        }
+
+        points(
+          x_data,
+          y_data,
+          pch = pch, bg = colData,
+          cex = cex.point,
+          col = colData
+        )
+
       }
 
       try(lines(
@@ -1215,7 +1202,6 @@ plot.drFitSpline <-
               c(drFitSpline$parameters$yEC50, drFitSpline$parameters$yEC50),
               lty = 2)
       }
-      title(main = drFitSpline$drID)
     } # p <- function()
     if (export == TRUE){
       w <- width
@@ -1301,16 +1287,15 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 
       # initialize plot
       if(deriv == TRUE){
-        if(!shiny){
-          layout(mat = matrix(c(1, 2), nrow = 2, ncol = 1),
-                 heights = c(2, 1.3), # Heights of the two rows
-                 widths = c(1, 1)) # Widths of the two columns
-        }
+        layout(mat = matrix(c(1, 2), nrow = 2, ncol = 1),
+               heights = c(2, 1.3), # Heights of the two rows
+               widths = c(1, 1)) # Widths of the two columns
         par(mai=c(0.35,0.8,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       } else {
         par(mai=c(0.7,0.8,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       }
-      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim)
 
       # /// plot data
       points(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex.point)
@@ -1321,18 +1306,18 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point = cex.point)
       }
       # add plot title
-      title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
+      title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
       #add axis titles
       if (fit.log.y==FALSE){
-        title(ylab = "Growth y(t) ", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Growth y(t) ", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
       }
       else if (fit.log.y==TRUE){
-        title(ylab = "Growth [Ln(y(t)/y0)]", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Growth [Ln(y(t)/y0)]", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
       }
       # add second plot with slope over time
       if(deriv == TRUE){
         par(cex.axis = cex.axis)
-        par(mai=c(0.7,0.8,0.2,0))
+        par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.2,0))
         y.max <- ceiling(max(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) max(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
         y.min <- floor(min(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) min(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
         if(is.null(y.lim.deriv)){
@@ -1340,7 +1325,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         if ((gcBootSpline$control$log.x.gc==FALSE)){
           try( plot(gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y,
-                    xlab="", ylab="", type = "l", lwd=lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
+                    xlab="", ylab="", type = "l", lwd=lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim, xaxt = "n") )
         }
         if ((gcBootSpline$control$log.x.gc==TRUE)){
           try( lines(gcBootSpline$boot.gcSpline[[1]]$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y, lwd=lwd, xlab="Ln(1+time)", ylab="Growth rate", type = "l") )
@@ -1349,14 +1334,16 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
           plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd=lwd, xlim = x.lim,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point=cex.point)
         }
-        title(ylab = "Growth rate", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Growth rate", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       if (fit.log.x==TRUE){
-        title(xlab = "Ln(1+time)", line = 2.3, cex.lab = cex.lab)
+        title(xlab = "Ln(1+time)", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       else if(fit.log.x==FALSE){
-        title(xlab = "Time", line = 2.3, cex.lab = cex.lab)
+        title(xlab = "Time", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
       }
+      axis(1, mgp=c(3,1+0.5*cex.axis,0))
+
       par(mfrow=c(1,1))
     } # p1 <- function()
     p2 <- function()
@@ -1370,15 +1357,29 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       par(mfrow=c(2,2))
 
       if (sum(!is.na(lambda))>1){
-        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda), cex.lab = cex.lab, cex.axis = cex.axis))
-      }
-      else{
-        empty.plot("Empty plot!")
-      }
-
-      if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(mu)) }
-      if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="dY", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
-      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
+        try(hist(lambda, col="gray",main=expression(bold(lambda)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "lambda", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else{ empty.plot("Empty plot!") }
+      if (sum(!is.na(mu))>1){
+        try(hist(mu , col="gray", main=expression(bold(mu)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "mu", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(mu)) }
+      if (sum(!is.na(dY))>1){
+        try(hist(dY, col="gray", main=expression(bold(dY)),cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "dY", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(dY)) }
+      if (sum(!is.na(integral))>1){
+        try(hist(integral, col="gray", main=expression(bold(Integral)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "integral", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(Integral))}
       graphics::mtext(paste(gcBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
@@ -1389,7 +1390,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       else layout(matrix(c(1,2,4,1,3,5), nrow = 3, ncol = 2))
 
       par(cex.lab = cex.lab, cex.axis = cex.axis)
-      par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), mgp=c(3, 1, 0), las=0)
+      par(mar=c(5.1, 4.1, 4.1, 2.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), mgp=c(3, 1, 0), las=0)
       colSpline <- rep(colSpline, (gcBootSpline$control$nboot.gc%/%length(colSpline))+1)
 
       fit.log.x     <- gcBootSpline$control$log.x.gc
@@ -1402,11 +1403,12 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 
       # initialize plot
       if(deriv == TRUE){
-        par(mai=c(0.35,0.8,0.5,0))
+        par(mai=c(0.35 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       } else {
-        par(mai=c(0.7,0.8,0.5,0))
+        par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.5,0))
+        plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim, xaxt="n")
       }
-      plot(c(global.minx, global.maxx), c(global.miny, global.maxy), pch="",xlab="",ylab="", xlim = x.lim, ylim = y.lim)
 
       # /// plot data
       points(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex.point)
@@ -1417,18 +1419,18 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
                          deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point=cex.point)
       }
       # add plot title
-      title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1))
+      title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
       #add axis titles
       if (fit.log.y==FALSE){
-        title(ylab = "Growth y(t) ", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Growth y(t)", line = 1 + 0.5*cex.lab, cex.lab = cex.lab)
       }
       else if (fit.log.y==TRUE){
-        title(ylab = "Growth [Ln(y(t)/y0)]", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Growth [Ln(y(t)/y0)]", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       # add second plot with slope over time
       if(deriv == TRUE){
         par(cex.axis = cex.axis)
-        par(mai=c(0.7,0.8,0.2,0))
+        par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.2,0))
         y.max <- ceiling(max(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) max(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
         y.min <- floor(min(unlist(lapply(1:length(gcBootSpline$boot.gcSpline), function(x) min(gcBootSpline$boot.gcSpline[[x]]$spline.deriv1$y))))*10)/10
         if(is.null(y.lim.deriv)){
@@ -1436,7 +1438,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
         }
         if ((gcBootSpline$control$log.x.gc==FALSE)){
           try( plot(gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y,
-                    xlab="", ylab="", type = "l", lwd=lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim ) )
+                    xlab="", ylab="", type = "l", lwd=lwd, col = colSpline, ylim = y.lim.deriv, xlim = x.lim, xaxt = "n") )
         }
         if ((gcBootSpline$control$log.x.gc==TRUE)){
           try( lines(gcBootSpline$boot.gcSpline[[1]]$x, gcBootSpline$boot.gcSpline[[1]]$spline.deriv1$y, lwd=lwd, xlab="Ln(1+time)", ylab="Growth rate", type = "l") )
@@ -1445,14 +1447,15 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
           plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd=lwd, xlim = x.lim,
                            deriv = T, plot = F, export = F, pch=0, colSpline=colSpline[i], cex.point=cex.point)
         }
-        title(ylab = "Growth rate", line = 2.3, cex.lab = cex.lab)
+        title(ylab = "Growth rate", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       if (fit.log.x==TRUE){
-        title(xlab = "Ln(1+time)", line = 2.3, cex.lab = cex.lab)
+        title(xlab = "Ln(1+time)", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
       else if(fit.log.x==FALSE){
-        title(xlab = "Time", line = 2.3, cex.lab = cex.lab)
+        title(xlab = "Time", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
       }
+      axis(1, mgp=c(3,1+0.5*cex.axis,0))
 
       lambda    <- gcBootSpline$lambda
       mu        <- gcBootSpline$mu
@@ -1460,16 +1463,32 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
       integral  <- gcBootSpline$integral
 
       # /// plot histograms of growth parameters
-      if (sum(!is.na(lambda))>1){
-        try(hist(lambda, col="gray",xlab="lambda", main=expression(lambda), cex.lab = cex.lab, cex.axis = cex.axis))
-      }
-      else{
-        empty.plot("Empty plot!")
-      }
+      par(mai=c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis,0.2*cex.lab,0))
 
-      if (sum(!is.na(mu))>1){ try(hist(mu , col="gray", xlab="mu", main=expression(mu), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(mu)) }
-      if (sum(!is.na(dY))>1){ try(hist(dY, col="gray", xlab="dY", main=expression(dY), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(dY)) }
-      if (sum(!is.na(integral))>1){ try(hist(integral, col="gray", xlab="integral", main=expression(Integral), cex.lab = cex.lab, cex.axis = cex.axis)) } else { empty.plot("Empty plot!", main=expression(Integral))}
+      if (sum(!is.na(lambda))>1){
+        try(hist(lambda, col="gray",main=expression(bold(lambda)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "lambda", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else{ empty.plot("Empty plot!") }
+      if (sum(!is.na(mu))>1){
+        try(hist(mu , col="gray", main=expression(bold(mu)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "mu", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(mu)) }
+      if (sum(!is.na(dY))>1){
+        try(hist(dY, col="gray", main=expression(bold(dY)),cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "dY", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(dY)) }
+      if (sum(!is.na(integral))>1){
+        try(hist(integral, col="gray", main=expression(bold(Integral)), cex.main = cex.lab, cex.axis = cex.axis, xaxt = "n",xlab="",ylab=""))
+        title(xlab = "integral", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      } else { empty.plot("Empty plot!", main=expression(Integral))}
       par(mfrow=c(1,1))
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p3 <- function()

@@ -42,7 +42,7 @@ knit_table <- function(df, caption){
                          pageLength = 15,
                          fixedHeader=TRUE))
   } else {
-     colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "slope<sub>max</sub>", "$\\\\mu_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "x<sub>start</sub>", "$t_{start}$") %>% str_replace_all(., "x<sub>D</sub>", "$t_{D}$") %>% str_replace_all(., "x<sub>end</sub>", "$t_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "x<sub>shift</sub>", "$t_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "x<sub>max</sub>", "t$_{max}$") 
+     colnames(df) <- colnames(df) %>% str_replace_all(.,"<br>", "\n") %>%  str_replace_all(., "_", "\\\\char`_") %>% str_replace_all(., "slope<sub>max</sub>", "$slope_{max}$") %>% str_replace_all(., "λ", "$\\\\lambda$") %>% str_replace_all(., "Δ", "$\\\\Delta$") %>% str_replace_all(., "x<sub>start</sub>", "$x_{start}$") %>% str_replace_all(., "x<sub>D</sub>", "$x_{D}$") %>% str_replace_all(., "x<sub>end</sub>", "$x_{end}$") %>% str_replace_all(., "R<sup>2</sup>", "$R^2$") %>% str_replace_all(., "α", "$\\\\alpha$") %>% str_replace_all(., "x<sub>shift</sub>", "$x_{shift}$") %>% str_replace_all(., "ν", "$\\\\nu$") %>% str_replace_all(., "y<sub>max</sub>", "y$_{max}$") %>% str_replace_all(., "x<sub>max</sub>", "x$_{max}$") 
      colnames(df) <- kableExtra::linebreak(colnames(df), align = "c")
      for(i in 2:ncol(df)){
        df[,i] <- df[,i] %>% str_replace_all(., "^<b>", "\\\\textbf\\{") %>% str_replace_all(., "</b>", "\\}") 
@@ -174,7 +174,7 @@ if(any(c("s") %in% control$fit.opt)){
                              
                              "Δy" = round(as.numeric(res.table.fl1$dY.spline), 3),
                              
-                             "x<sub>max</sub>" = ifelse(is.na(res.table.fl1$max_slope2.spline), round(as.numeric(res.table.fl1$tmax.spline), 2), paste0("<b>", round(as.numeric(res.table.fl1$tmax.spline), 2), "</b>", " (", round(as.numeric(res.table.fl1$tmax2.spline), 2), ")")),
+                             "x<sub>max</sub>" = ifelse(is.na(res.table.fl1$max_slope2.spline), round(as.numeric(res.table.fl1$x.max.spline), 2), paste0("<b>", round(as.numeric(res.table.fl1$x.max.spline), 2), "</b>", " (", round(as.numeric(res.table.fl1$x.max2.spline), 2), ")")),
                              
                              "smooth.<br>fac" = res.table.fl1$smooth.spline,
                              
