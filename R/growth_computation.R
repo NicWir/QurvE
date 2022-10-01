@@ -962,7 +962,7 @@ growth.workflow <- function (grodata = NULL,
 #' @family reports
 growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
   {
-  showModal(modalDialog("Rendering report...", footer=NULL))
+  try(showModal(modalDialog("Rendering report...", footer=NULL)), silent = TRUE)
   # results an object of class grofit
   if(methods::is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
 
@@ -1032,7 +1032,7 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
                     quiet = TRUE)
   message(paste0("Report files saved in: '/", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
-  removeModal()
+  try(removeModal(), silent = TRUE)
 }
 
 

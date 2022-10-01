@@ -2577,7 +2577,7 @@ fl.workflow <- function(grodata = NULL,
 #' @include general_misc_utils.R
 fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
 {
-  showModal(modalDialog("Rendering report...", footer=NULL))
+  try(showModal(modalDialog("Rendering report...", footer=NULL)), silent = TRUE)
   # results an object of class grofit
   if(class(flFitRes) != "flFitRes") stop("flFitRes needs to be an object created with fl.workflow().")
 
@@ -2665,7 +2665,7 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
                     quiet = TRUE)
   message(paste0("Files saved in: '", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
-  removeModal()
+  try(removeModal(), silent = TRUE)
 }
 
 #' Fit a biosensor model (Meyer et al., 2019) to response vs. concentration data
