@@ -5594,12 +5594,8 @@ server <- function(input, output, session){
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                             gsub("\\)", "\\\\)",
-                                                                                                                  gsub("\\(", "\\\\(",
-                                                                                                                       gsub("\\?", "\\\\?",
-                                                                                                                            gsub("\\.", "\\\\.",
-                                                                                                                                 gsub("\\+", "\\\\+",
-                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
                                                                                                              ".+[[:space:]]",
                                                                                                              unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                              "$"), nm[ndx.filt.rep[[j]]])]))
@@ -5640,45 +5636,66 @@ server <- function(input, output, session){
                                                             ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                      mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
                                                                    "", " \u00B1 ") ) ),
-                                                          mu.sd),
+                                                          unlist(lapply(1:length(mu.mean), function (x)
+                                                          ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
+                                                                   mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
+                                                                 "", mu.sd[x])))),
 
                                "t<sub>D</sub>" = paste0(tD.mean,
                                                         unlist(lapply(1:length(tD.mean), function (x)
                                                           ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                    tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                  "", " \u00B1 ") ) ),
-                                                        tD.sd),
+                                                        unlist(lapply(1:length(tD.mean), function (x)
+                                                        ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
+                                                                 tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
+                                                               "", tD.sd[x])))),
                                "λ" =  paste0(lambda.mean,
                                              unlist(lapply(1:length(lambda.mean), function (x)
                                                ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                         lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                       "", " \u00B1 ") ) ),
-                                             lambda.sd),
+                                             unlist(lapply(1:length(lambda.mean), function (x)
+                                             ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                      lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                    "", lambda.sd[x])))),
                                "ΔY" = paste0(dY.mean,
                                              unlist(lapply(1:length(dY.mean), function (x)
                                                ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                         dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                       "", " \u00B1 ") ) ),
-                                             dY.sd),
+                                             unlist(lapply(1:length(dY.mean), function (x)
+                                               ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                      dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                    "", dY.sd[x])))),
                                "y<sub>max</sub>" = paste0(A.mean,
                                                           unlist(lapply(1:length(A.mean), function (x)
                                                             ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                      A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                    "", " \u00B1 ") ) ),
-                                                          A.sd),
+                                                          unlist(lapply(1:length(A.mean), function (x)
+                                                          ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                   A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                 "", A.sd[x])))),
                                "t<sub>start</sub><br>(µ<sub>max</sub>)" = paste0(tmu.start.mean,
                                                                                  unlist(lapply(1:length(tmu.start.mean), function (x)
                                                                                    ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
                                                                                             tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
                                                                                           "", " \u00B1 ") ) ),
-                                                                                 tmu.start.sd),
+                                                                                 unlist(lapply(1:length(tmu.start.mean), function (x)
+                                                                                 ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
+                                                                                          tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
+                                                                                        "", tmu.start.sd[x])))),
 
                                "t<sub>end</sub><br>(µ<sub>max</sub>)" = paste0(tmu.end.mean,
                                                                                unlist(lapply(1:length(tmu.end.mean), function (x)
                                                                                  ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                                           tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
                                                                                         "", " \u00B1 ") ) ),
-                                                                               tmu.end.sd),
+                                                                               unlist(lapply(1:length(tmu.end.mean), function (x)
+                                                                               ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
+                                                                                        tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
+                                                                                      "", tmu.end.sd[x])))),
                                stringsAsFactors = F, check.names = F)
     table_linear_group
 
@@ -5717,12 +5734,8 @@ server <- function(input, output, session){
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                             gsub("\\)", "\\\\)",
-                                                                                                                  gsub("\\(", "\\\\(",
-                                                                                                                       gsub("\\?", "\\\\?",
-                                                                                                                            gsub("\\.", "\\\\.",
-                                                                                                                                 gsub("\\+", "\\\\+",
-                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
                                                                                                              ".+[[:space:]]",
                                                                                                              unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                              "$"), nm[ndx.filt.rep[[j]]])]))
@@ -5759,37 +5772,55 @@ server <- function(input, output, session){
                                                             ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                      mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
                                                                    "", " \u00B1 ") ) ),
-                                                          mu.sd),
+                                                          unlist(lapply(1:length(mu.mean), function (x)
+                                                          ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
+                                                                   mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
+                                                                 "", mu.sd[x])))),
                                "t<sub>D</sub>" = paste0(tD.mean,
                                                         unlist(lapply(1:length(tD.mean), function (x)
                                                           ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                    tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                  "", " \u00B1 ") ) ),
-                                                        tD.sd),
+                                                        unlist(lapply(1:length(tD.mean), function (x)
+                                                        ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
+                                                                 tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
+                                                               "", tD.sd[x])))),
                                "λ" = paste0(lambda.mean,
                                             unlist(lapply(1:length(lambda.mean), function (x)
                                               ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                        lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                      "", " \u00B1 ") ) ),
-                                            lambda.sd),
+                                            unlist(lapply(1:length(lambda.mean), function (x)
+                                            ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                     lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                   "", lambda.sd[x])))),
                                "y<sub>max</sub>" = paste0(A.mean,
                                                           unlist(lapply(1:length(A.mean), function (x)
                                                             ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                      A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                    "", " \u00B1 ") ) ),
-                                                          A.sd),
+                                                          unlist(lapply(1:length(A.mean), function (x)
+                                                            ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                   A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                 "", A.sd[x])))),
                                "ΔY" = paste0(dY.mean,
                                              unlist(lapply(1:length(dY.mean), function (x)
                                                ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                         dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                       "", " \u00B1 ") ) ),
-                                             dY.sd),
+                                             unlist(lapply(1:length(dY.mean), function (x)
+                                             ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                      dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                    "", dY.sd[x])))),
                                "t<sub>max</sub>" = paste0(tmax.mean,
                                                           unlist(lapply(1:length(tmax.mean), function (x)
                                                             ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                      tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                    "", " \u00B1 ") ) ),
-                                                          tmax.sd),
+                                                          unlist(lapply(1:length(tmax.mean), function (x)
+                                                          ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
+                                                                   tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
+                                                                 "", tmax.sd[x])))),
                                check.names = F)
     table_spline_group
   })
@@ -6060,12 +6091,8 @@ server <- function(input, output, session){
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                             gsub("\\)", "\\\\)",
-                                                                                                                  gsub("\\(", "\\\\(",
-                                                                                                                       gsub("\\?", "\\\\?",
-                                                                                                                            gsub("\\.", "\\\\.",
-                                                                                                                                 gsub("\\+", "\\\\+",
-                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
                                                                                                              ".+[[:space:]]",
                                                                                                              unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                              "$"), nm[ndx.filt.rep[[j]]])]))
@@ -6101,39 +6128,57 @@ server <- function(input, output, session){
                                                                   ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
                                                                            max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
                                                                          "", " \u00B1 ") ) ),
-                                                                max_slope.sd),
+                                                                unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                         max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                       "", max_slope.sd[x])))),
 
                                      "λ" =  paste0(lambda.mean,
                                                    unlist(lapply(1:length(lambda.mean), function (x)
                                                      ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                               lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                             "", " \u00B1 ") ) ),
-                                                   lambda.sd),
+                                                   unlist(lapply(1:length(lambda.mean), function (x)
+                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                          "", lambda.sd[x])))),
                                      "ΔY" = paste0(dY.mean,
                                                    unlist(lapply(1:length(dY.mean), function (x)
                                                      ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                               dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                             "", " \u00B1 ") ) ),
-                                                   dY.sd),
+                                                   unlist(lapply(1:length(dY.mean), function (x)
+                                                     ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                            dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                          "", dY.sd[x])))),
                                      "y<sub>max</sub>" = paste0(A.mean,
                                                                 unlist(lapply(1:length(A.mean), function (x)
                                                                   ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                            A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                          "", " \u00B1 ") ) ),
-                                                                A.sd),
+                                                                unlist(lapply(1:length(A.mean), function (x)
+                                                                ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                         A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                       "", A.sd[x])))),
                                      "x<sub>start</sub><br>(slope<sub>max</sub>)" = paste0(tmu.start.mean,
                                                                                        unlist(lapply(1:length(tmu.start.mean), function (x)
                                                                                          ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
                                                                                                   tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
                                                                                                 "", " \u00B1 ") ) ),
-                                                                                       tmu.start.sd),
+                                                                                       unlist(lapply(1:length(tmu.start.mean), function (x)
+                                                                                       ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
+                                                                                                tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
+                                                                                              "", tmu.start.sd[x])))),
 
                                      "x<sub>end</sub><br>(slope<sub>max</sub>)" = paste0(tmu.end.mean,
                                                                                      unlist(lapply(1:length(tmu.end.mean), function (x)
                                                                                        ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                                                 tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
                                                                                               "", " \u00B1 ") ) ),
-                                                                                     tmu.end.sd),
+                                                                                     unlist(lapply(1:length(tmu.end.mean), function (x)
+                                                                                       ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
+                                                                                              tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
+                                                                                            "", tmu.end.sd[x])))),
                                      stringsAsFactors = F, check.names = F)
 
 
@@ -6174,12 +6219,8 @@ server <- function(input, output, session){
     filter.ls <- list()
     for(j in 1:length(ndx.filt.rep)){
       filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                             gsub("\\)", "\\\\)",
-                                                                                                                  gsub("\\(", "\\\\(",
-                                                                                                                       gsub("\\?", "\\\\?",
-                                                                                                                            gsub("\\.", "\\\\.",
-                                                                                                                                 gsub("\\+", "\\\\+",
-                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]))))),
+                                                                                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
                                                                                                              ".+[[:space:]]",
                                                                                                              unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                              "$"), nm[ndx.filt.rep[[j]]])]))
@@ -6213,31 +6254,46 @@ server <- function(input, output, session){
                                                                   ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
                                                                            max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
                                                                          "", " \u00B1 ") ) ),
-                                                                max_slope.sd),
+                                                                unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                         max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                       "", max_slope.sd[x])))),
                                      "λ" = paste0(lambda.mean,
                                                   unlist(lapply(1:length(lambda.mean), function (x)
                                                     ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                              lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                            "", " \u00B1 ") ) ),
-                                                  lambda.sd),
+                                                  unlist(lapply(1:length(lambda.mean), function (x)
+                                                  ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                           lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                         "", lambda.sd[x])))),
                                      "y<sub>max</sub>" = paste0(A.mean,
                                                                 unlist(lapply(1:length(A.mean), function (x)
                                                                   ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                            A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                          "", " \u00B1 ") ) ),
-                                                                A.sd),
+                                                                unlist(lapply(1:length(A.mean), function (x)
+                                                                ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                         A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                       "", A.sd[x])))),
                                      "ΔY" = paste0(dY.mean,
                                                    unlist(lapply(1:length(dY.mean), function (x)
                                                      ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                               dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                             "", " \u00B1 ") ) ),
-                                                   dY.sd),
+                                                   unlist(lapply(1:length(dY.mean), function (x)
+                                                     ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                              dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                            "", dY.sd)))),
                                      "x<sub>max</sub>" = paste0(tmax.mean,
                                                                 unlist(lapply(1:length(tmax.mean), function (x)
                                                                   ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                            tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                          "", " \u00B1 ") ) ),
-                                                                tmax.sd),
+                                                                unlist(lapply(1:length(tmax.mean), function (x)
+                                                                  ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
+                                                                           tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
+                                                                         "", tmax.sd[x])))),
                                      check.names = F)
 
     table_spline_group
