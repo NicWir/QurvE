@@ -14,11 +14,28 @@ parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
+{
+  # Read table file
+  input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
+
+  time.ndx <- grep("time", input[1,], ignore.case = T)
+  # extract different read data in dataset
+  read.ndx <- grep("measured", input[1,], ignore.case = T)
+  reads <- input[1, read.ndx]
+  suppressWarnings(
+    reads[!is.na(as.numeric(reads))] <- gsub("\\.", ",", as.numeric(reads[!is.na(as.numeric(reads))]))
+  )
+  reads <- reads[!is.na(reads)]
+  reads <- unique(reads)
+  return(reads)
+}
+
 parse_data_shiny <-
   function(data.file = NULL,
            map.file = NULL,
            software = "Gen5",
-           convert.time = TRUE,
+           convert.time = NULL,
            data.sheet = 1,
            map.sheet = 1,
            csvsep.data = ";",
@@ -35,7 +52,6 @@ parse_data_shiny <-
     if(!is.null(fl2.nm) && is.na(fl2.nm)) fl2.nm <- NULL
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
-    if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
@@ -55,25 +71,41 @@ parse_data_shiny <-
     if(any(c("Gen5", "Gen6") %in% software)){
       parsed.ls <- parse_Gen5Gen6_shiny(data = input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
-      read.data <- parsed.ls[[2]]
     } # if("Gen5" %in% software)
-    # Convert time values to hours
-    if(convert.time){
-      for(i in 1:length(data.ls)){
-        if(length(data.ls[[i]]) > 1) data.ls[[i]][2:nrow(data.ls[[i]]),1] <- as.numeric(data.ls[[i]][2:nrow(data.ls[[i]]),1])*24
-      }
+
+
+    if("Chi.Bio" %in% software){
+      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm)
+      data.ls <- parsed.ls[[1]]
     }
     noNA.ndx <- which(!is.na(data.ls))
 
-    # Remove any columns between time and 'A1'
-    A1.ndx <- match("A1", data.ls[[noNA.ndx[1]]][1,])
-    if(A1.ndx>2){
-      for(i in 1:length(data.ls)){
-        if(length(data.ls[[i]]) > 1){
-          data.ls[[i]] <- data.ls[[i]][ ,c(1,A1.ndx:ncol(read.data[[i]]))]
-        }
+    # Convert time values
+    if(!is.null(convert.time)){
+
+      conversion <- parse(text = convert.time)
+
+      for(i in 1:length(data.ls[!is.na(data.ls)])){
+        x <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])
+        time_converted <- eval(conversion)
+        data.ls[[i]][2:nrow(data.ls[[1]]),1] <- time_converted
       }
     }
+
+    if(any(c("Gen5", "Gen6") %in% software)){
+      # Remove any columns between time and 'A1' (for plate readers)
+      A1.ndx <- match("A1", data.ls[[noNA.ndx[1]]][1,])
+      if(A1.ndx>2){
+        for(i in 1:length(data.ls)){
+          if(length(data.ls[[i]]) > 1){
+            data.ls[[i]] <- data.ls[[i]][ ,c(1,A1.ndx:ncol(data.ls[[i]]))]
+          }
+        }
+      }
+    } else {
+      data.ls <-data.ls[noNA.ndx]
+    }
+
     # apply identifiers specified in mapping file
     for(i in noNA.ndx){
       if(!is.null(mapping)){
@@ -183,7 +215,26 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
   data.ls[[2]] <- fluorescence1
   data.ls[[3]] <- fluorescence2
 
-  return(list(data.ls, read.data))
+  return(list(data.ls))
+}
+
+parse_chibio_shiny <- function(input, density.nm)
+{
+  time.ndx <- grep("time", input[1,], ignore.case = T)
+  read.ndx <- grep("measured", input[1,], ignore.case = T)
+  reads <- input[1, read.ndx]
+
+  data.ls <- list()
+  if(length(reads)>1){
+    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1,density.nm], as.numeric(input[-1, density.nm])))
+  } else {
+    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
+  }
+  data.ls[[1]] <- density
+  data.ls[[2]] <- NA
+  data.ls[[3]] <- NA
+
+  return(list(data.ls))
 }
 
 write.csv.utf8.BOM <- function(df, filename)

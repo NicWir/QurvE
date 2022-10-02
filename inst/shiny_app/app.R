@@ -15,7 +15,7 @@ for( i in new_packages ){
 
 
 library(shiny, quietly = T)
-library(QurvE, quietly = T)
+# library(QurvE, quietly = T)
 library(shinyBS, quietly = T)
 library(shinycssloaders, quietly = T)
 library(shinyFiles, quietly = T)
@@ -369,7 +369,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             h3(strong("2. Format"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                             selectInput(inputId = "platereader_software",
                                                                         label = "Platereader software",
-                                                                        choices = c("Biotek - Gen5/Gen6" = "Gen5"
+                                                                        choices = c("Biotek - Gen5/Gen6" = "Gen5",
+                                                                                    "Chi.Bio" = "chibio"
                                                                         )
                                                             )
                                                           )
@@ -404,10 +405,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
                                                             div(style = "margin-top: -10px"),
                                                             h3(strong("4. Load mapping"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
-                                                            tags$div(title="A table with mapping information is stored within the same Excel file that contains experimental data as separate sheet.",
-                                                                     checkboxInput(inputId = 'mapping_included_in_parse',
-                                                                                   label = 'Included in data file (xlsx/xls)',
-                                                                                   value = FALSE)
+                                                            conditionalPanel(
+                                                              condition = "output.parse_file_format == 'xlsx' | output.parse_file_format == 'xls'",
+                                                              tags$div(title="A table with mapping information is stored within the same Excel file that contains experimental data as separate sheet.",
+                                                                       checkboxInput(inputId = 'mapping_included_in_parse',
+                                                                                     label = 'Included in data file (xlsx/xls)',
+                                                                                     value = FALSE)
+                                                              )
                                                             ),
                                                             tags$div(title = "Table with four columns: Well | Description | Replicate | Concentration",
                                                                      fileInput(inputId = 'map_file',
@@ -454,10 +458,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                value = TRUE)
                                                         ),
 
-                                                        tags$div(title="Convert the Excel time format into hours.",
+                                                        tags$div(title=HTML(paste("Provide an equation in the form 'y = function(x)' to convert time values. For example, type 'y = x / 60' to convert minutes to hours.\n", "Note: the time unit will affect calculated parameters (e.g., the growth rate in 1/h, 1/min, or 1/s) as well as the time displayed in all plots.")),
                                                                  checkboxInput(inputId = 'convert_time_values_plate_reader',
-                                                                               label = 'Convert time values',
+                                                                               label = 'Convert time to hours',
                                                                                value = TRUE)
+                                                        ),
+
+                                                        conditionalPanel(
+                                                          condition = 'input.convert_time_values_plate_reader',
+                                                          tags$div(title=HTML(paste("Provide an equation in the form 'y = function(x)' to convert time values. For example, type 'y = x / 60' to convert minutes to hours.\n", "Note: the time unit will affect calculated parameters (e.g., the growth rate in 1/h, 1/min, or 1/s) as well as the time displayed in all plots.")),
+                                                                   textInput(inputId = "convert_time_equation_plate_reader",
+                                                                             label = "Type equation in the form 'y = function(x)'",
+                                                                             placeholder = 'y = x / 24')
+                                                          )
                                                         ),
 
                                                         tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
@@ -467,9 +480,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         conditionalPanel(
                                                           condition = 'input.calibration_plate_reader',
-                                                          textInput(inputId = "calibration_equation_plate_reader",
-                                                                    label = "Type equation in the form 'y = function(x)'",
-                                                                    placeholder = 'y = x * 0.5 - 1'
+                                                          tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
+                                                                   textInput(inputId = "calibration_equation_plate_reader",
+                                                                             label = "Type equation in the form 'y = function(x)'",
+                                                                             placeholder = 'y = x * 0.5 - 1')
                                                           )
                                                         ),
 
@@ -4976,6 +4990,16 @@ server <- function(input, output, session){
   # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
+  # Update placeholder for time conversion based on selected software
+  observe({
+    if("Gen5" %in% input$platereader_software){
+      updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x * 24")
+    }
+    if("chibio" %in% input$platereader_software){
+      updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 60")
+    }
+  })
+
   ### Test if parse_file was loaded
   output$parsefileUploaded <- reactive({
     if(is.null(input$parse_file)) return(FALSE)
@@ -5038,13 +5062,24 @@ server <- function(input, output, session){
 
     filename <- inFile$datapath
     showModal(modalDialog("Reading data file...", footer=NULL))
-    try(reads <- QurvE:::parse_properties_Gen5Gen6(file=filename,
-                                           csvsep = input$separator_custom_density,
-                                           dec = input$decimal_separator_custom_density,
-                                           sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
-        silent = FALSE
+    if("Gen5" %in% input$platereader_software){
+      try(reads <- QurvE:::parse_properties_Gen5Gen6(file=filename,
+                                                     csvsep = input$separator_custom_density,
+                                                     dec = input$decimal_separator_custom_density,
+                                                     sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
+          silent = FALSE
 
-    )
+      )
+    }
+    if("chibio" %in% input$platereader_software){
+      try(reads <- QurvE:::parse_properties_chibio(file=filename,
+                                                     csvsep = input$separator_custom_density,
+                                                     dec = input$decimal_separator_custom_density,
+                                                     sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
+          silent = FALSE
+
+      )
+    }
     if(exists("reads")){
       show("parsed_reads_density")
       if(length(reads)>1) show("parsed_reads_fluorescence1")
@@ -5080,13 +5115,16 @@ server <- function(input, output, session){
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
     showModal(modalDialog("Parsing data input...", footer=NULL))
+    if(input$convert_time_equation_plate_reader == "" || is.na(input$convert_time_equation_plate_reader)) convert.time <- NULL
+    else convert.time <- input$convert_time_equation_plate_reader
+
     if(input$mapping_included_in_parse){
       try(
         results$parsed_data <- QurvE:::parse_data_shiny(
           data.file = input$parse_file$datapath,
           map.file = input$parse_file$datapath,
           software = input$platereader_software,
-          convert.time = input$convert_time_values_plate_reader,
+          convert.time = ifelse(input$convert_time_values_plate_reader, convert.time, NULL),
           data.sheet = input$parse_data_sheets,
           map.sheet = input$map_data_sheets,
           csvsep.data =  input$separator_parse,
@@ -5118,7 +5156,7 @@ server <- function(input, output, session){
           data.file = input$parse_file$datapath,
           map.file = input$map_file$datapath,
           software = input$platereader_software,
-          convert.time = input$convert_time_values_plate_reader,
+          convert.time = ifelse(input$convert_time_values_plate_reader, convert.time, NULL),
           data.sheet = input$parse_data_sheets,
           map.sheet = input$map_data_sheets,
           csvsep.data =  input$separator_parse,

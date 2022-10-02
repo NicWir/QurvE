@@ -395,7 +395,14 @@ read_data <-
     } # end of else {}
     return(df.mat)
   }
-  if(length(dat)>1){dat.mat <- create_datmat(dat, time.ndx=time.ndx); dat.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])}else{dat.mat <- NA}
+  if(length(dat)>1){
+    dat.mat <- create_datmat(dat, time.ndx=time.ndx)
+    if(ncol(dat.mat) == 1) dat.mat <- t(dat.mat)
+    dat.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])
+  }
+  else{
+    dat.mat <- NA
+  }
   if((length(fluoro1) > 1 ) || !is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx);  fluoro1.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro1.mat[,1])}else{fluoro1.mat <- NA}
   if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx);  fluoro2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.mat[,1])}else{fluoro2.mat <- NA}
   if(((length(fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx);  fluoro1.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro1.norm.mat[,1])}else{fluoro1.norm.mat <- NA}
@@ -459,7 +466,8 @@ read_data <-
 #' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
 #' @param map.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
 #' @param software (Character) The name of the software used to export the plate reader data.
-#' @param convert.time (Logical) Shall the time be converted from, e.g., 00:15:00 in Excel into hours (\code{TRUE}) or not (\code{FALSE})?
+#' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
+#' For example: \code{convert.time = 'y = 24 * x'}
 #' @param data.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
 #' @param map.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
 #' @param csvsep.data (Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}
@@ -478,8 +486,8 @@ read_data <-
 parse_data <-
   function(data.file = NULL,
            map.file = NULL,
-           software = "Gen5",
-           convert.time = TRUE,
+           software = c("Gen5", "Chi.Bio"),
+           convert.time = NULL,
            data.sheet = 1,
            map.sheet = 1,
            csvsep.data = ";",
@@ -489,9 +497,10 @@ parse_data <-
            subtract.blank  = T,
            calibration = NULL
   ) {
+    software <- match.arg(software)
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
-    if(!(software %in% c("Gen5", "Gen6"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
+    if(!(software %in% c("Gen5", "Gen6", "Chi.Bio"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
@@ -509,20 +518,34 @@ parse_data <-
     if(any(c("Gen5", "Gen6") %in% software)){
       parsed.ls <- parse_Gen5Gen6(input)
       data.ls <- parsed.ls[[1]]
-      read.data <- parsed.ls[[2]]
     } # if("Gen5" %in% software)
-    # Convert time values to hours
-    if(convert.time){
+    if("Chi.Bio" %in% software){
+      parsed.ls <- parse_chibio(input)
+      data.ls <- parsed.ls[[1]]
+    }
+
+    # Convert time values
+    if(!is.null(convert.time)){
+
+      conversion <- parse(text = convert.time)
+
       for(i in 1:length(data.ls[!is.na(data.ls)])){
-        data.ls[[i]][2:nrow(data.ls[[1]]),1] <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])*24
+        x <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])
+        time_converted <- eval(conversion)
+        data.ls[[i]][2:nrow(data.ls[[1]]),1] <- time_converted
       }
     }
+
     noNA.ndx <- which(!is.na(data.ls))
 
-    # Remove any columns between time and 'A1'
-    A1.ndx <- match("A1", data.ls[[1]][1,])
-    if(A1.ndx>2){
-      data.ls <- lapply(noNA.ndx, function(x) data.ls[[x]][ ,c(1,A1.ndx:ncol(read.data[[x]]))])
+    if(any(c("Gen5", "Gen6") %in% software)){
+      # Remove any columns between time and 'A1' (for plate readers)
+      A1.ndx <- match("A1", data.ls[[1]][1,])
+      if(A1.ndx>2){
+        data.ls <- lapply(noNA.ndx, function(x) data.ls[[x]][ ,c(1,A1.ndx:ncol(data.ls[[x]]))])
+      }
+    } else {
+      data.ls <-data.ls[noNA.ndx]
     }
     # apply identifiers specified in mapping file
     for(i in noNA.ndx){

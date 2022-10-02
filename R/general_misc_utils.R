@@ -302,7 +302,32 @@ parse_Gen5Gen6 <- function(input)
     data.ls[[2]] <- NA
     data.ls[[3]] <- NA
   }
-  return(list(data.ls, read.data))
+  return(list(data.ls))
+}
+
+parse_chibio <- function(input)
+{
+  time.ndx <- grep("time", input[1,], ignore.case = T)
+  read.ndx <- grep("measured", input[1,], ignore.case = T)
+  reads <- input[1, read.ndx]
+
+  data.ls <- list()
+  if(length(reads)>1){
+
+    answer <- readline(paste0("Indicate where the density data is stored?\n",
+                              paste(unlist(lapply(1:length(reads), function (i)
+                                paste0("[", i, "] ", reads[i]))),
+                                collapse = "\n")))
+
+    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+  } else {
+    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
+  }
+  data.ls[[1]] <- density
+  data.ls[[2]] <- NA
+  data.ls[[3]] <- NA
+
+  return(list(data.ls))
 }
 
 biosensor.eq <- function (x, y.min, y.max, K, n)
