@@ -69,7 +69,7 @@ fl.control <- function(fit.opt = c("l", "s"),
   if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
   x_type <- match.arg(x_type)
   dr.method <- match.arg(dr.method)
-  if(nboot.fl == "" || is.null(nboot.fl)) nboot.fl <- 0
+  if(is.null(nboot.fl) || nboot.fl == "") nboot.fl <- 0
   if ((is.character(fit.opt) == FALSE | !any(fit.opt %in% c("l", "s"))))
     stop("value of fit.opt must be character and contain one of or both 'l' and 's'.")
   if ((is.character(x_type) == FALSE | !any(x_type %in% c("density", "time"))))
@@ -220,8 +220,8 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   if (!any(control$fit.opt %in% "s"))
     stop("Fit option is not set for a fluorescence spline fit. See fl.control()")
 
-  if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))]
-  if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))]
+  if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))][!is.na(as.vector(as.numeric(as.matrix(density))))]
+  if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
   fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
   bad.values <- (fl_data < 0)
   if (TRUE %in% bad.values) {
@@ -1211,6 +1211,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
                                                                        summary.flBootSpline(boot.all[[x]])
                                                                        )
   )
+  df <- data.frame()
 
   out.table       <- do.call(rbind, fitted)
   class(out.table) <- c("data.frame", "flTable")

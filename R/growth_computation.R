@@ -1999,8 +1999,8 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
   if(max(data) < control$growth.thresh * data[1]){
     if(control$suppress.messages==F) message(paste0("gcFitSpline: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
     gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
-                        fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
-                                                                                                                    mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
+                        fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = 0, dY = 0,
+                                                                                                                    mu = 0, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
                                                                                                                     lambda2 = NA, b.tangent2 = NA, integral = NA),
                         spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
                         control = control)
@@ -2013,7 +2013,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
                         gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A = NA, dY = NA,
                                                                                      mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
                                                                                      lambda2 = NA, b.tangent2 = NA, integral = NA),
-                        spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                        spline = NA, reliable = NULL, fitFlag = TRUE, fitFlag2 = FALSE,
                         control = control)
     class(gcFitSpline) <- "gcFitSpline"
     return(gcFitSpline)
@@ -3781,9 +3781,13 @@ low.integrate <- function (x, y)
     stop("low.integrate: x and y have to be of same length !")
   spline <- NULL
   try(spline <- smooth.spline(x, y, keep.data = FALSE))
-  if (is.null(spline) == TRUE) {
+  if (is.null(spline)){
+    try(spline <- smooth.spline(x, y, keep.data = FALSE, spar = 0.1))
+  }
+  if (is.null(spline)){
+    try(spline <- smooth.spline(x, y, keep.data = FALSE, spar = 0.1))
     warning("Spline could not be fitted to data!")
-    stop("Error in low.integrate")
+    stop()
   }
   f <- function(t) {
     p <- stats::predict(spline, t)

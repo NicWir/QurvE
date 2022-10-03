@@ -2659,7 +2659,12 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   # Check FitFlag for each replicate, work per condition
   for(i in 1:length(ndx.filt)){
     if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (as.logical(gcTable[j, ifelse(fit.type=="linfit", "reliable_fit.linfit", ifelse(fit.type=="model", "reliable_fit.model", "reliable_fit.spline"))])))))){
-      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (as.logical(gcTable[j, ifelse(fit.type=="linfit", "reliable_fit.linfit", ifelse(fit.type=="model", "reliable_fit.model", "reliable_fit.spline"))]))))
+      fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (as.logical(gcTable[ndx.filt[[i]][j], ifelse(fit.type=="linfit", "reliable_fit.linfit", ifelse(fit.type=="model", "reliable_fit.model", "reliable_fit.spline"))]))))
+      for(j in 1:length(fitflags)){
+        if(!is.na(gcTable[ndx.filt[[i]][j], param])){
+          fitflags[j] <- TRUE
+        }
+      }
       nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
       ndx.filt[[i]] <- ndx.filt[[i]][fitflags]
     }
@@ -2718,10 +2723,14 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
 
 
-  replicates <- unlist(lapply(1:length(ndx.filt), function(x) seq(1, length(ndx.filt[[x]]))))
+  replicates <- unlist(
+    lapply(
+      1:length(ndx.filt), function(x) if(length(ndx.filt[[x]])>0){ seq(1, length(ndx.filt[[x]]))}
+    )
+  )
   df_reps <-
     data.frame(condition = unlist(lapply(1:length(ndx.filt), function(x) rep(labels[x], length(ndx.filt[[x]])))),
-               replicate = unlist(lapply(1:length(ndx.filt), function(x) seq(1, length(ndx.filt[[x]])))),
+               replicate = replicates,
                value = unlist(lapply(1:length(ndx.filt), function (x) as.numeric(gcTable[ndx.filt[[x]], param])))
                ) %>%
     tibble::rownames_to_column()

@@ -659,31 +659,34 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                               label = 'Biphasic growth')
                                                                        ),
 
-                                                                       numericInput(
+                                                                       numberInput(
                                                                          inputId = 'growth_threshold_growth',
                                                                          label = 'Growth threshold',
                                                                          value = 1.5,
                                                                          min = NA,
                                                                          max = NA,
+                                                                         placeholder = 1.5
                                                                        ),
                                                                        bsPopover(id = "growth_threshold_growth", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no density value is greater than [growth threshold] \\* start density."),
 
-                                                                       numericInput(
+                                                                       numberInput(
                                                                          inputId = 'minimum_density_growth',
                                                                          label = 'Minimum density',
                                                                          value = 0,
                                                                          min = NA,
                                                                          max = NA,
+                                                                         placeholder = 0
                                                                        ),
                                                                        bsPopover(id = "minimum_density_growth", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
 
 
-                                                                       numericInput(
+                                                                       numberInput(
                                                                          inputId = 't0_growth',
                                                                          label = 't0',
                                                                          value = 0,
                                                                          min = NA,
                                                                          max = NA,
+                                                                         placeholder = 0
                                                                        ),
                                                                        bsPopover(id = "t0_growth", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
 
@@ -718,12 +721,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                         ),
                                                                                         bsPopover(id = "smoothing_factor_growth_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
-                                                                                        numericInput(
+                                                                                        numberInput(
                                                                                           inputId = 'number_of_bootstrappings_dr_growth',
                                                                                           label = 'Number of bootstrappings',
                                                                                           value = 0,
                                                                                           min = NA,
                                                                                           max = NA,
+                                                                                          placeholder = 0
                                                                                         ),
                                                                                         bsPopover(id = "number_of_bootstrappings_dr_growth", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
 
@@ -756,30 +760,33 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Linear fit')),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'R2_threshold_growth',
                                                              label = 'R2 threshold',
                                                              value = 0.95,
-                                                             min = NA,
-                                                             max = NA,
+                                                             min = 0,
+                                                             max = 1,
+                                                             placeholder = 0.95
                                                            ),
                                                            bsPopover(id = "R2_threshold_growth", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'RSD_threshold_growth',
                                                              label = 'RSD threshold',
                                                              value = 0.1,
-                                                             min = NA,
-                                                             max = NA,
+                                                             min = 0,
+                                                             max = 1,
+                                                             placeholder = 0.1
                                                            ),
                                                            bsPopover(id = "RSD_threshold_growth", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'dY_threshold_growth',
                                                              label = 'dY threshold',
                                                              value = 0.05,
-                                                             min = NA,
-                                                             max = NA,
+                                                             min = 0,
+                                                             max = 1,
+                                                             placeholder = 0.05
                                                            ),
                                                            bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of density increase a linear regression window should cover to be considered."),
 
@@ -885,22 +892,24 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                   value = TRUE)
                                                            ),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'smoothing_factor_nonparametric_growth',
                                                              label = 'Smoothing factor',
                                                              value = 0.55,
                                                              min = NA,
                                                              max = NA,
+                                                             placeholder = 0.55
                                                            ),
                                                            bsPopover(id = "smoothing_factor_nonparametric_growth", title = HTML("<em>smooth.gc</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'number_of_bootstrappings_growth',
                                                              label = 'Number of bootstrappings',
                                                              value = 0,
                                                              min = NA,
                                                              max = NA,
+                                                             placeholder = 0
                                                            ),
                                                            bsPopover(id = "number_of_bootstrappings_growth", title = HTML("<em>nboot.gc</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
                                                            fluidRow(
@@ -956,7 +965,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        selectInput(
                                                                          inputId = 'data_type_x_fluorescence',
-                                                                         label = 'Independent variable',
+                                                                         label = 'Independent variable (x)',
                                                                          choices = ""
                                                                        ),
                                                                        bsPopover(id = "data_type_x_fluorescence", title = HTML("<em>x_type</em>"), content = "Select the data type that is used as the independent variable for all fits."),
@@ -972,36 +981,39 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("density")',
-                                                                         numericInput(
+                                                                         numberInput(
                                                                            inputId = 'growth_threshold_in_percent_fluorescence',
                                                                            label = 'growth threshold (in %)',
                                                                            value = 1.5,
                                                                            min = NA,
                                                                            max = NA,
+                                                                           placeholder = 1.5
                                                                          ),
                                                                          bsPopover(id = "growth_threshold_in_percent_fluorescence", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no density value is greater than [growth threshold] \\* start density."),
                                                                        ),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("density")',
-                                                                         numericInput(
+                                                                         numberInput(
                                                                            inputId = 'minimum_density_fluorescence',
                                                                            label = 'minimum density',
                                                                            value = 0,
                                                                            min = NA,
                                                                            max = NA,
+                                                                           placeholder = 0
                                                                          ),
                                                                          bsPopover(id = "minimum_density_fluorescence", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
                                                                        ),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("time")',
-                                                                         numericInput(
+                                                                         numberInput(
                                                                            inputId = 't0_fluorescence',
                                                                            label = 't0',
                                                                            value = 0,
                                                                            min = NA,
                                                                            max = NA,
+                                                                           placeholder = 0
                                                                          )
                                                                        ),
                                                                        bsPopover(id = "t0_fluorescence", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
@@ -1040,12 +1052,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                                                 conditionalPanel(
                                                                                                   condition = 'input.dr_method_fluorescence == "spline"',
-                                                                                                  numericInput(
+                                                                                                  numberInput(
                                                                                                     inputId = 'number_of_bootstrappings_dr_fluorescence',
                                                                                                     label = 'Number of bootstrappings',
                                                                                                     value = 0,
                                                                                                     min = NA,
                                                                                                     max = NA,
+                                                                                                    placeholder = 0
                                                                                                   ),
                                                                                                   bsPopover(id = "number_of_bootstrappings_dr_fluorescence", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
                                                                                                 ),
@@ -1093,30 +1106,33 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Linear fit')),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'R2_threshold_fluorescence',
                                                              label = 'R2 threshold',
                                                              value = 0.95,
                                                              min = NA,
                                                              max = NA,
+                                                             placeholder = 0.95
                                                            ),
                                                            bsPopover(id = "R2_threshold_fluorescence", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'RSD_threshold_fluorescence',
                                                              label = 'RSD threshold',
                                                              value = 0.1,
                                                              min = NA,
                                                              max = NA,
+                                                             placeholder = 0.1
                                                            ),
                                                            bsPopover(id = "RSD_threshold_fluorescence", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'dY_threshold_fluorescence',
                                                              label = 'dY threshold',
                                                              value = 0.05,
                                                              min = NA,
                                                              max = NA,
+                                                             placeholder = 0.05
                                                            ),
                                                            bsPopover(id = "dY_threshold_fluorescence", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of fluorescence increase a linear regression window should cover to be considered."),
 
@@ -1165,21 +1181,23 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Nonparametric fit')),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'smoothing_factor_nonparametric_fluorescence',
                                                              label = 'Smoothing factor',
                                                              value = 0.75,
                                                              min = NA,
                                                              max = NA,
+                                                             placeholder = 0.75
                                                            ),
                                                            bsPopover(id = "smoothing_factor_nonparametric_fluorescence", title = HTML("<em>smooth.fl</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
-                                                           numericInput(
+                                                           numberInput(
                                                              inputId = 'number_of_bootstrappings_fluorescence',
                                                              label = 'Number of bootstrappings',
                                                              value = 0,
                                                              min = NA,
                                                              max = NA,
+                                                             placeholder = 0
                                                            ),
                                                            bsPopover(id = "number_of_bootstrappings_fluorescence", title = HTML("<em>nboot.fl</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
 
@@ -2379,7 +2397,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "!input.select_string_visualize_growth_group && input.plot_group_averages_growth_group_plot",
-                                                                     selectizeInput(inputId = "samples_visualize_growth_group",
+                                                                     selectizeInput(inputId = "groups_visualize_growth_group",
                                                                                     label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
@@ -3126,7 +3144,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "!input.select_string_visualize_fluorescence_group && input.plot_group_averages_fluorescence_group_plot",
-                                                                     selectizeInput(inputId = "samples_visualize_fluorescence_group",
+                                                                     selectizeInput(inputId = "groups_visualize_fluorescence_group",
                                                                                     label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
@@ -5361,10 +5379,64 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(NULL)
 
-    if (is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL" || input$smoothing_factor_growth_dr == "") {
+    if (is.null(input$number_of_bootstrappings_growth) || is.na(input$number_of_bootstrappings_growth) || input$number_of_bootstrappings_growth == "NULL" || input$number_of_bootstrappings_growth == "") {
+      nboot.gc <- 0.55
+    } else {
+      nboot.gc <- as.numeric(input$number_of_bootstrappings_growth)
+    }
+
+    if (is.null(input$smoothing_factor_nonparametric_growth) || is.na(input$smoothing_factor_nonparametric_growth) || input$smoothing_factor_nonparametric_growth == "NULL" || input$smoothing_factor_nonparametric_growth == "") {
+      smooth.gc <- 0.55
+    } else {
+      smooth.gc <- as.numeric(input$smoothing_factor_nonparametric_growth)
+    }
+
+    if (is.null(input$smoothing_factor_growth_dr) || is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL" || input$smoothing_factor_growth_dr == "") {
       smooth.dr = NULL
     } else {
-      smooth.dr <- input$smoothing_factor_growth_dr
+      smooth.dr <- as.numeric(input$smoothing_factor_growth_dr)
+    }
+
+    if (is.null(input$number_of_bootstrappings_dr_growth) || is.na(input$number_of_bootstrappings_dr_growth) || input$number_of_bootstrappings_dr_growth == "NULL" || input$number_of_bootstrappings_dr_growth == "") {
+      nboot.dr <- 0
+    } else {
+      nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_growth)
+    }
+
+    if (is.null(input$R2_threshold_growth) || is.na(input$R2_threshold_growth) || input$R2_threshold_growth == "NULL" || input$R2_threshold_growth == "") {
+      lin.R2 <- 0.95
+    } else {
+      lin.R2 <- as.numeric(input$R2_threshold_growth)
+    }
+
+    if (is.null(input$RSD_threshold_growth) || is.na(input$RSD_threshold_growth) || input$RSD_threshold_growth == "NULL" || input$RSD_threshold_growth == "") {
+      lin.RSD <- 0.1
+    } else {
+      lin.RSD <- as.numeric(input$RSD_threshold_growth)
+    }
+
+    if (is.null(input$dY_threshold_growth) || is.na(input$dY_threshold_growth) || input$dY_threshold_growth == "NULL" || input$dY_threshold_growth == "") {
+      lin.dY <- 0.05
+    } else {
+      lin.dY <- as.numeric(input$dY_threshold_growth)
+    }
+
+    if (is.null(input$minimum_density_growth) || is.na(input$minimum_density_growth) || input$minimum_density_growth == "NULL" || input$minimum_density_growth == "") {
+      min.density <- 0
+    } else {
+      min.density <- as.numeric(input$minimum_density_growth)
+    }
+
+    if (is.null(input$t0_growth) || is.na(input$t0_growth) || input$t0_growth == "NULL" || input$t0_growth == "") {
+      t0 <- 0
+    } else {
+      t0 <- as.numeric(input$t0_growth)
+    }
+
+    if (is.null(input$growth_threshold_growth) || is.na(input$growth_threshold_growth) || input$growth_threshold_growth == "NULL" || input$growth_threshold_growth == "") {
+      growth.thresh <- 1.5
+    } else {
+      growth.thresh <- as.numeric(input$growth_threshold_growth)
     }
 
     fit.opt <- c()
@@ -5400,26 +5472,26 @@ server <- function(input, output, session){
                               growth.workflow(grodata = grodata,
                                               ec50 = input$perform_ec50_growth,
                                               fit.opt = fit.opt,
-                                              t0 = input$t0_growth,
-                                              min.density = input$minimum_density_growth,
+                                              t0 = t0,
+                                              min.density = min.density,
                                               log.x.gc = input$log_transform_time_growth,
                                               log.y.model = input$log_transform_data_parametric_growth,
                                               log.y.spline = input$log_transform_data_nonparametric_growth,
                                               biphasic = input$biphasic_growth,
                                               lin.h = input$custom_sliding_window_size_value_growth,
-                                              lin.R2 = as.numeric(input$R2_threshold_growth),
-                                              lin.RSD = as.numeric(input$RSD_threshold_growth),
-                                              lin.dY = as.numeric(input$dY_threshold_growth),
+                                              lin.R2 = lin.R2,
+                                              lin.RSD = lin.RSD,
+                                              lin.dY = lin.dY,
                                               interactive = F,
-                                              nboot.gc = input$number_of_bootstrappings_growth,
-                                              smooth.gc = input$smoothing_factor_nonparametric_growth,
+                                              nboot.gc = nboot.gc,
+                                              smooth.gc = smooth.gc,
                                               model.type = models,
-                                              growth.thresh = input$growth_threshold_growth,
+                                              growth.thresh = growth.thresh,
                                               dr.parameter = input$response_parameter_growth,
                                               smooth.dr = smooth.dr,
                                               log.x.dr = input$log_transform_concentration_growth,
                                               log.y.dr = input$log_transform_response_growth,
-                                              nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                              nboot.dr = nboot.dr,
                                               suppress.messages = T,
                                               report = NULL,
                                               shiny = TRUE
@@ -5522,16 +5594,64 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(NULL)
 
-    if (is.na(input$smoothing_factor_nonparametric_fluorescence) || input$smoothing_factor_nonparametric_fluorescence == "NULL" || input$smoothing_factor_nonparametric_fluorescence == "") {
-      smooth.fl = NULL
+    if (is.null(input$smoothing_factor_nonparametric_fluorescence) || is.na(input$smoothing_factor_nonparametric_fluorescence) || input$smoothing_factor_nonparametric_fluorescence == "NULL" || input$smoothing_factor_nonparametric_fluorescence == "") {
+      smooth.fl = 0.75
     } else {
-      smooth.fl <- 0.75
+      smooth.fl <- as.numeric(input$smoothing_factor_nonparametric_fluorescence)
     }
 
-    if (is.na(input$smoothing_factor_fluorescence_dr) || input$smoothing_factor_fluorescence_dr == "NULL" || input$smoothing_factor_fluorescence_dr == "") {
+    if (is.null(input$smoothing_factor_fluorescence_dr) || is.na(input$smoothing_factor_fluorescence_dr) || input$smoothing_factor_fluorescence_dr == "NULL" || input$smoothing_factor_fluorescence_dr == "") {
       smooth.dr = NULL
     } else {
-      smooth.dr <- input$smoothing_factor_fluorescence_dr
+      smooth.dr <- as.numeric(input$smoothing_factor_fluorescence_dr)
+    }
+
+    if (is.null(input$number_of_bootstrappings_fluorescence) || is.na(input$number_of_bootstrappings_fluorescence) || input$number_of_bootstrappings_fluorescence == "NULL" || input$number_of_bootstrappings_fluorescence == "") {
+      nboot.fl <- 0
+    } else {
+      nboot.fl <- as.numeric(input$number_of_bootstrappings_fluorescence)
+    }
+
+    if (is.null(input$number_of_bootstrappings_dr_fluorescence) || is.na(input$number_of_bootstrappings_dr_fluorescence) || input$number_of_bootstrappings_dr_fluorescence == "NULL" || input$number_of_bootstrappings_dr_fluorescence == "") {
+      nboot.dr <- 0
+    } else {
+      nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_fluorescence)
+    }
+
+    if (is.null(input$R2_threshold_fluorescence) || is.na(input$R2_threshold_fluorescence) || input$R2_threshold_fluorescence == "NULL" || input$R2_threshold_fluorescence == "") {
+      lin.R2 <- 0.95
+    } else {
+      lin.R2 <- as.numeric(input$R2_threshold_fluorescence)
+    }
+
+    if (is.null(input$RSD_threshold_fluorescence) || is.na(input$RSD_threshold_fluorescence) || input$RSD_threshold_fluorescence == "NULL" || input$RSD_threshold_fluorescence == "") {
+      lin.RSD <- 0.1
+    } else {
+      lin.RSD <- as.numeric(input$RSD_threshold_fluorescence)
+    }
+
+    if (is.null(input$dY_threshold_fluorescence) || is.na(input$dY_threshold_fluorescence) || input$dY_threshold_fluorescence == "NULL" || input$dY_threshold_fluorescence == "") {
+      lin.dY <- 0.05
+    } else {
+      lin.dY <- as.numeric(input$dY_threshold_fluorescence)
+    }
+
+    if (is.null(input$growth_threshold_in_percent_fluorescence) || is.na(input$growth_threshold_in_percent_fluorescence) || input$growth_threshold_in_percent_fluorescence == "NULL" || input$growth_threshold_in_percent_fluorescence == "") {
+      growth.thresh <- 1.5
+    } else {
+      growth.thresh <- as.numeric(input$growth_threshold_in_percent_fluorescence)
+    }
+
+    if (is.null(input$t0_fluorescence) || is.na(input$t0_fluorescence) || input$t0_fluorescence == "NULL" || input$t0_fluorescence == "") {
+      t0 <- 0
+    } else {
+      t0 <- as.numeric(input$t0_fluorescence)
+    }
+
+    if (is.null(input$minimum_density_fluorescence) || is.na(input$minimum_density_fluorescence) || input$minimum_density_fluorescence == "NULL" || input$minimum_density_fluorescence == "") {
+      min.density <- 0
+    } else {
+      min.density <- as.numeric(input$minimum_density_fluorescence)
     }
 
     fit.opt <- c()
@@ -5547,7 +5667,6 @@ server <- function(input, output, session){
 
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
-    browser()
     # Run fluorescence workflow
     try(
       shiny::withProgress(message = "Computations completed",
@@ -5558,16 +5677,16 @@ server <- function(input, output, session){
                                           fit.opt = fit.opt,
                                           x_type = input$data_type_x_fluorescence,
                                           norm_fl = input$normalize_fluorescence,
-                                          t0 = input$t0_fluorescence,
-                                          min.density = input$minimum_density_fluorescence,
+                                          t0 = t0,
+                                          min.density = min.density,
                                           log.x.lin = input$log_transform_x_linear_fluorescence,
                                           log.x.spline = input$log_transform_x_nonparametric_fluorescence,
                                           log.y.lin = input$log_transform_data_linear_fluorescence,
                                           log.y.spline = input$log_transform_data_nonparametric_fluorescence,
                                           lin.h = as.numeric(input$custom_sliding_window_size_value_fluorescence),
-                                          lin.R2 = as.numeric(input$R2_threshold_fluorescence),
-                                          lin.RSD = as.numeric(input$RSD_threshold_fluorescence),
-                                          lin.dY = as.numeric(input$dY_threshold_fluorescence),
+                                          lin.R2 = lin.R2,
+                                          lin.RSD = lin.RSD,
+                                          lin.dY = lin.dY,
                                           biphasic = input$biphasic_fluorescence,
                                           interactive = FALSE,
                                           dr.parameter = input$response_parameter_fluorescence,
@@ -5575,10 +5694,10 @@ server <- function(input, output, session){
                                           smooth.dr = smooth.dr,
                                           log.x.dr = input$log_transform_concentration_fluorescence,
                                           log.y.dr = input$log_transform_response_fluorescence,
-                                          nboot.dr = input$number_of_bootstrappings_dr_fluorescence,
-                                          nboot.fl = input$number_of_bootstrappings_fluorescence,
+                                          nboot.dr = nboot.dr,
+                                          nboot.fl = nboot.fl,
                                           smooth.fl = smooth.fl,
-                                          growth.thresh = input$growth_threshold_in_percent_fluorescence,
+                                          growth.thresh = growth.thresh,
                                           suppress.messages = T,
                                           neg.nan.act = FALSE,
                                           clean.bootstrap = TRUE,
@@ -5630,7 +5749,7 @@ server <- function(input, output, session){
       } else {
         showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Model")
       }
-      if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt) || input$number_of_bootstrappings_growth <= 1){
+      if(!("s" %in% results$growth$control$fit.opt || "a" %in% results$growth$control$fit.opt) || results$growth$control$nboot.gc <= 1){
         hideTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
       } else {
         showTab(inputId = "tabsetPanel_Results_Growth", target = "tabPanel_Results_Growth_Spline_bt")
@@ -6127,7 +6246,7 @@ server <- function(input, output, session){
       } else {
         showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Linear")
       }
-      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt) || input$number_of_bootstrappings_fluorescence <= 1){
+      if(!("s" %in% results$fluorescence$control$fit.opt || "a" %in% results$fluorescence$control$fit.opt) || results$fluorescence$control$nboot.fl <=1){
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
       } else {
         showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
@@ -7665,13 +7784,13 @@ server <- function(input, output, session){
       }
 
       # Update gcTable with new results
-      res.table.fl <- results$fluorescence$flFit$flTable
-      fit.summary <- summary.flFitLinear(results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]])
+      res.table.fl <- results$fluorescence$flFit1$flTable
+      fit.summary <- summary.flFitLinear(results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
                            selected_vals_validate_fluorescence$sample_validate_fluorescence_linear,
-                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, names(results$fluorescence$flFit$flFittedLinear)))
-      results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
+                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, names(results$fluorescence$flFit1$flFittedLinear)))
+      results$fluorescence$flFit1$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
       # Show [Restore fit] button
       show("restore_fluorescence_linear")
@@ -7892,13 +8011,13 @@ server <- function(input, output, session){
         )
       }
       # Update gcTable with new results
-      res.table.fl <- results$fluorescence$flFit$flTable
-      fit.summary <- summary.flFitSpline(results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]])
+      res.table.fl <- results$fluorescence$flFit1$flTable
+      fit.summary <- summary.flFitSpline(results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
                            selected_vals_validate_fluorescence$sample_validate_fluorescence_spline,
-                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline, names(results$fluorescence$flFit$flFittedSplines)))
-      results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
+                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline, names(results$fluorescence$flFit1$flFittedSplines)))
+      results$fluorescence$flFit1$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
       # Show [Restore fit] button
       show("restore_fluorescence_spline")
@@ -8089,8 +8208,16 @@ server <- function(input, output, session){
     )
   })
 
+  observe({
+    updateSelectInput(session,
+                      inputId = "groups_visualize_growth_group",
+                      choices = selected_inputs_visualize_growth_group()
+    )
+  })
+
   growth_group_plot <- reactive({
     results <- results$growth
+    browser()
     if(input$select_string_visualize_growth_group){
       suppressWarnings(
         plot.grofit(results,
@@ -8120,7 +8247,11 @@ server <- function(input, output, session){
       suppressWarnings(
         plot.grofit(results,
                     data.type = input$data_type_growth_group_plot,
-                    IDs = input$samples_visualize_growth_group,
+                    IDs = if(input$plot_group_averages_growth_group_plot){
+                      input$groups_visualize_growth_group
+                    }else{
+                      input$samples_visualize_growth_group
+                    },
                     names = NULL,
                     conc = input$select_samples_based_on_concentration_growth_group_plot,
                     exclude.nm = NULL,
@@ -8425,7 +8556,6 @@ server <- function(input, output, session){
       reference.conc <- NULL
       reference.nm <- NULL
     }
-    browser()
     if(input$select_string_visualize_parameter_growth_plot){
       suppressWarnings(
         plot.parameter(results,
@@ -8666,6 +8796,13 @@ server <- function(input, output, session){
     )
   })
 
+  observe({
+    updateSelectInput(session,
+                      inputId = "groups_visualize_fluorescence_group",
+                      choices = selected_inputs_visualize_fluorescence_group()
+    )
+  })
+
   output$fluorescence_group_plot <- renderPlot({
     results <- results$fluorescence
     if(input$select_string_visualize_growth_group){
@@ -8698,7 +8835,11 @@ server <- function(input, output, session){
         plot.flFitRes(
           results,
           data.type = input$data_type_fluorescence_group_plot,
-          IDs = input$samples_visualize_fluorescence_group,
+          IDs = if(input$plot_group_averages_fluorescence_group_plot){
+            input$groups_visualize_fluorescence_group
+          }else{
+            input$samples_visualize_fluorescence_group
+          },
           names = NULL,
           conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
           exclude.nm = NULL,
@@ -9078,6 +9219,8 @@ server <- function(input, output, session){
           reference.conc <- NULL
           reference.nm <- NULL
         }
+        browser()
+
         if(input$select_string_visualize_parameter_fluorescence_plot){
           suppressWarnings(
             plot.parameter(results,
@@ -9444,7 +9587,7 @@ server <- function(input, output, session){
         if(is.null(results)) return(NULL)
         if(results$control$dr.method == "spline"){
           dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50')
-          if(input$number_of_bootstrappings_dr_fluorescence > 1){
+          if(results$control$nboot.dr > 1){
             dr_parameters <- c(dr_parameters, 'Response(EC50) - Bootstrap' = 'drboot.meanEC50', 'EC50 - Bootstrap' = 'drboot.meanEC50y')
           }
         } else {

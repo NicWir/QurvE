@@ -247,7 +247,7 @@ summary.gcFitLinear <- function(object,...)
 
 
   if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
-    table<-c(0, rep(NA,length(contents.fitted.param)-1))
+    table<-c(0, rep(NA,7), "FALSE", rep(NA,5), "FALSE")
   }
   else{
     table <- c(object$par[5], log(2)/object$par[5],

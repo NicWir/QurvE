@@ -20,7 +20,7 @@ summary.flFitSpline <- function(object,...)
     table <- c(0, rep(NA,length(contents.fitted.spline)-4), as.character(object$fitFlag), as.character(object$fitFlag2), ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
   }
   else{
-    table <- c(object$parameters$max_slope, object$parameters$x.max, object$parameters$lambda,
+    table <- c(object$parameters$max_slope, object$parameters$x.max, ifelse(length(object$parameters$lambda) < 1, NA, object$parameters$lambda),
                object$parameters$max_slope2, object$parameters$x.max2, object$parameters$lambda2,
                object$parameters$A-object$parameters$dY, object$parameters$A, object$parameters$dY, object$parameters$integral, as.character(object$fitFlag), as.character(object$fitFlag2),
                ifelse(is.null(object$control$smooth.fl), "NULL", as.numeric(object$control$smooth.fl)))
@@ -56,7 +56,7 @@ summary.flFitLinear <- function(object,...)
 
 
   if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
-    table<-c(0, rep(NA,length(contents.fitted.param)-1))
+    table<-c(0, rep(NA, 6), "FALSE", rep(NA, 4), "FALSE")
   }
   else{
     table <- c(object$par["max_slope"],
