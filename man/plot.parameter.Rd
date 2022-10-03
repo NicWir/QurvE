@@ -11,6 +11,7 @@
     "tD.spline", "tD2.spline", "mu.spline", "lambda.spline", "A.spline", "dY.spline",
     "integral.spline", "mu2.spline", "lambda2.spline", "mu.bt", "lambda.bt", "A.bt",
     "integral.bt", "max_slope.linfit", "max_slope.spline"),
+  IDs = NULL,
   names = NULL,
   conc = NULL,
   basesize = 12,
@@ -36,6 +37,8 @@
 'mu.model', 'lambda.model', 'A.model',
 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'}
+
+\item{IDs}{(String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.}
 
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 

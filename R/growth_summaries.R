@@ -1,9 +1,25 @@
+#' Generic summary function for drFitSpline objects
+#'
+#' @param object object of class \code{drFitSpline} object of class \code{drFitSpline}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from the dose-response analysis of a single sample.
+#' @export
+#'
 summary.drFitSpline <- function (object,...)
   {
     # object of class drFitSpline
     data.frame(object$parameters)
 }
 
+#' Generic summary function for gcFitSpline objects
+#'
+#' @param object object of class \code{gcFitSpline}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from the nonparametric fit.
+#' @export
+#'
 summary.gcFitSpline <- function(object,...)
   {
 
@@ -30,6 +46,14 @@ summary.gcFitSpline <- function(object,...)
     summary.gcFitSpline
 }
 
+#' Generic summary function for gcFitModel objects
+#'
+#' @param object object of class \code{gcFitModel}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from the growth model fit.
+#' @export
+#'
 summary.gcFitModel <- function(object, ...)
   {
     # object of class gcFitModel
@@ -79,6 +103,14 @@ summary.gcFitModel <- function(object, ...)
     summary.gcFitModel
 }
 
+#' Generic summary function for drFit objects
+#'
+#' @param object object of class \code{drFit}
+#' @param ...
+#'
+#' @return A dataframe with parameters for all samples extracted from the dose-response analysis.
+#' @export
+#'
 summary.drFit <- function(object, ...)
   {
     # object of class drFit
@@ -86,6 +118,14 @@ summary.drFit <- function(object, ...)
   summary.drFit
 }
 
+#' Generic summary function for gcBootSpline objects
+#'
+#' @param object object of class \code{gcBootSpline}
+#' @param ...
+#'
+#' @return A dataframe with statistical parameters extracted from the spline fit bootstrapping computation.
+#' @export
+#'
 summary.gcBootSpline <- function(object, ...)
   {
     # object of class gcBootSpline
@@ -129,6 +169,14 @@ summary.gcBootSpline <- function(object, ...)
     summary.gcBootSpline
 }
 
+#' Generic summary function for drBootSpline objects
+#'
+#' @param object object of class \code{drBootSpline}
+#' @param ...
+#'
+#' @return A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
+#' @export
+#'
 summary.drBootSpline <- function(object, ...)
   {
     # object of class drBootSpline
@@ -160,6 +208,14 @@ summary.drBootSpline <- function(object, ...)
     summary.drBootSpline
 }
 
+#' Generic summary function for gcFit objects
+#'
+#' @param object object of class \code{gcFit}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from all fits of a workflow.
+#' @export
+#'
 summary.gcFit <- function(object,...)
   {
     # object of class gcFit
@@ -167,6 +223,14 @@ summary.gcFit <- function(object,...)
   summary.gcFit
 }
 
+#' Generic summary function for gcFitLinear objects
+#'
+#' @param object object of class \code{gcFitLinear}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from the linear fit.
+#' @export
+#'
 summary.gcFitLinear <- function(object,...)
   {
   # object of class gcFitLinear

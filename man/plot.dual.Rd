@@ -7,6 +7,7 @@
 \method{plot}{dual}(
   object,
   fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
+  IDs = NULL,
   names = NULL,
   conc = NULL,
   mean = TRUE,
@@ -37,6 +38,8 @@
 \item{object}{A \code{flFit}, \code{flFitRes}, or \code{grodata} object created with \code{\link{flFit}}, \code{\link{fl.workflow}} or \code{\link{read_data}}}
 
 \item{fluorescence}{(Character) Indicate, which type of fluorescence data should be displayed.}
+
+\item{IDs}{(String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.}
 
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 

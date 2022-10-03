@@ -7,8 +7,8 @@
 parse_data(
   data.file = NULL,
   map.file = NULL,
-  software = "Gen5",
-  convert.time = TRUE,
+  software = c("Gen5", "Chi.Bio", "GrowthProfiler", "Tecan"),
+  convert.time = NULL,
   data.sheet = 1,
   map.sheet = 1,
   csvsep.data = ";",
@@ -24,9 +24,10 @@ parse_data(
 
 \item{map.file}{(Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.}
 
-\item{software}{(Character) The name of the software used to export the plate reader data.}
+\item{software}{(Character) The name of the software/device used to export the plate reader data.}
 
-\item{convert.time}{(Logical) Shall the time be converted from, e.g., 00:15:00 in Excel into hours (\code{TRUE}) or not (\code{FALSE})?}
+\item{convert.time}{(\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
+For example: \code{convert.time = 'y = 24 * x'}}
 
 \item{data.sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
 

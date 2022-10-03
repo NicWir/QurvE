@@ -89,7 +89,7 @@ The algorithm works as follows:
 \item Fit linear regressions (Theil-Sen estimator) to all subsets of \code{h} consecutive, log-transformed data
 points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear regression to points
 1 \dots 5, 2 \dots 6, 3 \dots 7 and so on.
-\item Find the subset with the highest slope \eqn{mu_{max}}. Does the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} value of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
+\item Find the subset with the highest slope \eqn{mu_{max}}. Do the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} and relative standard deviation (RSD) values of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
 \item Include also the data points of adjacent subsets that have a slope of at least \eqn{quota \cdot mu{max}}, e.g., all regression windows that have at least 95\% of the maximum slope.
 \item Fit a new linear model to the extended data window identified in step 3.
 }

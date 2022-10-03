@@ -8,6 +8,7 @@
   grofit,
   ...,
   data.type = c("spline", "raw"),
+  IDs = NULL,
   names = NULL,
   conc = NULL,
   exclude.nm = NULL,
@@ -40,6 +41,8 @@
 \item{...}{(\emph{optional}) Additional \code{grofit} objects created in separate workflows.}
 
 \item{data.type}{(Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results}
+
+\item{IDs}{(String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.}
 
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 

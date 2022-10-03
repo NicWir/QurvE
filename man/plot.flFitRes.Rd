@@ -9,6 +9,7 @@
 \method{plot}{flFitRes}(
   object,
   data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  IDs = NULL,
   names = NULL,
   conc = NULL,
   mean = TRUE,
@@ -38,6 +39,7 @@
 \method{plot}{flFit}(
   object,
   data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  IDs = NULL,
   names = NULL,
   conc = NULL,
   mean = TRUE,
@@ -67,6 +69,7 @@
 \method{plot}{grodata}(
   object,
   data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  IDs = NULL,
   names = NULL,
   conc = NULL,
   mean = TRUE,
@@ -97,6 +100,8 @@
 \item{object}{A \code{flFitRes}, \code{flFit}, or \code{grodata} object created with \code{\link{fl.workflow}} containing fluorescence data.}
 
 \item{data.type}{(Character) Indicate, which type of fluorescence data should be displayed.}
+
+\item{IDs}{(String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.}
 
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 

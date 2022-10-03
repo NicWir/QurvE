@@ -1,7 +1,15 @@
+#' Generic summary function for flFitSpline objects
+#'
+#' @param object object of class \code{flFitSpline}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from the nonparametric fit.
+#' @export
+#'
 summary.flFitSpline <- function(object,...)
 {
 
-  # object of class gcFitSpline
+  # object of class flFitSpline
 
   contents.fitted.spline  <- c("max_slope.spline", "x.max.spline", "lambda.spline",
                                "max_slope2.spline", "x.max2.spline", "lambda2.spline",
@@ -24,9 +32,17 @@ summary.flFitSpline <- function(object,...)
   summary.flFitSpline
 }
 
+#' Generic summary function for flFitLinear objects
+#'
+#' @param object object of class \code{flFitLinear}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from the linear fit.
+#' @export
+#'
 summary.flFitLinear <- function(object,...)
 {
-  # object of class gcFitLinear
+  # object of class flFitLinear
 
   contents.fitted.param     = c("max_slope.linfit",
                                 "lambda.linfit",
@@ -60,9 +76,17 @@ summary.flFitLinear <- function(object,...)
   summary.flFitLinear
 }
 
+#' Generic summary function for flBootSpline objects
+#'
+#' @param object object of class \code{flBootSpline}
+#' @param ...
+#'
+#' @return A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
+#' @export
+#'
 summary.flBootSpline <- function(object, ...)
 {
-  # object of class gcBootSpline
+  # object of class flBootSpline
   contents.bootstrap        <- c("max_slope.bt", "lambda.bt", "A.bt", "dY.bt", "integral.bt",
                                  "stdmax_slope.bt", "stdlambda.bt", "stdA.bt", "stddY.bt", "stdintegral.bt",
                                  "reliable_fit.bt",
@@ -103,6 +127,14 @@ summary.flBootSpline <- function(object, ...)
   summary.flBootSpline
 }
 
+#' Generic summary function for flFit objects
+#'
+#' @param object object of class \code{flFit}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from all fits of a workflow.
+#' @export
+#'
 summary.flFit <- function(object,...)
 {
   # object of class flFit
@@ -110,8 +142,16 @@ summary.flFit <- function(object,...)
   summary.flFit
 }
 
+#' Generic summary function for drFitModel objects
+#'
+#' @param object object of class \code{drFitModel}
+#' @param ...
+#'
+#' @return A dataframe with biosensor response parameters.
+#' @export
+#'
 summary.drFitModel <- function(object, ...)
 {
-  # object of class drFitSpline
+  # object of class drFitModel
   data.frame(object$parameters)
 }

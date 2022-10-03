@@ -381,19 +381,22 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ),
                                                         div(style = "margin-top: -15px"),
                                                         conditionalPanel(
-                                                          condition = "output.parsefileUploaded && input.platereader_software != 'GrowthProfiler'",
+                                                          condition = "output.parsefileUploaded",
                                                           wellPanel(
                                                             style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
                                                             div(style = "margin-top: -10px"),
                                                             h3(strong("3. Assign data type"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
-                                                            selectInput(inputId = "parsed_reads_density",
-                                                                        label = "Density data",
-                                                                        choices = ""
-                                                            ),
+                                                            conditionalPanel(
+                                                              condition = "input.platereader_software != 'GrowthProfiler'",
+                                                              selectInput(inputId = "parsed_reads_density",
+                                                                          label = "Density data",
+                                                                          choices = ""
+                                                              ),
 
-                                                            selectInput(inputId = "parsed_reads_fluorescence1",
-                                                                        label = "Fluorescence data 1",
-                                                                        choices = ""
+                                                              selectInput(inputId = "parsed_reads_fluorescence1",
+                                                                          label = "Fluorescence data 1",
+                                                                          choices = ""
+                                                              )
                                                             ),
 
                                                             # selectInput(inputId = "parsed_reads_fluorescence2",
@@ -4732,7 +4735,10 @@ server <- function(input, output, session){
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
-      showModal(modalDialog("Reading data file...", footer=NULL))
+      showModal(
+        modalDialog(
+          HTML("<strong>Reading data file...</strong><br><br><i>Note: Reading .xls/.xlsx files can take up to several minutes. Consider saving as .csv/.tsv/.txt before running QurvE.</i>"),
+          footer=NULL))
       try(
         f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence1_sheets, progress = T)))
       )
@@ -5071,11 +5077,17 @@ server <- function(input, output, session){
       return(NULL)
 
     filename <- inFile$datapath
+    if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
+        stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx"){
+      showModal(modalDialog(HTML("<strong>Reading data file...</strong><br><br><i>Note: Reading .xls/.xlsx files can take up to several minutes. Consider saving as .csv/.tsv/.txt before running QurvE.</i>"), footer=NULL))
+
+    }else {
     showModal(modalDialog("Reading data file...", footer=NULL))
+    }
     if("Gen5" %in% input$platereader_software){
       try(reads <- QurvE:::parse_properties_Gen5Gen6(file=filename,
-                                                     csvsep = input$separator_custom_density,
-                                                     dec = input$decimal_separator_custom_density,
+                                                     csvsep = input$separator_parse,
+                                                     dec = input$decimal_separator_parse,
                                                      sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
           silent = FALSE
 
@@ -5083,8 +5095,8 @@ server <- function(input, output, session){
     }
     if("Chi.Bio" %in% input$platereader_software){
       try(reads <- QurvE:::parse_properties_chibio(file=filename,
-                                                     csvsep = input$separator_custom_density,
-                                                     dec = input$decimal_separator_custom_density,
+                                                     csvsep = input$separator_parse,
+                                                     dec = input$decimal_separator_parse,
                                                      sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
           silent = FALSE
 
@@ -5092,8 +5104,8 @@ server <- function(input, output, session){
     }
     if("Tecan" %in% input$platereader_software){
       try(reads <- QurvE:::parse_properties_tecan(file=filename,
-                                                   csvsep = input$separator_custom_density,
-                                                   dec = input$decimal_separator_custom_density,
+                                                   csvsep = input$separator_parse,
+                                                   dec = input$decimal_separator_parse,
                                                    sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
           silent = FALSE
 
@@ -5170,7 +5182,15 @@ server <- function(input, output, session){
       )
     } else {
       if(is.null(input$map_file$datapath)){
-        showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
+        showModal(
+          modalDialog(
+            HTML(
+              "<strong>Parsing data input...</strong><br><br>No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE."
+            ),
+            easyClose = FALSE,
+            footer=NULL
+          )
+        )
       }
       try(
         results$parsed_data <- QurvE:::parse_data_shiny(
@@ -5502,6 +5522,12 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(NULL)
 
+    if (is.na(input$smoothing_factor_nonparametric_fluorescence) || input$smoothing_factor_nonparametric_fluorescence == "NULL" || input$smoothing_factor_nonparametric_fluorescence == "") {
+      smooth.fl = NULL
+    } else {
+      smooth.fl <- 0.75
+    }
+
     if (is.na(input$smoothing_factor_fluorescence_dr) || input$smoothing_factor_fluorescence_dr == "NULL" || input$smoothing_factor_fluorescence_dr == "") {
       smooth.dr = NULL
     } else {
@@ -5517,8 +5543,11 @@ server <- function(input, output, session){
       fit.opt <- c(fit.opt,
                    's')
     }
+
+
     # removeModal()
     showModal(modalDialog("Running computations...", footer=NULL))
+    browser()
     # Run fluorescence workflow
     try(
       shiny::withProgress(message = "Computations completed",
@@ -5548,7 +5577,7 @@ server <- function(input, output, session){
                                           log.y.dr = input$log_transform_response_fluorescence,
                                           nboot.dr = input$number_of_bootstrappings_dr_fluorescence,
                                           nboot.fl = input$number_of_bootstrappings_fluorescence,
-                                          smooth.fl = input$smoothing_factor_nonparametric_fluorescence,
+                                          smooth.fl = smooth.fl,
                                           growth.thresh = input$growth_threshold_in_percent_fluorescence,
                                           suppress.messages = T,
                                           neg.nan.act = FALSE,
