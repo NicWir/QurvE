@@ -31,6 +31,23 @@ parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+parse_properties_tecan <- function(file, csvsep=";", dec=".", sheet=1)
+{
+  # Read table file
+  input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
+  # get row numbers for "time" in column 2
+  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
+  time.ndx <- time.ndx[-1]
+  # extract different read data in dataset
+  reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
+  suppressWarnings(
+    reads[!is.na(as.numeric(reads))] <- gsub("\\.", ",", as.numeric(reads[!is.na(as.numeric(reads))]))
+  )
+  reads <- reads[!is.na(reads)]
+  reads <- unique(reads)
+  return(reads)
+}
+
 parse_data_shiny <-
   function(data.file = NULL,
            map.file = NULL,
@@ -81,6 +98,11 @@ parse_data_shiny <-
 
     if("GrowthProfiler" %in% software){
       parsed.ls <- parse_growthprofiler(input)
+      data.ls <- parsed.ls[[1]]
+    }
+
+    if("Tecan" %in% software){
+      parsed.ls <- parse_tecan_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -225,7 +247,7 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
 parse_chibio_shiny <- function(input, density.nm)
 {
   time.ndx <- grep("time", input[1,], ignore.case = T)
-  read.ndx <- grep("measured", input[1,], ignore.case = T)
+  read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
   reads <- input[1, read.ndx]
 
   data.ls <- list()
@@ -237,6 +259,72 @@ parse_chibio_shiny <- function(input, density.nm)
   data.ls[[1]] <- density
   data.ls[[2]] <- NA
   data.ls[[3]] <- NA
+
+  return(list(data.ls))
+}
+
+parse_tecan_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
+{
+  # get row numbers for "time" in column 2
+  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
+  time.ndx <- time.ndx[-1]
+  # extract different read data in dataset
+  reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
+  read.ndx <- time.ndx[!is.na(reads)]
+  reads <- reads[!is.na(reads)]
+
+  read.data <- list()
+  ncol <- length(input[read.ndx[1],][!is.na(input[read.ndx[1],])])
+  if(length(read.ndx)>1){
+    # Extract all read tables except the last
+    read.data <- lapply(1:(length(read.ndx)-1), function(x) t(input[read.ndx[x]:(read.ndx[x+1]-4), 1:(ncol)]))
+    read.data <- lapply(1:length(read.data), function(x) as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]), ])
+    # Extract last read table
+    read.data[[length(read.ndx)]] <- t(data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1), 1:(ncol)]))
+    read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
+  } else {
+    read.data[[1]] <- t(data.frame(input[read.ndx:(read.ndx + match(NA, input[read.ndx:nrow(input),3])-2), 1:(ncol)]))
+  }
+  # Remove temperature columns
+  for(i in 1:length(read.data))
+    read.data[[i]] <- read.data[[i]][ ,-(grep("^Temp.", read.data[[i]][1,]))]
+
+  # Remove time points with NA in all samples
+  for(i in 1:length(read.data))
+    read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
+                            read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ])
+  if(length(read.ndx)>1){
+    # give all reads the same time values as the first read
+    for(i in 2:length(read.data)){
+      read.data[[i]][[1]] <- read.data[[1]][[1]]
+    }
+  }
+  names(read.data) <- reads
+
+  data.ls <- list()
+
+  if (!is.null(density.nm) && density.nm != "Ignore")
+    density <- read.data[[match(density.nm, reads)]]
+  else
+    density  <- NA
+
+  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
+    fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
+    fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+  }
+  else
+    fluorescence1 <- NA
+
+  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+    fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+  }
+  else
+    fluorescence2 <- NA
+
+  data.ls[[1]] <- density
+  data.ls[[2]] <- fluorescence1
+  data.ls[[3]] <- fluorescence2
 
   return(list(data.ls))
 }

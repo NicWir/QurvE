@@ -371,7 +371,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                         label = "Platereader software",
                                                                         choices = c("Biotek - Gen5/Gen6" = "Gen5",
                                                                                     "Chi.Bio" = "Chi.Bio",
-                                                                                    "Growth Profiler" = "GrowthProfiler"
+                                                                                    "Growth Profiler 960" = "GrowthProfiler",
+                                                                                    "Tecan i-control" = "Tecan"
                                                                         ),
                                                                         multiple = TRUE,
                                                                         options = list(maxItems = 1)
@@ -3122,7 +3123,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "!input.select_string_visualize_fluorescence_group && input.plot_group_averages_fluorescence_group_plot",
-                                                                     selectizeInput(inputId = "samples_visualize_growth_group",
+                                                                     selectizeInput(inputId = "samples_visualize_fluorescence_group",
                                                                                     label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
@@ -4999,10 +5000,13 @@ server <- function(input, output, session){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x * 24")
     }
     if("Chi.Bio" %in% input$platereader_software){
-      updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 60")
+      updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 3600")
     }
     if("GrowthProfiler" %in% input$platereader_software){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 60")
+    }
+    if("Tecan" %in% input$platereader_software){
+      updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 3600")
     }
   })
 
@@ -5082,6 +5086,15 @@ server <- function(input, output, session){
                                                      csvsep = input$separator_custom_density,
                                                      dec = input$decimal_separator_custom_density,
                                                      sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
+          silent = FALSE
+
+      )
+    }
+    if("Tecan" %in% input$platereader_software){
+      try(reads <- QurvE:::parse_properties_tecan(file=filename,
+                                                   csvsep = input$separator_custom_density,
+                                                   dec = input$decimal_separator_custom_density,
+                                                   sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
           silent = FALSE
 
       )
@@ -5362,34 +5375,37 @@ server <- function(input, output, session){
     # Run growth workflow
     shiny::withProgress(message = "Computations completed",
                         try(
-                          results$growth <- growth.workflow(grodata = grodata,
-                                                            ec50 = input$perform_ec50_growth,
-                                                            fit.opt = fit.opt,
-                                                            t0 = input$t0_growth,
-                                                            min.density = input$minimum_density_growth,
-                                                            log.x.gc = input$log_transform_time_growth,
-                                                            log.y.model = input$log_transform_data_parametric_growth,
-                                                            log.y.spline = input$log_transform_data_nonparametric_growth,
-                                                            biphasic = input$biphasic_growth,
-                                                            lin.h = input$custom_sliding_window_size_value_growth,
-                                                            lin.R2 = as.numeric(input$R2_threshold_growth),
-                                                            lin.RSD = as.numeric(input$RSD_threshold_growth),
-                                                            lin.dY = as.numeric(input$dY_threshold_growth),
-                                                            interactive = F,
-                                                            nboot.gc = input$number_of_bootstrappings_growth,
-                                                            smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                                            model.type = models,
-                                                            growth.thresh = input$growth_threshold_growth,
-                                                            dr.parameter = input$response_parameter_growth,
-                                                            smooth.dr = smooth.dr,
-                                                            log.x.dr = input$log_transform_concentration_growth,
-                                                            log.y.dr = input$log_transform_response_growth,
-                                                            nboot.dr = input$number_of_bootstrappings_dr_growth,
-                                                            suppress.messages = T,
-                                                            report = NULL,
-                                                            shiny = TRUE
+                          results$growth <-
+                            suppressWarnings(
+                              growth.workflow(grodata = grodata,
+                                              ec50 = input$perform_ec50_growth,
+                                              fit.opt = fit.opt,
+                                              t0 = input$t0_growth,
+                                              min.density = input$minimum_density_growth,
+                                              log.x.gc = input$log_transform_time_growth,
+                                              log.y.model = input$log_transform_data_parametric_growth,
+                                              log.y.spline = input$log_transform_data_nonparametric_growth,
+                                              biphasic = input$biphasic_growth,
+                                              lin.h = input$custom_sliding_window_size_value_growth,
+                                              lin.R2 = as.numeric(input$R2_threshold_growth),
+                                              lin.RSD = as.numeric(input$RSD_threshold_growth),
+                                              lin.dY = as.numeric(input$dY_threshold_growth),
+                                              interactive = F,
+                                              nboot.gc = input$number_of_bootstrappings_growth,
+                                              smooth.gc = input$smoothing_factor_nonparametric_growth,
+                                              model.type = models,
+                                              growth.thresh = input$growth_threshold_growth,
+                                              dr.parameter = input$response_parameter_growth,
+                                              smooth.dr = smooth.dr,
+                                              log.x.dr = input$log_transform_concentration_growth,
+                                              log.y.dr = input$log_transform_response_growth,
+                                              nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                              suppress.messages = T,
+                                              report = NULL,
+                                              shiny = TRUE
 
-                          )
+                              )
+                            )
                         )
     )
     # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
@@ -5506,41 +5522,44 @@ server <- function(input, output, session){
     # Run fluorescence workflow
     try(
       shiny::withProgress(message = "Computations completed",
-                          results$fluorescence <- fl.workflow(grodata = grodata,
-                                                              ec50 = input$perform_ec50_fluorescence,
-                                                              fit.opt = fit.opt,
-                                                              x_type = input$data_type_x_fluorescence,
-                                                              norm_fl = input$normalize_fluorescence,
-                                                              t0 = input$t0_fluorescence,
-                                                              min.density = input$minimum_density_fluorescence,
-                                                              log.x.lin = input$log_transform_x_linear_fluorescence,
-                                                              log.x.spline = input$log_transform_x_nonparametric_fluorescence,
-                                                              log.y.lin = input$log_transform_data_linear_fluorescence,
-                                                              log.y.spline = input$log_transform_data_nonparametric_fluorescence,
-                                                              lin.h = as.numeric(input$custom_sliding_window_size_value_fluorescence),
-                                                              lin.R2 = as.numeric(input$R2_threshold_fluorescence),
-                                                              lin.RSD = as.numeric(input$RSD_threshold_fluorescence),
-                                                              lin.dY = as.numeric(input$dY_threshold_fluorescence),
-                                                              biphasic = input$biphasic_fluorescence,
-                                                              interactive = FALSE,
-                                                              dr.parameter = input$response_parameter_fluorescence,
-                                                              dr.method = input$dr_method_fluorescence,
-                                                              smooth.dr = smooth.dr,
-                                                              log.x.dr = input$log_transform_concentration_fluorescence,
-                                                              log.y.dr = input$log_transform_response_fluorescence,
-                                                              nboot.dr = input$number_of_bootstrappings_dr_fluorescence,
-                                                              nboot.fl = input$number_of_bootstrappings_fluorescence,
-                                                              smooth.fl = input$smoothing_factor_nonparametric_fluorescence,
-                                                              growth.thresh = input$growth_threshold_in_percent_fluorescence,
-                                                              suppress.messages = T,
-                                                              neg.nan.act = FALSE,
-                                                              clean.bootstrap = TRUE,
-                                                              report = NULL,
-                                                              out.dir = NULL,
-                                                              out.nm = NULL,
-                                                              export.fig = FALSE,
-                                                              shiny = TRUE
-                          )
+                          results$fluorescence <-
+                            suppressWarnings(
+                              fl.workflow(grodata = grodata,
+                                          ec50 = input$perform_ec50_fluorescence,
+                                          fit.opt = fit.opt,
+                                          x_type = input$data_type_x_fluorescence,
+                                          norm_fl = input$normalize_fluorescence,
+                                          t0 = input$t0_fluorescence,
+                                          min.density = input$minimum_density_fluorescence,
+                                          log.x.lin = input$log_transform_x_linear_fluorescence,
+                                          log.x.spline = input$log_transform_x_nonparametric_fluorescence,
+                                          log.y.lin = input$log_transform_data_linear_fluorescence,
+                                          log.y.spline = input$log_transform_data_nonparametric_fluorescence,
+                                          lin.h = as.numeric(input$custom_sliding_window_size_value_fluorescence),
+                                          lin.R2 = as.numeric(input$R2_threshold_fluorescence),
+                                          lin.RSD = as.numeric(input$RSD_threshold_fluorescence),
+                                          lin.dY = as.numeric(input$dY_threshold_fluorescence),
+                                          biphasic = input$biphasic_fluorescence,
+                                          interactive = FALSE,
+                                          dr.parameter = input$response_parameter_fluorescence,
+                                          dr.method = input$dr_method_fluorescence,
+                                          smooth.dr = smooth.dr,
+                                          log.x.dr = input$log_transform_concentration_fluorescence,
+                                          log.y.dr = input$log_transform_response_fluorescence,
+                                          nboot.dr = input$number_of_bootstrappings_dr_fluorescence,
+                                          nboot.fl = input$number_of_bootstrappings_fluorescence,
+                                          smooth.fl = input$smoothing_factor_nonparametric_fluorescence,
+                                          growth.thresh = input$growth_threshold_in_percent_fluorescence,
+                                          suppress.messages = T,
+                                          neg.nan.act = FALSE,
+                                          clean.bootstrap = TRUE,
+                                          report = NULL,
+                                          out.dir = NULL,
+                                          out.nm = NULL,
+                                          export.fig = FALSE,
+                                          shiny = TRUE
+                              )
+                            )
       )
     )
     ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
@@ -8377,6 +8396,7 @@ server <- function(input, output, session){
       reference.conc <- NULL
       reference.nm <- NULL
     }
+    browser()
     if(input$select_string_visualize_parameter_growth_plot){
       suppressWarnings(
         plot.parameter(results,

@@ -486,7 +486,7 @@ read_data <-
 parse_data <-
   function(data.file = NULL,
            map.file = NULL,
-           software = c("Gen5", "Chi.Bio", "GrowthProfiler"),
+           software = c("Gen5", "Chi.Bio", "GrowthProfiler", "Tecan"),
            convert.time = NULL,
            data.sheet = 1,
            map.sheet = 1,
@@ -500,7 +500,7 @@ parse_data <-
     software <- match.arg(software)
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
-    if(!(software %in% c("Gen5", "Gen6", "Chi.Bio", "GrowthProfiler"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6', 'Chi.Bio', and 'GrowthProfiler'.")
+    if(!(software %in% c("Gen5", "Gen6", "Chi.Bio", "GrowthProfiler", "Tecan"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6', 'Chi.Bio', and 'GrowthProfiler'.")
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
@@ -525,6 +525,10 @@ parse_data <-
     }
     if("GrowthProfiler" %in% software){
       parsed.ls <- parse_growthprofiler(input)
+      data.ls <- parsed.ls[[1]]
+    }
+    if("Tecan" %in% software){
+      parsed.ls <- parse_tecan(input)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -1840,7 +1844,9 @@ grofit.param <- function(time, data, gcID = "undefined", control)
     }
   }
   else{
-    warning("gcFitModel: Unable to fit this curve parametrically!")
+    if (control$suppress.messages == FALSE){
+      warning("gcFitModel: Unable to fit this curve parametrically!")
+    }
     Abest        <- c(NA, NA)
     mubest       <- c(NA, NA)
     lambdabest   <- c(NA, NA)
@@ -1857,10 +1863,10 @@ grofit.param <- function(time, data, gcID = "undefined", control)
       raw.data = data,
       gcID = gcID,
       fit.time = time,
-      fit.data = as.numeric(fitted.values(best)),
+      fit.data = ifelse(is.null(best), NA, as.numeric(fitted.values(best))),
       parameters = list(
         A = Abest,
-        dY = max(fitted.values(best))-min(fitted.values(best)),
+        dY = ifelse(is.null(best), NA, max(fitted.values(best))-min(fitted.values(best))),
         mu = mubest,
         lambda = lambdabest,
         b.tangent = b.tangent,
