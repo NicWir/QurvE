@@ -15,7 +15,7 @@ for( i in new_packages ){
 
 
 library(shiny, quietly = T)
-library(QurvE, quietly = T)
+# library(QurvE, quietly = T)
 library(shinyBS, quietly = T)
 library(shinycssloaders, quietly = T)
 library(shinyFiles, quietly = T)
@@ -1358,7 +1358,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              width = "100%",
                                                                                              choices = "",
                                                                                              multiple = FALSE,
-                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                             options = list(closeAfterSelect = FALSE)
                                                                               ),
                                                                               checkboxInput(inputId = 'logy_validate_growth_plot_linear',
                                                                                             label = 'Log-transform y axis',
@@ -1496,7 +1496,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              width = "100%",
                                                                                              choices = "",
                                                                                              multiple = FALSE,
-                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                             options = list(closeAfterSelect = FALSE)
                                                                               ),
 
                                                                               sliderInput(inputId = 'shape_type_validate_growth_plot_spline',
@@ -1656,7 +1656,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                width = "100%",
                                                                                                choices = "",
                                                                                                multiple = FALSE,
-                                                                                               options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                               options = list(closeAfterSelect = FALSE)
                                                                                 ),
                                                                               ),
                                                                               sliderInput(inputId = 'shape_type_validate_growth_plot_model',
@@ -1758,7 +1758,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              width = "100%",
                                                                                              choices = "",
                                                                                              multiple = FALSE,
-                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                             options = list(closeAfterSelect = FALSE)
                                                                               ),
 
                                                                               checkboxInput(inputId = "plot_derivative_growth_spline_bt",
@@ -1906,7 +1906,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              width = "100%",
                                                                                              choices = "",
                                                                                              multiple = FALSE,
-                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                             options = list(closeAfterSelect = FALSE)
                                                                               ),
                                                                               checkboxInput(inputId = 'logy_validate_fluorescence_plot_linear',
                                                                                             label = 'Log-transform y axis',
@@ -2043,7 +2043,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              width = "100%",
                                                                                              choices = "",
                                                                                              multiple = FALSE,
-                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                             options = list(closeAfterSelect = FALSE)
                                                                               ),
                                                                               checkboxInput(inputId = 'logy_validate_fluorescence_plot_spline',
                                                                                             label = 'Log-transform y axis',
@@ -2200,7 +2200,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              width = "100%",
                                                                                              choices = "",
                                                                                              multiple = FALSE,
-                                                                                             options = list(maxOptions = 15, closeAfterSelect = FALSE)
+                                                                                             options = list(closeAfterSelect = FALSE)
                                                                               ),
 
                                                                               checkboxInput(inputId = "plot_derivative_fluorescence_spline_bt",
@@ -5068,7 +5068,6 @@ server <- function(input, output, session){
 
     filename <- inFile$datapath
     showModal(modalDialog("Reading data file...", footer=NULL))
-    browser()
     if("Gen5" %in% input$platereader_software){
       try(reads <- QurvE:::parse_properties_Gen5Gen6(file=filename,
                                                      csvsep = input$separator_custom_density,
@@ -5361,34 +5360,35 @@ server <- function(input, output, session){
     showModal(modalDialog("Running computations...", footer=NULL))
     # Run growth workflow
     shiny::withProgress(message = "Computations completed",
+                        try(
+                          results$growth <- growth.workflow(grodata = grodata,
+                                                            ec50 = input$perform_ec50_growth,
+                                                            fit.opt = fit.opt,
+                                                            t0 = input$t0_growth,
+                                                            min.density = input$minimum_density_growth,
+                                                            log.x.gc = input$log_transform_time_growth,
+                                                            log.y.model = input$log_transform_data_parametric_growth,
+                                                            log.y.spline = input$log_transform_data_nonparametric_growth,
+                                                            biphasic = input$biphasic_growth,
+                                                            lin.h = input$custom_sliding_window_size_value_growth,
+                                                            lin.R2 = as.numeric(input$R2_threshold_growth),
+                                                            lin.RSD = as.numeric(input$RSD_threshold_growth),
+                                                            lin.dY = as.numeric(input$dY_threshold_growth),
+                                                            interactive = F,
+                                                            nboot.gc = input$number_of_bootstrappings_growth,
+                                                            smooth.gc = input$smoothing_factor_nonparametric_growth,
+                                                            model.type = models,
+                                                            growth.thresh = input$growth_threshold_growth,
+                                                            dr.parameter = input$response_parameter_growth,
+                                                            smooth.dr = smooth.dr,
+                                                            log.x.dr = input$log_transform_concentration_growth,
+                                                            log.y.dr = input$log_transform_response_growth,
+                                                            nboot.dr = input$number_of_bootstrappings_dr_growth,
+                                                            suppress.messages = T,
+                                                            report = NULL,
+                                                            shiny = TRUE
 
-                        results$growth <- growth.workflow(grodata = grodata,
-                                                          ec50 = input$perform_ec50_growth,
-                                                          fit.opt = fit.opt,
-                                                          t0 = input$t0_growth,
-                                                          min.density = input$minimum_density_growth,
-                                                          log.x.gc = input$log_transform_time_growth,
-                                                          log.y.model = input$log_transform_data_parametric_growth,
-                                                          log.y.spline = input$log_transform_data_nonparametric_growth,
-                                                          biphasic = input$biphasic_growth,
-                                                          lin.h = input$custom_sliding_window_size_value_growth,
-                                                          lin.R2 = as.numeric(input$R2_threshold_growth),
-                                                          lin.RSD = as.numeric(input$RSD_threshold_growth),
-                                                          lin.dY = as.numeric(input$dY_threshold_growth),
-                                                          interactive = F,
-                                                          nboot.gc = input$number_of_bootstrappings_growth,
-                                                          smooth.gc = input$smoothing_factor_nonparametric_growth,
-                                                          model.type = models,
-                                                          growth.thresh = input$growth_threshold_growth,
-                                                          dr.parameter = input$response_parameter_growth,
-                                                          smooth.dr = smooth.dr,
-                                                          log.x.dr = input$log_transform_concentration_growth,
-                                                          log.y.dr = input$log_transform_response_growth,
-                                                          nboot.dr = input$number_of_bootstrappings_dr_growth,
-                                                          suppress.messages = T,
-                                                          report = NULL,
-                                                          shiny = TRUE
-
+                          )
                         )
     )
     # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
@@ -7211,7 +7211,6 @@ server <- function(input, output, session){
                               control = control_new))
 
       # Update gcTable with new results
-      browser()
       res.table.gc <- results$growth$gcFit$gcTable
       fit.summary <- summary.gcFitModel(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]])
 

@@ -1627,6 +1627,10 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
   time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
   data    <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
 
+  if(length(data[data<0]) > 0){
+    data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
+  }
+
   # /// check length of input data
   if (length(time)!=length(data)) stop("gcFitModel: length of time and data input vectors differ!")
   if(max(data) < control$growth.thresh * data[1]){
@@ -2385,6 +2389,10 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   fit.dY <- control$lin.dY
   t0 <- control$t0
   min.density <- control$min.density
+
+  if(length(data[data<0]) > 0){
+    data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
+  }
 
   bad.values <- ((is.na(time))|(is.na(data)) | time < 0)
   data.in <- data <- data[!bad.values]
