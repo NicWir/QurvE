@@ -1181,6 +1181,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
 
     # Perform linear fits in parallel
     if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
+      require(foreach, quietly = TRUE)
       fitlinear.all <- foreach::foreach(i = 1:dim(data)[1]
       ) %dopar% {
         QurvE::growth.gcFitLinear(times.ls[[i]], wells.ls[[i]], gcID = gcIDs.ls[[i]], control = control)
@@ -1255,6 +1256,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
     # Perform spline bootstrappings in parallel
     if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
         (control$nboot.gc > 10) ){
+      require(foreach, quietly = TRUE)
       boot.all <- foreach::foreach(i = 1:dim(data)[1]
       ) %dopar% {
         QurvE::growth.gcBootSpline(times.ls[[i]], wells.ls[[i]], gcIDs.ls[[i]], control)

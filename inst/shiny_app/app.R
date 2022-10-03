@@ -15,7 +15,7 @@ for( i in new_packages ){
 
 
 library(shiny, quietly = T)
-# library(QurvE, quietly = T)
+library(QurvE, quietly = T)
 library(shinyBS, quietly = T)
 library(shinycssloaders, quietly = T)
 library(shinyFiles, quietly = T)
@@ -5160,7 +5160,7 @@ server <- function(input, output, session){
         showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
       }
       try(
-        results$parsed_data <- parse_data_shiny(
+        results$parsed_data <- QurvE:::parse_data_shiny(
           data.file = input$parse_file$datapath,
           map.file = input$map_file$datapath,
           software = input$platereader_software,
@@ -5195,9 +5195,11 @@ server <- function(input, output, session){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
       # show [Run Computation] button in Computation-Growth
       show("run_growth")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
     if("fluorescence1" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence1)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
     # if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
     #   showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
@@ -5209,7 +5211,6 @@ server <- function(input, output, session){
     # hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
 
-    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
 
     removeModal()
   })
