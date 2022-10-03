@@ -73,27 +73,32 @@ fast.write.csv <- function(dat, file, row.names = TRUE) {
 read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
   if (file.exists(filename)) {
     if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
+      ncols <- max(count.fields(filename, sep = csvsep))
       dat <-
         utils::read.csv(
           filename,
           dec = dec,
           sep = csvsep,
+          blank.lines.skip = FALSE,
           header = F,
           stringsAsFactors = F,
           fill = T,
           na.strings = "",
           quote = "",
           comment.char = "",
-          check.names = F
+          check.names = F,
+          col.names = paste0("V", seq_len(ncols))
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
       dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = sheet, progress = TRUE)))
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
+      ncols <- max(count.fields(filename, sep = csvsep))
       dat <-
         utils::read.csv(
           filename,
           dec = dec,
+          blank.lines.skip = FALSE,
           sep = "\t",
           header = F,
           stringsAsFactors = F,
@@ -101,9 +106,11 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
           na.strings = "",
           quote = "",
           comment.char = "",
-          check.names = F
+          check.names = F,
+          col.names = paste0("V", seq_len(ncols))
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
+      ncols <- max(count.fields(filename, sep = csvsep))
       dat <-
         utils::read.table(
           filename,
@@ -115,7 +122,8 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
           na.strings = "",
           quote = "",
           comment.char = "",
-          check.names = F
+          check.names = F,
+          col.names = paste0("V", seq_len(ncols))
         )
     } else {
       stop(
@@ -323,6 +331,23 @@ parse_chibio <- function(input)
   } else {
     density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
   }
+  data.ls[[1]] <- density
+  data.ls[[2]] <- NA
+  data.ls[[3]] <- NA
+
+  return(list(data.ls))
+}
+
+parse_growthprofiler <- function(input)
+{
+  # get row numbers for "time" in column 1
+  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
+  # get index of empty column at the and of the data series
+  na.ndx <- which(is.na(input[time.ndx,]))
+
+  density <- input[time.ndx:nrow(input), 1:(na.ndx-1)]
+
+  data.ls <- list()
   data.ls[[1]] <- density
   data.ls[[2]] <- NA
   data.ls[[3]] <- NA

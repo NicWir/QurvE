@@ -15,7 +15,7 @@ for( i in new_packages ){
 
 
 library(shiny, quietly = T)
-# library(QurvE, quietly = T)
+library(QurvE, quietly = T)
 library(shinyBS, quietly = T)
 library(shinycssloaders, quietly = T)
 library(shinyFiles, quietly = T)
@@ -367,17 +367,20 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
                                                             div(style = "margin-top: -10px"),
                                                             h3(strong("2. Format"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
-                                                            selectInput(inputId = "platereader_software",
+                                                            selectizeInput(inputId = "platereader_software",
                                                                         label = "Platereader software",
                                                                         choices = c("Biotek - Gen5/Gen6" = "Gen5",
-                                                                                    "Chi.Bio" = "chibio"
-                                                                        )
+                                                                                    "Chi.Bio" = "Chi.Bio",
+                                                                                    "Growth Profiler" = "GrowthProfiler"
+                                                                        ),
+                                                                        multiple = TRUE,
+                                                                        options = list(maxItems = 1)
                                                             )
                                                           )
                                                         ),
                                                         div(style = "margin-top: -15px"),
                                                         conditionalPanel(
-                                                          condition = "output.parsefileUploaded",
+                                                          condition = "output.parsefileUploaded && input.platereader_software != 'GrowthProfiler'",
                                                           wellPanel(
                                                             style='padding: 5px; border-color: #ADADAD; padding-bottom: 0',
                                                             div(style = "margin-top: -10px"),
@@ -4995,7 +4998,10 @@ server <- function(input, output, session){
     if("Gen5" %in% input$platereader_software){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x * 24")
     }
-    if("chibio" %in% input$platereader_software){
+    if("Chi.Bio" %in% input$platereader_software){
+      updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 60")
+    }
+    if("GrowthProfiler" %in% input$platereader_software){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 60")
     }
   })
@@ -5062,6 +5068,7 @@ server <- function(input, output, session){
 
     filename <- inFile$datapath
     showModal(modalDialog("Reading data file...", footer=NULL))
+    browser()
     if("Gen5" %in% input$platereader_software){
       try(reads <- QurvE:::parse_properties_Gen5Gen6(file=filename,
                                                      csvsep = input$separator_custom_density,
@@ -5071,7 +5078,7 @@ server <- function(input, output, session){
 
       )
     }
-    if("chibio" %in% input$platereader_software){
+    if("Chi.Bio" %in% input$platereader_software){
       try(reads <- QurvE:::parse_properties_chibio(file=filename,
                                                      csvsep = input$separator_custom_density,
                                                      dec = input$decimal_separator_custom_density,
@@ -5080,15 +5087,18 @@ server <- function(input, output, session){
 
       )
     }
-    if(exists("reads")){
+    if(exists("reads") && length(reads) > 0){
       show("parsed_reads_density")
       if(length(reads)>1) show("parsed_reads_fluorescence1")
       if(length(reads)>2) show("parsed_reads_fluorescence2")
       show("parse_data")
       removeModal()
       reads <- c(reads, "Ignore")
-    } else {
+    } else if(!("GrowthProfiler" %in% input$platereader_software) && !is.null(input$platereader_software)){
       showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software and sheet?", easyClose = T, footer=NULL))
+    } else {
+      show("parse_data")
+      removeModal()
     }
   })
   observe({
@@ -5117,7 +5127,6 @@ server <- function(input, output, session){
     showModal(modalDialog("Parsing data input...", footer=NULL))
     if(input$convert_time_equation_plate_reader == "" || is.na(input$convert_time_equation_plate_reader)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_plate_reader
-
     if(input$mapping_included_in_parse){
       try(
         results$parsed_data <- QurvE:::parse_data_shiny(
@@ -5149,10 +5158,10 @@ server <- function(input, output, session){
       )
     } else {
       if(is.null(input$map_file$datapath)){
-        showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be availabel if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
+        showModal(modalDialog("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.", easyClose = T, footer=NULL))
       }
       try(
-        results$parsed_data <- QurvE:::parse_data_shiny(
+        results$parsed_data <- parse_data_shiny(
           data.file = input$parse_file$datapath,
           map.file = input$map_file$datapath,
           software = input$platereader_software,
@@ -5207,11 +5216,14 @@ server <- function(input, output, session){
   })
   #### Generate parsed tables to display in [DATA] tab
   output$parsed_data_table_density <- DT::renderDT({
-
     if(is.null(results$parsed_data) || length(results$parsed_data$density) < 2) return(NULL)
 
     table_density <- t(results$parsed_data$density)
-    table_density[-(1:3), ] <- apply(apply(table_density[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
+    if(dim(table_density)[2]<2){
+      table_density[-(1:3), ] <- round(as.numeric(table_density[-(1:3), ]), digits = 3)
+    }else{
+      table_density[-(1:3), ] <- apply(apply(table_density[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
+    }
     rownames(table_density)[-(1:3)] <- ""
     table_density <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
                            table_density)
@@ -5360,9 +5372,9 @@ server <- function(input, output, session){
                                                           log.y.spline = input$log_transform_data_nonparametric_growth,
                                                           biphasic = input$biphasic_growth,
                                                           lin.h = input$custom_sliding_window_size_value_growth,
-                                                          lin.R2 = input$R2_threshold_growth,
-                                                          lin.RSD = input$RSD_threshold_growth,
-                                                          lin.dY = input$dY_threshold_growth,
+                                                          lin.R2 = as.numeric(input$R2_threshold_growth),
+                                                          lin.RSD = as.numeric(input$RSD_threshold_growth),
+                                                          lin.dY = as.numeric(input$dY_threshold_growth),
                                                           interactive = F,
                                                           nboot.gc = input$number_of_bootstrappings_growth,
                                                           smooth.gc = input$smoothing_factor_nonparametric_growth,
@@ -5504,10 +5516,10 @@ server <- function(input, output, session){
                                                               log.x.spline = input$log_transform_x_nonparametric_fluorescence,
                                                               log.y.lin = input$log_transform_data_linear_fluorescence,
                                                               log.y.spline = input$log_transform_data_nonparametric_fluorescence,
-                                                              lin.h = input$custom_sliding_window_size_value_fluorescence,
-                                                              lin.R2 = input$R2_threshold_fluorescence,
-                                                              lin.RSD = input$RSD_threshold_fluorescence,
-                                                              lin.dY = input$dY_threshold_fluorescence,
+                                                              lin.h = as.numeric(input$custom_sliding_window_size_value_fluorescence),
+                                                              lin.R2 = as.numeric(input$R2_threshold_fluorescence),
+                                                              lin.RSD = as.numeric(input$RSD_threshold_fluorescence),
+                                                              lin.dY = as.numeric(input$dY_threshold_fluorescence),
                                                               biphasic = input$biphasic_fluorescence,
                                                               interactive = FALSE,
                                                               dr.parameter = input$response_parameter_fluorescence,
@@ -5582,6 +5594,7 @@ server <- function(input, output, session){
     }
   })
 
+    ### Linear ####
   table_growth_linear <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
     table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
@@ -5725,6 +5738,8 @@ server <- function(input, output, session){
               escape = FALSE)
   })
 
+    ### Spline ####
+
   table_growth_spline <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
@@ -5849,6 +5864,8 @@ server <- function(input, output, session){
               escape = FALSE)
   })
 
+    ### Spline BT ####
+
   table_growth_spline_bt <- reactive({
     res.table.gc <- results$growth$gcFit$gcTable
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.gc$TestId, res.table.gc$AddId, res.table.gc$concentration, sep = "|"),
@@ -5896,6 +5913,8 @@ server <- function(input, output, session){
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
+
+    ### Model ####
 
   table_growth_model <- reactive({
     try({
@@ -6749,10 +6768,10 @@ server <- function(input, output, session){
       control <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control
       control_new <- control
       gcID <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$gcID
-      lin.h.new <- dplyr::if_else(!is.na(as.numeric(input$lin.h.rerun)), as.numeric(input$lin.h.rerun), as.numeric(control$lin.h))
+      lin.h.new <- ifelse(!is.na(as.numeric(input$lin.h.rerun)), as.numeric(input$lin.h.rerun), as.numeric(control$lin.h))
       if(!is.na(lin.h.new)) control_new$lin.h <- lin.h.new
-      control_new$lin.R2 <- dplyr::if_else(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
-      control_new$lin.RSD <- dplyr::if_else(!is.na(as.numeric(input$lin.RSD.rerun)), as.numeric(input$lin.RSD.rerun), control$lin.RSD)
+      control_new$lin.R2 <- ifelse(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
+      control_new$lin.RSD <- ifelse(!is.na(as.numeric(input$lin.RSD.rerun)), as.numeric(input$lin.RSD.rerun), control$lin.RSD)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun)), as.numeric(input$t0.lin.rerun), control$t0)
       min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun)), as.numeric(input$min.density.lin.rerun), control$min.density)
       if(is.numeric(min.density.lin.new)){
@@ -6773,6 +6792,15 @@ server <- function(input, output, session){
                              control = control_new,
                              quota = quota_new)
       )
+      # Update gcTable with new results
+      res.table.gc <- results$growth$gcFit$gcTable
+      fit.summary <- summary.gcFitLinear(results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]])
+
+      sample.ndx <- ifelse(is.numeric(selected_vals_validate_growth$sample_validate_growth_linear),
+                           selected_vals_validate_growth$sample_validate_growth_linear,
+                           match(selected_vals_validate_growth$sample_validate_growth_linear, names(results$growth$gcFit$gcFittedLinear)))
+      results$growth$gcFit$gcTable[sample.ndx, colnames(res.table.gc) %in% colnames(fit.summary)] <- fit.summary
+
       # Show [Restore fit] button
       show("restore_growth_linear")
     }
@@ -6987,7 +7015,7 @@ server <- function(input, output, session){
       control_new <- control
       gcID <- results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$gcID
 
-      control_new$smooth.gc <- dplyr::if_else(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$smooth.gc)
+      control_new$smooth.gc <- ifelse(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$smooth.gc)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
       min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
       if(is.numeric(min.density.spline.new)){
@@ -7006,6 +7034,15 @@ server <- function(input, output, session){
                              gcID = gcID,
                              control = control_new)
       )
+      # Update gcTable with new results
+      res.table.gc <- results$growth$gcFit$gcTable
+      fit.summary <- summary.gcFitSpline(results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]])
+
+      sample.ndx <- ifelse(is.numeric(selected_vals_validate_growth$sample_validate_growth_spline),
+                           selected_vals_validate_growth$sample_validate_growth_spline,
+                           match(selected_vals_validate_growth$sample_validate_growth_spline, names(results$growth$gcFit$gcFittedSplines)))
+      results$growth$gcFit$gcTable[sample.ndx, colnames(res.table.gc) %in% colnames(fit.summary)] <- fit.summary
+
       # Show [Restore fit] button
       show("restore_growth_spline")
     }
@@ -7105,7 +7142,11 @@ server <- function(input, output, session){
 
           checkboxInput(inputId = 'huang_growth_rerun',
                         label = 'Huang',
-                        value = ("huang" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type))
+                        value = ("huang" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type)),
+
+          checkboxInput(inputId = 'baranyi_growth_rerun',
+                        label = 'Baranyi and Roberts',
+                        value = ("baranyi" %in% results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$model.type))
         ),
         footer=tagList(
           fluidRow(
@@ -7160,12 +7201,26 @@ server <- function(input, output, session){
       if(input$gompertz_growth_rerun == TRUE) models <- c(models, "gompertz")
       if(input$extended_gompertz_growth_rerun == TRUE) models <- c(models, "gompertz.exp")
       if(input$huang_growth_rerun == TRUE) models <- c(models, "huang")
+      if(input$baranyi_growth_rerun == TRUE) models <- c(models, "baranyi")
+
       control_new$model.type <- models
 
       try(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]] <-
             growth.gcFitModel(acttime, actwell,
                               gcID = gcID,
                               control = control_new))
+
+      # Update gcTable with new results
+      browser()
+      res.table.gc <- results$growth$gcFit$gcTable
+      fit.summary <- summary.gcFitModel(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]])
+
+      sample.ndx <- ifelse(is.numeric(selected_vals_validate_growth$sample_validate_growth_model),
+                           selected_vals_validate_growth$sample_validate_growth_model,
+                           match(selected_vals_validate_growth$sample_validate_growth_model, names(results$growth$gcFit$gcFittedModels)))
+      results$growth$gcFit$gcTable[sample.ndx, colnames(res.table.gc) %in% colnames(fit.summary)] <- fit.summary
+      results$growth$gcFit$gcTable[sample.ndx, "used.model"] <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$model
+
       # Show [Restore fit] button
       show("restore_growth_model")
     }
@@ -7527,10 +7582,10 @@ server <- function(input, output, session){
       control_new <- control
       ID <- results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$ID
 
-      lin.h.new <- dplyr::if_else(!is.na(as.numeric(input$lin.h.rerun.fluorescence)), as.numeric(input$lin.h.rerun.fluorescence), control$lin.h)
+      lin.h.new <- ifelse(!is.na(as.numeric(input$lin.h.rerun.fluorescence)), as.numeric(input$lin.h.rerun.fluorescence), control$lin.h)
       if(!is.na(lin.h.new)) control_new$lin.h <- lin.h.new
-      control_new$lin.R2 <- dplyr::if_else(!is.na(as.numeric(input$lin.R2.rerun.fluorescence)), as.numeric(input$lin.R2.rerun.fluorescence), control$lin.R2)
-      control_new$lin.RSD <- dplyr::if_else(!is.na(as.numeric(input$lin.RSD.rerun.fluorescence)), as.numeric(input$lin.RSD.rerun.fluorescence), control$lin.RSD)
+      control_new$lin.R2 <- ifelse(!is.na(as.numeric(input$lin.R2.rerun.fluorescence)), as.numeric(input$lin.R2.rerun.fluorescence), control$lin.R2)
+      control_new$lin.RSD <- ifelse(!is.na(as.numeric(input$lin.RSD.rerun.fluorescence)), as.numeric(input$lin.RSD.rerun.fluorescence), control$lin.RSD)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun.fluorescence)), as.numeric(input$t0.lin.rerun.fluorescence), control$t0)
       min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun.fluorescence)), as.numeric(input$min.density.lin.rerun.fluorescence), control$min.density)
       if(is.numeric(min.density.lin.new)){
@@ -7560,6 +7615,15 @@ server <- function(input, output, session){
                         quota = quota_new)
         )
       }
+
+      # Update gcTable with new results
+      res.table.fl <- results$fluorescence$flFit$flTable
+      fit.summary <- summary.flFitLinear(results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]])
+
+      sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
+                           selected_vals_validate_fluorescence$sample_validate_fluorescence_linear,
+                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, names(results$fluorescence$flFit$flFittedLinear)))
+      results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
       # Show [Restore fit] button
       show("restore_fluorescence_linear")
@@ -7753,7 +7817,7 @@ server <- function(input, output, session){
       control_new <- control
       ID <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$ID
 
-      control_new$smooth.fl <- dplyr::if_else(!is.na(as.numeric(input$smooth.fl.rerun.fluorescence)), as.numeric(input$smooth.fl.rerun.fluorescence), control$smooth.fl)
+      control_new$smooth.fl <- ifelse(!is.na(as.numeric(input$smooth.fl.rerun.fluorescence)), as.numeric(input$smooth.fl.rerun.fluorescence), control$smooth.fl)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun.fluorescence)), as.numeric(input$t0.spline.rerun.fluorescence), control$t0)
       min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun.fluorescence)), as.numeric(input$min.density.spline.rerun.fluorescence), control$min.density)
       if(is.numeric(min.density.spline.new)){
@@ -7779,6 +7843,14 @@ server <- function(input, output, session){
                         control = control_new)
         )
       }
+      # Update gcTable with new results
+      res.table.fl <- results$fluorescence$flFit$flTable
+      fit.summary <- summary.flFitSpline(results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]])
+
+      sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                           selected_vals_validate_fluorescence$sample_validate_fluorescence_spline,
+                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline, names(results$fluorescence$flFit$flFittedSplines)))
+      results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
       # Show [Restore fit] button
       show("restore_fluorescence_spline")

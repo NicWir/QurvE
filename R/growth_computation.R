@@ -465,7 +465,7 @@ read_data <-
 #'
 #' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
 #' @param map.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
-#' @param software (Character) The name of the software used to export the plate reader data.
+#' @param software (Character) The name of the software/device used to export the plate reader data.
 #' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 #' For example: \code{convert.time = 'y = 24 * x'}
 #' @param data.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
@@ -486,7 +486,7 @@ read_data <-
 parse_data <-
   function(data.file = NULL,
            map.file = NULL,
-           software = c("Gen5", "Chi.Bio"),
+           software = c("Gen5", "Chi.Bio", "GrowthProfiler"),
            convert.time = NULL,
            data.sheet = 1,
            map.sheet = 1,
@@ -500,7 +500,7 @@ parse_data <-
     software <- match.arg(software)
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
-    if(!(software %in% c("Gen5", "Gen6", "Chi.Bio"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6'.")
+    if(!(software %in% c("Gen5", "Gen6", "Chi.Bio", "GrowthProfiler"))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6', 'Chi.Bio', and 'GrowthProfiler'.")
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
@@ -521,6 +521,10 @@ parse_data <-
     } # if("Gen5" %in% software)
     if("Chi.Bio" %in% software){
       parsed.ls <- parse_chibio(input)
+      data.ls <- parsed.ls[[1]]
+    }
+    if("GrowthProfiler" %in% software){
+      parsed.ls <- parse_growthprofiler(input)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -1351,11 +1355,11 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
                 else {
                   new_params <- unlist(strsplit(test_answer, split = ","))
                   t0_new <- ifelse(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
-                  h_new <- dplyr::if_else(!is.na(as.numeric(new_params[2])), as.numeric(new_params[2]), control$lin.h)
+                  h_new <- ifelse(!is.na(as.numeric(new_params[2])), as.numeric(new_params[2]), control$lin.h)
                   quota_new <- ifelse(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
                   min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
-                  R2_new <- dplyr::if_else(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
-                  RSD_new <- dplyr::if_else(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
+                  R2_new <- ifelse(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
+                  RSD_new <- ifelse(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
                   control_new <- control
                   control_new$t0 <- t0_new
                   if(!is.na(h_new)) control_new$lin.h <- h_new
@@ -2382,7 +2386,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   t0 <- control$t0
   min.density <- control$min.density
 
-  bad.values <- ((is.na(time))|(is.na(data)) | data < 0)
+  bad.values <- ((is.na(time))|(is.na(data)) | time < 0)
   data.in <- data <- data[!bad.values]
   time.in <- time <- time[!bad.values]
   if(!is.null(t0) && !is.na(t0) && t0 != ""){
@@ -2390,6 +2394,19 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   } else {
     t0 <- 0
   }
+
+  if(length(data) < 4){
+    if(control$suppress.messages==F) message(paste0("Linear fit: Not enough valid values in sample to perform fit."))
+    gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = NA, filt.data = NA,
+                        log.data = NA, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
+                          y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
+                          t_turn = NA, mumax2 = NA, y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
+                          tmax2_end = NA), ndx = NA, ndx2 = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
+    )
+    class(gcFitLinear) <- "gcFitLinear"
+    return(gcFitLinear)
+  }
+
   # extract period of growth (from defined t0)
   t.growth <- time[which.min(abs(time-t0)):which.max(data)]
   if(!is.null(h) && !is.na(h) && h != ""){

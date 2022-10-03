@@ -78,6 +78,12 @@ parse_data_shiny <-
       parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm)
       data.ls <- parsed.ls[[1]]
     }
+
+    if("GrowthProfiler" %in% software){
+      parsed.ls <- parse_growthprofiler(input)
+      data.ls <- parsed.ls[[1]]
+    }
+
     noNA.ndx <- which(!is.na(data.ls))
 
     # Convert time values
@@ -102,8 +108,6 @@ parse_data_shiny <-
           }
         }
       }
-    } else {
-      data.ls <-data.ls[noNA.ndx]
     }
 
     # apply identifiers specified in mapping file

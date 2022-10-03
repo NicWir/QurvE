@@ -1335,6 +1335,19 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
   }
 
+  if(length(fl_data) < 4){
+    if(control$suppress.messages==F) message(paste0("Linear fit: Not enough valid values in sample to perform fit."))
+    flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
+                        raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
+                        filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+                        ID = ID, FUN = grow_exponential, fit = NA, par = c(
+                          y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
+                          x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
+                          x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
+    class(flFitLinear) <- "flFitLinear"
+    return(flFitLinear)
+  }
+
   fl_data.log <- log(fl_data/fl_data[1])
 
   if(x_type == "density"){
