@@ -21,7 +21,7 @@ parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
 
   time.ndx <- grep("time", input[1,], ignore.case = T)
   # extract different read data in dataset
-  read.ndx <- grep("measured", input[1,], ignore.case = T)
+  read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
   reads <- input[1, read.ndx]
   suppressWarnings(
     reads[!is.na(as.numeric(reads))] <- gsub("\\.", ",", as.numeric(reads[!is.na(as.numeric(reads))]))
@@ -92,7 +92,7 @@ parse_data_shiny <-
 
 
     if("Chi.Bio" %in% software){
-      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm)
+      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -244,7 +244,7 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
   return(list(data.ls))
 }
 
-parse_chibio_shiny <- function(input, density.nm)
+parse_chibio_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
 {
   time.ndx <- grep("time", input[1,], ignore.case = T)
   read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
@@ -252,13 +252,29 @@ parse_chibio_shiny <- function(input, density.nm)
 
   data.ls <- list()
   if(length(reads)>1){
-    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1,density.nm], as.numeric(input[-1, density.nm])))
+    if (!is.null(density.nm) && density.nm != "Ignore")
+    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(density.nm, reads)]], as.numeric(input[-1, read.ndx[match(density.nm, reads)]])))
+    else
+      density  <- NA
+
+    if (!is.null(fl1.nm) && fl1.nm != "Ignore")
+      fluorescence1 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl1.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl1.nm, reads)]])))
+    else
+      fluorescence1  <- NA
+
+    if (!is.null(fl2.nm) && fl2.nm != "Ignore")
+      fluorescence2 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl2.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl2.nm, reads)]])))
+    else
+      fluorescence2  <- NA
   } else {
     density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
+    fluorescence1 <- NA
+    fluorescence2 <- NA
   }
+
   data.ls[[1]] <- density
-  data.ls[[2]] <- NA
-  data.ls[[3]] <- NA
+  data.ls[[2]] <- fluorescence1
+  data.ls[[3]] <- fluorescence2
 
   return(list(data.ls))
 }

@@ -4247,7 +4247,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                         ), # tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
                         #___Export RData___####
                         tabPanel(span("Data Export", title = "Export all computation results as RData file."),
-                                 icon = icon("file-lines"),
+                                 icon = icon("download"),
                                  value = "tabPanel_Export_RData",
                                  tabsetPanel(type = "tabs", id = "tabsetPanel_Export_Data",
                                              ##____Growth results export____####
@@ -4266,7 +4266,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                       )
 
                                              ),
-                                             ##Fluorescence results export____####
+                                             ## Fluorescence results export____####
                                              tabPanel(title = "Fluorescence", value = "tabPanel_export_data_fluorescence",
                                                       sidebarPanel(width = 3,
                                                                    fluidRow(
@@ -4277,6 +4277,60 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              icon = icon("file-export"),
                                                                                              style="padding:5px; font-size:120%"),
                                                                               style="float:right")
+                                                                     )
+                                                                   )
+                                                      )
+
+                                             ),
+                                 )
+                        ),
+                        #Import RData___####
+                        tabPanel(span("Data Import", title = "Import and RData file with results from a previous QurvE analysis."),
+                                 icon = icon("upload"),
+                                 value = "tabPanel_Import_RData",
+                                 tabsetPanel(type = "tabs", id = "tabsetPanel_Import_Data",
+                                             ##____Growth results export____####
+                                             tabPanel(title = "Growth", value = "tabPanel_import_data_growth",
+                                                      sidebarPanel(width = 3,
+                                                                   fluidRow(
+                                                                     column(12,
+                                                                            fileInput(inputId = 'import_RData_growth',
+                                                                                      label = 'Choose growth RData file',
+                                                                                      accept = c('.rdata')
+                                                                            ),
+                                                                            conditionalPanel(
+                                                                              condition = 'output.RData_growth_uploaded',
+                                                                              div(
+                                                                                actionButton(inputId = "read_RData_growth",
+                                                                                             label = "Read data",
+                                                                                             icon=icon("upload"),
+                                                                                             style="padding:5px; font-size:120%"),
+                                                                                style="float:right")
+                                                                            ),
+
+                                                                     )
+                                                                   )
+                                                      )
+
+                                             ),
+                                             ## Fluorescence results export____####
+                                             tabPanel(title = "Fluorescence", value = "tabPanel_import_data_fluorescence",
+                                                      sidebarPanel(width = 3,
+                                                                   fluidRow(
+                                                                     column(12,
+                                                                            fileInput(inputId = 'import_RData_fluorescence',
+                                                                                      label = 'Choose fluorescence RData file',
+                                                                                      accept = c('.rdata')
+                                                                            ),
+                                                                            conditionalPanel(
+                                                                              condition = 'output.RData_fluorescence_uploaded',
+                                                                              div(
+                                                                                actionButton(inputId = "read_RData_fluorescence",
+                                                                                             label = "Read data",
+                                                                                             icon=icon("upload"),
+                                                                                             style="padding:5px; font-size:120%"),
+                                                                                style="float:right")
+                                                                            ),
                                                                      )
                                                                    )
                                                       )
@@ -5499,25 +5553,19 @@ server <- function(input, output, session){
                             )
                         )
     )
-    # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
-    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
-    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
-    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
-    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
-    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
 
+    if(!is.null("results$growth")){
+      # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
+      removeModal()
+    } else showModal(modalDialog(geterrmessage(), footer=NULL, easyClose = T))
 
-    # )},
-    # message = function(m) {
-    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
-    # },
-    # warning = function(m) {
-    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
-    # }
-
-    removeModal()
   })
-    ##____Fluorescence____#####
+  ##____Fluorescence____#####
 
   # Create vector of x_types based on presence of data types
   output$normalized_fl_present <- reactive({
@@ -5572,19 +5620,6 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$run_fluorescence,{
-    # withCallingHandlers({
-    #
-    #   shinyjs::html(id = "text", html = '<br>', add = TRUE)
-    # # Activate menus
-    # enable(selector = "#navbar li:nth-child(3)")
-    # enable(selector = "#navbar li:nth-child(4)")
-    # enable(selector = "#navbar li:nth-child(5)")
-    #
-    # # Inactivate Fluorescence menus
-    # disable(selector = "#navbar li:nth-child(3) li:nth-child(2)")
-    # disable(selector = "#navbar li:nth-child(4) li:nth-child(2)")
-    # disable(selector = "#navbar li:nth-child(4) li:nth-child(3)")
-
     # Choose data input
 
     if(!is.null(results$custom_data)){
@@ -5709,23 +5744,16 @@ server <- function(input, output, session){
                             )
       )
     )
-    ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
-    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
-    shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
-    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
-    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
-    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
 
-
-
-    # )},
-    # message = function(m) {
-    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
-    # },
-    # warning = function(m) {
-    #   shinyjs::html(id = "text", html = m$message, add = TRUE)
-    # }
-    removeModal()
+    if(!is.null("results$fluorescence")){
+      ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
+      shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
+      removeModal()
+    } else showModal(modalDialog(geterrmessage(), footer=NULL, easyClose = T))
   })
 
   # Results ####
@@ -9749,7 +9777,7 @@ server <- function(input, output, session){
     }
   })
 
-  # RData Growth ####
+    ## RData Growth ####
   output$export_RData_growth <- downloadHandler(
     filename = function() {
       paste0("GrowthResults.RData")
@@ -9769,7 +9797,7 @@ server <- function(input, output, session){
     contentType = paste0(".RData")
   )
 
-  # RData Fluorescence ####
+    ## RData Fluorescence ####
   output$export_RData_fluorescence <- downloadHandler(
     filename = function() {
       paste0("FluorescenceResults.RData")
@@ -9789,6 +9817,50 @@ server <- function(input, output, session){
     contentType = paste0(".RData")
   )
 
+  # Import RData files
+    ## Growth
+    output$RData_growth_uploaded <- reactive({
+    if(is.null(input$import_RData_growth)) return(FALSE)
+    else return(TRUE)
+    })
+    outputOptions(output, 'RData_growth_uploaded', suspendWhenHidden=FALSE)
+
+    observeEvent(input$read_RData_growth,{
+      showModal(modalDialog("Reading data file...", footer=NULL))
+      try(load(input$import_RData_growth$datapath))
+      try(results$growth <- object)
+      if(!is.null("results$growth")){
+        # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+        shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
+        shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
+        shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
+        shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+        shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
+        removeModal()
+      } else showModal(modalDialog(geterrmessage(), footer=NULL, easyClose = T))
+    })
+    ## Fluorescence
+    output$RData_fluorescence_uploaded <- reactive({
+      if(is.null(input$import_RData_fluorescence)) return(FALSE)
+      else return(TRUE)
+    })
+    outputOptions(output, 'RData_fluorescence_uploaded', suspendWhenHidden=FALSE)
+
+    observeEvent(input$read_RData_fluorescence,{
+      showModal(modalDialog("Reading data file...", footer=NULL))
+      try(load(input$import_RData_fluorescence$datapath))
+      try(results$fluorescence <- object)
+
+      if(!is.null("results$fluorescence")){
+        ## ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
+        shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
+        shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Report]")
+        shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Visualize]")
+        shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
+        shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
+        removeModal()
+      } else showModal(modalDialog(geterrmessage(), footer=NULL, easyClose = T))
+    })
   # Show content after initializing ####
   load_data()
 
