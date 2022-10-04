@@ -1,6 +1,6 @@
 #' Read growth and fluorescence data in table format
 #'
-#' \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
+#' \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction, applies data transformation (calibration), and combines technical replicates.
 #'
 #' @param data.density An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing density data.
 #' In column format, the first three table rows contain
@@ -446,6 +446,114 @@ read_data <-
   if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  fluoro1.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.norm.mat[, -(1:3)]))
   if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
 
+  # if identical time values are present, combine the respective measurement as their mean
+  ## create list with unique time values and their frequencies
+  t.mat.freq <- lapply(1:nrow(t.mat), function(i) data.frame(table(t.mat[i,])))
+
+  if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1)){ #does any time value exist more than once in the same sample?
+    ## create list with duplicated time values
+    t.mult <- lapply(1:length(t.mat.freq), function(i) t.mat.freq[[i]][t.mat.freq[[i]]$Freq>1, ])
+    t.mult <- lapply(1:length(t.mult), function(i) t.mat[i,][t.mat[i,] %in% t.mult[[i]]$Var1 ])
+    unique.t.mult <- lapply(1:length(t.mult), function(i) unique(t.mult[[i]]))
+
+    ## combine measurements with duplicated time entries
+    t.ls <- list()
+    dat.ls <- list()
+    f1.ls <- list()
+    f2.ls <- list()
+    f1.norm.ls <- list()
+    f2.norm.ls <- list()
+
+    for(i in 1:length(t.mult)){
+      if(length(t.mult[[i]])>1){
+        col.nm <- lapply(1:length(unique.t.mult[[i]]), function(j)
+          names( t.mult[[i]][which(t.mult[[i]] %in% unique.t.mult[[i]][j]) ] )
+        )
+        col.ndx <- lapply(1:length(col.nm), function(j) which(colnames(t.mat) %in% col.nm[[j]])
+        )
+        # add column with average
+
+        ###### MAKE PER ROW AND ALSO IN TIME MATRIX!!!
+        combine.ndx <- c(1:col.ndx[[1]][1]) # time values of sample up to first duplicated time
+        if(length(col.ndx) == 2){
+          if(col.ndx[[1]][length(col.ndx[[1]])] == length(t.mat[i, ])){
+            combine.ndx <- c(combine.ndx,
+                             (col.ndx[[1]][length(col.ndx[[1]])]+1):col.ndx[[2]][1])
+          } else {
+            combine.ndx <- c(combine.ndx,
+                             (col.ndx[[1]][length(col.ndx[[1]])]+1):col.ndx[[2]][1],
+                             (col.ndx[[2]][length(col.ndx[[2]])]+1):length(t.mat[i, ]))
+          }
+        } else if(length(col.ndx) > 2){
+          for(j in 2:(length(col.ndx)-1)){
+            combine.ndx <- c(combine.ndx,
+                             (col.ndx[[j-1]][length(col.ndx[[j-1]])]+1):col.ndx[[j]][1],
+                             (col.ndx[[j]][length(col.ndx[[j]])]+1):col.ndx[[j+1]][1]
+            )
+          }
+          if(!col.ndx[[length(col.ndx)]][length(col.ndx[[length(col.ndx)]])] == length(t.mat[i, ])){
+            combine.ndx <- c(combine.ndx,
+                             (col.ndx[[length(col.ndx)]][length(col.ndx[[length(col.ndx)]])]+1):length(t.mat[i, ]))
+          }
+        }
+
+        t.ls[[i]] <- t.mat[i, combine.ndx] # time values of sample up to duplicated time
+
+        combine.ndx.dat <- combine.ndx + 3 # account for three identifier columns
+        ndx.average.first <- which(diff(combine.ndx.dat) > 1)+3
+
+        if(length(dat.mat) > 1){
+          dat.ls[[i]] <- c(dat.mat[i, 1:3], dat.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+          for(j in 1:length(ndx.average.first)){
+            dat.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(dat.mat[i, (col.ndx[[j]]+3)]))
+          }
+        }
+
+        if(length(fluoro1.mat) > 1){
+          f1.ls[[i]] <- c(fluoro1.mat[i, 1:3], fluoro1.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+          for(j in 1:length(ndx.average.first)){
+            f1.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro1.mat[i, (col.ndx[[j]]+3)]))
+          }
+        }
+
+        if(length(fluoro2.mat) > 1){
+          f2.ls[[i]] <- c(fluoro2.mat[i, 1:3], fluoro2.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+          for(j in 1:length(ndx.average.first)){
+            f2.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro2.mat[i, (col.ndx[[j]]+3)]))
+          }
+        }
+
+        if(length(fluoro1.norm.mat) > 1){
+          f1.norm.ls[[i]] <- c(fluoro1.norm.mat[i, 1:3], fluoro1.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+          for(j in 1:length(ndx.average.first)){
+            f1.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro1.norm.mat[i, (col.ndx[[j]]+3)]))
+          }
+        }
+
+        if(length(fluoro2.norm.mat) > 1){
+          f2.norm.ls[[i]] <- c(fluoro2.norm.mat[i, 1:3], fluoro2.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+          for(j in 1:length(ndx.average.first)){
+            f2.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro2.norm.mat[i, (col.ndx[[j]]+3)]))
+          }
+        }
+      } # if(length(t.mult[[i]])>1)
+    } # for(i in 1:length(t.mult))
+
+    t.mat <- do.call(rbind, t.ls)
+    if(length(dat.mat) > 1) dat.mat <- as.data.frame(unclass(do.call(rbind, dat.ls)), stringsAsFactors = TRUE)
+    if(length(fluoro1.mat) > 1) fluoro1.mat <- as.data.frame(unclass(do.call(rbind, f1.ls)), stringsAsFactors = TRUE)
+    if(length(fluoro2.mat) > 1) fluoro2.mat <- as.data.frame(unclass(do.call(rbind, f2.ls)), stringsAsFactors = TRUE)
+    if(length(fluoro1.norm.mat) > 1) fluoro1.norm.mat <- as.data.frame(unclass(do.call(rbind, f1.norm.ls)), stringsAsFactors = TRUE)
+    if(length(fluoro2.norm.mat) > 1) fluoro2.norm.mat <- as.data.frame(unclass(do.call(rbind, f2.norm.ls)), stringsAsFactors = TRUE)
+
+    #convert values from factor to numeric
+    if(length(dat.mat) > 1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
+    if(length(fluoro1.mat) > 1)    fluoro1.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.mat[, -(1:3)]))
+    if(length(fluoro2.mat) > 1)    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
+    if(length(fluoro1.norm.mat) > 1)  fluoro1.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.norm.mat[, -(1:3)]))
+    if(length(fluoro2.norm.mat) > 1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
+
+  } # if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1))
 
   dataset <- list("time" = t.mat,
                   "density" = dat.mat,

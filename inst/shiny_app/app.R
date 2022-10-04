@@ -5462,7 +5462,6 @@ server <- function(input, output, session){
       fit.opt <- c(fit.opt,
                    's')
     }
-
     showModal(modalDialog("Running computations...", footer=NULL))
     # Run growth workflow
     shiny::withProgress(message = "Computations completed",
@@ -8217,7 +8216,6 @@ server <- function(input, output, session){
 
   growth_group_plot <- reactive({
     results <- results$growth
-    browser()
     if(input$select_string_visualize_growth_group){
       suppressWarnings(
         plot.grofit(results,
@@ -9219,7 +9217,6 @@ server <- function(input, output, session){
           reference.conc <- NULL
           reference.nm <- NULL
         }
-        browser()
 
         if(input$select_string_visualize_parameter_fluorescence_plot){
           suppressWarnings(
