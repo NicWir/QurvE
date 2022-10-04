@@ -74,7 +74,7 @@ object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
 \item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.density}.}
 }
 \description{
-\code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction and combines technical replicates.
+\code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction, applies data transformation (calibration), and combines technical replicates.
 }
 \details{
 \figure{Data_layout.png}
