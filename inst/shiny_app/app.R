@@ -5571,7 +5571,7 @@ server <- function(input, output, session){
     } else showModal(modalDialog(geterrmessage(), footer=NULL, easyClose = T))
 
   })
-  ##____Fluorescence____#####
+    ##____Fluorescence____#####
 
   # Create vector of x_types based on presence of data types
   output$normalized_fl_present <- reactive({
@@ -6960,6 +6960,9 @@ server <- function(input, output, session){
   # Re-run selected linear fit with user-defined parameters upon click on 'submit'
   observeEvent(input$submit.rerun.linear.growth, {
     if(!is.null(results$growth$gcFit)){
+
+      showModal(modalDialog("Fitting sample data...", footer = NULL))
+
       # store previous fit in memory
       selected_vals_validate_growth$restore_growth_linear <- results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]
 
@@ -6995,7 +6998,7 @@ server <- function(input, output, session){
       )
       # Update gcTable with new results
       res.table.gc <- results$growth$gcFit$gcTable
-      fit.summary <- summary.gcFitLinear(results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]])
+      fit.summary <- QurvE:::summary.gcFitLinear(results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_growth$sample_validate_growth_linear),
                            selected_vals_validate_growth$sample_validate_growth_linear,
@@ -7228,6 +7231,7 @@ server <- function(input, output, session){
         }
       }
 
+      showModal(modalDialog("Fitting sample data...", footer = NULL))
 
       try(
         results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]] <-
@@ -7237,7 +7241,7 @@ server <- function(input, output, session){
       )
       # Update gcTable with new results
       res.table.gc <- results$growth$gcFit$gcTable
-      fit.summary <- summary.gcFitSpline(results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]])
+      fit.summary <- QurvE:::summary.gcFitSpline(results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_growth$sample_validate_growth_spline),
                            selected_vals_validate_growth$sample_validate_growth_spline,
@@ -7405,6 +7409,7 @@ server <- function(input, output, session){
       if(input$baranyi_growth_rerun == TRUE) models <- c(models, "baranyi")
 
       control_new$model.type <- models
+      showModal(modalDialog("Fitting sample data...", footer = NULL))
 
       try(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]] <-
             growth.gcFitModel(acttime, actwell,
@@ -7413,7 +7418,7 @@ server <- function(input, output, session){
 
       # Update gcTable with new results
       res.table.gc <- results$growth$gcFit$gcTable
-      fit.summary <- summary.gcFitModel(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]])
+      fit.summary <- QurvE:::summary.gcFitModel(results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_growth$sample_validate_growth_model),
                            selected_vals_validate_growth$sample_validate_growth_model,
@@ -7772,6 +7777,9 @@ server <- function(input, output, session){
   # Re-run selected linear fit with user-defined parameters upon click on 'submit'
   observeEvent(input$submit.rerun.linear.fluorescence, {
     if(!is.null(results$fluorescence$flFit1)){
+
+      showModal(modalDialog("Fitting sample data...", footer = NULL))
+
       # store previous fit in memory
       selected_vals_validate_fluorescence$restore_fluorescence_linear <- results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]
 
@@ -7818,7 +7826,7 @@ server <- function(input, output, session){
 
       # Update gcTable with new results
       res.table.fl <- results$fluorescence$flFit1$flTable
-      fit.summary <- summary.flFitLinear(results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]])
+      fit.summary <- QurvE:::summary.flFitLinear(results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
                            selected_vals_validate_fluorescence$sample_validate_fluorescence_linear,
@@ -8007,6 +8015,9 @@ server <- function(input, output, session){
   # Re-run selected spline fit with user-defined parameters upon click on 'submit'
   observeEvent(input$submit.rerun.spline.fluorescence, {
     if(!is.null(results$fluorescence$flFit1)){
+
+      showModal(modalDialog("Fitting sample data...", footer = NULL))
+
       # store previous fit in memory
       selected_vals_validate_fluorescence$restore_fluorescence_spline <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]
 
@@ -8045,7 +8056,7 @@ server <- function(input, output, session){
       }
       # Update gcTable with new results
       res.table.fl <- results$fluorescence$flFit1$flTable
-      fit.summary <- summary.flFitSpline(results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]])
+      fit.summary <- QurvE:::summary.flFitSpline(results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
                            selected_vals_validate_fluorescence$sample_validate_fluorescence_spline,
