@@ -1980,7 +1980,11 @@ grofit.param <- function(time, data, gcID = "undefined", control)
       raw.data = data,
       gcID = gcID,
       fit.time = time,
-      fit.data = ifelse(is.null(best), NA, as.numeric(fitted.values(best))),
+      fit.data = if(is.null(best)){
+        NA
+        } else {
+          as.numeric(fitted.values(best))
+          },
       parameters = list(
         A = Abest,
         dY = ifelse(is.null(best), NA, max(fitted.values(best))-min(fitted.values(best))),

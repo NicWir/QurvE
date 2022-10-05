@@ -78,7 +78,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                                       lambda: ~ .(round(gcFittedLinear$par[["lag"]], digits = 3))~~~~
                                       t[max]: ~ .(round(gcFittedLinear$par[["tmax_start"]], digits = 2))-.(round(gcFittedLinear$par[["tmax_end"]], digits = 2))~~~~
                                       R2:~ .(round(gcFittedLinear$rsquared, digits = 3))),
-                             side = 4 , adj = 0.3, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+                             side = 4 , adj = 0.35, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
 
              graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                                    "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
