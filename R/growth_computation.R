@@ -138,11 +138,20 @@ read_data <-
         time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
         calib <- parse(text = calibration)
         if(length(time.ndx)==1){
+          if(!is.null(nrow(df[-time.ndx, -(1:3)]))){
           x <- matrix(as.numeric(unlist(df[-time.ndx, -(1:3)])), nrow = nrow(df[-time.ndx, -(1:3)]))
+          } else {
+          x <- as.numeric(unlist(df[-time.ndx, -(1:3)]))
+          }
           df[-time.ndx, -(1:3)] <- eval(calib)
         } else { # identify different datasets based on the occurence of multiple 'time' entities
-          x <-  matrix(as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)])),
-                       nrow = nrow(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
+          if(!is.null(nrow(df[-time.ndx, -(1:3)]))){
+            x <-  matrix(as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)])),
+                         nrow = nrow(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
+          } else {
+            x <- as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
+          }
+
           df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)] <- eval(calib)
           for (i in 2:(length(time.ndx))){
             x <- matrix(as.numeric(unlist(df[if (is.na(time.ndx[i + 1])) {

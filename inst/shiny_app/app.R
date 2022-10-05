@@ -5288,6 +5288,7 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence1
           ),
+          calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, "")
           # fl2.nm = ifelse(
           #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
           #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
