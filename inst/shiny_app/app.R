@@ -4367,11 +4367,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
 server <- function(input, output, session){
 
-  # output$debug <- renderPrint({
-  #
-  #   paste(
-  #     output$normalized_fl_present)
-  #   })
   # Disable navbar menus before running computations
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Report]")
@@ -9888,6 +9883,11 @@ server <- function(input, output, session){
       q("no")
     })
   }
+
+  # Ensure that the application will stop the websocket server started by shiny::runApp() and the underlying R process when the browser window is closed.
+  session$onSessionEnded(function() {
+    stopApp()
+  })
 
 }
 
