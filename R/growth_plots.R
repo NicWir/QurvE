@@ -73,7 +73,13 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+
+             graphics::mtext(bquote(mu: ~ .(round(gcFittedLinear$par[["mumax"]], digits = 3))~~~~
+                                      lambda: ~ .(round(gcFittedLinear$par[["lag"]], digits = 3))~~~~
+                                      t[max]: ~ .(round(gcFittedLinear$par[["tmax_start"]], digits = 2))-.(round(gcFittedLinear$par[["tmax_end"]], digits = 2))~~~~
+                                      R2:~ .(round(gcFittedLinear$rsquared, digits = 3))),
+                             side = 4 , adj = 0.3, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+
              graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                                    "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                                    "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
@@ -150,7 +156,12 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
                try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = T)
              }
-             graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.85, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+             graphics::mtext(bquote(mu: ~ .(round(gcFittedLinear$par[["mumax"]], digits = 3))~~~~
+                                      lambda: ~ .(round(gcFittedLinear$par[["lag"]], digits = 3))~~~~
+                                      t[max]: ~ .(round(gcFittedLinear$par[["tmax_start"]], digits = 2))-.(round(gcFittedLinear$par[["tmax_end"]], digits = 2))~~~~
+                                      R2:~ .(round(gcFittedLinear$rsquared, digits = 3))),
+                             side = 4 , adj = 0.55, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+
              graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
                          "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
@@ -1668,9 +1679,10 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
               legend.background=element_blank(),
               legend.title = element_blank(),
               legend.position = c(0.90, 0.08),
-              plot.title = element_text(size = basesize, face = "bold"),
+              plot.title = element_text(size = basesize*1.1, face = "bold", vjust = 3),
               panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank()) +
+              panel.grid.minor = element_blank(),
+              plot.margin = unit(c(1,2,1,1), "lines")) +
         scale_color_manual(name='Growth fit',
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
@@ -1684,13 +1696,34 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
         p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
       }
 
+      x_limit <- ggplot_build(p)$layout$panel_params[[1]]$x.range
+      y_limit <- ggplot_build(p)$layout$panel_params[[1]]$y.range
+      y_limit[2] <- y_limit[2] * 1.25
+
       p <- p +
         annotate(
           "text",
           label = paste("t0:", gcFittedSpline$control$t0, "  min.density:", gcFittedSpline$control$min.density, "  smoothing:", gcFittedSpline$control$smooth.gc),
-          x = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$x.range[2],
-          y = 1.2 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
-          angle = 0, parse = F, size = basesize*3.2/12)
+          x = 0.5*x_limit[2],
+          y = 1.3 * y_limit[2],
+          angle = 0, parse = F, size = basesize*3.2/12) +
+        annotate(
+          "text",
+          label = bquote(mu: ~ .(round(gcFittedSpline$parameters$mu, digits = 3))~~~~
+                           lambda: ~ .(round(gcFittedSpline$parameters$lambda, digits = 3))~~~~
+                           t[max]: ~ .(round(gcFittedSpline$parameters$t.max, digits = 2))),
+          x = 1.01*x_limit[2],
+          y = 0.2 * y_limit[2],
+          angle = 90, parse = F, size = basesize*3.2/12) +
+        coord_cartesian(xlim = c(0, x_limit[2]*0.95), ylim = c(y_limit[1], y_limit[2]), clip = "off")
+
+      # annotate(
+      #   "text",
+      #   label = paste("t0:", gcFittedSpline$control$t0, "  min.density:", gcFittedSpline$control$min.density, "  smoothing:", gcFittedSpline$control$smooth.gc),
+      #   x = 19,
+      #   y = 0.1 * y_limit[2],
+      #   angle = 90, parse = F, size = basesize*3.2/12) +
+      #   coord_cartesian(xlim = c(x_limit[1], x_limit[2]), clip = "off")
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
@@ -1836,7 +1869,8 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
           geom_line(color = colSpline, size = lwd) +
           theme_classic(base_size = basesize) +
           xlab("Time") +
-          ylab(label = "Growth rate")
+          ylab(label = "Growth rate") +
+          coord_cartesian(xlim = c(0, x_limit[2]*0.95), ylim = c(y_limit[1], y_limit[2]), clip = "off")
 
         if(!is.null(y.lim.deriv)){
           p.mu <- p.mu + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 10))
