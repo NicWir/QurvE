@@ -325,15 +325,54 @@ parse_chibio <- function(input)
     answer <- readline(paste0("Indicate where the density data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n")))
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+    if(as.numeric(answer) == length(reads)+1){
+      density <- NA
+    } else {
+      density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+      if(all(as.numeric(density[-1,2]) == 0) | all(is.na(density[-1,2]))){
+        density <- NA
+      }
+    }
 
-    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+    answer <- readline(paste0("Indicate where the fluorescence 1 data is stored?\n",
+                              paste(unlist(lapply(1:length(reads), function (i)
+                                paste0("[", i, "] ", reads[i]))),
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 1 data\n"))
+    if(as.numeric(answer) == length(reads)+1){
+      fluorescence1 <- NA
+    } else {
+      fluorescence1 <- data.frame("time" = input[, time.ndx], "fluorescence1" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+      fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+      if(all(as.numeric(fluorescence1[-1,2]) == 0) || all(is.na(fluorescence1[-1,2]))){
+        fluorescence1 <- NA
+      }
+    }
+    data.ls[[1]] <- density
+    data.ls[[2]] <- fluorescence1
+
+    if(length(reads)>2){
+      answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
+                                paste(unlist(lapply(1:length(reads), function (i)
+                                  paste0("[", i, "] ", reads[i]))),
+                                  collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
+      if(as.numeric(answer) == length(reads)+1){
+        fluorescence2 <- NA
+      } else {
+        fluorescence2 <- data.frame("time" = input[, time.ndx], "fluorescence2" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+        fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+        if(all(as.numeric(fluorescence2[-1,2]) == 0) || all(is.na(fluorescence2[-1,2]))){
+          fluorescence2 <- NA
+        }
+      }
+      data.ls[[3]] <- fluorescence2
+    }
   } else {
     density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
+    data.ls[[1]] <- density
+    data.ls[[2]] <- NA
+    data.ls[[3]] <- NA
   }
-  data.ls[[1]] <- density
-  data.ls[[2]] <- NA
-  data.ls[[3]] <- NA
 
   return(list(data.ls))
 }

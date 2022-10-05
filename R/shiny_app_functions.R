@@ -252,18 +252,30 @@ parse_chibio_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
 
   data.ls <- list()
   if(length(reads)>1){
-    if (!is.null(density.nm) && density.nm != "Ignore")
-    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(density.nm, reads)]], as.numeric(input[-1, read.ndx[match(density.nm, reads)]])))
+    if (!is.null(density.nm) && density.nm != "Ignore"){
+      density <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(density.nm, reads)]], as.numeric(input[-1, read.ndx[match(density.nm, reads)]])))
+      if(all(as.numeric(density[-1,2]) == 0) || all(is.na(density[-1,2]))){
+        density <- NA
+      }
+    }
     else
       density  <- NA
 
-    if (!is.null(fl1.nm) && fl1.nm != "Ignore")
+    if (!is.null(fl1.nm) && fl1.nm != "Ignore"){
       fluorescence1 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl1.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl1.nm, reads)]])))
+      if(all(as.numeric(fluorescence1[-1,2]) == 0) || all(is.na(fluorescence1[-1,2]))){
+        fluorescence1 <- NA
+      }
+    }
     else
       fluorescence1  <- NA
 
-    if (!is.null(fl2.nm) && fl2.nm != "Ignore")
+    if (!is.null(fl2.nm) && fl2.nm != "Ignore"){
       fluorescence2 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl2.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl2.nm, reads)]])))
+      if(all(as.numeric(fluorescence2[-1,2]) == 0) || all(is.na(fluorescence2[-1,2]))){
+        fluorescence2 <- NA
+      }
+    }
     else
       fluorescence2  <- NA
   } else {
