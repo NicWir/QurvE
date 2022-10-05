@@ -265,6 +265,24 @@ parse_Gen5Gen6 <- function(input)
     }
   }
   names(read.data) <- reads
+
+  well_format <- str_extract(input[grep("Plate Type", input[,1]), 2], pattern = "[[:digit:]]+")
+
+  if(as.numeric(well_format) > 96){
+    # Combine data tables with identical read name (for > 96-well plates )
+    unique_reads <- unique(reads)
+    read.data.combined <- list()
+    for(i in 1:length(unique_reads)){
+      identical.ndx <- which(names(read.data) %in% unique_reads[i])
+      selected_reads <- lapply(1:length(read.data[identical.ndx]), function(x)
+        read.data[[identical.ndx[x]]][, -(1:2)])
+      read.data.combined[[i]] <- do.call(cbind, selected_reads)
+      read.data.combined[[i]] <- cbind(read.data[[identical.ndx[1]]][,1:2], read.data.combined[[i]])
+    }
+    names(read.data.combined) <- unique_reads
+    read.data <- read.data.combined
+  }
+
   data.ls <- list()
   if(length(reads)>1){
 

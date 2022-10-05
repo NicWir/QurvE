@@ -200,7 +200,7 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
     }
   }
   names(read.data) <- reads
-  well_format <- gsub("[[:space:]].+", "", data[grep("Plate Type", data[,1]), 2])
+  well_format <- str_extract(data[grep("Plate Type", data[,1]), 2], pattern = "[[:digit:]]+")
   if(as.numeric(well_format) > 96){
     # Combine data tables with identical read name (for > 96-well plates )
     unique_reads <- unique(reads)
