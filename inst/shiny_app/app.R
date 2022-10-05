@@ -129,7 +129,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                   shinyjs::inlineCSS(css),
                   div(
                     id = "loading_page",
-                    h1("Initializing...")
+                    HTML("<br>"),
+                    HTML("<br>"),
+                    HTML('<center><img src="QurvE_logo.png" width="500" vertical-align="middle"></center>'),
+                    HTML("<br>"),
+                    HTML("<br>"),
+                    h1("Initializing...", align = "center")
                   ),
                   hidden(
                     div(
