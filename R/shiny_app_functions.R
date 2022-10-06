@@ -53,8 +53,8 @@ parse_data_shiny <-
            map.file = NULL,
            software = "Gen5",
            convert.time = NULL,
-           data.sheet = 1,
-           map.sheet = 1,
+           sheet.data = 1,
+           sheet.map = 1,
            csvsep.data = ";",
            dec.data = ".",
            csvsep.map = ";",
@@ -72,13 +72,13 @@ parse_data_shiny <-
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
-      input <- read_file(data.file, csvsep=csvsep.data, dec=dec.data, sheet=data.sheet)
+      input <- read_file(data.file, csvsep=csvsep.data, dec=dec.data, sheet=sheet.data)
     } else {
       stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
     }
     if(!is.null(map.file)){
       if (file.exists(map.file)) {
-        mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=map.sheet)
+        mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=sheet.map)
       } else {
         stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
       }
