@@ -2223,7 +2223,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
         class(gcFitSpline) <- "gcFitSpline"
         return(gcFitSpline)
       }
-      mumax.index <- which.max(mumax.index$y) # index of data point with maximum growth rate in first derivative fit
+      mumax.index <- which.max(deriv1.growth$y) # index of data point with maximum growth rate in first derivative fit
       mumax.index.spl <- which(spline$x == deriv1$x[mumax.index]) # index of data point with maximum growth rate in spline fit
       t.max <- deriv1$x[mumax.index] # time of maximum growth rate
       mumax <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
