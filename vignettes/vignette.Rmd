@@ -2,11 +2,22 @@
 title: "Quantitiative Growth Curve Evaluation with Package `QurvE`"
 author: "Nicolas T. Wirth"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+# output: 
+#   rmarkdown::html_vignette
+output:
+  bookdown::html_document2:
+    fig_caption: yes
+    toc: true
+    toc_float: true
+    theme: united
+  bookdown::pdf_document2:
+    fig_caption: yes
+    toc: false
+    latex_engine: xelatex
 vignette: >
   %\VignetteIndexEntry{Quantitiative Growth Curve Evaluation with Package `QurvE`}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/research-institute-for-nature-and-forest.csl
 link-citations: true
 lang: en-US
@@ -19,6 +30,24 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+colorize <- function(x, color) {
+    if (knitr::is_latex_output()) {
+        sprintf("\\textcolor{%s}{%s}", color, x)
+    } else if (knitr::is_html_output()) {
+        sprintf("<span style='color: %s;'>%s</span>", color,
+                x)
+    } else x
+}
+
+colorize_code <- function(x, color) {
+    if (knitr::is_latex_output()) {
+        sprintf("\\textcolor{%s}{`%s`}", color, x)
+    } else if (knitr::is_html_output()) {
+        sprintf("<span style='color: %s;'>`%s`</span>", color,
+                x)
+    } else x
+}
 ```
 
 <strong>Please note:</strong> This vignette will be updated from time to time when new features are implemented. Please find the most recent version at the [QurvE GitHub repository](https://github.com/NicWir/QurvE).
@@ -29,13 +58,27 @@ In virtually all disciplines of biology dealing with living organisms, from clas
 
 Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, density increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
 
-The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. With consideration for `R` novices, it establishes a framework in which a complete, detailed growth curve analysis can be performed in two simple steps:
+The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. `QurvE` was designed to be usable with minimal prior knowledge of the R programming language or programming in general. You will need to be familiar with the idea of running commands from a console or writing basic scripts. For R beginners, [this](https://moderndive.netlify.app/1-getting-started.html) is a great starting point, there are some good resources [here](https://education.rstudio.com/learn/beginner/) and we suggest using the [RStudio application](https://rstudio.com/products/rstudio/). It provides an environment for writing and running R code.
+
+With consideration for `R` novices, `QurvE` establishes a framework in which a complete, detailed growth curve analysis can be performed in two simple steps:
 
 1.  *Read data* in custom format or parse data from a plate reader experiment.
 
 2.  *Run workflow*, including fitting of growth curves, dose-response analysis, and rendering a report that summarizes the results.
 
 All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fits by defining thresholds and quality criteria, allows the direct parsing of data from plate reader result files, and calculates parameters for an additional growth phase (bi-phasic growth).
+
+# Installation
+
+## Development version
+
+Install the must current version with package `devtools`:
+
+```{r eval = FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("NicWir/QurvE")
+```
 
 # Growth profiling methods
 
@@ -84,39 +127,71 @@ Three methods are available to characterize growth curves:
 
 [^1]: For linear and nonparametric (i.e, smooth spline) fits, the lag time is calculated as the intersect of the tangent at µ~max~ and a horizontal line at the first data point (y~0~). For the analysis of bi-phasic growth curves, the lag time is extracted as the lower of the two obtained $\lambda$ values.
 
-<!-- -->
+# Data formats
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+`QurvE` accepts files with the formats *.xls*, *.xlsx*, *.csv*, *.tsv*, and *.txt* (tab separated). The data in the files should be structured as shown in Figure \@ref(fig:data-layout). Alternatively, data parsers are available that allow direct import of raw data from different culture instruments. For a list of currently supported devices, please run `?parse_data`.
 
-## Figures
+## Custom format
 
-The figure sizes have been customised so that you can easily put two images side-by-side.
+To ensure compatibility with any type of measurement and data type (e.g., optical density, cell count, measured dimensions), `QurvE` uses a custom data layout. Here the first column contains *time values* and **'Time'** in the top cell, cells #2 and #3 are ignored. The remaining columns contain *measurement values* and the following sample identifiers in the top three rows:
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+1.  Sample name; usually a combination of organism and condition, or 'blank'.
+2.  Replicate number; replicates are identified by *identical* names and concentration values. If only one type of replicate (biological or technical) was performed, enter numerical values here. If **both** biological and technical replicates of these biological replicates have been performed, the biological replicates shall be indicated with numbers and the technical replicates with letters. The technical replicates are then combined with their average value.
+3.  (*optional*) Concentration values of an added compound; this information is used to perform a dose-response analysis.
+
+Several experiments (e.g., runs on different plate readers) can be combined into a single file and analyzed simultaneously. Therefore, different experiments are marked by the presence of separate time columns. Different lengths and values in these time columns are permitted.
+
+```{r data-layout, echo = FALSE, fig.cap = "\\label{fig:data-layout} Custom QurvE data layout", fig.align='center'}
+knitr::include_graphics("../man/figures/Data_layout.png", dpi = 300, error = F)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+`r cat("")`  
+To read data in custom format, run:
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+```{r read-custom, echo = TRUE, eval = FALSE}
+input <- read_data(data.density = 'path_to_data_file',
+                   csvsep = ';', # or ','
+                   dec = '.', # or ','
+                   sheet.density = 1, # number (or "name") of the EXCEL file sheet containing data
+                   subtract.blank = TRUE,
+                   calibration = NULL
+)
+```
+
+The `r colorize_code("data.density", "red")` argument takes the path to the file containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.density", "red")` specifies the number or name (in quotes) of the sheet containing the data. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. 
+
+
+## Data parser
+
+The data generated by culture devices (e.g., plate readers) from different manufacturers come in different formats. If these data are to be used directly, they must first be "parsed" from the plate reader into the `QurvE` standard format. In this scenario, sample information must be provided in a separate table that *maps* samples with their respective identifiers.The *mapping table* must have the following layout (Figure \@ref(fig:mapping-layout)):
+
+```{r mapping-layout, echo = FALSE, out.width = "40%", fig.cap = "\\label{fig:mapping-layout} Data parser mapping layout", fig.align='center'}
+knitr::include_graphics("../man/figures/mapping_layout.png", dpi = 300, error = F)
+```
+
+To parse data, run:
+
+```{r parse-data, echo = TRUE, eval = FALSE}
+input <- parse_data(data.file = 'path_to_data_file',
+                    map.file = 'path_to_mapping_file',
+                    software = 'used_software_or_device', 
+                    csvsep.data = ';', # or ','
+                    dec.data = '.', # or ','
+                    csvsep.map = ';', # or ','
+                    dec.map = '.', # or ','
+                    sheet.data = 1, # number (or "name") of the EXCEL file sheet containing data
+                    sheet.map = 1, # number (or "name") of the EXCEL file sheet containing 
+                                   # mapping information
+                    subtract.blank = TRUE,
+                    calibration = NULL,
+                    convert.time = NULL
+)
+```
+
+The `r colorize_code("data.file", "red")` argument takes the path to the file containing experimental data exported from a culture device, `r colorize_code("map.file", "red")` the path to the file with mapping information. With `r colorize_code("software", "red")`, you can specify the device (or software) that was used to generate the data. `r colorize_code("csvsep.data", "red")` and `r colorize_code("csvsep.map", "red")` specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`). `r colorize_code("dec.data", "red")` and `r colorize_code("dec.map", "red")` are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file, `r colorize_code("sheet.data", "red")` and/or `r colorize_code("sheet.map", "red")` specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. Similarly, `r colorize_code("convert.time", "red")` accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours). 
+
+# Run a complete growth analysis workflow
+
+`QurvE` reduces all computational steps required to create a complete growth profile to two steps, **read data** and **run workflow**.
 
 Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes[^2], and tables, e.g. using `knitr::kable()`.
-
-[^2]: A footnote here.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither." ([via](https://twitter.com/hadleywickham/status/504368538874703872))

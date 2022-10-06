@@ -585,8 +585,8 @@ read_data <-
 #' @param software (Character) The name of the software/device used to export the plate reader data.
 #' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 #' For example: \code{convert.time = 'y = 24 * x'}
-#' @param data.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
-#' @param map.sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
+#' @param sheet.data (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
+#' @param sheet.map (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
 #' @param csvsep.data (Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}
 #' @param dec.data (Character) decimal separator used in CSV, TSV or TXT data file.
 #' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
@@ -603,10 +603,10 @@ read_data <-
 parse_data <-
   function(data.file = NULL,
            map.file = NULL,
-           software = c("Gen5", "Chi.Bio", "GrowthProfiler", "Tecan"),
+           software = c("Gen5", "Gen6", "Chi.Bio", "GrowthProfiler", "Tecan"),
            convert.time = NULL,
-           data.sheet = 1,
-           map.sheet = 1,
+           sheet.data = 1,
+           sheet.map = 1,
            csvsep.data = ";",
            dec.data = ".",
            csvsep.map = ";",
@@ -621,13 +621,13 @@ parse_data <-
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
-      input <- read_file(data.file, csvsep=csvsep.data, dec=dec.data, sheet=data.sheet)
+      input <- read_file(data.file, csvsep=csvsep.data, dec=dec.data, sheet=sheet.data)
     } else {
       stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
     }
     if(!is.null(map.file)){
       if (file.exists(map.file)) {
-        mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=map.sheet)
+        mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=sheet.map)
       } else {
         stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
       }
@@ -746,7 +746,7 @@ parse_data <-
 growth.control <- function (neg.nan.act = FALSE,
                             clean.bootstrap = TRUE,
                             suppress.messages = FALSE,
-                            fit.opt = c("l", "s"),
+                            fit.opt = c("a"),
                             t0 = 0,
                             min.density = NA,
                             log.x.gc = FALSE,
@@ -920,7 +920,7 @@ growth.workflow <- function (grodata = NULL,
                              neg.nan.act = FALSE,
                              clean.bootstrap = TRUE,
                              suppress.messages = FALSE,
-                             fit.opt = c("l", "s"),
+                             fit.opt = c("a"),
                              t0 = 0,
                              min.density = NA,
                              log.x.gc = FALSE,
