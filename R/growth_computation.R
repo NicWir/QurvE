@@ -1539,7 +1539,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
                                     parameters = list(A = NA, dY = NA, mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
                                                       lambda2 = NA, b.tangent2 = NA, integral = NA),
                                     parametersLowess = list(A = NA, mu = NA, lambda = NA),
-                                    spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                                    spline = NA, spline.deriv1 = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
                                     control = control)
         class(nonpara)      <- "gcFitSpline"
         fitnonpara.all[[i]] <- nonpara
@@ -2123,7 +2123,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
                         fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = 0, dY = 0,
                                                                                                                     mu = 0, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
                                                                                                                     lambda2 = NA, b.tangent2 = NA, integral = NA),
-                        spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                        spline = NA, spline.deriv1 = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
                         control = control)
     class(gcFitSpline) <- "gcFitSpline"
     return(gcFitSpline)
@@ -2134,7 +2134,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
                         gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A = NA, dY = NA,
                                                                                      mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
                                                                                      lambda2 = NA, b.tangent2 = NA, integral = NA),
-                        spline = NA, reliable = NULL, fitFlag = TRUE, fitFlag2 = FALSE,
+                        spline = NA, spline.deriv1 = NA, reliable = NULL, fitFlag = TRUE, fitFlag2 = FALSE,
                         control = control)
     class(gcFitSpline) <- "gcFitSpline"
     return(gcFitSpline)
@@ -2201,15 +2201,29 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
                           fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
                                                                                                                       mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
                                                                                                                       lambda2 = NA, b.tangent2 = NA, integral = NA),
-                          spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                          spline = NA, spline.deriv1 = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
                           control = control)
       class(gcFitSpline) <- "gcFitSpline"
       return(gcFitSpline)
     } # if(!exists("spline") || is.null(spline) == TRUE)
     else {
-      # Perform spline fit and extract parameters
+      # Perform first derivative and extract parameters
       deriv1 <- stats::predict(spline, time, deriv = 1)
-      mumax.index <- which.max(deriv1$y) # index of data point with maximum growth rate in first derivative fit
+      #consider only slopes at density values greater than the initial value
+      deriv1.growth <- deriv1; deriv1.growth$x <- deriv1.growth$x[spline$y > spline$y[1]]; deriv1.growth$y <- deriv1.growth$y[spline$y > spline$y[1]]
+      if(length(deriv1.growth$y) < 3){
+        warning("gcFitSpline: No significant amount of density values above the start value!")
+
+        gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
+                            fit.time = spline$x, fit.data = spline$y, parameters = list(A = NA, dY = NA,
+                                                                                        mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
+                                                                                        lambda2 = NA, b.tangent2 = NA, integral = NA),
+                            spline = spline, spline.deriv1 = deriv1, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
+                            control = control)
+        class(gcFitSpline) <- "gcFitSpline"
+        return(gcFitSpline)
+      }
+      mumax.index <- which.max(mumax.index$y) # index of data point with maximum growth rate in first derivative fit
       mumax.index.spl <- which(spline$x == deriv1$x[mumax.index]) # index of data point with maximum growth rate in spline fit
       t.max <- deriv1$x[mumax.index] # time of maximum growth rate
       mumax <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)

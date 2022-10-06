@@ -5523,7 +5523,7 @@ server <- function(input, output, session){
                         try(
                           results$growth <-
                             suppressWarnings(
-                              growth.workflow(grodata = grodata,
+                              QurvE::growth.workflow(grodata = grodata,
                                               ec50 = input$perform_ec50_growth,
                                               fit.opt = fit.opt,
                                               t0 = t0,
@@ -5707,7 +5707,7 @@ server <- function(input, output, session){
       shiny::withProgress(message = "Computations completed",
                           results$fluorescence <-
                             suppressWarnings(
-                              fl.workflow(grodata = grodata,
+                              QurvE::fl.workflow(grodata = grodata,
                                           ec50 = input$perform_ec50_fluorescence,
                                           fit.opt = fit.opt,
                                           x_type = input$data_type_x_fluorescence,
