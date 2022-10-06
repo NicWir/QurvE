@@ -194,4 +194,3 @@ The `r colorize_code("data.file", "red")` argument takes the path to the file co
 
 `QurvE` reduces all computational steps required to create a complete growth profile to two steps, **read data** and **run workflow**.
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.

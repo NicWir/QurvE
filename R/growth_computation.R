@@ -2106,7 +2106,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
     }
   }
   if (control$log.y.spline == TRUE) {
-    bad.values <- (data < 0)
+    bad.values <- (data <= 0)
     if (TRUE %in% bad.values) {
       if (control$neg.nan.act == FALSE) {
         time <- time[!bad.values]
@@ -2523,7 +2523,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
   }
 
-  bad.values <- ((is.na(time))|(is.na(data)) | time < 0)
+  bad.values <- ((is.na(time))|(is.na(data)) | time < 0 | data <=0)
   data.in <- data <- data[!bad.values]
   time.in <- time <- time[!bad.values]
   if(!is.null(t0) && !is.na(t0) && t0 != ""){
@@ -3323,7 +3323,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
   }
   if (control$log.y.spline == TRUE) {
     data.log <- log(data/data[1])
-    bad.values <- (data.log < 0)
+    bad.values <- (data.log <= 0)
     if (TRUE %in% bad.values) {
       time <- time[!bad.values]
       data.log <- data.log[!bad.values]
