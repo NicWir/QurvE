@@ -63,7 +63,7 @@ Caution!: When utilizing calibration, carefully consider whether or not blanks w
 \value{
 An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with density and fluorescence data (if applicable),
 and an experimental design table. The \code{grodata} object can be directly
-used to run \code{\link{growth.workflow}}/\code{\link{fl.workflow}} or, together with a \code{grofit.control}/\code{fl.control}
+used to run \code{\link{growth.workflow}}/\code{\link{fl.workflow}} or, together with a \code{growth.control}/\code{fl.control}
 object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
 \item{time}{Matrix with raw time values extracted from \code{data.density}.}
 \item{density}{Dataframe with raw density values and sample identifiers extracted from \code{data.density}.}

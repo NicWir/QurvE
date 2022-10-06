@@ -14,7 +14,7 @@ growth.workflow(
   neg.nan.act = FALSE,
   clean.bootstrap = TRUE,
   suppress.messages = FALSE,
-  fit.opt = c("l", "s"),
+  fit.opt = c("a"),
   t0 = 0,
   min.density = NA,
   log.x.gc = FALSE,

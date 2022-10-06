@@ -145,7 +145,7 @@ Several experiments (e.g., runs on different plate readers) can be combined into
 knitr::include_graphics("../man/figures/Data_layout.png", dpi = 300, error = F)
 ```
 
-`r cat("")`  
+`r cat("")`\
 To read data in custom format, run:
 
 ```{r read-custom, echo = TRUE, eval = FALSE}
@@ -158,8 +158,7 @@ input <- read_data(data.density = 'path_to_data_file',
 )
 ```
 
-The `r colorize_code("data.density", "red")` argument takes the path to the file containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.density", "red")` specifies the number or name (in quotes) of the sheet containing the data. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. 
-
+The `r colorize_code("data.density", "red")` argument takes the path to the file containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.density", "red")` specifies the number or name (in quotes) of the sheet containing the data. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values.
 
 ## Data parser
 
@@ -188,9 +187,49 @@ input <- parse_data(data.file = 'path_to_data_file',
 )
 ```
 
-The `r colorize_code("data.file", "red")` argument takes the path to the file containing experimental data exported from a culture device, `r colorize_code("map.file", "red")` the path to the file with mapping information. With `r colorize_code("software", "red")`, you can specify the device (or software) that was used to generate the data. `r colorize_code("csvsep.data", "red")` and `r colorize_code("csvsep.map", "red")` specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`). `r colorize_code("dec.data", "red")` and `r colorize_code("dec.map", "red")` are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file, `r colorize_code("sheet.data", "red")` and/or `r colorize_code("sheet.map", "red")` specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. Similarly, `r colorize_code("convert.time", "red")` accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours). 
+The `r colorize_code("data.file", "red")` argument takes the path to the file containing experimental data exported from a culture device, `r colorize_code("map.file", "red")` the path to the file with mapping information. With `r colorize_code("software", "red")`, you can specify the device (or software) that was used to generate the data. `r colorize_code("csvsep.data", "red")` and `r colorize_code("csvsep.map", "red")` specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`). `r colorize_code("dec.data", "red")` and `r colorize_code("dec.map", "red")` are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file, `r colorize_code("sheet.data", "red")` and/or `r colorize_code("sheet.map", "red")` specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. Similarly, `r colorize_code("convert.time", "red")` accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours).
 
 # Run a complete growth analysis workflow
 
 `QurvE` reduces all computational steps required to create a complete growth profiling to two steps, **read data** and **run workflow**.
 
+After loading the package:
+
+```{r library-QurvE, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+library(QurvE)
+```
+
+we load experimental data from the publication @wirth2021 in which *Pseudomonas putida* KT2440 and an engineered strain were tested for their sensitivity towards the product 2-fluoromuconic acid:
+
+### Load data
+
+```{r load-data, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+input <- read_data(data.density = system.file('2-FMA_toxicity.xlsx', package = 'QurvE')
+          )
+```
+
+The created object `input` is a list of class `grodata` containing:
+
+-   a `time` matrix with time with 66 rows, each corresponding to one sample in the dataset, and 161 columns, i.e., time values for each sample.
+
+-   a `density` data frame with 66 rows and 161+3 columns. The three additional columns contain the sample identifiers `condition`, `replicate`, and `concentration`.
+
+-   `fluorescence1` (here: `NA`)
+
+-   `fluorescence2` (here: `NA`)
+
+-   `norm.fluorescence1` (here: `NA`)
+
+-   `norm.fluorescence2` (here: `NA`)
+
+-   `expdesign`, a data frame containing the `label`, `condition`, `replicate`, and `concentration` for each sample:
+
+```{r head-input, echo = T, eval = TRUE}
+head(input$expdesign)
+```
+
+We can plot the raw data:
+```{r raw-plot, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+plot.grofit(input, data.type = "raw")
+
+```

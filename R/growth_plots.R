@@ -2007,7 +2007,7 @@ plot.grofit <- function(grofit, ...,
   if(length(arglist) > 1){
     # combine several grofit objects for joint plotting
     lapply(arglist, function(x) {
-      if(methods::is(x) != "grofit") stop("Input objects need to be of class 'grofit' created with growth.workflow().")
+      if(methods::is(x) != "grofit" &&  methods::is(x) != "grodata") stop("Input objects need to be of class 'grofit' created with growth.workflow().")
     })
     merged <- grofit
     for(i in 2:length(arglist)){
@@ -2024,7 +2024,7 @@ plot.grofit <- function(grofit, ...,
   }
 
   # grofit an object of class grofit
-  if(methods::is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
+  if(methods::is(grofit) != "grofit" && methods::is(grofit) != "grodata") stop("grofit needs to be an object created with growth.workflow().")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
@@ -2037,7 +2037,10 @@ plot.grofit <- function(grofit, ...,
   exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates; apply selecting arguments
-  sample.nm <- nm <- as.character(names(grofit$gcFit$gcFittedSplines))
+  sample.nm <- nm <- if(methods::is(grofit) == "grofit"){
+    as.character(names(grofit$gcFit$gcFittedSplines))} else {
+      as.character(grofit$expdesign$label)
+    }
   if(!is.null(IDs)){
     # Check if IDs refer to samples or conditions
     if(any(grep(" \\| ", IDs))){
@@ -2142,7 +2145,11 @@ plot.grofit <- function(grofit, ...,
         data <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)
       } else {
         time <- lapply(1:length(ndx), function(i) cbind(grofit$time[ndx[[i]], ])) %>% as.list(.)
-        data <- grofit$data[ndx, 4:ncol(grofit$data)]
+        if(methods::is(grofit) == "grofit"){
+          data <- grofit$data[ndx, 4:ncol(grofit$data)]
+        } else {
+          data <- grofit$density[ndx, 4:ncol(grofit$density)]
+        }
         data <- split(as.matrix(data), 1:nrow(as.matrix(data)))
         data <- lapply(1:length(data), function(i) as.numeric(data[[i]]))
       }

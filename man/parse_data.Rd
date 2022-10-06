@@ -7,10 +7,10 @@
 parse_data(
   data.file = NULL,
   map.file = NULL,
-  software = c("Gen5", "Chi.Bio", "GrowthProfiler", "Tecan"),
+  software = c("Gen5", "Gen6", "Chi.Bio", "GrowthProfiler", "Tecan"),
   convert.time = NULL,
-  data.sheet = 1,
-  map.sheet = 1,
+  sheet.data = 1,
+  sheet.map = 1,
   csvsep.data = ";",
   dec.data = ".",
   csvsep.map = ";",
@@ -29,9 +29,9 @@ parse_data(
 \item{convert.time}{(\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 For example: \code{convert.time = 'y = 24 * x'}}
 
-\item{data.sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
+\item{sheet.data}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
 
-\item{map.sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
+\item{sheet.map}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
 
 \item{csvsep.data}{(Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}}
 
