@@ -192,5 +192,5 @@ The `r colorize_code("data.file", "red")` argument takes the path to the file co
 
 # Run a complete growth analysis workflow
 
-`QurvE` reduces all computational steps required to create a complete growth profile to two steps, **read data** and **run workflow**.
+`QurvE` reduces all computational steps required to create a complete growth profiling to two steps, **read data** and **run workflow**.
 
