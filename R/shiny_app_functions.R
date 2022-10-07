@@ -117,7 +117,7 @@ parse_data_shiny <-
     }
 
     if(any(grep("Biolector", software, ignore.case = T))){
-      parsed.ls <- parse_tecan_shiny(input)
+      parsed.ls <- parse_biolector_shiny(input)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -372,7 +372,7 @@ parse_tecan_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
   return(list(data.ls))
 }
 
-parse_biolector <- function(input, density.nm)
+parse_biolector_shiny <- function(input, density.nm)
 {
   # get index (row,column) for "Time:"
   time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = T)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = T),], ignore.case = T))

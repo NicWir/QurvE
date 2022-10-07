@@ -58,7 +58,7 @@ summary.gcFitModel <- function(object, ...)
   {
     # object of class gcFitModel
 
-    contents.fitted.param     = c("mu.model", "lambda.model", "A.model", "dY.model",
+    contents.fitted.param     = c("mu.model", "tD.model", "lambda.model", "A.model", "dY.model",
                                   "integral.model",
                                   "parameter_nu.model",
                                   "parameter_alpha.model",
@@ -81,7 +81,7 @@ summary.gcFitModel <- function(object, ...)
       }
     }
     else{
-      table <- c(object$parameters$mu[1], object$parameters$lambda[1],  object$parameters$A[1],
+      table <- c(object$parameters$mu[1], object$parameters$tD[1], object$parameters$lambda[1],  object$parameters$A[1],
                  object$parameters$dY[1],
                  object$parameters$integral,
                  ifelse(!is.null(object$parameters$fitpar$nu[1]),object$parameters$fitpar$nu[1], NA),

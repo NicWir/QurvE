@@ -5088,7 +5088,7 @@ server <- function(input, output, session){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 3600")
     }
     if("Biolector" %in% input$platereader_software){
-      updateTextInput(session, "convert_time_equation_plate_reader", value = NULL)
+      updateTextInput(session, "convert_time_equation_plate_reader", value = NULL, placeholder = "")
     }
   })
 
@@ -5203,8 +5203,14 @@ server <- function(input, output, session){
       show("parse_data")
       removeModal()
       reads <- c(reads, "Ignore")
-    } else if(!("GrowthProfiler" %in% input$platereader_software) && !is.null(input$platereader_software)){
-      showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software and sheet?", easyClose = T, footer=NULL))
+    } else if(!("GrowthProfiler" %in% input$platereader_software) &&
+              !is.null(input$platereader_software)){
+                if(stringr::str_replace_all(filename, ".{1,}\\.", "") == "xlsx")
+                  showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software and sheet?", easyClose = T, footer=NULL))
+                if(stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv")
+                  showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software and separator?", easyClose = T, footer=NULL))
+                else
+                  showModal(modalDialog("No read data could be extracted from the provided data file. Did you choose the correct software?", easyClose = T, footer=NULL))
     } else {
       show("parse_data")
       removeModal()
@@ -5233,6 +5239,7 @@ server <- function(input, output, session){
 
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
+    browser()
     showModal(modalDialog("Parsing data input...", footer=NULL))
     if(input$convert_time_equation_plate_reader == "" || is.na(input$convert_time_equation_plate_reader)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_plate_reader
@@ -5242,7 +5249,11 @@ server <- function(input, output, session){
           data.file = input$parse_file$datapath,
           map.file = input$parse_file$datapath,
           software = input$platereader_software,
-          convert.time = ifelse(input$convert_time_values_plate_reader, convert.time, NULL),
+          convert.time = if(input$convert_time_values_plate_reader){
+            convert.time
+          } else {
+            NULL
+          },
           sheet.data = input$parse_data_sheets,
           sheet.map = input$map_data_sheets,
           csvsep.data =  input$separator_parse,
@@ -5282,7 +5293,11 @@ server <- function(input, output, session){
           data.file = input$parse_file$datapath,
           map.file = input$map_file$datapath,
           software = input$platereader_software,
-          convert.time = ifelse(input$convert_time_values_plate_reader, convert.time, NULL),
+          convert.time = if(input$convert_time_values_plate_reader){
+            convert.time
+          } else {
+            NULL
+          },
           sheet.data = input$parse_data_sheets,
           sheet.map = input$map_data_sheets,
           csvsep.data =  input$separator_parse,
@@ -8702,7 +8717,12 @@ server <- function(input, output, session){
       }
     }
     if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
-      gc_parameters <- c(gc_parameters, 'mu.model' = 'mu.model', 'lambda.model' = 'lambda.model', 'A.model' = 'A.model', 'dY.model' = 'dY.model')
+      gc_parameters <- c(gc_parameters,
+                         'Growth rate (model)' = 'mu.model',
+                         'Doubling time (model)' = 'tD.model',
+                         'Lag time (model)' = 'lambda.model',
+                         'Maximum density (model)' = 'A.model',
+                         'ΔDensity (model)' = 'dY.model')
     }
     gc_parameters
   })

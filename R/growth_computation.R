@@ -1527,7 +1527,9 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
       }
       else{
         # /// generate empty object
-        fitpara          <- list(time.in =  acttime, data.in = actwell, raw.time = acttime, raw.data = actwell, gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A=NA, mu=NA, lambda=NA, integral=NA),
+        fitpara          <- list(time.in =  acttime, data.in = actwell, raw.time = acttime,
+                                 raw.data = actwell, gcID = gcID, fit.time = NA, fit.data = NA,
+                                 parameters = list(A=NA, mu=NA, tD = NA, lambda=NA, integral=NA),
                                  model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
         class(fitpara)   <- "gcFitModel"
         fitpara.all[[i]] <- fitpara
@@ -1764,7 +1766,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
   if(max(data) < control$growth.thresh * data[1]){
     if(control$suppress.messages==F) message(paste0("Parametric fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
     gcFitModel   <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
-                         fit.data = NA, parameters = list(A=NA, mu=0, lambda=NA, integral=NA),
+                         fit.data = NA, parameters = list(A=NA, mu=0, tD = NA, lambda=NA, integral=NA),
                          model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
     class(gcFitModel) <- "gcFitModel"
     return(gcFitModel)
@@ -1773,7 +1775,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
   if (length(data)<5){
     warning("gcFitModel: There is not enough valid data. Must have at least 5 unique values!")
     gcFitModel <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
-                         fit.data = NA, parameters = list(A=NA, mu=NA, lambda=NA, integral=NA),
+                         fit.data = NA, parameters = list(A=NA, mu=NA, tD = NA, lambda=NA, integral=NA),
                          model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
     class(gcFitModel) <- "gcFitModel"
     return(gcFitModel)
@@ -1994,6 +1996,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
         A = Abest,
         dY = ifelse(is.null(best), NA, max(fitted.values(best))-min(fitted.values(best))),
         mu = mubest,
+        tD = log(2)/as.numeric(mubest),
         lambda = lambdabest,
         b.tangent = b.tangent,
         fitpar = if(exists("fitparbest")){
