@@ -5239,7 +5239,6 @@ server <- function(input, output, session){
 
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
-    browser()
     showModal(modalDialog("Parsing data input...", footer=NULL))
     if(input$convert_time_equation_plate_reader == "" || is.na(input$convert_time_equation_plate_reader)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_plate_reader
