@@ -570,6 +570,90 @@ parse_biolector <- function(input)
   return(list(data.ls))
 }
 
+parse_victornivo <- function(input)
+{
+  # get index (row,column) for "Time:"
+  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
+  # extract different read data in dataset
+  reads <- lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2])
+  reads <- reads[!is.na(reads)]
+
+  read.data <- list()
+  n.sample <- as.numeric(gsub(" wells.+", "", input[grep("PLATE FORMAT", input[,1]),2]))
+  if(length(time.ndx)>1){
+    # Extract read tables
+    read.data <- lapply(1:length(time.ndx), function(x) t(data.frame(input[(time.ndx[x]+1):(time.ndx[x]+n.sample), -(1:2)])))
+    # add Well
+    read.data <- lapply(1:length(read.data), function(x) rbind(t(data.frame(input[(time.ndx[x]+1):(time.ndx[x]+n.sample), 1])), read.data[[x]]))
+    # add time column
+    read.data <- lapply(1:length(read.data), function(x) cbind(t(data.frame(input[time.ndx[x], -1])), read.data[[x]]))
+  } else {
+    read.data[[1]] <- t(data.frame(input[(time.ndx[1]+1):(time.ndx[1]+n.sample), -(1:2)]))
+    # add Well or Content name
+    read.data[[1]] <- rbind(t(data.frame(input[(time.ndx[[1]]+1):(time.ndx[[1]]+n.sample), 1])), read.data[[1]])
+    # add time column
+    read.data[[1]] <-cbind(t(data.frame(input[time.ndx[1], -1])), read.data[[1]])
+  }
+
+  # Remove time points with NA in all samples
+  for(i in 1:length(read.data))
+    read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
+                            read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ])
+  if(length(time.ndx)>1){
+    # give all reads the same time values as the first read
+    for(i in 2:length(time.ndx)){
+      read.data[[i]][[1]] <- read.data[[1]][[1]]
+    }
+  }
+  names(read.data) <- reads
+  data.ls <- list()
+  if(length(reads)>1){
+
+    answer <- readline(paste0("Indicate where the density data is stored?\n",
+                              paste(unlist(lapply(1:length(reads), function (i)
+                                paste0("[", i, "] ", reads[i]))),
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+    if(as.numeric(answer) == length(reads)+1){
+      density <- NA
+    } else {
+      density <- read.data[[as.numeric(answer)]]
+    }
+
+    answer <- readline(paste0("Indicate where the fluorescence 1 data is stored?\n",
+                              paste(unlist(lapply(1:length(reads), function (i)
+                                paste0("[", i, "] ", reads[i]))),
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 1 data\n"))
+    if(as.numeric(answer) == length(reads)+1){
+      fluorescence1 <- NA
+    } else {
+      fluorescence1 <- read.data[[as.numeric(answer)]]
+      fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+    }
+    data.ls[[1]] <- density
+    data.ls[[2]] <- fluorescence1
+
+    if(length(reads)>2){
+      answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
+                                paste(unlist(lapply(1:length(reads), function (i)
+                                  paste0("[", i, "] ", reads[i]))),
+                                  collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
+      if(as.numeric(answer) == length(reads)+1){
+        fluorescence2 <- NA
+      } else {
+        fluorescence2 <- read.data[[as.numeric(answer)]]
+        fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+      }
+      data.ls[[3]] <- fluorescence2
+    }
+  } else {
+    density <- read.data[[1]]
+    data.ls[[1]] <- density
+    data.ls[[2]] <- NA
+    data.ls[[3]] <- NA
+  }
+  return(list(data.ls))
+}
+
 biosensor.eq <- function (x, y.min, y.max, K, n)
 {
   y.min <- y.min[1]

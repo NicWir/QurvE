@@ -77,7 +77,7 @@ summary.gcFitModel <- function(object, ...)
       if(is.na(object$parameters$mu[1])){
         table<-rep(NA,length(contents.fitted.param))
       } else {
-        table<-c(0, rep(NA,length(contents.fitted.param)-1))
+        table<-c(0, rep(NA,13), as.character(object$fitFlag),  rep(NA,12))
       }
     }
     else{

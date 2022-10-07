@@ -378,7 +378,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     "Biolector" = "Biolector",
                                                                                     "Chi.Bio" = "Chi.Bio",
                                                                                     "Growth Profiler 960" = "GrowthProfiler",
-                                                                                    "Tecan i-control" = "Tecan"
+                                                                                    "Tecan i-control" = "Tecan",
+                                                                                    "PerkinElmer - Victor Nivo" = "VictorNivo"
                                                                         ),
                                                                         multiple = TRUE,
                                                                         options = list(maxItems = 1)
@@ -5090,6 +5091,9 @@ server <- function(input, output, session){
     if("Biolector" %in% input$platereader_software){
       updateTextInput(session, "convert_time_equation_plate_reader", value = NULL, placeholder = "")
     }
+    if("VictorNivo" %in% input$platereader_software){
+      updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 3600")
+    }
   })
 
   ### Test if parse_file was loaded
@@ -5192,6 +5196,15 @@ server <- function(input, output, session){
                                                   csvsep = input$separator_parse,
                                                   dec = input$decimal_separator_parse,
                                                   sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
+          silent = FALSE
+
+      )
+    }
+    if("VictorNivo" %in% input$platereader_software){
+      try(reads <- QurvE:::parse_properties_victornivo(file=filename,
+                                                      csvsep = input$separator_parse,
+                                                      dec = input$decimal_separator_parse,
+                                                      sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
           silent = FALSE
 
       )

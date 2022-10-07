@@ -62,6 +62,18 @@ parse_properties_biolector <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
+{
+  # Read table file
+  input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
+  # get index (row,column) for "Time:"
+  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
+  # extract different read data in dataset
+  reads <- lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2])
+  reads <- reads[!is.na(reads)]
+  return(reads)
+}
+
 parse_data_shiny <-
   function(data.file = NULL,
            map.file = NULL,
@@ -117,7 +129,12 @@ parse_data_shiny <-
     }
 
     if(any(grep("Biolector", software, ignore.case = T))){
-      parsed.ls <- parse_biolector_shiny(input)
+      parsed.ls <- parse_biolector_shiny(input, density.nm = density.nm)
+      data.ls <- parsed.ls[[1]]
+    }
+
+    if(any(grep("VictorNivo", software, ignore.case = T))){
+      parsed.ls <- parse_victornivo_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -434,6 +451,72 @@ parse_biolector_shiny <- function(input, density.nm)
     data.ls[[2]] <- NA
     data.ls[[3]] <- NA
   }
+  return(list(data.ls))
+}
+
+parse_victornivo_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
+{
+  # get index (row,column) for "Time:"
+  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
+  # extract different read data in dataset
+  reads <- lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2])
+  reads <- reads[!is.na(reads)]
+
+  read.data <- list()
+  n.sample <- as.numeric(gsub(" wells.+", "", input[grep("PLATE FORMAT", input[,1]),2]))
+  if(length(time.ndx)>1){
+    # Extract read tables
+    read.data <- lapply(1:length(time.ndx), function(x) t(data.frame(input[(time.ndx[x]+1):(time.ndx[x]+n.sample), -(1:2)])))
+    # add Well
+    read.data <- lapply(1:length(read.data), function(x) rbind(t(data.frame(input[(time.ndx[x]+1):(time.ndx[x]+n.sample), 1])), read.data[[x]]))
+    # add time column
+    read.data <- lapply(1:length(read.data), function(x) cbind(t(data.frame(input[time.ndx[x], -1])), read.data[[x]]))
+  } else {
+    read.data[[1]] <- t(data.frame(input[(time.ndx[1]+1):(time.ndx[1]+n.sample), -(1:2)]))
+    # add Well or Content name
+    read.data[[1]] <- rbind(t(data.frame(input[(time.ndx[[1]]+1):(time.ndx[[1]]+n.sample), 1])), read.data[[1]])
+    # add time column
+    read.data[[1]] <-cbind(t(data.frame(input[time.ndx[1], -1])), read.data[[1]])
+  }
+
+  # Remove time points with NA in all samples
+  for(i in 1:length(read.data))
+    read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
+                            read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ])
+  if(length(time.ndx)>1){
+    # give all reads the same time values as the first read
+    for(i in 2:length(time.ndx)){
+      read.data[[i]][[1]] <- read.data[[1]][[1]]
+    }
+  }
+  names(read.data) <- reads
+
+  data.ls <- list()
+  if (!is.null(density.nm) && density.nm != "Ignore")
+    density <- read.data[[match(density.nm, reads)]]
+  else
+    density  <- NA
+
+  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
+    fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
+    fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+  }
+  else
+    fluorescence1 <- NA
+
+  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+    fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+  }
+  else
+    fluorescence2 <- NA
+
+
+  # density <- read.data[[1]]
+  data.ls[[1]] <- density
+  data.ls[[2]] <- fluorescence1
+  data.ls[[3]] <- fluorescence2
+
   return(list(data.ls))
 }
 

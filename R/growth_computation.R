@@ -603,7 +603,7 @@ read_data <-
 parse_data <-
   function(data.file = NULL,
            map.file = NULL,
-           software = c("Gen5", "Gen6", "Biolector", "Chi.Bio", "GrowthProfiler", "Tecan"),
+           software = c("Gen5", "Gen6", "Biolector", "Chi.Bio", "GrowthProfiler", "Tecan", "VictorNivo", "VictorX3"),
            convert.time = NULL,
            sheet.data = 1,
            sheet.map = 1,
@@ -617,7 +617,7 @@ parse_data <-
     software <- match_arg(software)
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
-    if(!any(grep("Gen5|Gen6|Biolector|Chi\\.Bio|GrowthProfiler|Tecan", software, ignore.case=T))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6', 'Chi.Bio', and 'GrowthProfiler'.")
+    if(!any(grep("Gen5|Gen6|Biolector|Chi\\.Bio|GrowthProfiler|Tecan|VictorNivo|VictorX3", software, ignore.case=T))) stop("The plate reader control software you provided as 'software' is currently not supported by parse_data(). Supported options are:\n 'Gen5', 'Gen6', 'Chi.Bio', and 'GrowthProfiler'.")
     # Read table file
     if (file.exists(data.file)) {
       # Read table file
@@ -651,6 +651,11 @@ parse_data <-
 
     if(any(grep("Biolector", software, ignore.case = T))){
       parsed.ls <- parse_biolector(input)
+      data.ls <- parsed.ls[[1]]
+    }
+
+    if(any(grep("VictorNivo", software, ignore.case = T))){
+      parsed.ls <- parse_victornivo(input)
       data.ls <- parsed.ls[[1]]
     }
 
