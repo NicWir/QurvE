@@ -375,6 +375,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             selectizeInput(inputId = "platereader_software",
                                                                         label = "Platereader software",
                                                                         choices = c("Biotek - Gen5/Gen6" = "Gen5",
+                                                                                    "Biolector" = "Biolector",
                                                                                     "Chi.Bio" = "Chi.Bio",
                                                                                     "Growth Profiler 960" = "GrowthProfiler",
                                                                                     "Tecan i-control" = "Tecan"
@@ -5086,6 +5087,9 @@ server <- function(input, output, session){
     if("Tecan" %in% input$platereader_software){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 3600")
     }
+    if("Biolector" %in% input$platereader_software){
+      updateTextInput(session, "convert_time_equation_plate_reader", value = NULL)
+    }
   })
 
   ### Test if parse_file was loaded
@@ -5179,6 +5183,15 @@ server <- function(input, output, session){
                                                    csvsep = input$separator_parse,
                                                    dec = input$decimal_separator_parse,
                                                    sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
+          silent = FALSE
+
+      )
+    }
+    if("Biolector" %in% input$platereader_software){
+      try(reads <- QurvE:::parse_properties_biolector(file=filename,
+                                                  csvsep = input$separator_parse,
+                                                  dec = input$decimal_separator_parse,
+                                                  sheet = ifelse(input$parse_data_sheets == "Sheet1", 1, input$parse_data_sheets) ),
           silent = FALSE
 
       )
@@ -5622,7 +5635,6 @@ server <- function(input, output, session){
 
   observeEvent(input$run_fluorescence,{
     # Choose data input
-
     if(!is.null(results$custom_data)){
       grodata <- results$custom_data
     } else if(!is.null(results$parsed_data)){

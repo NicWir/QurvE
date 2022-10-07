@@ -497,6 +497,79 @@ parse_tecan <- function(input)
   return(list(data.ls))
 }
 
+parse_biolector <- function(input)
+{
+  # get index (row,column) for "Time:"
+  time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = T)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = T),], ignore.case = T))
+  # extract different read data in dataset
+  reads <- unique(input[,time.ndx[2]][grep("Biomass", input[,time.ndx[2]])])
+  reads <- reads[!is.na(reads)]
+  read.ndx <- lapply(1:length(reads), function(x) which(input[,time.ndx[2]] %in% reads[x]))
+
+  read.data <- list()
+  n.time <- length(input[time.ndx[1], -(1:time.ndx[2])])
+  if(length(read.ndx)>1){
+    # Extract read tables
+    read.data <- lapply(1:length(read.ndx), function(x) input[read.ndx[[x]], -(1:time.ndx[2])])
+    read.data <- lapply(1:length(read.data), function(x) t(as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]), ]))
+    # add Well or Content name
+    read.data <- lapply(1:length(read.data), function(x) if(all(gsub("[[:digit:]]+", "", input[read.ndx[[x]], 2]) == "X")){
+      rbind(t(data.frame(input[read.ndx[[x]], 1])), read.data[[x]])
+    } else {
+      rbind(t(data.frame(input[read.ndx[[x]], 2])), read.data[[x]])
+    }
+    )
+    # add time column
+    read.data <- lapply(1:length(read.data), function(x) cbind(t(data.frame(input[time.ndx[1], -(1:(time.ndx[2]-1))])), read.data[[x]]))
+  } else {
+    read.data[[1]] <- t(data.frame(input[read.ndx[[1]], -(1:time.ndx[2])]))
+    # add Well or Content name
+    if(all(gsub("[[:digit:]]+", "", input[read.ndx[[1]], 2]) == "X")){
+      read.data[[1]] <- rbind(t(data.frame(input[read.ndx[[1]], 1])), read.data[[1]])
+    } else {
+      read.data[[1]] <- rbind(t(data.frame(input[read.ndx[[1]], 2])), read.data[[1]])
+    }
+    # add time column
+    read.data[[1]] <- cbind(t(data.frame(input[time.ndx[1], -(1:(time.ndx[2]-1))])), read.data[[1]])
+  }
+
+  # Remove time points with NA in all samples
+  for(i in 1:length(read.data))
+    read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
+                            read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ])
+  if(length(read.ndx)>1){
+    # give all reads the same time values as the first read
+    for(i in 2:length(read.data)){
+      read.data[[i]][[1]] <- read.data[[1]][[1]]
+    }
+  }
+  names(read.data) <- reads
+  data.ls <- list()
+  if(length(reads)>1){
+
+    answer <- readline(paste0("Indicate where the density data is stored?\n",
+                              paste(unlist(lapply(1:length(reads), function (i)
+                                paste0("[", i, "] ", reads[i]))),
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+    if(as.numeric(answer) == length(reads)+1){
+      density <- NA
+    } else {
+      density <- read.data[[as.numeric(answer)]]
+    }
+
+    data.ls[[1]] <- density
+    data.ls[[2]] <- NA
+    data.ls[[3]] <- NA
+
+  } else {
+    density <- read.data[[1]]
+    data.ls[[1]] <- density
+    data.ls[[2]] <- NA
+    data.ls[[3]] <- NA
+  }
+  return(list(data.ls))
+}
+
 biosensor.eq <- function (x, y.min, y.max, K, n)
 {
   y.min <- y.min[1]
@@ -658,4 +731,64 @@ siegel_regression <- function (formula, data = NULL)
   attr(output$model, "terms") <- terms(formula)
   class(output) <- c("lm")
   return(output)
+}
+
+#from tfse package
+#' match arg to choices
+#'
+#' Wrapper around \link[base]{match.arg} that defaults to ignoring case and
+#'   trimming white space
+#'
+#' @param arg a character vector (of length one unless several.ok is TRUE) or
+#'   NULL
+#' @param choices a character vector of candidate values
+#' @param multiple logical specifying if arg should be allowed to have more than
+#'   one element. Defaults to FALSE
+#' @param ignore_case logical indicating whether to ignore capitalization.
+#'   Defaults to TRUE
+#' @param trim_ws logical indicating whether to trim surrounding white space.
+#'   Defaults to TRUE
+#' @return Value(s) matched via partial matching.
+#' @export
+match_arg <- function(arg, choices,
+                      multiple = FALSE,
+                      ignore_case = TRUE,
+                      trim_ws = FALSE) {
+  if (missing(choices)) {
+    formal.args <- formals(sys.function(sysP <- sys.parent()))
+    choices <- eval(formal.args[[as.character(substitute(arg))]],
+                    envir = sys.frame(sysP))
+  }
+  if (is.null(arg))
+    return(choices[1L])
+  else if (!is.character(arg))
+    stop("'arg' must be NULL or a character vector")
+  if (!multiple) {
+    if (identical(arg, choices))
+      return(arg[1L])
+    if (length(arg) > 1L)
+      stop("'arg' must be of length 1")
+  }
+  else if (length(arg) == 0L)
+    stop("'arg' must be of length >= 1")
+  if (trim_ws) {
+    arg <- trim_ws(arg)
+  }
+  if (ignore_case) {
+    arg <- tolower(arg)
+    choices_ <- choices
+    choices <- tolower(choices)
+  }
+  i <- pmatch(arg, choices, nomatch = 0L, duplicates.ok = TRUE)
+  if (all(i == 0L))
+    stop(gettextf("'arg' should be one of %s",
+                  paste(dQuote(choices), collapse = ", ")),
+         domain = NA)
+  i <- i[i > 0L]
+  if (!multiple && length(i) > 1)
+    stop("there is more than one match in 'match.arg'")
+  if (ignore_case) {
+    choices <- choices_
+  }
+  choices[i]
 }

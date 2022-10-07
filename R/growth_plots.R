@@ -2239,8 +2239,8 @@ plot.grofit <- function(grofit, ...,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -2390,8 +2390,8 @@ plot.grofit <- function(grofit, ...,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){

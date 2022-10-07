@@ -1417,8 +1417,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -1596,8 +1596,8 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
@@ -2017,8 +2017,8 @@ plot.dual <-  function(object,
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(log.y.density == TRUE){
       if(!is.null(y.lim.density)){
@@ -2168,8 +2168,8 @@ plot.dual <-  function(object,
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))

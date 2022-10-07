@@ -220,7 +220,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   if (!any(control$fit.opt %in% "s"))
     stop("Fit option is not set for a fluorescence spline fit. See fl.control()")
 
-  if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))][!is.na(as.vector(as.numeric(as.matrix(density))))]
+  if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
   if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
   fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
   bad.values <- (fl_data < 0)

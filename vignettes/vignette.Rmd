@@ -197,6 +197,7 @@ After loading the package:
 
 ```{r library-QurvE, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
 library(QurvE)
+library(ggplot2) ### REMOVE AFTER QurvE UPDATE!!!
 ```
 
 we load experimental data from the publication @wirth2021 in which *Pseudomonas putida* KT2440 and an engineered strain were tested for their sensitivity towards the product 2-fluoromuconic acid:
@@ -229,7 +230,7 @@ head(input$expdesign)
 ```
 
 We can plot the raw data:
-```{r raw-plot, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
-plot.grofit(input, data.type = "raw")
+```{r raw-plot, fig.width=9, fig.height=9, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+plot.grofit(input, data.type = "raw", log.y = FALSE, x.lim = c(NA, 32))
 
 ```
