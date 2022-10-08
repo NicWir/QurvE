@@ -2598,7 +2598,7 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
   # Define objects based on additional function calls
   call <- match.call()
   ## remove strictly defined arguments
-  call$flFitRes <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- NULL
+  call$flFitRes <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- NULL
 
   arglist <- sapply(call, function(x) x)
   arglist <- unlist(arglist)[-1]
@@ -2609,8 +2609,8 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
     }
   }
 
-  if(!exists("mean.grp")) mean.grp <- NA
-  if(!exists("mean.conc")) mean.conc <- NA
+  if(!exists("mean.grp") || mean.grp==mean.grp) mean.grp <- NA
+  if(!exists("mean.conc") || mean.conc==mean.conc) mean.conc <- NA
   flFit1 <- flFitRes$flFit1
   drFit1 <- flFitRes$drFit1
   flFit2 <- flFitRes$flFit2
@@ -2633,14 +2633,16 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
   if(!exists("res.table.dr2")){
     if(length(flFitRes$drFit2)>1 && !is.na(flFitRes$drFit2$drTable)) res.table.dr2 <- flFitRes$drFit2$drTable
   }
-  # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
-  mu.min1 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) min(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
-  if(mu.min1 >0) mu.min1 <- 0
-  mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) max(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
-  if(length(flFit2)>1){
-    mu.min2 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) min(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
-    if(mu.min2 >0) mu.min2 <- 0
-    mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) max(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+  if(any(c("a", "s") %in% flFitRes$control$fit.opt)){
+    # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
+    mu.min1 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) min(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    if(mu.min1 >0) mu.min1 <- 0
+    mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) max(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    if(length(flFit2)>1){
+      mu.min2 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) min(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+      if(mu.min2 >0) mu.min2 <- 0
+      mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) max(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    }
   }
 
   if(!is.null(out.dir)){

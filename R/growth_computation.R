@@ -659,6 +659,11 @@ parse_data <-
       data.ls <- parsed.ls[[1]]
     }
 
+    if(any(grep("VictorX3", software, ignore.case = T))){
+      parsed.ls <- parse_victorx3(input)
+      data.ls <- parsed.ls[[1]]
+    }
+
     # Convert time values
     if(!is.null(convert.time)){
 
@@ -1152,10 +1157,12 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
   if(!exists("res.table.dr")){
     if(length(grofit$drFit) >1 ) res.table.dr <- grofit$drFit$drTable
   }
-  # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
-  mu.min <- suppressWarnings(min(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) min(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
-  if(mu.min >0) mu.min <- 0
-  mu.max <- suppressWarnings(max(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) max(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+  if(any(c("a", "b", "s") %in% grofit$control$fit.opt)){
+    # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
+    mu.min <- suppressWarnings(min(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) min(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    if(mu.min >0) mu.min <- 0
+    mu.max <- suppressWarnings(max(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) max(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+  }
   if(!is.null(out.dir)){
     wd <-  out.dir
   } else {
@@ -2591,6 +2598,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     #    plot(s, round((log(s/20, base=1.15))*0.75))
     # }
   }
+  control$lin.h <- h
 
   if(!is.null(quota) && !is.na(quota) && quota != ""){
     if(quota > 1){
@@ -2740,16 +2748,17 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                                             ret.check[, 7] >= t0), 1] # consider only slopes after defined t0
           }
           #consider only candidate windows next to index.max.ret
-          candidate_intervals <- split(candidates, cumsum(c(1, diff(candidates) != 1)))
+          candidate_intervals <- split(candidates, cumsum(c(1, diff(candidates) != 1))) # split candidates into consecutive intervals
           if(any(index.max.ret %in% unlist(candidate_intervals))){
+            # which interval contains maximum slope?
+            ndx <-  as.numeric(which(sapply(
+              candidate_intervals,
+              FUN = function(X)
+                any(X %in% index.max.ret)
+            )))
+
             candidates <-
-              candidate_intervals[as.numeric(which(
-                sapply(
-                  candidate_intervals,
-                  FUN = function(X)
-                    index.max.ret %in% X
-                )
-              ))][[1]]
+              candidate_intervals[[ndx]]
           }
 
 

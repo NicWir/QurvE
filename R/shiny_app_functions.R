@@ -74,6 +74,18 @@ parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
+{
+  # Read table file
+  input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
+  # get index (row,column) for "Time:"
+  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = T)
+  # extract different read data in dataset
+  reads <- unlist(lapply(1:length(time.ndx), function(x) input[1, time.ndx[x]+1]))
+  reads <- reads[!is.na(reads)]
+  return(reads)
+}
+
 parse_data_shiny <-
   function(data.file = NULL,
            map.file = NULL,
@@ -135,6 +147,11 @@ parse_data_shiny <-
 
     if(any(grep("VictorNivo", software, ignore.case = T))){
       parsed.ls <- parse_victornivo_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
+      data.ls <- parsed.ls[[1]]
+    }
+
+    if(any(grep("VictorX3", software, ignore.case = T))){
+      parsed.ls <- parse_victorx3_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -477,6 +494,120 @@ parse_victornivo_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
     read.data[[1]] <- rbind(t(data.frame(input[(time.ndx[[1]]+1):(time.ndx[[1]]+n.sample), 1])), read.data[[1]])
     # add time column
     read.data[[1]] <-cbind(t(data.frame(input[time.ndx[1], -1])), read.data[[1]])
+  }
+
+  # Remove time points with NA in all samples
+  for(i in 1:length(read.data))
+    read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
+                            read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ])
+  if(length(time.ndx)>1){
+    # give all reads the same time values as the first read
+    for(i in 2:length(time.ndx)){
+      read.data[[i]][[1]] <- read.data[[1]][[1]]
+    }
+  }
+  names(read.data) <- reads
+
+  data.ls <- list()
+  if (!is.null(density.nm) && density.nm != "Ignore")
+    density <- read.data[[match(density.nm, reads)]]
+  else
+    density  <- NA
+
+  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
+    fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
+    fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+  }
+  else
+    fluorescence1 <- NA
+
+  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+    fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+  }
+  else
+    fluorescence2 <- NA
+
+
+  # density <- read.data[[1]]
+  data.ls[[1]] <- density
+  data.ls[[2]] <- fluorescence1
+  data.ls[[3]] <- fluorescence2
+
+  return(list(data.ls))
+}
+
+parse_victorx3_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
+{
+  # get index (row,column) for "Time:"
+  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = T)
+  # extract different read data in dataset
+  reads <- unlist(lapply(1:length(time.ndx), function(x) input[1, time.ndx[x]+1]))
+  reads <- reads[!is.na(reads)]
+
+  read.data <- list()
+  nrow <- suppressWarnings(match(NA, as.numeric(input[-1,1]) ))
+  if(length(time.ndx)>1){
+    # Extract read tables
+    read.data <- lapply(1:length(reads), function(x)
+      input[2:nrow, c(2, 3,time.ndx[x], time.ndx[x]+1)]
+    )
+    # assign column names
+    read.data <- lapply(read.data, setNames, c("repeat", "well", "time", "read"))
+    # round time values to full minutes
+    time <- lapply(1:length(read.data), function(x)
+      round(c(
+        as.matrix(
+          read.table(text = read.data[[x]][,3], sep = ":")
+        ) %*% c(60, 1, 1/60)
+      ), digits = 0)
+    )
+    # assign all measurements the first time value of the respective repeat
+    for(x in 1:length(read.data)){
+      for(i in 1:length(unique(read.data[[x]][ , "repeat"])) ){
+        time[[x]][read.data[[x]][ , "repeat"] == unique(read.data[[x]][ , "repeat"])[i]] <-
+          time[[x]][read.data[[x]][ , "repeat"] == unique(read.data[[x]][ , "repeat"])[i]][1]
+      }
+    }
+    # replace time values in data tables
+    for(x in 1:length(read.data)){
+      read.data[[x]][,3] <- time[[x]]
+    }
+    # remove "repeat" column
+    read.data <- lapply(1:length(read.data), function(x) read.data[[x]][,-1])
+    # convert to wide format
+    read.data <- lapply(1:length(read.data), function(x)
+      pivot_wider(data = read.data[[x]], names_from= well, values_from = read))
+    # change list element names
+    names(read.data) <- reads
+    # add column names as first row
+    read.data <- lapply(1:length(read.data), function(x) rbind(colnames(read.data[[x]]), read.data[[x]]))
+  } else {
+    # Extract read table
+    read.data[[1]] <- input[2:nrow, c(2, 3,time.ndx, time.ndx+1)]
+    # assign column names
+    read.data[[1]] <- setNames(object = read.data[[1]], nm = c("well", "time", "read"))
+    # round time values to full minutes
+    time <- round(c(
+      as.matrix(
+        read.table(text = read.data[[1]][,2], sep = ":")
+      ) %*% c(60, 1, 1/60)
+    ), digits = 0)
+    # assign all measurements the first time value of the respective repeat
+    for(i in 1:length(unique(read.data[[1]][ , "repeat"])) ){
+      time[read.data[[1]][ , "repeat"] == unique(read.data[[1]][ , "repeat"])[i]] <-
+        time[read.data[[1]][ , "repeat"] == unique(read.data[[1]][ , "repeat"])[i]][1]
+    }
+    # replace time values in data table
+    read.data[[1]][,2] <- time
+    # remove "repeat" column
+    read.data[[1]] <- read.data[[1]][,-1]
+    # convert to wide format
+    read.data[[1]] <- pivot_wider(data = read.data[[1]], names_from= well, values_from = read)
+    # change list element names
+    names(read.data)[1] <- reads
+    # add column names as first row
+    read.data[[1]] <- rbind(colnames(read.data[[1]]), read.data[[1]])
   }
 
   # Remove time points with NA in all samples

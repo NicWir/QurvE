@@ -462,7 +462,7 @@ if(any(c("s") %in% control$fit.opt)) {
       } else {
         "Time"
       }
-      y.label <- if(flFitSpline$control$norm_fl == TRUE){
+      y.label <- if(flFitSpline$control$norm_fl == TRUE && flFitSpline$control$x_type == "time"){
         "Norm. fluorescence"
       } else {
         "Fluorescence"

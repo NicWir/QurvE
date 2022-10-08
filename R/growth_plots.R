@@ -2719,7 +2719,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   # apply normalization to reference condition
   if(!is.null(reference.nm) && reference.nm != ""){
-    ref.ndx <- grep( gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", reference.nm), labels)
+    ref.ndx <- match( gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", reference.nm), labels)
     if (length(ref.ndx) > 1){
       if(!is.null(reference.conc)){
         refconc.ndx <- which(reference.conc == as.numeric(str_extract(labels, "[:graph:]+$")))
@@ -2901,7 +2901,7 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   values <- drTable[, param]
   # apply normalization to reference condition
   if(!is.null(reference.nm)){
-    ref.ndx <- grep(reference.nm, nm)
+    ref.ndx <- match( gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", reference.nm), nm)
     if(length(ref.ndx) > 1){
       message("The provided combination of reference.nm = '", reference.nm, " did not allow for the unique identification of a reference condition. The first match will be returned.")
       ref.ndx <- ref.ndx[1]
