@@ -566,21 +566,7 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
             expand = F
           )
        
-       # /// add tangent at maximum slope
-        mu     <- as.numeric(coef$mu[1])
-        bla    <- (x$fit.time)*mu
-        bla    <- bla+(-mu*lagtime)
-        tangent.df <- data.frame("time" = x$fit.time,
-                                 "y" = bla)
-        df.horizontal <- data.frame("time" = c(x$fit.time[1], lagtime),
-                                    "y" = x[["fit.data"]][1])
-        p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
-        print(p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                              xend = time[which.min(abs(y - p.yrange.end))],
-                              yend = y[which.min(abs(y - p.yrange.end))]), 
-                              data = tangent.df, linetype = "dashed", color = ggplot2::alpha("forestgreen", 0.85), size = 0.5) +
-          geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
-                       linetype = "dashed", color = ggplot2::alpha("forestgreen", 0.85), size = 0.5))
+      print(p)
     }
   }
   plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))

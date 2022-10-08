@@ -2591,7 +2591,7 @@ fl.workflow <- function(grodata = NULL,
 #' @include general_misc_utils.R
 fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
 {
-  try(showModal(modalDialog("Rendering report...", footer=NULL)), silent = TRUE)
+  try(showModal(modalDialog("Rendering report...\n(This can take up to several minutes)", footer=NULL)), silent = TRUE)
   # results an object of class grofit
   if(class(flFitRes) != "flFitRes") stop("flFitRes needs to be an object created with fl.workflow().")
 
@@ -2635,13 +2635,13 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
   }
   if(any(c("a", "s") %in% flFitRes$control$fit.opt)){
     # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
-    mu.min1 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) min(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    mu.min1 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit1$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1)), NA, min(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
     if(mu.min1 >0) mu.min1 <- 0
-    mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit1$gcFittedSplines), function(x) max(flFitRes$flFit1$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit1$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1)), NA, max(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
     if(length(flFit2)>1){
-      mu.min2 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) min(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+      mu.min2 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit2$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)), NA, min(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
       if(mu.min2 >0) mu.min2 <- 0
-      mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$gcFittedSplines), function(x) max(flFitRes$flFit2$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+      mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)), NA, max(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
     }
   }
 

@@ -1125,7 +1125,7 @@ growth.workflow <- function (grodata = NULL,
 #' @family reports
 growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
   {
-  try(showModal(modalDialog("Rendering report...", footer=NULL)), silent = TRUE)
+  try(showModal(modalDialog("Rendering report...\n(This can take up to several minutes)", footer=NULL)), silent = TRUE)
   # results an object of class grofit
   if(methods::is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
 
@@ -1159,9 +1159,9 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
   }
   if(any(c("a", "b", "s") %in% grofit$control$fit.opt)){
     # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
-    mu.min <- suppressWarnings(min(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) min(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    mu.min <- suppressWarnings(min(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) ifelse(all(is.na(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1)), NA, min(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
     if(mu.min >0) mu.min <- 0
-    mu.max <- suppressWarnings(max(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) max(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))))*1.05
+    mu.max <- suppressWarnings(max(sapply(1:length(grofit$gcFit$gcFittedSplines), function(x) ifelse(all(is.na(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1)), NA, max(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
   }
   if(!is.null(out.dir)){
     wd <-  out.dir

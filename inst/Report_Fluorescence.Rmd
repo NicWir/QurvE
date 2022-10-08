@@ -234,14 +234,14 @@ if(any(c("l") %in% control$fit.opt)){
                  if(control$log.y.lin){
                    ylab = "Ln[FL/FL(0)]"
                  } else {
-                   ylab = "FL"
+                   ylab = "Fluorescence"
                  }
                }
              } else {
                if(control$log.y.lin){
                  ylab = "Ln[FL/FL(0)]"
                } else {
-                 ylab = "FL"
+                 ylab = "Fluorescence"
                }
              }
              if(control$x_type == "time"){

@@ -2397,8 +2397,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
-                                                                                    options = list(maxOptions = 15,
-                                                                                                   closeAfterSelect = FALSE,
+                                                                                    options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      )
                                                                    ),
@@ -2410,8 +2409,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
-                                                                                    options = list(maxOptions = 15,
-                                                                                                   closeAfterSelect = FALSE,
+                                                                                    options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      )
                                                                    ),
@@ -2604,8 +2602,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
-                                                                                    options = list(maxOptions = 15,
-                                                                                                   closeAfterSelect = FALSE,
+                                                                                    options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      )
                                                                    ),
@@ -3144,8 +3141,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
-                                                                                    options = list(maxOptions = 15,
-                                                                                                   closeAfterSelect = FALSE,
+                                                                                    options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      )
                                                                    ),
@@ -3157,8 +3153,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
-                                                                                    options = list(maxOptions = 15,
-                                                                                                   closeAfterSelect = FALSE,
+                                                                                    options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      )
                                                                    ),
@@ -3363,8 +3358,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
-                                                                                    options = list(maxOptions = 15,
-                                                                                                   closeAfterSelect = FALSE,
+                                                                                    options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      )
                                                                    ),
@@ -3546,8 +3540,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
-                                                                                    options = list(maxOptions = 15,
-                                                                                                   closeAfterSelect = FALSE,
+                                                                                    options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      )
                                                                    ),
@@ -5095,7 +5088,7 @@ server <- function(input, output, session){
     if("VictorNivo" %in% input$platereader_software){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 3600")
     }
-    if("VictorNivo" %in% input$platereader_software){
+    if("VictorX3" %in% input$platereader_software){
       updateTextInput(session, "convert_time_equation_plate_reader", value = "y = x / 60")
     }
   })
