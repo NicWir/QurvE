@@ -79,6 +79,69 @@ The following parameters were used to fit the data:
 \pagebreak
 
 ## Growth fit results
+### Grouped results
+```{r table_linear_group, echo=F, warning=F, message=F, results='asis'}
+if(any(c("a", "l") %in% control$fit.opt)){
+  if(!all(is.na(res.table.gc$lambda.linfit))){
+    table_linear_group <- table_group_growth_linear(res.table.gc)
+    table_linear_group <- as.data.frame(apply(table_linear_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+    table_linear_group[is.na(table_linear_group)] <- ""
+    if (knitr::is_html_output()) {
+      knit_table(table_linear_group, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit"))
+    } else {
+      knit_table(table_linear_group, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
+    }
+  }
+}
+```
+```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
+try(plot.parameter(grofit, param = "mu.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+```
+`r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
+```{r table_model_group, echo=F, warning=F, message=F, results='asis', fig.align='center'}
+if(any(c("a", "b", "m") %in% control$fit.opt)){
+  if(!all(is.na(res.table.gc$lambda.model))){
+        table_model_group <- table_group_growth_model(res.table.gc)
+
+    table_model_group <- as.data.frame(apply(table_model_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+    table_model_group[is.na(table_model_group)] <- ""
+    if (knitr::is_html_output()) {
+      knit_table(table_model_group, caption = "Parametric Fit")
+    } else {
+      knit_table(table_model_group, caption = "Parametric Fit") %>% kableExtra::column_spec(column=1, width = "4cm")
+    }
+  }
+}
+```
+```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
+try(plot.parameter(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots")))
+```
+`r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
+```{r table_spline_group, echo=F, warning=F, message=F, results='asis', fig.align='center'}
+if(any(c("a", "b", "s") %in% control$fit.opt)){
+  if(!all(is.na(res.table.gc$lambda.spline))){
+    table_spline_group <- table_group_growth_spline(res.table.gc)
+
+  table_spline_group <- as.data.frame(apply(table_spline_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+  table_spline_group[is.na(table_spline_group)] <- ""
+  if (knitr::is_html_output()) {
+      knit_table(table_spline_group, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"))
+    } else {
+      knit_table(table_spline_group, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
+    }
+  }
+}
+```
+```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
+try(plot.parameter(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
+```
+\clearpage
+### Individual samples
 ```{r table_linear, echo=F, warning=F, message=F, results='asis'}
 if(any(c("a", "l") %in% control$fit.opt)){
   if(!all(is.na(res.table.gc$lambda.linfit))){
@@ -118,11 +181,6 @@ if(any(c("a", "l") %in% control$fit.opt)){
   }
 }
 ```
-```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
-try(plot.parameter(grofit, param = "mu.linfit", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots")))
-```
 `r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_model, echo=F, warning=F, message=F, results='asis', fig.align='center'}
 if(any(c("a", "b", "m") %in% control$fit.opt)){
@@ -155,10 +213,6 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
     }
   }
 }
-```
-```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
-try(plot.parameter(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots")))
 ```
 `r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -196,11 +250,6 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
     }
   }
 }
-```
-```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
-try(plot.parameter(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
 ```
 \clearpage
 

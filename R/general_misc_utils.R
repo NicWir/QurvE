@@ -1008,3 +1008,41 @@ match_arg <- function(arg, choices,
   }
   choices[i]
 }
+
+get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
+{
+  if(!is.null(param2)){
+    avg <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
+                    is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
+                  "", ifelse(is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) )),
+                             round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
+                             paste0("<strong>", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
+                                    "</strong>", " (", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) ), 3), ")")))
+  } else {
+    avg <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
+                    is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
+                  "", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3)
+    )
+  }
+  avg <- unlist(lapply(1:length(avg), function (x) ifelse(is.na(avg[x]), "", avg[x])) )
+  avg
+}
+
+get_sd_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
+{
+  if(!is.null(param2)){
+    sd <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
+                   is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
+                 "", ifelse(is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) )),
+                            round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
+                            paste0("<strong>", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
+                                   "</strong>", " (", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) ), 3), ")")))
+  } else {
+    sd <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
+                   is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
+                 "", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3)
+    )
+  }
+  sd <- unlist(lapply(1:length(sd), function (x) ifelse(is.na(sd[x]), "", sd[x])) )
+  sd
+}

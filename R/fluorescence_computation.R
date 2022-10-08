@@ -2510,17 +2510,49 @@ fl.workflow <- function(grodata = NULL,
 
     if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
       flTable1 <- data.frame(apply(flFitRes[["flFit1"]][["flTable"]],2,as.character))
-      res.table.fl1 <- Filter(function(x) !all(is.na(x)),flTable1)
+      res.table.fl1 <- cbind(flTable1[,1:3], Filter(function(x) !all(is.na(x)),flTable1[,-(1:3)]))
       export_Table(table = res.table.fl1, out.dir = wd, out.nm = "results.fl1")
       cat(paste0("\nResults of fluorescence 1 analysis saved as tab-delimited text file in:\n",
                  wd, "/results.fl1.txt\n"))
+      # Export grouped results table
+      if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
+        table_linear_group <- table_group_fluorescence_linear(res.table.fl1)
+        names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
+        table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
+        colnames(table_linear_group) <- names
+        export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence1_linear")
+      }
+
+      if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
+        table_spline_group <- table_group_fluorescence_spline(res.table.fl1)
+        names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
+        table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
+        colnames(table_spline_group) <- names
+        export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence1_spline")
+      }
     }
     if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
       flTable2 <- data.frame(apply(flFitRes[["flFit2"]][["flTable"]],2,as.character))
-      res.table.fl2 <- Filter(function(x) !all(is.na(x)),flTable2)
+      res.table.fl2 <- cbind(flTable2[,1:3], Filter(function(x) !all(is.na(x)),flTable2[,-(1:3)]))
       export_Table(table = res.table.fl2, out.dir = wd, out.nm = "results.fl2")
       cat(paste0("Results of fluorescence 2 analysis saved as tab-delimited text file in:\n",
                  wd, "/results.fl2.txt\n"))
+      # Export grouped results table
+      if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
+        table_linear_group <- table_group_fluorescence_linear(res.table.fl2)
+        names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
+        table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
+        colnames(table_linear_group) <- names
+        export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_linear")
+      }
+
+      if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
+        table_spline_group <- table_group_fluorescence_spline(res.table.fl2)
+        names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
+        table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
+        colnames(table_spline_group) <- names
+        export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_spline")
+      }
     }
 
     if (ec50 == TRUE) {
@@ -2989,3 +3021,207 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
 }
 
 
+#' Generate a grouped results table for linear fits with average and standard deviations
+#'
+#' @param flTable An object of class \code{flTable}
+#'
+#' @return A data frame with grouped linear fit results
+#' @export
+#'
+table_group_fluorescence_linear <- function(flTable)
+{
+  nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
+
+  ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.rep)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), nm[ndx.filt.rep[[j]]])]))
+  }
+  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
+
+  names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+  # calculate average param values
+  max_slope.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
+  max_slope.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.linfit", param2 = "max_slope2.linfit")
+
+  lambda.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+  lambda.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+
+  dY.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+  dY.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+
+  A.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+  A.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+
+  tmu.start.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
+  tmu.start.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.start.linfit", param2 = "x.mu2.start.linfit")
+
+  tmu.end.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
+  tmu.end.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.mu.end.linfit", param2 = "x.mu2.end.linfit")
+
+  labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
+
+  table_linear_group <- data.frame("Sample|Conc." = labels,
+                                   "slope<sub>max</sub>" = paste0(max_slope.mean,
+                                                                  unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                    ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                             max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                           "", " \u00B1 ") ) ),
+                                                                  unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                    ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                             max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                           "", max_slope.sd[x])))),
+
+                                   "λ" =  paste0(lambda.mean,
+                                                 unlist(lapply(1:length(lambda.mean), function (x)
+                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                          "", " \u00B1 ") ) ),
+                                                 unlist(lapply(1:length(lambda.mean), function (x)
+                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                          "", lambda.sd[x])))),
+                                   "ΔY" = paste0(dY.mean,
+                                                 unlist(lapply(1:length(dY.mean), function (x)
+                                                   ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                            dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                          "", " \u00B1 ") ) ),
+                                                 unlist(lapply(1:length(dY.mean), function (x)
+                                                   ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                            dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                          "", dY.sd[x])))),
+                                   "y<sub>max</sub>" = paste0(A.mean,
+                                                              unlist(lapply(1:length(A.mean), function (x)
+                                                                ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                         A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                       "", " \u00B1 ") ) ),
+                                                              unlist(lapply(1:length(A.mean), function (x)
+                                                                ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                         A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                       "", A.sd[x])))),
+                                   "x<sub>start</sub><br>(slope<sub>max</sub>)" = paste0(tmu.start.mean,
+                                                                                         unlist(lapply(1:length(tmu.start.mean), function (x)
+                                                                                           ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
+                                                                                                    tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
+                                                                                                  "", " \u00B1 ") ) ),
+                                                                                         unlist(lapply(1:length(tmu.start.mean), function (x)
+                                                                                           ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
+                                                                                                    tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
+                                                                                                  "", tmu.start.sd[x])))),
+
+                                   "x<sub>end</sub><br>(slope<sub>max</sub>)" = paste0(tmu.end.mean,
+                                                                                       unlist(lapply(1:length(tmu.end.mean), function (x)
+                                                                                         ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
+                                                                                                  tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
+                                                                                                "", " \u00B1 ") ) ),
+                                                                                       unlist(lapply(1:length(tmu.end.mean), function (x)
+                                                                                         ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
+                                                                                                  tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
+                                                                                                "", tmu.end.sd[x])))),
+                                   stringsAsFactors = F, check.names = F)
+
+
+  return(table_linear_group)
+}
+
+
+#' Generate a grouped results table for spline fits with average and standard deviations
+#'
+#' @param flTable An object of class \code{flTable}
+#'
+#' @return A data frame with grouped spline fit results
+#' @export
+#'
+table_group_fluorescence_spline <- function(flTable)
+{
+  nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
+
+  ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.rep)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), nm[ndx.filt.rep[[j]]])]))
+  }
+  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
+
+  names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
+
+  # calculate average param values
+  max_slope.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
+  max_slope.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "max_slope.spline", param2 = "max_slope2.spline")
+
+  lambda.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+  lambda.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+
+  dY.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+  dY.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+
+  A.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+  A.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+
+  tmax.mean <- QurvE:::get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
+  tmax.sd <- QurvE:::get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
+
+  labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
+
+  table_spline_group <- data.frame("Sample | Conc." = labels,
+                                   "slope<sub>max</sub>" = paste0(max_slope.mean,
+                                                                  unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                    ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                             max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                           "", " \u00B1 ") ) ),
+                                                                  unlist(lapply(1:length(max_slope.mean), function (x)
+                                                                    ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
+                                                                             max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
+                                                                           "", max_slope.sd[x])))),
+                                   "λ" = paste0(lambda.mean,
+                                                unlist(lapply(1:length(lambda.mean), function (x)
+                                                  ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                           lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                         "", " \u00B1 ") ) ),
+                                                unlist(lapply(1:length(lambda.mean), function (x)
+                                                  ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
+                                                           lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
+                                                         "", lambda.sd[x])))),
+                                   "y<sub>max</sub>" = paste0(A.mean,
+                                                              unlist(lapply(1:length(A.mean), function (x)
+                                                                ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                         A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                       "", " \u00B1 ") ) ),
+                                                              unlist(lapply(1:length(A.mean), function (x)
+                                                                ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
+                                                                         A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
+                                                                       "", A.sd[x])))),
+                                   "ΔY" = paste0(dY.mean,
+                                                 unlist(lapply(1:length(dY.mean), function (x)
+                                                   ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                            dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                          "", " \u00B1 ") ) ),
+                                                 unlist(lapply(1:length(dY.mean), function (x)
+                                                   ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
+                                                            dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
+                                                          "", dY.sd)))),
+                                   "x<sub>max</sub>" = paste0(tmax.mean,
+                                                              unlist(lapply(1:length(tmax.mean), function (x)
+                                                                ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
+                                                                         tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
+                                                                       "", " \u00B1 ") ) ),
+                                                              unlist(lapply(1:length(tmax.mean), function (x)
+                                                                ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
+                                                                         tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
+                                                                       "", tmax.sd[x])))),
+                                   check.names = F)
+
+  return(table_spline_group)
+}

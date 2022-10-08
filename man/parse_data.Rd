@@ -7,7 +7,8 @@
 parse_data(
   data.file = NULL,
   map.file = NULL,
-  software = c("Gen5", "Gen6", "Chi.Bio", "GrowthProfiler", "Tecan"),
+  software = c("Gen5", "Gen6", "Biolector", "Chi.Bio", "GrowthProfiler", "Tecan",
+    "VictorNivo", "VictorX3"),
   convert.time = NULL,
   sheet.data = 1,
   sheet.map = 1,
