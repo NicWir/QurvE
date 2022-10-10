@@ -725,7 +725,8 @@ parse_data <-
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and _spline_ fits. Default: \code{TRUE}
+#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{TRUE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
 #' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} and \code{\link{growth.gcFitSpline}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
@@ -757,6 +758,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             t0 = 0,
                             min.density = NA,
                             log.x.gc = FALSE,
+                            log.y.lin = TRUE,
                             log.y.spline = TRUE,
                             log.y.model = TRUE,
                             lin.h = NULL,
@@ -790,6 +792,8 @@ growth.control <- function (neg.nan.act = FALSE,
     stop("value of suppress.messages must be logical and of one element")
   if ((is.logical(log.x.gc) == FALSE) | (length(log.x.gc) != 1))
     stop("value of log.x.gc must be logical and of one element")
+  if ((is.logical(log.y.lin) == FALSE) | (length(log.y.lin) != 1))
+    stop("value of log.y.lin must be logical and of one element")
   if ((is.logical(log.y.spline) == FALSE) | (length(log.y.spline) != 1))
     stop("value of log.y.spline must be logical and of one element")
   if ((is.logical(interactive) == FALSE) | (length(interactive) != 1))
@@ -850,7 +854,7 @@ growth.control <- function (neg.nan.act = FALSE,
   }
   grofit.control <- list(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                          suppress.messages = suppress.messages, fit.opt = fit.opt, t0 = t0, min.density = min.density,
-                         log.x.gc = log.x.gc, log.y.spline = log.y.spline, log.y.model=log.y.model, biphasic = biphasic,
+                         log.x.gc = log.x.gc, log.y.lin = log.y.lin, log.y.spline = log.y.spline, log.y.model=log.y.model, biphasic = biphasic,
                          lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, interactive = interactive,
                          nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
                          dr.have.atleast = round(dr.have.atleast), dr.parameter = dr.parameter,
@@ -877,7 +881,8 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default:  \code{fit.opt = c("l", "s")}.
 #' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
-#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ and spline fits. Default: \code{TRUE}
+#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{TRUE}
+#' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{TRUE}
 #' @param log.y.model (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _model_ fits. Default: \code{TRUE}
 #' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} and \code{\link{growth.gcFitSpline}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
@@ -931,6 +936,7 @@ growth.workflow <- function (grodata = NULL,
                              t0 = 0,
                              min.density = NA,
                              log.x.gc = FALSE,
+                             log.y.lin = TRUE,
                              log.y.spline = TRUE,
                              log.y.model = TRUE,
                              biphasic = FALSE,
@@ -962,7 +968,7 @@ growth.workflow <- function (grodata = NULL,
 
   ## remove strictly defined arguments
   call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <-
-    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.model <- call$biphasic <-
+    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <-
     call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <-
     call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
 
@@ -998,7 +1004,7 @@ growth.workflow <- function (grodata = NULL,
   }
   control <- growth.control(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                             suppress.messages = suppress.messages, fit.opt = fit.opt, t0 = t0, min.density = min.density,
-                            log.x.gc = log.x.gc, log.y.spline = log.y.spline, log.y.model = log.y.model, biphasic = biphasic,
+                            log.x.gc = log.x.gc, log.y.lin = log.y.lin, log.y.spline = log.y.spline, log.y.model = log.y.model, biphasic = biphasic,
                             lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, interactive = interactive,
                             nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
                             dr.have.atleast = round(dr.have.atleast), dr.parameter = dr.parameter,
@@ -1473,7 +1479,11 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
             answer_satisfied <- "n"
             reliability_tag_linear <- NA
             while ("n" %in% answer_satisfied) {
-              try(plot(fitlinear, log = "y"))
+              if(control$log.y.lin){
+                try(plot(fitlinear, log = "y"))
+              } else {
+                try(plot(fitlinear, log = ""))
+              }
               graphics::mtext(side = 3, line = 3, adj = 0,
                     outer = F,
                     cex = 1,
@@ -1690,6 +1700,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
                                                                  reliability_tag = reliability_tag[x],
                                                                  used.model = ifelse(is.null(fitpara.all[[x]]$model), NA, fitpara.all[[x]]$model),
                                                                  log.x = control$log.x.gc,
+                                                                 log.y.lin = control$log.y.lin,
                                                                  log.y.spline = control$log.y.spline,
                                                                  log.y.model = control$log.y.model,
                                                                  nboot.gc = control$nboot.gc
@@ -2483,6 +2494,8 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #' @param quota (Numeric, between 0 an 1) Define what fraction of \eqn{mu_{max}} the slope of regression windows adjacent to the window with highest slope should have to be included in the overall linear fit.
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
 #' @param gcID (Character) The name of the analyzed sample.
+#' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
+#' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{TRUE}
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param lin.h (Numeric) Manually define the size of the sliding window . If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
@@ -2540,7 +2553,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #' @export
 #'
 growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
-                               control = growth.control(t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE))
+                               control = growth.control(t0 = 0, log.x.gc = FALSE, log.y.lin = TRUE, min.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE))
 {
   R2 <- control$lin.R2
   RSD <- control$lin.RSD
@@ -2664,12 +2677,23 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   if(N > h && N>3){
     # Perform linear regression for all N windows and save results in 'ret'
     ret <- matrix(0, nrow = N - h, ncol = 6)
-    for(i in 1:(N - h)) {
-      ret[i, ] <- c(i, with(obs, (lm_parms(lm_window(time, ylog, i0 = i, h = h)))))
+    if (control$log.y.lin == TRUE) {
+      for(i in 1:(N - h)) {
+        ret[i, ] <- c(i, with(obs, (lm_parms(lm_window(time, ylog, i0 = i, h = h)))))
+      }
+    } else {
+      for(i in 1:(N - h)) {
+        ret[i, ] <- c(i, with(obs, (lm_parms(lm_window(time, data, i0 = i, h = h)))))
+      }
     }
     colnames(ret) <- c("index", "y-intersect", "slope", "X4", "R2", "RSD")
     # add time and density values as columns in ret
-    ret <- data.frame(ret, time = time[ret[,1]], data = obs$ylog[ret[,1]])
+    if (control$log.y.lin == TRUE) {
+      ret <- data.frame(ret, time = time[ret[,1]], data = obs$ylog[ret[,1]])
+    } else {
+      ret <- data.frame(ret, time = time[ret[,1]], data = obs$data[ret[,1]])
+    }
+
     # add dY, i.e., the percentage of density that a regression window covers, to ret
     ret <- data.frame(ret, dY = ((obs$data[match(ret[, "time"], obs$time)+(h-1)] - obs$data[match(ret[, "time"], obs$time)]) / dY.total))
 
@@ -2692,7 +2716,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
       # duplicate ret for further tuning of fit
       if(exists("min.density")){
         ret.check <- ret[max(which.min(abs(time-t0)), which.min(abs(ret$data-min.density))) : nrow(ret),] # consider only slopes from defined t0 and min.density
-      } else{
+      } else {
         ret.check <- ret[which.min(abs(time-t0)):nrow(ret),] # consider only slopes from defined t0
       }
 
@@ -2761,7 +2785,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
           if(length(candidates) > 0) {
             #perform linear regression with candidate data points
             tp <- seq(min(candidates), max(candidates) + h-1)
-            m <- lm_window(obs$time, obs$ylog, min(tp), length(tp)) # linear model
+            if (control$log.y.lin == TRUE) {
+              m <- lm_window(obs$time, obs$ylog, min(tp), length(tp)) # linear model
+            } else {
+              m <- lm_window(obs$time, obs$data, min(tp), length(tp)) # linear model
+            }
             p  <- c(lm_parms(m), n=length(tp)) # # slope equation parameters (linear model)
           } else {
             p <- c(a=0, b=0, se=0, r2=0, cv=0, n=0)
@@ -2774,15 +2802,22 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             tmax_end <- obs$time[tp[length(tp)]]
 
             y0_lm    <- unname(coef(m)[1]) # y-intercept of tangent
-            y0_data  <- obs$ylog[1] # y0 in dataset
+            if (control$log.y.lin == TRUE) {
+              y0_data  <- obs$ylog[1] # y0 in dataset
+            } else {
+              y0_data  <- obs$data[1] # y0 in dataset
+            }
             mumax <- unname(coef(m)[2])
 
             ## estimate lag phase
             lambda <- (y0_data - y0_lm) / mumax
 
             # correct y0 values for Ln(y(t)/y0)
-            y0_lm <- obs$data[1] * exp(y0_lm)
-            y0_data <- obs$data[1]
+            if (control$log.y.lin == TRUE) {
+              y0_lm <- obs$data[1] * exp(y0_lm)
+              y0_data <- obs$data[1]
+            }
+
 
             # get indices of time points used in linear fit
             ndx <- seq(min(match(ret.check[match(candidates, ret.check[,1]), "time"], time.in)),
@@ -2804,7 +2839,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             return(gcFitLinear)
           }
           if(control$biphasic) {
-            spline <- stats::smooth.spline(obs$time, obs$ylog, spar = 0.5, cv = NA, keep.data = FALSE)
+            if (control$log.y.lin == TRUE) {
+              spline <- stats::smooth.spline(obs$time, obs$ylog, spar = 0.5, cv = NA, keep.data = FALSE)
+            } else {
+              spline <- stats::smooth.spline(obs$time, obs$data, spar = 0.5, cv = NA, keep.data = FALSE)
+            }
             deriv2 <- stats::predict(spline, deriv = 2)
             deriv2_spline <- stats::smooth.spline(deriv2$x, deriv2$y, spar = 0.4, cv = NA, keep.data = FALSE)
             # extract local minima and maxima of deriv2
@@ -2833,14 +2872,14 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             #consider only candidate windows next to index.max.ret
             candidate_intervals.ext <- split(candidates.ext, cumsum(c(1, diff(candidates.ext) != 1)))
             if(any(index.max.ret %in% unlist(unname(candidate_intervals.ext)))){
+              ndx.ext <-  as.numeric(which(sapply(
+                candidate_intervals.ext,
+                FUN = function(X)
+                  any(X %in% index.max.ret)
+              )))
+
               candidates.ext <-
-                candidate_intervals.ext[as.numeric(which(
-                  sapply(
-                    candidate_intervals.ext,
-                    FUN = function(X)
-                      index.max.ret %in% X
-                  )
-                ))][[1]]
+                candidate_intervals.ext[[ndx.ext]]
             }
             tp.ext <- seq(min(candidates.ext), max(candidates.ext) + h-1)
 
@@ -2913,14 +2952,24 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               #consider only candidate windows next to index.max.ret.postmin
               candidate_intervals.postmin <- split(candidates.postmin, cumsum(c(1, diff(candidates.postmin) != 1)))
               if (any(index.max.ret.postmin %in% unlist(candidate_intervals.postmin))) {
-                candidates.postmin <- candidate_intervals.postmin[
-                  as.numeric(which(sapply(candidate_intervals.postmin,FUN = function(X) index.max.ret.postmin %in% X)))][[1]]
+                ndx.postmin <-  as.numeric(which(sapply(
+                  candidate_intervals.postmin,
+                  FUN = function(X)
+                    any(X %in% index.max.ret.postmin)
+                )))
+
+                candidates.postmin <-
+                  candidate_intervals.postmin[[ndx.postmin]]
               }
 
               if (length(candidates.postmin) > 0) {
                 #perform linear regression with candidate data points
                 tp.postmin <- seq(min(candidates.postmin), max(candidates.postmin) + h - 1)
-                m.postmin <- lm_window(obs$time, obs$ylog, min(tp.postmin), length(tp.postmin)) # linear model
+                if (control$log.y.lin == TRUE) {
+                  m.postmin <- lm_window(obs$time, obs$ylog, min(tp.postmin), length(tp.postmin)) # linear model
+                } else {
+                  m.postmin <- lm_window(obs$time, obs$data, min(tp.postmin), length(tp.postmin)) # linear model
+                }
                 p.postmin  <- c(lm_parms(m.postmin), n = length(tp.postmin)) # # slope equation parameters (linear model)
               } else {
                 p.postmin <- c(
@@ -2938,16 +2987,21 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 ## get time window of exponential fit
                 tmax_start.postmin <- obs$time[tp.postmin[1]]
                 tmax_end.postmin <- obs$time[tp.postmin[length(tp.postmin)]]
-                y_turn.postmin <- obs$ylog[postmin.ndx] # y at turning point
                 t_turn.postmin <- obs$time[postmin.ndx]
-                y0_lm.postmin    <- unname(coef(m.postmin)[1]) # y-intercept of tangent
+                y0_lm.postmin <- unname(coef(m.postmin)[1]) # y-intercept of tangent
                 mumax.postmin <- unname(coef(m.postmin)[2])
 
                 ## estimate lag phase between first and second growth phase
-                lambda.postmin <- (obs$ylog[1] - y0_lm.postmin) / mumax.postmin
+                if (control$log.y.lin == TRUE) {
+                  lambda.postmin <- (obs$ylog[1] - y0_lm.postmin) / mumax.postmin
+                } else {
+                  lambda.postmin <- (obs$data[1] - y0_lm.postmin) / mumax.postmin
+                }
 
                 # correct y0 values for Ln(y(t)/y0)
-                y0_lm.postmin <- obs$data[1] * exp(y0_lm.postmin)
+                if (control$log.y.lin == TRUE) {
+                  y0_lm.postmin <- obs$data[1] * exp(y0_lm.postmin)
+                }
 
                 # get indices of time points used in linear fit
                 ndx.postmin <- seq(min(match(ret[match(candidates.postmin, ret[,1]), "time"], time.in)),
@@ -3020,17 +3074,27 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                   ret.premin[, 7] >= t0), 1]
 
               #consider only candidate windows next to index.max.ret.premin
-              candidate_intervals.premin <-split(candidates.premin, cumsum(c(1, diff(candidates.premin) != 1)))
-              if (index.max.ret.premin %in% unlist(candidate_intervals.premin)) {
-                candidates.premin <- candidate_intervals.premin[
-                  as.numeric(which(sapply(candidate_intervals.premin,FUN = function(X) index.max.ret.premin %in% X)))][[1]]
+              candidate_intervals.premin <- split(candidates.premin, cumsum(c(1, diff(candidates.premin) != 1)))
+              if (any(unlist(candidate_intervals.premin) %in% index.max.ret.premin)) {
+                ndx.premin <-  as.numeric(which(sapply(
+                  candidate_intervals.premin,
+                  FUN = function(X)
+                    any(X %in% index.max.ret.premin)
+                )))
+
+                candidates.premin <-
+                  candidate_intervals.premin[[ndx.premin]]
               }
 
 
               if (length(candidates.premin) > 0) {
                 #perform linear regression with candidate data points
                 tp.premin <- seq(min(candidates.premin), max(candidates.premin) + h - 1)
-                m.premin <- lm_window(obs$time, obs$ylog, min(tp.premin), length(tp.premin)) # linear model
+                if (control$log.y.lin == TRUE) {
+                  m.premin <- lm_window(obs$time, obs$ylog, min(tp.premin), length(tp.premin)) # linear model
+                } else {
+                  m.premin <- lm_window(obs$time, obs$data, min(tp.premin), length(tp.premin)) # linear model
+                }
                 p.premin  <- c(lm_parms(m.premin), n = length(tp.premin)) # # slope equation parameters (linear model)
               } else {
                 p.premin <- c(
@@ -3048,16 +3112,21 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 ## get time window of exponential fit
                 tmax_start.premin <- obs$time[tp.premin[1]]
                 tmax_end.premin <- obs$time[tp.premin[length(tp.premin)]]
-                y_turn.premin <- obs$ylog[tp.premin[length(tp.premin)]] # y at turning point
                 t_turn.premin <- obs$time[premin.ndx]
                 y0_lm.premin    <- unname(coef(m.premin)[1]) # y-intercept of tangent
                 mumax.premin <- unname(coef(m.premin)[2])
 
                 ## estimate lag phase between first and second growth phase
-                lambda.premin <- (obs$ylog[1] - y0_lm.premin) / mumax.premin
+                if (control$log.y.lin == TRUE) {
+                  lambda.premin <- (obs$ylog[1] - y0_lm.premin) / mumax.premin
+                } else {
+                  lambda.premin <- (obs$data[1] - y0_lm.premin) / mumax.premin
+                }
 
                 # correct y0 values for Ln(y(t)/y0)
-                y0_lm.premin <-  obs$data[1] * exp(y0_lm.premin)
+                if (control$log.y.lin == TRUE) {
+                  y0_lm.premin <-  obs$data[1] * exp(y0_lm.premin)
+                }
 
                 # get indices of time points used in linear fit
                 ndx.premin <- seq(min(match(ret[match(candidates.premin, ret[,1]), "time"], time.in)),
@@ -3193,7 +3262,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     filt.data = obs$data,
     log.data = obs$ylog,
     gcID = gcID,
-    FUN = grow_exponential,
+    FUN = if (control$log.y.lin == TRUE) {
+      grow_exponential
+    } else {
+      grow_linear
+    },
     fit = m,
     par = c(
       y0 = y0_data,
@@ -3346,7 +3419,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
     }
   }
   if (control$log.x.gc == TRUE) {
-    bad.values <- (time < 0)
+    bad.values <- (time <= -1)
     if (TRUE %in% bad.values) {
       time <- time[!bad.values]
       data <- data[!bad.values]

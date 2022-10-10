@@ -1279,7 +1279,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
 #' @export
 #'
 flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined",  quota = 0.95,
-                        control = fl.control(x_type = c("density", "time"), t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY = 0.05, biphasic = FALSE))
+                        control = fl.control(x_type = c("density", "time"), log.x.lin = FALSE, log.y.lin = FALSE, t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY = 0.05, biphasic = FALSE))
 {
   x_type <- control$x_type
   R2 <- control$lin.R2
@@ -1970,7 +1970,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 # extract linear regression results before pre-max_slope turning point
                 ret.premin <- ret[ret$x <= obs$x[premin.ndx-h],]
                 # Consider only positive slopes and slopes that are at least 10% of max_slope
-                ret.premin <- ret.premin[ret.premin[, "slope"] > 0 & ret.postmin[, "slope"] >= 0.1*max_slope, ]
+                ret.premin <- ret.premin[ret.premin[, "slope"] > 0 & ret.premin[, "slope"] >= 0.1*max_slope, ]
                 #remove regressions included in the extended candidate list
                 ret.premin <- ret.premin[!(ret.premin[, 1] %in% tp.ext), ]
                 ## Determine index of window with maximum slope, iterate until regression is found that meets R2 and RSD criterion

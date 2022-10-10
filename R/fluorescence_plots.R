@@ -1393,11 +1393,11 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
     ylab.title <- if(data.type == "norm.fl"){
       "Normalized fluorescence"
     } else if(data.type == "raw"){
-      "fluorescence"
+      "Fluorescence"
     } else if(data.type == "spline" && flFit$control$norm_fl){
       "Normalized fluorescence"
     } else if(data.type == "spline" && !flFit$control$norm_fl){
-      "fluorescence"
+      "Fluorescence"
     }
     # else if(data.type == "norm.fl2"){
     #   "Normalized fluorescence 2"

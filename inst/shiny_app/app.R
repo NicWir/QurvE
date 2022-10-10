@@ -798,6 +798,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            ),
                                                            bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of density increase a linear regression window should cover to be considered."),
 
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
+                                                                    checkboxInput(inputId = 'log_transform_data_linear_growth',
+                                                                                  label = 'Log-transform growth data')
+                                                           ),
+
                                                            checkboxInput(inputId = 'custom_sliding_window_size_growth',
                                                                          label = 'Custom sliding window size',
                                                                          value = FALSE),
@@ -3194,13 +3199,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      )
                                                                    ),
 
-                                                                   conditionalPanel(
-                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline'  ||
-                                                                     input.data_type_fluorescence_group_plot == 'raw' ",
-                                                                     checkboxInput(inputId = "plot_group_averages_fluorescence_group_plot",
-                                                                                   label = "Plot group averages",
-                                                                                   value = TRUE)
-                                                                   ),
+                                                                   checkboxInput(inputId = "plot_group_averages_fluorescence_group_plot",
+                                                                                 label = "Plot group averages",
+                                                                                 value = TRUE),
 
                                                                    conditionalPanel(
                                                                      condition = "input.data_type_fluorescence_group_plot == 'spline' ",
@@ -4610,11 +4611,11 @@ server <- function(input, output, session){
     ## Read data
     try(
       results$custom_data <- read_data(data.density = density.file$datapath,
-                                       data.fluoro1 = fl.file$datapath,
+                                       data.fl = fl.file$datapath,
                                        # data.fluoro2 = fl2.file$datapath,
                                        data.format = "col",
                                        sheet.density = input$custom_growth_sheets,
-                                       sheet.fluoro1 = input$custom_fluorescence_sheets,
+                                       sheet.fl = input$custom_fluorescence_sheets,
                                        # sheet.fluoro2 = input$custom_fluorescence2_sheets,
                                        csvsep = input$separator_custom_density,
                                        dec = input$decimal_separator_custom_density,
@@ -5589,6 +5590,7 @@ server <- function(input, output, session){
                                               t0 = t0,
                                               min.density = min.density,
                                               log.x.gc = input$log_transform_time_growth,
+                                              log.y.lin = input$log_transform_data_linear_growth,
                                               log.y.model = input$log_transform_data_parametric_growth,
                                               log.y.spline = input$log_transform_data_nonparametric_growth,
                                               biphasic = input$biphasic_growth,
@@ -5766,7 +5768,7 @@ server <- function(input, output, session){
       shiny::withProgress(message = "Computations completed",
                           results$fluorescence <-
                             suppressWarnings(
-                              QurvE::fl.workflow(grodata = grodata,
+                             QurvE::fl.workflow(grodata = grodata,
                                           ec50 = input$perform_ec50_fluorescence,
                                           fit.opt = fit.opt,
                                           x_type = input$data_type_x_fluorescence,
@@ -6559,41 +6561,45 @@ server <- function(input, output, session){
       1,
       selected_vals_validate_growth$sample_validate_growth_linear
     )]]) > 1) {
-      plot.gcFitLinear(
-        gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(
-          selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
-            is.null(
-              selected_vals_validate_growth$sample_validate_growth_linear
-            ),
-          1,
-          selected_vals_validate_growth$sample_validate_growth_linear
-        )]],
-        pch = input$shape_type_validate_growth_plot_linear,
+      suppressWarnings(
+        plot.gcFitLinear(
+          gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(
+            selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+              is.null(
+                selected_vals_validate_growth$sample_validate_growth_linear
+              ),
+            1,
+            selected_vals_validate_growth$sample_validate_growth_linear
+          )]],
+          pch = input$shape_type_validate_growth_plot_linear,
 
-        log = logy_validate_growth_plot_linear(),
-        cex.point = input$shape_size_validate_growth_plot_linear,
-        cex.lab = input$axis_size_validate_growth_plot_linear,
-        cex.axis = input$lab_size_validate_growth_plot_linear,
-        lwd = input$line_width_validate_growth_plot_linear,
-        y.lim = ylim,
-        x.lim = xlim
+          log = logy_validate_growth_plot_linear(),
+          cex.point = input$shape_size_validate_growth_plot_linear,
+          cex.lab = input$axis_size_validate_growth_plot_linear,
+          cex.axis = input$lab_size_validate_growth_plot_linear,
+          lwd = input$line_width_validate_growth_plot_linear,
+          y.lim = ylim,
+          x.lim = xlim
+        )
       )
       if(input$diagnostics_validate_growth_plot_linear){
-        plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
-          selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
-            is.null(
-              selected_vals_validate_growth$sample_validate_growth_linear
-            ),
-          1,
-          selected_vals_validate_growth$sample_validate_growth_linear
-        )]],
-        which = "fit_diagnostics",
-        pch = input$shape_type_validate_growth_plot_linear,
-        log = logy_validate_growth_plot_linear(),
-        cex.point = input$shape_size_validate_growth_plot_linear,
-        cex.lab = input$axis_size_validate_growth_plot_linear,
-        cex.axis = input$lab_size_validate_growth_plot_linear,
-        lwd = input$line_width_validate_growth_plot_linear
+        suppressWarnings(
+          plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
+            selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+              is.null(
+                selected_vals_validate_growth$sample_validate_growth_linear
+              ),
+            1,
+            selected_vals_validate_growth$sample_validate_growth_linear
+          )]],
+          which = "fit_diagnostics",
+          pch = input$shape_type_validate_growth_plot_linear,
+          log = logy_validate_growth_plot_linear(),
+          cex.point = input$shape_size_validate_growth_plot_linear,
+          cex.lab = input$axis_size_validate_growth_plot_linear,
+          cex.axis = input$lab_size_validate_growth_plot_linear,
+          lwd = input$line_width_validate_growth_plot_linear
+          )
         )
       }
     }
@@ -6612,6 +6618,7 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
+        checkboxInput('log.y.lin.rerun', 'log-transform density values', value = results$growth$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$log.y.lin),
         textInput('t0.lin.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$t0)),
         textInput('min.density.lin.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.density)),
         textAreaInput('quota.rerun', 'Quota', placeholder = HTML(paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$quota,
@@ -6666,6 +6673,7 @@ server <- function(input, output, session){
       control_new$lin.R2 <- ifelse(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
       control_new$lin.RSD <- ifelse(!is.na(as.numeric(input$lin.RSD.rerun)), as.numeric(input$lin.RSD.rerun), control$lin.RSD)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun)), as.numeric(input$t0.lin.rerun), control$t0)
+      control:new$log.y.lin <- inpuy$log.y.lin.rerun
       min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun)), as.numeric(input$min.density.lin.rerun), control$min.density)
       if(is.numeric(min.density.lin.new)){
         if(!is.na(min.density.lin.new) && all(as.vector(actwell) < min.density.lin.new)){
@@ -6760,32 +6768,36 @@ server <- function(input, output, session){
         1,
         selected_vals_validate_growth$sample_validate_growth_linear
       )]]) > 1) {
-        plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(selected_vals_validate_growth$sample_validate_growth_linear == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_linear), 1, selected_vals_validate_growth$sample_validate_growth_linear)]],
-                         pch = input$shape_type_validate_growth_plot_linear,
-                         log = log,
-                         cex.point = input$shape_size_validate_growth_plot_linear,
-                         cex.lab = input$axis_size_validate_growth_plot_linear,
-                         cex.axis = input$lab_size_validate_growth_plot_linear,
-                         lwd = input$line_width_validate_growth_plot_linear,
-                         y.lim = ylim,
-                         x.lim = xlim
+        suppressWarnings(
+          plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(selected_vals_validate_growth$sample_validate_growth_linear == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_linear), 1, selected_vals_validate_growth$sample_validate_growth_linear)]],
+                           pch = input$shape_type_validate_growth_plot_linear,
+                           log = log,
+                           cex.point = input$shape_size_validate_growth_plot_linear,
+                           cex.lab = input$axis_size_validate_growth_plot_linear,
+                           cex.axis = input$lab_size_validate_growth_plot_linear,
+                           lwd = input$line_width_validate_growth_plot_linear,
+                           y.lim = ylim,
+                           x.lim = xlim
+          )
         )
         if(input$diagnostics_validate_growth_plot_linear){
-          plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
-            selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
-              is.null(
-                selected_vals_validate_growth$sample_validate_growth_linear
-              ),
-            1,
-            selected_vals_validate_growth$sample_validate_growth_linear
-          )]],
-          which = "fit_diagnostics",
-          pch = input$shape_type_validate_growth_plot_linear,
-          log = log,
-          cex.point = input$shape_size_validate_growth_plot_linear,
-          cex.lab = input$axis_size_validate_growth_plot_linear,
-          cex.axis = input$lab_size_validate_growth_plot_linear,
-          lwd = input$line_width_validate_growth_plot_linear
+          suppressWarnings(
+            plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
+              selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+                is.null(
+                  selected_vals_validate_growth$sample_validate_growth_linear
+                ),
+              1,
+              selected_vals_validate_growth$sample_validate_growth_linear
+            )]],
+            which = "fit_diagnostics",
+            pch = input$shape_type_validate_growth_plot_linear,
+            log = log,
+            cex.point = input$shape_size_validate_growth_plot_linear,
+            cex.lab = input$axis_size_validate_growth_plot_linear,
+            cex.axis = input$lab_size_validate_growth_plot_linear,
+            lwd = input$line_width_validate_growth_plot_linear
+            )
           )
         }
       }
@@ -6827,35 +6839,38 @@ server <- function(input, output, session){
     )]]) > 1) {
       showModal(modalDialog("Creating plot...", footer = NULL))
 
-      try(plot.gcFitSpline(
-        gcFittedSpline = results$gcFit$gcFittedSplines[[ifelse(
-          selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
-            is.null(
+      try(
+        suppressWarnings(
+          plot.gcFitSpline(
+            gcFittedSpline = results$gcFit$gcFittedSplines[[ifelse(
+              selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
+                is.null(
+                  selected_vals_validate_growth$sample_validate_growth_spline
+                ),
+              1,
               selected_vals_validate_growth$sample_validate_growth_spline
+            )]],
+            log.y = input$logy_validate_growth_plot_spline,
+            x.lim = c(
+              input$x_range_min_validate_growth_plot_spline,
+              input$x_range_max_validate_growth_plot_spline
             ),
-          1,
-          selected_vals_validate_growth$sample_validate_growth_spline
-        )]],
-        log.y = input$logy_validate_growth_plot_spline,
-        x.lim = c(
-          input$x_range_min_validate_growth_plot_spline,
-          input$x_range_max_validate_growth_plot_spline
-        ),
-        y.lim = c(
-          input$y_range_min_validate_growth_plot_spline,
-          input$y_range_max_validate_growth_plot_spline
-        ),
-        y.lim.deriv = c(
-          input$y_range_min_derivative_validate_growth_plot_spline,
-          input$y_range_max_derivative_validate_growth_plot_spline
-        ),
-        lwd = input$line_width_validate_growth_plot_spline,
-        cex.point = input$shape_size_validate_growth_plot_spline,
-        basesize = input$base_size_validate_growth_plot_spline,
-        n.ybreaks = input$nbreaks_validate_growth_plot_spline,
-        pch = input$shape_type_validate_growth_plot_spline,
-        deriv = input$plot_derivative_validate_growth_plot_spline,
-      )
+            y.lim = c(
+              input$y_range_min_validate_growth_plot_spline,
+              input$y_range_max_validate_growth_plot_spline
+            ),
+            y.lim.deriv = c(
+              input$y_range_min_derivative_validate_growth_plot_spline,
+              input$y_range_max_derivative_validate_growth_plot_spline
+            ),
+            lwd = input$line_width_validate_growth_plot_spline,
+            cex.point = input$shape_size_validate_growth_plot_spline,
+            basesize = input$base_size_validate_growth_plot_spline,
+            n.ybreaks = input$nbreaks_validate_growth_plot_spline,
+            pch = input$shape_type_validate_growth_plot_spline,
+            deriv = input$plot_derivative_validate_growth_plot_spline,
+          )
+        )
       )
       removeModal()
     }
@@ -6989,17 +7004,19 @@ server <- function(input, output, session){
                                                    selected_vals_validate_growth$sample_validate_growth_model == "" ||
                                                    is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(selected_vals_validate_growth$sample_validate_growth_model == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]],
-                      colData = 1,
-                      colModel = 2,
-                      colLag = 3,
-                      pch = input$shape_type_validate_growth_plot_model,
-                      basesize = input$base_size_validate_growth_plot_model,
-                      cex.point = input$shape_size_validate_growth_plot_model,
-                      lwd = input$line_width_validate_growth_plot_model,
-                      n.ybreaks = input$nbreaks_validate_growth_plot_model,
-                      eq.size = input$eqsize_validate_growth_plot_model,
-                      export = FALSE
+      suppressWarnings(
+        plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(selected_vals_validate_growth$sample_validate_growth_model == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]],
+                        colData = 1,
+                        colModel = 2,
+                        colLag = 3,
+                        pch = input$shape_type_validate_growth_plot_model,
+                        basesize = input$base_size_validate_growth_plot_model,
+                        cex.point = input$shape_size_validate_growth_plot_model,
+                        lwd = input$line_width_validate_growth_plot_model,
+                        n.ybreaks = input$nbreaks_validate_growth_plot_model,
+                        eq.size = input$eqsize_validate_growth_plot_model,
+                        export = FALSE
+        )
       )
       removeModal()
     }
@@ -7386,35 +7403,39 @@ server <- function(input, output, session){
                 as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
     }
     if(length(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
-                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
-                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
+                                                   selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
+                                                   is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
 
-      plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                              log = logy_validate_fluorescence_plot_linear(),
-                              pch = input$shape_type_validate_fluorescence_plot_linear,
-                              cex.point = input$shape_size_validate_fluorescence_plot_linear,
-                              cex.lab = input$axis_size_validate_fluorescence_plot_linear,
-                              cex.axis = input$lab_size_validate_fluorescence_plot_linear,
-                              lwd = input$line_width_validate_fluorescence_plot_linear,
-                              y.lim = ylim,
-                              x.lim = xlim
-                              # ADD FURTHER INPUT (see Notion)
+      suppressWarnings(
+        plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                         log = logy_validate_fluorescence_plot_linear(),
+                         pch = input$shape_type_validate_fluorescence_plot_linear,
+                         cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                         cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                         cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                         lwd = input$line_width_validate_fluorescence_plot_linear,
+                         y.lim = ylim,
+                         x.lim = xlim
+                         # ADD FURTHER INPUT (see Notion)
+        )
       )
       if(input$diagnostics_validate_fluorescence_plot_linear){
-        plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
-                                                                        is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
-                                                                      1,
-                                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                                which = "fit_diagnostics",
-                                log = logy_validate_fluorescence_plot_linear(),
-                                pch = input$shape_type_validate_fluorescence_plot_linear,
-                                cex.point = input$shape_size_validate_fluorescence_plot_linear,
-                                cex.lab = input$axis_size_validate_fluorescence_plot_linear,
-                                cex.axis = input$lab_size_validate_fluorescence_plot_linear,
-                                lwd = input$line_width_validate_fluorescence_plot_linear,
-                                y.lim = ylim,
-                                x.lim = xlim
-                                # ADD FURTHER INPUT (see Notion)
+        suppressWarnings(
+          plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
+                                                                  is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
+                                                                1,
+                                                                selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                           which = "fit_diagnostics",
+                           log = logy_validate_fluorescence_plot_linear(),
+                           pch = input$shape_type_validate_fluorescence_plot_linear,
+                           cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                           cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                           cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                           lwd = input$line_width_validate_fluorescence_plot_linear,
+                           y.lim = ylim,
+                           x.lim = xlim
+                           # ADD FURTHER INPUT (see Notion)
+          )
         )
       }
     }
@@ -7579,27 +7600,13 @@ server <- function(input, output, session){
                   as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
       }
       if(length(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
-                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
-                                                      is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
-                                                      1,
-                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
+                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
+                                                     is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
+                                                     1,
+                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
 
-        plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                         log = log,
-                         pch = input$shape_type_validate_fluorescence_plot_linear,
-                         cex.point = input$shape_size_validate_fluorescence_plot_linear,
-                         cex.lab = input$axis_size_validate_fluorescence_plot_linear,
-                         cex.axis = input$lab_size_validate_fluorescence_plot_linear,
-                         lwd = input$line_width_validate_fluorescence_plot_linear,
-                         y.lim = ylim,
-                         x.lim = xlim
-                         # ADD FURTHER INPUT (see Notion)
-        )
-        if(input$diagnostics_validate_fluorescence_plot_linear){
-          plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
-                                                                   selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == ""||
-                                                                   is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                           which = "fit_diagnostics",
+        suppressWarnings(
+          plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                            log = log,
                            pch = input$shape_type_validate_fluorescence_plot_linear,
                            cex.point = input$shape_size_validate_fluorescence_plot_linear,
@@ -7609,6 +7616,24 @@ server <- function(input, output, session){
                            y.lim = ylim,
                            x.lim = xlim
                            # ADD FURTHER INPUT (see Notion)
+          )
+        )
+        if(input$diagnostics_validate_fluorescence_plot_linear){
+          suppressWarnings(
+            plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
+                                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == ""||
+                                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                             which = "fit_diagnostics",
+                             log = log,
+                             pch = input$shape_type_validate_fluorescence_plot_linear,
+                             cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                             cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                             cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                             lwd = input$line_width_validate_fluorescence_plot_linear,
+                             y.lim = ylim,
+                             x.lim = xlim
+                             # ADD FURTHER INPUT (see Notion)
+            )
           )
         }
       }
@@ -7641,27 +7666,27 @@ server <- function(input, output, session){
   output$validate_fluorescence_plot_spline <- renderPlot({
     results <- results$fluorescence
     if(length(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1"||
-                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "" ||
-                                                     is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
-                                                     1,
-                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
+                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "" ||
+                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                    1,
+                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
-                                                                is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
-                                                              1,
-                                                              input$sample_validate_fluorescence_spline)]],
-                       log.y = input$logy_validate_fluorescence_plot_spline,
-                       x.lim = c(input$x_range_min_validate_fluorescence_plot_spline, input$x_range_max_validate_fluorescence_plot_spline),
-                       y.lim = c(input$y_range_min_validate_fluorescence_plot_spline,input$y_range_max_validate_fluorescence_plot_spline),
-                       y.lim.deriv = c(input$y_range_min_derivative_validate_fluorescence_plot_spline, input$y_range_max_derivative_validate_fluorescence_plot_spline),
-                       lwd = input$line_width_validate_fluorescence_plot_spline,
-                       basesize = input$base_size_validate_fluorescence_plot_spline,
-                       cex.point = input$shape_size_validate_fluorescence_plot_spline,
-                       n.ybreaks = input$nbreaks__validate_fluorescence_plot_spline,
-                       deriv = input$plot_derivative_validate_fluorescence_plot_spline,
-                       pch = input$shape_type_validate_fluorescence_plot_spline,
-
-
+      suppressWarnings(
+        plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+                                                                 is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                               1,
+                                                               input$sample_validate_fluorescence_spline)]],
+                         log.y = input$logy_validate_fluorescence_plot_spline,
+                         x.lim = c(input$x_range_min_validate_fluorescence_plot_spline, input$x_range_max_validate_fluorescence_plot_spline),
+                         y.lim = c(input$y_range_min_validate_fluorescence_plot_spline,input$y_range_max_validate_fluorescence_plot_spline),
+                         y.lim.deriv = c(input$y_range_min_derivative_validate_fluorescence_plot_spline, input$y_range_max_derivative_validate_fluorescence_plot_spline),
+                         lwd = input$line_width_validate_fluorescence_plot_spline,
+                         basesize = input$base_size_validate_fluorescence_plot_spline,
+                         cex.point = input$shape_size_validate_fluorescence_plot_spline,
+                         n.ybreaks = input$nbreaks__validate_fluorescence_plot_spline,
+                         deriv = input$plot_derivative_validate_fluorescence_plot_spline,
+                         pch = input$shape_type_validate_fluorescence_plot_spline
+        )
       )
       removeModal()
     }
@@ -8513,7 +8538,7 @@ server <- function(input, output, session){
 
 
     ## Fluorescence Plots: #####
-  ### Group Plots ####
+      ### Group Plots ####
   selected_inputs_visualize_fluorescence_group <- reactive({
     results <- results$fluorescence
     if(is.null(results)) return("")
@@ -8537,6 +8562,93 @@ server <- function(input, output, session){
                       inputId = "groups_visualize_fluorescence_group",
                       choices = selected_inputs_visualize_fluorescence_group()
     )
+  })
+
+  observe({
+    if (length(results$fluorescence$flFit)>1){
+      if(input$data_type_fluorescence_group_plot == "raw") y_axis <- "Fluorescence"
+      # if(input$data_type_fluorescence_group_plot == "raw2") y_axis <- "Fluorescence 2"
+      if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$norm_fl){
+        y_axis <- "Normalized fluorescence"
+      }
+      if(input$data_type_fluorescence_group_plot == "spline" && !results$fluorescence$control$norm_fl){
+        y_axis <- "Fluorescence"
+      }
+      # if(input$data_type_fluorescence_group_plot == "spline2") y_axis <- "Fluorescence 2"
+      if(input$data_type_fluorescence_group_plot == "norm.fl") y_axis <- "Normalized fluorescence"
+      # if(input$data_type_fluorescence_group_plot == "norm.fl2") y_axis <- "Normalized fluorescence 2"
+    }
+    else {
+      y_axis <- ""
+    }
+    updateSelectInput(inputId = "y_axis_title_fluorescence_group_plot",
+                      selected = y_axis
+    )
+  })
+
+  observe({
+    if (length(results$fluorescence$flFit)>1){
+      if(input$data_type_fluorescence_group_plot == "norm.fl"  || input$data_type_fluorescence_group_plot == "raw" ){ # || data.type == "raw2" || data.type == "norm.fl2"
+        x_axis <- "Time"
+      } else if (results$fluorescence$control$x_type == "density"){
+        x_axis <- "Density"
+      } else {
+        x_axis <- "Time"
+      }
+    }
+    else {
+      x_axis <- ""
+    }
+    updateSelectInput(inputId = "x_axis_title_fluorescence_group_plot",
+                      selected = x_axis
+    )
+  })
+
+  observe({
+    if (length(results$fluorescence$flFit)>1){
+      if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$x_type == "density"){
+        updateCheckboxInput(
+          session =  session,
+          inputId =  "plot_group_averages_fluorescence_group_plot",
+          value = FALSE
+        )
+        shinyjs::hide(id = "plot_group_averages_fluorescence_group_plot")
+      } else {
+        updateCheckboxInput(
+          session =  session,
+          inputId =  "plot_group_averages_fluorescence_group_plot",
+          value = TRUE
+        )
+        shinyjs::show(id = "plot_group_averages_fluorescence_group_plot")
+      }
+    }
+  })
+
+  selected_inputs_fluorescence_group_plot_data_type <- reactive({
+    results <- results$fluorescence
+    selection <- c()
+    if(length(results$data$fluorescence) > 1){
+      selection <- c(selection, "Raw fluorescence" = "raw")
+    }
+    # if(length(results$data$fluorescence2) > 1){
+    #   selection <- c(selection, "Raw fluorescence 2")
+    # }
+    if(length(results$data$norm.fluorescence) > 1){
+      selection <- c(selection, "Normalized FL" = "norm.fl")
+    }
+    # if(length(results$data$norm.fluorescence2) > 1){
+    #   selection <- c(selection, "Normalized FL2")
+    # }
+    # if(length(results$data$norm.fluorescence2) > 1){
+    #   selection <- c(selection, "Normalized FL2")
+    # }
+    if(length(results$data$fluorescence) > 1 && "s" %in% results$control$fit.opt){
+      selection <- c(selection, "Spline fits FL" = "spline")
+    }
+    # if(length(results$data$norm.fluorescence2) > 1 && "s" %in% results$control$fit.opt){
+    #   selection <- c(selection, "Spline fits FL2")
+    # }
+    selection
   })
 
   output$fluorescence_group_plot <- renderPlot({
@@ -8599,36 +8711,6 @@ server <- function(input, output, session){
   })
 
   observe({
-    if (length(results$fluorescence$flFit)>1){
-      if(input$data_type_fluorescence_group_plot == "raw") y_axis <- "Fluorescence"
-      # if(input$data_type_fluorescence_group_plot == "raw2") y_axis <- "Fluorescence 2"
-      if(input$data_type_fluorescence_group_plot == "spline") y_axis <- "Fluorescence"
-      # if(input$data_type_fluorescence_group_plot == "spline2") y_axis <- "Fluorescence 2"
-      if(input$data_type_fluorescence_group_plot == "norm.fl") y_axis <- "Normalized fluorescence"
-      # if(input$data_type_fluorescence_group_plot == "norm.fl2") y_axis <- "Normalized fluorescence 2"
-    }
-    else {
-      y_axis <- ""
-    }
-    updateSelectInput(inputId = "y_axis_title_fluorescence_group_plot",
-                      selected = y_axis
-    )
-  })
-
-  observe({
-    if (length(results$fluorescence$flFit)>1){
-      if(results$fluorescence$control$x_type == "time") x_axis <- "Time"
-      if(results$fluorescence$control$x_type == "density") x_axis <- "Density"
-    }
-    else {
-      x_axis <- ""
-    }
-    updateSelectInput(inputId = "x_axis_title_fluorescence_group_plot",
-                      selected = x_axis
-    )
-  })
-
-  observe({
     if(input$plot_derivative_fluorescence_group_plot && (input$data_type_fluorescence_group_plot == 'spline' )) h <- 9
     else h <- 6
     updateSelectInput(inputId = "height_download_fluorescence_group_plot",
@@ -8647,33 +8729,6 @@ server <- function(input, output, session){
     },
     contentType = ifelse(input$format_download_fluorescence_group_plot == ".pdf", "image/pdf", "image/png")
   )
-
-  selected_inputs_fluorescence_group_plot_data_type <- reactive({
-    results <- results$fluorescence
-    selection <- c()
-    if(length(results$data$fluorescence) > 1){
-      selection <- c(selection, "Raw fluorescence" = "raw")
-    }
-    # if(length(results$data$fluorescence2) > 1){
-    #   selection <- c(selection, "Raw fluorescence 2")
-    # }
-    if(length(results$data$norm.fluorescence) > 1){
-      selection <- c(selection, "Normalized FL" = "norm.fl")
-    }
-    # if(length(results$data$norm.fluorescence2) > 1){
-    #   selection <- c(selection, "Normalized FL2")
-    # }
-    # if(length(results$data$norm.fluorescence2) > 1){
-    #   selection <- c(selection, "Normalized FL2")
-    # }
-    if(length(results$data$fluorescence) > 1 && "s" %in% results$control$fit.opt){
-      selection <- c(selection, "Spline fits FL" = "spline")
-    }
-    # if(length(results$data$norm.fluorescence2) > 1 && "s" %in% results$control$fit.opt){
-    #   selection <- c(selection, "Spline fits FL2")
-    # }
-    selection
-  })
 
   observe({
     updateSelectInput(inputId = "data_type_fluorescence_group_plot",
