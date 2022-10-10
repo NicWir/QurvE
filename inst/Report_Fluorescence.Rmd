@@ -55,95 +55,78 @@ knit_table <- function(df, caption){
 ## Summary
 The dataset contains _`r nrow(flFitRes[["time"]])`_ samples.\
 
-_`r length(levels(data[["fluorescence1"]][["condition"]]))`_ conditions were identified:\
-  `r colFmt(levels(data[["fluorescence1"]][["condition"]]), 'NavyBlue')`\
+_`r length(levels(data[["fluorescence"]][["condition"]]))`_ conditions were identified:\
+  `r colFmt(levels(data[["fluorescence"]][["condition"]]), 'NavyBlue')`\
   
-_`r length(levels(data[["fluorescence1"]][["concentration"]]))`_ different concentrations were identified:\
-  `r colFmt(levels(data[["fluorescence1"]][["concentration"]]), 'NavyBlue')`\
+_`r length(levels(data[["fluorescence"]][["concentration"]]))`_ different concentrations were identified:\
+  `r colFmt(levels(data[["fluorescence"]][["concentration"]]), 'NavyBlue')`\
   
 The following parameters were used to fit the data: 
 
 * minimum density considered: `r colFmt(ifelse(!is.null(control$min.density),control$min.density, "none"), 'NavyBlue')`
 * minimum time considered for linear and spline fits (t0): `r colFmt(control$t0, 'NavyBlue')`
-* data type used as independent variable: `r colFmt(control$x_type, 'NavyBlue')`
+* data type used as independent variable (x): `r colFmt(control$x_type, 'NavyBlue')`
 `r if(control$x_type == "time"){paste0("* normalized fluorescence used for fits:")}` `r if(control$x_type == "time"){colFmt(control$norm_fl, 'NavyBlue')}`
-* log-transform density values for spline fits: `r colFmt(control$log.y.spline, 'NavyBlue')`
-* log-transform density values for linear fits: `r colFmt(control$log.y.lin, 'NavyBlue')`
-* log-transform time values for spline fits: `r colFmt(control$log.x.spline, 'NavyBlue')`
-* log-transform time values for linear fits: `r colFmt(control$log.x.linear, 'NavyBlue')`
+* log-transform fluorescence values for spline fits: `r colFmt(control$log.y.spline, 'NavyBlue')`
+* log-transform fluorescence values for linear fits: `r colFmt(control$log.y.lin, 'NavyBlue')`
+* log-transform x values for spline fits: `r colFmt(control$log.x.spline, 'NavyBlue')`
+* log-transform x values for linear fits: `r colFmt(control$log.x.lin, 'NavyBlue')`
 * perform dose-response analysis: `r colFmt(ec50, 'NavyBlue')`
-`r if(ec50){paste0("* method used for dose-response analysis:")}` `r if(control$x_type == "time"){colFmt(control$norm_fl, 'NavyBlue')}`
-`r if(ec50){paste0("* parameter used for dose-response analysis:")}` `r if(ec50){colFmt(control$dr.method, 'NavyBlue')}`
-* growth threshold: `r colFmt(control$growth.thresh, 'NavyBlue')` * start_density
+`r if(ec50){paste0("* method used for dose-response analysis:")}` `r if(ec50){colFmt(control$dr.method, 'NavyBlue')}`
+`r if(ec50){paste0("* parameter used for dose-response analysis:")}` `r if(ec50){colFmt(control$dr.parameter, 'NavyBlue')}`
+* growth threshold: `r colFmt(control$growth.thresh, 'NavyBlue')` `r colFmt('* start_density', 'NavyBlue')`
 `r if(any(c("l") %in% control$fit.opt)){paste0("* sliding window size in linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(ifelse(!is.null(control$lin.h), control$lin.h, "automated calculation"), 'NavyBlue')}`
 `r if(any(c("l") %in% control$fit.opt)){paste0("* R2 threshold for linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(control$lin.R2, 'NavyBlue')}`
 `r if(any(c("l") %in% control$fit.opt)){paste0("* RSD threshold for linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(control$lin.RSD, 'NavyBlue')}`
 `r if(any(c("l") %in% control$fit.opt)){paste0("* Relative ΔY threshold for linear regression:")}` `r if(any(c("l") %in% control$fit.opt)){colFmt(control$lin.dY, 'NavyBlue')}`
 
 \pagebreak
-## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1){"Graphical overview -  Fluorescence 1"}`
-```{r dual_plot_fl1, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1}
+
+## Graphical overview -  Fluorescence
+<!-- ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence)>1){"Graphical overview -  Fluorescence 1"}` -->
+```{r dual_plot_fl, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence)>1}
 suppressWarnings(
-  plot.dual(flFitRes, fluorescence = "fl1", export = export)
+  plot.dual(flFitRes, fluorescence = "fl", export = export)
 )
 ```
 
-## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1){"Graphical overview -  Normalized fluorescence 1"}`
-```{r dual_plot_norm.fl1, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1}
+## Graphical overview -  Normalized fluorescence
+<!-- ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence)>1){"Graphical overview -  Normalized fluorescence 1"}` -->
+```{r dual_plot_norm.fl, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence)>1}
 suppressWarnings(
-  plot.dual(flFitRes, fluorescence = "norm.fl1", export = export)
+  plot.dual(flFitRes, fluorescence = "norm.fl", export = export)
 )
 ```
+<!-- ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1){"Graphical overview -  Fluorescence 2"}` -->
+<!-- ```{r dual_plot_fl2, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1} -->
+<!-- suppressWarnings( -->
+<!--   plot.dual(flFitRes, fluorescence = "fl2", export = export) -->
+<!-- ) -->
+<!-- ``` -->
 
-## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1){"Graphical overview -  Fluorescence 2"}`
-```{r dual_plot_fl2, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1}
-suppressWarnings(
-  plot.dual(flFitRes, fluorescence = "fl2", export = export)
-)
-```
+<!-- ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1){"Graphical overview -  Normalized fluorescence 2"}` -->
+<!-- ```{r dual_plot_norm.fl2, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1} -->
+<!-- suppressWarnings( -->
+<!--   plot.dual(flFitRes, fluorescence = "norm.fl2", export = export) -->
+<!-- ) -->
+<!-- ``` -->
 
-## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1){"Graphical overview -  Normalized fluorescence 2"}`
-```{r dual_plot_norm.fl2, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1}
-suppressWarnings(
-  plot.dual(flFitRes, fluorescence = "norm.fl2", export = export)
-)
-```
+`r if((length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence)>1) ||  (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1)){"\\pagebreak"}` 
+<!-- (length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1)  -->
 
-`r if((length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence1)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1) || (length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence2)>1)){"\\pagebreak"}`
-## `r if(length(flFit2)>1){"Fluorescence 1 fit results"} else {"Fluorescence fit results"}`
-```{r table_linear1, echo=F, warning=F, message=F, results='asis'}
+## Fluorescence fit results
+
+### Grouped results
+```{r table_linear_group, echo=F, warning=F, message=F, results='asis'}
 if(any(c("l") %in% control$fit.opt)){
-  if(!all(is.na(res.table.fl1$lambda.linfit))){
-    table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl1$TestId, res.table.fl1$AddId, res.table.fl1$concentration, sep = "|"),
-                               
-                               "slope<sub>max</sub>" = ifelse(res.table.fl1$max_slope.linfit==0 | is.na(res.table.fl1$max_slope.linfit), "", ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$max_slope.linfit), 3), paste0("<b>", round(as.numeric(res.table.fl1$max_slope.linfit), 3), "</b>", " (", round(as.numeric(res.table.fl1$max_slope2.linfit), 3), ")"))),
-                               
-                               "λ" = round(as.numeric(res.table.fl1$lambda.linfit), 2), 
-                               
-                               
-                               "Δy" = round(as.numeric(res.table.fl1$dY.linfit), 3),
-                               
-                               
-                               "y<sub>max</sub>" = round(as.numeric(res.table.fl1$A.linfit), 3),
-                               
-                               
-                               "x<sub>start</sub><br>(slope<sub>max</sub>)" = ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$x.mu.start.linfit), 2), paste0("<b>", round(as.numeric(res.table.fl1$x.mu.start.linfit), 2), "</b>", " (", round(as.numeric(res.table.fl1$x.mu2.start.linfit), 2), ")")),
-                               
-                               
-                               "x<sub>end</sub><br>(slope<sub>max</sub>)" = ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$x.mu.end.linfit), 2), paste0("<b>", round(as.numeric(res.table.fl1$x.mu.end.linfit), 2), "</b>", " (", round(as.numeric(res.table.fl1$x.mu2.end.linfit), 2), ")")),
-                               
-                               
-                               
-                               "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.fl1$max_slope2.linfit), round(as.numeric(res.table.fl1$r2mu.linfit), 3), paste0("<b>", round(as.numeric(res.table.fl1$r2mu.linfit), 3), "</b>", " (", round(as.numeric(res.table.fl1$r2mu2.linfit), 3), ")")),
-                               
-                               
-                               stringsAsFactors = F, check.names = F)
-    table_linear <- as.data.frame(apply(table_linear, 2, function(x) str_replace_all(x, "NA ± NA", "")))
-    table_linear[is.na(table_linear)] <- ""
+  if(!all(is.na(res.table.fl$lambda.linfit))){
+    table_linear_group <- table_group_fluorescence_linear(res.table.fl)
+    table_linear_group <- as.data.frame(apply(table_linear_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+    table_linear_group[is.na(table_linear_group)] <- ""
     if (knitr::is_html_output()) {
-      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit"))
+      knit_table(table_linear_group, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit"))
     } else {
-      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
+      knit_table(table_linear_group, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
     }
   }
 }
@@ -161,36 +144,23 @@ try(suppressWarnings(
 ```
 `r if(any(c("l") %in% control$fit.opt)){"\\clearpage"}`
 
-```{r table_spline, echo=F, warning=F, message=F, results='asis', fig.align='center'}
+```{r table_spline_group, echo=F, warning=F, message=F, results='asis', fig.align='center'}
 if(any(c("s") %in% control$fit.opt)){
-  if(!all(is.na(res.table.fl1$lambda.spline))){
-    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl1$TestId, res.table.fl1$AddId, res.table.fl1$concentration, sep = "|"),
-                             
-                             "slope<sub>max</sub>" = ifelse(res.table.fl1$max_slope.spline==0 | is.na(res.table.fl1$max_slope.spline), "", ifelse(is.na(res.table.fl1$max_slope2.spline), round(as.numeric(res.table.fl1$max_slope.spline), 3), paste0("<b>", round(as.numeric(res.table.fl1$max_slope.spline), 3), "</b>", " (", round(as.numeric(res.table.fl1$max_slope2.spline), 3), ")"))),
-                             
-                             "λ" = round(as.numeric(res.table.fl1$lambda.spline), 2), 
-                             
-                             "y<sub>max</sub>" = round(as.numeric(res.table.fl1$A.spline), 3),
-                             
-                             "Δy" = round(as.numeric(res.table.fl1$dY.spline), 3),
-                             
-                             "x<sub>max</sub>" = ifelse(is.na(res.table.fl1$max_slope2.spline), round(as.numeric(res.table.fl1$x.max.spline), 2), paste0("<b>", round(as.numeric(res.table.fl1$x.max.spline), 2), "</b>", " (", round(as.numeric(res.table.fl1$x.max2.spline), 2), ")")),
-                             
-                             "smooth.<br>fac" = res.table.fl1$smooth.spline,
-                             
-                             stringsAsFactors = F, check.names = F)
+  if(!all(is.na(res.table.fl$lambda.spline))){
+        table_spline_group <- table_group_fluorescence_spline(res.table.fl)
+
     # if ( control$nboot.gc > 1 ){
-    #   table_spline <- cbind(table_spline, data.frame("slope<sub>max</sub><br>boot" = paste(round(as.numeric(res.table.fl1$max_slope.bt), 3),"\u00B1", round(as.numeric(res.table.fl1$stdmax_slope.bt),3)), 
-    #                                                "λ<br>boot" = paste(round(as.numeric(res.table.fl1$lambda.bt), 2),"\u00B1", round(as.numeric(res.table.fl1$stdlambda.bt),2)),
-    #                                                "A<br>boot" = paste(round(as.numeric(res.table.fl1$A.bt), 3),"\u00B1", round(as.numeric(res.table.fl1$stdA.bt),3)),
+    #   table_spline <- cbind(table_spline, data.frame("slope<sub>max</sub><br>boot" = paste(round(as.numeric(res.table.fl$max_slope.bt), 3),"\u00B1", round(as.numeric(res.table.fl$stdmax_slope.bt),3)), 
+    #                                                "λ<br>boot" = paste(round(as.numeric(res.table.fl$lambda.bt), 2),"\u00B1", round(as.numeric(res.table.fl$stdlambda.bt),2)),
+    #                                                "A<br>boot" = paste(round(as.numeric(res.table.fl$A.bt), 3),"\u00B1", round(as.numeric(res.table.fl$stdA.bt),3)),
     #                                                stringsAsFactors = F, check.names = F))
     # }
-  table_spline <- as.data.frame(apply(table_spline, 2, function(x) str_replace_all(x, "NA ± NA", "")))
-  table_spline[is.na(table_spline)] <- ""
+  table_spline_group <- as.data.frame(apply(table_spline_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+  table_spline_group[is.na(table_spline_group)] <- ""
   if (knitr::is_html_output()) {
-      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"))
+      knit_table(table_spline_group, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"))
     } else {
-      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
+      knit_table(table_spline_group, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
     }
   }
 }
@@ -205,6 +175,82 @@ try(suppressWarnings(
 try(suppressWarnings(
   plot.parameter(flFitRes, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
 )
+```
+\clearpage
+
+### Individual samples
+```{r table_linear_individual, echo=F, warning=F, message=F, results='asis'}
+if(any(c("l") %in% control$fit.opt)){
+  if(!all(is.na(res.table.fl$lambda.linfit))){
+    table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
+                               
+                               "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.linfit==0 | is.na(res.table.fl$max_slope.linfit), "", ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$max_slope.linfit), 3), paste0("<b>", round(as.numeric(res.table.fl$max_slope.linfit), 3), "</b>", " (", round(as.numeric(res.table.fl$max_slope2.linfit), 3), ")"))),
+                               
+                               "λ" = round(as.numeric(res.table.fl$lambda.linfit), 2), 
+                               
+                               
+                               "Δy" = round(as.numeric(res.table.fl$dY.linfit), 3),
+                               
+                               
+                               "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.linfit), 3),
+                               
+                               
+                               "x<sub>start</sub><br>(slope<sub>max</sub>)" = ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$x.mu.start.linfit), 2), paste0("<b>", round(as.numeric(res.table.fl$x.mu.start.linfit), 2), "</b>", " (", round(as.numeric(res.table.fl$x.mu2.start.linfit), 2), ")")),
+                               
+                               
+                               "x<sub>end</sub><br>(slope<sub>max</sub>)" = ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$x.mu.end.linfit), 2), paste0("<b>", round(as.numeric(res.table.fl$x.mu.end.linfit), 2), "</b>", " (", round(as.numeric(res.table.fl$x.mu2.end.linfit), 2), ")")),
+                               
+                               
+                               
+                               "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$r2mu.linfit), 3), paste0("<b>", round(as.numeric(res.table.fl$r2mu.linfit), 3), "</b>", " (", round(as.numeric(res.table.fl$r2mu2.linfit), 3), ")")),
+                               
+                               
+                               stringsAsFactors = F, check.names = F)
+    table_linear <- as.data.frame(apply(table_linear, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+    table_linear[is.na(table_linear)] <- ""
+    if (knitr::is_html_output()) {
+      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit"))
+    } else {
+      knit_table(table_linear, caption = ifelse(control$biphasic, "Linear Fit (Values in parentheses indicate parameters for secondary growth phase)", "Linear Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
+    }
+  }
+}
+```
+`r if(any(c("l") %in% control$fit.opt)){"\\clearpage"}`
+
+```{r table_spline_individual, echo=F, warning=F, message=F, results='asis', fig.align='center'}
+if(any(c("s") %in% control$fit.opt)){
+  if(!all(is.na(res.table.fl$lambda.spline))){
+    table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
+                             
+                             "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.spline==0 | is.na(res.table.fl$max_slope.spline), "", ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$max_slope.spline), 3), paste0("<b>", round(as.numeric(res.table.fl$max_slope.spline), 3), "</b>", " (", round(as.numeric(res.table.fl$max_slope2.spline), 3), ")"))),
+                             
+                             "λ" = round(as.numeric(res.table.fl$lambda.spline), 2), 
+                             
+                             "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.spline), 3),
+                             
+                             "Δy" = round(as.numeric(res.table.fl$dY.spline), 3),
+                             
+                             "x<sub>max</sub>" = ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$x.max.spline), 2), paste0("<b>", round(as.numeric(res.table.fl$x.max.spline), 2), "</b>", " (", round(as.numeric(res.table.fl$x.max2.spline), 2), ")")),
+                             
+                             "smooth.<br>fac" = res.table.fl$smooth.spline,
+                             
+                             stringsAsFactors = F, check.names = F)
+    # if ( control$nboot.gc > 1 ){
+    #   table_spline <- cbind(table_spline, data.frame("slope<sub>max</sub><br>boot" = paste(round(as.numeric(res.table.fl$max_slope.bt), 3),"\u00B1", round(as.numeric(res.table.fl$stdmax_slope.bt),3)), 
+    #                                                "λ<br>boot" = paste(round(as.numeric(res.table.fl$lambda.bt), 2),"\u00B1", round(as.numeric(res.table.fl$stdlambda.bt),2)),
+    #                                                "A<br>boot" = paste(round(as.numeric(res.table.fl$A.bt), 3),"\u00B1", round(as.numeric(res.table.fl$stdA.bt),3)),
+    #                                                stringsAsFactors = F, check.names = F))
+    # }
+  table_spline <- as.data.frame(apply(table_spline, 2, function(x) str_replace_all(x, "NA ± NA", "")))
+  table_spline[is.na(table_spline)] <- ""
+  if (knitr::is_html_output()) {
+      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit"))
+    } else {
+      knit_table(table_spline, caption = ifelse(control$biphasic, "Smooth Spline Fit (Values in parentheses indicate parameters for secondary growth phase)", "Smooth Spline Fit")) %>% kableExtra::column_spec(column=1, width = "4cm")
+    }
+  }
+}
 ```
 \clearpage
 
@@ -333,38 +379,38 @@ if(any(c("l") %in% control$fit.opt)){
 }
   
   plot.ggLinear <- function(){
-    if(flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-      x <- flFitRes[["flFit1"]][["flFittedLinear"]][[i]]
+    if(flFitRes[["flFit"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+      x <- flFitRes[["flFit"]][["flFittedLinear"]][[i]]
       plot.flFitLinear2(flFittedLinear = x, title = gsub(" \\| NA", "", paste(x$ID, collapse = " | ")))
     }
   }
   plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"),"/Plots"))
   if(all(c('pdf', 'html') %in% format)){
     if (knitr::is_latex_output()) {
-      # foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedLinear"]]),
+      # foreach(i = 1:length(flFitRes[["flFit"]][["flFittedLinear"]]),
       #         .packages = "ggplot2") %dopar% {
-      #           if(flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-      #             pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6);   plot.ggLinear();   invisible(dev.off())
+      #           if(flFitRes[["flFit"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+      #             pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6);   plot.ggLinear();   invisible(dev.off())
       #           }
       #         }
-      for(i in 1:length(flFitRes[["flFit1"]][["flFittedLinear"]])){
-        if(length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))>0 && flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
+      for(i in 1:length(flFitRes[["flFit"]][["flFittedLinear"]])){
+        if(length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))>0 && flFitRes[["flFit"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+                  suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
           plot.ggLinear()
           invisible(dev.off())
                  }
       }
     }
   } else{
-    # foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedLinear"]]),
+    # foreach(i = 1:length(flFitRes[["flFit"]][["flFittedLinear"]]),
     #         .packages = "ggplot2") %dopar% {
-    #           if(flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-    #             pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i])))))), ".pdf"), width = 8, height = 6);   plot.ggLinear();   invisible(dev.off())
+    #           if(flFitRes[["flFit"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+    #             pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedLinear"]])[i])))))), ".pdf"), width = 8, height = 6);   plot.ggLinear();   invisible(dev.off())
     #           }
     #         }
-    for(i in 1:length(flFitRes[["flFit1"]][["flFittedLinear"]])){
-        if(length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|\\(|\\)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
+    for(i in 1:length(flFitRes[["flFit"]][["flFittedLinear"]])){
+        if(length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))==0 && flFitRes[["flFit"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
+                  suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|\\(|\\)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
           plot.ggLinear()
           invisible(dev.off())
                  }
@@ -374,7 +420,7 @@ if(any(c("l") %in% control$fit.opt)){
   Files_list <- list.files(path = plotdir, 
                            pattern = "^PlotLinear_",
                            full.names = TRUE)
-  sort.ndx <- match(gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes$flFit1$flFittedLinear))))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
+  sort.ndx <- match(gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes$flFit$flFittedLinear))))))), gsub(".+PlotLinear_","", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
@@ -662,8 +708,8 @@ if(any(c("s") %in% control$fit.opt)) {
   } # else of if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE))
 }
   plot.ggSpline   <- function() {
-    if (flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-      x <- flFitRes[["flFit1"]][["flFittedSplines"]][[i]]
+    if (flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+      x <- flFitRes[["flFit"]][["flFittedSplines"]][[i]]
       plot.flFitSpline2(x)
     }
   }
@@ -671,11 +717,11 @@ if(any(c("s") %in% control$fit.opt)) {
     ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
   if(all(c('pdf', 'html') %in% format)){
     if (knitr::is_latex_output()) {
-      foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
+      foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
-              if (length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+              if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
                 suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
+                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
                 ))))), ".pdf")))
                 suppressWarnings(
                   plot.ggSpline()
@@ -685,11 +731,11 @@ if(any(c("s") %in% control$fit.opt)) {
             }
     }
   } else{
-    foreach(i = 1:length(flFitRes[["flFit1"]][["flFittedSplines"]]),
+    foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
-              if (length(grep("^NA ", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit1"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+              if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
                 suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit1"]][["flFittedSplines"]])[i])
+                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
                 ))))),  ".pdf"))
                 )
                 suppressWarnings(
@@ -705,7 +751,7 @@ if(any(c("s") %in% control$fit.opt)) {
                            full.names = TRUE)
   sort.ndx <-
     match(gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(
-      " \\| ", "_", names(flFitRes$flFit1$flFittedSplines)
+      " \\| ", "_", names(flFitRes$flFit$flFittedSplines)
     )))))), gsub(".+PlotSpline_", "", gsub(".pdf", "", Files_list)))
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
@@ -714,75 +760,75 @@ if(any(c("s") %in% control$fit.opt)) {
 `r if(ec50){"\\clearpage"}`
 
 ## `r if(ec50 && control$dr.method == "spline"){"Dose-response analysis - Spline fit"} else if (ec50 && control$dr.method == "model"){"Dose-response analysis - Model fit"}`
-```{r ec50_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedSplines"]]) > 0}
-cat(paste0("_", length(flFitRes$drFit1$drTable$Test), "_ conditions were identified:\n",
-           paste(colFmt(flFitRes$drFit1$drTable$Test, 'NavyBlue'), "\n", collapse = ", ")))
+```{r ec50_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0}
+cat(paste0("_", length(flFitRes$drFit$drTable$Test), "_ conditions were identified:\n",
+           paste(colFmt(flFitRes$drFit$drTable$Test, 'NavyBlue'), "\n", collapse = ", ")))
 cat("  \n")
 ec50.df <- data.frame()
-for(i in 1:length(flFitRes$drFit1$drFittedSplines)){
-  ec50.df <- plyr::rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit1$drFittedSplines)[i],
-                              "EC50" = round(flFitRes$drFit1$drFittedSplines[[i]]$parameters$EC50, 3),
-                              "Response" = round(flFitRes$drFit1$drFittedSplines[[i]]$parameters$yEC50, 3))
+for(i in 1:length(flFitRes$drFit$drFittedSplines)){
+  ec50.df <- plyr::rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit$drFittedSplines)[i],
+                              "EC50" = round(flFitRes$drFit$drFittedSplines[[i]]$parameters$EC50, 3),
+                              "Response" = round(flFitRes$drFit$drFittedSplines[[i]]$parameters$yEC50, 3))
   )
 }
-names(ec50.df)[3] <- paste0("Response (", flFitRes$drFit1$drFittedSplines[[1]]$parameters$test, ")")
+names(ec50.df)[3] <- paste0("Response (", flFitRes$drFit$drFittedSplines[[1]]$parameters$test, ")")
 knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 ```
 
-```{r ec50_spline_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedSplines"]]) > 0}
+```{r ec50_spline_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0}
 suppressWarnings(
-  plot.drFit(flFitRes$drFit1, export = export)
+  plot.drFit(flFitRes$drFit, export = export)
 )
 ```
 
-```{r ec50.boot_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
+```{r ec50.boot_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
 boot.ec50.df <- data.frame()
-  for (i in 1:length(flFitRes$drFit1$drBootSplines)){
+  for (i in 1:length(flFitRes$drFit$drBootSplines)){
     boot.ec50.df <-
       plyr::rbind.fill(
         boot.ec50.df,
         data.frame(
-          "Condition" = flFitRes$drFit1$drTable$Test[i],
-          "EC50.boot" = paste(round(as.numeric(flFitRes$drFit1$drTable$drboot.meanEC50[i]), 3),"\u00B1", round(as.numeric(flFitRes$drFit1$drTable$drboot.sdEC50[i]),3)),
-          "Response.boot" = paste(round(as.numeric(flFitRes$drFit1$drTable$drboot.meanEC50y[i]), 3),"\u00B1", round(as.numeric(flFitRes$drFit1$drTable$drboot.sdEC50y[i]),3))
+          "Condition" = flFitRes$drFit$drTable$Test[i],
+          "EC50.boot" = paste(round(as.numeric(flFitRes$drFit$drTable$drboot.meanEC50[i]), 3),"\u00B1", round(as.numeric(flFitRes$drFit$drTable$drboot.sdEC50[i]),3)),
+          "Response.boot" = paste(round(as.numeric(flFitRes$drFit$drTable$drboot.meanEC50y[i]), 3),"\u00B1", round(as.numeric(flFitRes$drFit$drTable$drboot.sdEC50y[i]),3))
         )
       )
   }
   knit_table(boot.ec50.df, caption = "Dose-Response Analysis - Bootstrapping")
 ```
 
-```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
-for(i in 1:length(flFitRes$drFit1$drBootSplines)){
-  if(flFitRes$drFit1$drBootSplines[[i]]$bootFlag == TRUE){
-    plot.drBootSpline(flFitRes$drFit1$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = paste0(wd, "/Plots"))
+```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
+for(i in 1:length(flFitRes$drFit$drBootSplines)){
+  if(flFitRes$drFit$drBootSplines[[i]]$bootFlag == TRUE){
+    plot.drBootSpline(flFitRes$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = paste0(wd, "/Plots"))
   }
 }
 ```
-```{r ec50_model_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 1}
-cat(paste0("_", length(flFitRes$drFit1$drTable$Test), "_ conditions were identified:\n",
-           paste(colFmt(flFitRes$drFit1$drTable$Test, 'NavyBlue'), collapse = ", ")))
+```{r ec50_model_summary, echo=F, warning=F, message=F, results='asis', eval = ec50 && length(flFitRes[["drFit"]][["drFittedModels"]]) > 1}
+cat(paste0("_", length(flFitRes$drFit$drTable$Test), "_ conditions were identified:\n",
+           paste(colFmt(flFitRes$drFit$drTable$Test, 'NavyBlue'), collapse = ", ")))
 cat("  \n")
 
 ec50.df <- data.frame()
-for(i in 1:length(flFitRes$drFit1$drFittedModels)){
-  ec50.df <- plyr::rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit1$drFittedModels)[i],
-                              "K" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$K.orig, 3),
-                              "y.min" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$y.min, 3),
-                              "y.max" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$y.max, 3),
-                              "fold change" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$fc, 3),
-                              "n" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$n, 3),
-                              "yEC50" = round(flFitRes$drFit1$drFittedModels[[i]]$parameters$yEC50.orig, 3))
+for(i in 1:length(flFitRes$drFit$drFittedModels)){
+  ec50.df <- plyr::rbind.fill(ec50.df, data.frame("Condition" = names(flFitRes$drFit$drFittedModels)[i],
+                              "K" = round(flFitRes$drFit$drFittedModels[[i]]$parameters$K.orig, 3),
+                              "y.min" = round(flFitRes$drFit$drFittedModels[[i]]$parameters$y.min, 3),
+                              "y.max" = round(flFitRes$drFit$drFittedModels[[i]]$parameters$y.max, 3),
+                              "fold change" = round(flFitRes$drFit$drFittedModels[[i]]$parameters$fc, 3),
+                              "n" = round(flFitRes$drFit$drFittedModels[[i]]$parameters$n, 3),
+                              "yEC50" = round(flFitRes$drFit$drFittedModels[[i]]$parameters$yEC50.orig, 3))
   )
 }
-names(ec50.df)[7] <- paste0("Response (", flFitRes$drFit1$drFittedModels[[1]]$parameters$test, ")")
+names(ec50.df)[7] <- paste0("Response (", flFitRes$drFit$drFittedModels[[1]]$parameters$test, ")")
 knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 ```
 
-```{r ec50_model_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit1"]][["drFittedModels"]]) > 1}
-for(i in 1:length(flFitRes[["drFit1"]][["drFittedModels"]])){
+```{r ec50_model_plots, fig.width=7, fig.height=5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit"]][["drFittedModels"]]) > 1}
+for(i in 1:length(flFitRes[["drFit"]][["drFittedModels"]])){
   try(
     suppressWarnings(
-      plot.drFitModel(flFitRes$drFit1$drFittedModels[[i]], export = export)
+      plot.drFitModel(flFitRes$drFit$drFittedModels[[i]], export = export)
     )
   )
 }
@@ -805,7 +851,7 @@ suppressWarnings(
 ## `r if(!all(is.na(mean.grp))){"Group average plots"}`
 ```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if("all" %in% mean.grp){
-  if(length(flFitRes$flFit1$flFittedSplines[[1]]$spline)>1){
+  if(length(flFitRes$flFit$flFittedSplines[[1]]$spline)>1){
     logy <- control$log.y.spline
     suppressWarnings(
       plot.flFitRes(flFitRes, basesize = 15, export = export, log.y = logy, mean = T, out.dir = paste0(wd, "/Plots"))
@@ -813,7 +859,7 @@ if("all" %in% mean.grp){
   }
 } else if(!all(is.na(mean.grp))){
   for(i in 1:length(mean.grp)){
-    if(length(grep(mean.grp[i], as.character(names(flFitRes$flFit1$flFittedSplines))))>0){
+    if(length(grep(mean.grp[i], as.character(names(flFitRes$flFit$flFittedSplines))))>0){
       suppressWarnings(
         plot.flFitRes(flFitRes, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
       )
@@ -822,7 +868,7 @@ if("all" %in% mean.grp){
 }
 if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
-    if(length(grep(mean.conc[i], str_extract(names(flFitRes$flFit1$flFittedSplines), "[:alnum:]+$")))>0){
+    if(length(grep(mean.conc[i], str_extract(names(flFitRes$flFit$flFittedSplines), "[:alnum:]+$")))>0){
       suppressWarnings(
         plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
       )

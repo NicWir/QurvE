@@ -99,11 +99,10 @@ parse_data_shiny <-
            dec.map = ".",
            subtract.blank  = T,
            density.nm = NULL,
-           fl1.nm = NULL,
-           fl2.nm = NULL,
+           fl.nm = NULL,
            calibration = NULL
   ) {
-    if(!is.null(fl1.nm) && is.na(fl1.nm)) fl1.nm <- NULL
+    if(!is.null(fl.nm) && is.na(fl.nm)) fl.nm <- NULL
     if(!is.null(fl2.nm) && is.na(fl2.nm)) fl2.nm <- NULL
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
@@ -124,11 +123,11 @@ parse_data_shiny <-
       mapping <- NULL
     }
     if(any(grep("Gen5|Gen6", software, ignore.case = T))){
-      parsed.ls <- parse_Gen5Gen6_shiny(data = input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_Gen5Gen6_shiny(data = input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     } # if("Gen5" %in% software)
     if(any(grep("Chi.Bio", software, ignore.case = T))){
-      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
     if(any(grep("GrowthProfiler", software, ignore.case = T))){
@@ -136,7 +135,7 @@ parse_data_shiny <-
       data.ls <- parsed.ls[[1]]
     }
     if(any(grep("Tecan", software, ignore.case = T))){
-      parsed.ls <- parse_tecan_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_tecan_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -146,12 +145,12 @@ parse_data_shiny <-
     }
 
     if(any(grep("VictorNivo", software, ignore.case = T))){
-      parsed.ls <- parse_victornivo_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_victornivo_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
     if(any(grep("VictorX3", software, ignore.case = T))){
-      parsed.ls <- parse_victorx3_shiny(input, density.nm = density.nm, fl1.nm = fl1.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_victorx3_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -209,13 +208,13 @@ parse_data_shiny <-
         data.ls[[i]] <- data.ls[[i]][,!is.na(data.ls[[i]][1,])]
       }
     }
-    names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
-    grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank, calibration = calibration)
+    names(data.ls) <- c("density", "fluorescence", "fluorescence2")
+    grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration)
 
     return(grodata)
   }
 
-parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
+parse_Gen5Gen6_shiny <- function(data, density.nm, fl.nm)
 {
   # get row numbers for "time" in column 2
   time.ndx <- grep("\\btime\\b", data[[2]], ignore.case = T)
@@ -270,30 +269,30 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl1.nm, fl2.nm)
   else
     density  <- NA
 
-  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
-    fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
-    fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+  if(!is.null(fl.nm) && fl.nm != "Ignore"){
+    fluorescence <-  read.data[[match(fl.nm, reads)]]
+    fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
   }
   else
-    fluorescence1 <- NA
+    fluorescence <- NA
 
-  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
-    fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
-    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
-  }
-  else
-    fluorescence2 <- NA
+  # if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+  #   fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+  #   fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+  # }
+  # else
+  #   fluorescence2 <- NA
 
 
   # density <- read.data[[1]]
   data.ls[[1]] <- density
-  data.ls[[2]] <- fluorescence1
-  data.ls[[3]] <- fluorescence2
+  data.ls[[2]] <- fluorescence
+  # data.ls[[3]] <- fluorescence2
 
   return(list(data.ls))
 }
 
-parse_chibio_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
+parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   time.ndx <- grep("time", input[1,], ignore.case = T)
   read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
@@ -310,37 +309,37 @@ parse_chibio_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
     else
       density  <- NA
 
-    if (!is.null(fl1.nm) && fl1.nm != "Ignore"){
-      fluorescence1 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl1.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl1.nm, reads)]])))
-      if(all(as.numeric(fluorescence1[-1,2]) == 0) || all(is.na(fluorescence1[-1,2]))){
-        fluorescence1 <- NA
+    if (!is.null(fl.nm) && fl.nm != "Ignore"){
+      fluorescence <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl.nm, reads)]])))
+      if(all(as.numeric(fluorescence[-1,2]) == 0) || all(is.na(fluorescence[-1,2]))){
+        fluorescence <- NA
       }
     }
     else
-      fluorescence1  <- NA
+      fluorescence  <- NA
 
-    if (!is.null(fl2.nm) && fl2.nm != "Ignore"){
-      fluorescence2 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl2.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl2.nm, reads)]])))
-      if(all(as.numeric(fluorescence2[-1,2]) == 0) || all(is.na(fluorescence2[-1,2]))){
-        fluorescence2 <- NA
-      }
-    }
-    else
-      fluorescence2  <- NA
+    # if (!is.null(fl2.nm) && fl2.nm != "Ignore"){
+    #   fluorescence2 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl2.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl2.nm, reads)]])))
+    #   if(all(as.numeric(fluorescence2[-1,2]) == 0) || all(is.na(fluorescence2[-1,2]))){
+    #     fluorescence2 <- NA
+    #   }
+    # }
+    # else
+    #   fluorescence2  <- NA
   } else {
     density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
-    fluorescence1 <- NA
-    fluorescence2 <- NA
+    fluorescence <- NA
+    # fluorescence2 <- NA
   }
 
   data.ls[[1]] <- density
-  data.ls[[2]] <- fluorescence1
-  data.ls[[3]] <- fluorescence2
+  data.ls[[2]] <- fluorescence
+  # data.ls[[3]] <- fluorescence2
 
   return(list(data.ls))
 }
 
-parse_tecan_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
+parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
   time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
@@ -385,23 +384,23 @@ parse_tecan_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
   else
     density  <- NA
 
-  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
-    fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
-    fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+  if(!is.null(fl.nm) && fl.nm != "Ignore"){
+    fluorescence <-  read.data[[match(fl.nm, reads)]]
+    fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
   }
   else
-    fluorescence1 <- NA
+    fluorescence <- NA
 
-  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
-    fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
-    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
-  }
-  else
-    fluorescence2 <- NA
+  # if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+  #   fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+  #   fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+  # }
+  # else
+  #   fluorescence2 <- NA
 
   data.ls[[1]] <- density
-  data.ls[[2]] <- fluorescence1
-  data.ls[[3]] <- fluorescence2
+  data.ls[[2]] <- fluorescence
+  # data.ls[[3]] <- fluorescence2
 
   return(list(data.ls))
 }
@@ -460,18 +459,18 @@ parse_biolector_shiny <- function(input, density.nm)
 
     data.ls[[1]] <- density
     data.ls[[2]] <- NA
-    data.ls[[3]] <- NA
+    # data.ls[[3]] <- NA
 
   } else {
     density <- read.data[[1]]
     data.ls[[1]] <- density
     data.ls[[2]] <- NA
-    data.ls[[3]] <- NA
+    # data.ls[[3]] <- NA
   }
   return(list(data.ls))
 }
 
-parse_victornivo_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
+parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
   time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
@@ -514,30 +513,30 @@ parse_victornivo_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
   else
     density  <- NA
 
-  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
-    fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
-    fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+  if(!is.null(fl.nm) && fl.nm != "Ignore"){
+    fluorescence <-  read.data[[match(fl.nm, reads)]]
+    fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
   }
   else
-    fluorescence1 <- NA
+    fluorescence <- NA
 
-  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
-    fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
-    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
-  }
-  else
-    fluorescence2 <- NA
+  # if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+  #   fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+  #   fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+  # }
+  # else
+  #   fluorescence2 <- NA
 
 
   # density <- read.data[[1]]
   data.ls[[1]] <- density
-  data.ls[[2]] <- fluorescence1
-  data.ls[[3]] <- fluorescence2
+  data.ls[[2]] <- fluorescence
+  # data.ls[[3]] <- fluorescence2
 
   return(list(data.ls))
 }
 
-parse_victorx3_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
+parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
   time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = T)
@@ -628,25 +627,25 @@ parse_victorx3_shiny <- function(input, density.nm, fl1.nm, fl2.nm)
   else
     density  <- NA
 
-  if(!is.null(fl1.nm) && fl1.nm != "Ignore"){
-    fluorescence1 <-  read.data[[match(fl1.nm, reads)]]
-    fluorescence1[which(fluorescence1 == "OVRFLW", arr.ind = TRUE)] <- NA
+  if(!is.null(fl.nm) && fl.nm != "Ignore"){
+    fluorescence <-  read.data[[match(fl.nm, reads)]]
+    fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
   }
   else
-    fluorescence1 <- NA
+    fluorescence <- NA
 
-  if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
-    fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
-    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
-  }
-  else
-    fluorescence2 <- NA
+  # if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+  #   fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+  #   fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+  # }
+  # else
+  #   fluorescence2 <- NA
 
 
   # density <- read.data[[1]]
   data.ls[[1]] <- density
-  data.ls[[2]] <- fluorescence1
-  data.ls[[3]] <- fluorescence2
+  data.ls[[2]] <- fluorescence
+  # data.ls[[3]] <- fluorescence2
 
   return(list(data.ls))
 }

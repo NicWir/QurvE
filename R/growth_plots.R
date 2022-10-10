@@ -2617,7 +2617,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   } else if (methods::is(object)=="grofit"){
     gcTable <- object$gcFit$gcTable
   } else if (methods::is(object)=="flFitRes"){
-    gcTable <- object$flFit1$flTable
+    gcTable <- object$flFit$flTable
   } else if (any(methods::is(object) %in% "gcTable")){
     gcTable <- object
   } else if (methods::is(object)=="flFit"){
@@ -2870,7 +2870,7 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
   } else if (methods::is(object)=="grofit"){
     drTable <- object$drFit$drTable
   } else if (methods::is(object)=="flFitRes"){
-    drTable <- object$drFit1$drTable
+    drTable <- object$drFit$drTable
   } else if (any(methods::is(object) %in% "drTable")){
     drTable <- object
   }

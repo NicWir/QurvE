@@ -9,19 +9,15 @@
 #'    \item replicate number (_optional_: followed by a letter to indicate technical replicates)
 #'    \item concentration value (_optional_)
 #' }
-#' @param data.fluoro1 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
-#' @param data.fluoro2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
+#' @param data.fl (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
 #' @param data.format (Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}
 #' @param csvsep (Character) separator used in CSV file storing density data (ignored for other file types). Default: \code{";"}
 #' @param dec (Character) decimal separator used in CSV, TSV or TXT file storing density data. Default: \code{"."}
-#' @param csvsep.fl1 (Character) separator used in CSV file storing fluorescence 1 data (ignored for other file types). Default: \code{";"}
-#' @param dec.fl1 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 1 data. Default: \code{"."}
-#' @param csvsep.fl2 (Character) separator used in CSV file storing fluorescence 2 data (ignored for other file types). Default: \code{";"}
-#' @param dec.fl2 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 2 data. Default: \code{"."}
+#' @param csvsep.fl (Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}
+#' @param dec.fl (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence data. Default: \code{"."}
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]). If \code{calibration = TRUE}, blanks are subtracted after value conversion.
 #' @param sheet.density (Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (_optional_).
-#' @param sheet.fluoro1 (Numeric or Character) Number or name of the sheet with fluorescence 1 data in XLS or XLSX files (_optional_).
-#' @param sheet.fluoro2 (Numeric or Character) Number or name of the sheet with fluorescence 2 data in XLS or XLSX files (_optional_).
+#' @param sheet.fl (Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (_optional_).
 #' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
@@ -34,34 +30,28 @@
 #'   object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
 #' \item{time}{Matrix with raw time values extracted from \code{data.density}.}
 #' \item{density}{Dataframe with raw density values and sample identifiers extracted from \code{data.density}.}
-#' \item{fluorescence1}{Dataframe with raw fluorescence1 values and sample identifiers extracted from \code{data.fluoro1}. \code{NA}, if no fluorescence1 data is provided.}
-#' \item{fluorescence2}{Dataframe with raw fluorescence2 values and sample identifiers extracted from \code{data.fluoro2}. \code{NA}, if no fluorescence2 data is provided.}
-#' \item{norm.fluorescence1}{fluorescence1 data divided by density values. \code{NA}, if no fluorescence1 data is provided.}
-#' \item{norm.fluorescence2}{fluorescence2 data divided by density values. \code{NA}, if no fluorescence1 data is provided.}
+#' \item{fluorescence}{Dataframe with raw fluorescence values and sample identifiers extracted from \code{data.fl}. \code{NA}, if no fluorescence data is provided.}
+#' \item{norm.fluorescence}{fluorescence data divided by density values. \code{NA}, if no fluorescence data is provided.}
 #' \item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.density}.}
 #'
 #' @export
 #' @md
 read_data <-
   function(data.density,
-           data.fluoro1 = NA,
-           data.fluoro2 = NA,
+           data.fl = NA,
            data.format = "col",
            csvsep = ";",
            dec = ".",
-           csvsep.fl1 = ";",
-           dec.fl1 = ".",
-           csvsep.fl2 = ";",
-           dec.fl2 = ".",
+           csvsep.fl = ";",
+           dec.fl = ".",
            sheet.density = 1,
-           sheet.fluoro1 = 1,
-           sheet.fluoro2 = 1,
+           sheet.fl = 1,
            subtract.blank  = T,
            calibration = NULL)
   {
     if(is.null(data.density)) data.density <- NA
-    if(is.null(data.fluoro1)) data.fluoro1 <- NA
-    if(is.null(data.fluoro2)) data.fluoro2 <- NA
+    if(is.null(data.fl)) data.fl <- NA
+    # if(is.null(data.fluoro2)) data.fluoro2 <- NA
     if(!is.null(calibration) && calibration == "") calibration <- NULL
 
     # Load density data
@@ -79,56 +69,55 @@ read_data <-
     } else {
       message("Sample data are stored in rows. If they are stored in column format, please run read_data() with data.format = 'col'.")
     }
-    # Load fluorescence 1 data
-    if((length(data.fluoro1) > 1 ) || !all(is.na(data.fluoro1))){
-      if (!is.character(data.fluoro1)) {
-        fluoro1 <- data.fluoro1
+    # Load fluorescence data
+    if((length(data.fl) > 1 ) || !all(is.na(data.fl))){
+      if (!is.character(data.fl)) {
+        fl <- data.fl
       } else {
         # Read table file
-        fluoro1 <- read_file(data.fluoro1, csvsep=csvsep.fl1, dec=dec.fl1, sheet=sheet.fluoro1)
+        fl <- read_file(data.fl, csvsep=csvsep.fl, dec=dec.fl, sheet=sheet.fl)
       }
       if(data.format == "col"){
-        fluoro1 <- t(fluoro1)
+        fl <- t(fl)
       }
-      if(!(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))){
+      if(!(any(grepl("time", unlist(fl[,1]), ignore.case = TRUE)))){
         if(data.format == "col"){
-          stop("Could not find 'time' in column 1 of data.fluoro1")
+          stop("Could not find 'time' in column 1 of data.fl")
         } else {
-          stop("Could not find 'time' in row 1 of data.fluoro1")
+          stop("Could not find 'time' in row 1 of data.fl")
         }
       }
       # add minimum negative value + 1 to all fluorescence data
     } else {
-      fluoro1 <- NA
+      fl <- NA
     }
-    # Load fluorescence 2 data
-    if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){
-      if (!is.character(data.fluoro2)) {
-        fluoro2 <- data.fluoro2
-      } else {
-        # Read table file
-        fluoro2 <- read_file(data.fluoro2, csvsep=csvsep.fl2, dec=dec.fl2, sheet=sheet.fluoro2)
-      }
-      if(data.format == "col"){
-        fluoro2 <- t(fluoro2)
-      }
-      if(!(any(grepl("time", unlist(fluoro2[,1]), ignore.case = TRUE)))){
-        if(data.format == "col"){
-          stop("Could not find 'time' in column 1 of data.fluoro2")
-        } else {
-          stop("Could not find 'time' in row 1 of data.fluoro2")
-        }
-      }
-    } else {
-      fluoro2 <- NA
-    }
+    # # Load fluorescence 2 data
+    # if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)){
+    #   if (!is.character(data.fluoro2)) {
+    #     fluoro2 <- data.fluoro2
+    #   } else {
+    #     # Read table file
+    #     fluoro2 <- read_file(data.fluoro2, csvsep=csvsep.fl2, dec=dec.fl2, sheet=sheet.fluoro2)
+    #   }
+    #   if(data.format == "col"){
+    #     fluoro2 <- t(fluoro2)
+    #   }
+    #   if(!(any(grepl("time", unlist(fluoro2[,1]), ignore.case = TRUE)))){
+    #     if(data.format == "col"){
+    #       stop("Could not find 'time' in column 1 of data.fluoro2")
+    #     } else {
+    #       stop("Could not find 'time' in row 1 of data.fluoro2")
+    #     }
+    #   }
+    # } else {
+    #   fluoro2 <- NA
+    # }
     if((length(dat) > 1 && !(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))) &&
-       (length(fluoro1) > 1 && !(any(grepl("time", unlist(fluoro1[,1]), ignore.case = TRUE)))) &&
-       (length(fluoro2) > 1 && !(any(grepl("time", unlist(fluoro2[,1]), ignore.case = TRUE))))){
+       (length(fl) > 1 && !(any(grepl("time", unlist(fl[,1]), ignore.case = TRUE)))) ){ #&& (length(fluoro2) > 1 && !(any(grepl("time", unlist(fluoro2[,1]), ignore.case = TRUE))))
       if(data.format == "col"){
-        stop("Could not find 'time' in column 1 of any provided 'data.density', 'data.fluoro1', or 'data.fluoro2'.")
+        stop("Could not find 'time' in column 1 of any provided 'data.density' or 'data.fl'.")
       } else {
-        stop("Could not find 'time' in row 1 of any provided 'data.density', 'data.fluoro1', or 'data.fluoro2'.")
+        stop("Could not find 'time' in row 1 of any provided 'data.density' or 'data.fl'.")
       }
     }
 
@@ -174,8 +163,8 @@ read_data <-
         return(df)
       }
       if(length(dat)>1)             dat <- calibrate(df = dat)
-      if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1 <- calibrate(df=fluoro1)
-      if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- calibrate(df=fluoro2)
+      if((length(fl) > 1 ) || !is.na(data.fl))    fl <- calibrate(df=fl)
+      # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- calibrate(df=fluoro2)
 
     }
 
@@ -235,8 +224,8 @@ read_data <-
         return(df)
       }
       if(length(dat)>1)             dat <- subtract_blank(dat)
-      if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1 <- subtract_blank(df=fluoro1)
-      if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- subtract_blank(df=fluoro2)
+      if((length(fl) > 1 ) || !is.na(data.fl))    fl <- subtract_blank(df=fl)
+      # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- subtract_blank(df=fluoro2)
     }
 
     ### Combine technical replicates
@@ -286,8 +275,8 @@ read_data <-
       return(df)
     }
     if(length(dat)>1)              dat <- combine_techrep(dat)
-    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- combine_techrep(df=fluoro1)
-    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- combine_techrep(df=fluoro2)
+    if((length(fl) > 1 ) || !is.na(data.fl))     fl <- combine_techrep(df=fl)
+    # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- combine_techrep(df=fluoro2)
 
 
     # remove blank columns from dataset
@@ -299,55 +288,56 @@ read_data <-
       return(df)
     }
     if(length(dat)>1)              dat <- remove_blank(dat)
-    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- remove_blank(df=fluoro1)
-    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
+    if((length(fl) > 1 ) || !is.na(data.fl))     fl <- remove_blank(df=fl)
+    # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
 
     # Remove columns with NA measurements in all samples
     if(length(dat)>1)              dat <- dat[, c(1:3, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))+3)]
-    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))     fluoro1 <- fluoro1[, c(1:3, which(unlist(lapply(4:ncol(fluoro1), function(x)!all(is.na(fluoro1[2:nrow(fluoro1),x])))))+3)]
-    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, c(1:3, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))+3)]
+    if((length(fl) > 1 ) || !is.na(data.fl))     fl <- fl[, c(1:3, which(unlist(lapply(4:ncol(fl), function(x)!all(is.na(fl[2:nrow(fl),x])))))+3)]
+    # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, c(1:3, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))+3)]
 
     # add minimum negative value + 1 to all fluorescence data
-    if((length(fluoro1) > 1 ) || !is.na(data.fluoro1)){
-      num.fluoro1 <- t(apply(fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)], 1, as.numeric))
-      min.F1 <- unique(num.fluoro1[which(num.fluoro1 == min(num.fluoro1, na.rm = TRUE), arr.ind = TRUE)])
+    if((length(fl) > 1 ) || !is.na(data.fl)){
+      num.fl <- t(apply(fl[2:nrow(fl), 4:ncol(fl)], 1, as.numeric))
+      min.F1 <- unique(num.fl[which(num.fl == min(num.fl, na.rm = TRUE), arr.ind = TRUE)])
       if(min.F1 <=0){
-        fluoro1[2:nrow(fluoro1), 4:ncol(fluoro1)] <- num.fluoro1+(-min.F1)+1
+        fl[2:nrow(fl), 4:ncol(fl)] <- num.fl+(-min.F1)+1
       }
     }
-    if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){
-      num.fluoro2 <- t(apply(fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)], 1, as.numeric))
-      min.F2 <- unique(num.fluoro2[which(num.fluoro2 == min(num.fluoro2, na.rm = TRUE), arr.ind = TRUE)])
-      if(min.F2 <=0){
-        fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)] <- num.fluoro2+(-min.F2)+1
-      }
-    }
+    # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){
+    #   num.fluoro2 <- t(apply(fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)], 1, as.numeric))
+    #   min.F2 <- unique(num.fluoro2[which(num.fluoro2 == min(num.fluoro2, na.rm = TRUE), arr.ind = TRUE)])
+    #   if(min.F2 <=0){
+    #     fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)] <- num.fluoro2+(-min.F2)+1
+    #   }
+    # }
 
     # normalize fluorescence
-    if(((length(fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){
-      fluoro1.norm <- fluoro1
-      time.ndx <- grep("time", unlist(fluoro1.norm[,1]), ignore.case = TRUE)
-      fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)] <-
-        t(apply(fluoro1.norm[-time.ndx, 4:ncol(fluoro1.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
+    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){
+      fl.norm <- fl
+      time.ndx <- grep("time", unlist(fl.norm[,1]), ignore.case = TRUE)
+      fl.norm[-time.ndx, 4:ncol(fl.norm)] <-
+        t(apply(fl.norm[-time.ndx, 4:ncol(fl.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
     }
-    if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){
-      fluoro2.norm <- fluoro1
-      time.ndx <- grep("time", unlist(fluoro2.norm[,1]), ignore.case = TRUE)
-      fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)] <-
-        t(apply(fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
-    }
+    # if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){
+    #   fluoro2.norm <- fl
+    #   time.ndx <- grep("time", unlist(fluoro2.norm[,1]), ignore.case = TRUE)
+    #   fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)] <-
+    #     t(apply(fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
+    # }
 
     # Create time matrix
     if(length(dat) > 1) {
       time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
       dat.time <- dat
-    } else if(length(fluoro1) > 1){
-      time.ndx <- grep("time", unlist(fluoro1[,1]), ignore.case = TRUE)
-      dat.time <- fluoro1
-    } else if(length(fluoro2) > 1){
-      time.ndx <- grep("time", unlist(fluoro2[,1]), ignore.case = TRUE)
-      dat.time <- fluoro2
+    } else if(length(fl) > 1){
+      time.ndx <- grep("time", unlist(fl[,1]), ignore.case = TRUE)
+      dat.time <- fl
     }
+    # else if(length(fluoro2) > 1){
+    #   time.ndx <- grep("time", unlist(fluoro2[,1]), ignore.case = TRUE)
+    #   dat.time <- fluoro2
+    # }
 
   if(length(time.ndx)==1){
     time <- as.numeric(unlist(dat.time[time.ndx[1],4:ncol(dat.time)]))
@@ -412,48 +402,49 @@ read_data <-
   else{
     dat.mat <- NA
   }
-  if((length(fluoro1) > 1 ) || !is.na(data.fluoro1)){fluoro1.mat <- create_datmat(df=fluoro1, time.ndx=time.ndx);  fluoro1.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro1.mat[,1])}else{fluoro1.mat <- NA}
-  if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx);  fluoro2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.mat[,1])}else{fluoro2.mat <- NA}
-  if(((length(fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1){fluoro1.norm.mat <- create_datmat(df=fluoro1.norm, time.ndx=time.ndx);  fluoro1.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro1.norm.mat[,1])}else{fluoro1.norm.mat <- NA}
-  if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx);  fluoro2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.norm.mat[,1])}else{fluoro2.norm.mat <- NA}
+  if((length(fl) > 1 ) || !is.na(data.fl)){fl.mat <- create_datmat(df=fl, time.ndx=time.ndx);  fl.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.mat[,1])}else{fl.mat <- NA}
+  # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx);  fluoro2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.mat[,1])}else{fluoro2.mat <- NA}
+  if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){fl.norm.mat <- create_datmat(df=fl.norm, time.ndx=time.ndx);  fl.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.norm.mat[,1])}else{fl.norm.mat <- NA}
+  # if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx);  fluoro2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.norm.mat[,1])}else{fluoro2.norm.mat <- NA}
 
   if(length(dat)>1)             colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if((length(fluoro1) > 1 ) || !is.na(data.fluoro1))    colnames(fluoro1.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
-  if(((length(fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  colnames(fluoro1.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if((length(fl) > 1 ) || !is.na(data.fl))    colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
+  # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
+  if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+  # if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
 
   if(length(dat) > 1) {
     label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
     condition <- dat.mat[, 1]
     replicate <- dat.mat[, 2]
     concentration <- dat.mat[, 3]
-  } else if(length(fluoro1) > 1){
-    label <- unlist(lapply(1:nrow(fluoro1.mat), function(x) paste(fluoro1.mat[x,1], fluoro1.mat[x,2], fluoro1.mat[x,3], sep = " | ")))
-    condition <- fluoro1.mat[, 1]
-    replicate <- fluoro1.mat[, 2]
-    concentration <- fluoro1.mat[, 3]
-  } else if(length(fluoro2) > 1){
-    label <- unlist(lapply(1:nrow(fluoro2.mat), function(x) paste(fluoro2.mat[x,1], fluoro2.mat[x,2], fluoro2.mat[x,3], sep = " | ")))
-    condition <- fluoro2.mat[, 1]
-    replicate <- fluoro2.mat[, 2]
-    concentration <- fluoro2.mat[, 3]
+  } else if(length(fl) > 1){
+    label <- unlist(lapply(1:nrow(fl.mat), function(x) paste(fl.mat[x,1], fl.mat[x,2], fl.mat[x,3], sep = " | ")))
+    condition <- fl.mat[, 1]
+    replicate <- fl.mat[, 2]
+    concentration <- fl.mat[, 3]
   }
+  # else if(length(fluoro2) > 1){
+  #   label <- unlist(lapply(1:nrow(fluoro2.mat), function(x) paste(fluoro2.mat[x,1], fluoro2.mat[x,2], fluoro2.mat[x,3], sep = " | ")))
+  #   condition <- fluoro2.mat[, 1]
+  #   replicate <- fluoro2.mat[, 2]
+  #   concentration <- fluoro2.mat[, 3]
+  # }
 
 
   expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
 
   if(length(dat)>1)             dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
-  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1.mat <- as.data.frame(unclass(fluoro1.mat), stringsAsFactors = TRUE)
-  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat <- as.data.frame(unclass(fluoro2.mat), stringsAsFactors = TRUE)
-  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  fluoro1.norm.mat <- as.data.frame(unclass(fluoro1.norm.mat), stringsAsFactors = TRUE)
-  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat <- as.data.frame(unclass(fluoro2.norm.mat), stringsAsFactors = TRUE)
+  if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat <- as.data.frame(unclass(fl.mat), stringsAsFactors = TRUE)
+  # if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat <- as.data.frame(unclass(fluoro2.mat), stringsAsFactors = TRUE)
+  if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat <- as.data.frame(unclass(fl.norm.mat), stringsAsFactors = TRUE)
+  # if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat <- as.data.frame(unclass(fluoro2.norm.mat), stringsAsFactors = TRUE)
   #convert values from factor to numeric
   if(length(dat)>1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
-  if((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1))    fluoro1.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.mat[, -(1:3)]))
-  if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
-  if(((length(data.fluoro1) > 1 ) || !is.na(data.fluoro1)) && length(dat)>1)  fluoro1.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.norm.mat[, -(1:3)]))
-  if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
+  if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, -(1:3)]))
+  # if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
+  if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, -(1:3)]))
+  # if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
 
   # if identical time values are present, combine the respective measurement as their mean
   ## create list with unique time values and their frequencies
@@ -518,58 +509,58 @@ read_data <-
           }
         }
 
-        if(length(fluoro1.mat) > 1){
-          f1.ls[[i]] <- c(fluoro1.mat[i, 1:3], fluoro1.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+        if(length(fl.mat) > 1){
+          f1.ls[[i]] <- c(fl.mat[i, 1:3], fl.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
           for(j in 1:length(ndx.average.first)){
-            f1.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro1.mat[i, (col.ndx[[j]]+3)]))
+            f1.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.mat[i, (col.ndx[[j]]+3)]))
           }
         }
 
-        if(length(fluoro2.mat) > 1){
-          f2.ls[[i]] <- c(fluoro2.mat[i, 1:3], fluoro2.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+        # if(length(fluoro2.mat) > 1){
+        #   f2.ls[[i]] <- c(fluoro2.mat[i, 1:3], fluoro2.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+        #   for(j in 1:length(ndx.average.first)){
+        #     f2.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro2.mat[i, (col.ndx[[j]]+3)]))
+        #   }
+        # }
+
+        if(length(fl.norm.mat) > 1){
+          f1.norm.ls[[i]] <- c(fl.norm.mat[i, 1:3], fl.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
           for(j in 1:length(ndx.average.first)){
-            f2.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro2.mat[i, (col.ndx[[j]]+3)]))
+            f1.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.norm.mat[i, (col.ndx[[j]]+3)]))
           }
         }
 
-        if(length(fluoro1.norm.mat) > 1){
-          f1.norm.ls[[i]] <- c(fluoro1.norm.mat[i, 1:3], fluoro1.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
-          for(j in 1:length(ndx.average.first)){
-            f1.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro1.norm.mat[i, (col.ndx[[j]]+3)]))
-          }
-        }
-
-        if(length(fluoro2.norm.mat) > 1){
-          f2.norm.ls[[i]] <- c(fluoro2.norm.mat[i, 1:3], fluoro2.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
-          for(j in 1:length(ndx.average.first)){
-            f2.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro2.norm.mat[i, (col.ndx[[j]]+3)]))
-          }
-        }
+        # if(length(fluoro2.norm.mat) > 1){
+        #   f2.norm.ls[[i]] <- c(fluoro2.norm.mat[i, 1:3], fluoro2.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
+        #   for(j in 1:length(ndx.average.first)){
+        #     f2.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro2.norm.mat[i, (col.ndx[[j]]+3)]))
+        #   }
+        # }
       } # if(length(t.mult[[i]])>1)
     } # for(i in 1:length(t.mult))
 
     t.mat <- do.call(rbind, t.ls)
     if(length(dat.mat) > 1) dat.mat <- as.data.frame(unclass(do.call(rbind, dat.ls)), stringsAsFactors = TRUE)
-    if(length(fluoro1.mat) > 1) fluoro1.mat <- as.data.frame(unclass(do.call(rbind, f1.ls)), stringsAsFactors = TRUE)
-    if(length(fluoro2.mat) > 1) fluoro2.mat <- as.data.frame(unclass(do.call(rbind, f2.ls)), stringsAsFactors = TRUE)
-    if(length(fluoro1.norm.mat) > 1) fluoro1.norm.mat <- as.data.frame(unclass(do.call(rbind, f1.norm.ls)), stringsAsFactors = TRUE)
-    if(length(fluoro2.norm.mat) > 1) fluoro2.norm.mat <- as.data.frame(unclass(do.call(rbind, f2.norm.ls)), stringsAsFactors = TRUE)
+    if(length(fl.mat) > 1) fl.mat <- as.data.frame(unclass(do.call(rbind, f1.ls)), stringsAsFactors = TRUE)
+    # if(length(fluoro2.mat) > 1) fluoro2.mat <- as.data.frame(unclass(do.call(rbind, f2.ls)), stringsAsFactors = TRUE)
+    if(length(fl.norm.mat) > 1) fl.norm.mat <- as.data.frame(unclass(do.call(rbind, f1.norm.ls)), stringsAsFactors = TRUE)
+    # if(length(fluoro2.norm.mat) > 1) fluoro2.norm.mat <- as.data.frame(unclass(do.call(rbind, f2.norm.ls)), stringsAsFactors = TRUE)
 
     #convert values from factor to numeric
     if(length(dat.mat) > 1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
-    if(length(fluoro1.mat) > 1)    fluoro1.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.mat[, -(1:3)]))
-    if(length(fluoro2.mat) > 1)    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
-    if(length(fluoro1.norm.mat) > 1)  fluoro1.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro1.norm.mat[, -(1:3)]))
-    if(length(fluoro2.norm.mat) > 1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
+    if(length(fl.mat) > 1)    fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, -(1:3)]))
+    # if(length(fluoro2.mat) > 1)    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
+    if(length(fl.norm.mat) > 1)  fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, -(1:3)]))
+    # if(length(fluoro2.norm.mat) > 1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
 
   } # if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1))
 
   dataset <- list("time" = t.mat,
                   "density" = dat.mat,
-                  "fluorescence1" = fluoro1.mat,
-                  "fluorescence2" = fluoro2.mat,
-                  "norm.fluorescence1" = fluoro1.norm.mat,
-                  "norm.fluorescence2" = fluoro2.norm.mat,
+                  "fluorescence" = fl.mat,
+                  # "fluorescence2" = fluoro2.mat,
+                  "norm.fluorescence" = fl.norm.mat,
+                  # "norm.fluorescence2" = fluoro2.norm.mat,
                   "expdesign" = expdesign)
 
   class(dataset) <- "grodata"
@@ -711,14 +702,15 @@ parse_data <-
     }
     if(length(data.ls)==1){
       names(data.ls) <- "density"
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = NA, data.fluoro2 = NA, subtract.blank = subtract.blank, calibration = calibration)
-    } else if(length(data.ls)==2){
-      names(data.ls) <- c("density", "fluorescence1")
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = NA, subtract.blank = subtract.blank, calibration = calibration)
+      grodata <- read_data(data.density = data.ls[[1]], data.fl = NA, subtract.blank = subtract.blank, calibration = calibration)
     } else {
-      names(data.ls) <- c("density", "fluorescence1", "fluorescence2")
-      grodata <- read_data(data.density = data.ls[[1]], data.fluoro1 = data.ls[[2]], data.fluoro2 = data.ls[[3]], subtract.blank = subtract.blank, calibration = calibration)
+      names(data.ls) <- c("density", "fluorescence")
+      grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration)
     }
+    # else {
+    #   names(data.ls) <- c("density", "fluorescence", "fluorescence2")
+    #   grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration)
+    # }
     return(grodata)
   }
 
@@ -1212,7 +1204,7 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
 #'
 #' @param time (optional) A matrix containing time values for each sample.
 #' @param data  Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
-#'   \item a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes,
+#'   \item a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, a \code{'fluorescence'} dataframes,
 #'   or \item a dataframe containing density values (if a \code{time} matrix is provided as separate argument).}
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}},
 #'   defining relevant fitting options.

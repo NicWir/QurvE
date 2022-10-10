@@ -744,7 +744,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' \code{flFit} performs all computational fluorescence fitting operations based on the user input.
 #'
 #' @param fl_data Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
-#'   \item a list containing a \code{'time'} matrix (for x_type == "time") or \code{'density'} dataframe (for x_type == "density") and, \code{'fluorescence1'} and \code{'fluorescence2'} (if applicable) dataframes,
+#'   \item a list containing a \code{'time'} matrix (for x_type == "time") or \code{'density'} dataframe (for x_type == "density") and a \code{'fluorescence'} dataframes,
 #'   or \item a dataframe containing (normalized) fluorescence values (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).}
 #' @param time (optional) A matrix containing time values for each sample.
 #' @param density (optional) A dataframe containing density values for each sample and sample identifiers in the first three columns.
@@ -809,7 +809,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
   } else if(!is.null(fl_data)){
     time <- fl_data$time
     density <- fl_data$density
-    fl_data <- fl_data$fluorescence1
+    fl_data <- fl_data$fluorescence
   }
   # /// check if start density values are above min.density in all samples
   if(!is.null(density) && length(density) > 1){
@@ -2311,10 +2311,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' @return A \code{flFitRes} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{fl.report}}.
 #' \item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided. Else, extracted from \code{grofit}).}
 #' \item{data}{Raw data dataframe passed to the function as \code{grodata}.}
-#' \item{flFit1}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence1 data.}
-#' \item{flFit2}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence2 data.}
-#' \item{drFit1}{\code{drFit} or \code{drFitfl} object created with the call of \code{\link{growth.drFit}} or \code{\link{fl.drFit}} for fluorescence1 data (based on the \code{dr.method} argument in \code{control}; see \code{\link{fl.control}}).}
-#' \item{drFit2}{\code{drFit} or \code{drFitfl} object created with the call of \code{\link{growth.drFit}} or \code{\link{fl.drFit}} for fluorescence2 data (based on the \code{dr.method} argument in \code{control}; see \code{\link{fl.control}}).}
+#' \item{flFit}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence data.}
+#' \item{drFit}{\code{drFit} or \code{drFitfl} object created with the call of \code{\link{growth.drFit}} or \code{\link{fl.drFit}} for fluorescence data (based on the \code{dr.method} argument in \code{control}; see \code{\link{fl.control}}).}
 #' \item{expdesign}{Experimental design table inherited from \code{grodata} or created from the identifier columns (columns 1-3) in \code{data}.}
 #' \item{control}{Object of class \code{fl.control} created with the call of \code{\link{fl.control}}.}
 #' @export
@@ -2393,14 +2391,14 @@ fl.workflow <- function(grodata = NULL,
     if(!is.null(grodata$time)) time <- grodata$time
     if(!is.null(grodata$density)) density <- grodata$density
     if(!is.null(grodata$expdesign)) expdesign <- grodata$expdesign
-    if(!is.null(grodata$fluorescence1)) fluorescence1 <- grodata$fluorescence1
-    if(!is.null(grodata$fluorescence2)) fluorescence2 <- grodata$fluorescence2
-    if(!is.null(grodata$norm.fluorescence1)) norm.fluorescence1 <- grodata$norm.fluorescence1
-    if(!is.null(grodata$norm.fluorescence2)) norm.fluorescence2 <- grodata$norm.fluorescence2
+    if(!is.null(grodata$fluorescence)) fluorescence <- grodata$fluorescence
+    # if(!is.null(grodata$fluorescence2)) fluorescence2 <- grodata$fluorescence2
+    if(!is.null(grodata$norm.fluorescence)) norm.fluorescence <- grodata$norm.fluorescence
+    # if(!is.null(grodata$norm.fluorescence2)) norm.fluorescence2 <- grodata$norm.fluorescence2
 
     if(!is.null(time)) time <- time
     if(!is.null(density)) density <- density
-    if(!is.null(fl_data)) fluorescence1 <- fl_data
+    if(!is.null(fl_data)) fluorescence <- fl_data
   }
   control <- fl.control(fit.opt = fit.opt, norm_fl = norm_fl, x_type = x_type, t0 = t0, min.density = min.density, log.x.lin = log.x.lin,
                         log.x.spline = log.x.spline, log.y.lin = log.y.lin, log.y.spline = log.y.spline,
@@ -2414,88 +2412,88 @@ fl.workflow <- function(grodata = NULL,
   out.drFit <- NA
 
   # /// fit of fluorescence curves -----------------------------------
-  if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence1) && length(norm.fluorescence1) > 1 && !all(is.na(norm.fluorescence1)))){
+  if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence) && length(norm.fluorescence) > 1 && !all(is.na(norm.fluorescence)))){
     if ((control$suppress.messages==FALSE)){
       cat("\n\n")
-      cat(paste("=== Performing Fits for Fluorescence 1 =================================\n"))
+      cat(paste("=== Performing Fits for fluorescence =================================\n"))
       cat("----------------------------------------------------\n")
     }
     if(exists("shiny") && shiny == TRUE){
-      out.flFit1 <- flFit(time = time, density = density, fl_data = norm.fluorescence1, control = control, shiny = TRUE)
+      out.flFit <- flFit(time = time, density = density, fl_data = norm.fluorescence, control = control, shiny = TRUE)
     } else {
-      out.flFit1 <- flFit(time = time, density = density, fl_data = norm.fluorescence1, control = control, shiny = FALSE)
+      out.flFit <- flFit(time = time, density = density, fl_data = norm.fluorescence, control = control, shiny = FALSE)
     }
 
-  } else if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+  } else if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
     if(exists("shiny") && shiny == TRUE){
-      out.flFit1 <- flFit(time = time, density = density, fl_data = fluorescence1, control = control, shiny = TRUE)
+      out.flFit <- flFit(time = time, density = density, fl_data = fluorescence, control = control, shiny = TRUE)
     } else {
-      out.flFit1 <- flFit(time = time, density = density, fl_data = fluorescence1, control = control, shiny = FALSE)
+      out.flFit <- flFit(time = time, density = density, fl_data = fluorescence, control = control, shiny = FALSE)
     }
   }
-  if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence2) && length(norm.fluorescence2) > 1 && !all(is.na(norm.fluorescence2)))){
-    if ((control$suppress.messages==FALSE)){
-      cat("\n\n")
-      cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
-      cat("----------------------------------------------------\n")
-    }
-    if(exists("shiny") && shiny == TRUE){
-      out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control, shiny = TRUE)
-    } else {
-      out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control, shiny = FALSE)
-    }
-  } else if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-    if ((control$suppress.messages==FALSE)){
-      cat("\n\n")
-      cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
-      cat("----------------------------------------------------\n")
-    }
-    if(exists("shiny") && shiny == TRUE){
-      out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control, shiny = TRUE)
-    } else {
-      out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control, shiny = FALSE)
-    }
-  }
+  # if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence2) && length(norm.fluorescence2) > 1 && !all(is.na(norm.fluorescence2)))){
+  #   if ((control$suppress.messages==FALSE)){
+  #     cat("\n\n")
+  #     cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
+  #     cat("----------------------------------------------------\n")
+  #   }
+  #   if(exists("shiny") && shiny == TRUE){
+  #     out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control, shiny = TRUE)
+  #   } else {
+  #     out.flFit2 <- flFit(time = time, density = density, fl_data = norm.fluorescence2, control = control, shiny = FALSE)
+  #   }
+  # } else if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+  #   if ((control$suppress.messages==FALSE)){
+  #     cat("\n\n")
+  #     cat(paste("=== Performing Fits for Fluorescence 2 =================================\n"))
+  #     cat("----------------------------------------------------\n")
+  #   }
+  #   if(exists("shiny") && shiny == TRUE){
+  #     out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control, shiny = TRUE)
+  #   } else {
+  #     out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control, shiny = FALSE)
+  #   }
+  # }
 
   # /// Estimate EC50 values
   if (ec50 == TRUE) {
-    if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+    if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
       if ((control$suppress.messages==FALSE)){
         cat("\n\n")
-        cat(paste("=== Performing Dose-Response Analysis for  Fluorescence 1 =================================\n"))
+        cat(paste("=== Performing Dose-Response Analysis for  fluorescence =================================\n"))
         cat("----------------------------------------------------\n")
       }
       if(control$dr.method == "spline"){
-        out.drFit1 <- growth.drFit(summary.flFit(out.flFit1), control)
-        boot.ec1 <- out.drFit1$boot.ec
+        out.drFit <- growth.drFit(summary.flFit(out.flFit), control)
+        boot.ec1 <- out.drFit$boot.ec
       } else {
-        out.drFit1 <- fl.drFit(summary.flFit(out.flFit1), control)
+        out.drFit <- fl.drFit(summary.flFit(out.flFit), control)
         boot.ec1 <- NA
       }
-      EC50.table1 <- out.drFit1$drTable
+      EC50.table1 <- out.drFit$drTable
     }
-    if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-      if ((control$suppress.messages==FALSE)){
-        cat("\n\n")
-        cat(paste("=== Performing Dose-Response Analysis for  Fluorescence 2 =================================\n"))
-        cat("----------------------------------------------------\n")
-      }
-      if(control$dr.method == "spline"){
-        out.drFit2 <- growth.drFit(summary.flFit(out.flFit2), control)
-        boot.ec2 <- out.drFit2$boot.ec
-      } else {
-        out.drFit2 <- fl.drFit(summary.flFit(out.flFit2), control)
-        boot.ec2 <- NA
-      }
-      EC50.table2 <- out.drFit2$drTable
-    }
+    # if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+    #   if ((control$suppress.messages==FALSE)){
+    #     cat("\n\n")
+    #     cat(paste("=== Performing Dose-Response Analysis for  Fluorescence 2 =================================\n"))
+    #     cat("----------------------------------------------------\n")
+    #   }
+    #   if(control$dr.method == "spline"){
+    #     out.drFit2 <- growth.drFit(summary.flFit(out.flFit2), control)
+    #     boot.ec2 <- out.drFit2$boot.ec
+    #   } else {
+    #     out.drFit2 <- fl.drFit(summary.flFit(out.flFit2), control)
+    #     boot.ec2 <- NA
+    #   }
+    #   EC50.table2 <- out.drFit2$drTable
+    # }
   }
   # ///
   na.obj <- NA
-  flFitRes <- list(time = time, data = grodata, flFit1 = get(ifelse(exists("out.flFit1"), "out.flFit1", "na.obj")),
-                   flFit2 = get(ifelse(exists("out.flFit2"), "out.flFit2", "na.obj")),
-                 drFit1 = get(ifelse(exists("out.drFit1"), "out.drFit1", "na.obj")),
-                 drFit2 = get(ifelse(exists("out.drFit2"), "out.drFit2", "na.obj")),
+  flFitRes <- list(time = time, data = grodata, flFit = get(ifelse(exists("out.flFit"), "out.flFit", "na.obj")),
+                   # flFit2 = get(ifelse(exists("out.flFit2"), "out.flFit2", "na.obj")),
+                 drFit = get(ifelse(exists("out.drFit"), "out.drFit", "na.obj")),
+                 # drFit2 = get(ifelse(exists("out.drFit2"), "out.drFit2", "na.obj")),
                  expdesign = expdesign, control = control)
   class(flFitRes) <- "flFitRes"
 
@@ -2508,71 +2506,71 @@ fl.workflow <- function(grodata = NULL,
     }
     dir.create(wd, showWarnings = F)
 
-    if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
-      flTable1 <- data.frame(apply(flFitRes[["flFit1"]][["flTable"]],2,as.character))
-      res.table.fl1 <- cbind(flTable1[,1:3], Filter(function(x) !all(is.na(x)),flTable1[,-(1:3)]))
-      export_Table(table = res.table.fl1, out.dir = wd, out.nm = "results.fl1")
-      cat(paste0("\nResults of fluorescence 1 analysis saved as tab-delimited text file in:\n",
+    if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
+      flTable <- data.frame(apply(flFitRes[["flFit"]][["flTable"]],2,as.character))
+      res.table.fl <- cbind(flTable[,1:3], Filter(function(x) !all(is.na(x)),flTable[,-(1:3)]))
+      export_Table(table = res.table.fl, out.dir = wd, out.nm = "results.fl1")
+      cat(paste0("\nResults of fluorescence analysis saved as tab-delimited text file in:\n",
                  wd, "/results.fl1.txt\n"))
       # Export grouped results table
       if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
-        table_linear_group <- table_group_fluorescence_linear(res.table.fl1)
+        table_linear_group <- table_group_fluorescence_linear(res.table.fl)
         names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
         table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
         colnames(table_linear_group) <- names
-        export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence1_linear")
+        export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence_linear")
       }
 
       if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
-        table_spline_group <- table_group_fluorescence_spline(res.table.fl1)
+        table_spline_group <- table_group_fluorescence_spline(res.table.fl)
         names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
         table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
         colnames(table_spline_group) <- names
-        export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence1_spline")
+        export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence_spline")
       }
     }
-    if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-      flTable2 <- data.frame(apply(flFitRes[["flFit2"]][["flTable"]],2,as.character))
-      res.table.fl2 <- cbind(flTable2[,1:3], Filter(function(x) !all(is.na(x)),flTable2[,-(1:3)]))
-      export_Table(table = res.table.fl2, out.dir = wd, out.nm = "results.fl2")
-      cat(paste0("Results of fluorescence 2 analysis saved as tab-delimited text file in:\n",
-                 wd, "/results.fl2.txt\n"))
-      # Export grouped results table
-      if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
-        table_linear_group <- table_group_fluorescence_linear(res.table.fl2)
-        names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
-        table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
-        colnames(table_linear_group) <- names
-        export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_linear")
-      }
-
-      if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
-        table_spline_group <- table_group_fluorescence_spline(res.table.fl2)
-        names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
-        table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
-        colnames(table_spline_group) <- names
-        export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_spline")
-      }
-    }
+    # if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+    #   flTable2 <- data.frame(apply(flFitRes[["flFit2"]][["flTable"]],2,as.character))
+    #   res.table.fl2 <- cbind(flTable2[,1:3], Filter(function(x) !all(is.na(x)),flTable2[,-(1:3)]))
+    #   export_Table(table = res.table.fl2, out.dir = wd, out.nm = "results.fl2")
+    #   cat(paste0("Results of fluorescence 2 analysis saved as tab-delimited text file in:\n",
+    #              wd, "/results.fl2.txt\n"))
+    #   # Export grouped results table
+    #   if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
+    #     table_linear_group <- table_group_fluorescence_linear(res.table.fl2)
+    #     names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
+    #     table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
+    #     colnames(table_linear_group) <- names
+    #     export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_linear")
+    #   }
+    #
+    #   if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
+    #     table_spline_group <- table_group_fluorescence_spline(res.table.fl2)
+    #     names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
+    #     table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
+    #     colnames(table_spline_group) <- names
+    #     export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_spline")
+    #   }
+    # }
 
     if (ec50 == TRUE) {
-      if (!is.null(fluorescence1) && length(fluorescence1) > 1 && !all(is.na(fluorescence1))){
+      if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
         if(!is.null(EC50.table1) && length(EC50.table1) > 1) {
           res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
           export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
-          cat(paste0("\nResults of EC50 analysis for fluorescence 1 saved as tab-delimited in:\n",
+          cat(paste0("\nResults of EC50 analysis for fluorescence saved as tab-delimited in:\n",
                      wd, "/results.fl_dr1.txt\n"))
         }
       }
-      if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
-        if(!is.null(EC50.table2) && length(EC50.table2) > 1) {
-          res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
-          export_Table(table = res.table.dr_fl2, out.dir = wd, out.nm = "results.fl_dr2")
-
-          cat(paste0("Results of EC50 analysis for fluorescence 2 saved as tab-delimited in:\n",
-                     wd, "/results.fl_dr2.txt\n"))
-        }
-      }
+      # if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
+      #   if(!is.null(EC50.table2) && length(EC50.table2) > 1) {
+      #     res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
+      #     export_Table(table = res.table.dr_fl2, out.dir = wd, out.nm = "results.fl_dr2")
+      #
+      #     cat(paste0("Results of EC50 analysis for fluorescence 2 saved as tab-delimited in:\n",
+      #                wd, "/results.fl_dr2.txt\n"))
+      #   }
+      # }
 
 
     } else {
@@ -2643,38 +2641,38 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
 
   if(!exists("mean.grp") || mean.grp==mean.grp) mean.grp <- NA
   if(!exists("mean.conc") || mean.conc==mean.conc) mean.conc <- NA
-  flFit1 <- flFitRes$flFit1
-  drFit1 <- flFitRes$drFit1
-  flFit2 <- flFitRes$flFit2
-  drFit2 <- flFitRes$drFit2
+  flFit <- flFitRes$flFit
+  drFit <- flFitRes$drFit
+  # flFit2 <- flFitRes$flFit2
+  # drFit2 <- flFitRes$drFit2
 
   control <- flFitRes$control
   time <- flFitRes$time
   data <- flFitRes$data
-  if(!exists("res.table.fl1")){
-    res.table.fl1 <- flFitRes$flFit1$flTable
+  if(!exists("res.table.fl")){
+    res.table.fl <- flFitRes$flFit$flTable
   }
-  if(!exists("res.table.dr1")){
-    if(length(flFitRes$drFit1)>1 && length(flFitRes$drFit1$drTable)>2) res.table.dr1 <- flFitRes$drFit1$drTable
+  if(!exists("res.table.dr")){
+    if(length(flFitRes$drFit)>1 && length(flFitRes$drFit$drTable)>2) res.table.dr <- flFitRes$drFit$drTable
   }
-  if(!exists("res.table.gc2")){
-    if(length(flFit2)>1){
-      res.table.fl2 <- flFitRes$flFit2$flTable
-    }
-  }
-  if(!exists("res.table.dr2")){
-    if(length(flFitRes$drFit2)>1 && !is.na(flFitRes$drFit2$drTable)) res.table.dr2 <- flFitRes$drFit2$drTable
-  }
+  # if(!exists("res.table.gc2")){
+  #   if(length(flFit2)>1){
+  #     res.table.fl2 <- flFitRes$flFit2$flTable
+  #   }
+  # }
+  # if(!exists("res.table.dr2")){
+  #   if(length(flFitRes$drFit2)>1 && !is.na(flFitRes$drFit2$drTable)) res.table.dr2 <- flFitRes$drFit2$drTable
+  # }
   if(any(c("a", "s") %in% flFitRes$control$fit.opt)){
     # find minimum and maximum mu values in whole dataset to equilibrate derivative plots for spline fits
-    mu.min1 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit1$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1)), NA, min(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
+    mu.min1 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1)), NA, min(flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
     if(mu.min1 >0) mu.min1 <- 0
-    mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit1$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1)), NA, max(flFitRes$flFit1$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
-    if(length(flFit2)>1){
-      mu.min2 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit2$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)), NA, min(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
-      if(mu.min2 >0) mu.min2 <- 0
-      mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)), NA, max(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
-    }
+    mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1)), NA, max(flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
+  #   if(length(flFit2)>1){
+  #     mu.min2 <- suppressWarnings(min(sapply(1:length(flFitRes$flFit2$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)), NA, min(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
+  #     if(mu.min2 >0) mu.min2 <- 0
+  #     mu.max1 <- suppressWarnings(max(sapply(1:length(flFitRes$flFit2$flFittedSplines), function(x) ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)), NA, max(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))), na.rm = TRUE))*1.05
+  #   }
   }
 
   if(!is.null(out.dir)){

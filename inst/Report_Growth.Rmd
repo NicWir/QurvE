@@ -79,6 +79,7 @@ The following parameters were used to fit the data:
 \pagebreak
 
 ## Growth fit results
+
 ### Grouped results
 ```{r table_linear_group, echo=F, warning=F, message=F, results='asis'}
 if(any(c("a", "l") %in% control$fit.opt)){
@@ -141,6 +142,7 @@ try(plot.parameter(grofit, param = "lambda.spline", export = export, out.dir = p
 try(plot.parameter(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
 ```
 \clearpage
+
 ### Individual samples
 ```{r table_linear, echo=F, warning=F, message=F, results='asis'}
 if(any(c("a", "l") %in% control$fit.opt)){

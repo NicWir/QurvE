@@ -195,42 +195,42 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             )
                                                           )
                                                         ),
-                                                        #____Fluorescence 1___________
+                                                        #____Fluorescence___________
                                                         wellPanel(
                                                           h4(strong("Fluorescence data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
                                                           style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
 
-                                                          fileInput(inputId = 'custom_file_fluorescence1',
+                                                          fileInput(inputId = 'custom_file_fluorescence',
                                                                     label = 'Fluorescence data 1',
                                                                     accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
                                                           ),
 
                                                           conditionalPanel(
-                                                            condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'xlsx'",
+                                                            condition = "output.fluorescencefileUploaded && output.custom_fluorescence_format == 'xlsx'",
 
-                                                            selectInput(inputId = "custom_fluorescence1_sheets",
+                                                            selectInput(inputId = "custom_fluorescence_sheets",
                                                                         label = "Select Sheet",
                                                                         choices = "Sheet1")
                                                           ), # select sheet: conditional
                                                           conditionalPanel(
-                                                            condition = "output.fluorescence1fileUploaded && output.custom_fluorescence1_format == 'csv'",
+                                                            condition = "output.fluorescencefileUploaded && output.custom_fluorescence_format == 'csv'",
 
-                                                            selectInput(inputId = "separator_custom_fluorescence1",
+                                                            selectInput(inputId = "separator_custom_fluorescence",
                                                                         label = "Select separator",
                                                                         choices = c("," = ",",
                                                                                     ";" = ";")
                                                             ),
 
-                                                            selectInput(inputId = "decimal_separator_custom_fluorescence1",
+                                                            selectInput(inputId = "decimal_separator_custom_fluorescence",
                                                                         label = "Select Decimal separator",
                                                                         choices = c("." = ".",
                                                                                     "," = ",")
                                                             )
                                                           ),
                                                           conditionalPanel(
-                                                            condition = "output.fluorescence1fileUploaded && (output.custom_fluorescence1_format == 'tsv' || output.custom_fluorescence1_format == 'txt')",
+                                                            condition = "output.fluorescencefileUploaded && (output.custom_fluorescence_format == 'tsv' || output.custom_fluorescence_format == 'txt')",
 
-                                                            selectInput(inputId = "decimal_separator_custom_fluorescence1",
+                                                            selectInput(inputId = "decimal_separator_custom_fluorescence",
                                                                         label = "Select Decimal separator",
                                                                         choices = c("." = ".",
                                                                                     "," = ",")
@@ -307,7 +307,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ),
 
                                                         conditionalPanel(
-                                                          condition = 'output.growthfileUploaded || output.fluorescence1fileUploaded || output.fluorescence1fileUploaded',
+                                                          condition = 'output.growthfileUploaded || output.fluorescencefileUploaded || output.fluorescencefileUploaded',
                                                           fluidRow(
                                                             column(12,
                                                                    div(
@@ -401,7 +401,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                           choices = ""
                                                               ),
 
-                                                              selectInput(inputId = "parsed_reads_fluorescence1",
+                                                              selectInput(inputId = "parsed_reads_fluorescence",
                                                                           label = "Fluorescence data 1",
                                                                           choices = ""
                                                               )
@@ -581,14 +581,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                               DT::dataTableOutput("growth_data_custom_processed")
                                                             )
                                                    ),
-                                                   # tabPanel(title = "Fluorescence 1", value = "tabPanel_custom_tables_fluorescence1",
+                                                   # tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence",
                                                    #          withSpinner(
-                                                   #            DT::dataTableOutput("custom_table_fluorescence1")
+                                                   #            DT::dataTableOutput("custom_table_fluorescence")
                                                    #          )
                                                    # ),
-                                                   tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence1_processed",
+                                                   tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence_processed",
                                                             withSpinner(
-                                                              DT::dataTableOutput("custom_table_fluorescence1_processed")
+                                                              DT::dataTableOutput("custom_table_fluorescence_processed")
                                                             )
                                                    ),
                                                    # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
@@ -608,8 +608,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                    tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
                                                             DT::dataTableOutput('parsed_data_table_density')
                                                    ),
-                                                   tabPanel(title = "Fluorescence", value = "tabPanel_parsed_tables_fluorescence1",
-                                                            DT::dataTableOutput('parsed_data_table_fluorescence1')
+                                                   tabPanel(title = "Fluorescence", value = "tabPanel_parsed_tables_fluorescence",
+                                                            DT::dataTableOutput('parsed_data_table_fluorescence')
                                                    ),
                                                    # tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
                                                    #          DT::dataTableOutput('parsed_data_table_fluorescence2')
@@ -1333,19 +1333,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                value = TRUE),
                                                                  conditionalPanel(
                                                                    condition = "!input.grouped_results_fluorescence_linear",
-                                                                   DT::dataTableOutput('results_table_fluorescence1_linear')
+                                                                   DT::dataTableOutput('results_table_fluorescence_linear')
                                                                  ),
                                                                  conditionalPanel(
                                                                    condition = "input.grouped_results_fluorescence_linear",
-                                                                   DT::dataTableOutput('results_table_fluorescence1_linear_group')
+                                                                   DT::dataTableOutput('results_table_fluorescence_linear_group')
                                                                  ),
                                                                  conditionalPanel(
                                                                    condition = "!input.grouped_results_fluorescence_linear",
-                                                                   downloadButton('download_table_fluorescence1_linear',"Download table")
+                                                                   downloadButton('download_table_fluorescence_linear',"Download table")
                                                                  ),
                                                                  conditionalPanel(
                                                                    condition = "input.grouped_results_fluorescence_linear",
-                                                                   downloadButton('download_table_fluorescence1_linear_group',"Download table")
+                                                                   downloadButton('download_table_fluorescence_linear_group',"Download table")
                                                                  ),
                                                         ),
                                                         tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Fluorescence_Spline",
@@ -1357,32 +1357,32 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                value = TRUE),
                                                                  conditionalPanel(
                                                                    condition = "!input.grouped_results_fluorescence_spline",
-                                                                   DT::dataTableOutput('results_table_fluorescence1_spline')
+                                                                   DT::dataTableOutput('results_table_fluorescence_spline')
                                                                  ),
                                                                  conditionalPanel(
                                                                    condition = "input.grouped_results_fluorescence_spline",
-                                                                   DT::dataTableOutput('results_table_fluorescence1_spline_group')
+                                                                   DT::dataTableOutput('results_table_fluorescence_spline_group')
                                                                  ),
                                                                  conditionalPanel(
                                                                    condition = "!input.grouped_results_fluorescence_spline",
-                                                                   downloadButton('download_table_fluorescence1_spline',"Download table")
+                                                                   downloadButton('download_table_fluorescence_spline',"Download table")
                                                                  ),
                                                                  conditionalPanel(
                                                                    condition = "input.grouped_results_fluorescence_spline",
-                                                                   downloadButton('download_table_fluorescence1_spline_group',"Download table")
+                                                                   downloadButton('download_table_fluorescence_spline_group',"Download table")
                                                                  ),
                                                         ),
                                                         tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Fluorescence_Spline_bt",
-                                                                 DT::dataTableOutput('results_table_fluorescence1_spline_bt'),
-                                                                 downloadButton('download_table_fluorescence1_spline_bt',"Download table")
+                                                                 DT::dataTableOutput('results_table_fluorescence_spline_bt'),
+                                                                 downloadButton('download_table_fluorescence_spline_bt',"Download table")
                                                         ),
                                                         tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Spline",
-                                                                 DT::dataTableOutput('results_table_fluorescence1_dr_spline'),
-                                                                 downloadButton('download_table_fluorescence1_dr_spline',"Download table")
+                                                                 DT::dataTableOutput('results_table_fluorescence_dr_spline'),
+                                                                 downloadButton('download_table_fluorescence_dr_spline',"Download table")
                                                         ),
                                                         tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Model",
-                                                                 DT::dataTableOutput('results_table_fluorescence1_dr_model'),
-                                                                 downloadButton('download_table_fluorescence1_dr_model',"Download table")
+                                                                 DT::dataTableOutput('results_table_fluorescence_dr_model'),
+                                                                 downloadButton('download_table_fluorescence_dr_model',"Download table")
                                                         )
                                             )
                                    )
@@ -3138,9 +3138,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    selectInput(inputId = "data_type_fluorescence_group_plot",
                                                                                label = "Data type",
-                                                                               choices = c("Raw fluorescence" = "raw1",
-                                                                                           "Spline fits FL" = "spline1",
-                                                                                           "Normalized FL" = "norm.fl1"
+                                                                               choices = c("Raw fluorescence" = "raw",
+                                                                                           "Spline fits FL" = "spline",
+                                                                                           "Normalized FL" = "norm.fl"
                                                                                )
                                                                    ),
 
@@ -3195,15 +3195,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    ),
 
                                                                    conditionalPanel(
-                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2' ||
-                                                                     input.data_type_fluorescence_group_plot == 'raw1' || input.data_type_fluorescence_group_plot == 'raw2'",
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline'  ||
+                                                                     input.data_type_fluorescence_group_plot == 'raw' ",
                                                                      checkboxInput(inputId = "plot_group_averages_fluorescence_group_plot",
                                                                                    label = "Plot group averages",
                                                                                    value = TRUE)
                                                                    ),
 
                                                                    conditionalPanel(
-                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline' ",
                                                                      checkboxInput(inputId = "plot_derivative_fluorescence_group_plot",
                                                                                    label = "Plot derivative",
                                                                                    value = TRUE)
@@ -3249,7 +3249,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      )
                                                                    ),
                                                                    conditionalPanel(
-                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline'",
                                                                      strong("y-Range (derivative)"),
                                                                      fluidRow(
                                                                        column(5,
@@ -3279,7 +3279,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    ),
 
                                                                    conditionalPanel(
-                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline1' || input.data_type_fluorescence_group_plot == 'spline2'",
+                                                                     condition = "input.data_type_fluorescence_group_plot == 'spline' ",
                                                                      textInput(inputId = "y_axis_title_derivative_fluorescence_group_plot",
                                                                                label = "y-axis title derivative",
                                                                                value = ""
@@ -3356,8 +3356,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    selectInput(inputId = "fluorescence_type_dual_plot",
                                                                                label = "Fluorescence type",
-                                                                               choices = c("Fluorescence" = "fl1",
-                                                                                           "Normalized fluorescence" = "norm.fl1"
+                                                                               choices = c("Fluorescence" = "fl",
+                                                                                           "Normalized fluorescence" = "norm.fl"
                                                                                )
                                                                    ),
 
@@ -4416,7 +4416,7 @@ server <- function(input, output, session){
       grodata <- NULL
     }
     if(!is.null(grodata)){
-      if(length(grodata$fluorescence1) < 2){
+      if(length(grodata$fluorescence) < 2){
         shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Computation_Fluorescence]")
       } else {
         shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Computation_Fluorescence]")
@@ -4569,7 +4569,7 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(FALSE)
 
-    if(length(grodata$fluorescence1) > 1 || length(grodata$fluorescence2) > 1){
+    if(length(grodata$fluorescence) > 1 || length(grodata$fluorescence2) > 1){
       return(TRUE)
     } else return(FALSE)
   })
@@ -4584,14 +4584,14 @@ server <- function(input, output, session){
   })
   outputOptions(output, 'growthfileUploaded', suspendWhenHidden=FALSE)
 
-  ### Test if custom_file_fluorescence1 was loaded
-  output$fluorescence1fileUploaded <- reactive({
-    if(is.null(input$custom_file_fluorescence1)) return(FALSE)
+  ### Test if custom_file_fluorescence was loaded
+  output$fluorescencefileUploaded <- reactive({
+    if(is.null(input$custom_file_fluorescence)) return(FALSE)
     else return(TRUE)
   })
-  outputOptions(output, 'fluorescence1fileUploaded', suspendWhenHidden=FALSE)
+  outputOptions(output, 'fluorescencefileUploaded', suspendWhenHidden=FALSE)
 
-  ### Test if custom_file_fluorescence1 was loaded
+  ### Test if custom_file_fluorescence was loaded
   # output$fluorescence2fileUploaded <- reactive({
   #   if(is.null(input$custom_file_fluorescence2)) return(FALSE)
   #   else return(TRUE)
@@ -4602,24 +4602,24 @@ server <- function(input, output, session){
   observeEvent(input$read_custom,{
     showModal(modalDialog("Reading data input...", footer=NULL))
     density.file <- input$custom_file_density
-    fl1.file <- input$custom_file_fluorescence1
+    fl.file <- input$custom_file_fluorescence
     # fl2.file <- input$custom_file_fluorescence2
 
-    if(is.null(density.file) && is.null(fl1.file) && is.null(fl2.file)) return(NULL)
+    if(is.null(density.file) && is.null(fl.file) && is.null(fl2.file)) return(NULL)
 
     ## Read data
     try(
       results$custom_data <- read_data(data.density = density.file$datapath,
-                                       data.fluoro1 = fl1.file$datapath,
+                                       data.fluoro1 = fl.file$datapath,
                                        # data.fluoro2 = fl2.file$datapath,
                                        data.format = "col",
                                        sheet.density = input$custom_growth_sheets,
-                                       sheet.fluoro1 = input$custom_fluorescence1_sheets,
+                                       sheet.fluoro1 = input$custom_fluorescence_sheets,
                                        # sheet.fluoro2 = input$custom_fluorescence2_sheets,
                                        csvsep = input$separator_custom_density,
                                        dec = input$decimal_separator_custom_density,
-                                       csvsep.fl1 = input$separator_custom_density,
-                                       dec.fl1 = input$decimal_separator_custom_density,
+                                       csvsep.fl = input$separator_custom_density,
+                                       dec.fl = input$decimal_separator_custom_density,
                                        # csvsep.fl2 = input$separator_custom_density,
                                        # dec.fl2 = input$decimal_separator_custom_density,
                                        subtract.blank = input$subtract_blank_custom,
@@ -4644,10 +4644,10 @@ server <- function(input, output, session){
       # Remove eventually pre-loaded parsed data
       results$parsed_data <- NULL
       hide("parsed_reads_density")
-      hide("parsed_reads_fluorescence1")
+      hide("parsed_reads_fluorescence")
       # hide("parsed_reads_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
       # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
@@ -4735,12 +4735,12 @@ server <- function(input, output, session){
 
   ### Render experimental design table
   custom_data_table_expdesign <- reactive({
-    if(is.null(growth_data_custom_processed()) && is.null(custom_table_fluorescence1_processed())) return(NULL)
+    if(is.null(growth_data_custom_processed()) && is.null(custom_table_fluorescence_processed())) return(NULL)
     else if(!is.null(growth_data_custom_processed())){
       dat <- growth_data_custom_processed()
     }
-    else if(!is.null(custom_table_fluorescence1_processed())){
-      dat <- custom_table_fluorescence1_processed()
+    else if(!is.null(custom_table_fluorescence_processed())){
+      dat <- custom_table_fluorescence_processed()
     }
 
     dat.mat <- t(dat)
@@ -4768,10 +4768,10 @@ server <- function(input, output, session){
     # } else {
     #   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
     # }
-    # if(exists("custom_table_fluorescence1") && !is.null(custom_table_fluorescence1()) && is.null(custom_table_fluorescence1_processed()) ){
-    #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1", select = TRUE)
+    # if(exists("custom_table_fluorescence") && !is.null(custom_table_fluorescence()) && is.null(custom_table_fluorescence_processed()) ){
+    #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence", select = TRUE)
     # } else {
-    #   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
+    #   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence")
     # }
     if(exists("custom_data_table_expdesign") && !is.null(custom_data_table_expdesign())){
       showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
@@ -4783,24 +4783,24 @@ server <- function(input, output, session){
     } else {
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed")
     }
-    if(exists("custom_table_fluorescence1_processed") && !is.null(custom_table_fluorescence1_processed()) ){
-      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1_processed", select = TRUE)
+    if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) ){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed", select = TRUE)
     } else {
-      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1_processed")
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
     }
   })
 
 
-  ### Render custom fluorescence 1 table
-  custom_table_fluorescence1 <- reactive({
-    inFile <- input$custom_file_fluorescence1
+  ### Render custom fluorescence table
+  custom_table_fluorescence <- reactive({
+    inFile <- input$custom_file_fluorescence
 
     if(is.null(inFile))
       return(NULL)
 
     filename <- inFile$datapath
-    dec <- input$decimal_separator_custom_fluorescence1
-    csvsep <- input$separator_custom_fluorescence1
+    dec <- input$decimal_separator_custom_fluorescence
+    csvsep <- input$separator_custom_fluorescence
     if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
       f1 <-
         utils::read.csv(
@@ -4822,7 +4822,7 @@ server <- function(input, output, session){
           HTML("<strong>Reading data file...</strong><br><br><i>Note: Reading .xls/.xlsx files can take up to several minutes. Consider saving as .csv/.tsv/.txt before running QurvE.</i>"),
           footer=NULL))
       try(
-        f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence1_sheets, progress = T)))
+        f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence_sheets, progress = T)))
       )
       removeModal()
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
@@ -4862,8 +4862,8 @@ server <- function(input, output, session){
     } else return(NULL)
   })
 
-  output$custom_table_fluorescence1 <- DT::renderDT({
-    f1 <- custom_table_fluorescence1()
+  output$custom_table_fluorescence <- DT::renderDT({
+    f1 <- custom_table_fluorescence()
     DT::datatable(f1,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f1)-3)))
@@ -4891,24 +4891,24 @@ server <- function(input, output, session){
   })
 
   # render processed fluorescence table
-  custom_table_fluorescence1_processed <- reactive({
+  custom_table_fluorescence_processed <- reactive({
 
-    if(is.null(results$custom_data) || length(results$custom_data$fluorescence1)<2) return(NULL)
+    if(is.null(results$custom_data) || length(results$custom_data$fluorescence)<2) return(NULL)
 
-    table_fl1 <- t(results$custom_data$fluorescence1)
-    table_fl1[-(1:3), ] <- apply(apply(table_fl1[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
-    rownames(table_fl1)[-(1:3)] <- ""
-    table_fl1 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
-                       table_fl1)
+    table_fl <- t(results$custom_data$fluorescence)
+    table_fl[-(1:3), ] <- apply(apply(table_fl[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+    rownames(table_fl)[-(1:3)] <- ""
+    table_fl <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
+                       table_fl)
 
-    table_fl1
+    table_fl
   })
 
-  output$custom_table_fluorescence1_processed <- DT::renderDT({
-    table_fl1 <- custom_table_fluorescence1_processed()
-    DT::datatable(table_fl1,
+  output$custom_table_fluorescence_processed <- DT::renderDT({
+    table_fl <- custom_table_fluorescence_processed()
+    DT::datatable(table_fl,
                            options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
+                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl)-3)))
   })
 
   ### Render custom fluorescence 2 table
@@ -5006,15 +5006,15 @@ server <- function(input, output, session){
   })
   outputOptions(output, 'custom_density_format', suspendWhenHidden=FALSE)
 
-  output$custom_fluorescence1_format <- reactive({
-    if(is.null(input$custom_file_fluorescence1)) return(NULL)
+  output$custom_fluorescence_format <- reactive({
+    if(is.null(input$custom_file_fluorescence)) return(NULL)
 
-    filename <- input$custom_file_fluorescence1$name
+    filename <- input$custom_file_fluorescence$name
 
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     format
   })
-  outputOptions(output, 'custom_fluorescence1_format', suspendWhenHidden=FALSE)
+  outputOptions(output, 'custom_fluorescence_format', suspendWhenHidden=FALSE)
 
   # output$custom_fluorescence2_format <- reactive({
   #   if(is.null(input$custom_file_fluorescence2)) return(NULL)
@@ -5035,12 +5035,12 @@ server <- function(input, output, session){
     sheets
   })
 
-  fluorescence1_excel_sheets <- reactive({
-    filename <- input$custom_file_fluorescence1$datapath
-    if(is.null(input$custom_file_fluorescence1)) return("")
+  fluorescence_excel_sheets <- reactive({
+    filename <- input$custom_file_fluorescence$datapath
+    if(is.null(input$custom_file_fluorescence)) return("")
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     if(format != "xlsx" && format != "xls") return("")
-    sheets <- readxl::excel_sheets(input$custom_file_fluorescence1$datapath)
+    sheets <- readxl::excel_sheets(input$custom_file_fluorescence$datapath)
     sheets
   })
 
@@ -5059,8 +5059,8 @@ server <- function(input, output, session){
     )})
 
   observe({
-    updateSelectInput(inputId = "custom_fluorescence1_sheets",
-                      choices = fluorescence1_excel_sheets()
+    updateSelectInput(inputId = "custom_fluorescence_sheets",
+                      choices = fluorescence_excel_sheets()
     )})
 
   # observe({
@@ -5074,11 +5074,11 @@ server <- function(input, output, session){
   ### Hide elements to guide user
   hide("Parsed_Data_Tables")
   hide("parsed_reads_density")
-  hide("parsed_reads_fluorescence1")
+  hide("parsed_reads_fluorescence")
   # hide("parsed_reads_fluorescence2")
   hide("parse_data")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
   # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
@@ -5231,7 +5231,7 @@ server <- function(input, output, session){
     }
     if(exists("reads") && length(reads) > 0){
       show("parsed_reads_density")
-      if(length(reads)>1) show("parsed_reads_fluorescence1")
+      if(length(reads)>1) show("parsed_reads_fluorescence")
       if(length(reads)>2) show("parsed_reads_fluorescence2")
       show("parse_data")
       removeModal()
@@ -5255,7 +5255,7 @@ server <- function(input, output, session){
     )
   })
   observe({
-    updateSelectInput(inputId = "parsed_reads_fluorescence1",
+    updateSelectInput(inputId = "parsed_reads_fluorescence",
                       choices = selected_inputs_parsed_reads()
     )
   })
@@ -5294,15 +5294,15 @@ server <- function(input, output, session){
           dec.map = input$decimal_separator_map,
           subtract.blank = input$subtract_blank_plate_reader,
           density.nm = input$parsed_reads_density,
-          fl1.nm = ifelse(
-            input$parsed_reads_fluorescence1 == input$parsed_reads_density,
+          fl.nm = ifelse(
+            input$parsed_reads_fluorescence == input$parsed_reads_density,
             NA,
-            input$parsed_reads_fluorescence1
+            input$parsed_reads_fluorescence
           ),
           calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, "")
           # fl2.nm = ifelse(
           #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
           #   NA,
           #   input$parsed_reads_fluorescence2
           # )
@@ -5338,17 +5338,17 @@ server <- function(input, output, session){
           dec.map = input$decimal_separator_map,
           subtract.blank = input$subtract_blank_plate_reader,
           density.nm = input$parsed_reads_density,
-          fl1.nm = ifelse(
-            input$parsed_reads_fluorescence1 == input$parsed_reads_density,
+          fl.nm = ifelse(
+            input$parsed_reads_fluorescence == input$parsed_reads_density,
             NA,
-            input$parsed_reads_fluorescence1
+            input$parsed_reads_fluorescence
           ),
           calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, "")
           # fl2.nm = ifelse(
           #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence1,
+          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
           #   NA,
-          #   input$parsed_reads_fluorescence1
+          #   input$parsed_reads_fluorescence
           # )
         )
       )
@@ -5363,8 +5363,8 @@ server <- function(input, output, session){
       show("run_growth")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
-    if("fluorescence1" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence1)>1){
-      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence1")
+    if("fluorescence" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence)>1){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
     # if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
@@ -5373,7 +5373,7 @@ server <- function(input, output, session){
     # Remove eventually pre-loaded custom data
     results$custom_data <- NULL
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
-    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence1")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence")
     # hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
 
@@ -5400,21 +5400,21 @@ server <- function(input, output, session){
 
     table_density
   })
-  output$parsed_data_table_fluorescence1 <- DT::renderDT({
+  output$parsed_data_table_fluorescence <- DT::renderDT({
 
-    if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence1)<2) return(NULL)
+    if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence)<2) return(NULL)
 
-    table_fl1 <- t(results$parsed_data$fluorescence1)
-    table_fl1[-(1:3), ] <- apply(apply(table_fl1[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
-    rownames(table_fl1)[-(1:3)] <- ""
-    table_fl1 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
-                       table_fl1)
+    table_fl <- t(results$parsed_data$fluorescence)
+    table_fl[-(1:3), ] <- apply(apply(table_fl[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+    rownames(table_fl)[-(1:3)] <- ""
+    table_fl <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
+                       table_fl)
 
-    table_fl1 <- DT::datatable(table_fl1,
+    table_fl <- DT::datatable(table_fl,
                            options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl1)-3)))
+                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl)-3)))
 
-    table_fl1
+    table_fl
   })
   # output$parsed_data_table_fluorescence2 <- DT::renderDT({
   #
@@ -5636,7 +5636,7 @@ server <- function(input, output, session){
       grodata <- results$parsed_data
     } else return(FALSE)
 
-    if(length(grodata$norm.fluorescence1) > 1){
+    if(length(grodata$norm.fluorescence) > 1){
       return(TRUE)
     } else {
       return(FALSE)
@@ -6156,20 +6156,20 @@ server <- function(input, output, session){
       } else {
         showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_Spline_bt")
       }
-      if(length(results$fluorescence$drFit1) >1 && length(results$fluorescence$drFit1$drTable) > 1 && results$fluorescence$control$dr.method == "spline"){
+      if(length(results$fluorescence$drFit) >1 && length(results$fluorescence$drFit$drTable) > 1 && results$fluorescence$control$dr.method == "spline"){
         showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Spline")
       } else {
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Spline")
       }
-      if(length(results$fluorescence$drFit1) >1 && length(results$fluorescence$drFit1$drTable) > 1 && results$fluorescence$control$dr.method == "model"){
+      if(length(results$fluorescence$drFit) >1 && length(results$fluorescence$drFit$drTable) > 1 && results$fluorescence$control$dr.method == "model"){
         showTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Model")
       } else {
         hideTab(inputId = "tabsetPanel_Results_Fluorescence", target = "tabPanel_Results_Fluorescence_DR_Model")
       }
     }
   })
-  table_fluorescence1_linear <- reactive({
-    res.table.fl <- results$fluorescence$flFit1$flTable
+  table_fluorescence_linear <- reactive({
+    res.table.fl <- results$fluorescence$flFit$flTable
 
     table_linear <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
                                "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.linfit==0 | is.na(res.table.fl$max_slope.linfit), "", ifelse(is.na(res.table.fl$max_slope2.linfit), round(as.numeric(res.table.fl$max_slope.linfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slope.linfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.linfit), 3), ")"))),
@@ -6186,25 +6186,25 @@ server <- function(input, output, session){
 
   })
 
-  output$results_table_fluorescence1_linear <- DT::renderDT({
-    DT::datatable(table_fluorescence1_linear(),
+  output$results_table_fluorescence_linear <- DT::renderDT({
+    DT::datatable(table_fluorescence_linear(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
 
-  table_fluorescence1_linear_group <- reactive({
-    flTable <- results$fluorescence$flFit1$flTable
+  table_fluorescence_linear_group <- reactive({
+    flTable <- results$fluorescence$flFit$flTable
     QurvE:::table_group_fluorescence_linear(flTable)
   })
 
-  output$results_table_fluorescence1_linear_group <- DT::renderDT({
-    DT::datatable(table_fluorescence1_linear_group(),
+  output$results_table_fluorescence_linear_group <- DT::renderDT({
+    DT::datatable(table_fluorescence_linear_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
 
-  table_fluorescence1_spline <- reactive({
-    res.table.fl <- results$fluorescence$flFit1$flTable
+  table_fluorescence_spline <- reactive({
+    res.table.fl <- results$fluorescence$flFit$flTable
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
                                "slope<sub>max</sub>" = ifelse(res.table.fl$max_slope.spline==0 | is.na(res.table.fl$max_slope.spline), "", ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$max_slope.spline), 3), paste0("<strong>", round(as.numeric(res.table.fl$max_slope.spline), 3), "</strong>", " (", round(as.numeric(res.table.fl$max_slope2.spline), 3), ")"))),
                                "λ" = round(as.numeric(res.table.fl$lambda.spline), 2),
@@ -6215,25 +6215,25 @@ server <- function(input, output, session){
     table_spline
   })
 
-  output$results_table_fluorescence1_spline <- DT::renderDT({
-    DT::datatable(table_fluorescence1_spline(),
+  output$results_table_fluorescence_spline <- DT::renderDT({
+    DT::datatable(table_fluorescence_spline(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
 
-  table_fluorescence1_spline_group <- reactive({
-    flTable <- results$fluorescence$flFit1$flTable
+  table_fluorescence_spline_group <- reactive({
+    flTable <- results$fluorescence$flFit$flTable
     QurvE:::table_group_fluorescence_spline(flTable)
   })
 
-  output$results_table_fluorescence1_spline_group <- DT::renderDT({
-    DT::datatable(table_fluorescence1_spline_group(),
+  output$results_table_fluorescence_spline_group <- DT::renderDT({
+    DT::datatable(table_fluorescence_spline_group(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
 
-  table_fluorescence1_spline_bt <- reactive({
-    res.table.fl <- results$fluorescence$flFit1$flTable
+  table_fluorescence_spline_bt <- reactive({
+    res.table.fl <- results$fluorescence$flFit$flTable
     table_spline <- data.frame("Sample|Replicate|Conc." = paste(res.table.fl$TestId, res.table.fl$AddId, res.table.fl$concentration, sep = "|"),
                                "µ<sub>max</sub>" = ifelse(res.table.fl$max_slope.bt==0 | is.na(res.table.fl$max_slope.bt),
                                                           "",
@@ -6274,15 +6274,15 @@ server <- function(input, output, session){
     table_spline
   })
 
-  output$results_table_fluorescence1_spline_bt <- DT::renderDT({
-    DT::datatable(table_fluorescence1_spline_bt(),
+  output$results_table_fluorescence_spline_bt <- DT::renderDT({
+    DT::datatable(table_fluorescence_spline_bt(),
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
               escape = FALSE)
   })
 
-  table_fluorescence1_dr_spline <- reactive({
+  table_fluorescence_dr_spline <- reactive({
     try({
-      res.table.dr <- results$fluorescence$drFit1$drTable
+      res.table.dr <- results$fluorescence$drFit$drTable
       table_dr <- data.frame("Test" = res.table.dr$Test,
                              "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
                              "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
@@ -6310,16 +6310,16 @@ server <- function(input, output, session){
     })
   })
 
-  output$results_table_fluorescence1_dr_spline <- DT::renderDT({
-    table_dr <- table_fluorescence1_dr_spline()
+  output$results_table_fluorescence_dr_spline <- DT::renderDT({
+    table_dr <- table_fluorescence_dr_spline()
     DT::datatable(table_dr,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
               escape = FALSE)
   })
 
-  table_fluorescence1_dr_model <- reactive({
+  table_fluorescence_dr_model <- reactive({
     try({
-      res.table.dr <- results$fluorescence$drFit1$drTable
+      res.table.dr <- results$fluorescence$drFit$drTable
       table_dr <- data.frame("Test" = res.table.dr$Test,
                              "Leakiness (min. FL)" = round(as.numeric(res.table.dr[["y.min"]]), 3),
                              "Sensitivity (K, EC50)" = round(as.numeric(res.table.dr[["K"]]), 3),
@@ -6345,86 +6345,86 @@ server <- function(input, output, session){
     })
   })
 
-  output$results_table_fluorescence1_dr_model <- DT::renderDT({
-    table_dr_model <- table_fluorescence1_dr_model()
+  output$results_table_fluorescence_dr_model <- DT::renderDT({
+    table_dr_model <- table_fluorescence_dr_model()
     DT::datatable(table_dr_model,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
               escape = FALSE)
   })
 
       ###____Table Download____####
-  output$download_table_fluorescence1_linear <- downloadHandler(
+  output$download_table_fluorescence_linear <- downloadHandler(
     filename = function() {
-      paste("fluorescence1_results_linear_fits", ".csv", sep="")
+      paste("fluorescence_results_linear_fits", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_fluorescence1_linear()
+      table <- table_fluorescence_linear()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
-  output$download_table_fluorescence1_linear_group <- downloadHandler(
+  output$download_table_fluorescence_linear_group <- downloadHandler(
     filename = function() {
-      paste("fluorescence1_results_linear_fits_grouped", ".csv", sep="")
+      paste("fluorescence_results_linear_fits_grouped", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_fluorescence1_linear_group()
+      table <- table_fluorescence_linear_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
-  output$download_table_fluorescence1_spline <- downloadHandler(
+  output$download_table_fluorescence_spline <- downloadHandler(
     filename = function() {
-      paste("fluorescence1_results_spline_fits", ".csv", sep="")
+      paste("fluorescence_results_spline_fits", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_fluorescence1_spline()
+      table <- table_fluorescence_spline()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
-  output$download_table_fluorescence1_spline_group <- downloadHandler(
+  output$download_table_fluorescence_spline_group <- downloadHandler(
     filename = function() {
-      paste("fluorescence1_results_spline_fits_grouped", ".csv", sep="")
+      paste("fluorescence_results_spline_fits_grouped", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_fluorescence1_spline_group()
+      table <- table_fluorescence_spline_group()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
-  output$download_table_fluorescence1_spline_bt <- downloadHandler(
+  output$download_table_fluorescence_spline_bt <- downloadHandler(
     filename = function() {
       paste("fluorescence_results_spline_bootstrappings", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_fluorescence1_spline_bt()
+      table <- table_fluorescence_spline_bt()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
-  output$download_table_fluorescence1_dr_spline <- downloadHandler(
+  output$download_table_fluorescence_dr_spline <- downloadHandler(
     filename = function() {
       paste("fluorescence_results_dose-response_analysis_spline", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_fluorescence1_dr_spline()
+      table <- table_fluorescence_dr_spline()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       QurvE:::write.csv.utf8.BOM(table, file)
     }
   )
 
-  output$download_table_fluorescence1_dr_model <- downloadHandler(
+  output$download_table_fluorescence_dr_model <- downloadHandler(
     filename = function() {
       paste("fluorescence_results_dose-response_analysis_model", ".csv", sep="")
     },
     content = function(file) {
-      table <- table_fluorescence1_dr_model()
+      table <- table_fluorescence_dr_model()
       colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
       QurvE:::write.csv.utf8.BOM(table, file)
     }
@@ -7339,7 +7339,7 @@ server <- function(input, output, session){
     results <- results$fluorescence
     if(is.null(results)) return("")
     if("l" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
-      select_samples <- names(results$flFit1$flFittedLinear)
+      select_samples <- names(results$flFit$flFittedLinear)
     } else {
       return("")
     }
@@ -7385,11 +7385,11 @@ server <- function(input, output, session){
       xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
                 as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
     }
-    if(length(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
+    if(length(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
                                                     is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
 
-      plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+      plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                               log = logy_validate_fluorescence_plot_linear(),
                               pch = input$shape_type_validate_fluorescence_plot_linear,
                               cex.point = input$shape_size_validate_fluorescence_plot_linear,
@@ -7401,7 +7401,7 @@ server <- function(input, output, session){
                               # ADD FURTHER INPUT (see Notion)
       )
       if(input$diagnostics_validate_fluorescence_plot_linear){
-        plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
+        plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
                                                                         is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
                                                                       1,
                                                                       selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
@@ -7427,17 +7427,17 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
-        textInput('t0.lin.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$t0)),
-        textInput('min.density.lin.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.density)),
-        textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
+        textInput('t0.lin.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$t0)),
+        textInput('min.density.lin.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.density)),
+        textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
                                                                                      "\n",
                                                                                      "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
         textInput('lin.h.rerun.fluorescence', 'Sliding window size (h)', placeholder = paste0("previously: ",
-                                                                                              ifelse(!is.null(results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h),
-                                                                                                     results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h,
+                                                                                              ifelse(!is.null(results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h),
+                                                                                                     results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h,
                                                                                                      "NULL"))),
-        textInput('lin.R2.rerun.fluorescence', 'R2 threshold', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.R2)),
-        textInput('lin.RSD.rerun.fluorescence', 'RSD threshold for slope', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.RSD)),
+        textInput('lin.R2.rerun.fluorescence', 'R2 threshold', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.R2)),
+        textInput('lin.RSD.rerun.fluorescence', 'RSD threshold for slope', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.RSD)),
         footer=tagList(
           fluidRow(
             column(12,
@@ -7464,19 +7464,19 @@ server <- function(input, output, session){
 
   # Re-run selected linear fit with user-defined parameters upon click on 'submit'
   observeEvent(input$submit.rerun.linear.fluorescence, {
-    if(!is.null(results$fluorescence$flFit1)){
+    if(!is.null(results$fluorescence$flFit)){
 
       showModal(modalDialog("Fitting sample data...", footer = NULL))
 
       # store previous fit in memory
-      selected_vals_validate_fluorescence$restore_fluorescence_linear <- results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]
+      selected_vals_validate_fluorescence$restore_fluorescence_linear <- results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]
 
       # Re-run fit and store in results object
-      actwell <- results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$raw.fl
-      acttime <- results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$raw.x
-      control <- results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control
+      actwell <- results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$raw.fl
+      acttime <- results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$raw.x
+      control <- results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control
       control_new <- control
-      ID <- results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$ID
+      ID <- results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$ID
 
       lin.h.new <- ifelse(!is.na(as.numeric(input$lin.h.rerun.fluorescence)), as.numeric(input$lin.h.rerun.fluorescence), control$lin.h)
       if(!is.na(lin.h.new)) control_new$lin.h <- lin.h.new
@@ -7496,7 +7496,7 @@ server <- function(input, output, session){
 
       if(control$x_type == "time"){
         try(
-          results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <-
+          results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <-
             flFitLinear(time = acttime, fl_data = actwell,
                         ID = ID,
                         control = control_new,
@@ -7504,7 +7504,7 @@ server <- function(input, output, session){
         )
       } else {
         try(
-          results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <-
+          results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <-
             flFitLinear(density = acttime, fl_data = actwell,
                         ID = ID,
                         control = control_new,
@@ -7513,13 +7513,13 @@ server <- function(input, output, session){
       }
 
       # Update gcTable with new results
-      res.table.fl <- results$fluorescence$flFit1$flTable
-      fit.summary <- QurvE:::summary.flFitLinear(results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]])
+      res.table.fl <- results$fluorescence$flFit$flTable
+      fit.summary <- QurvE:::summary.flFitLinear(results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
                            selected_vals_validate_fluorescence$sample_validate_fluorescence_linear,
-                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, names(results$fluorescence$flFit1$flFittedLinear)))
-      results$fluorescence$flFit1$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
+                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, names(results$fluorescence$flFit$flFittedLinear)))
+      results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
       # Show [Restore fit] button
       show("restore_fluorescence_linear")
@@ -7531,7 +7531,7 @@ server <- function(input, output, session){
   # Restore previous linear fit upon click on [Restore Fit]
   observeEvent(input$restore_fluorescence_linear, {
     # store previous fit from memory
-    results$fluorescence$flFit1$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <- selected_vals_validate_fluorescence$restore_fluorescence_linear
+    results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <- selected_vals_validate_fluorescence$restore_fluorescence_linear
     hide("restore_fluorescence_linear")
   })
 
@@ -7578,13 +7578,13 @@ server <- function(input, output, session){
         xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
                   as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
       }
-      if(length(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
+      if(length(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
                                                       selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
                                                       is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
                                                       1,
                                                       selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
 
-        plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+        plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                          log = log,
                          pch = input$shape_type_validate_fluorescence_plot_linear,
                          cex.point = input$shape_size_validate_fluorescence_plot_linear,
@@ -7596,7 +7596,7 @@ server <- function(input, output, session){
                          # ADD FURTHER INPUT (see Notion)
         )
         if(input$diagnostics_validate_fluorescence_plot_linear){
-          plot.flFitLinear(results$flFit1$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
+          plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
                                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == ""||
                                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                            which = "fit_diagnostics",
@@ -7623,7 +7623,7 @@ server <- function(input, output, session){
     results <- results$fluorescence
     if(is.null(results)) return("")
     if("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
-      select_samples <- names(results$flFit1$flFittedSplines)
+      select_samples <- names(results$flFit$flFittedSplines)
     } else {
       return("")
     }
@@ -7640,13 +7640,13 @@ server <- function(input, output, session){
 
   output$validate_fluorescence_plot_spline <- renderPlot({
     results <- results$fluorescence
-    if(length(results$flFit1$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1"||
+    if(length(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1"||
                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "" ||
                                                      is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
                                                      1,
                                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      plot.flFitSpline(results$flFit1$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+      plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
                                                                 is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
                                                               1,
                                                               input$sample_validate_fluorescence_spline)]],
@@ -7674,9 +7674,9 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
-        textInput('t0.spline.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$t0)),
-        textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.density)),
-        textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
+        textInput('t0.spline.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$t0)),
+        textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.density)),
+        textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
         footer=tagList(
           fluidRow(
             column(12,
@@ -7702,19 +7702,19 @@ server <- function(input, output, session){
 
   # Re-run selected spline fit with user-defined parameters upon click on 'submit'
   observeEvent(input$submit.rerun.spline.fluorescence, {
-    if(!is.null(results$fluorescence$flFit1)){
+    if(!is.null(results$fluorescence$flFit)){
 
       showModal(modalDialog("Fitting sample data...", footer = NULL))
 
       # store previous fit in memory
-      selected_vals_validate_fluorescence$restore_fluorescence_spline <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]
+      selected_vals_validate_fluorescence$restore_fluorescence_spline <- results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]
 
       # Re-run fit and store in results object
-      actwell <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$fl.in
-      acttime <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$x.in
-      control <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control
+      actwell <- results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$fl.in
+      acttime <- results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$x.in
+      control <- results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control
       control_new <- control
-      ID <- results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$ID
+      ID <- results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$ID
 
       control_new$smooth.fl <- ifelse(!is.na(as.numeric(input$smooth.fl.rerun.fluorescence)), as.numeric(input$smooth.fl.rerun.fluorescence), control$smooth.fl)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun.fluorescence)), as.numeric(input$t0.spline.rerun.fluorescence), control$t0)
@@ -7729,27 +7729,27 @@ server <- function(input, output, session){
       }
       if(control$x_type == "time"){
         try(
-          results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <-
+          results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <-
             flFitSpline(time = acttime, fl_data = actwell,
                         ID = ID,
                         control = control_new)
         )
       } else {
         try(
-          results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <-
+          results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <-
             flFitSpline(density = acttime, fl_data = actwell,
                         ID = ID,
                         control = control_new)
         )
       }
       # Update gcTable with new results
-      res.table.fl <- results$fluorescence$flFit1$flTable
-      fit.summary <- QurvE:::summary.flFitSpline(results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]])
+      res.table.fl <- results$fluorescence$flFit$flTable
+      fit.summary <- QurvE:::summary.flFitSpline(results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]])
 
       sample.ndx <- ifelse(is.numeric(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
                            selected_vals_validate_fluorescence$sample_validate_fluorescence_spline,
-                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline, names(results$fluorescence$flFit1$flFittedSplines)))
-      results$fluorescence$flFit1$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
+                           match(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline, names(results$fluorescence$flFit$flFittedSplines)))
+      results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
       # Show [Restore fit] button
       show("restore_fluorescence_spline")
@@ -7762,7 +7762,7 @@ server <- function(input, output, session){
   # Restore previous spline fit upon click on [Restore Fit]
   observeEvent(input$restore_fluorescence_spline, {
     # store previous fit from memory
-    results$fluorescence$flFit1$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <- selected_vals_validate_fluorescence$restore_fluorescence_spline
+    results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <- selected_vals_validate_fluorescence$restore_fluorescence_spline
     hide("restore_fluorescence_spline")
   })
 
@@ -7784,7 +7784,7 @@ server <- function(input, output, session){
     results <- results$fluorescence
     if(is.null(results)) return("")
     if(("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt) && results$control$nboot.fl > 1){
-      select_samples <- names(results$flFit1$flBootSplines)
+      select_samples <- names(results$flFit$flBootSplines)
     } else {
       return("")
     }
@@ -7799,7 +7799,7 @@ server <- function(input, output, session){
     )})
 
   validate_fluorescence_plot_spline_bt <- reactive({
-    results <- results$fluorescence$flFit1$flBootSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == "1"||
+    results <- results$fluorescence$flFit$flBootSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == "1"||
                                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == ""  ||
                                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt),
                                                                  1,
@@ -7867,7 +7867,7 @@ server <- function(input, output, session){
       }
       # Generate plot
       results <-
-        results$fluorescence$flFit1$flBootSplines[[ifelse(
+        results$fluorescence$flFit$flBootSplines[[ifelse(
           selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == "1" ||
             is.null(
               selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt
@@ -8599,12 +8599,12 @@ server <- function(input, output, session){
   })
 
   observe({
-    if (length(results$fluorescence$flFit1)>1){
-      if(input$data_type_fluorescence_group_plot == "raw1") y_axis <- "Fluorescence"
+    if (length(results$fluorescence$flFit)>1){
+      if(input$data_type_fluorescence_group_plot == "raw") y_axis <- "Fluorescence"
       # if(input$data_type_fluorescence_group_plot == "raw2") y_axis <- "Fluorescence 2"
-      if(input$data_type_fluorescence_group_plot == "spline1") y_axis <- "Fluorescence"
+      if(input$data_type_fluorescence_group_plot == "spline") y_axis <- "Fluorescence"
       # if(input$data_type_fluorescence_group_plot == "spline2") y_axis <- "Fluorescence 2"
-      if(input$data_type_fluorescence_group_plot == "norm.fl1") y_axis <- "Normalized fluorescence"
+      if(input$data_type_fluorescence_group_plot == "norm.fl") y_axis <- "Normalized fluorescence"
       # if(input$data_type_fluorescence_group_plot == "norm.fl2") y_axis <- "Normalized fluorescence 2"
     }
     else {
@@ -8616,7 +8616,7 @@ server <- function(input, output, session){
   })
 
   observe({
-    if (length(results$fluorescence$flFit1)>1){
+    if (length(results$fluorescence$flFit)>1){
       if(results$fluorescence$control$x_type == "time") x_axis <- "Time"
       if(results$fluorescence$control$x_type == "density") x_axis <- "Density"
     }
@@ -8629,7 +8629,7 @@ server <- function(input, output, session){
   })
 
   observe({
-    if(input$plot_derivative_fluorescence_group_plot && (input$data_type_fluorescence_group_plot == 'spline1' || input$data_type_fluorescence_group_plot == 'spline2')) h <- 9
+    if(input$plot_derivative_fluorescence_group_plot && (input$data_type_fluorescence_group_plot == 'spline' )) h <- 9
     else h <- 6
     updateSelectInput(inputId = "height_download_fluorescence_group_plot",
                       selected = h
@@ -8651,14 +8651,14 @@ server <- function(input, output, session){
   selected_inputs_fluorescence_group_plot_data_type <- reactive({
     results <- results$fluorescence
     selection <- c()
-    if(length(results$data$fluorescence1) > 1){
-      selection <- c(selection, "Raw fluorescence" = "raw1")
+    if(length(results$data$fluorescence) > 1){
+      selection <- c(selection, "Raw fluorescence" = "raw")
     }
     # if(length(results$data$fluorescence2) > 1){
     #   selection <- c(selection, "Raw fluorescence 2")
     # }
-    if(length(results$data$norm.fluorescence1) > 1){
-      selection <- c(selection, "Normalized FL" = "norm.fl1")
+    if(length(results$data$norm.fluorescence) > 1){
+      selection <- c(selection, "Normalized FL" = "norm.fl")
     }
     # if(length(results$data$norm.fluorescence2) > 1){
     #   selection <- c(selection, "Normalized FL2")
@@ -8666,8 +8666,8 @@ server <- function(input, output, session){
     # if(length(results$data$norm.fluorescence2) > 1){
     #   selection <- c(selection, "Normalized FL2")
     # }
-    if(length(results$data$fluorescence1) > 1 && "s" %in% results$control$fit.opt){
-      selection <- c(selection, "Spline fits FL" = "spline1")
+    if(length(results$data$fluorescence) > 1 && "s" %in% results$control$fit.opt){
+      selection <- c(selection, "Spline fits FL" = "spline")
     }
     # if(length(results$data$norm.fluorescence2) > 1 && "s" %in% results$control$fit.opt){
     #   selection <- c(selection, "Spline fits FL2")
@@ -8683,8 +8683,8 @@ server <- function(input, output, session){
       ### DR Plots Spline ####
   # Hide Spline dose-response plot if dr.method != "spline"
   observe({
-    if(length(results$fluorescence$drFit1) > 1 &&
-       length(results$fluorescence$drFit1$drTable) > 1 &&
+    if(length(results$fluorescence$drFit) > 1 &&
+       length(results$fluorescence$drFit$drTable) > 1 &&
        input$dr_method_fluorescence == "spline"){
       showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_spline")
     } else {
@@ -8694,7 +8694,7 @@ server <- function(input, output, session){
   })
 
   output$dose_response_plot_fluorescence_combined <- renderPlot({
-    results <- results$fluorescence$drFit1
+    results <- results$fluorescence$drFit
     plot.drFit(results,
                combine=TRUE,
                names = input$select_samples_based_on_string_dose_response_fluorescence_plot,
@@ -8729,7 +8729,7 @@ server <- function(input, output, session){
 
 
       output$dose_response_fluorescence_plot_individual <- renderPlot({
-        results <- results$fluorescence$drFit1$drFittedSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot), 1, input$individual_plots_dose_response_fluorescence_plot)]]
+        results <- results$fluorescence$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot), 1, input$individual_plots_dose_response_fluorescence_plot)]]
 
         # Define log-transformation of axes
         if(input$log_transform_y_axis_dose_response_fluorescence_plot &&
@@ -8790,7 +8790,7 @@ server <- function(input, output, session){
                 units = "in",
                 res = input$dpi_download_dose_response_fluorescence_plot_individual)
           }
-          results <- results$fluorescence$drFit1$drFittedSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot), 1, input$individual_plots_dose_response_fluorescence_plot)]]
+          results <- results$fluorescence$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot), 1, input$individual_plots_dose_response_fluorescence_plot)]]
 
           # Define log-transformation of axes
           if(input$log_transform_y_axis_dose_response_fluorescence_plot &&
@@ -8839,7 +8839,7 @@ server <- function(input, output, session){
       )
 
       select_inputs_individual_plots_dose_response_fluorescence_plot<- reactive({
-        if (length(results$fluorescence$drFit1)>1) names(results$fluorescence$drFit1$drFittedSplines)
+        if (length(results$fluorescence$drFit)>1) names(results$fluorescence$drFit$drFittedSplines)
         else return("")
       })
 
@@ -8852,8 +8852,8 @@ server <- function(input, output, session){
 
       # Hide Model dose-response plot if dr.method != "model"
       observe({
-        if(length(results$fluorescence$drFit1) > 1 &&
-           length(results$fluorescence$drFit1$drTable) > 1 &&
+        if(length(results$fluorescence$drFit) > 1 &&
+           length(results$fluorescence$drFit$drTable) > 1 &&
            input$dr_method_fluorescence == "model"){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_model")
         } else {
@@ -8863,7 +8863,7 @@ server <- function(input, output, session){
       })
 
       output$dose_response_model_fluorescence_plot_individual <- renderPlot({
-        results <- results$fluorescence$drFit1$drFittedModels[[ifelse(input$individual_plots_dose_response_model_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_model_fluorescence_plot), 1, input$individual_plots_dose_response_model_fluorescence_plot)]]
+        results <- results$fluorescence$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_model_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_model_fluorescence_plot), 1, input$individual_plots_dose_response_model_fluorescence_plot)]]
 
         # Define log-transformation of axes
         if(input$log_transform_y_axis_dose_response_model_fluorescence_plot &&
@@ -8920,7 +8920,7 @@ server <- function(input, output, session){
       )
 
       select_inputs_individual_plots_dose_response_model_fluorescence_plot<- reactive({
-        if (length(results$fluorescence$drFit1)>1) names(results$fluorescence$drFit1$drFittedModels)
+        if (length(results$fluorescence$drFit)>1) names(results$fluorescence$drFit$drFittedModels)
         else return("")
       })
       observe({
@@ -9096,7 +9096,7 @@ server <- function(input, output, session){
 
       ### DR Plots (Bootstrap) ####
       observe({
-        if(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1 && results$fluorescence$control$nboot.dr > 1){
+        if(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1 && results$fluorescence$control$nboot.dr > 1){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_bt")
         } else {
           hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponse_bt")
@@ -9104,7 +9104,7 @@ server <- function(input, output, session){
       })
 
       dose_response_fluorescence_plot_individual_bt <- reactive({
-        results <- results$fluorescence$drFit1$drBootSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot_bt == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot_bt), 1, input$individual_plots_dose_response_fluorescence_plot_bt)]]
+        results <- results$fluorescence$drFit$drBootSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot_bt == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot_bt), 1, input$individual_plots_dose_response_fluorescence_plot_bt)]]
 
         plot.drBootSpline(drBootSpline = results,
                           pch = input$shape_type_dose_response_fluorescence_plot_bt,
@@ -9137,7 +9137,7 @@ server <- function(input, output, session){
                 units = "in",
                 res = input$dpi_download_dose_response_fluorescence_plot_individual_bt)
           }
-          results <- results$fluorescence$drFit1$drBootSplines[[input$individual_plots_dose_response_fluorescence_plot_bt]]
+          results <- results$fluorescence$drFit$drBootSplines[[input$individual_plots_dose_response_fluorescence_plot_bt]]
 
           plot.drBootSpline(drBootSpline = results,
                             pch = input$shape_type_dose_response_fluorescence_plot_bt,
@@ -9174,7 +9174,7 @@ server <- function(input, output, session){
       })
 
       observe({
-        if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence1) > 1){
+        if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence) > 1){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
         } else {
           hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
@@ -9253,14 +9253,14 @@ server <- function(input, output, session){
       selected_inputs_fluorescence_type_dual_plot <- reactive({
         results <- results$fluorescence
         selection <- c()
-        if(length(results$data$fluorescence1) > 1){
-          selection <- c(selection, "Raw fluorescence" = "fl1")
+        if(length(results$data$fluorescence) > 1){
+          selection <- c(selection, "Raw fluorescence" = "fl")
         }
         # if(length(results$data$fluorescence2) > 1){
         #   selection <- c(selection, "Raw fluorescence 2" = "fl2")
         # }
-        if(length(results$data$norm.fluorescence1) > 1){
-          selection <- c(selection, "Normalized FL" = "norm.fl1")
+        if(length(results$data$norm.fluorescence) > 1){
+          selection <- c(selection, "Normalized FL" = "norm.fl")
         }
         # if(length(results$data$norm.fluorescence2) > 1){
         #   selection <- c(selection, "Normalized FL2" = "norm.fl2")
@@ -9275,7 +9275,7 @@ server <- function(input, output, session){
 
       ### DR Parameter Plots ####
       observe({
-        if(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1){
+        if(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponseParameters")
         } else {
           hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPanel_Visualize_Fluorescence_DoseResponseParameters")
@@ -9337,12 +9337,12 @@ server <- function(input, output, session){
       })
 
       select_inputs_individual_plots_dose_response_fluorescence_plot <- reactive({
-        if (length(results$fluorescence$drFit1)>1) names(results$fluorescence$drFit1$drFittedSplines)
+        if (length(results$fluorescence$drFit)>1) names(results$fluorescence$drFit$drFittedSplines)
         else return("")
       })
 
       select_inputs_individual_plots_dose_response_fluorescence_plot_bt <- reactive({
-        if (length(results$fluorescence$drFit1)>1 && results$fluorescence$control$nboot.dr > 1) names(results$fluorescence$drFit1$drBootSplines)
+        if (length(results$fluorescence$drFit)>1 && results$fluorescence$control$nboot.dr > 1) names(results$fluorescence$drFit$drBootSplines)
         else return("")
       })
 
@@ -9436,7 +9436,7 @@ server <- function(input, output, session){
             fl.report(flFitRes = results$fluorescence,
                       out.dir = gsub("\\\\file.+$", "", file),
                       out.nm = gsub("^.+\\\\", "", file),
-                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                      ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
                       format = input$report_filetype_fluorescence,
                       export = FALSE)
           )
@@ -9457,7 +9457,7 @@ server <- function(input, output, session){
             fl.report(flFitRes = results$fluorescence,
                       out.dir = gsub("\\\\file.+$", "", file),
                       out.nm = gsub("^.+\\\\", "", file),
-                      ec50 = ifelse(length(results$fluorescence$drFit1) > 1 && length(results$fluorescence$drFit1$drTable) > 1, TRUE, FALSE),
+                      ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
                       format = input$report_filetype_fluorescence,
                       export = FALSE)
           )

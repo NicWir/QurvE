@@ -1097,7 +1097,7 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
 #' @export
 #'
 plot.flFitRes <-  function(object,
-                        data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+                        data.type = c("spline", "raw", "norm.fl"),
                         IDs = NULL,
                         names = NULL,
                         conc = NULL,
@@ -1141,10 +1141,10 @@ plot.flFitRes <-  function(object,
   if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
 
   if(!any(methods::is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'object' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
-  if(methods::is(object) == "grodata" && !any(data.type %in% c("raw1", "raw2", "norm.fl1", "norm.fl2"))) stop("Raw input data can only be used to visualize data.type 'raw1', 'raw2', 'norm.fl1', or 'norm.fl2'.")
+  if(methods::is(object) == "grodata" && !any(data.type %in% c("raw", "norm.fl"))) stop("Raw input data can only be used to visualize data.type 'raw', or 'norm.fl'.")
 
   data.type <- match.arg(data.type)
-  if(data.type == "raw1" || data.type == "raw2" || data.type == "norm.fl1" || data.type == "norm.fl2" && deriv ==TRUE){
+  if(data.type == "raw" || data.type == "norm.fl"  && deriv ==TRUE){ # || data.type == "norm.fl2"  || data.type == "raw2"
     warning("Derivatives cannot be calculated for 'raw' or 'norm.fl' data. Only the fluorescence values will be shown.")
     deriv = FALSE
   }
@@ -1152,8 +1152,8 @@ plot.flFitRes <-  function(object,
     raw_data <- object
   }
   if(methods::is(object) == "flFitRes"){
-    if(data.type == "spline1" || data.type == "raw1" || data.type == "norm.fl1") flFit <- object$flFit1
-    if(data.type == "spline2" || data.type == "raw2" || data.type == "norm.fl2") flFit <- object$flFit2
+    if(data.type == "spline" || data.type == "raw" || data.type == "norm.fl") flFit <- object$flFit
+    # if(data.type == "spline2" || data.type == "raw2" || data.type == "norm.fl2") flFit <- object$flFit2
     raw_data <- object$data
   } else {
     flFit <- object
@@ -1162,7 +1162,7 @@ plot.flFitRes <-  function(object,
   # /// check input parameters
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
-  if(data.type == "spline1" || data.type == "spline2"){
+  if(data.type == "spline" ){ # || data.type == "spline2"
     if (!("s" %in% flFit$control$fit.opt | "a" %in% flFit$control$fit.opt)) stop("To plot spline fit results, please run fl.workflow() with 's' in fit.opt.")
   }
 
@@ -1173,23 +1173,23 @@ plot.flFitRes <-  function(object,
   if(any(methods::is(object) %in% c("flFit","flFitRes"))){
     sample.nm <- nm <- as.character(names(flFit$flFittedSplines))
   } else {
-    if(data.type == "norm.fl1"){
-      sample.nm <- nm <- paste(object$norm.fluorescence1[,1], object$norm.fluorescence1[,2], object$norm.fluorescence1[,3], sep = " | ")
+    if(data.type == "norm.fl"){
+      sample.nm <- nm <- paste(object$norm.fluorescence[,1], object$norm.fluorescence[,2], object$norm.fluorescence[,3], sep = " | ")
     }
-    if(data.type == "norm.fl2"){
-      sample.nm <- nm <- paste(object$norm.fluorescence2[,1], object$norm.fluorescence2[,2], object$norm.fluorescence2[,3], sep = " | ")
+    # if(data.type == "norm.fl2"){
+    #   sample.nm <- nm <- paste(object$norm.fluorescence2[,1], object$norm.fluorescence2[,2], object$norm.fluorescence2[,3], sep = " | ")
+    # }
+    if(data.type == "raw"){
+      sample.nm <- nm <- paste(object$fluorescence[,1], object$fluorescence[,2], object$fluorescence[,3], sep = " | ")
     }
-    if(data.type == "raw1"){
-      sample.nm <- nm <- paste(object$fluorescence1[,1], object$fluorescence1[,2], object$fluorescence1[,3], sep = " | ")
-    }
-    if(data.type == "raw2"){
-      sample.nm <- nm <- paste(object$fluorescence2[,1], object$fluorescence2[,2], object$fluorescence2[,3], sep = " | ")
-    }
+    # if(data.type == "raw2"){
+    #   sample.nm <- nm <- paste(object$fluorescence2[,1], object$fluorescence2[,2], object$fluorescence2[,3], sep = " | ")
+    # }
   }
-  if(data.type == "norm.fl1") data.nm = "norm.fluorescence1"
-  if(data.type == "norm.fl2") data.nm = "norm.fluorescence2"
-  if(data.type == "raw1") data.nm = "fluorescence1"
-  if(data.type == "raw2") data.nm = "fluorescence2"
+  if(data.type == "norm.fl") data.nm = "norm.fluorescence"
+  # if(data.type == "norm.fl2") data.nm = "norm.fluorescence2"
+  if(data.type == "raw") data.nm = "fluorescence"
+  # if(data.type == "raw2") data.nm = "fluorescence2"
 
   if(!is.null(IDs)){
     # Check if IDs refer to samples or conditions
@@ -1248,7 +1248,7 @@ plot.flFitRes <-  function(object,
   }
   if(!is.null(remove)) ndx.filt <- ndx.filt[-remove]
   # Check FitFlag for each replicate, work per condition
-  if(data.type == "spline1" || data.type == "spline2"){
+  if(data.type == "spline" ){ #|| data.type == "spline2"
     for(i in 1:length(ndx.filt)){
       if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (flFit[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
         fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (flFit[["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
@@ -1261,7 +1261,7 @@ plot.flFitRes <-  function(object,
   ndx.keep <- grep(paste0("^",
                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), "$", collapse = "|"), sample.nm)
 
-  if(data.type == "spline1"  || data.type == "spline2"){
+  if(data.type == "spline"  ){ #|| data.type == "spline2"
     # correct for log transformation
     if(flFit$control$log.y.spline == TRUE){
       for(i in 1:length(ndx.keep)){
@@ -1270,7 +1270,7 @@ plot.flFitRes <-  function(object,
       }
     }
   }
-if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type == "density" && mean == TRUE){
+if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE){ # || data.type == "spline2"
   message("Grouping of replicates is not supported for spline fits with x_type = 'density'. Argument changed to mean = FALSE.")
   mean <- FALSE
 }
@@ -1291,7 +1291,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
                                              "$"), sample.nm))
       name <- conditions_unique[n]
       # Create lists for density and time values for each sample
-      if(data.type == "spline1"  || data.type == "spline2"){
+      if(data.type == "spline" ){ # || data.type == "spline2"
         time <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.x)) %>% as.list(.)
         data <- lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.fl)) %>% as.list(.)
       } else {
@@ -1383,30 +1383,33 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
     if(log.y==TRUE){
       df$lower[df$lower<0] <- 0
     }
-    xlab.title <- if(data.type == "norm.fl1" || data.type == "norm.fl2" || data.type == "raw1" || data.type == "raw2"){
+    xlab.title <- if(data.type == "norm.fl"  || data.type == "raw" ){ # || data.type == "raw2" || data.type == "norm.fl2"
       "Time"
     } else if (flFit$control$x_type == "density"){
       "Density"
     } else {
       "Time"
     }
-    ylab.title <- if(data.type == "norm.fl1"){
-      "Normalized fluorescence 1"
-    } else if(data.type == "norm.fl2"){
-      "Normalized fluorescence 2"
-    } else if(data.type == "raw1"){
-      "Fluorescence 1"
-    } else if(data.type == "raw2" || data.type == "spline2"){
-      "Fluorescence 2"
-    } else if(data.type == "spline1" && flFit$control$norm_fl){
-      "Normalized fluorescence 1"
-    } else if(data.type == "spline1" && !flFit$control$norm_fl){
-      "Fluorescence 1"
-    } else if(data.type == "spline2" && flFit$control$norm_fl){
-      "Normalized fluorescence 2"
-    } else if(data.type == "spline2" && !flFit$control$norm_fl){
-      "Fluorescence 2"
+    ylab.title <- if(data.type == "norm.fl"){
+      "Normalized fluorescence"
+    } else if(data.type == "raw"){
+      "fluorescence"
+    } else if(data.type == "spline" && flFit$control$norm_fl){
+      "Normalized fluorescence"
+    } else if(data.type == "spline" && !flFit$control$norm_fl){
+      "fluorescence"
     }
+    # else if(data.type == "norm.fl2"){
+    #   "Normalized fluorescence 2"
+    # else if(data.type == "raw2" || data.type == "spline2"){
+    #   "Fluorescence 2"
+    # }
+    # else if(data.type == "spline2" && flFit$control$norm_fl){
+    #     "Normalized fluorescence 2"
+    #   }
+    # else if(data.type == "spline2" && !flFit$control$norm_fl){
+    #     "Fluorescence 2"
+    #   }
     p <- ggplot(df, aes(x=time, y=mean, col = name)) +
       geom_line(size=lwd) +
       geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
@@ -1545,7 +1548,7 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
   else {
     df <- data.frame()
     for(i in 1:length(ndx.keep)){
-      if(data.type == "spline1"  || data.type == "spline2"){
+      if(data.type == "spline"){ # || data.type == "spline2"
         df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
                                               "time" = flFit$flFittedSplines[[ndx.keep[i]]][["fit.x"]],
                                               "y" = flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]))
@@ -1560,33 +1563,34 @@ if((data.type == "spline1" || data.type == "spline2") && flFit$control$x_type ==
                                                 "y" = unlist(unname(type.convert(object[[data.nm]][ndx.keep[i], 4:ncol(object[[data.nm]])], as.is=T)))))
         }
       }
-    } # if(data.type == "spline1"  || data.type == "spline2")
+    } # if(data.type == "spline"  || data.type == "spline2")
     df <- df[df[["y"]]>0, ]
     if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
-    xlab.title <- if(data.type == "norm.fl1" || data.type == "norm.fl2" || data.type == "raw1" || data.type == "raw2"){
+    xlab.title <- if(data.type == "norm.fl" || data.type == "raw" ){ # || data.type == "raw2" || data.type == "norm.fl2"
       "Time"
     } else if (object$control$x_type == "density"){
       "Density"
     } else {
       "Time"
     }
-    ylab.title <- if(data.type == "norm.fl1"){
-      "Normalized fluorescence 1"
-    } else if(data.type == "norm.fl2"){
-      "Normalized fluorescence 2"
-    } else if(data.type == "raw1"){
-      "Fluorescence 1"
-    } else if(data.type == "raw2" || data.type == "spline2"){
-      "Fluorescence 2"
-    } else if(data.type == "spline1" && flFit$control$norm_fl){
-      "Normalized fluorescence 1"
-    } else if(data.type == "spline1" && !flFit$control$norm_fl){
-      "Fluorescence 1"
-    } else if(data.type == "spline2" && flFit$control$norm_fl){
-      "Normalized fluorescence 2"
-    } else if(data.type == "spline2" && !flFit$control$norm_fl){
-      "Fluorescence 2"
+    ylab.title <- if(data.type == "norm.fl"){
+      "Normalized fluorescence"
+    } else if(data.type == "raw"){
+      "fluorescence"
+    } else if(data.type == "spline" && flFit$control$norm_fl){
+      "Normalized fluorescence"
+    } else if(data.type == "spline" && !flFit$control$norm_fl){
+      "fluorescence"
     }
+    # else if(data.type == "raw2" || data.type == "spline2"){
+    #   "Fluorescence 2"
+    # } else if(data.type == "spline2" && !flFit$control$norm_fl){
+    #   "Fluorescence 2"
+    # } else if(data.type == "spline2" && flFit$control$norm_fl){
+    #   "Normalized fluorescence 2"
+    # } else if(data.type == "norm.fl2"){
+    #   "Normalized fluorescence 2"
+    # }
     p <- ggplot(df, aes(x=time, y=y, col = name)) +
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
@@ -1791,7 +1795,7 @@ plot.grodata <- plot.flFitRes
 #' @export
 #'
 plot.dual <-  function(object,
-                       fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
+                       fluorescence = c("fl", "norm.fl"),
                        IDs = NULL,
                        names = NULL,
                        conc = NULL,
@@ -1838,8 +1842,8 @@ plot.dual <-  function(object,
     raw_data <- object
   }
   if(methods::is(object) == "flFitRes"){
-    if(length(grep("1", fluorescence))>0) flFit <- object$flFit1
-    if(length(grep("2", fluorescence))>0) flFit <- object$flFit2
+    flFit <- object$flFit
+    # if(length(grep("2", fluorescence))>0) flFit <- object$flFit2
     raw_data <- object$data
   } else {
     flFit <- object
@@ -1857,12 +1861,12 @@ plot.dual <-  function(object,
   if(any(methods::is(object) %in% c("flFit","flFitRes"))){
     sample.nm <- nm <- as.character(names(flFit$flFittedSplines))
   } else {
-    sample.nm <- nm <- paste(object$fluorescence1[,1], object$fluorescence1[,2], object$fluorescence1[,3], sep = " | ")
+    sample.nm <- nm <- paste(object$fluorescence[,1], object$fluorescence[,2], object$fluorescence[,3], sep = " | ")
   }
-  if(fluorescence == "fl1") fl.nm = "fluorescence1"
-  if(fluorescence == "fl2") fl.nm = "fluorescence1"
-  if(fluorescence == "norm.fl1") fl.nm = "norm.fluorescence1"
-  if(fluorescence == "norm.fl2") fl.nm = "norm.fluorescence2"
+  if(fluorescence == "fl") fl.nm = "fluorescence"
+  # if(fluorescence == "fl2") fl.nm = "fluorescence"
+  if(fluorescence == "norm.fl") fl.nm = "norm.fluorescence"
+  # if(fluorescence == "norm.fl2") fl.nm = "norm.fluorescence2"
 
   if(!is.null(IDs)){
     # Check if IDs refer to samples or conditions
