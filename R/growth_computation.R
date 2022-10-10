@@ -1605,7 +1605,11 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
             answer_satisfied <- "n"
             reliability_tag_nonpara <- NA
             while ("n" %in% answer_satisfied) {
-              plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE,slope = T, colData=1, cex=1, plot=T, export=F)
+              if(control$log.y.spline){
+                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, colData=1, cex=1, plot=T, export=F)
+              } else {
+                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, log.y = FALSE, colData=1, cex=1, plot=T, export=F)
+              }
               answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
               if ("n" %in% answer_satisfied) {
                     test_answer <- readline("Enter: smooth.gc, t0, min.density                                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.density (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
@@ -2251,12 +2255,12 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
         return(gcFitSpline)
       }
       mumax.index <- which.max(deriv1.growth$y) # index of data point with maximum growth rate in first derivative fit
-      mumax.index.spl <- which(spline$x == deriv1$x[mumax.index]) # index of data point with maximum growth rate in spline fit
-      t.max <- deriv1$x[mumax.index] # time of maximum growth rate
-      mumax <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
-      y.max <- spline$y[mumax.index.spl] # cell density at time of max growth rate
+      mumax.index.spl <- which(spline$x == deriv1.growth$x[mumax.index]) # index of data point with maximum growth rate in spline fit
+      t.max <- deriv1.growth$x[mumax.index] # time of maximum growth rate
+      mumax <- max(deriv1.growth$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
+      y.max <- spline$y[which(deriv1$y == deriv1.growth$y[mumax.index])] # cell density at time of max growth rate
       b.spl <- y.max - mumax * t.max # the y-intercept of the tangent at µmax
-      lambda.spl <- -b.spl/mumax  # lag time
+      lambda.spl <- (spline$y[1] - b.spl)/mumax  # lag time
       integral <- low.integrate(spline$x, spline$y)
 
       if(control$biphasic) {
@@ -2265,9 +2269,12 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
         # Find local minima that frame µmax and remove the 'peak' from deriv1
         n <- round((log(n.spl+4, base=2.1))/0.75)/2
         minima <- inflect(deriv1$y, threshold = n)$minima
+        # consider only minima with a slope value of <= 0.75 * µmax
+        minima <- minima[deriv1$y[minima] <= 0.75 * mumax]
+
         minima <- c(1, minima)
         for(i in 1:(length(minima)-1)){
-          if(any(minima[i]:minima[i+1] %in% mumax.index)){
+          if(any(minima[i]:minima[i+1] %in% mumax.index.spl)){
             min.ndx <- c(minima[i], minima[i+1])
           }
         }
@@ -2283,7 +2290,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
             t.max2 <- deriv1.2$x[mumax2.index] # time of maximum growth rate
             y.max2 <- spline$y[mumax2.index.spl] # cell density at time of max growth rate
             b.spl2 <- y.max2 - mumax2 * t.max2 # the y-intercept of the tangent at µmax
-            lambda.spl2 <- -b.spl2/mumax2  # lag time
+            lambda.spl2 <- (spline$y[1] - b.spl2)/mumax2  # lag time
             fitFlag2 <- TRUE
           } else {
             mumax2.index <- NA

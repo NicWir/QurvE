@@ -639,7 +639,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        style='padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
                                                                        h2(strong('Growth fit')),
                                                                        h4('Global fit options'),
-                                                                       tags$div(title="Perform linear regression on log-transformed density data.",
+                                                                       tags$div(title="Perform linear regression on (log-transformed) density data.",
                                                                                 checkboxInput(inputId = 'linear_regression_growth',
                                                                                               label = 'Linear regression',
                                                                                               value = TRUE)
@@ -800,7 +800,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                            tags$div(title="Perform a Ln(y/y0) transformation on density values.",
                                                                     checkboxInput(inputId = 'log_transform_data_linear_growth',
-                                                                                  label = 'Log-transform growth data')
+                                                                                  label = 'Log-transform growth data',
+                                                                                  value = TRUE)
                                                            ),
 
                                                            checkboxInput(inputId = 'custom_sliding_window_size_growth',

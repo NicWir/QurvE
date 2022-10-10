@@ -451,9 +451,9 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
     #   p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
     #                             xend = time[which.min(abs(y - p.yrange.end))],
     #                             yend = y[which.min(abs(y - p.yrange.end))]),
-    #                         data = tangent.df, linetype = "dashed", color = colModel, size = 0.5) +
+    #                         data = tangent.df, linetype = "dashed", color = colModel, size = lwd) +
     #     geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
-    #                  linetype = "dashed", color = colModel, size = 0.5)
+    #                  linetype = "dashed", color = colModel, size = lwd)
     # }
     if(export == FALSE && plot == FALSE){
       return(p)
@@ -966,8 +966,8 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     if(ec50line){
       plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
       plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
-      p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd) +
-        geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = lwd)
+      p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd) +
+        geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd)
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
@@ -1631,7 +1631,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 
           time <- seq(lambda, max(gcFittedSpline$"fit.time"), length=200)
           y_tangent <- gcFittedSpline$parameters["b.tangent"][[1]]+time*mu
-          try(lines(time, y_tangent, lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.85), ...))
+          try(lines(time, y_tangent, lty=2, lwd= 2.8*lwd, col=ggplot2::alpha(colSpline, 0.85), ...))
           try(lines(c(min(gcFittedSpline$"raw.time"[1]), lambda), rep(gcFittedSpline$"raw.data"[1], 2), lty=2, lwd=2.8*lwd, col=ggplot2::alpha(colSpline, 0.7)))
         }
       }
@@ -1762,6 +1762,8 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
             } else {
               bla <- coef["b.tangent"][[1]] + (mu*time)
             }
+            time <- time[bla >= 0.6* gcFittedSpline$data.in[1]][bla <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla <- bla[bla >= 0.6* gcFittedSpline$data.in[1]][bla <= 1.15 * max(gcFittedSpline$fit.data)]
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
             # time values for tangent at µmax2
@@ -1772,24 +1774,37 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
             } else {
               bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
             }
+            time2 <- time2[bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla2 <- bla2[bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
 
             tangent.df2 <- data.frame("time" = time2,
                                       "y" = bla2)
             df.horizontal2 <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime2),
-                                         "y" = gcFittedSpline[["data.in"]][1])
+                                        "y" = if(gcFittedSpline$control$log.y.spline){
+                                          exp(gcFittedSpline[["fit.data"]][1])*gcFittedSpline[["data.in"]][1]
+                                        } else {
+                                          gcFittedSpline[["fit.data"]][1]
+                                        })
 
-            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-            p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+            if(gcFittedSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = time2, y = bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+            }
 
             if(!(lagtime2 <0)){
               p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
             }
           } # if(lagtime2 < lagtime)
           else {
@@ -1801,10 +1816,18 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
             } else {
               bla <- coef["b.tangent"][[1]] + (mu*time)
             }
+            time <- time[bla <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla <- bla[bla <= 1.15 * max(gcFittedSpline$fit.data)]
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
+
             df.horizontal <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime),
-                                        "y" = gcFittedSpline[["data.in"]][1])
+                                         "y" = if(gcFittedSpline$control$log.y.spline){
+                                           exp(gcFittedSpline[["fit.data"]][1])*gcFittedSpline[["data.in"]][1]
+                                         } else {
+                                           gcFittedSpline[["fit.data"]][1]
+                                         })
+
             # time values for tangent at µmax2
             time2_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max2-0.15*growth.time)))
             time2_start <- gcFittedSpline$fit.time[time2_start.ndx]
@@ -1815,21 +1838,30 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
             } else {
               bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
             }
+            time2 <- time2[bla2 >= 0.6* gcFittedSpline$data.in[1]][bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla2 <- bla2[bla2 >= 0.6* gcFittedSpline$data.in[1]][bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
             tangent.df2 <- data.frame("time" = time2,
                                       "y" = bla2)
 
-            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-            p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+            if(gcFittedSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = time, y = y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = time2, y = y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+            }
 
             if(!(lagtime <0)){
               p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
             }
           }
         } # if(gcFittedSpline$fitFlag2)
@@ -1842,17 +1874,185 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
           } else {
             bla <- coef["b.tangent"][[1]] + (mu*time)
           }
+          time <- time[bla <= 1.15 * max(gcFittedSpline$fit.data)]
+          bla <- bla[bla <= 1.15 * max(gcFittedSpline$fit.data)]
+
           tangent.df <- data.frame("time" = time,
                                    "y" = bla)
           df.horizontal <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime),
-                                      "y" = gcFittedSpline[["data.in"]][1])
-          p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                    xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                    yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+                                      "y" = if(gcFittedSpline$control$log.y.spline){
+                                        exp(gcFittedSpline[["fit.data"]][1])*gcFittedSpline[["data.in"]][1]
+                                      } else {
+                                        gcFittedSpline[["fit.data"]][1]
+                                      })
+
+          if(gcFittedSpline$control$log.y.spline){
+            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+          }
+          else {
+            p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+          }
+
           if(!(lagtime <0)){
             p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+          }
+        } # else of if(gcFittedSpline$fitFlag2)
+      } # if(slope == TRUE && log.y == T)
+
+      # /// add tangent at maximum slope
+      if(slope == TRUE && log.y == F){
+        mu     <- as.numeric(coef$mu[1])
+        if(gcFittedSpline$fitFlag2){
+          lagtime2 <- coef$lambda2
+          growth.time <- gcFittedSpline$fit.time[which.max(gcFittedSpline$fit.data)]
+          mu2 <- coef$mu2
+          if(lagtime2 < lagtime && lagtime2 > gcFittedSpline$raw.time[1]){
+            # time values for tangent at µmax
+            time_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max-0.15*growth.time)))
+            time_start <- gcFittedSpline$fit.time[time_start.ndx]
+            time <- seq(time_start, max(gcFittedSpline$fit.time), length=200)
+            # y values for tangent at µmax
+            if(gcFittedSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (mu*time)
+            }
+            time <- time[bla >= 0.6* gcFittedSpline$data.in[1]][bla <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla <- bla[bla >= 0.6* gcFittedSpline$data.in[1]][bla <= 1.15 * max(gcFittedSpline$fit.data)]
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+            # time values for tangent at µmax2
+            time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(gcFittedSpline$"fit.time"), length=200)
+            # y values for tangent at µmax
+            if(gcFittedSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
+            }
+            time2 <- time2[bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla2 <- bla2[bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
+
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+            df.horizontal2 <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime2),
+                                        "y" = if(gcFittedSpline$control$log.y.spline){
+                                          exp(gcFittedSpline[["fit.data"]][1])*gcFittedSpline[["data.in"]][1]
+                                        } else {
+                                          gcFittedSpline[["fit.data"]][1]
+                                        })
+
+            if(gcFittedSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = time2, y = bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+            }
+
+            if(!(lagtime2 <0)){
+              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal2,
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+            }
+          } # if(lagtime2 < lagtime)
+          else {
+            # time values for tangent at µmax
+            time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFittedSpline$"fit.time"), length=200)
+            # y values for tangent at µmax
+            if(gcFittedSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (mu*time)
+            }
+            time <- time[bla <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla <- bla[bla <= 1.15 * max(gcFittedSpline$fit.data)]
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+            df.horizontal <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime),
+                                        "y" = if(gcFittedSpline$control$log.y.spline){
+                                          exp(gcFittedSpline[["fit.data"]][1])*gcFittedSpline[["data.in"]][1]
+                                        } else {
+                                          gcFittedSpline[["fit.data"]][1]
+                                        })
+            # time values for tangent at µmax2
+            time2_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max2-0.15*growth.time)))
+            time2_start <- gcFittedSpline$fit.time[time2_start.ndx]
+            time2 <- seq(time2_start, max(gcFittedSpline$"fit.time"), length=200)
+            # y values for tangent at µmax
+            if(gcFittedSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (mu2*time2)
+            }
+            time2 <- time2[bla2 >= 0.6* gcFittedSpline$data.in[1]][bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
+            bla2 <- bla2[bla2 >= 0.6* gcFittedSpline$data.in[1]][bla2 <= 1.15 * max(gcFittedSpline$fit.data)]
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+
+            if(!gcFittedSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+
+              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = time2, y = bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+            }
+
+            if(!(lagtime <0)){
+              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+            }
+          }
+        } # if(gcFittedSpline$fitFlag2)
+        else {
+          # time values for tangent
+          time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFittedSpline$"fit.time"), length=200)
+          # y values for tangent
+          if(gcFittedSpline$control$log.y.spline){
+            bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
+          } else {
+            bla <- coef["b.tangent"][[1]] + (mu*time)
+          }
+          time <- time[bla <= 1.15 * max(gcFittedSpline$fit.data)]
+          bla <- bla[bla <= 1.15 * max(gcFittedSpline$fit.data)]
+          tangent.df <- data.frame("time" = time,
+                                   "y" = bla)
+          df.horizontal <- data.frame("time" = c(gcFittedSpline[["raw.time"]][1], lagtime),
+                                      "y" = if(gcFittedSpline$control$log.y.spline){
+                                        exp(gcFittedSpline[["fit.data"]][1])*gcFittedSpline[["data.in"]][1]
+                                      } else {
+                                        gcFittedSpline[["fit.data"]][1]
+                                      })
+          if(!gcFittedSpline$control$log.y.spline){
+            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
+                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+          }
+          else {
+            p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+          }
+          if(!(lagtime <0)){
+            p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
           }
         } # else of if(gcFittedSpline$fitFlag2)
       } # if(slope == TRUE && log.y == T)
@@ -1870,7 +2070,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
           theme_classic(base_size = basesize) +
           xlab("Time") +
           ylab(label = "Growth rate") +
-          coord_cartesian(xlim = c(0, x_limit[2]*0.95), ylim = c(y_limit[1], y_limit[2]), clip = "off")
+          coord_cartesian(xlim = c(0, x_limit[2]*0.95), clip = "off")
 
         if(!is.null(y.lim.deriv)){
           p.mu <- p.mu + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 10))
