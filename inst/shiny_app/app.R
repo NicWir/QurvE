@@ -768,6 +768,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Linear fit')),
 
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
+                                                                    checkboxInput(inputId = 'log_transform_data_linear_growth',
+                                                                                  label = 'Log-transform data',
+                                                                                  value = TRUE)
+                                                           ),
                                                            numberInput(
                                                              inputId = 'R2_threshold_growth',
                                                              label = 'R2 threshold',
@@ -797,12 +802,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              placeholder = 0.05
                                                            ),
                                                            bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of density increase a linear regression window should cover to be considered."),
-
-                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
-                                                                    checkboxInput(inputId = 'log_transform_data_linear_growth',
-                                                                                  label = 'Log-transform growth data',
-                                                                                  value = TRUE)
-                                                           ),
 
                                                            checkboxInput(inputId = 'custom_sliding_window_size_growth',
                                                                          label = 'Custom sliding window size',
@@ -836,6 +835,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                          sidebarPanel(
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Parametric fit')),
+
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
+                                                                    checkboxInput(inputId = 'log_transform_data_parametric_growth',
+                                                                                  label = 'Log-transform data',
+                                                                                  value = TRUE)
+                                                           ),
+
                                                            wellPanel(
                                                              h4(strong('Models:')),
                                                              style='border-color: #ADADAD; padding: 1; padding-top: 0; padding-bottom: 0',
@@ -875,11 +881,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     value = TRUE)
                                                              )
                                                            ),
-                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
-                                                                    checkboxInput(inputId = 'log_transform_data_parametric_growth',
-                                                                                  label = 'Log-transform data',
-                                                                                  value = TRUE)
-                                                           ),
+
                                                            fluidRow(
                                                              column(12,
                                                                     div(

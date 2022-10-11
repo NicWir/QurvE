@@ -2785,7 +2785,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             )))
 
             candidates <-
-              candidate_intervals[[ndx]]
+              unlist(candidate_intervals[ndx])
           }
 
 
