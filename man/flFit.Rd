@@ -8,7 +8,7 @@ flFit(fl_data, time = NULL, density = NULL, control = fl.control(), ...)
 }
 \arguments{
 \item{fl_data}{Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
-\item a list containing a \code{'time'} matrix (for x_type == "time") or \code{'density'} dataframe (for x_type == "density") and, \code{'fluorescence1'} and \code{'fluorescence2'} (if applicable) dataframes,
+\item a list containing a \code{'time'} matrix (for x_type == "time") or \code{'density'} dataframe (for x_type == "density") and a \code{'fluorescence'} dataframes,
 or \item a dataframe containing (normalized) fluorescence values (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).}}
 
 \item{time}{(optional) A matrix containing time values for each sample.}

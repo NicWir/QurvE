@@ -12,6 +12,7 @@ growth.control(
   t0 = 0,
   min.density = NA,
   log.x.gc = FALSE,
+  log.y.lin = TRUE,
   log.y.spline = TRUE,
   log.y.model = TRUE,
   lin.h = NULL,
@@ -23,6 +24,10 @@ growth.control(
   nboot.gc = 0,
   smooth.gc = 0.55,
   model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
+  dr.method = c("model", "spline"),
+  dr.model = c("weibull2x", "gammadr", "multi2", "LL.2", "LL.3", "LL.4", "LL.5", "W1.2",
+    "W1.3", "W1.4", "W2.2", "W2.3", "W2.4", "LL.3u", "LL2.2", "LL2.3", "LL2.3u", "LL2.4",
+    "LL2.5", "AR.2", "AR.3"),
   dr.have.atleast = 6,
   dr.parameter = "mu.linfit",
   smooth.dr = NULL,
@@ -47,7 +52,9 @@ growth.control(
 
 \item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
 
-\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} and \emph{spline} fits. Default: \code{TRUE}}
+\item{log.y.lin}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} fits. Default: \code{TRUE}}
+
+\item{log.y.spline}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{spline} fits. Default: \code{TRUE}}
 
 \item{log.y.model}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{model} fits. Default: \code{TRUE}}
 
@@ -68,6 +75,10 @@ growth.control(
 \item{smooth.gc}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}}
 
 \item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.}
+
+\item{dr.method}{(Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).}
+
+\item{dr.model}{(Character) Provide a list of models from the R package \code{\link[drc]} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
 
 \item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 

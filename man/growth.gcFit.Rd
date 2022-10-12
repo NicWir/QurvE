@@ -10,7 +10,7 @@ growth.gcFit(time, data, control = growth.control(), ...)
 \item{time}{(optional) A matrix containing time values for each sample.}
 
 \item{data}{Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
-\item a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, \code{'fluorescence1'} and \code{'fluorescence2'} dataframes,
+\item a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, a \code{'fluorescence'} dataframes,
 or \item a dataframe containing density values (if a \code{time} matrix is provided as separate argument).}}
 
 \item{control}{A \code{grofit.control} object created with \code{\link{growth.control}},

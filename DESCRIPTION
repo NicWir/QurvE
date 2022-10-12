@@ -23,6 +23,7 @@ Depends:
 Imports: 
     data.table,
     doParallel,
+    drc,
     DT,
     foreach,
     ggnewscale,

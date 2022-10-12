@@ -10,8 +10,9 @@ flFitLinear(
   fl_data,
   ID = "undefined",
   quota = 0.95,
-  control = fl.control(x_type = c("density", "time"), t0 = 0, min.density = NA, lin.h =
-    NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY = 0.05, biphasic = FALSE)
+  control = fl.control(x_type = c("density", "time"), log.x.lin = FALSE, log.y.lin =
+    FALSE, t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY
+    = 0.05, biphasic = FALSE)
 )
 }
 \arguments{

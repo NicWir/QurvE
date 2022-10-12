@@ -737,6 +737,8 @@ parse_data <-
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
+#' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
+#' @param dr.model (Character) Provide a list of models from the R package \code{\link[drc]} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See \code{\link{smooth.spline}} for further details. Default: \code{NULL}.
@@ -770,6 +772,12 @@ growth.control <- function (neg.nan.act = FALSE,
                             nboot.gc = 0,
                             smooth.gc = 0.55,
                             model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
+                            dr.method = c("model", "spline"),
+                            dr.model = c('weibull2x', 'gammadr', 'multi2',
+                                         'LL.2', 'LL.3', 'LL.4', 'LL.5', 'W1.2',
+                                         'W1.3', 'W1.4', 'W2.2', 'W2.3', 'W2.4', 'LL.3u',
+                                         'LL2.2', 'LL2.3', 'LL2.3u', 'LL2.4',
+                                         'LL2.5', 'AR.2', 'AR.3'),
                             dr.have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
                             dr.parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
                             smooth.dr = NULL,
@@ -784,6 +792,8 @@ growth.control <- function (neg.nan.act = FALSE,
     stop("value of fit.opt must be character and contain one or more of 'l', 's', or 'm', or be 'a' (for all).")
   if (is.character(model.type) == FALSE)
     stop("value of model.type must be character")
+  if (is.character(dr.model) == FALSE)
+    stop("value of dr.model must be character")
   if ((is.logical(neg.nan.act) == FALSE) | (length(neg.nan.act) != 1))
     stop("value of neg.nan.act must be logical and of one element")
   if ((is.logical(clean.bootstrap) == FALSE) | (length(clean.bootstrap) !=1))
@@ -808,6 +818,8 @@ growth.control <- function (neg.nan.act = FALSE,
     stop("value of dr.have.atleast must be numeric (>=6) and of one element")
   if (((is.character(dr.parameter) == FALSE) && (is.numeric(dr.parameter) == FALSE)) | (length(dr.parameter) !=1))
     stop("value of dr.parameter must be a string or numeric and of one element")
+  if ((is.character(dr.method) == FALSE) | (length(dr.parameter) !=1))
+    stop("value of dr.method must be a string and of one element")
   if ((is.numeric(nboot.dr) == FALSE) | (length(nboot.dr) != 1) | (nboot.dr < 0))
     stop("value of nboot.dr must be numeric (>=0) and of one element")
   if (((is.numeric(smooth.gc) == FALSE)))
@@ -856,7 +868,7 @@ growth.control <- function (neg.nan.act = FALSE,
                          suppress.messages = suppress.messages, fit.opt = fit.opt, t0 = t0, min.density = min.density,
                          log.x.gc = log.x.gc, log.y.lin = log.y.lin, log.y.spline = log.y.spline, log.y.model=log.y.model, biphasic = biphasic,
                          lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, interactive = interactive,
-                         nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
+                         nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr, dr.method = dr.method, dr.model = dr.model,
                          dr.have.atleast = round(dr.have.atleast), dr.parameter = dr.parameter,
                          log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
                          model.type = model.type, growth.thresh = growth.thresh)
@@ -893,6 +905,8 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
+#' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
+#' @param dr.model (Character) Provide a list of models from the R package \code{\link[drc]} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
@@ -948,6 +962,12 @@ growth.workflow <- function (grodata = NULL,
                              nboot.gc = 0,
                              smooth.gc = 0.55,
                              model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
+                             dr.method = c("model", "spline"),
+                             dr.model = c('weibull2x', 'gammadr', 'multi2',
+                                          'LL.2', 'LL.3', 'LL.4', 'LL.5', 'W1.2',
+                                          'W1.3', 'W1.4', 'W2.2', 'W2.3', 'W2.4', 'LL.3u',
+                                          'LL2.2', 'LL2.3', 'LL2.3u', 'LL2.4',
+                                          'LL2.5', 'AR.2', 'AR.3'),
                              growth.thresh = 1.5,
                              dr.have.atleast = 6,
                              dr.parameter = 34,
@@ -969,7 +989,7 @@ growth.workflow <- function (grodata = NULL,
   ## remove strictly defined arguments
   call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <-
     call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <-
-    call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <-
+    call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <- call$dr.method <- call$dr.model <-
     call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
 
 
@@ -1006,7 +1026,7 @@ growth.workflow <- function (grodata = NULL,
                             suppress.messages = suppress.messages, fit.opt = fit.opt, t0 = t0, min.density = min.density,
                             log.x.gc = log.x.gc, log.y.lin = log.y.lin, log.y.spline = log.y.spline, log.y.model = log.y.model, biphasic = biphasic,
                             lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, interactive = interactive,
-                            nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr,
+                            nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr, dr.method = dr.method, dr.model = dr.model,
                             dr.have.atleast = round(dr.have.atleast), dr.parameter = dr.parameter,
                             log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
                             model.type = model.type, growth.thresh = growth.thresh)
@@ -3535,6 +3555,7 @@ growth.drFit <- function (gcTable, control = growth.control())
   }
   else {
     skip <- c()
+
     for (i in 1:length(distinct)) {
       conc <- factor((FitData[, 3])[which(FitData[, 1] ==
                                             distinct[i])])
@@ -3550,22 +3571,29 @@ growth.drFit <- function (gcTable, control = growth.control())
 
       names(test) <- rep(names(FitData)[dr.parameter], length(test))
       drID <- distinct[i]
-      EC50[[i]] <- growth.drFitSpline(conc, test, drID, control)
-      if (control$nboot.dr > 0) {
-        EC50.boot[[i]] <- growth.drBootSpline(conc, test, drID,
-                                              control)
-      }
-      else {
-        EC50.boot[[i]] <- list(raw.time = conc, raw.data = test,
-                               drID = drID, boot.x = NA, boot.y = NA, boot.drSpline = NA,
-                               ec50.boot = NA, bootFlag = FALSE, control = control)
-        class(EC50.boot[[i]]) <- "drBootSpline"
+      if(control$dr.method == "spline"){
+        EC50[[i]] <- growth.drFitSpline(conc, test, drID, control)
+        if (control$nboot.dr > 0) {
+          EC50.boot[[i]] <- growth.drBootSpline(conc, test, drID,
+                                                control)
+        }
+        else {
+          EC50.boot[[i]] <- list(raw.time = conc, raw.data = test,
+                                 drID = drID, boot.x = NA, boot.y = NA, boot.drSpline = NA,
+                                 ec50.boot = NA, bootFlag = FALSE, control = control)
+          class(EC50.boot[[i]]) <- "drBootSpline"
+        }
+      } else {
+        EC50[[i]] <- growth.drFitModel(conc, test, drID, control)
       }
       description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
                                 log.y = control$log.y.dr, Samples = control$nboot.dr)
-      out.row <- cbind(description, summary.drFitSpline(EC50[[i]]),
+      if(control$dr.method == "spline")
+        out.row <- cbind(description, summary.drFitSpline(EC50[[i]]),
                        summary.drBootSpline(EC50.boot[[i]]))
-      EC50.table <- rbind(EC50.table, out.row)
+      else
+        out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
+      EC50.table <- rbind(as.data.frame(EC50.table), out.row)
       class(EC50.table) <- c("drTable", "list")
     }
   }
@@ -3574,9 +3602,16 @@ growth.drFit <- function (gcTable, control = growth.control())
     EC50 <- EC50[-skip]
     EC50.boot <- EC50.boot[-skip]
   }
-  names(EC50) <- names(EC50.boot) <- distinct
-  drFit <- list(raw.data = FitData, drTable = EC50.table,
-                drBootSplines = EC50.boot, drFittedSplines = EC50, control = control)
+  if(control$dr.method == "spline"){
+    names(EC50) <- names(EC50.boot) <- distinct
+    drFit <- list(raw.data = FitData, drTable = EC50.table,
+                  drBootSplines = EC50.boot, drFittedSplines = EC50, control = control)
+  } else {
+    names(EC50) <- distinct
+    drFit <- list(raw.data = FitData, drTable = EC50.table,
+                  drFittedModels = EC50, control = control)
+  }
+
   class(drFit) <- "drFit"
   drFit
 }
@@ -3622,7 +3657,7 @@ growth.drFit <- function (gcTable, control = growth.control())
 #'
 #' @export
 #'
-growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth.control())
+growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.control())
 {
   if (methods::is(control) != "grofit.control" && methods::is(control) != "fl.control")
     stop("control must be of class grofit.control or fl.control!")
@@ -3653,7 +3688,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
     drFitSpline <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                                          yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
+                                          yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
                         control = control)
     class(drFitSpline) <- "drFitSpline"
     return(drFitSpline)
@@ -3663,7 +3698,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
     drFitSpline <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                                          yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
+                                          yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
                         control = control)
     class(drFitSpline) <- "drFitSpline"
     return(drFitSpline)
@@ -3707,7 +3742,7 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
     drFitSpline <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                                          yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
+                                          yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
                         control = control)
     class(drFitSpline) <- "drFitSpline"
     return(drFitSpline)
@@ -3782,6 +3817,118 @@ growth.drFitSpline <- function (conc, test, drID = "undefined", control = growth
                       fitFlag = fitFlag, reliable = NULL, control = control)
   class(drFitSpline) <- "drFitSpline"
   drFitSpline
+}
+
+
+#' Fit various models to response vs. concentration data of a single sample to determine the EC50.
+#'
+#' @param conc Vector of concentration values.
+#' @param test Vector of response parameter values of the same length as \code{conc}.
+#' @param drID (Character) The name of the analyzed condition
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#'
+#' @return A \code{drFitModel} object.
+#' @references Christian Ritz, Florent Baty, Jens C. Streibig, Daniel Gerhard (2015). _Dose-Response Analysis Using R_. PLoS ONE 10(12): e0146021. DOI: 10.1371/journal.pone.0146021
+#' @export
+#'
+#' @import drc
+#' models <- unlist(lapply(1:length(models), function(x) models[[x]][1]))
+growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.control())
+{
+  if (methods::is(control) != "grofit.control" && methods::is(control) != "fl.control")
+    stop("growth.drFitModel: control must be of class grofit.control or fl.control!")
+  test.nm <- names(test)[1]
+  test <- as.vector(as.numeric(as.matrix(test)))
+  conc <- as.vector(as.numeric(as.matrix(conc)))
+  models <- control$dr.model
+  if (is.vector(conc) == FALSE || is.vector(test) == FALSE)
+    stop("growth.drFitModel: dose or response data must be a vector !")
+  if (control$neg.nan.act == FALSE) {
+    missings <- is.na(conc) | is.na(test) | !is.numeric(conc) |
+      !is.numeric(test)
+    conc <- conc[!missings]
+    test <- test[!missings]
+    negs <- (conc < 0) | (test < 0)
+    conc <- conc[!negs]
+    test <- test[!negs]
+  }
+  else {
+    if (sum(is.na(conc) | is.na(test)))
+      stop("growth.drFitModel: NA values encountered. Program terminated")
+    if ((sum((conc < 0)) > 0) | (sum((test < 0)) > 0))
+      stop("growth.drFitModel: Negative values encountered. Program terminated")
+    if ((FALSE %in% is.numeric(conc)) || (FALSE %in% is.numeric(test)))
+      stop("growth.drFitModel: Non numeric values encountered. Program terminated")
+  }
+  if (length(test) < 6) {
+    warning("growth.drFitModel: There is not enough valid data. Must have at least 6 unique values!")
+    drFitModel <- list(raw.conc = conc, raw.test = test,
+                        drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
+                        parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                                          yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
+                        control = control)
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
+  }
+  if (length(test) < control$dr.have.atleast) {
+    warning("growth.drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
+    drFitModel <- list(raw.conc = conc, raw.test = test,
+                        drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
+                        parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                                          yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
+                        control = control)
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
+  }
+  # Perform model fits
+  model.fits <- list()
+  for(i in 1:length(models)){
+    model.fits[[i]] <- try(drc::drm(
+      test~as.numeric(as.character(conc)),
+      fct = get(models[i])()
+    ), silent = T)
+  }
+  models <- models[unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) != "try-error"]
+  model.fits <- model.fits[unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) != "try-error"]
+  names(model.fits) <- models
+
+  # select best fitting model
+  model.AIC <- lapply(1:length(model.fits), function(x) AIC(model.fits[[x]]))
+  names(model.AIC) <- models
+
+  best.model.ndx <- which.min(unlist(model.AIC))
+  best.model.nm <- models[best.model.ndx]
+  best.model <- model.fits[[best.model.ndx]]
+
+  # get EC50 value
+  if(any(grep("BC", best.model.nm)) ){
+    ec50 <- ED(best.model, 50, lower = 0.1, upper = 1000, interval = "fls" )
+  } else if(any(grep("NEC", best.model.nm))){
+    ec50 <- best.model$coefficients[4]
+  } else {
+    ec50 <- ED(best.model, 50, interval = "delta")
+  }
+  # get response at ec50
+  dataList <- best.model[["dataList"]]
+  dose <- dataList[["dose"]]
+
+  concgrid <- seq(min(dose), max(dose), length = 200)
+  respgrid <- best.model$curve[[1]](concgrid)
+
+  y.ec50 <- drc:::PR(object = best.model, xVec = ec50[1])
+
+  # Plot best fit
+  drc.models <- drc:::getMeanFunctions(display = FALSE)
+  drc.models.nm <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][1])), "NEC.4")
+  drc.models.descr <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][2])), "model for estimation of\nno effect concentration (NEC)")
+
+  drFitModel <- list(raw.conc = conc, raw.test = test,
+                     drID = drID, fit.conc = concgrid, fit.test = respgrid, model = best.model,
+                     parameters = list(EC50 = ec50, yEC50 = y.ec50, test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
+                     control = control)
+
+  class(drFitModel) <- "drFitModel"
+  return(drFitModel)
 }
 
 #' Perform a smooth spline fit on response vs. concentration data of a single sample

@@ -8,7 +8,7 @@
 \usage{
 \method{plot}{flFitRes}(
   object,
-  data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  data.type = c("spline", "raw", "norm.fl"),
   IDs = NULL,
   names = NULL,
   conc = NULL,
@@ -38,7 +38,7 @@
 
 \method{plot}{flFit}(
   object,
-  data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  data.type = c("spline", "raw", "norm.fl"),
   IDs = NULL,
   names = NULL,
   conc = NULL,
@@ -68,7 +68,7 @@
 
 \method{plot}{grodata}(
   object,
-  data.type = c("spline1", "spline2", "raw1", "raw2", "norm.fl1", "norm.fl2"),
+  data.type = c("spline", "raw", "norm.fl"),
   IDs = NULL,
   names = NULL,
   conc = NULL,

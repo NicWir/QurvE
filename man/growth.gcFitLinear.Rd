@@ -9,8 +9,8 @@ growth.gcFitLinear(
   data,
   gcID = "undefined",
   quota = 0.95,
-  control = growth.control(t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD
-    = 0.1, lin.dY = 0.05, biphasic = FALSE)
+  control = growth.control(t0 = 0, log.x.gc = FALSE, log.y.lin = TRUE, min.density = NA,
+    lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE)
 )
 }
 \arguments{
@@ -23,6 +23,10 @@ growth.gcFitLinear(
 \item{quota}{(Numeric, between 0 an 1) Define what fraction of \eqn{mu_{max}} the slope of regression windows adjacent to the window with highest slope should have to be included in the overall linear fit.}
 
 \item{control}{A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
+
+\item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
+
+\item{log.y.lin}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} fits. Default: \code{TRUE}}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 

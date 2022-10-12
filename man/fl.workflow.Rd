@@ -132,10 +132,8 @@ fl.workflow(
 A \code{flFitRes} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{fl.report}}.
 \item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided. Else, extracted from \code{grofit}).}
 \item{data}{Raw data dataframe passed to the function as \code{grodata}.}
-\item{flFit1}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence1 data.}
-\item{flFit2}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence2 data.}
-\item{drFit1}{\code{drFit} or \code{drFitfl} object created with the call of \code{\link{growth.drFit}} or \code{\link{fl.drFit}} for fluorescence1 data (based on the \code{dr.method} argument in \code{control}; see \code{\link{fl.control}}).}
-\item{drFit2}{\code{drFit} or \code{drFitfl} object created with the call of \code{\link{growth.drFit}} or \code{\link{fl.drFit}} for fluorescence2 data (based on the \code{dr.method} argument in \code{control}; see \code{\link{fl.control}}).}
+\item{flFit}{\code{flFit} object created with the call of \code{\link{flFit}} on fluorescence data.}
+\item{drFit}{\code{drFit} or \code{drFitfl} object created with the call of \code{\link{growth.drFit}} or \code{\link{fl.drFit}} for fluorescence data (based on the \code{dr.method} argument in \code{control}; see \code{\link{fl.control}}).}
 \item{expdesign}{Experimental design table inherited from \code{grodata} or created from the identifier columns (columns 1-3) in \code{data}.}
 \item{control}{Object of class \code{fl.control} created with the call of \code{\link{fl.control}}.}
 }

@@ -5620,6 +5620,8 @@ server <- function(input, output, session){
                         )
     )
 
+    browser()
+
     if(!is.null("results$growth")){
       # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
       shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
@@ -8415,8 +8417,7 @@ server <- function(input, output, session){
                          'Growth rate (model)' = 'mu.model',
                          'Doubling time (model)' = 'tD.model',
                          'Lag time (model)' = 'lambda.model',
-                         'Maximum density (model)' = 'A.model',
-                         'ΔDensity (model)' = 'dY.model')
+                         'Maximum density (model)' = 'A.model')
     }
     gc_parameters
   })

@@ -1107,131 +1107,301 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
 #' @export plot.drFitSpline
 #' @export
 #'
-plot.drFitSpline <-
-  function (drFitSpline,
-            add = FALSE,
-            ec50line = TRUE,
-            log = "",
-            pch = 16,
-            colSpline = 1,
-            colData = 1,
-            cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
-            y.lim = NULL, x.lim = NULL,
-            y.title = NULL, x.title = NULL,
-            lwd = 2, plot = TRUE, export = FALSE,
-            height = 7, width = 9, out.dir = NULL,
-            ...)
-  {
-    # drFitSpline an object of class drFitSpline
-    if(methods::is(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
-    # /// check input parameters
-    if (is.logical(add) == FALSE)
-      stop("Need logical value for: add")
-    if (is.logical(ec50line) == FALSE)
-      stop("Need logical value for: ec50line")
-    if (is.numeric(pch) == FALSE)
-      stop("Need numeric value for: pch")
-    if (is.numeric(cex.point) == FALSE)
-      stop("Need numeric value for: cex.point")
-    p <- function(){
+plot.drFitSpline <- function (drFitSpline,
+                              add = FALSE,
+                              ec50line = TRUE,
+                              log = "",
+                              pch = 16,
+                              colSpline = 1,
+                              colData = 1,
+                              cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
+                              y.lim = NULL, x.lim = NULL,
+                              y.title = NULL, x.title = NULL,
+                              lwd = 2, plot = TRUE, export = FALSE,
+                              height = 7, width = 9, out.dir = NULL,
+                              ...)
+{
+  # drFitSpline an object of class drFitSpline
+  if(methods::is(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
+  # /// check input parameters
+  if (is.logical(add) == FALSE)
+    stop("Need logical value for: add")
+  if (is.logical(ec50line) == FALSE)
+    stop("Need logical value for: ec50line")
+  if (is.numeric(pch) == FALSE)
+    stop("Need numeric value for: pch")
+  if (is.numeric(cex.point) == FALSE)
+    stop("Need numeric value for: cex.point")
+  p <- function(){
+    if(drFitSpline$control$log.x.dr == TRUE){
+      x_data <- log(drFitSpline$raw.conc + 1)
+    } else {
+      x_data <- drFitSpline$raw.conc
+    }
+
+    if(drFitSpline$control$log.y.dr == TRUE){
+      y_data <- log(drFitSpline$raw.test + 1)
+    } else {
+      y_data <- drFitSpline$raw.test
+    }
+
+    if (add == FALSE) {
+      opar <- par(no.readonly = TRUE)
+      on.exit(par(opar))
+
+      par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7 + 0.09*cex.lab + 0.11*cex.axis, 0.7 + 0.05*cex.axis + 0.2*cex.lab, 0.2 + 0.2*cex.lab, 0.3), mgp=c(3, 1, 0), las=0)
+      par(cex.lab = cex.lab, cex.axis = cex.axis)
+
       if(drFitSpline$control$log.x.dr == TRUE){
-        x_data <- log(drFitSpline$raw.conc + 1)
+        xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "ln(1+concentration)")
       } else {
-        x_data <- drFitSpline$raw.conc
+        xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "concentration")
       }
 
       if(drFitSpline$control$log.y.dr == TRUE){
-        y_data <- log(drFitSpline$raw.test + 1)
+        ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
       } else {
-        y_data <- drFitSpline$raw.test
+        ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
       }
 
-      if (add == FALSE) {
-        opar <- par(no.readonly = TRUE)
-        on.exit(par(opar))
 
-        par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mai = c(0.7 + 0.09*cex.lab + 0.11*cex.axis, 0.7 + 0.05*cex.axis + 0.2*cex.lab, 0.2 + 0.2*cex.lab, 0.3), mgp=c(3, 1, 0), las=0)
-        par(cex.lab = cex.lab, cex.axis = cex.axis)
+      plot(
+        x_data,
+        y_data,
+        log = log,
+        pch = pch, bg = colData,
+        cex = cex.point,
+        col = colData, xlab="", ylab="", xaxt="n")
 
-        if(drFitSpline$control$log.x.dr == TRUE){
-          xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "ln(1+concentration)")
-        } else {
-          xlab = ifelse(!is.null(x.title) && x.title != "", x.title, "concentration")
-        }
+      axis(1, mgp=c(3,1+0.5*cex.axis,0))
 
-        if(drFitSpline$control$log.y.dr == TRUE){
-          ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("ln[1+", "Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), ""), "]"))
-        } else {
-          ylab = ifelse(!is.null(y.title) && y.title != "", y.title, paste0("Response", ifelse(!is.na(drFitSpline$parameters$test), paste0(" (", drFitSpline$parameters$test, ")"), "")))
-        }
+      title(xlab = xlab, line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+      title(ylab = ylab, line = 1 + 0.5*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
 
 
-        plot(
-          x_data,
-          y_data,
-          log = log,
-          pch = pch, bg = colData,
-          cex = cex.point,
-          col = colData, xlab="", ylab="", xaxt="n")
+      title(main = drFitSpline$drID, line = 1, cex.main = cex.lab)
+    }
+    else{
 
-        axis(1, mgp=c(3,1+0.5*cex.axis,0))
+      points(
+        x_data,
+        y_data,
+        pch = pch, bg = colData,
+        cex = cex.point,
+        col = colData
+      )
 
-        title(xlab = xlab, line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-        title(ylab = ylab, line = 1 + 0.5*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+    }
 
+    try(lines(
+      drFitSpline$fit.conc,
+      drFitSpline$fit.test,
+      type = "l",
+      lwd = lwd,
+      col = colSpline
+    ))
 
-        title(main = drFitSpline$drID, line = 1, cex.main = cex.lab)
+    if (ec50line == TRUE) {
+      #vertical lines
+      totmin = min(min(drFitSpline$fit.conc), min(drFitSpline$fit.test))
+      lines(c(drFitSpline$parameters$EC50, drFitSpline$parameters$EC50),
+            c(totmin - 1, drFitSpline$parameters$yEC50),
+            lty = 2)
+      #horizontal
+      lines(c(-1, drFitSpline$parameters$EC50),
+            c(drFitSpline$parameters$yEC50, drFitSpline$parameters$yEC50),
+            lty = 2)
+    }
+  } # p <- function()
+  if (export == TRUE){
+    w <- width
+    h <- height
+    out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+    dir.create(out.dir, showWarnings = F)
+    grDevices::png(paste0(out.dir, "/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.png"),
+                   width = w, height = h, units = 'in', res = 300)
+    p()
+    grDevices::dev.off()
+    grDevices::pdf(paste0(out.dir, "/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.pdf"))
+    p()
+    grDevices::dev.off()
+  }
+
+  if (plot == TRUE){
+    p()
+  }
+}
+
+#' Generic plot function for \code{drFitModel} objects.
+#'
+#' @param drFitModel object of class \code{drFitModel}, created with \code{\link{growth.drFitModel}}.
+#' @param type (Character) Specify how to plot the data. There are currently 5 options: "average" (averages and fitted curve(s); default), "none" (only the fitted curve(s)), "obs" (only the data points), "all" (all data points and fitted curve(s)), "bars" (averages and fitted curve(s) with model-based standard errors (see Details)), and "confidence" (confidence bands for fitted curve(s)).
+#' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 values (\code{TRUE}) or not (\code{FALSE}).
+#' @param add (Logical) If \code{TRUE} then add to already existing plot.
+#' @param broken (Logical) If TRUE the x axis is broken provided this axis is logarithmic (using functionality in the CRAN package 'plotrix').
+#' @param bp (Numeric) Specifying the break point below which the dose is zero (the amount of stretching on the dose axis above zero in order to create the visual illusion of a logarithmic scale including 0). The default is the base-10 value corresponding to the rounded value of the minimum of the log10 values of all positive dose values. This argument is only working for logarithmic dose axes.
+#' @param gridsize (Numeric) Number of points in the grid used for plotting the fitted curves.
+#' @param log (Character) String which contains '"x"' if the x axis is to be logarithmic, '"y"' if the y axis is to be logarithmic and '"xy"' or '"yx"' if both axes are to be logarithmic. The default is "x". The empty string "" yields the original axes.
+#' @param n.xbreaks (Numeric) Number of breaks on the x-axis (if not log-transformed). The breaks are generated using \code{pretty}. Thus, the final number of breaks can deviate from the user input.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis (if not log-transformed). The breaks are generated using \code{pretty}. Thus, the final number of breaks can deviate from the user input.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param cex.axis (Numeric) Font size of axis annotations.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param col (Logical or a vector of colors) If \code{TRUE} default colours are used. If \code{FALSE} (default) no colors are used.
+#' @param lwd (Numeric) Line width.
+#' @param lty (Numeric) Specify the line type.
+#' @param xlab (Character) An optional label for the x axis.
+#' @param ylab (Character) An optional label for the y axis.
+#' @param legend (Logical) If \code{TRUE} a legend is displayed.
+#' @param legendText a character string or vector of character strings specifying the legend text (the position of the upper right corner of the legend box).
+#' @param cex.legend numeric specifying the legend text size.
+#'
+#' @export
+#'
+plot.drFitModel <- function(drFitModel,
+                            type = c("average", "all", "bars", "none", "obs", "confidence"),
+                            ec50line = TRUE,
+                            add = FALSE,
+                            broken = TRUE,
+                            bp,
+                            gridsize = 200,
+                            log = "x",
+                            n.xbreaks,
+                            n.ybreaks,
+                            x.lim,
+                            y.lim,
+                            cex.point,
+                            cex.axis = 1,
+                            cex.lab = 1.5,
+                            col = 1,
+                            lwd = 2,
+                            lty = 2,
+                            xlab,
+                            ylab,
+                            legend = T,
+                            legendText,
+                            cex.legend = 1.2
+                            )
+{
+  type <- match.arg(type)
+  model <- drFitModel$model
+  conc <- drFitModel$raw.conc
+  test <- drFitModel$raw.test
+  if(missing(bp)){
+    log10cl <- round(log10(min(conc[conc > 0]))) - 1
+    bp <- 10^(log10cl)
+  }
+  if(missing(n.xbreaks)){
+    xt <- NULL
+    if(any(grep("x", log))){
+      if(min(conc) <= 0){
+        xt.minor <- xgx_minor_breaks_log10(c(bp, max(conc)))[-1]
       }
       else{
-
-        points(
-          x_data,
-          y_data,
-          pch = pch, bg = colData,
-          cex = cex.point,
-          col = colData
-        )
-
+        xt.minor <- xgx_minor_breaks_log10(c(min(conc), max(conc)))
       }
-
-      try(lines(
-        drFitSpline$fit.conc,
-        drFitSpline$fit.test,
-        type = "l",
-        lwd = lwd,
-        col = colSpline
-      ))
-
-      if (ec50line == TRUE) {
-        #vertical lines
-        totmin = min(min(drFitSpline$fit.conc), min(drFitSpline$fit.test))
-        lines(c(drFitSpline$parameters$EC50, drFitSpline$parameters$EC50),
-              c(totmin - 1, drFitSpline$parameters$yEC50),
-              lty = 2)
-        #horizontal
-        lines(c(-1, drFitSpline$parameters$EC50),
-              c(drFitSpline$parameters$yEC50, drFitSpline$parameters$yEC50),
-              lty = 2)
-      }
-    } # p <- function()
-    if (export == TRUE){
-      w <- width
-      h <- height
-      out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-      dir.create(out.dir, showWarnings = F)
-      grDevices::png(paste0(out.dir, "/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.png"),
-                     width = w, height = h, units = 'in', res = 300)
-      p()
-      grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.pdf"))
-      p()
-      grDevices::dev.off()
     }
+  } else {
+    if(any(grep("x", log))){
+      if(min(conc) <= 0){
+        xt <- xgx_breaks_log10(c(bp, max(conc)))
+        xt.minor <- xgx_minor_breaks_log10(c(bp, max(conc)))[-1]
+      }
+      else{
+        xt <- xgx_breaks_log10(c(min(conc), max(conc)))
+        xt.minor <- xgx_minor_breaks_log10(c(min(conc), max(conc)))
+      }
 
-    if (plot == TRUE){
-      p()
+    } else {
+      xt <- pretty(conc, n.xbreaks)
     }
   }
+  if(missing(n.ybreaks)){
+    yt <- NULL
+    if(any(grep("y", log))){
+      yt.minor <- xgx_minor_breaks_log10(c(min(test), max(test)))
+    }
+  } else {
+    if(any(grep("y", log))){
+      yt <- xgx_breaks_log10(c(min(test), max(test)))
+      yt.minor <- xgx_minor_breaks_log10(c(min(test), max(test)))
+    } else {
+      yt <- pretty(test, n.ybreaks)
+    }
+  }
+  if(missing(legendText))
+    legendText <- drFitModel$parameters$model
+  if(missing(xlab))
+    xlab <- "Concentration"
+  if(missing(ylab))
+    ylab <- paste0("Response (", drFitModel$parameters$test, ")")
+
+  par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
+  try(
+    drc:::plot.drc(x = model,
+                   broken = broken,
+                   type = "all",
+                   add = add,
+                   col = col,
+                   lwd = lwd,
+                   lty = lty,
+                   xt = xt,
+                   yt = yt,
+                   log = log,
+                   xlab = "",
+                   ylab = "",
+                   xlim = x.lim,
+                   ylim = x.lim,
+                   cex = cex.point,
+                   cex.axis = cex.axis,
+                   legend = legend,
+                   legendText = legendText,
+                   cex.legend = cex.legend,
+                   gridsize = gridsize,
+                   legendPos = c(1.25*max(conc), 1.02*max(test)),
+                   bp = bp,
+    )
+  )
+  title(ylab = ylab, line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+  title(xlab = xlab, line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
+  if(any(grep("x", log))){
+    axis(side=1, at=xt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
+  }
+  if(any(grep("y", log))){
+    axis(side=2, at=yt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
+  }
+  try(drc:::plot.drc(model,
+                     xlim = x.lim,
+                     ylim = x.lim,
+                     broken = broken,
+                     type = type,
+                     add = T,
+                     col = col,
+                     lwd = lwd,
+                     lty = lty,
+                     gridsize = gridsize)
+  )
+  if (ec50line == TRUE) {
+    #vertical lines
+    totmin = min(min(drFitModel$fit.conc), min(drFitModel$fit.test))
+    lines(c(drFitModel$parameters$EC50[1], drFitModel$parameters$EC50[1]),
+          c(totmin - 1, drFitModel$parameters$yEC50[1]),
+          lty = 2, col = col, lwd = 0.5*lwd)
+    #horizontal
+    if(any(grep("x", log))){
+      lines(c(bp, drFitModel$parameters$EC50[1]),
+            c(drFitModel$parameters$yEC50[1], drFitModel$parameters$yEC50[1]),
+            lty = 2, col = col, lwd = 0.5*lwd)
+    } else {
+      lines(c(totmin, drFitModel$parameters$EC50[1]),
+            c(drFitModel$parameters$yEC50[1], drFitModel$parameters$yEC50[1]),
+            lty = 2, col = 2, lwd = 0.5*lwd)
+    }
+
+  }
+}
 
 #' Generic plot function for \code{gcBootSpline} objects.
 #'

@@ -1,6 +1,6 @@
 #' Generic summary function for drFitSpline objects
 #'
-#' @param object object of class \code{drFitSpline} object of class \code{drFitSpline}
+#' @param object object of class \code{drFitSpline}
 #' @param ...
 #'
 #' @return A dataframe with parameters extracted from the dose-response analysis of a single sample.
@@ -10,6 +10,20 @@ summary.drFitSpline <- function (object,...)
   {
     # object of class drFitSpline
     data.frame(object$parameters)
+}
+
+#' Generic summary function for drFitModel objects
+#'
+#' @param object object of class \code{drFitModel}
+#' @param ...
+#'
+#' @return A dataframe with parameters extracted from the dose-response analysis of a single sample.
+#' @export
+#'
+summary.drFitModel <- function (object,...)
+{
+  # object of class drFitSpline
+  data.frame(object$parameters)
 }
 
 #' Generic summary function for gcFitSpline objects

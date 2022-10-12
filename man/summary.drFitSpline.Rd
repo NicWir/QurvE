@@ -7,7 +7,7 @@
 \method{summary}{drFitSpline}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{drFitSpline} object of class \code{drFitSpline}}
+\item{object}{object of class \code{drFitSpline}}
 
 \item{...}{}
 }

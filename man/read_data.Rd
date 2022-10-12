@@ -6,18 +6,14 @@
 \usage{
 read_data(
   data.density,
-  data.fluoro1 = NA,
-  data.fluoro2 = NA,
+  data.fl = NA,
   data.format = "col",
   csvsep = ";",
   dec = ".",
-  csvsep.fl1 = ";",
-  dec.fl1 = ".",
-  csvsep.fl2 = ";",
-  dec.fl2 = ".",
+  csvsep.fl = ";",
+  dec.fl = ".",
   sheet.density = 1,
-  sheet.fluoro1 = 1,
-  sheet.fluoro2 = 1,
+  sheet.fl = 1,
   subtract.blank = T,
   calibration = NULL
 )
@@ -31,9 +27,7 @@ In column format, the first three table rows contain
 \item concentration value (\emph{optional})
 }}
 
-\item{data.fluoro1}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
-
-\item{data.fluoro2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
+\item{data.fl}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
 
 \item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}}
 
@@ -41,19 +35,13 @@ In column format, the first three table rows contain
 
 \item{dec}{(Character) decimal separator used in CSV, TSV or TXT file storing density data. Default: \code{"."}}
 
-\item{csvsep.fl1}{(Character) separator used in CSV file storing fluorescence 1 data (ignored for other file types). Default: \code{";"}}
+\item{csvsep.fl}{(Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}}
 
-\item{dec.fl1}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 1 data. Default: \code{"."}}
-
-\item{csvsep.fl2}{(Character) separator used in CSV file storing fluorescence 2 data (ignored for other file types). Default: \code{";"}}
-
-\item{dec.fl2}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence 2 data. Default: \code{"."}}
+\item{dec.fl}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence data. Default: \code{"."}}
 
 \item{sheet.density}{(Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (\emph{optional}).}
 
-\item{sheet.fluoro1}{(Numeric or Character) Number or name of the sheet with fluorescence 1 data in XLS or XLSX files (\emph{optional}).}
-
-\item{sheet.fluoro2}{(Numeric or Character) Number or name of the sheet with fluorescence 2 data in XLS or XLSX files (\emph{optional}).}
+\item{sheet.fl}{(Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (\emph{optional}).}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}). If \code{calibration = TRUE}, blanks are subtracted after value conversion.}
 
@@ -67,10 +55,8 @@ used to run \code{\link{growth.workflow}}/\code{\link{fl.workflow}} or, together
 object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
 \item{time}{Matrix with raw time values extracted from \code{data.density}.}
 \item{density}{Dataframe with raw density values and sample identifiers extracted from \code{data.density}.}
-\item{fluorescence1}{Dataframe with raw fluorescence1 values and sample identifiers extracted from \code{data.fluoro1}. \code{NA}, if no fluorescence1 data is provided.}
-\item{fluorescence2}{Dataframe with raw fluorescence2 values and sample identifiers extracted from \code{data.fluoro2}. \code{NA}, if no fluorescence2 data is provided.}
-\item{norm.fluorescence1}{fluorescence1 data divided by density values. \code{NA}, if no fluorescence1 data is provided.}
-\item{norm.fluorescence2}{fluorescence2 data divided by density values. \code{NA}, if no fluorescence1 data is provided.}
+\item{fluorescence}{Dataframe with raw fluorescence values and sample identifiers extracted from \code{data.fl}. \code{NA}, if no fluorescence data is provided.}
+\item{norm.fluorescence}{fluorescence data divided by density values. \code{NA}, if no fluorescence data is provided.}
 \item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.density}.}
 }
 \description{

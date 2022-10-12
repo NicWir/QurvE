@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{dual}(
   object,
-  fluorescence = c("fl1", "fl2", "norm.fl1", "norm.fl2"),
+  fluorescence = c("fl", "norm.fl"),
   IDs = NULL,
   names = NULL,
   conc = NULL,
