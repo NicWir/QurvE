@@ -17,6 +17,7 @@
   n.ybreaks,
   x.lim,
   y.lim,
+  pch = 1,
   cex.point,
   cex.axis = 1,
   cex.lab = 1.5,
@@ -27,6 +28,7 @@
   ylab,
   legend = T,
   legendText,
+  legendPos,
   cex.legend = 1.2
 )
 
@@ -43,6 +45,7 @@
   n.ybreaks,
   x.lim,
   y.lim,
+  pch = 1,
   cex.point,
   cex.axis = 1,
   cex.lab = 1.5,
@@ -53,6 +56,7 @@
   ylab,
   legend = T,
   legendText,
+  legendPos,
   cex.legend = 1.2
 )
 }
@@ -81,6 +85,8 @@
 
 \item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
+\item{pch}{(Numeric) Symbol used to plot data points.}
+
 \item{cex.point}{(Numeric) Size of the raw data points.}
 
 \item{cex.axis}{(Numeric) Font size of axis annotations.}
@@ -99,13 +105,13 @@
 
 \item{legend}{(Logical) If \code{TRUE} a legend is displayed.}
 
-\item{legendText}{a character string or vector of character strings specifying the legend text (the position of the upper right corner of the legend box).}
+\item{legendText}{(Character) Specify the legend text (the position of the upper right corner of the legend box).}
+
+\item{legendPos}{(Numeric) Vector of length 2 giving the position of the legend.}
 
 \item{cex.legend}{numeric specifying the legend text size.}
 
 \item{drFittedModel}{Object of class \code{drFitModel}, created with \code{\link{fl.drFitModel}}.}
-
-\item{pch}{(Numeric) Size of the raw data circles.}
 
 \item{colData}{(Numeric or Character) Color used to plot the raw data.}
 
@@ -127,4 +133,7 @@
 Generic plot function for \code{drFitModel} objects.
 
 Generic plot function for \code{drFitModel} objects.
+}
+\references{
+Christian Ritz, Florent Baty, Jens C. Streibig, Daniel Gerhard (2015). \emph{Dose-Response Analysis Using R}. PLoS ONE 10(12): e0146021. DOI: 10.1371/journal.pone.0146021
 }

@@ -3832,7 +3832,6 @@ growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.
 #' @export
 #'
 #' @import drc
-#' models <- unlist(lapply(1:length(models), function(x) models[[x]][1]))
 growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.control())
 {
   if (methods::is(control) != "grofit.control" && methods::is(control) != "fl.control")

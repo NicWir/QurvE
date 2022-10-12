@@ -1246,6 +1246,7 @@ plot.drFitSpline <- function (drFitSpline,
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis (if not log-transformed). The breaks are generated using \code{pretty}. Thus, the final number of breaks can deviate from the user input.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param pch (Numeric) Symbol used to plot data points.
 #' @param cex.point (Numeric) Size of the raw data points.
 #' @param cex.axis (Numeric) Font size of axis annotations.
 #' @param cex.lab (Numeric) Font size of axis titles.
@@ -1255,10 +1256,13 @@ plot.drFitSpline <- function (drFitSpline,
 #' @param xlab (Character) An optional label for the x axis.
 #' @param ylab (Character) An optional label for the y axis.
 #' @param legend (Logical) If \code{TRUE} a legend is displayed.
-#' @param legendText a character string or vector of character strings specifying the legend text (the position of the upper right corner of the legend box).
+#' @param legendText (Character) Specify the legend text (the position of the upper right corner of the legend box).
+#' @param legendPos (Numeric) Vector of length 2 giving the position of the legend.
 #' @param cex.legend numeric specifying the legend text size.
 #'
 #' @export
+#'
+#' @references Christian Ritz, Florent Baty, Jens C. Streibig, Daniel Gerhard (2015). _Dose-Response Analysis Using R_. PLoS ONE 10(12): e0146021. DOI: 10.1371/journal.pone.0146021
 #'
 plot.drFitModel <- function(drFitModel,
                             type = c("average", "all", "bars", "none", "obs", "confidence"),
@@ -1272,6 +1276,7 @@ plot.drFitModel <- function(drFitModel,
                             n.ybreaks,
                             x.lim,
                             y.lim,
+                            pch = 1,
                             cex.point,
                             cex.axis = 1,
                             cex.lab = 1.5,
@@ -1282,6 +1287,7 @@ plot.drFitModel <- function(drFitModel,
                             ylab,
                             legend = T,
                             legendText,
+                            legendPos,
                             cex.legend = 1.2
                             )
 {
@@ -1338,12 +1344,17 @@ plot.drFitModel <- function(drFitModel,
   if(missing(ylab))
     ylab <- paste0("Response (", drFitModel$parameters$test, ")")
 
+  if(missing(legendPos)){
+    legendPos <- c(1.25*max(conc), 1.02*max(test))
+  }
+
   par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
   try(
     drc:::plot.drc(x = model,
                    broken = broken,
                    type = "all",
                    add = add,
+                   pch = pch,
                    col = col,
                    lwd = lwd,
                    lty = lty,
@@ -1360,7 +1371,7 @@ plot.drFitModel <- function(drFitModel,
                    legendText = legendText,
                    cex.legend = cex.legend,
                    gridsize = gridsize,
-                   legendPos = c(1.25*max(conc), 1.02*max(test)),
+                   legendPos = legendPos,
                    bp = bp,
     )
   )
@@ -1373,6 +1384,7 @@ plot.drFitModel <- function(drFitModel,
     axis(side=2, at=yt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
   }
   try(drc:::plot.drc(model,
+                     pch = pch,
                      xlim = x.lim,
                      ylim = x.lim,
                      broken = broken,
@@ -1381,7 +1393,8 @@ plot.drFitModel <- function(drFitModel,
                      col = col,
                      lwd = lwd,
                      lty = lty,
-                     gridsize = gridsize)
+                     gridsize = gridsize,
+                     legend = FALSE)
   )
   if (ec50line == TRUE) {
     #vertical lines
@@ -1406,7 +1419,7 @@ plot.drFitModel <- function(drFitModel,
 #' Generic plot function for \code{gcBootSpline} objects.
 #'
 #' @param gcBootSpline object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.
-#' @param pch (Numeric) Size of the raw data circles.
+#' @param pch (Numeric) Symbol used to plot data points.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param deriv (Logical) Show the derivatives (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param colSpline (Numeric or character) Spline line colour.

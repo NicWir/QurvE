@@ -29,7 +29,7 @@
 \arguments{
 \item{gcBootSpline}{object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.}
 
-\item{pch}{(Numeric) Size of the raw data circles.}
+\item{pch}{(Numeric) Symbol used to plot data points.}
 
 \item{colData}{(Numeric or character) Contour color of the raw data circles.}
 

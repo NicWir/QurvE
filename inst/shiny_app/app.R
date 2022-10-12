@@ -710,34 +710,48 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
 
                                                                        conditionalPanel(condition = "input.perform_ec50_growth",
+                                                                                        selectInput(inputId = "dr_method_growth",
+                                                                                                    label = "Method",
+                                                                                                    choices = c("Dose-response models" = "model",
+                                                                                                                "Response spline fit" = "spline")
+                                                                                        ),
+                                                                                        bsPopover(id = "dr_method_growth", title = HTML("<em>dr.method</em>"), content = "Fit either a various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit."),
+
                                                                                         selectInput(inputId = "response_parameter_growth",
                                                                                                     label = "Response Parameter",
                                                                                                     choices = ""),
                                                                                         bsPopover(id = "response_parameter_growth", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve."),
 
-                                                                                        checkboxInput(inputId = 'log_transform_concentration_growth',
-                                                                                                      label = 'Log transform concentration'),
+                                                                                        conditionalPanel(
+                                                                                          condition = 'input.dr_method_growth == "spline"',
+                                                                                          tags$div(title="Perform a log(x+1) transformation on concentration values.",
+                                                                                                   checkboxInput(inputId = 'log_transform_concentration_growth',
+                                                                                                                 label = 'Log transform concentration')
+                                                                                          ),
 
-                                                                                        checkboxInput(inputId = 'log_transform_response_growth',
-                                                                                                      label = 'Log transform response'),
+                                                                                          tags$div(title="Perform a log(y+1) transformation on response values.",
+                                                                                                   checkboxInput(inputId = 'log_transform_response_growth',
+                                                                                                                 label = 'Log transform response')
+                                                                                          ),
 
-                                                                                        textInput(
-                                                                                          inputId = 'smoothing_factor_growth_dr',
-                                                                                          label = 'Smoothing factor dose-response splines',
-                                                                                          value = "",
-                                                                                          placeholder = "NULL (choose automatically)"
-                                                                                        ),
-                                                                                        bsPopover(id = "smoothing_factor_growth_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+                                                                                          textInput(
+                                                                                            inputId = 'smoothing_factor_growth_dr',
+                                                                                            label = 'Smoothing factor dose-response splines',
+                                                                                            value = "",
+                                                                                            placeholder = "NULL (choose automatically)"
+                                                                                          ),
+                                                                                          bsPopover(id = "smoothing_factor_growth_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
-                                                                                        numberInput(
-                                                                                          inputId = 'number_of_bootstrappings_dr_growth',
-                                                                                          label = 'Number of bootstrappings',
-                                                                                          value = 0,
-                                                                                          min = NA,
-                                                                                          max = NA,
-                                                                                          placeholder = 0
-                                                                                        ),
-                                                                                        bsPopover(id = "number_of_bootstrappings_dr_growth", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
+                                                                                          numberInput(
+                                                                                            inputId = 'number_of_bootstrappings_dr_growth',
+                                                                                            label = 'Number of bootstrappings',
+                                                                                            value = 0,
+                                                                                            min = NA,
+                                                                                            max = NA,
+                                                                                            placeholder = 0
+                                                                                          ),
+                                                                                          bsPopover(id = "number_of_bootstrappings_dr_growth", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+                                                                                        ), #conditionalPanel(condition = 'input.dr_method_growth == "spline"')
 
                                                                        ) # conditionalPanel(condition = "input.perform_ec50_growth"
                                                                      ), #  wellPanel
@@ -2732,12 +2746,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  ) #  mainPanel
                                                         ),
 
-                                                        ### Growth DR Plots ####
+                                                        ### Growth DR Plots Spline ####
 
-                                                        tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse",
+                                                        tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse_Spline",
                                                                  sidebarPanel(
                                                                    conditionalPanel(
-                                                                     condition = "output.more_than_one_drfit",
+                                                                     condition = "output.more_than_one_drfit_spline",
                                                                      wellPanel(
                                                                        style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
                                                                        checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot',
@@ -2957,9 +2971,213 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         ), # tabPanel(title = "Dose-response analysis"
 
+                                                        ### Growth DR Plots Model ####
+
+                                                        tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse_Model",
+                                                                 sidebarPanel(
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_one_drfit_model",
+                                                                     wellPanel(
+                                                                       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                       checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot_model',
+                                                                                     label = 'Combine conditions into a single plot',
+                                                                                     value = FALSE)
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot_model",
+                                                                     textInput(inputId = "select_samples_based_on_string_dose_response_growth_plot_model",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
+                                                                     textInput(inputId = "exclude_samples_based_on_string_dose_response_growth_plot_model",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     )
+                                                                   ),
+
+                                                                   h3('Customize plot appearance'),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_dose_response_growth_plot_model",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = FALSE),
+
+                                                                   checkboxInput(inputId = "log_transform_x_axis_dose_response_growth_plot_model",
+                                                                                 label = "Log-transform x-axis",
+                                                                                 value = FALSE),
+
+                                                                   sliderInput(inputId = 'shape_type_dose_response_growth_plot_model',
+                                                                               label = 'Shape type',
+                                                                               min = 1,
+                                                                               max = 25,
+                                                                               value = 15),
+
+                                                                   sliderInput(inputId = 'shape_size_dose_response_growth_plot_model',
+                                                                               label = 'Shape size',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 2,
+                                                                               step = 0.5),
+
+                                                                     sliderInput(inputId = 'axis_size_dose_response_growth_plot_model',
+                                                                                 label = 'Axis title font size',
+                                                                                 min = 0.1,
+                                                                                 max = 10,
+                                                                                 value = 1.3,
+                                                                                 step = 0.1),
+
+                                                                     sliderInput(inputId = 'lab_size_dose_response_growth_plot_model',
+                                                                                 label = 'Axis label font size',
+                                                                                 min = 0.1,
+                                                                                 max = 10,
+                                                                                 value = 1.3,
+                                                                                 step = 0.1),
+
+                                                                   sliderInput(inputId = 'line_width_dose_response_growth_plot',
+                                                                               label = 'Line width',
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.log_transform_x_axis_dose_response_growth_plot_model",
+                                                                   sliderInput(inputId = "nbreaks_x_growth_plot_model",
+                                                                               label = "Number of breaks on x-axis",
+                                                                               min = 1,
+                                                                               max = 20,
+                                                                               value = 6)
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.log_transform_y_axis_dose_response_growth_plot_model",
+                                                                     sliderInput(inputId = "nbreaks_y_growth_plot_model",
+                                                                                 label = "Number of breaks on y-axis",
+                                                                                 min = 1,
+                                                                                 max = 20,
+                                                                                 value = 6)
+                                                                   ),
+
+                                                                   checkboxInput(inputId = 'show_ec50_indicator_lines_dose_response_growth_plot_model',
+                                                                                 label = 'Show EC50 indicator lines',
+                                                                                 value = TRUE),
+
+                                                                   checkboxInput(inputId = 'show_break_dose_response_growth_plot_model',
+                                                                                 label = 'Show x axis break',
+                                                                                 value = TRUE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.show_break_dose_response_growth_plot_model",
+                                                                     sliderInput(inputId = 'bp_dose_response_growth_plot_model',
+                                                                                 label = 'Break point position',
+                                                                                 min = 0.0001,
+                                                                                 max = 100,
+                                                                                 value = 0.01),
+                                                                   ),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_dose_response_growth_plot_model",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_dose_response_growth_plot_model",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_dose_response_growth_plot_model",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_dose_response_growth_plot_model",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   textInput(inputId = "y_axis_title_dose_response_growth_plot_model",
+                                                                             label = "y-axis title",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_dose_response_growth_plot_model",
+                                                                             label = "x-axis title",
+                                                                             value = ""
+                                                                   )
+
+                                                                 ), # sidebarPanel
+
+                                                                                  mainPanel(
+                                                                                    conditionalPanel(
+                                                                                      condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot_model",
+                                                                                      h3('Combined plots')
+                                                                                    ),
+                                                                                    conditionalPanel(
+                                                                                      condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot_model",
+                                                                                      h3('Individual plots'),
+                                                                                      selectInput(inputId = 'individual_plots_dose_response_growth_plot_model',
+                                                                                                  label = 'Select plot',
+                                                                                                  choices = "",
+                                                                                                  multiple = FALSE,
+                                                                                                  selectize = FALSE,
+                                                                                                  size = 3),
+                                                                                    ),
+                                                                                    plotOutput("dose_response_growth_plot_model",
+                                                                                               width = "100%", height = "800px"),
+
+                                                                                    h3(strong("Export plot")),
+
+                                                                                    fluidRow(
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "width_download_dose_response_growth_plot_model",
+                                                                                                          label = "Width (in inches)",
+                                                                                                          value = 7)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "height_download_dose_response_growth_plot_model",
+                                                                                                          label = "Height (in inches)",
+                                                                                                          value = 6)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             numericInput(inputId = "dpi_download_dose_response_growth_plot_model",
+                                                                                                          label = "DPI",
+                                                                                                          value = 300)
+                                                                                      ), # column
+                                                                                      column(width = 4,
+                                                                                             downloadButton('download_dose_response_growth_plot_model',"Download Plot"),
+
+                                                                                             radioButtons("format_download_dose_response_growth_plot_model",
+                                                                                                          label = NULL,
+                                                                                                          choices = c("PNG" = ".png",
+                                                                                                                      "PDF" = ".pdf"),
+                                                                                                          selected = ".png",
+                                                                                                          inline = TRUE)
+                                                                                      ), # column
+                                                                                    ) # fluidRow
+                                                                                  ), # mainPanel
+
+
+                                                        ), # tabPanel(title = "Dose-response analysis"
+
                                                         ### Growth DR Plots Bootstrap ####
 
-                                                        tabPanel(title = "Dose-Response Analysis (Bootstrap)", value = "tabPanel_Visualize_Growth_DoseResponse_bt",
+                                                        tabPanel(title = "Dose-Response Analysis (Bootstrap)", value = "tabPanel_Visualize_Growth_DoseResponse_Spline_bt",
                                                                  sidebarPanel(
 
                                                                    h3('Customize plot appearance'),
@@ -5606,6 +5824,7 @@ server <- function(input, output, session){
                                               smooth.gc = smooth.gc,
                                               model.type = models,
                                               growth.thresh = growth.thresh,
+                                              dr.method = input$dr_method_growth,
                                               dr.parameter = input$response_parameter_growth,
                                               smooth.dr = smooth.dr,
                                               log.x.dr = input$log_transform_concentration_growth,
@@ -8059,20 +8278,20 @@ server <- function(input, output, session){
     contentType = ifelse(input$format_download_growth_group_plot == ".pdf", "image/pdf", "image/png")
   )
 
-      ### DR Plots ####
+      ### DR Plots Spline ####
   observe({
-    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1){
-      showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
+    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$control$dr.method == "spline"){
+      showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Spline")
     } else {
-      hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse")
+      hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Spline")
     }
   })
 
-  output$more_than_one_drfit <- reactive({
+  output$more_than_one_drfit_spline <- reactive({
     if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drFittedSplines) > 1) return(TRUE)
     else return(FALSE)
   })
-  outputOptions(output, 'more_than_one_drfit', suspendWhenHidden=FALSE)
+  outputOptions(output, 'more_than_one_drfit_spline', suspendWhenHidden=FALSE)
 
   dose_response_growth_plot_combined <- reactive({
     results <- results$growth$drFit
@@ -8110,6 +8329,93 @@ server <- function(input, output, session){
     },
     contentType = ifelse(input$format_download_dose_response_growth_plot_combined == ".pdf", "image/pdf", "image/png")
   )
+
+      ### DR Plots Model ####
+      observe({
+        if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$control$dr.method == "model"){
+          showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Model")
+        } else {
+          hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Model")
+        }
+      })
+
+      output$more_than_one_drfit_model <- reactive({
+        if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drFittedModels) > 1) return(TRUE)
+        else return(FALSE)
+      })
+      outputOptions(output, 'more_than_one_drfit_model', suspendWhenHidden=FALSE)
+
+      dose_response_growth_plot_model <- reactive({
+        results <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
+
+        # Define log-transformation of axes
+        if(input$log_transform_y_axis_dose_response_growth_plot_model &&
+           input$log_transform_x_axis_dose_response_growth_plot_model){
+          log <- "xy"
+        } else if(input$log_transform_y_axis_dose_response_growth_plot_model){
+          log <- "y"
+        } else if(input$log_transform_x_axis_dose_response_growth_plot_model){
+          log <- "x"
+        } else {
+          log <- ""
+        }
+
+        # Define x- and y-axis limits
+        if(any(input$y_range_min_dose_response_growth_plot_model == "",
+               input$y_range_max_dose_response_growth_plot_model == "")){
+          ylim <- NULL
+        } else {
+          ylim <- c(as.numeric(input$y_range_min_dose_response_growth_plot_model),
+                    as.numeric(input$y_range_max_dose_response_growth_plot_model))
+        }
+
+        if(any(input$x_range_min_dose_response_growth_plot_model == "",
+               input$x_range_max_dose_response_growth_plot_model == "")){
+          xlim <- NULL
+        } else {
+          xlim <- c(as.numeric(input$x_range_min_dose_response_growth_plot_model),
+                    as.numeric(input$x_range_max_dose_response_growth_plot_model))
+        }
+        browser()
+        if(!input$combine_conditions_into_a_single_plot_dose_response_growth_plot_model){
+          plot.drFitModel(drFitSpline = results,
+                          combine = FALSE,
+                          pch = input$shape_type_dose_response_growth_plot_model,
+                          cex.point = input$shape_size_dose_response_growth_plot_model,
+                          cex.lab = input$axis_size_dose_response_growth_plot_model,
+                          cex.axis = input$lab_size_dose_response_growth_plot_model,
+                          y.title = input$y_axis_title_dose_response_growth_plot_model,
+                          x.title = input$x_axis_title_dose_response_growth_plot_model,
+                          log = log,
+                          lwd = input$line_width_dose_response_growth_plot_model,
+                          ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot_model,
+                          y.lim = ylim,
+                          x.lim = xlim,
+                          broken = input$show_break_dose_response_growth_plot_model,
+                          n.xbreaks = input$nbreaks_x_growth_plot_model,
+                          n.ybreaks = input$nbreaks_y_growth_plot_model,
+                          xlab = input$x_axis_title_dose_response_growth_plot_model,
+                          ylab = input$y_axis_title_dose_response_growth_plot_model,
+                          bp = input$bp_dose_response_growth_plot_model
+          )
+        }
+      })
+
+      output$dose_response_growth_plot_model <- renderPlot({
+        dose_response_growth_plot_model()
+      })
+
+      output$download_dose_response_growth_plot_model <- downloadHandler(
+        filename = function() {
+          paste("dose_response_growth_model",  input$format_download_dose_response_growth_plot_model, sep="")
+        },
+        content = function(file) {
+          ggsave(filename = file, width = input$width_download_dose_response_growth_plot_model,
+                 height = input$height_download_dose_response_growth_plot_model,
+                 dpi = input$dpi_download_dose_response_growth_plot_model)
+        },
+        contentType = ifelse(input$format_download_dose_response_growth_plot_model == ".pdf", "image/pdf", "image/png")
+      )
 
       ### DR Plots Spline Individual ####
 
@@ -8235,9 +8541,9 @@ server <- function(input, output, session){
       ### DR Plots (Bootstrap) ####
   observe({
     if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$control$nboot.dr > 1){
-      showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_bt")
+      showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Spline_bt")
     } else {
-      hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_bt")
+      hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Spline_bt")
     }
   })
 
