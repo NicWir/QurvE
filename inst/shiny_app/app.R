@@ -715,7 +715,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                     choices = c("Dose-response models" = "model",
                                                                                                                 "Response spline fit" = "spline")
                                                                                         ),
-                                                                                        bsPopover(id = "dr_method_growth", title = HTML("<em>dr.method</em>"), content = "Fit either a various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit."),
+                                                                                        bsPopover(id = "dr_method_growth",
+                                                                                                  title = HTML("<em>dr.method</em>"),
+                                                                                                  placement = "right",
+                                                                                                  content = "Fit either a various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit."),
 
                                                                                         selectInput(inputId = "response_parameter_growth",
                                                                                                     label = "Response Parameter",
@@ -1067,7 +1070,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                             choices = c("Biosensor response model" = "model",
                                                                                                                         "Response spline fit" = "spline")
                                                                                                 ),
-                                                                                                bsPopover(id = "dr_method_fluorescence", title = HTML("<em>dr.method</em>"), content = "Fit either a biosensor response model (Meyer et al., 2019) to response-vs.-concentration data, or apply a nonparametric (spline) fit."),
+                                                                                                bsPopover(id = "dr_method_fluorescence",
+                                                                                                          placement = "right",
+                                                                                                          title = HTML("<em>dr.method</em>"),
+                                                                                                          content = "Fit either a biosensor response model (Meyer et al., 2019) to response-vs.-concentration data, or apply a nonparametric (spline) fit."
+                                                                                                          ),
 
                                                                                                 selectInput(inputId = "response_parameter_fluorescence",
                                                                                                             label = "Response Parameter",
@@ -1444,10 +1451,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                               sliderInput(inputId = 'shape_size_validate_growth_plot_linear',
                                                                                           label = 'Shape size',
-                                                                                          min = 1,
+                                                                                          min = 0.1,
                                                                                           max = 10,
                                                                                           value = 2,
-                                                                                          step = 0.5),
+                                                                                          step = 0.1),
 
 
 
@@ -1635,9 +1642,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                               sliderInput(inputId = 'shape_size_validate_growth_plot_spline',
                                                                                           label = 'Shape size',
-                                                                                          min = 1,
+                                                                                          min = 0.1,
                                                                                           max = 10,
-                                                                                          value = 3,
+                                                                                          value = 2,
                                                                                           step = 0.1),
 
                                                                               sliderInput(inputId = "line_width_validate_growth_plot_spline",
@@ -1732,9 +1739,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           value = 21),
                                                                               sliderInput(inputId = 'shape_size_validate_growth_plot_model',
                                                                                           label = 'Shape size',
-                                                                                          min = 1,
+                                                                                          min = 0.1,
                                                                                           max = 10,
-                                                                                          value = 3,
+                                                                                          value = 2,
                                                                                           step = 0.1),
 
                                                                               sliderInput(inputId = "line_width_validate_growth_plot_model",
@@ -1842,10 +1849,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                               sliderInput(inputId = 'shape_size_validate_growth_spline_bt',
                                                                                           label = 'Shape size',
-                                                                                          min = 1,
+                                                                                          min = 0.1,
                                                                                           max = 10,
                                                                                           value = 2,
-                                                                                          step = 0.5),
+                                                                                          step = 0.1),
 
 
 
@@ -1992,10 +1999,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                               sliderInput(inputId = 'shape_size_validate_fluorescence_plot_linear',
                                                                                           label = 'Shape size',
-                                                                                          min = 1,
+                                                                                          min = 0.1,
                                                                                           max = 10,
                                                                                           value = 2,
-                                                                                          step = 0.5),
+                                                                                          step = 0.1),
 
 
 
@@ -2181,10 +2188,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                               sliderInput(inputId = 'shape_size_validate_fluorescence_plot_spline',
                                                                                           label = 'Shape size',
-                                                                                          min = 1,
+                                                                                          min = 0.1,
                                                                                           max = 10,
                                                                                           value = 2,
-                                                                                          step = 0.5),
+                                                                                          step = 0.1),
 
                                                                               sliderInput(inputId = "line_width_validate_fluorescence_plot_spline",
                                                                                           label = "Line width",
@@ -2284,10 +2291,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                               sliderInput(inputId = 'shape_size_validate_fluorescence_spline_bt',
                                                                                           label = 'Shape size',
-                                                                                          min = 1,
+                                                                                          min = 0.1,
                                                                                           max = 10,
                                                                                           value = 2,
-                                                                                          step = 0.5),
+                                                                                          step = 0.1),
 
 
 
@@ -2686,10 +2693,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = "shape.size_growth_parameter_plot",
                                                                                label = "Shape size",
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
-                                                                               value = 2.5,
-                                                                               step = 0.5),
+                                                                               value = 2,
+                                                                               step = 0.1),
 
                                                                    sliderInput(inputId = "basesize_growth_parameter_plot",
                                                                                label = "Base font size",
@@ -2792,10 +2799,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = 'shape_size_dose_response_growth_plot',
                                                                                label = 'Shape size',
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
                                                                                value = 2,
-                                                                               step = 0.5),
+                                                                               step = 0.1),
 
                                                                    conditionalPanel(
                                                                      condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
@@ -2975,39 +2982,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse_Model",
                                                                  sidebarPanel(
-                                                                   conditionalPanel(
-                                                                     condition = "output.more_than_one_drfit_model",
-                                                                     wellPanel(
-                                                                       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                                       checkboxInput(inputId = 'combine_conditions_into_a_single_plot_dose_response_growth_plot_model',
-                                                                                     label = 'Combine conditions into a single plot',
-                                                                                     value = FALSE)
-                                                                     )
-                                                                   ),
-
-                                                                   conditionalPanel(
-                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot_model",
-                                                                     textInput(inputId = "select_samples_based_on_string_dose_response_growth_plot_model",
-                                                                               label = "Select sample based on string (separate by ;)"
-                                                                     )
-                                                                   ),
-
-                                                                   conditionalPanel(
-                                                                     condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot",
-                                                                     textInput(inputId = "exclude_samples_based_on_string_dose_response_growth_plot_model",
-                                                                               label = "Exclude sample based on string (separate by ;)"
-                                                                     )
-                                                                   ),
 
                                                                    h3('Customize plot appearance'),
 
-                                                                   checkboxInput(inputId = "log_transform_y_axis_dose_response_growth_plot_model",
-                                                                                 label = "Log-transform y-axis",
-                                                                                 value = FALSE),
-
                                                                    checkboxInput(inputId = "log_transform_x_axis_dose_response_growth_plot_model",
                                                                                  label = "Log-transform x-axis",
-                                                                                 value = FALSE),
+                                                                                 value = TRUE),
 
                                                                    sliderInput(inputId = 'shape_type_dose_response_growth_plot_model',
                                                                                label = 'Shape type',
@@ -3017,26 +2997,26 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = 'shape_size_dose_response_growth_plot_model',
                                                                                label = 'Shape size',
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
                                                                                value = 2,
-                                                                               step = 0.5),
+                                                                               step = 0.1),
 
-                                                                     sliderInput(inputId = 'axis_size_dose_response_growth_plot_model',
-                                                                                 label = 'Axis title font size',
-                                                                                 min = 0.1,
-                                                                                 max = 10,
-                                                                                 value = 1.3,
-                                                                                 step = 0.1),
+                                                                   sliderInput(inputId = 'axis_size_dose_response_growth_plot_model',
+                                                                               label = 'Axis title font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.3,
+                                                                               step = 0.1),
 
-                                                                     sliderInput(inputId = 'lab_size_dose_response_growth_plot_model',
-                                                                                 label = 'Axis label font size',
-                                                                                 min = 0.1,
-                                                                                 max = 10,
-                                                                                 value = 1.3,
-                                                                                 step = 0.1),
+                                                                   sliderInput(inputId = 'lab_size_dose_response_growth_plot_model',
+                                                                               label = 'Axis label font size',
+                                                                               min = 0.1,
+                                                                               max = 10,
+                                                                               value = 1.3,
+                                                                               step = 0.1),
 
-                                                                   sliderInput(inputId = 'line_width_dose_response_growth_plot',
+                                                                   sliderInput(inputId = 'line_width_dose_response_growth_plot_model',
                                                                                label = 'Line width',
                                                                                min = 0.01,
                                                                                max = 10,
@@ -3044,11 +3024,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "input.log_transform_x_axis_dose_response_growth_plot_model",
-                                                                   sliderInput(inputId = "nbreaks_x_growth_plot_model",
-                                                                               label = "Number of breaks on x-axis",
-                                                                               min = 1,
-                                                                               max = 20,
-                                                                               value = 6)
+                                                                     sliderInput(inputId = "nbreaks_x_growth_plot_model",
+                                                                                 label = "Number of breaks on x-axis",
+                                                                                 min = 1,
+                                                                                 max = 20,
+                                                                                 value = 6)
                                                                    ),
 
                                                                    conditionalPanel(
@@ -3070,11 +3050,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "input.show_break_dose_response_growth_plot_model",
-                                                                     sliderInput(inputId = 'bp_dose_response_growth_plot_model',
+                                                                     numberInput(inputId = 'bp_dose_response_growth_plot_model',
                                                                                  label = 'Break point position',
-                                                                                 min = 0.0001,
-                                                                                 max = 100,
-                                                                                 value = 0.01),
+                                                                                 value = ""),
                                                                    ),
 
                                                                    strong("x-Range"),
@@ -3123,56 +3101,47 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                  ), # sidebarPanel
 
-                                                                                  mainPanel(
-                                                                                    conditionalPanel(
-                                                                                      condition = "input.combine_conditions_into_a_single_plot_dose_response_growth_plot_model",
-                                                                                      h3('Combined plots')
-                                                                                    ),
-                                                                                    conditionalPanel(
-                                                                                      condition = "!input.combine_conditions_into_a_single_plot_dose_response_growth_plot_model",
-                                                                                      h3('Individual plots'),
-                                                                                      selectInput(inputId = 'individual_plots_dose_response_growth_plot_model',
-                                                                                                  label = 'Select plot',
-                                                                                                  choices = "",
-                                                                                                  multiple = FALSE,
-                                                                                                  selectize = FALSE,
-                                                                                                  size = 3),
-                                                                                    ),
-                                                                                    plotOutput("dose_response_growth_plot_model",
-                                                                                               width = "100%", height = "800px"),
+                                                                 mainPanel(
 
-                                                                                    h3(strong("Export plot")),
+                                                                   selectInput(inputId = 'individual_plots_dose_response_growth_plot_model',
+                                                                               label = 'Select plot',
+                                                                               choices = "",
+                                                                               multiple = FALSE,
+                                                                               selectize = FALSE,
+                                                                               size = 3),
+                                                                   plotOutput("dose_response_growth_plot_model",
+                                                                              width = "100%", height = "800px"),
 
-                                                                                    fluidRow(
-                                                                                      column(width = 4,
-                                                                                             numericInput(inputId = "width_download_dose_response_growth_plot_model",
-                                                                                                          label = "Width (in inches)",
-                                                                                                          value = 7)
-                                                                                      ), # column
-                                                                                      column(width = 4,
-                                                                                             numericInput(inputId = "height_download_dose_response_growth_plot_model",
-                                                                                                          label = "Height (in inches)",
-                                                                                                          value = 6)
-                                                                                      ), # column
-                                                                                      column(width = 4,
-                                                                                             numericInput(inputId = "dpi_download_dose_response_growth_plot_model",
-                                                                                                          label = "DPI",
-                                                                                                          value = 300)
-                                                                                      ), # column
-                                                                                      column(width = 4,
-                                                                                             downloadButton('download_dose_response_growth_plot_model',"Download Plot"),
+                                                                   h3(strong("Export plot")),
 
-                                                                                             radioButtons("format_download_dose_response_growth_plot_model",
-                                                                                                          label = NULL,
-                                                                                                          choices = c("PNG" = ".png",
-                                                                                                                      "PDF" = ".pdf"),
-                                                                                                          selected = ".png",
-                                                                                                          inline = TRUE)
-                                                                                      ), # column
-                                                                                    ) # fluidRow
-                                                                                  ), # mainPanel
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_dose_response_growth_plot_model",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 7)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_dose_response_growth_plot_model",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 6)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_dose_response_growth_plot_model",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_dose_response_growth_plot_model',"Download Plot"),
 
-
+                                                                            radioButtons("format_download_dose_response_growth_plot_model",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ), # column
+                                                                   ) # fluidRow
+                                                                 ), # mainPanel
                                                         ), # tabPanel(title = "Dose-response analysis"
 
                                                         ### Growth DR Plots Bootstrap ####
@@ -3191,10 +3160,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = 'shape_size_dose_response_growth_plot_bt',
                                                                                label = 'Shape size',
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
                                                                                value = 2,
-                                                                               step = 0.5),
+                                                                               step = 0.1),
 
                                                                    sliderInput(inputId = 'axis_size_dose_response_growth_plot_bt',
                                                                                label = 'Axis title font size',
@@ -3824,10 +3793,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = "shape.size_fluorescence_parameter_plot",
                                                                                label = "Shape size",
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
-                                                                               value = 2.5,
-                                                                               step = 0.5),
+                                                                               value = 2,
+                                                                               step = 0.1),
 
                                                                    sliderInput(inputId = "basesize_fluorescence_parameter_plot",
                                                                                label = "Base font size",
@@ -3917,10 +3886,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot',
                                                                                label = 'Shape size',
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
                                                                                value = 2,
-                                                                               step = 0.5),
+                                                                               step = 0.1),
 
                                                                    conditionalPanel(
                                                                      condition = "input.combine_conditions_into_a_single_plot_dose_response_fluorescence_plot",
@@ -4116,9 +4085,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = 'shape_size_dose_response_model_fluorescence_plot',
                                                                                label = 'Shape size',
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
-                                                                               value = 1,
+                                                                               value = 2,
                                                                                step = 0.1),
 
                                                                    sliderInput(inputId = 'axis_size_dose_response_model_fluorescence_plot',
@@ -4240,10 +4209,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    sliderInput(inputId = 'shape_size_dose_response_fluorescence_plot_bt',
                                                                                label = 'Shape size',
-                                                                               min = 1,
+                                                                               min = 0.1,
                                                                                max = 10,
                                                                                value = 2,
-                                                                               step = 0.5),
+                                                                               step = 0.1),
 
                                                                    sliderInput(inputId = 'axis_size_dose_response_fluorescence_plot_bt',
                                                                                label = 'Axis title font size',
@@ -5839,8 +5808,6 @@ server <- function(input, output, session){
                         )
     )
 
-    browser()
-
     if(!is.null("results$growth")){
       # ENABLE DISABLED PANELS AFTER RUNNING COMPUTATION
       shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
@@ -6228,43 +6195,6 @@ server <- function(input, output, session){
               escape = FALSE)
   })
 
-  table_growth_dr_spline <- reactive({
-    try({
-      res.table.dr <- results$growth$drFit$drTable
-      table_dr <- data.frame("Test" = res.table.dr$Test,
-                                "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
-                                "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
-                                "Test parameter" = res.table.dr[["test"]],
-                                stringsAsFactors = F, check.names = F)
-      if(!is.null(res.table.dr)){
-        if(results$growth$control$log.x.dr){
-          table_dr <- suppressWarnings(cbind(table_dr,
-                                             data.frame("EC50 (original)" = round(as.numeric(res.table.dr[["EC50.orig"]]), 3),
-                                                        stringsAsFactors = F, check.names = F)))
-        }
-        if(results$growth$control$log.y.dr){
-          table_dr <- suppressWarnings(cbind(table_dr,
-                                             data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
-                                                        stringsAsFactors = F, check.names = F)))
-        }
-        if ( results$growth$control$nboot.dr > 2 ){
-          table_dr <- suppressWarnings(cbind(table_dr,
-                                             data.frame("Mean EC50 (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50"]]), 3), sep = " \u00B1 "),
-                                                        "Response(EC50) (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50y"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50y"]]), 3), sep = " \u00B1 "),
-                                                        stringsAsFactors = F, check.names = F)))
-        }
-      }
-      table_dr
-    })
-  })
-
-  output$results_table_growth_dr_spline <- DT::renderDT({
-    table_dr <- table_growth_dr_spline()
-    DT::datatable(table_dr,
-              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
-              escape = FALSE)
-  })
-
   table_growth_model_group <- reactive({
     gcTable <- results$growth$gcFit$gcTable
     QurvE:::table_group_growth_model(gcTable)
@@ -6275,6 +6205,64 @@ server <- function(input, output, session){
                   options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                   escape = FALSE)
   })
+
+  ### DR Spline ####
+
+  table_growth_dr_spline <- reactive({
+    if(results$growth$control$dr.method == "spline"){
+      try({
+        res.table.dr <- results$growth$drFit$drTable
+        table_dr <- data.frame("Test" = res.table.dr$Test,
+                               "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
+                               "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
+                               "Test parameter" = res.table.dr[["test"]],
+                               stringsAsFactors = F, check.names = F)
+        if(!is.null(res.table.dr)){
+          if(results$growth$control$log.x.dr){
+            table_dr <- suppressWarnings(cbind(table_dr,
+                                               data.frame("EC50 (original)" = round(as.numeric(res.table.dr[["EC50.orig"]]), 3),
+                                                          stringsAsFactors = F, check.names = F)))
+          }
+          if(results$growth$control$log.y.dr){
+            table_dr <- suppressWarnings(cbind(table_dr,
+                                               data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
+                                                          stringsAsFactors = F, check.names = F)))
+          }
+          if ( results$growth$control$nboot.dr > 2 ){
+            table_dr <- suppressWarnings(cbind(table_dr,
+                                               data.frame("Mean EC50 (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50"]]), 3), sep = " \u00B1 "),
+                                                          "Response(EC50) (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50y"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50y"]]), 3), sep = " \u00B1 "),
+                                                          stringsAsFactors = F, check.names = F)))
+          }
+        }
+        table_dr
+      })
+    }
+    else{
+      models <- invisible(drc:::getMeanFunctions(display = F))
+      model.names <- c(unlist(lapply(1:length(models), function(x) models[[x]][1])), "weibull2x", "gammadr", "multi2")
+      model.descr <- c(unlist(lapply(1:length(models), function(x) models[[x]][2])), "four-parameter Weibull model", "Gamma dose-response model", "Multistage dose-response model with quadratic terms")
+      try({
+        res.table.dr <- results$growth$drFit$drTable
+        table_dr <- data.frame("Test" = res.table.dr$Test,
+                               "EC50 \u00B1 SE" = paste0(round(as.numeric(res.table.dr[["EC50.Estimate"]]), 3), " \u00B1 ", round(as.numeric(res.table.dr[["EC50.Std..Error"]]), 3)),
+                               "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
+                               "Test parameter" = res.table.dr[["test"]],
+                               "Model" = paste0(res.table.dr[["model"]], ": ", model.descr[match(res.table.dr[["model"]], model.names)]),
+                               stringsAsFactors = F, check.names = F)
+
+        table_dr
+      })
+    }
+  })
+
+  output$results_table_growth_dr_spline <- DT::renderDT({
+    table_dr <- table_growth_dr_spline()
+    DT::datatable(table_dr,
+              options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "All")) ),
+              escape = FALSE)
+  })
+
       ###____Table Download____####
   output$download_table_growth_linear <- downloadHandler(
     filename = function() {
@@ -6752,9 +6740,9 @@ server <- function(input, output, session){
     # Define x- and y-axis limits
     if(any(input$y_range_min_validate_growth_plot_linear == "",
            input$y_range_max_validate_growth_plot_linear == "")){
-      ylim <- NULL
+      y.lim <- NULL
     } else {
-      ylim <- c(as.numeric(input$y_range_min_validate_growth_plot_linear),
+      y.lim <- c(as.numeric(input$y_range_min_validate_growth_plot_linear),
                 as.numeric(input$y_range_max_validate_growth_plot_linear))
     }
 
@@ -6768,9 +6756,9 @@ server <- function(input, output, session){
 
     if(any(input$x_range_min_validate_growth_plot_linear == "",
            input$x_range_max_validate_growth_plot_linear == "")){
-      xlim <- NULL
+      x.lim <- NULL
     } else {
-      xlim <- c(as.numeric(input$x_range_min_validate_growth_plot_linear),
+      x.lim <- c(as.numeric(input$x_range_min_validate_growth_plot_linear),
                 as.numeric(input$x_range_max_validate_growth_plot_linear))
     }
 
@@ -6802,8 +6790,8 @@ server <- function(input, output, session){
           cex.lab = input$axis_size_validate_growth_plot_linear,
           cex.axis = input$lab_size_validate_growth_plot_linear,
           lwd = input$line_width_validate_growth_plot_linear,
-          y.lim = ylim,
-          x.lim = xlim
+          y.lim = y.lim,
+          x.lim = x.lim
         )
       )
       if(input$diagnostics_validate_growth_plot_linear){
@@ -6961,9 +6949,9 @@ server <- function(input, output, session){
       # Define x- and y-axis limits
       if(any(input$y_range_min_validate_growth_plot_linear == "",
              input$y_range_max_validate_growth_plot_linear == "")){
-        ylim <- NULL
+        y.lim <- NULL
       } else {
-        ylim <- c(as.numeric(input$y_range_min_validate_growth_plot_linear),
+        y.lim <- c(as.numeric(input$y_range_min_validate_growth_plot_linear),
                   as.numeric(input$y_range_max_validate_growth_plot_linear))
       }
 
@@ -6977,9 +6965,9 @@ server <- function(input, output, session){
 
       if(any(input$x_range_min_validate_growth_plot_linear == "",
              input$x_range_max_validate_growth_plot_linear == "")){
-        xlim <- NULL
+        x.lim <- NULL
       } else {
-        xlim <- c(as.numeric(input$x_range_min_validate_growth_plot_linear),
+        x.lim <- c(as.numeric(input$x_range_min_validate_growth_plot_linear),
                   as.numeric(input$x_range_max_validate_growth_plot_linear))
       }
 
@@ -7000,8 +6988,8 @@ server <- function(input, output, session){
                            cex.lab = input$axis_size_validate_growth_plot_linear,
                            cex.axis = input$lab_size_validate_growth_plot_linear,
                            lwd = input$line_width_validate_growth_plot_linear,
-                           y.lim = ylim,
-                           x.lim = xlim
+                           y.lim = y.lim,
+                           x.lim = x.lim
           )
         )
         if(input$diagnostics_validate_growth_plot_linear){
@@ -7062,7 +7050,6 @@ server <- function(input, output, session){
       selected_vals_validate_growth$sample_validate_growth_spline
     )]]) > 1) {
       showModal(modalDialog("Creating plot...", footer = NULL))
-
       try(
         suppressWarnings(
           plot.gcFitSpline(
@@ -7417,9 +7404,9 @@ server <- function(input, output, session){
     # Define x- and y-axis limits
     if(any(input$y_range_min_validate_growth_spline_bt == "",
            input$y_range_max_validate_growth_spline_bt == "")){
-      ylim <- NULL
+      y.lim <- NULL
     } else {
-      ylim <- c(as.numeric(input$y_range_min_validate_growth_spline_bt),
+      y.lim <- c(as.numeric(input$y_range_min_validate_growth_spline_bt),
                 as.numeric(input$y_range_max_validate_growth_spline_bt))
     }
 
@@ -7433,9 +7420,9 @@ server <- function(input, output, session){
 
     if(any(input$x_range_min_validate_growth_spline_bt == "",
            input$x_range_max_validate_growth_spline_bt == "")){
-      xlim <- NULL
+      x.lim <- NULL
     } else {
-      xlim <- c(as.numeric(input$x_range_min_validate_growth_spline_bt),
+      x.lim <- c(as.numeric(input$x_range_min_validate_growth_spline_bt),
                 as.numeric(input$x_range_max_validate_growth_spline_bt))
     }
     if(length(results$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
@@ -7450,8 +7437,8 @@ server <- function(input, output, session){
                         cex.lab = input$axis_size_validate_growth_spline_bt,
                         cex.axis = input$lab_size_validate_growth_spline_bt,
                         lwd = input$line_width_validate_growth_spline_bt,
-                        y.lim = ylim,
-                        x.lim = xlim,
+                        y.lim = y.lim,
+                        x.lim = x.lim,
                         y.lim.deriv = ylim.deriv,
                         deriv = input$plot_derivative_growth_spline_bt,
                         shiny = TRUE
@@ -7488,9 +7475,9 @@ server <- function(input, output, session){
       ## Define x- and y-axis limits
       if(any(input$y_range_min_validate_growth_spline_bt == "",
              input$y_range_max_validate_growth_spline_bt == "")){
-        ylim <- NULL
+        y.lim <- NULL
       } else {
-        ylim <- c(as.numeric(input$y_range_min_validate_growth_spline_bt),
+        y.lim <- c(as.numeric(input$y_range_min_validate_growth_spline_bt),
                   as.numeric(input$y_range_max_validate_growth_spline_bt))
       }
 
@@ -7504,9 +7491,9 @@ server <- function(input, output, session){
 
       if(any(input$x_range_min_validate_growth_spline_bt == "",
              input$x_range_max_validate_growth_spline_bt == "")){
-        xlim <- NULL
+        x.lim <- NULL
       } else {
-        xlim <- c(as.numeric(input$x_range_min_validate_growth_spline_bt),
+        x.lim <- c(as.numeric(input$x_range_min_validate_growth_spline_bt),
                   as.numeric(input$x_range_max_validate_growth_spline_bt))
       }
 
@@ -7516,8 +7503,8 @@ server <- function(input, output, session){
                         cex.lab = input$axis_size_validate_growth_spline_bt,
                         cex.axis = input$lab_size_validate_growth_spline_bt,
                         lwd = input$line_width_validate_growth_spline_bt,
-                        y.lim = ylim,
-                        x.lim = xlim,
+                        y.lim = y.lim,
+                        x.lim = x.lim,
                         y.lim.deriv = ylim.deriv,
                         deriv = input$plot_derivative_growth_spline_bt,
                         shiny = TRUE
@@ -7605,9 +7592,9 @@ server <- function(input, output, session){
     # Define x- and y-axis limits
     if(any(input$y_range_min_validate_fluorescence_plot_linear == "",
            input$y_range_max_validate_fluorescence_plot_linear == "")){
-      ylim <- NULL
+      y.lim <- NULL
     } else {
-      ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_plot_linear),
+      y.lim <- c(as.numeric(input$y_range_min_validate_fluorescence_plot_linear),
                 as.numeric(input$y_range_max_validate_fluorescence_plot_linear))
     }
 
@@ -7621,9 +7608,9 @@ server <- function(input, output, session){
 
     if(any(input$x_range_min_validate_fluorescence_plot_linear == "",
            input$x_range_max_validate_fluorescence_plot_linear == "")){
-      xlim <- NULL
+      x.lim <- NULL
     } else {
-      xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
+      x.lim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
                 as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
     }
     if(length(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1"||
@@ -7638,8 +7625,8 @@ server <- function(input, output, session){
                          cex.lab = input$axis_size_validate_fluorescence_plot_linear,
                          cex.axis = input$lab_size_validate_fluorescence_plot_linear,
                          lwd = input$line_width_validate_fluorescence_plot_linear,
-                         y.lim = ylim,
-                         x.lim = xlim
+                         y.lim = y.lim,
+                         x.lim = x.lim
                          # ADD FURTHER INPUT (see Notion)
         )
       )
@@ -7656,8 +7643,8 @@ server <- function(input, output, session){
                            cex.lab = input$axis_size_validate_fluorescence_plot_linear,
                            cex.axis = input$lab_size_validate_fluorescence_plot_linear,
                            lwd = input$line_width_validate_fluorescence_plot_linear,
-                           y.lim = ylim,
-                           x.lim = xlim
+                           y.lim = y.lim,
+                           x.lim = x.lim
                            # ADD FURTHER INPUT (see Notion)
           )
         )
@@ -7802,9 +7789,9 @@ server <- function(input, output, session){
       # Define x- and y-axis limits
       if(any(input$y_range_min_validate_fluorescence_plot_linear == "",
              input$y_range_max_validate_fluorescence_plot_linear == "")){
-        ylim <- NULL
+        y.lim <- NULL
       } else {
-        ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_plot_linear),
+        y.lim <- c(as.numeric(input$y_range_min_validate_fluorescence_plot_linear),
                   as.numeric(input$y_range_max_validate_fluorescence_plot_linear))
       }
 
@@ -7818,9 +7805,9 @@ server <- function(input, output, session){
 
       if(any(input$x_range_min_validate_fluorescence_plot_linear == "",
              input$x_range_max_validate_fluorescence_plot_linear == "")){
-        xlim <- NULL
+        x.lim <- NULL
       } else {
-        xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
+        x.lim <- c(as.numeric(input$x_range_min_validate_fluorescence_plot_linear),
                   as.numeric(input$x_range_max_validate_fluorescence_plot_linear))
       }
       if(length(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
@@ -7837,8 +7824,8 @@ server <- function(input, output, session){
                            cex.lab = input$axis_size_validate_fluorescence_plot_linear,
                            cex.axis = input$lab_size_validate_fluorescence_plot_linear,
                            lwd = input$line_width_validate_fluorescence_plot_linear,
-                           y.lim = ylim,
-                           x.lim = xlim
+                           y.lim = y.lim,
+                           x.lim = x.lim
                            # ADD FURTHER INPUT (see Notion)
           )
         )
@@ -7854,8 +7841,8 @@ server <- function(input, output, session){
                              cex.lab = input$axis_size_validate_fluorescence_plot_linear,
                              cex.axis = input$lab_size_validate_fluorescence_plot_linear,
                              lwd = input$line_width_validate_fluorescence_plot_linear,
-                             y.lim = ylim,
-                             x.lim = xlim
+                             y.lim = y.lim,
+                             x.lim = x.lim
                              # ADD FURTHER INPUT (see Notion)
             )
           )
@@ -8058,9 +8045,9 @@ server <- function(input, output, session){
     # Define x- and y-axis limits
     if(any(input$y_range_min_validate_fluorescence_spline_bt == "",
            input$y_range_max_validate_fluorescence_spline_bt == "")){
-      ylim <- NULL
+      y.lim <- NULL
     } else {
-      ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_spline_bt),
+      y.lim <- c(as.numeric(input$y_range_min_validate_fluorescence_spline_bt),
                 as.numeric(input$y_range_max_validate_fluorescence_spline_bt))
     }
 
@@ -8074,9 +8061,9 @@ server <- function(input, output, session){
 
     if(any(input$x_range_min_validate_fluorescence_spline_bt == "",
            input$x_range_max_validate_fluorescence_spline_bt == "")){
-      xlim <- NULL
+      x.lim <- NULL
     } else {
-      xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_spline_bt),
+      x.lim <- c(as.numeric(input$x_range_min_validate_fluorescence_spline_bt),
                 as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
     }
 
@@ -8086,8 +8073,8 @@ server <- function(input, output, session){
                       cex.lab = input$axis_size_validate_fluorescence_spline_bt,
                       cex.axis = input$lab_size_validate_fluorescence_spline_bt,
                       lwd = input$line_width_validate_fluorescence_spline_bt,
-                      y.lim = ylim,
-                      x.lim = xlim,
+                      y.lim = y.lim,
+                      x.lim = x.lim,
                       y.lim.deriv = ylim.deriv,
                       deriv = input$plot_derivative_fluorescence_spline_bt,
                       shiny = TRUE
@@ -8129,9 +8116,9 @@ server <- function(input, output, session){
       # Define x- and y-axis limits
       if(any(input$y_range_min_validate_fluorescence_spline_bt == "",
              input$y_range_max_validate_fluorescence_spline_bt == "")){
-        ylim <- NULL
+        y.lim <- NULL
       } else {
-        ylim <- c(as.numeric(input$y_range_min_validate_fluorescence_spline_bt),
+        y.lim <- c(as.numeric(input$y_range_min_validate_fluorescence_spline_bt),
                   as.numeric(input$y_range_max_validate_fluorescence_spline_bt))
       }
 
@@ -8145,9 +8132,9 @@ server <- function(input, output, session){
 
       if(any(input$x_range_min_validate_fluorescence_spline_bt == "",
              input$x_range_max_validate_fluorescence_spline_bt == "")){
-        xlim <- NULL
+        x.lim <- NULL
       } else {
-        xlim <- c(as.numeric(input$x_range_min_validate_fluorescence_spline_bt),
+        x.lim <- c(as.numeric(input$x_range_min_validate_fluorescence_spline_bt),
                   as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
       }
 
@@ -8157,8 +8144,8 @@ server <- function(input, output, session){
                         cex.lab = input$axis_size_validate_fluorescence_spline_bt,
                         cex.axis = input$lab_size_validate_fluorescence_spline_bt,
                         lwd = input$line_width_validate_fluorescence_spline_bt,
-                        y.lim = ylim,
-                        x.lim = xlim,
+                        y.lim = y.lim,
+                        x.lim = x.lim,
                         y.lim.deriv = ylim.deriv,
                         deriv = input$plot_derivative_fluorescence_spline_bt,
                         shiny = TRUE
@@ -8345,60 +8332,70 @@ server <- function(input, output, session){
       })
       outputOptions(output, 'more_than_one_drfit_model', suspendWhenHidden=FALSE)
 
+      select_inputs_individual_plots_dose_response_growth_plot_model <- reactive({
+        if (length(results$growth$drFit)>1) names(results$growth$drFit$drFittedModels)
+        else return("")
+      })
+
+      observe({
+        updateSelectInput(inputId = "individual_plots_dose_response_growth_plot_model",
+                          choices = select_inputs_individual_plots_dose_response_growth_plot_model())
+      })
+
       dose_response_growth_plot_model <- reactive({
-        results <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
 
         # Define log-transformation of axes
-        if(input$log_transform_y_axis_dose_response_growth_plot_model &&
-           input$log_transform_x_axis_dose_response_growth_plot_model){
-          log <- "xy"
-        } else if(input$log_transform_y_axis_dose_response_growth_plot_model){
-          log <- "y"
-        } else if(input$log_transform_x_axis_dose_response_growth_plot_model){
+        if(input$log_transform_x_axis_dose_response_growth_plot_model){
           log <- "x"
         } else {
           log <- ""
         }
 
         # Define x- and y-axis limits
-        if(any(input$y_range_min_dose_response_growth_plot_model == "",
-               input$y_range_max_dose_response_growth_plot_model == "")){
-          ylim <- NULL
-        } else {
-          ylim <- c(as.numeric(input$y_range_min_dose_response_growth_plot_model),
-                    as.numeric(input$y_range_max_dose_response_growth_plot_model))
+        if(!any(input$y_range_min_dose_response_growth_plot_model == "",
+                input$y_range_max_dose_response_growth_plot_model == "") &&
+           !any(is.null(input$y_range_min_dose_response_growth_plot_model),
+                is.null(input$y_range_max_dose_response_growth_plot_model))){
+          y.lim <- c(as.numeric(input$y_range_min_dose_response_growth_plot_model),
+                     as.numeric(input$y_range_max_dose_response_growth_plot_model))
         }
 
-        if(any(input$x_range_min_dose_response_growth_plot_model == "",
-               input$x_range_max_dose_response_growth_plot_model == "")){
-          xlim <- NULL
-        } else {
-          xlim <- c(as.numeric(input$x_range_min_dose_response_growth_plot_model),
-                    as.numeric(input$x_range_max_dose_response_growth_plot_model))
+        if(!any(input$x_range_min_dose_response_growth_plot_model == "",
+                input$x_range_max_dose_response_growth_plot_model == "") &&
+           !any(is.null(input$x_range_min_dose_response_growth_plot_model),
+                is.null(input$x_range_max_dose_response_growth_plot_model))){
+          x.lim <- c(as.numeric(input$x_range_min_dose_response_growth_plot_model),
+                     as.numeric(input$x_range_max_dose_response_growth_plot_model))
         }
-        browser()
-        if(!input$combine_conditions_into_a_single_plot_dose_response_growth_plot_model){
-          plot.drFitModel(drFitSpline = results,
-                          combine = FALSE,
+        results <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
+
+        try(
+          plot.drFitModel(drFitModel =  results,
                           pch = input$shape_type_dose_response_growth_plot_model,
                           cex.point = input$shape_size_dose_response_growth_plot_model,
                           cex.lab = input$axis_size_dose_response_growth_plot_model,
                           cex.axis = input$lab_size_dose_response_growth_plot_model,
-                          y.title = input$y_axis_title_dose_response_growth_plot_model,
-                          x.title = input$x_axis_title_dose_response_growth_plot_model,
                           log = log,
                           lwd = input$line_width_dose_response_growth_plot_model,
                           ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot_model,
-                          y.lim = ylim,
-                          x.lim = xlim,
+                          y.lim = if(!exists("y.lim")){
+                            substitute()
+                          } else {
+                            y.lim
+                          },
+                          x.lim = if(!exists("x.lim")){
+                            substitute()
+                          } else {
+                            x.lim
+                          },
                           broken = input$show_break_dose_response_growth_plot_model,
                           n.xbreaks = input$nbreaks_x_growth_plot_model,
                           n.ybreaks = input$nbreaks_y_growth_plot_model,
                           xlab = input$x_axis_title_dose_response_growth_plot_model,
                           ylab = input$y_axis_title_dose_response_growth_plot_model,
-                          bp = input$bp_dose_response_growth_plot_model
+                          bp = ifelse(is.na(input$bp_dose_response_growth_plot_model)||(input$bp_dose_response_growth_plot_model == ""), rlang::missing_arg(), input$bp_dose_response_growth_plot_model)
           )
-        }
+        )
       })
 
       output$dose_response_growth_plot_model <- renderPlot({
@@ -8410,9 +8407,62 @@ server <- function(input, output, session){
           paste("dose_response_growth_model",  input$format_download_dose_response_growth_plot_model, sep="")
         },
         content = function(file) {
-          ggsave(filename = file, width = input$width_download_dose_response_growth_plot_model,
-                 height = input$height_download_dose_response_growth_plot_model,
-                 dpi = input$dpi_download_dose_response_growth_plot_model)
+          if(input$format_download_dose_response_growth_plot_individual == ".pdf"){
+            pdf(file = file,
+                width = input$width_download_dose_response_growth_plot_model,
+                height = input$height_download_dose_response_growth_plot_model)
+          } else {
+            png(file = file,
+                width = input$width_download_dose_response_growth_plot_model,
+                height = input$height_download_dose_response_growth_plot_model,
+                units = "in",
+                res = input$dpi_download_dose_response_growth_plot_model)
+          }
+          # Define log-transformation of axes
+          if(input$log_transform_x_axis_dose_response_growth_plot_model){
+            log <- "x"
+          } else {
+            log <- ""
+          }
+
+          # Define x- and y-axis limits
+          if(!any(input$y_range_min_dose_response_growth_plot_model == "",
+                  input$y_range_max_dose_response_growth_plot_model == "") &&
+             !any(is.null(input$y_range_min_dose_response_growth_plot_model),
+                  is.null(input$y_range_max_dose_response_growth_plot_model))){
+            y.lim <- c(as.numeric(input$y_range_min_dose_response_growth_plot_model),
+                       as.numeric(input$y_range_max_dose_response_growth_plot_model))
+          }
+
+          if(!any(input$x_range_min_dose_response_growth_plot_model == "",
+                  input$x_range_max_dose_response_growth_plot_model == "") &&
+             !any(is.null(input$x_range_min_dose_response_growth_plot_model),
+                  is.null(input$x_range_max_dose_response_growth_plot_model))){
+            x.lim <- c(as.numeric(input$x_range_min_dose_response_growth_plot_model),
+                       as.numeric(input$x_range_max_dose_response_growth_plot_model))
+          }
+          results <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
+
+          try(
+            plot.drFitModel(drFitModel =  results,
+                            pch = input$shape_type_dose_response_growth_plot_model,
+                            cex.point = input$shape_size_dose_response_growth_plot_model,
+                            cex.lab = input$axis_size_dose_response_growth_plot_model,
+                            cex.axis = input$lab_size_dose_response_growth_plot_model,
+                            log = log,
+                            lwd = input$line_width_dose_response_growth_plot_model,
+                            ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot_model,
+                            y.lim = ifelse(!exists("y.lim"), substitute(), y.lim),
+                            x.lim = ifelse(!exists("x.lim"), substitute(), x.lim),
+                            broken = input$show_break_dose_response_growth_plot_model,
+                            n.xbreaks = input$nbreaks_x_growth_plot_model,
+                            n.ybreaks = input$nbreaks_y_growth_plot_model,
+                            xlab = input$x_axis_title_dose_response_growth_plot_model,
+                            ylab = input$y_axis_title_dose_response_growth_plot_model,
+                            bp = ifelse(is.na(input$bp_dose_response_growth_plot_model)||(input$bp_dose_response_growth_plot_model == ""), rlang::missing_arg(), input$bp_dose_response_growth_plot_model)
+            )
+          )
+          dev.off()
         },
         contentType = ifelse(input$format_download_dose_response_growth_plot_model == ".pdf", "image/pdf", "image/png")
       )
@@ -8438,17 +8488,17 @@ server <- function(input, output, session){
     # Define x- and y-axis limits
     if(any(input$y_range_min_dose_response_growth_plot == "",
            input$y_range_max_dose_response_growth_plot == "")){
-      ylim <- NULL
+      y.lim <- NULL
     } else {
-      ylim <- c(as.numeric(input$y_range_min_dose_response_growth_plot),
+      y.lim <- c(as.numeric(input$y_range_min_dose_response_growth_plot),
                 as.numeric(input$y_range_max_dose_response_growth_plot))
     }
 
     if(any(input$x_range_min_dose_response_growth_plot == "",
            input$x_range_max_dose_response_growth_plot == "")){
-      xlim <- NULL
+      x.lim <- NULL
     } else {
-      xlim <- c(as.numeric(input$x_range_min_dose_response_growth_plot),
+      x.lim <- c(as.numeric(input$x_range_min_dose_response_growth_plot),
                 as.numeric(input$x_range_max_dose_response_growth_plot))
     }
 
@@ -8463,8 +8513,8 @@ server <- function(input, output, session){
                      log = log,
                      lwd = input$line_width_dose_response_growth_plot,
                      ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
-                     y.lim = ylim,
-                     x.lim = xlim
+                     y.lim = y.lim,
+                     x.lim = x.lim
                      )
   })
 
@@ -8505,17 +8555,17 @@ server <- function(input, output, session){
       # Define x- and y-axis limits
       if(any(input$y_range_min_dose_response_growth_plot == "",
              input$y_range_max_dose_response_growth_plot == "")){
-        ylim <- NULL
+        y.lim <- NULL
       } else {
-        ylim <- c(as.numeric(input$y_range_min_dose_response_growth_plot),
+        y.lim <- c(as.numeric(input$y_range_min_dose_response_growth_plot),
                   as.numeric(input$y_range_max_dose_response_growth_plot))
       }
 
       if(any(input$x_range_min_dose_response_growth_plot == "",
              input$x_range_max_dose_response_growth_plot == "")){
-        xlim <- NULL
+        x.lim <- NULL
       } else {
-        xlim <- c(as.numeric(input$x_range_min_dose_response_growth_plot),
+        x.lim <- c(as.numeric(input$x_range_min_dose_response_growth_plot),
                   as.numeric(input$x_range_max_dose_response_growth_plot))
       }
 
@@ -8530,8 +8580,8 @@ server <- function(input, output, session){
                        log = log,
                        lwd = input$line_width_dose_response_growth_plot,
                        ec50line = input$show_ec50_indicator_lines_dose_response_growth_plot,
-                       y.lim = ylim,
-                       x.lim = xlim
+                       y.lim = y.lim,
+                       x.lim = x.lim
       )
       dev.off()
     },
@@ -8623,6 +8673,7 @@ server <- function(input, output, session){
       reference.conc <- NULL
       reference.nm <- NULL
     }
+    browser()
     if(input$select_string_visualize_parameter_growth_plot){
       suppressWarnings(
         plot.parameter(results,
@@ -8817,12 +8868,17 @@ server <- function(input, output, session){
 
   selected_inputs_parameter_growth_dr_parameter_plot <- reactive({
     results <- results$growth
-
-    dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50')
-    if(!is.null(input$number_of_bootstrappings_dr_growth) && !is.na(input$number_of_bootstrappings_dr_growth) && input$number_of_bootstrappings_dr_growth != "" && as.numeric(input$number_of_bootstrappings_dr_growth) > 1){
-      dr_parameters <- c(dr_parameters, 'Response(EC50) - Bootstrap' = 'drboot.meanEC50', 'EC50 - Bootstrap' = 'drboot.meanEC50y')
+    if(!is.null(results)){
+      if(results$control$dr.method == "spline"){
+        dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50')
+        if(!is.null(input$number_of_bootstrappings_dr_growth) && !is.na(input$number_of_bootstrappings_dr_growth) && input$number_of_bootstrappings_dr_growth != "" && as.numeric(input$number_of_bootstrappings_dr_growth) > 1){
+          dr_parameters <- c(dr_parameters, 'Response(EC50) - Bootstrap' = 'drboot.meanEC50', 'EC50 - Bootstrap' = 'drboot.meanEC50y')
+        }
+      } else {
+        dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50.Estimate')
+      }
+      dr_parameters
     }
-    dr_parameters
   })
 
   selected_inputs_reference_condition_growth_dr_parameter_plot <- reactive({
@@ -9111,17 +9167,17 @@ server <- function(input, output, session){
         # Define x- and y-axis limits
         if(any(input$y_range_min_dose_response_fluorescence_plot == "",
                input$y_range_max_dose_response_fluorescence_plot == "")){
-          ylim <- NULL
+          y.lim <- NULL
         } else {
-          ylim <- c(as.numeric(input$y_range_min_dose_response_fluorescence_plot),
+          y.lim <- c(as.numeric(input$y_range_min_dose_response_fluorescence_plot),
                     as.numeric(input$y_range_max_dose_response_fluorescence_plot))
         }
 
         if(any(input$x_range_min_dose_response_fluorescence_plot == "",
                input$x_range_max_dose_response_fluorescence_plot == "")){
-          xlim <- NULL
+          x.lim <- NULL
         } else {
-          xlim <- c(as.numeric(input$x_range_min_dose_response_fluorescence_plot),
+          x.lim <- c(as.numeric(input$x_range_min_dose_response_fluorescence_plot),
                     as.numeric(input$x_range_max_dose_response_fluorescence_plot))
         }
         plot.drFitSpline(results,
@@ -9135,8 +9191,8 @@ server <- function(input, output, session){
                          y.title = input$y_axis_title_dose_response_fluorescence_plot,
                          x.title = input$x_axis_title_dose_response_fluorescence_plot,
                          log = log,
-                         y.lim = ylim,
-                         x.lim = xlim)
+                         y.lim = y.lim,
+                         x.lim = x.lim)
       })
 
       output$download_dose_response_fluorescence_plot_individual <- downloadHandler(
@@ -9172,17 +9228,17 @@ server <- function(input, output, session){
           # Define x- and y-axis limits
           if(any(input$y_range_min_dose_response_fluorescence_plot == "",
                  input$y_range_max_dose_response_fluorescence_plot == "")){
-            ylim <- NULL
+            y.lim <- NULL
           } else {
-            ylim <- c(as.numeric(input$y_range_min_dose_response_fluorescence_plot),
+            y.lim <- c(as.numeric(input$y_range_min_dose_response_fluorescence_plot),
                       as.numeric(input$y_range_max_dose_response_fluorescence_plot))
           }
 
           if(any(input$x_range_min_dose_response_fluorescence_plot == "",
                  input$x_range_max_dose_response_fluorescence_plot == "")){
-            xlim <- NULL
+            x.lim <- NULL
           } else {
-            xlim <- c(as.numeric(input$x_range_min_dose_response_fluorescence_plot),
+            x.lim <- c(as.numeric(input$x_range_min_dose_response_fluorescence_plot),
                       as.numeric(input$x_range_max_dose_response_fluorescence_plot))
           }
           plot.drFitSpline(results,
@@ -9196,8 +9252,8 @@ server <- function(input, output, session){
                            y.title = input$y_axis_title_dose_response_fluorescence_plot,
                            x.title = input$x_axis_title_dose_response_fluorescence_plot,
                            log = log,
-                           y.lim = ylim,
-                           x.lim = xlim)
+                           y.lim = y.lim,
+                           x.lim = x.lim)
           dev.off()
         },
         contentType = ifelse(input$format_download_dose_response_fluorescence_plot_individual == ".pdf", "image/pdf", "image/png")
@@ -9245,17 +9301,17 @@ server <- function(input, output, session){
         # Define x- and y-axis limits
         if(any(input$y_range_min_dose_response_model_fluorescence_plot == "",
            input$y_range_max_dose_response_model_fluorescence_plot == "")){
-          ylim <- NULL
+          y.lim <- NULL
         } else {
-          ylim <- c(as.numeric(input$y_range_min_dose_response_model_fluorescence_plot),
+          y.lim <- c(as.numeric(input$y_range_min_dose_response_model_fluorescence_plot),
                     as.numeric(input$y_range_max_dose_response_model_fluorescence_plot))
         }
 
         if(any(input$x_range_min_dose_response_model_fluorescence_plot == "",
                input$x_range_max_dose_response_model_fluorescence_plot == "")){
-          xlim <- NULL
+          x.lim <- NULL
         } else {
-          xlim <- c(as.numeric(input$x_range_min_dose_response_model_fluorescence_plot),
+          x.lim <- c(as.numeric(input$x_range_min_dose_response_model_fluorescence_plot),
                     as.numeric(input$x_range_max_dose_response_model_fluorescence_plot))
         }
 
@@ -9267,8 +9323,8 @@ server <- function(input, output, session){
                         log = log,
                         cex.lab = input$axis_size_dose_response_model_fluorescence_plot,
                         cex.axis = input$lab_size_dose_response_model_fluorescence_plot,
-                        y.lim = ylim,
-                        x.lim = xlim
+                        y.lim = y.lim,
+                        x.lim = x.lim
         )
       })
 

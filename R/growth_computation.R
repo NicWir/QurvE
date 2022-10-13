@@ -738,7 +738,7 @@ parse_data <-
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
-#' @param dr.model (Character) Provide a list of models from the R package \code{\link[drc]} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
+#' @param dr.model (Character) Provide a list of models from the R package \code{\link{drc}} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See \code{\link{smooth.spline}} for further details. Default: \code{NULL}.
@@ -906,7 +906,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
-#' @param dr.model (Character) Provide a list of models from the R package \code{\link[drc]} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
+#' @param dr.model (Character) Provide a list of models from the R package \code{\link{drc}} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
@@ -3882,10 +3882,14 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   # Perform model fits
   model.fits <- list()
   for(i in 1:length(models)){
-    model.fits[[i]] <- try(drc::drm(
-      test~as.numeric(as.character(conc)),
-      fct = get(models[i])()
-    ), silent = T)
+    model.fits[[i]] <- try(
+      invisible(
+        drc::drm(
+          test~as.numeric(as.character(conc)),
+          fct = get(models[i])()
+        )
+      ), silent = T
+    )
   }
   models <- models[unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) != "try-error"]
   model.fits <- model.fits[unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) != "try-error"]
@@ -3901,11 +3905,11 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
 
   # get EC50 value
   if(any(grep("BC", best.model.nm)) ){
-    ec50 <- ED(best.model, 50, lower = 0.1, upper = 1000, interval = "fls" )
+    ec50 <- drc::ED(best.model, 50, lower = 0.1, upper = 1000, interval = "fls" )
   } else if(any(grep("NEC", best.model.nm))){
     ec50 <- best.model$coefficients[4]
   } else {
-    ec50 <- ED(best.model, 50, interval = "delta")
+    ec50 <- drc:::ED(best.model, 50, interval = "delta")
   }
   # get response at ec50
   dataList <- best.model[["dataList"]]

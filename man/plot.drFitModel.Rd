@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{drFitModel}(
   drFitModel,
-  type = c("average", "all", "bars", "none", "obs", "confidence"),
+  type = c("confidence", "all", "bars", "none", "obs", "average"),
   ec50line = TRUE,
   add = FALSE,
   broken = TRUE,
@@ -29,12 +29,12 @@
   legend = T,
   legendText,
   legendPos,
-  cex.legend = 1.2
+  cex.legend = NULL
 )
 
 \method{plot}{drFitModel}(
   drFitModel,
-  type = c("average", "all", "bars", "none", "obs", "confidence"),
+  type = c("confidence", "all", "bars", "none", "obs", "average"),
   ec50line = TRUE,
   add = FALSE,
   broken = TRUE,
@@ -57,7 +57,7 @@
   legend = T,
   legendText,
   legendPos,
-  cex.legend = 1.2
+  cex.legend = NULL
 )
 }
 \arguments{
