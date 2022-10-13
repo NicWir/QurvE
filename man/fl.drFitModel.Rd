@@ -16,7 +16,7 @@ fl.drFitModel(conc, test, drID = "undefined", control = fl.control())
 \item{control}{A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.}
 }
 \value{
-A \code{drFitSpline} object.
+A \code{drFitFLModel} object.
 \item{raw.conc}{Raw data provided to the function as \code{conc}.}
 \item{raw.test}{Raw data for the response parameter provided to the function as \code{test}.}
 \item{drID}{(Character) Identifies the tested condition}

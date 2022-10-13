@@ -9315,7 +9315,7 @@ server <- function(input, output, session){
                     as.numeric(input$x_range_max_dose_response_model_fluorescence_plot))
         }
 
-        plot.drFitModel(results,
+        plot.drFitFLModel(results,
                         pch = input$shape_type_dose_response_model_fluorescence_plot,
                         cex.point = input$shape_size_dose_response_model_fluorescence_plot,
                         lwd = input$line_width_dose_response_model_fluorescence_plot,
