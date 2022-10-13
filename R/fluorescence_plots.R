@@ -905,9 +905,9 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
   par(mfrow = c(1, 1))
 }
 
-#' Generic plot function for \code{drFitModel} objects.
+#' Generic plot function for \code{drFitFLModel} objects.
 #'
-#' @param drFittedModel Object of class \code{drFitModel}, created with \code{\link{fl.drFitModel}}.
+#' @param drFittedFLModel Object of class \code{drFitFLModel}, created with \code{\link{fl.drFitFLModel}}.
 #' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).
 #' @param log ("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.
 #' @param pch (Numeric) Size of the raw data circles.
@@ -926,18 +926,18 @@ plot.flBootSpline <- function(flBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
-#' @export plot.drFitModel
+#' @export plot.drFitFLModel
 #' @export
 #'
-plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch = 1,
+plot.drFitFLModel <- function(drFittedFLModel, ec50line = TRUE, log = c("xy"), pch = 1,
                             colSpline = 1, colData = 1, cex.point = 1, cex.lab = 1.5,
                             cex.axis = 1.3, y.lim = NULL, x.lim = NULL,
                             lwd = 2, plot = TRUE, export = FALSE,
                             height = 7, width = 9, out.dir = NULL,
                             ...)
 {
-  # drFittedModel an object of class drFittedModel
-  if(methods::is(drFittedModel) != "drFitModel") stop("drFittedModel needs to be an object created with fl.drFitModel().")
+  # drFittedFLModel an object of class drFittedFLModel
+  if(methods::is(drFittedFLModel) != "drFitFLModel") stop("drFittedFLModel needs to be an object created with fl.drFitModel().")
   # /// check input parameters
   if (is.logical(ec50line) == FALSE)
     stop("Need logical value for: ec50line")
@@ -945,62 +945,62 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
     stop("Need numeric value for: pch")
   if (is.numeric(cex.point) == FALSE)
     stop("Need numeric value for: cex.point")
-  conc <- drFittedModel$raw.conc
+  conc <- drFittedFLModel$raw.conc
   p <- function(){
     opar <- par(no.readonly = TRUE)
     on.exit(par(opar))
 
     par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1))
     par(cex.lab = cex.lab, cex.axis = cex.axis)
-    if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == TRUE)) {
+    if ((drFittedFLModel$control$log.x.dr == TRUE) && (drFittedFLModel$control$log.y.dr == TRUE)) {
       plot(
         log(conc + 1),
-        log(drFittedModel$raw.test + 1),
+        log(drFittedFLModel$raw.test + 1),
         log = log,
         col = colData,
         xlab = "ln(1+concentration)",
         ylab = "ln(1+response)",
         type = "n", xlim = x.lim, ylim = y.lim, ...
       )
-      points(log(conc + 1), log(drFittedModel$raw.test + 1), cex = cex.point, pch = pch)
+      points(log(conc + 1), log(drFittedFLModel$raw.test + 1), cex = cex.point, pch = pch)
     }
     else
     {
-      if ((drFittedModel$control$log.x.dr == FALSE) && (drFittedModel$control$log.y.dr == TRUE)) {
+      if ((drFittedFLModel$control$log.x.dr == FALSE) && (drFittedFLModel$control$log.y.dr == TRUE)) {
         plot(
           conc,
-          log(drFittedModel$raw.test + 1),
+          log(drFittedFLModel$raw.test + 1),
           log = log,
           col = colData,
           xlab = "concentration",
           ylab = "ln(1+response)",
           type = "n", xlim = x.lim, ylim = y.lim, ...
         )
-        points(conc, log(drFittedModel$raw.test + 1), cex = cex.point, pch = pch)
+        points(conc, log(drFittedFLModel$raw.test + 1), cex = cex.point, pch = pch)
       }
       else
       {
-        if ((drFittedModel$control$log.x.dr == TRUE) && (drFittedModel$control$log.y.dr == FALSE)) {
+        if ((drFittedFLModel$control$log.x.dr == TRUE) && (drFittedFLModel$control$log.y.dr == FALSE)) {
           plot(
             log(conc + 1),
-            drFittedModel$raw.test,
+            drFittedFLModel$raw.test,
             log = log,
             col = colData,
             xlab = "Ln(1+concentration)",
-            ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), "")),
+            ylab = paste0("Response", ifelse(!is.na(drFittedFLModel$parameters$test), paste0(" (", drFittedFLModel$parameters$test, ")"), "")),
             type = "n", xlim = x.lim, ylim = y.lim, ...
           )
-          points(log(conc + 1), drFittedModel$raw.test, cex = cex.point, pch = pch)
+          points(log(conc + 1), drFittedFLModel$raw.test, cex = cex.point, pch = pch)
         }
         else
         {
-          if ((drFittedModel$control$log.x.dr == FALSE) && (drFittedModel$control$log.y.dr == FALSE)) {
+          if ((drFittedFLModel$control$log.x.dr == FALSE) && (drFittedFLModel$control$log.y.dr == FALSE)) {
             if(any(grep("x", log))){
-              conc[conc==0] <- drFittedModel$fit.conc[2]
+              conc[conc==0] <- drFittedFLModel$fit.conc[2]
             }
-            mean <- sapply(1:length(conc), function(x) mean(drFittedModel$raw.test[conc==unique(conc)[x]]))
+            mean <- sapply(1:length(conc), function(x) mean(drFittedFLModel$raw.test[conc==unique(conc)[x]]))
             mean <- mean[!is.na(mean)]
-            sd <- sapply(1:length(conc), function(x) sd(drFittedModel$raw.test[conc==unique(conc)[x]]))
+            sd <- sapply(1:length(conc), function(x) sd(drFittedFLModel$raw.test[conc==unique(conc)[x]]))
             sd <- sd[!is.na(sd)]
             plot(
               unique(conc)[order(unique(conc))],
@@ -1008,7 +1008,7 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
               log = log,
               col = colData,
               xlab = "Concentration",
-              ylab = paste0("Response", ifelse(!is.na(drFittedModel$parameters$test), paste0(" (", drFittedModel$parameters$test, ")"), "")),
+              ylab = paste0("Response", ifelse(!is.na(drFittedFLModel$parameters$test), paste0(" (", drFittedFLModel$parameters$test, ")"), "")),
               type = "n", xlim = x.lim, ylim = y.lim, ...
             )
             points(unique(conc)[order(unique(conc))], mean, cex = cex.point, pch = pch)
@@ -1022,42 +1022,42 @@ plot.drFitModel <- function(drFittedModel, ec50line = TRUE, log = c("xy"), pch =
     }
 
     try(lines(
-      drFittedModel$fit.conc,
-      drFittedModel$fit.test,
+      drFittedFLModel$fit.conc,
+      drFittedFLModel$fit.test,
       lwd = lwd,
       col = colSpline
     ), silent = F)
 
     if (ec50line == TRUE) {
       #vertical lines
-      totmin = min(min(drFittedModel$fit.conc), min(drFittedModel$fit.test))
-      lines(c(drFittedModel$parameters$K, drFittedModel$parameters$K),
-            c(1, drFittedModel$parameters$yEC50),
+      totmin = min(min(drFittedFLModel$fit.conc), min(drFittedFLModel$fit.test))
+      lines(c(drFittedFLModel$parameters$K, drFittedFLModel$parameters$K),
+            c(1, drFittedFLModel$parameters$yEC50),
             lty = 2, lwd = lwd)
       #horizontal
-      lines(c(ifelse(any(grep("x", log)), 0.001, -1), drFittedModel$parameters$K),
-            c(drFittedModel$parameters$yEC50, drFittedModel$parameters$yEC50),
+      lines(c(ifelse(any(grep("x", log)), 0.001, -1), drFittedFLModel$parameters$K),
+            c(drFittedFLModel$parameters$yEC50, drFittedFLModel$parameters$yEC50),
             lty = 2, lwd = lwd)
     }
-    title(main = drFittedModel$drID)
+    title(main = drFittedFLModel$drID)
   } # p <- function()
   if (export == TRUE){
     w <- width
     h <- height
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
     dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", paste(drFittedModel$drID, collapse = "_"), "_drFitModel.png"),
+    grDevices::png(paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.png"),
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(drFittedModel$drID, collapse = "_"), "_drFitModel.pdf"))
+    grDevices::pdf(paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.pdf"))
     p()
     grDevices::dev.off()
   }
 
   if (plot == TRUE){
-    if(drFittedModel$fitFlag == TRUE) p()
-    else stop(paste0("Model could not be fitted to the data for: ", drFittedModel$drID, "."))
+    if(drFittedFLModel$fitFlag == TRUE) p()
+    else stop(paste0("Model could not be fitted to the data for: ", drFittedFLModel$drID, "."))
   }
 }
 

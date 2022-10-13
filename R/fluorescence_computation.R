@@ -2789,7 +2789,7 @@ fl.drFit <- function(FitData, control = fl.control())
       description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
                                 log.y = control$log.y.dr)
       if(class(EC50[[i]]) != "try-error"){
-        out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
+        out.row <- cbind(description, summary.drFitFLModel(EC50[[i]]))
       } else {
         out.row <- cbind(description, data.frame("yEC50" = NA, "y.min" = NA, "y.max" = NA, "fc" = NA, "K" = NA, "n" = NA,
                                         "yEC50.orig" = NA, "K.orig" = NA, "test" = NA))
@@ -2819,7 +2819,7 @@ fl.drFit <- function(FitData, control = fl.control())
 #' @param drID (Character) The name of the analyzed condition
 #' @param control A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.
 #'
-#' @return A \code{drFitSpline} object.
+#' @return A \code{drFitFLModel} object.
 #' \item{raw.conc}{Raw data provided to the function as \code{conc}.}
 #' \item{raw.test}{Raw data for the response parameter provided to the function as \code{test}.}
 #' \item{drID}{(Character) Identifies the tested condition}
@@ -2881,7 +2881,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
                                           yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
                         control = control)
-    class(drFitModel) <- "drFitModel"
+    class(drFitModel) <- "drFitFLModel"
     return(drFitModel)
   }
   if (length(test) < control$dr.have.atleast) {
@@ -2891,7 +2891,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
                                           yEC50.orig = NA), fitFlag = FALSE, reliable = NULL,
                         control = control)
-    class(drFitModel) <- "drFitModel"
+    class(drFitModel) <- "drFitFLModel"
     return(drFitModel)
   }
   if (control$log.x.dr == TRUE)
@@ -2942,7 +2942,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
                        parameters = list(yEC50 = NA, y.min = NA, y.max = NA, fc = NA, K = NA, n = NA,
                                          yEC50.orig = NA, K.orig = NA, test = NA),
                        fitFlag = FALSE, reliable = NULL, control = control)
-    class(drFitModel) <- "drFitModel"
+    class(drFitModel) <- "drFitFLModel"
     return(drFitModel)
   }
   # lines(conc.fit, biosensor.eq(x=conc.fit, y.min=coef(y.model)[1], y.max=coef(y.model)[2], K=coef(y.model)[3], n=coef(y.model)[4]), col = "red")
@@ -3014,7 +3014,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
                       parameters = list(yEC50 = yEC.test, y.min = y.min, y.max = y.max, fc = fc, K = K, n = n,
                                         yEC50.orig = EC.orig[2], K.orig = EC.orig[1], test = test.nm),
                       fitFlag = fitFlag, reliable = NULL, control = control)
-  class(drFitModel) <- "drFitModel"
+  class(drFitModel) <- "drFitFLModel"
   drFitModel
 }
 

@@ -142,7 +142,7 @@ summary.flFit <- function(object,...)
   summary.flFit
 }
 
-#' Generic summary function for drFitModel objects
+#' Generic summary function for drFitFLModel objects
 #'
 #' @param object object of class \code{drFitModel}
 #' @param ...
@@ -150,7 +150,7 @@ summary.flFit <- function(object,...)
 #' @return A dataframe with biosensor response parameters.
 #' @export
 #'
-summary.drFitModel <- function(object, ...)
+summary.drFitFLModel <- function(object, ...)
 {
   # object of class drFitModel
   data.frame(object$parameters)

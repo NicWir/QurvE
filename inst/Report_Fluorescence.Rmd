@@ -828,7 +828,7 @@ knit_table(ec50.df, caption = "Dose-Response Analysis - Spline Fits")
 for(i in 1:length(flFitRes[["drFit"]][["drFittedModels"]])){
   try(
     suppressWarnings(
-      plot.drFitModel(flFitRes$drFit$drFittedModels[[i]], export = export)
+      plot.drFitFLModel(flFitRes$drFit$drFittedModels[[i]], export = export)
     )
   )
 }
