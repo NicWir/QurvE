@@ -208,7 +208,7 @@ parse_data_shiny <-
         data.ls[[i]] <- data.ls[[i]][,!is.na(data.ls[[i]][1,])]
       }
     }
-    names(data.ls) <- c("density", "fluorescence", "fluorescence2")
+    names(data.ls) <- c("density", "fluorescence")
     grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration)
 
     return(grodata)
