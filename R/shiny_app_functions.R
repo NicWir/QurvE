@@ -103,7 +103,7 @@ parse_data_shiny <-
            calibration = NULL
   ) {
     if(!is.null(fl.nm) && is.na(fl.nm)) fl.nm <- NULL
-    if(!is.null(fl2.nm) && is.na(fl2.nm)) fl2.nm <- NULL
+    # if(!is.null(fl2.nm) && is.na(fl2.nm)) fl2.nm <- NULL
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
     if(is.null(map.file)) warning("No mapping file was provided. The samples will be identified based on their well position (A1, A2, A3, etc.). Grouping options will not be available if you run any further analysis with QurvE.")
     # Read table file
@@ -123,11 +123,11 @@ parse_data_shiny <-
       mapping <- NULL
     }
     if(any(grep("Gen5|Gen6", software, ignore.case = T))){
-      parsed.ls <- parse_Gen5Gen6_shiny(data = input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_Gen5Gen6_shiny(data = input, density.nm = density.nm, fl.nm = fl.nm)
       data.ls <- parsed.ls[[1]]
     } # if("Gen5" %in% software)
     if(any(grep("Chi.Bio", software, ignore.case = T))){
-      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm, fl.nm = fl.nm)
       data.ls <- parsed.ls[[1]]
     }
     if(any(grep("GrowthProfiler", software, ignore.case = T))){
@@ -135,7 +135,7 @@ parse_data_shiny <-
       data.ls <- parsed.ls[[1]]
     }
     if(any(grep("Tecan", software, ignore.case = T))){
-      parsed.ls <- parse_tecan_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_tecan_shiny(input, density.nm = density.nm, fl.nm = fl.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -145,12 +145,12 @@ parse_data_shiny <-
     }
 
     if(any(grep("VictorNivo", software, ignore.case = T))){
-      parsed.ls <- parse_victornivo_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_victornivo_shiny(input, density.nm = density.nm, fl.nm = fl.nm)
       data.ls <- parsed.ls[[1]]
     }
 
     if(any(grep("VictorX3", software, ignore.case = T))){
-      parsed.ls <- parse_victorx3_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_victorx3_shiny(input, density.nm = density.nm, fl.nm = fl.nm)
       data.ls <- parsed.ls[[1]]
     }
 
