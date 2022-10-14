@@ -1275,6 +1275,7 @@ plot.drFitSpline <- function (drFitSpline,
 #' @param legendPos (Numeric) Vector of length 2 giving the position of the legend.
 #' @param cex.legend numeric specifying the legend text size.
 #'
+#' @export plot.drFitModel
 #' @export
 #'
 #' @references Christian Ritz, Florent Baty, Jens C. Streibig, Daniel Gerhard (2015). _Dose-Response Analysis Using R_. PLoS ONE 10(12): e0146021. DOI: 10.1371/journal.pone.0146021

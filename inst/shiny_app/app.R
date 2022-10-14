@@ -1,3 +1,5 @@
+options(shiny.maxRequestSize=30*1024^2)
+
 #list of packages required
 list.of.packages <- c("shiny", "shinythemes", "shinyFiles", "shinyjs", "shinyBS", "shinycssloaders", "QurvE")
 #list of packages required
@@ -201,7 +203,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
 
                                                           fileInput(inputId = 'custom_file_fluorescence',
-                                                                    label = 'Fluorescence data 1',
+                                                                    label = 'Fluorescence data',
                                                                     accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
                                                           ),
 
@@ -402,7 +404,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                               ),
 
                                                               selectInput(inputId = "parsed_reads_fluorescence",
-                                                                          label = "Fluorescence data 1",
+                                                                          label = "Fluorescence data",
                                                                           choices = ""
                                                               )
                                                             ),
@@ -4979,6 +4981,10 @@ server <- function(input, output, session){
     } else {
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
     }
+    if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) &&
+       all(custom_table_fluorescence_processed() == growth_data_custom_processed())){
+      showModal(modalDialog("Density and Fluorescence data are identical. Did you assign the correct files and/or sheets?", easyClose = T))
+    }
   })
 
 
@@ -5816,7 +5822,9 @@ server <- function(input, output, session){
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
       removeModal()
-    } else showModal(modalDialog(geterrmessage(), footer=NULL, easyClose = T))
+    }
+    if(exists("results$growth") && !is.null("results$growth"))
+      showModal(modalDialog(geterrmessage()) )
 
   })
     ##____Fluorescence____#####
@@ -5827,6 +5835,9 @@ server <- function(input, output, session){
       grodata <- results$custom_data
     } else if(!is.null(results$parsed_data)){
       grodata <- results$parsed_data
+      if(input$parsed_reads_density == input$parsed_reads_fluorescence)
+        showModal(modalDialog("Identical values for density and fluorescence data. Did you choose the correct data identifiers?"))
+
     } else return(FALSE)
 
     if(length(grodata$norm.fluorescence) > 1){
@@ -6006,7 +6017,9 @@ server <- function(input, output, session){
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Results]")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Validate]")
       removeModal()
-    } else showModal(modalDialog(geterrmessage(), footer=NULL, easyClose = T))
+    }
+    if(exists("results$fluorescence") && !is.null("results$fluorescence"))
+      showModal(modalDialog(geterrmessage()) )
   })
 
   # Results ####
@@ -8673,7 +8686,6 @@ server <- function(input, output, session){
       reference.conc <- NULL
       reference.nm <- NULL
     }
-    browser()
     if(input$select_string_visualize_parameter_growth_plot){
       suppressWarnings(
         plot.parameter(results,
