@@ -18,6 +18,8 @@
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]). If \code{calibration = TRUE}, blanks are subtracted after value conversion.
 #' @param sheet.density (Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (_optional_).
 #' @param sheet.fl (Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (_optional_).
+#' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
+#' For example: \code{convert.time = 'y = 24 * x'}
 #' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
@@ -47,6 +49,7 @@ read_data <-
            sheet.density = 1,
            sheet.fl = 1,
            subtract.blank  = T,
+           convert.time = NULL,
            calibration = NULL)
   {
     if(is.null(data.density)) data.density <- NA
@@ -64,6 +67,20 @@ read_data <-
     if(data.format == "col"){
       dat <- t(dat)
     }
+    # Convert time values
+    if(!is.null(convert.time)){
+
+      conversion <- parse(text = convert.time)
+
+      x <- as.numeric(dat[1, -(1:3)])
+      time_converted <- eval(conversion)
+      dat[1, -(1:3)] <- time_converted
+    }
+    # Remove all-NA data series
+    allNA.ndx <- which(unlist(lapply(1:nrow(dat), function(x) all(is.na(dat[x, -(1:3)])))))
+    if(length(allNA.ndx) > 0)
+      dat <- dat[-allNA.ndx, ]
+
     if(data.format == "col"){
       message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
     } else {
@@ -86,6 +103,20 @@ read_data <-
         } else {
           stop("Could not find 'time' in row 1 of data.fl")
         }
+      }
+      # Remove all-NA data series
+      allNA.ndx <- which(unlist(lapply(1:nrow(fl), function(x) all(is.na(fl[x, -(1:3)])))))
+      if(length(allNA.ndx) > 0)
+        fl <- fl[-allNA.ndx, ]
+
+      # Convert time values
+      if(!is.null(convert.time)){
+
+        conversion <- parse(text = convert.time)
+
+        x <- as.numeric(fl[1, -(1:3)])
+        time_converted <- eval(conversion)
+        fl[1, -(1:3)] <- time_converted
       }
       # add minimum negative value + 1 to all fluorescence data
     } else {
@@ -3836,7 +3867,9 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
 {
   if (methods::is(control) != "grofit.control" && methods::is(control) != "fl.control")
     stop("growth.drFitModel: control must be of class grofit.control or fl.control!")
-  test.nm <- names(test)[1]
+  test.nm <- control$dr.parameter
+  if(test.nm != control$dr.parameter && control$dr.parameter != "mu.linfit")
+    test.nm <-  control$dr.parameter
   test <- as.vector(as.numeric(as.matrix(test)))
   conc <- as.vector(as.numeric(as.matrix(conc)))
   models <- control$dr.model

@@ -1,4 +1,4 @@
-options(shiny.maxRequestSize=30*1024^2)
+options(shiny.maxRequestSize=60*1024^2)
 
 #list of packages required
 list.of.packages <- c("shiny", "shinythemes", "shinyFiles", "shinyjs", "shinyBS", "shinycssloaders", "QurvE")
@@ -294,6 +294,21 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                value = TRUE)
                                                         ),
 
+                                                        tags$div(title=HTML(paste("Provide an equation in the form 'y = function(x)' to convert time values. For example, type 'y = x / 60' to convert minutes to hours.\n", "Note: the time unit will affect calculated parameters (e.g., the growth rate in 1/h, 1/min, or 1/s) as well as the time displayed in all plots.")),
+                                                                 checkboxInput(inputId = 'convert_time_values_custom',
+                                                                               label = 'Convert time values',
+                                                                               value = FALSE)
+                                                        ),
+
+                                                        conditionalPanel(
+                                                          condition = 'input.convert_time_values_custom',
+                                                          tags$div(title=HTML(paste("Provide an equation in the form 'y = function(x)' to convert time values. For example, type 'y = x / 60' to convert minutes to hours.\n", "Note: the time unit will affect calculated parameters (e.g., the growth rate in 1/h, 1/min, or 1/s) as well as the time displayed in all plots.")),
+                                                                   textInput(inputId = "convert_time_equation_custom",
+                                                                             label = "Type equation in the form 'y = function(x)'",
+                                                                             placeholder = 'y = x / 24')
+                                                          )
+                                                        ),
+
                                                         tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
                                                                  checkboxInput(inputId = 'calibration_custom',
                                                                                label = 'Apply calibration')
@@ -477,7 +492,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         tags$div(title=HTML(paste("Provide an equation in the form 'y = function(x)' to convert time values. For example, type 'y = x / 60' to convert minutes to hours.\n", "Note: the time unit will affect calculated parameters (e.g., the growth rate in 1/h, 1/min, or 1/s) as well as the time displayed in all plots.")),
                                                                  checkboxInput(inputId = 'convert_time_values_plate_reader',
-                                                                               label = 'Convert time to hours',
+                                                                               label = 'Convert time values',
                                                                                value = TRUE)
                                                         ),
 
@@ -725,7 +740,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                         selectInput(inputId = "response_parameter_growth",
                                                                                                     label = "Response Parameter",
                                                                                                     choices = ""),
-                                                                                        bsPopover(id = "response_parameter_growth", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve."),
+                                                                                        bsPopover(id = "response_parameter_growth", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
 
                                                                                         conditionalPanel(
                                                                                           condition = 'input.dr_method_growth == "spline"',
@@ -1081,7 +1096,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                 selectInput(inputId = "response_parameter_fluorescence",
                                                                                                             label = "Response Parameter",
                                                                                                             choices = ""),
-                                                                                                bsPopover(id = "response_parameter_fluorescence", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve."),
+                                                                                                bsPopover(id = "response_parameter_fluorescence", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
 
                                                                                                 checkboxInput(inputId = 'log_transform_concentration_fluorescence',
                                                                                                               label = 'log transform concentration'),
@@ -2898,6 +2913,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     plotOutput("dose_response_growth_plot_combined",
                                                                                                width = "100%", height = "800px"),
 
+                                                                                    fluidRow(
+                                                                                      column(6, align = "center", offset = 3,
+                                                                                             actionButton(inputId = "rerun_dr_spline_group",
+                                                                                                          label = "Re-run with modified parameters",
+                                                                                                          icon=icon("gears"),
+                                                                                                          style="padding:5px; font-size:120%"),
+                                                                                             actionButton(inputId = "restore_dr_spline_group",
+                                                                                                          label = "Restore fit",
+                                                                                                          # icon=icon("gears"),
+                                                                                                          style="padding:5px; font-size:120%")
+                                                                                      )
+                                                                                    ),
+
                                                                                     h3(strong("Export plot")),
 
                                                                                     fluidRow(
@@ -2943,6 +2971,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                 size = 3),
                                                                                     plotOutput("dose_response_growth_plot_individual",
                                                                                                width = "100%", height = "800px"),
+
+                                                                                    fluidRow(
+                                                                                      column(6, align = "center", offset = 3,
+                                                                                             actionButton(inputId = "rerun_dr_spline_individual",
+                                                                                                          label = "Re-run with modified parameters",
+                                                                                                          icon=icon("gears"),
+                                                                                                          style="padding:5px; font-size:120%"),
+                                                                                             actionButton(inputId = "restore_dr_spline_individual",
+                                                                                                          label = "Restore fit",
+                                                                                                          # icon=icon("gears"),
+                                                                                                          style="padding:5px; font-size:120%")
+                                                                                      )
+                                                                                    ),
 
                                                                                     h3(strong("Export plot")),
 
@@ -3113,6 +3154,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                size = 3),
                                                                    plotOutput("dose_response_growth_plot_model",
                                                                               width = "100%", height = "800px"),
+
+                                                                   fluidRow(
+                                                                     column(6, align = "center", offset = 3,
+                                                                            actionButton(inputId = "rerun_dr_model",
+                                                                                         label = "Re-run with modified parameters",
+                                                                                         icon=icon("gears"),
+                                                                                         style="padding:5px; font-size:120%"),
+                                                                            actionButton(inputId = "restore_dr_model",
+                                                                                         label = "Restore fit",
+                                                                                         # icon=icon("gears"),
+                                                                                         style="padding:5px; font-size:120%")
+                                                                     )
+                                                                   ),
 
                                                                    h3(strong("Export plot")),
 
@@ -4800,6 +4854,9 @@ server <- function(input, output, session){
 
     if(is.null(density.file) && is.null(fl.file) && is.null(fl2.file)) return(NULL)
 
+    if(input$convert_time_equation_custom == "" || is.na(input$convert_time_equation_custom)) convert.time <- NULL
+    else convert.time <- input$convert_time_equation_custom
+
     ## Read data
     try(
       results$custom_data <- read_data(data.density = density.file$datapath,
@@ -4816,6 +4873,7 @@ server <- function(input, output, session){
                                        # csvsep.fl2 = input$separator_custom_density,
                                        # dec.fl2 = input$decimal_separator_custom_density,
                                        subtract.blank = input$subtract_blank_custom,
+                                       convert.time = convert.time,
                                        calibration = ifelse(input$calibration_custom, input$calibration_equation_custom, "")
       )
     )
@@ -6898,7 +6956,7 @@ server <- function(input, output, session){
       control_new$lin.R2 <- ifelse(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
       control_new$lin.RSD <- ifelse(!is.na(as.numeric(input$lin.RSD.rerun)), as.numeric(input$lin.RSD.rerun), control$lin.RSD)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun)), as.numeric(input$t0.lin.rerun), control$t0)
-      control:new$log.y.lin <- inpuy$log.y.lin.rerun
+      control_new$log.y.lin <- input$log.y.lin.rerun
       min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun)), as.numeric(input$min.density.lin.rerun), control$min.density)
       if(is.numeric(min.density.lin.new)){
         if(!is.na(min.density.lin.new) && all(as.vector(actwell) < min.density.lin.new)){
@@ -8280,7 +8338,7 @@ server <- function(input, output, session){
 
       ### DR Plots Spline ####
   observe({
-    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$control$dr.method == "spline"){
+    if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$drFit$control$dr.method == "spline"){
       showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Spline")
     } else {
       hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Spline")
@@ -8314,6 +8372,124 @@ server <- function(input, output, session){
     )
   })
 
+  observeEvent(input$rerun_dr_spline_group, {
+
+    select_options <- c()
+    if(any("l" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.linfit', 'lambda.linfit', 'dY.linfit',
+                                                                         'A.linfit')
+    if(any("s" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.spline', 'lambda.spline',
+                                                                         'A.spline', 'dY.spline', 'integral.spline')
+    if(any("m" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.model', 'lambda.model', 'A.model', 'integral.model')
+    select_options
+
+    # display a modal dialog with a header, textinput and action buttons
+    showModal(
+      modalDialog(
+        tags$h2('Please enter adjusted parameters'),
+
+        selectInput(inputId = "dr_method_growth_rerun",
+                    label = "Method",
+                    choices = c("Dose-response models" = "model",
+                                "Response spline fit" = "spline")
+        ),
+        bsPopover(id = "dr_method_growth_rerun",
+                  title = HTML("<em>dr.method</em>"),
+                  placement = "right",
+                  content = "Fit either a various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit."),
+
+        selectInput(inputId = "response_parameter_growth_rerun",
+                    label = "Response Parameter",
+                    choices = select_options),
+        bsPopover(id = "response_parameter_growth_rerun", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
+
+        conditionalPanel(
+          condition = 'input.dr_method_growth_rerun == "spline"',
+          tags$div(title="Perform a log(x+1) transformation on concentration values.",
+                   checkboxInput(inputId = 'log_transform_concentration_growth_rerun',
+                                 label = 'Log transform concentration')
+          ),
+
+          tags$div(title="Perform a log(y+1) transformation on response values.",
+                   checkboxInput(inputId = 'log_transform_response_growth_rerun',
+                                 label = 'Log transform response')
+          ),
+
+          textInput(
+            inputId = 'smoothing_factor_growth_dr_rerun',
+            label = 'Smoothing factor dose-response splines',
+            value = "",
+            placeholder = "NULL (choose automatically)"
+          ),
+          bsPopover(id = "smoothing_factor_growth_dr_rerun", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+
+          numberInput(
+            inputId = 'number_of_bootstrappings_dr_growth_rerun',
+            label = 'Number of bootstrappings',
+            value = 0,
+            min = NA,
+            max = NA,
+            placeholder = 0
+          ),
+          bsPopover(id = "number_of_bootstrappings_dr_growth_rerun", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+        ), #conditionalPanel(condition = 'input.dr_method_growth_rerun == "spline"')
+        footer=tagList(
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton('submit.rerun.dr.spline.group', 'Submit'),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right")
+
+            )
+          )
+        )
+      )
+    )
+  })
+
+  # Re-run selected linear fit with user-defined parameters upon click on 'submit'
+  observeEvent(input$submit.rerun.dr.spline.group, {
+    if(!is.null(results$growth$drFit)){
+
+      showModal(modalDialog("Performing dose-reponse analysis...", footer = NULL))
+
+      # store previous fit in memory
+      selected_vals_validate_growth$restore_dr_spline_group <- results$growth$drFit
+
+      # Re-run fit and store in results object
+      gcTable <- results$growth$gcFit$gcTable
+      control <- results$growth$drFit$control
+      control_new <- results$growth$control <- control
+
+      control_new$dr.method <- input$dr_method_growth_rerun
+      control_new$dr.parameter <- input$response_parameter_growth_rerun
+      control_new$smooth.dr <- input$smoothing_factor_growth_dr_rerun
+      control_new$nboot.dr <- input$number_of_bootstrappings_dr_growth_rerun
+      control_new$log.x.dr <- input$log_transform_concentration_growth_rerun
+      control_new$log.y.dr <- input$log_transform_response_growth_rerun
+
+
+      try(
+        results$growth$drFit <-
+          growth.drFit(gcTable, control = control_new)
+      )
+
+      # Show [Restore fit] button
+      show("restore_dr_spline_group")
+    }
+
+    removeModal()
+  })
+
+  # Restore previous linear fit upon click on [Restore Fit]
+  observeEvent(input$restore_dr_spline_group, {
+    # store previous fit from memory
+    results$growth$drFit <- selected_vals_validate_growth$restore_dr_spline_group
+    hide("restore_dr_spline_group")
+  })
+
   output$dose_response_growth_plot_combined <- renderPlot({
     dose_response_growth_plot_combined()
   })
@@ -8332,7 +8508,7 @@ server <- function(input, output, session){
 
       ### DR Plots Model ####
       observe({
-        if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$control$dr.method == "model"){
+        if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1 && results$growth$drFit$control$dr.method == "model"){
           showTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Model")
         } else {
           hideTab(inputId = "tabsetPanel_Visualize_Growth", target = "tabPanel_Visualize_Growth_DoseResponse_Model")
@@ -8480,6 +8656,135 @@ server <- function(input, output, session){
         contentType = ifelse(input$format_download_dose_response_growth_plot_model == ".pdf", "image/pdf", "image/png")
       )
 
+      observeEvent(input$rerun_dr_model, {
+
+        select_options <- c()
+        if(any("l" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.linfit', 'lambda.linfit', 'dY.linfit',
+                                                                             'A.linfit')
+        if(any("s" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.spline', 'lambda.spline',
+                                                                             'A.spline', 'dY.spline', 'integral.spline')
+        if(any("m" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.model', 'lambda.model', 'A.model', 'integral.model')
+        select_options
+        # display a modal dialog with a header, textinput and action buttons
+        showModal(
+          modalDialog(
+            tags$h2('Please enter adjusted parameters'),
+
+            textInput(inputId = "dr_method_growth_rerun_model",
+                      label = "Method", value = results$growth$drFit$control$dr.method) %>% disabled(),
+
+            bsPopover(id = "dr_method_growth_rerun_model",
+                      title = HTML("<em>dr.method</em>"),
+                      placement = "right",
+                      content = "To change the method of the dose-response analysis, please re-run the Computation workflow or select [Combine conditions into a single plot] and click [Re-run]."),
+
+            selectInput(inputId = "response_parameter_growth_rerun_model",
+                        label = "Response Parameter",
+                        choices = select_options),
+            bsPopover(id = "response_parameter_growth_rerun_model", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
+
+            conditionalPanel(
+              condition = 'input.dr_method_growth_rerun_model == "spline"',
+              tags$div(title="Perform a log(x+1) transformation on concentration values.",
+                       checkboxInput(inputId = 'log_transform_concentration_growth_rerun_model',
+                                     label = 'Log transform concentration')
+              ),
+
+              tags$div(title="Perform a log(y+1) transformation on response values.",
+                       checkboxInput(inputId = 'log_transform_response_growth_rerun_model',
+                                     label = 'Log transform response')
+              ),
+
+              textInput(
+                inputId = 'smoothing_factor_growth_dr_rerun_model',
+                label = 'Smoothing factor dose-response splines',
+                value = "",
+                placeholder = "NULL (choose automatically)"
+              ),
+              bsPopover(id = "smoothing_factor_growth_dr_rerun_model", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+
+              numberInput(
+                inputId = 'number_of_bootstrappings_dr_growth_rerun_model',
+                label = 'Number of bootstrappings',
+                value = 0,
+                min = NA,
+                max = NA,
+                placeholder = 0
+              ),
+              bsPopover(id = "number_of_bootstrappings_dr_growth_rerun_model", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+            ), #conditionalPanel(condition = 'input.dr_method_growth_rerun == "spline"')
+            footer=tagList(
+              fluidRow(
+                column(12,
+                       div(
+                         actionButton('submit.rerun.dr.spline.model', 'Submit'),
+                         style="float:right"),
+                       div(
+                         modalButton('cancel'),
+                         style="float:right")
+
+                )
+              )
+            )
+          )
+        )
+      })
+
+
+      # Re-run selected linear fit with user-defined parameters upon click on 'submit'
+      observeEvent(input$submit.rerun.dr.spline.model, {
+        if(!is.null(results$growth$drFit)){
+
+          showModal(modalDialog("Performing dose-reponse analysis...", footer = NULL))
+
+          # store previous fit in memory
+          selected_vals_validate_growth$restore_dr_model <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
+
+          # Re-run fit and store in results object
+          gcTable <- results$growth$gcFit$gcTable
+          control <- results$growth$drFit$control
+          control_new <- control
+
+          # control_new$dr.method <- input$dr_method_growth_rerun_model
+          control_new$dr.parameter <- input$response_parameter_growth_rerun_model
+          control_new$smooth.dr <- input$smoothing_factor_growth_dr_rerun_model
+          control_new$nboot.dr <- input$number_of_bootstrappings_dr_growth_rerun_model
+          control_new$log.x.dr <- input$log_transform_concentration_growth_rerun_model
+          control_new$log.y.dr <- input$log_transform_response_growth_rerun_model
+
+          if(control_new$dr.method == "spline"){
+            try(
+              results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]] <-
+                growth.drFitSpline(conc =  results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]$raw.conc,
+                                   test = results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]$raw.test,
+                                   drID = results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]$drID,
+                                   control = control_new)
+            )
+          } else {
+            try(
+              results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]] <-
+                growth.drFitModel(conc =  results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]$raw.conc,
+                                  test = results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]$raw.test,
+                                  drID = results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]$drID,
+                                  control = control_new)
+            )
+          }
+
+
+          # Show [Restore fit] button
+          show("restore_dr_model")
+        }
+
+        removeModal()
+      })
+
+      # Restore previous linear fit upon click on [Restore Fit]
+      observeEvent(input$restore_dr_model, {
+        # store previous fit from memory
+        results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]] <- selected_vals_validate_growth$restore_dr_model
+        hide("restore_dr_model")
+      })
+
       ### DR Plots Spline Individual ####
 
 
@@ -8600,6 +8905,139 @@ server <- function(input, output, session){
     },
     contentType = ifelse(input$format_download_dose_response_growth_plot_individual == ".pdf", "image/pdf", "image/png")
   )
+
+  observeEvent(input$rerun_dr_spline_individual, {
+
+    select_options <- c()
+    if(any("l" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.linfit', 'lambda.linfit', 'dY.linfit',
+                                                                         'A.linfit')
+    if(any("s" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.spline', 'lambda.spline',
+                                                                         'A.spline', 'dY.spline', 'integral.spline')
+    if(any("m" %in% results$growth$control$fit.opt)) select_options <- c(select_options, 'mu.model', 'lambda.model', 'A.model', 'integral.model')
+    select_options
+    # display a modal dialog with a header, textinput and action buttons
+    showModal(
+      modalDialog(
+        tags$h2('Please enter adjusted parameters'),
+
+        textInput(inputId = "dr_method_growth_rerun_individual",
+                    label = "Method", value = results$growth$drFit$control$dr.method) %>% disabled(),
+
+        bsPopover(id = "dr_method_growth_rerun_individual",
+                  title = HTML("<em>dr.method</em>"),
+                  placement = "right",
+                  content = "To change the method of the dose-response analysis, please re-run the Computation workflow or select [Combine conditions into a single plot] and click [Re-run]."),
+
+        selectInput(inputId = "response_parameter_growth_rerun_individual",
+                    label = "Response Parameter",
+                    choices = select_options,
+                    selected =  results$growth$drFit$control$dr.parameter),
+        bsPopover(id = "response_parameter_growth_rerun_individual", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
+
+        conditionalPanel(
+          condition = 'input.dr_method_growth_rerun_individual == "spline"',
+          tags$div(title="Perform a log(x+1) transformation on concentration values.",
+                   checkboxInput(inputId = 'log_transform_concentration_growth_rerun_individual',
+                                 label = 'Log transform concentration',
+                                 value =  results$growth$drFit$control$log.x.dr)
+          ),
+
+          tags$div(title="Perform a log(y+1) transformation on response values.",
+                   checkboxInput(inputId = 'log_transform_response_growth_rerun_individual',
+                                 label = 'Log transform response',
+                                 value =  results$growth$drFit$control$log.y.dr)
+          ),
+
+          textInput(
+            inputId = 'smoothing_factor_growth_dr_rerun_individual',
+            label = 'Smoothing factor dose-response splines',
+            value = "",
+            placeholder = "NULL (choose automatically)"
+          ),
+          bsPopover(id = "smoothing_factor_growth_dr_rerun_individual", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+
+          numberInput(
+            inputId = 'number_of_bootstrappings_dr_growth_rerun_individual',
+            label = 'Number of bootstrappings',
+            value = 0,
+            min = NA,
+            max = NA,
+            placeholder = 0
+          ),
+          bsPopover(id = "number_of_bootstrappings_dr_growth_rerun_individual", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+        ), #conditionalPanel(condition = 'input.dr_method_growth_rerun == "spline"')
+        footer=tagList(
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton('submit.rerun.dr.spline.individual', 'Submit'),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right")
+
+            )
+          )
+        )
+      )
+    )
+  })
+
+
+  # Re-run selected linear fit with user-defined parameters upon click on 'submit'
+  observeEvent(input$submit.rerun.dr.spline.individual, {
+    if(!is.null(results$growth$drFit)){
+
+      showModal(modalDialog("Performing dose-reponse analysis...", footer = NULL))
+
+      # store previous fit in memory
+      selected_vals_validate_growth$restore_dr_spline_individual <- results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]
+
+      # Re-run fit and store in results object
+      gcTable <- results$growth$gcFit$gcTable
+      control <- results$growth$drFit$control
+      control_new <- control
+
+      # control_new$dr.method <- input$dr_method_growth_rerun_individual
+      control_new$dr.parameter <- input$response_parameter_growth_rerun_individual
+      control_new$smooth.dr <- input$smoothing_factor_growth_dr_rerun_individual
+      control_new$nboot.dr <- input$number_of_bootstrappings_dr_growth_rerun_individual
+      control_new$log.x.dr <- input$log_transform_concentration_growth_rerun_individual
+      control_new$log.y.dr <- input$log_transform_response_growth_rerun_individual
+
+      if(control_new$dr.method == "spline"){
+        try(
+          results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]] <-
+            growth.drFitSpline(conc =  results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]$raw.conc,
+                               test = results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]$raw.test,
+                               drID = results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]]$drID,
+                               control = control_new)
+        )
+      } else {
+        try(
+          results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]] <-
+            growth.drFitModel(conc =  results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]$raw.conc,
+                               test = results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]$raw.test,
+                               drID = results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]$drID,
+                               control = control_new)
+        )
+      }
+
+
+      # Show [Restore fit] button
+      show("restore_dr_spline_individual")
+    }
+
+    removeModal()
+  })
+
+  # Restore previous linear fit upon click on [Restore Fit]
+  observeEvent(input$restore_dr_spline_individual, {
+    # store previous fit from memory
+    results$growth$drFit$drFittedSplines[[ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), 1, input$individual_plots_dose_response_growth_plot)]] <- selected_vals_validate_growth$restore_dr_spline_individual
+    hide("restore_dr_spline_individual")
+  })
+
 
       ### DR Plots (Bootstrap) ####
   observe({

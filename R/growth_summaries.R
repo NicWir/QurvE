@@ -45,7 +45,7 @@ summary.gcFitSpline <- function(object,...)
                                  "smooth.spline")
 
     if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
-      table <- c(0, rep(NA,length(contents.fitted.spline)-4), as.character(object$fitFlag), as.character(object$fitFlag2), ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
+      table <- c(0, rep(NA,length(contents.fitted.spline)-6), 0, 0, as.character(object$fitFlag), as.character(object$fitFlag2), ifelse(is.null(object$control$smooth.gc), "NULL", as.numeric(object$control$smooth.gc)))
     }
     else{
       table <- c(object$parameters$mu, log(2)/object$parameters$mu, object$parameters$t.max, object$parameters$lambda,
@@ -261,7 +261,7 @@ summary.gcFitLinear <- function(object,...)
 
 
   if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
-    table<-c(0, rep(NA,7), "FALSE", rep(NA,5), "FALSE")
+    table<-c(0, NA, NA, 0, NA, NA, NA, NA, "FALSE", rep(NA,5), "FALSE")
   }
   else{
     table <- c(object$par[5], log(2)/object$par[5],
