@@ -15,6 +15,7 @@ read_data(
   sheet.density = 1,
   sheet.fl = 1,
   subtract.blank = T,
+  convert.time = NULL,
   calibration = NULL
 )
 }
@@ -44,6 +45,9 @@ In column format, the first three table rows contain
 \item{sheet.fl}{(Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (\emph{optional}).}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}). If \code{calibration = TRUE}, blanks are subtracted after value conversion.}
+
+\item{convert.time}{(\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
+For example: \code{convert.time = 'y = 24 * x'}}
 
 \item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.}

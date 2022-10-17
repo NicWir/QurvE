@@ -16,7 +16,9 @@ growth.workflow(
   suppress.messages = FALSE,
   fit.opt = c("a"),
   t0 = 0,
+  tmax = NA,
   min.density = NA,
+  max.density = NA,
   log.x.gc = FALSE,
   log.y.lin = TRUE,
   log.y.spline = TRUE,
@@ -71,7 +73,11 @@ growth.workflow(
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 
-\item{min.density}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.}
+\item{tmax}{(Numeric) Maximum time value considered for linear and spline fits.}
+
+\item{min.density}{(Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions or spline fits.}
+
+\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits.}
 
 \item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
 

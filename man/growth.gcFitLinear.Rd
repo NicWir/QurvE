@@ -9,8 +9,9 @@ growth.gcFitLinear(
   data,
   gcID = "undefined",
   quota = 0.95,
-  control = growth.control(t0 = 0, log.x.gc = FALSE, log.y.lin = TRUE, min.density = NA,
-    lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE)
+  control = growth.control(t0 = 0, tmax = NA, log.x.gc = FALSE, log.y.lin = TRUE,
+    min.density = NA, max.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1,
+    lin.dY = 0.05, biphasic = FALSE)
 )
 }
 \arguments{
@@ -28,7 +29,13 @@ growth.gcFitLinear(
 
 \item{log.y.lin}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} fits. Default: \code{TRUE}}
 
+\item{min.density}{(Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions.}
+
+\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions.}
+
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
+
+\item{tmax}{(Numeric) Minimum time value considered for linear and spline fits.}
 
 \item{lin.h}{(Numeric) Manually define the size of the sliding window . If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.}
 

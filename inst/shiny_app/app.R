@@ -704,6 +704,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        ),
                                                                        bsPopover(id = "minimum_density_growth", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
 
+                                                                       numberInput(
+                                                                         inputId = 'maximum_density_growth',
+                                                                         label = 'Maximum density',
+                                                                         value = 0,
+                                                                         min = NA,
+                                                                         max = NA,
+                                                                         placeholder = 0
+                                                                       ),
+                                                                       bsPopover(id = "maximum_density_growth", title = HTML("<em>max.density</em>"), content = "Consider only density values below and including [Maximum density] for linear and spline fits fits."),
+
 
                                                                        numberInput(
                                                                          inputId = 't0_growth',
@@ -714,6 +724,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          placeholder = 0
                                                                        ),
                                                                        bsPopover(id = "t0_growth", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
+
+                                                                       numberInput(
+                                                                         inputId = 'tmax_growth',
+                                                                         label = 'tmax',
+                                                                         value = 0,
+                                                                         min = NA,
+                                                                         max = NA,
+                                                                         placeholder = 0
+                                                                       ),
+                                                                       bsPopover(id = "tmax_growth", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits fits."),
 
                                                                      ), # Growth fit
 
@@ -2611,6 +2631,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 width = "100%", height = "1000px"),
 
                                                                    ),
+
                                                                    h3(strong("Export plot")),
 
                                                                    fluidRow(
@@ -5797,10 +5818,22 @@ server <- function(input, output, session){
       min.density <- as.numeric(input$minimum_density_growth)
     }
 
+    if (is.null(input$maximum_density_growth) || is.na(input$maximum_density_growth) || input$maximum_density_growth == "NULL" || input$maximum_density_growth == "") {
+      max.density <- NA
+    } else {
+      max.density <- as.numeric(input$maximum_density_growth)
+    }
+
     if (is.null(input$t0_growth) || is.na(input$t0_growth) || input$t0_growth == "NULL" || input$t0_growth == "") {
       t0 <- 0
     } else {
       t0 <- as.numeric(input$t0_growth)
+    }
+
+    if (is.null(input$tmax_growth) || is.na(input$tmax_growth) || input$tmax_growth == "NULL" || input$tmax_growth == "") {
+      tmax <- NA
+    } else {
+      tmax <- as.numeric(input$tmax_growth)
     }
 
     if (is.null(input$growth_threshold_growth) || is.na(input$growth_threshold_growth) || input$growth_threshold_growth == "NULL" || input$growth_threshold_growth == "") {
@@ -5842,7 +5875,9 @@ server <- function(input, output, session){
                                               ec50 = input$perform_ec50_growth,
                                               fit.opt = fit.opt,
                                               t0 = t0,
+                                              tmax = tmax,
                                               min.density = min.density,
+                                              max.density = max.density,
                                               log.x.gc = input$log_transform_time_growth,
                                               log.y.lin = input$log_transform_data_linear_growth,
                                               log.y.model = input$log_transform_data_parametric_growth,
@@ -6903,7 +6938,9 @@ server <- function(input, output, session){
         tags$h2('Please enter adjusted parameters'),
         checkboxInput('log.y.lin.rerun', 'log-transform density values', value = results$growth$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$log.y.lin),
         textInput('t0.lin.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$t0)),
+        textInput('tmax.lin.rerun', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$tmax)),
         textInput('min.density.lin.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.density)),
+        textInput('max.density.lin.rerun', 'Maximum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$max.density)),
         textAreaInput('quota.rerun', 'Quota', placeholder = HTML(paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$quota,
                                                                         "\n",
                                                                         "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
@@ -6956,6 +6993,7 @@ server <- function(input, output, session){
       control_new$lin.R2 <- ifelse(!is.na(as.numeric(input$lin.R2.rerun)), as.numeric(input$lin.R2.rerun), control$lin.R2)
       control_new$lin.RSD <- ifelse(!is.na(as.numeric(input$lin.RSD.rerun)), as.numeric(input$lin.RSD.rerun), control$lin.RSD)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun)), as.numeric(input$t0.lin.rerun), control$t0)
+      control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.lin.rerun)), as.numeric(input$tmax.lin.rerun), control$tmax)
       control_new$log.y.lin <- input$log.y.lin.rerun
       min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun)), as.numeric(input$min.density.lin.rerun), control$min.density)
       if(is.numeric(min.density.lin.new)){
@@ -6966,6 +7004,8 @@ server <- function(input, output, session){
           control_new$min.density <- min.density.lin.new
         }
       }
+      control_new$max.density <- ifelse(!is.na(as.numeric(input$max.density.lin.rerun)), as.numeric(input$max.density.lin.rerun), control$max.density)
+
       quota_new <- ifelse(!is.na(as.numeric(input$quota.rerun)), as.numeric(input$quota.rerun), 0.95)
 
       try(
@@ -7166,7 +7206,9 @@ server <- function(input, output, session){
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
         textInput('t0.spline.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$t0)),
+        textInput('tmax.spline.rerun', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$tmax)),
         textInput('min.density.spline.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$min.density)),
+        textInput('max.density.spline.rerun', 'Maximum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$max.density)),
         textInput('smooth.gc.rerun', 'Smoothing factor', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$smooth.gc)),
         footer=tagList(
           fluidRow(
@@ -7206,6 +7248,7 @@ server <- function(input, output, session){
 
       control_new$smooth.gc <- ifelse(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$smooth.gc)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
+      control_new$tax <- ifelse(!is.na(as.numeric(input$tax.spline.rerun)), as.numeric(input$tax.spline.rerun), control$tax)
       min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
       if(is.numeric(min.density.spline.new)){
         if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
@@ -7215,6 +7258,7 @@ server <- function(input, output, session){
           control_new$min.density <- min.density.spline.new
         }
       }
+      control_new$max.density <- ifelse(!is.na(as.numeric(input$max.density.spline.rerun)), as.numeric(input$max.density.spline.rerun), control$max.density)
 
       showModal(modalDialog("Fitting sample data...", footer = NULL))
 
@@ -8315,6 +8359,7 @@ server <- function(input, output, session){
   output$growth_group_plot <- renderPlot({
     growth_group_plot()
   })
+
 
   observe({
     if(input$plot_derivative_growth_group_plot && input$data_type_growth_group_plot == 'spline') h <- 9
