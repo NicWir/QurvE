@@ -1517,6 +1517,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     #    plot(s, round((log(s/20, base=1.15))*0.75))
     # }
   }
+  control$lin.h <- h
 
   if(!is.null(quota) && !is.na(quota) && quota != ""){
     if(quota > 1){

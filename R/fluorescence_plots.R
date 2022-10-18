@@ -110,7 +110,13 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time, QurvE:::grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
-             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
+
+             graphics::mtext(bquote(slope[max]: ~ .(round(flFittedLinear$par[["max_slope"]], digits = 3))~~~~
+                                      lambda: ~ .(round(flFittedLinear$par[["lag"]], digits = 3))~~~~
+                                      x[max]: ~ .(round(flFittedLinear$par[["x.max_start"]], digits = 2))-.(round(flFittedLinear$par[["x.max_end"]], digits = 2))~~~~
+                                      R2:~ .(round(flFittedLinear$rsquared, digits = 3))),
+                             side = 4 , adj = 0.45, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+
              graphics::mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
                          "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
@@ -190,14 +196,19 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                  try(lines(time, QurvE:::grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
                }
              }
-             graphics::mtext(paste("R2:", round(flFittedLinear$rsquared, digits = 3)), side = 4 , adj = 0.75, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab * 0.7)
+             graphics::mtext(bquote(slope[max]: ~ .(round(flFittedLinear$par[["max_slope"]], digits = 3))~~~~
+                                      lambda: ~ .(round(flFittedLinear$par[["lag"]], digits = 3))~~~~
+                                      x[max]: ~ .(round(flFittedLinear$par[["x.max_start"]], digits = 2))-.(round(flFittedLinear$par[["x.max_end"]], digits = 2))~~~~
+                                      R2:~ .(round(flFittedLinear$rsquared, digits = 3))),
+                             side = 4 , adj = 0.55, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+
              graphics::mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
-                         "   R2-thresh.:",  flFittedLinear$control$lin.R2,
-                         "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
-                         "t0:", flFittedLinear$control$t0,
-                         "  min.density:", flFittedLinear$control$min.density,
-                         "   dY-thresh.:",  flFittedLinear$control$lin.dY),
-                         cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
+                                   "   R2-thresh.:",  flFittedLinear$control$lin.R2,
+                                   "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
+                                   "t0:", flFittedLinear$control$t0,
+                                   "  min.density:", flFittedLinear$control$min.density,
+                                   "   dY-thresh.:",  flFittedLinear$control$lin.dY),
+                             cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
              ## residuals vs. fitted
              obs <- flFittedLinear$log.data
@@ -342,15 +353,24 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
       if(flFitSpline$control$log.y.spline == TRUE){
         fit.fl <-
           c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), exp(flFitSpline[["fit.fl"]]) *
-              flFitSpline[["raw.fl"]][1])
+              flFitSpline[["fl.in"]][1])
       } else {
         fit.fl <- c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), flFitSpline[["fit.fl"]])
       }
 
-      df.raw <- data.frame("x" = flFitSpline[["x.in"]],
-                         "data" = flFitSpline[["fl.in"]])
-      df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
-                           "fit.fl" = fit.fl)
+      if(flFitSpline$control$log.y.spline == TRUE){
+
+        df.raw <- data.frame("x" = flFitSpline[["raw.x"]],
+                             "data" = exp(flFitSpline[["raw.fl"]])*flFitSpline[["fl.in"]][1])
+        df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
+                             "fit.fl" = fit.fl)
+      } else {
+
+        df.raw <- data.frame("x" = flFitSpline[["raw.x"]],
+                             "data" = flFitSpline[["raw.fl"]])
+        df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
+                             "fit.fl" = fit.fl)
+      }
 
       x.label = if(flFitSpline$control$x_type == "density"){
         "Density"
@@ -373,9 +393,10 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
               legend.background=element_blank(),
               legend.title = element_blank(),
               legend.position = c(0.90, 0.08),
-              plot.title = element_text(size=15),
+              plot.title = element_text(size = basesize*1.1, face = "bold", vjust = 3),
               panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank()) +
+              panel.grid.minor = element_blank(),
+              plot.margin = unit(c(1,2,1,1), "lines")) +
         scale_color_manual(name='Fluorescence Fit',
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
@@ -385,6 +406,27 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
 
 
       p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+
+      if(!is.null(x.lim)){
+        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
+
+      x_limit <- ggplot_build(p)$layout$panel_params[[1]]$x.range
+      y_limit <- ggplot_build(p)$layout$panel_params[[1]]$y.range
+      y_limit[2] <- y_limit[2] * 1.25
+
+      p <- p +
+        annotate(
+          "text",
+          label = bquote(slope[max]: ~ .(round(coef$max_slope, digits = 3))~~~~
+                           lambda: ~ .(round(coef$lambda, digits = 3))~~~~
+                           x[max]: ~ .(round(coef$x.max, digits = 2))),
+          x = 1.01*x_limit[2],
+          y = 0.5 * y_limit[2],
+          angle = 90, parse = F, size = basesize*3.2/12) +
+        coord_cartesian(xlim = c(0, x_limit[2]*0.95), ylim = c(y_limit[1], y_limit[2]), clip = "off")
 
       # p <- p +
       #   annotate(
@@ -406,12 +448,6 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         } else {
           p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
         }
-      }
-
-      if(!is.null(x.lim)){
-        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
-      } else {
-        p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
       }
 
 
@@ -544,11 +580,22 @@ plot.flFitSpline <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, der
         }
         p.mu <- ggplot(df.mu, aes(x=x, y=y)) +
           geom_line(color = colSpline, size = lwd) +
-          theme_classic(base_size = 15) +
+          theme_classic(base_size = basesize) +
           xlab(x.label) +
           ylab(label = y.label.mu) +
-          scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-          scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+          coord_cartesian(xlim = c(0, x_limit[2]*0.95), clip = "off")
+
+        if(!is.null(y.lim.deriv)){
+          p.mu <- p.mu + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 10))
+        } else {
+          p.mu <- p.mu + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+
+        }
+        if(!is.null(x.lim)){
+          p.mu <- p.mu + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+        } else {
+          p.mu <- p.mu + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+        }
 
         p <- ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1))
 

@@ -1688,7 +1688,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           label = 'Base font size',
                                                                                           min = 10,
                                                                                           max = 35,
-                                                                                          value = 20,
+                                                                                          value = 23,
                                                                                           step = 0.5),
 
                                                                               sliderInput(inputId = "nbreaks_validate_growth_plot_spline",
@@ -1785,7 +1785,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           label = 'Base font size',
                                                                                           min = 10,
                                                                                           max = 35,
-                                                                                          value = 20,
+                                                                                          value = 23,
                                                                                           step = 0.5),
 
                                                                               sliderInput(inputId = "nbreaks_validate_growth_plot_model",
@@ -2041,14 +2041,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           label = 'Axis title font size',
                                                                                           min = 0.1,
                                                                                           max = 10,
-                                                                                          value = 1.9,
+                                                                                          value = 2,
                                                                                           step = 0.1),
 
                                                                               sliderInput(inputId = 'lab_size_validate_fluorescence_plot_linear',
                                                                                           label = 'Axis label font size',
                                                                                           min = 0.1,
                                                                                           max = 10,
-                                                                                          value = 1.7,
+                                                                                          value = 1.8,
                                                                                           step = 0.1),
 
                                                                               sliderInput(inputId = 'line_width_validate_fluorescence_plot_linear',
@@ -2234,7 +2234,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           label = 'Base font size',
                                                                                           min = 10,
                                                                                           max = 35,
-                                                                                          value = 20,
+                                                                                          value = 23,
                                                                                           step = 0.5),
 
                                                                               sliderInput(inputId = "nbreaks__validate_fluorescence_plot_spline",
@@ -2333,14 +2333,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           label = 'Axis title font size',
                                                                                           min = 0.1,
                                                                                           max = 10,
-                                                                                          value = 1.9,
+                                                                                          value = 2.8,
                                                                                           step = 0.1),
 
                                                                               sliderInput(inputId = 'lab_size_validate_fluorescence_spline_bt',
                                                                                           label = 'Axis label font size',
                                                                                           min = 0.1,
                                                                                           max = 10,
-                                                                                          value = 1.7,
+                                                                                          value = 2.4,
                                                                                           step = 0.1),
 
                                                                               sliderInput(inputId = 'line_width_validate_fluorescence_spline_bt',
@@ -2614,7 +2614,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = 'Base font size',
                                                                                min = 10,
                                                                                max = 35,
-                                                                               value = 20,
+                                                                               value = 23,
                                                                                step = 0.5)
 
                                                                  ), # Side panel growth group plots
@@ -2727,20 +2727,20 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = "Shape size",
                                                                                min = 0.1,
                                                                                max = 10,
-                                                                               value = 2,
+                                                                               value = 3,
                                                                                step = 0.1),
 
                                                                    sliderInput(inputId = "basesize_growth_parameter_plot",
                                                                                label = "Base font size",
                                                                                min = 10,
                                                                                max = 35,
-                                                                               value = 12,
+                                                                               value = 23,
                                                                                step = 0.5),
                                                                    sliderInput(inputId = "label.size_growth_parameter_plot",
                                                                                label = "Label font size",
                                                                                min = 5,
                                                                                max = 35,
-                                                                               value = 12,
+                                                                               value = 17,
                                                                                step = 0.5)
 
 
@@ -3339,13 +3339,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = "Base font size",
                                                                                min = 10,
                                                                                max = 35,
-                                                                               value = 12,
+                                                                               value = 23,
                                                                                step = 0.5),
+
                                                                    sliderInput(inputId = "label.size_growth_dr_parameter_plot",
                                                                                label = "Label font size",
                                                                                min = 5,
                                                                                max = 35,
-                                                                               value = 12,
+                                                                               value = 20,
                                                                                step = 0.5)
 
 
@@ -3564,7 +3565,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = 'Base font size',
                                                                                min = 10,
                                                                                max = 35,
-                                                                               value = 20,
+                                                                               value = 23,
                                                                                step = 0.5)
 
                                                                  ), # Side panel growth group plots
@@ -3757,7 +3758,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = 'Base font size',
                                                                                min = 10,
                                                                                max = 35,
-                                                                               value = 20,
+                                                                               value = 23,
                                                                                step = 0.5)
                                                                  ),
 
@@ -3866,14 +3867,21 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = "Shape size",
                                                                                min = 0.1,
                                                                                max = 10,
-                                                                               value = 2,
+                                                                               value = 3,
                                                                                step = 0.1),
 
                                                                    sliderInput(inputId = "basesize_fluorescence_parameter_plot",
                                                                                label = "Base font size",
                                                                                min = 10,
                                                                                max = 35,
-                                                                               value = 12,
+                                                                               value = 23,
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = "label.size_fluorescence_parameter_plot",
+                                                                               label = "Label font size",
+                                                                               min = 5,
+                                                                               max = 35,
+                                                                               value = 17,
                                                                                step = 0.5)
 
 
@@ -4390,13 +4398,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = "Base font size",
                                                                                min = 10,
                                                                                max = 35,
-                                                                               value = 12,
+                                                                               value = 23,
                                                                                step = 0.5),
+
                                                                    sliderInput(inputId = "label.size_fluorescence_dr_parameter_plot",
                                                                                label = "Label font size",
                                                                                min = 5,
                                                                                max = 35,
-                                                                               value = 12,
+                                                                               value = 20,
                                                                                step = 0.5)
 
 
@@ -4640,22 +4649,22 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 server <- function(input, output, session){
 
   # Notify about new QurvE version on Github
-  observe({
-    github_version <- gsub("Version: ", "", unlist(str_split(descr, "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
-    installed_version <- paste(packageVersion("QurvE"))
-    compared_versions <- remotes:::compare_versions(inst = installed_version, remote = github_version, is_cran = FALSE)
-    if(compared_versions == -1){
-      showModal(
-        modalDialog(
-          paste0(
-            "Your installed QurvE is outdated! A new version (",
-            github_version,
-            ") is available on Github. You can install the most recent development version by executing: devtools::install_github('NicWir/QurvE')."
-          ), easyClose = T
-        )
-      )
-    }
-  })
+  # observe({
+  #   github_version <- gsub("Version: ", "", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
+  #   installed_version <- paste(packageVersion("QurvE"))
+  #   compared_versions <- remotes:::compare_versions(inst = installed_version, remote = github_version, is_cran = FALSE)
+  #   if(compared_versions == -1){
+  #     showModal(
+  #       modalDialog(
+  #         paste0(
+  #           "Your installed QurvE is outdated! A new version (",
+  #           github_version,
+  #           ") is available on Github. You can install the most recent development version by executing devtools::install_github('NicWir/QurvE') in R and start the app via QurvE::run_app()."
+  #         ), easyClose = T
+  #       )
+  #     )
+  #   }
+  # })
 
   # Disable navbar menus before running computations
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
@@ -5073,7 +5082,8 @@ server <- function(input, output, session){
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
     }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) &&
-       all(custom_table_fluorescence_processed() == growth_data_custom_processed())){
+       exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed()) &&
+       all(results$custom_data$density == results$custom_data$fluorescence)){
       showModal(modalDialog("Density and Fluorescence data are identical. Did you assign the correct files and/or sheets?", easyClose = T))
     }
   })
@@ -6823,7 +6833,7 @@ server <- function(input, output, session){
     selected_vals_validate_growth$sample_validate_growth_model <- input$sample_validate_growth_model
   })
   observe({
-    req(input$sample_validate_growth_model)
+    req(input$sample_validate_growth_spline_bt)
     selected_vals_validate_growth$sample_validate_growth_spline_bt <- input$sample_validate_growth_spline_bt
   })
 
@@ -7686,6 +7696,10 @@ server <- function(input, output, session){
     req(input$sample_validate_fluorescence_spline)
     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline <- input$sample_validate_fluorescence_spline
   })
+  observe({
+    req(input$sample_validate_fluorescence_spline_bt)
+    selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt <- input$sample_validate_fluorescence_spline_bt
+  })
 
       ### Linear Fits ####
 
@@ -8008,6 +8022,7 @@ server <- function(input, output, session){
                                                     1,
                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
+      broser()
       suppressWarnings(
         plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
                                                                  is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
