@@ -13,6 +13,19 @@
   if(!tinytex::is_tinytex()){
     packageStartupMessage("TinyTex was not found on your system. To ensure full functionality of QurvE, please execute tinytex::install_tinytex().")
   }
+
+  github_version <- gsub("Version: ", "", unlist(str_split(descr, "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
+  installed_version <- paste(packageVersion("QurvE"))
+  compared_versions <- remotes:::compare_versions(inst = installed_version, remote = github_version, is_cran = FALSE)
+  if(compared_versions == -1){
+    packageStartupMessage(
+      paste0(
+        "Your installed QurvE is outdated! A new version (",
+        github_version,
+        ") is available on Github. You can install the most recent development version by executing: devtools::install_github('NicWir/QurvE')."
+      )
+    )
+  }
 }
 
 #' Format font color for Markdown reports

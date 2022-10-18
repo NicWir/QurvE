@@ -707,12 +707,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        numberInput(
                                                                          inputId = 'maximum_density_growth',
                                                                          label = 'Maximum density',
-                                                                         value = 0,
+                                                                         value = NULL,
                                                                          min = NA,
-                                                                         max = NA,
-                                                                         placeholder = 0
+                                                                         max = NA
                                                                        ),
-                                                                       bsPopover(id = "maximum_density_growth", title = HTML("<em>max.density</em>"), content = "Consider only density values below and including [Maximum density] for linear and spline fits fits."),
+                                                                       bsPopover(id = "maximum_density_growth", title = HTML("<em>max.density</em>"), content = "Consider only density values below and including [Maximum density] for linear and spline fits."),
 
 
                                                                        numberInput(
@@ -728,12 +727,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        numberInput(
                                                                          inputId = 'tmax_growth',
                                                                          label = 'tmax',
-                                                                         value = 0,
+                                                                         value = NULL,
                                                                          min = NA,
-                                                                         max = NA,
-                                                                         placeholder = 0
+                                                                         max = NA
                                                                        ),
-                                                                       bsPopover(id = "tmax_growth", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits fits."),
+                                                                       bsPopover(id = "tmax_growth", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits."),
 
                                                                      ), # Growth fit
 
@@ -755,7 +753,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                         bsPopover(id = "dr_method_growth",
                                                                                                   title = HTML("<em>dr.method</em>"),
                                                                                                   placement = "right",
-                                                                                                  content = "Fit either a various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit."),
+                                                                                                  content = "Fit either various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit.",
+                                                                                                  trigger = "hover", options = list(container = "body", template = widePopover)
+                                                                                                  ),
 
                                                                                         selectInput(inputId = "response_parameter_growth",
                                                                                                     label = "Response Parameter",
@@ -831,8 +831,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              inputId = 'R2_threshold_growth',
                                                              label = 'R2 threshold',
                                                              value = 0.95,
-                                                             min = 0,
-                                                             max = 1,
                                                              placeholder = 0.95
                                                            ),
                                                            bsPopover(id = "R2_threshold_growth", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
@@ -841,8 +839,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              inputId = 'RSD_threshold_growth',
                                                              label = 'RSD threshold',
                                                              value = 0.1,
-                                                             min = 0,
-                                                             max = 1,
                                                              placeholder = 0.1
                                                            ),
                                                            bsPopover(id = "RSD_threshold_growth", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
@@ -851,8 +847,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              inputId = 'dY_threshold_growth',
                                                              label = 'dY threshold',
                                                              value = 0.05,
-                                                             min = 0,
-                                                             max = 1,
                                                              placeholder = 0.05
                                                            ),
                                                            bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of density increase a linear regression window should cover to be considered."),
@@ -4645,6 +4639,24 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
 server <- function(input, output, session){
 
+  # Notify about new QurvE version on Github
+  observe({
+    github_version <- gsub("Version: ", "", unlist(str_split(descr, "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
+    installed_version <- paste(packageVersion("QurvE"))
+    compared_versions <- remotes:::compare_versions(inst = installed_version, remote = github_version, is_cran = FALSE)
+    if(compared_versions == -1){
+      showModal(
+        modalDialog(
+          paste0(
+            "Your installed QurvE is outdated! A new version (",
+            github_version,
+            ") is available on Github. You can install the most recent development version by executing: devtools::install_github('NicWir/QurvE')."
+          ), easyClose = T
+        )
+      )
+    }
+  })
+
   # Disable navbar menus before running computations
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Export_RData]")
   shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Report]")
@@ -6936,7 +6948,7 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
-        checkboxInput('log.y.lin.rerun', 'log-transform density values', value = results$growth$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$log.y.lin),
+        checkboxInput('log.y.lin.rerun', 'log-transform density values', value = results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$log.y.lin),
         textInput('t0.lin.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$t0)),
         textInput('tmax.lin.rerun', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$tmax)),
         textInput('min.density.lin.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.density)),
@@ -7007,7 +7019,6 @@ server <- function(input, output, session){
       control_new$max.density <- ifelse(!is.na(as.numeric(input$max.density.lin.rerun)), as.numeric(input$max.density.lin.rerun), control$max.density)
 
       quota_new <- ifelse(!is.na(as.numeric(input$quota.rerun)), as.numeric(input$quota.rerun), 0.95)
-
       try(
         results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]] <-
           growth.gcFitLinear(acttime, actwell,
@@ -7248,7 +7259,7 @@ server <- function(input, output, session){
 
       control_new$smooth.gc <- ifelse(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$smooth.gc)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
-      control_new$tax <- ifelse(!is.na(as.numeric(input$tax.spline.rerun)), as.numeric(input$tax.spline.rerun), control$tax)
+      control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.spline.rerun)), as.numeric(input$tmax.spline.rerun), control$tmax)
       min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
       if(is.numeric(min.density.spline.new)){
         if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
