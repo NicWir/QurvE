@@ -1186,7 +1186,11 @@ plot.drFitSpline <- function (drFitSpline,
         log = log,
         pch = pch, bg = colData,
         cex = cex.point,
-        col = colData, xlab="", ylab="", xaxt="n")
+        col = colData,
+        xlab="", ylab="",
+        xaxt="n",
+        ylim = y.lim,
+        xlim = x.lim)
 
       axis(1, mgp=c(3,1+0.5*cex.axis,0))
 

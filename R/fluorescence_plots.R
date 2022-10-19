@@ -118,12 +118,12 @@ plot.flFitLinear <- function(flFittedLinear, log="", which=c("fit", "diagnostics
                              side = 4 , adj = 0.45, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
 
              graphics::mtext(paste("h:", ifelse(is.null(flFittedLinear$control$lin.h), "NULL", flFittedLinear$control$lin.h),
-                         "   R2-thresh.:",  flFittedLinear$control$lin.R2,
-                         "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
-                         "t0:", flFittedLinear$control$t0,
-                         "  min.density:", flFittedLinear$control$min.density,
-                         "   dY-thresh.:",  flFittedLinear$control$lin.dY),
-                         cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
+                                   "   R2-thresh.:",  flFittedLinear$control$lin.R2,
+                                   "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
+                                   "t0:", flFittedLinear$control$t0,
+                                   "  min.density:", flFittedLinear$control$min.density,
+                                   "   dY-thresh.:",  flFittedLinear$control$lin.dY),
+                             cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
            },
            diagnostics = {
              opar <- par(no.readonly = TRUE)

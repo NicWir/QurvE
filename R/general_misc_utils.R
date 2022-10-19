@@ -16,8 +16,7 @@
 
   github_version <- gsub("Version: ", "", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
   installed_version <- paste(packageVersion("QurvE"))
-  compared_versions <- remotes:::compare_versions(inst = installed_version, remote = github_version, is_cran = FALSE)
-  if(compared_versions == -1){
+  if(github_version > installed_version){
     packageStartupMessage(
       paste0(
         "Your installed QurvE is outdated! A new version (",
