@@ -5,7 +5,7 @@
 \title{Compare growth parameters between samples or conditions}
 \usage{
 \method{plot}{parameter}(
-  object,
+  x,
   param = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit", "mu2.linfit",
     "lambda2.linfit", "mu.model", "lambda.model", "A.model", "tD.linfit", "tD2.linfit",
     "tD.spline", "tD2.spline", "mu.spline", "lambda.spline", "A.spline", "dY.spline",
@@ -26,11 +26,12 @@
   height = 7,
   width = NULL,
   out.dir = NULL,
-  out.nm = NULL
+  out.nm = NULL,
+  ...
 )
 }
 \arguments{
-\item{object}{A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}.}
+\item{x}{A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}.}
 
 \item{param}{(Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
@@ -69,6 +70,8 @@
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
+
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95\% confidence interval (only shown for > 2 replicates).

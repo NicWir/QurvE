@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{flBootSpline} objects.}
 \usage{
 \method{plot}{flBootSpline}(
-  flBootSpline,
+  x,
   pch = 1,
   colData = 1,
   deriv = TRUE,
@@ -27,7 +27,7 @@
 )
 }
 \arguments{
-\item{flBootSpline}{Object of class \code{flBootSpline}, created with \code{\link{flBootSpline}}.}
+\item{x}{Object of class \code{flBootSpline}, created with \code{\link{flBootSpline}}.}
 
 \item{pch}{(Numeric) Size of the raw data circles.}
 
@@ -63,7 +63,7 @@
 
 \item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 
-\item{...}{Further arguments to refine the generated base R plot.}
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 Generic plot function for \code{flBootSpline} objects.

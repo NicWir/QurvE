@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{gcBootSpline} objects.}
 \usage{
 \method{plot}{drBootSpline}(
-  drBootSpline,
+  x,
   pch = 19,
   colData = 1,
   colSpline = scales::alpha("black", 0.15),
@@ -23,7 +23,7 @@
 )
 }
 \arguments{
-\item{drBootSpline}{A \code{drBootSpline} object created with \code{\link{growth.drBootSpline}} or stored within a \code{grofit} or \code{drFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.drFit}}, respectively.}
+\item{x}{A \code{drBootSpline} object created with \code{\link{growth.drBootSpline}} or stored within a \code{grofit} or \code{drFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.drFit}}, respectively.}
 
 \item{pch}{(Numeric) Shape of the raw data symbols.}
 

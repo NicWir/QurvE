@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{grofit} objects. Combine different groups of samples into a single plot}
 \usage{
 \method{plot}{grofit}(
-  grofit,
+  x,
   ...,
   data.type = c("spline", "raw"),
   IDs = NULL,
@@ -36,7 +36,7 @@
 )
 }
 \arguments{
-\item{grofit}{A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.}
+\item{x}{A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.}
 
 \item{...}{(\emph{optional}) Additional \code{grofit} objects created in separate workflows.}
 

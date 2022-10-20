@@ -1,3 +1,5 @@
+utils::globalVariables(c("shiny"))
+
 #' Run upon attaching package QurvE
 #'
 #' Changes debug option for package \code{rgl} to avoid Rstudio crashing upon attaching it and prints welcome message
@@ -14,17 +16,17 @@
     packageStartupMessage("TinyTex was not found on your system. To ensure full functionality of QurvE, please execute tinytex::install_tinytex().")
   }
 
-  github_version <- gsub("Version: ", "", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
-  installed_version <- paste(packageVersion("QurvE"))
-  if(github_version > installed_version){
-    packageStartupMessage(
-      paste0(
-        "Your installed QurvE is outdated! A new version (",
-        github_version,
-        ") is available on Github. You can install the most recent development version by executing: devtools::install_github('NicWir/QurvE')."
-      )
-    )
-  }
+  # github_version <- gsub("Version: ", "", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
+  # installed_version <- paste(utils::packageVersion("QurvE"))
+  # if(github_version > installed_version){
+  #   packageStartupMessage(
+  #     paste0(
+  #       "Your installed QurvE is outdated! A new version (",
+  #       github_version,
+  #       ") is available on Github. You can install the most recent development version by executing: devtools::install_github('NicWir/QurvE')."
+  #     )
+  #   )
+  # }
 }
 
 #' Format font color for Markdown reports
@@ -85,7 +87,7 @@ fast.write.csv <- function(dat, file, row.names = TRUE) {
 read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
   if (file.exists(filename)) {
     if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
-      ncols <- max(count.fields(filename, sep = csvsep))
+      ncols <- max(utils::count.fields(filename, sep = csvsep))
       dat <-
         utils::read.csv(
           filename,
@@ -105,7 +107,7 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
       dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = sheet, progress = TRUE)))
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
-      ncols <- max(count.fields(filename))
+      ncols <- max(utils::count.fields(filename))
       dat <-
         utils::read.csv(
           filename,
@@ -122,7 +124,7 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
           col.names = paste0("V", seq_len(ncols))
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
-      ncols <- max(count.fields(filename))
+      ncols <- max(utils::count.fields(filename))
       dat <-
         utils::read.table(
           filename,
@@ -229,10 +231,9 @@ zipFastener <- function(df1, df2, along=2)
 #'
 #' @export
 #'
-#' @importFrom DT dataTableOutput renderDT datatable
 #' @importFrom readxl read_excel excel_sheets
 #'
-#' @import shiny doParallel knitr kableExtra
+#' @import shiny doParallel knitr
 run_app <- function() {
 
   # Locate all the shiny apps that exist
@@ -687,7 +688,7 @@ parse_victorx3 <- function(input)
     time <- lapply(1:length(read.data), function(x)
       round(c(
         as.matrix(
-          read.table(text = read.data[[x]][,3], sep = ":")
+          utils::read.table(text = read.data[[x]][,3], sep = ":")
         ) %*% c(60, 1, 1/60)
       ), digits = 0)
     )
@@ -706,7 +707,7 @@ parse_victorx3 <- function(input)
     read.data <- lapply(1:length(read.data), function(x) read.data[[x]][,-1])
     # convert to wide format
     read.data <- lapply(1:length(read.data), function(x)
-      pivot_wider(data = read.data[[x]], names_from= well, values_from = read))
+      pivot_wider(data = read.data[[x]], names_from= "well", values_from = "read"))
     # change list element names
     names(read.data) <- reads
     # add column names as first row
@@ -719,7 +720,7 @@ parse_victorx3 <- function(input)
     # round time values to full minutes
     time <- round(c(
       as.matrix(
-        read.table(text = read.data[[1]][,2], sep = ":")
+        utils::read.table(text = read.data[[1]][,2], sep = ":")
       ) %*% c(60, 1, 1/60)
     ), digits = 0)
     # assign all measurements the first time value of the respective repeat
@@ -732,7 +733,7 @@ parse_victorx3 <- function(input)
     # remove "repeat" column
     read.data[[1]] <- read.data[[1]][,-1]
     # convert to wide format
-    read.data[[1]] <- pivot_wider(data = read.data[[1]], names_from= well, values_from = read)
+    read.data[[1]] <- pivot_wider(data = read.data[[1]], names_from= "well", values_from = "read")
     # change list element names
     names(read.data)[1] <- reads
     # add column names as first row
@@ -1086,19 +1087,6 @@ get_sd_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 
 #'
 #' @return numeric vector of breaks
 #'
-#' @examples
-#' xgx_breaks_log10(c(1, 1000))
-#' xgx_breaks_log10(c(0.001, 100))
-#' xgx_breaks_log10(c(1e-4, 1e4))
-#' xgx_breaks_log10(c(1e-9, 1e9))
-#' xgx_breaks_log10(c(1, 2))
-#' xgx_breaks_log10(c(1, 5))
-#' xgx_breaks_log10(c(1, 10))
-#' xgx_breaks_log10(c(1, 100))
-#' xgx_breaks_log10(c(1, 1.01))
-#' xgx_breaks_log10(c(1, 1.0001))
-#' print(xgx_breaks_log10(c(1, 1.000001)), digits = 10)
-#'
 #' @importFrom labeling extended
 #'
 xgx_breaks_log10 <-  function(data_range) {
@@ -1136,19 +1124,6 @@ xgx_breaks_log10 <-  function(data_range) {
 #' @param data_range range of the data
 #'
 #' @return numeric vector of breaks
-#'
-#' @examples
-#' xgx_minor_breaks_log10(c(1, 1000))
-#' xgx_minor_breaks_log10(c(0.001, 100))
-#' xgx_minor_breaks_log10(c(1e-4, 1e4))
-#' xgx_minor_breaks_log10(c(1e-9, 1e9))
-#' xgx_minor_breaks_log10(c(1, 2))
-#' xgx_minor_breaks_log10(c(1, 5))
-#' xgx_minor_breaks_log10(c(1, 10))
-#' xgx_minor_breaks_log10(c(1, 100))
-#' xgx_minor_breaks_log10(c(1, 1.01))
-#' xgx_minor_breaks_log10(c(1, 1.0001))
-#' print(xgx_minor_breaks_log10(c(1, 1.000001)), digits = 10)
 #'
 #' @importFrom labeling extended
 #'

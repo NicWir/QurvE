@@ -7,7 +7,7 @@
 \title{Combine different groups of samples into a single plot}
 \usage{
 \method{plot}{flFitRes}(
-  object,
+  x,
   data.type = c("spline", "raw", "norm.fl"),
   IDs = NULL,
   names = NULL,
@@ -33,11 +33,12 @@
   width = NULL,
   out.dir = NULL,
   out.nm = NULL,
-  shiny = FALSE
+  shiny = FALSE,
+  ...
 )
 
 \method{plot}{flFit}(
-  object,
+  x,
   data.type = c("spline", "raw", "norm.fl"),
   IDs = NULL,
   names = NULL,
@@ -63,11 +64,12 @@
   width = NULL,
   out.dir = NULL,
   out.nm = NULL,
-  shiny = FALSE
+  shiny = FALSE,
+  ...
 )
 
 \method{plot}{grodata}(
-  object,
+  x,
   data.type = c("spline", "raw", "norm.fl"),
   IDs = NULL,
   names = NULL,
@@ -93,11 +95,12 @@
   width = NULL,
   out.dir = NULL,
   out.nm = NULL,
-  shiny = FALSE
+  shiny = FALSE,
+  ...
 )
 }
 \arguments{
-\item{object}{A \code{flFitRes}, \code{flFit}, or \code{grodata} object created with \code{\link{fl.workflow}} containing fluorescence data.}
+\item{x}{A \code{flFitRes}, \code{flFit}, or \code{grodata} object created with \code{\link{fl.workflow}} containing fluorescence data.}
 
 \item{data.type}{(Character) Indicate, which type of fluorescence data should be displayed.}
 
@@ -150,6 +153,8 @@
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
 
 \item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
+
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 Visualize fluorescence, normalized fluorescence, or spline fits of multiple sample groups in a single plot.

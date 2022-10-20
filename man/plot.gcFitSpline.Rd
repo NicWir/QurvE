@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{gcFitSpline} objects.}
 \usage{
 \method{plot}{gcFitSpline}(
-  gcFittedSpline,
+  x,
   add = FALSE,
   raw = TRUE,
   slope = TRUE,
@@ -31,7 +31,7 @@
 )
 }
 \arguments{
-\item{gcFittedSpline}{object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.}
+\item{x}{object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.}
 
 \item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.}
 

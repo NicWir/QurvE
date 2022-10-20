@@ -5,7 +5,7 @@
 \title{Compare calculated dose-response parameters between conditions.}
 \usage{
 \method{plot}{dr_parameter}(
-  object,
+  x,
   param = c("y.max", "y.min", "fc", "K", "n", "EC50", "yEC50", "drboot.meanEC50",
     "drboot.meanEC50y"),
   names = NULL,
@@ -18,11 +18,12 @@
   height = 7,
   width = NULL,
   out.dir = NULL,
-  out.nm = NULL
+  out.nm = NULL,
+  ...
 )
 }
 \arguments{
-\item{object}{A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{\link{growth.workflow}}, \code{\link{growth.drFit}}, \code{\link{fl.drFit}}, or \code{\link{fl.workflow}}.}
+\item{x}{A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{\link{growth.workflow}}, \code{\link{growth.drFit}}, \code{\link{fl.drFit}}, or \code{\link{fl.workflow}}.}
 
 \item{param}{(Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 'y.max', 'y.min', 'fc', 'K', or 'n' for fluorescence dose-response analyses with \code{dr.type = 'model'} in the \code{control} argument,
@@ -49,6 +50,8 @@ or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.}
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
+
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95\% confidence interval (only shown for > 2 replicates).

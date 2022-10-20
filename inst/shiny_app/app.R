@@ -4695,7 +4695,7 @@ server <- function(input, output, session){
   # Notify about new QurvE version on Github
   # observe({
   #   github_version <- gsub("Version: ", "", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
-  #   installed_version <- paste(packageVersion("QurvE"))
+  #   installed_version <- paste(utils::packageVersion("QurvE"))
   #   if(github_version > installed_version){
   #     showModal(
   #       modalDialog(
@@ -5196,7 +5196,7 @@ server <- function(input, output, session){
         )
     }
     if(exists("f1")){
-    f1[-(1:3),] <- apply(f1[-(1:3),], 2, as.numeric) %>% apply(., 2, round, digits = 2)
+    f1[-(1:3),] <- apply(apply(f1[-(1:3),], 2, as.numeric), 2, round, digits = 2)
     colnames(f1)[1] <- "Time"
     f1[1,1] <- ""
     return(f1)
@@ -5330,7 +5330,7 @@ server <- function(input, output, session){
   #
   #   colnames(f2)[1] <- "Time"
   #   f2[1,1] <- ""
-  #   datatable(f2,
+  #   DT::datatable(f2,
   #             options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
   #             escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f2)-3)))
   # })

@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{drFitModel} objects.}
 \usage{
 \method{plot}{drFitModel}(
-  drFitModel,
+  x,
   type = c("confidence", "all", "bars", "none", "obs", "average"),
   ec50line = TRUE,
   add = FALSE,
@@ -29,11 +29,12 @@
   legend = T,
   legendText,
   legendPos,
-  cex.legend = NULL
+  cex.legend = NULL,
+  ...
 )
 }
 \arguments{
-\item{drFitModel}{object of class \code{drFitModel}, created with \code{\link{growth.drFitModel}}.}
+\item{x}{object of class \code{drFitModel}, created with \code{\link{growth.drFitModel}}.}
 
 \item{type}{(Character) Specify how to plot the data. There are currently 5 options: "average" (averages and fitted curve(s); default), "none" (only the fitted curve(s)), "obs" (only the data points), "all" (all data points and fitted curve(s)), "bars" (averages and fitted curve(s) with model-based standard errors (see Details)), and "confidence" (confidence bands for fitted curve(s)).}
 
@@ -82,6 +83,8 @@
 \item{legendPos}{(Numeric) Vector of length 2 giving the position of the legend.}
 
 \item{cex.legend}{numeric specifying the legend text size.}
+
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 Generic plot function for \code{drFitModel} objects.

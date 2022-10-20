@@ -1,7 +1,7 @@
 #' Generic summary function for flFitSpline objects
 #'
 #' @param object object of class \code{flFitSpline}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from the nonparametric fit.
 #' @export
@@ -35,7 +35,7 @@ summary.flFitSpline <- function(object,...)
 #' Generic summary function for flFitLinear objects
 #'
 #' @param object object of class \code{flFitLinear}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from the linear fit.
 #' @export
@@ -79,7 +79,7 @@ summary.flFitLinear <- function(object,...)
 #' Generic summary function for flBootSpline objects
 #'
 #' @param object object of class \code{flBootSpline}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
 #' @export
@@ -130,7 +130,7 @@ summary.flBootSpline <- function(object, ...)
 #' Generic summary function for flFit objects
 #'
 #' @param object object of class \code{flFit}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from all fits of a workflow.
 #' @export
@@ -145,7 +145,7 @@ summary.flFit <- function(object,...)
 #' Generic summary function for drFitFLModel objects
 #'
 #' @param object object of class \code{drFitModel}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with biosensor response parameters.
 #' @export

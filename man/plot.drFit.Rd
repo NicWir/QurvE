@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{drFit} objects.}
 \usage{
 \method{plot}{drFit}(
-  drFit,
+  x,
   combine = TRUE,
   names = NULL,
   exclude.nm = NULL,
@@ -26,11 +26,12 @@
   height = NULL,
   width = NULL,
   out.dir = NULL,
-  out.nm = NULL
+  out.nm = NULL,
+  ...
 )
 }
 \arguments{
-\item{drFit}{object of class \code{drFit}, created with \code{\link{growth.drFit}}.}
+\item{x}{object of class \code{drFit}, created with \code{\link{growth.drFit}}.}
 
 \item{combine}{(Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -60,6 +61,8 @@
 
 \item{log.y}{(Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?}
 
+\item{log.x}{(Logical) Log-transform the x-axis of the plot (\code{TRUE}) or not (\code{FALSE})?}
+
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{export}{(Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).}
@@ -72,7 +75,7 @@
 
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
 
-\item{(Logical)}{Log-transform the x-axis of the plot (\code{TRUE}) or not (\code{FALSE})?}
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis

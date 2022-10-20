@@ -1,7 +1,7 @@
 #' Generic summary function for drFitSpline objects
 #'
 #' @param object object of class \code{drFitSpline}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from the dose-response analysis of a single sample.
 #' @export
@@ -15,7 +15,7 @@ summary.drFitSpline <- function (object,...)
 #' Generic summary function for drFitModel objects
 #'
 #' @param object object of class \code{drFitModel}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from the dose-response analysis of a single sample.
 #' @export
@@ -29,7 +29,7 @@ summary.drFitModel <- function (object,...)
 #' Generic summary function for gcFitSpline objects
 #'
 #' @param object object of class \code{gcFitSpline}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from the nonparametric fit.
 #' @export
@@ -63,7 +63,7 @@ summary.gcFitSpline <- function(object,...)
 #' Generic summary function for gcFitModel objects
 #'
 #' @param object object of class \code{gcFitModel}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from the growth model fit.
 #' @export
@@ -120,7 +120,7 @@ summary.gcFitModel <- function(object, ...)
 #' Generic summary function for drFit objects
 #'
 #' @param object object of class \code{drFit}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters for all samples extracted from the dose-response analysis.
 #' @export
@@ -135,7 +135,7 @@ summary.drFit <- function(object, ...)
 #' Generic summary function for gcBootSpline objects
 #'
 #' @param object object of class \code{gcBootSpline}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with statistical parameters extracted from the spline fit bootstrapping computation.
 #' @export
@@ -186,7 +186,7 @@ summary.gcBootSpline <- function(object, ...)
 #' Generic summary function for drBootSpline objects
 #'
 #' @param object object of class \code{drBootSpline}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
 #' @export
@@ -225,7 +225,7 @@ summary.drBootSpline <- function(object, ...)
 #' Generic summary function for gcFit objects
 #'
 #' @param object object of class \code{gcFit}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from all fits of a workflow.
 #' @export
@@ -240,7 +240,7 @@ summary.gcFit <- function(object,...)
 #' Generic summary function for gcFitLinear objects
 #'
 #' @param object object of class \code{gcFitLinear}
-#' @param ...
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from the linear fit.
 #' @export

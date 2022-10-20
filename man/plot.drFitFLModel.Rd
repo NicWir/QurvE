@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{drFitFLModel} objects.}
 \usage{
 \method{plot}{drFitFLModel}(
-  drFittedFLModel,
+  x,
   ec50line = TRUE,
   log = c("xy"),
   pch = 1,
@@ -26,7 +26,7 @@
 )
 }
 \arguments{
-\item{drFittedFLModel}{Object of class \code{drFitFLModel}, created with \code{\link{fl.drFitFLModel}}.}
+\item{x}{Object of class \code{drFitFLModel}, created with \code{\link{fl.drFitModel}}.}
 
 \item{ec50line}{(Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).}
 

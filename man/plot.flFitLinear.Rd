@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{flcFittedLinear} objects. Plot the results of a linear regression on ln-transformed data}
 \usage{
 \method{plot}{flFitLinear}(
-  flFittedLinear,
+  x,
   log = "",
   which = c("fit", "diagnostics", "fit_diagnostics"),
   pch = 21,
@@ -24,7 +24,7 @@
 )
 }
 \arguments{
-\item{flFittedLinear}{A \code{flFittedLinear} object created with \code{\link{flFitLinear}} or stored within a \code{flFitRes} or \code{flFit} object created with \code{\link{fl.workflow}} or \code{\link{flFit}}, respectively.}
+\item{x}{A \code{flFittedLinear} object created with \code{\link{flFitLinear}} or stored within a \code{flFitRes} or \code{flFit} object created with \code{\link{fl.workflow}} or \code{\link{flFit}}, respectively.}
 
 \item{log}{("x" or "y") Display the x- or y-axis on a logarithmic scale.}
 

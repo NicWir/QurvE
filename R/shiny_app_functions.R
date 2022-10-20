@@ -557,7 +557,7 @@ parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
     time <- lapply(1:length(read.data), function(x)
       round(c(
         as.matrix(
-          read.table(text = read.data[[x]][,3], sep = ":")
+          utils::read.table(text = read.data[[x]][,3], sep = ":")
         ) %*% c(60, 1, 1/60)
       ), digits = 0)
     )
@@ -576,7 +576,7 @@ parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
     read.data <- lapply(1:length(read.data), function(x) read.data[[x]][,-1])
     # convert to wide format
     read.data <- lapply(1:length(read.data), function(x)
-      pivot_wider(data = read.data[[x]], names_from= well, values_from = read))
+      pivot_wider(data = read.data[[x]], names_from= "well", values_from = "read"))
     # change list element names
     names(read.data) <- reads
     # add column names as first row
@@ -589,7 +589,7 @@ parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
     # round time values to full minutes
     time <- round(c(
       as.matrix(
-        read.table(text = read.data[[1]][,2], sep = ":")
+        utils::read.table(text = read.data[[1]][,2], sep = ":")
       ) %*% c(60, 1, 1/60)
     ), digits = 0)
     # assign all measurements the first time value of the respective repeat
@@ -602,7 +602,7 @@ parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
     # remove "repeat" column
     read.data[[1]] <- read.data[[1]][,-1]
     # convert to wide format
-    read.data[[1]] <- pivot_wider(data = read.data[[1]], names_from= well, values_from = read)
+    read.data[[1]] <- pivot_wider(data = read.data[[1]], names_from= "well", values_from = "read")
     # change list element names
     names(read.data)[1] <- reads
     # add column names as first row
@@ -657,7 +657,7 @@ write.csv.utf8.BOM <- function(df, filename)
     for (i in 1:ncol(df))
       df[,i] = iconv(df[,i], to = "UTF-8")
     writeChar(iconv("\ufeff", to = "UTF-8"), con, eos = NULL)
-    write.csv(df, file = con)
+    utils::write.csv(df, file = con)
   },finally = {close(con)})
 }
 

@@ -2,7 +2,7 @@
 #'
 #' \code{plot.gcFitLinear} shows the results of a linear regression on log-transformed data and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
 #'
-#' @param gcFittedLinear A \code{gcFittedLinear} object created with \code{\link{growth.gcFitLinear}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
+#' @param x A \code{gcFittedLinear} object created with \code{\link{growth.gcFitLinear}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param log ("x" or "y") Display the x- or y-axis on a logarithmic scale.
 #' @param which ("fit" or "diagnostics") Display either the results of the linear fit on the raw data or statistical evaluation of the linear regression.
 #' @param pch (Numeric) Shape of the raw data symbols.
@@ -19,15 +19,19 @@
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
+#' @importFrom graphics abline arrows axis hist layout lines mtext par points title
+#' @importFrom grDevices colors dev.new
+#'
 #' @export plot.gcFitLinear
 #' @export
 #'
-plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
+plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
                              cex.axis = 1.3, lwd = 2, y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
 {
-  if(methods::is(gcFittedLinear) != "gcFitLinear") stop("gcFittedLinear needs to be an object created with growth.gcFitLinear().")
+  gcFittedLinear <- x
+  if(methods::is(gcFittedLinear) != "gcFitLinear") stop("x needs to be an object created with growth.gcFitLinear().")
   which <- match.arg(which)
 
   p <- function(){
@@ -105,8 +109,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              axis(1, mgp=c(3,1+0.5*cex.axis,0))
              axis(2, las=1)
              ## normal q-q-plot
-             qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
-             qqline(gcFittedLinear$fit[["residuals"]])
+             stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
+             stats::qqline(gcFittedLinear$fit[["residuals"]])
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
              title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
              title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
@@ -188,8 +192,8 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
              axis(1, mgp=c(3,1+0.5*cex.axis,0))
              axis(2, las=1)
              ## normal q-q-plot
-             qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
-             qqline(gcFittedLinear$fit[["residuals"]])
+             stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
+             stats::qqline(gcFittedLinear$fit[["residuals"]])
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
              title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
              title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
@@ -220,7 +224,7 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'
 #' Plot the results of a parametric model fit on density vs. time data
 #'
-#' @param gcFittedModel A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
+#' @param x A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param raw (Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param pch (Numeric) Symbol used to plot data points.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
@@ -237,7 +241,6 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated \code{ggplot2} plot.
-#' @param eq.size
 #'
 #' @export plot.gcFitModel
 #' @export
@@ -245,11 +248,11 @@ plot.gcFitLinear <- function(gcFittedLinear, log="y", which=c("fit", "diagnostic
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equation = TRUE, eq.size = 1,
+plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq.size = 1,
                             colModel=ggplot2::alpha("forestgreen", 0.85), basesize=16, cex.point = 2, lwd = 0.7,
                             n.ybreaks = 6, plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
 {
-  # x an object of class gcFitModel
+  gcFittedModel <- x
 
   # /// check input parameters
   if (is.logical(raw)==FALSE)   stop("Need logical value for: raw")
@@ -257,7 +260,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
   if (is.logical(equation)==FALSE)   stop("Need logical value for: equation")
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (!(methods::is(gcFittedModel)=="gcFitModel"))   stop("gcFittedModel needs to be an object created with growth.gcFitModel().")
+  if (!(methods::is(gcFittedModel)=="gcFitModel"))   stop("x needs to be an object created with growth.gcFitModel().")
 
 
   # /// check if a data fit is available
@@ -267,7 +270,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
     df <- data.frame("time" = gcFittedModel[["raw.time"]],
                      "data" = gcFittedModel[["raw.data"]])
 
-    p <-    ggplot(df, aes(x=time, y=data)) +
+    p <-    ggplot(df, aes(x=.data$time, y=.data$data)) +
       xlab("Time") +
       ylab(label = ifelse(gcFittedModel$control$log.y.model == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
       theme_classic(base_size = basesize) +
@@ -289,7 +292,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
                      "fit.time" = gcFittedModel[["fit.time"]],
                      "fit.data" = gcFittedModel[["fit.data"]])
 
-    p <-    ggplot(df, aes(x=time, y=data)) +
+    p <-    ggplot(df, aes(x=.data$time, y=.data$data)) +
       geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = lwd) +
       xlab("Time") +
       ylab(label = ifelse(gcFittedModel$control$log.y.model == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
@@ -496,7 +499,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
 
 #' Generic plot function for \code{gcBootSpline} objects.
 #'
-#' @param drBootSpline A \code{drBootSpline} object created with \code{\link{growth.drBootSpline}} or stored within a \code{grofit} or \code{drFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.drFit}}, respectively.
+#' @param x A \code{drBootSpline} object created with \code{\link{growth.drBootSpline}} or stored within a \code{grofit} or \code{drFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.drFit}}, respectively.
 #' @param pch (Numeric) Shape of the raw data symbols.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
 #' @param colSpline (Numeric or Character) Color used to plot the splines.
@@ -515,7 +518,7 @@ plot.gcFitModel <- function(gcFittedModel, raw = TRUE, pch=1, colData=1, equatio
 #' @export plot.drBootSpline
 #' @export
 #'
-plot.drBootSpline <- function (drBootSpline,
+plot.drBootSpline <- function (x,
                                pch = 19,
                                colData = 1,
                                colSpline = scales::alpha("black", 0.15),
@@ -524,8 +527,9 @@ plot.drBootSpline <- function (drBootSpline,
                                height = 7, width = 9, out.dir = NULL, shiny = FALSE,
                                ...)
 {
+  drBootSpline <- x
   # drBootSpline an object of class drBootSpline
-  if(methods::is(drBootSpline) != "drBootSpline") stop("drBootSpline needs to be an object created with growth.drBootSpline.")
+  if(methods::is(drBootSpline) != "drBootSpline") stop("x needs to be an object created with growth.drBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot  <- function(text = "Empty plot", main = "") {
     par(cex.lab = cex.lab, cex.axis = cex.axis)
@@ -829,7 +833,7 @@ plot.drBootSpline <- function (drBootSpline,
 #'
 #' code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis
 #'
-#' @param drFit object of class \code{drFit}, created with \code{\link{growth.drFit}}.
+#' @param x object of class \code{drFit}, created with \code{\link{growth.drFit}}.
 #' @param combine (Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param names (String or vector of strings) Define conditions to combine into a single plot (if \code{combine = TRUE}). Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param exclude.nm (String or vector of strings) Define conditions to exclude from the plot (if \code{combine = TRUE}). Partial matches with sample/group names are accepted.
@@ -850,7 +854,8 @@ plot.drBootSpline <- function (drBootSpline,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param cex.point (Numeric) Size of the raw data points.
 #' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
-#' @param (Logical) Log-transform the x-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param log.x (Logical) Log-transform the x-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.drFit
 #' @export
@@ -858,12 +863,13 @@ plot.drBootSpline <- function (drBootSpline,
 #'   geom_point geom_segment ggplot ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
-plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex.point = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
+plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex.point = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
                        y.lim = NULL, x.lim = NULL, y.title = NULL, x.title = NULL, log.y = FALSE, log.x = FALSE,
-                       plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL)
+                       plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL, ...)
 {
+  drFit <- x
   # x an object of class drFit
-  if(methods::is(drFit) != "drFit") stop("drFit needs to be an object of class 'drFit', created with growth.drFit() or fl.drFit(control=fl.control(dr.method='spline').")
+  if(methods::is(drFit) != "drFit") stop("x needs to be an object of class 'drFit', created with growth.drFit() or fl.drFit(control=fl.control(dr.method='spline').")
   if(length(drFit) == 1) stop("drFit is NA. Please run growth.drFit() with valid data input or growth.workflow() with 'ec50 = T'.")
   n <- length(drFit$drFittedSplines)
   if(combine == FALSE || n < 2){
@@ -910,7 +916,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     }
     raw.x <- raw.x[nm]
     raw.y <- raw.y[nm]
-    raw.df <- lapply(1:length(raw.x), function(x) data.frame(x = raw.x[[x]], y = raw.y[[x]], Condition = rep(names(raw.x)[[x]], length(raw.x[[x]]))))
+    raw.df <- lapply(1:length(raw.x), function(x) data.frame("x" = raw.x[[x]], "y" = raw.y[[x]], "Condition" = rep(names(raw.x)[[x]], length(raw.x[[x]]))))
     # raw.df <- do.call("rbind", raw.df)
 
     n <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
@@ -922,7 +928,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     CI.L <- mean - error #left confidence interval
     CI.R <- mean + error #right confidence interval
 
-    raw.df <- data.frame(Condition = as.vector(names), conc = as.vector(conc), mean = as.vector(mean), CI.L = as.vector(CI.L), CI.R = as.vector(CI.R))
+    raw.df <- data.frame("Condition" = as.vector(names), "conc" = as.vector(conc), "mean" = as.vector(mean), "CI.L" = as.vector(CI.L), "CI.R" = as.vector(CI.R))
     if(log.x == TRUE) raw.df[raw.df[, "conc"] == 0, "conc"] <- 0.001
     # raw.df$Condition <- factor(raw.df$Condition, levels = raw.df$Condition)
     # raw.df$group <- gsub(" \\|.+", "", raw.df$name)
@@ -931,23 +937,23 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     # raw.df$CI.R[is.na(raw.df$CI.R)] <- 0
 
 
-    res.df <- lapply(1:length(raw.x), function(x) data.frame(Condition = names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]],
-                                                             ec50 = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["EC50"]],
-                                                             yEC50 = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["yEC50"]]))
+    res.df <- lapply(1:length(raw.x), function(x) data.frame("Condition" = names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]],
+                                                             "ec50" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["EC50"]],
+                                                             "yEC50" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["yEC50"]]))
     res.df <- do.call("rbind", res.df)
 
-    spline.df  <- lapply(1:length(raw.x), function(x) data.frame(x = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.conc"]],
-                                                                 y = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.test"]],
-                                                                 Condition = rep(names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
+    spline.df  <- lapply(1:length(raw.x), function(x) data.frame("x" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.conc"]],
+                                                                 "y" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.test"]],
+                                                                 "Condition" = rep(names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
     spline.df <- do.call("rbind", spline.df)
 
     if(log.x == TRUE) spline.df[spline.df[, "x"] == 0, "x"] <- 0.001
 
     nrow <- ceiling(length(drFit$drFittedSplines)/2)
-    p <- ggplot(data = raw.df, aes(conc, mean, colour = Condition)) +
+    p <- ggplot(data = raw.df, aes(.data$conc, .data$mean, colour = .data$Condition)) +
       geom_point(size=cex.point, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
-      geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
-      geom_line(data = spline.df, aes(x, y, colour = Condition), size = lwd) +
+      geom_errorbar(aes(ymin = .data$CI.L, ymax = .data$CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
+      geom_line(data = spline.df, aes(.data$x, .data$y, colour = .data$Condition), size = lwd) +
       theme_classic(base_size = basesize) +
       theme(legend.position="bottom") +
       ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
@@ -981,8 +987,8 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
     if(ec50line){
       plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
       plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
-      p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = ec50, y = yEC50, yend = yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd) +
-        geom_segment(data = res.df, aes(x = ec50, xend = ec50, y = plot.ymin, yend = yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd)
+      p <- p + geom_segment(data = res.df, aes(x = .data$plot.xmin, xend = .data$ec50, y = .data$yEC50, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd) +
+        geom_segment(data = res.df, aes(x = .data$ec50, xend = .data$ec50, y = .data$plot.ymin, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd)
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
@@ -1097,7 +1103,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
 #'
 #' code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
 #'
-#' @param drFitSpline object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.
+#' @param x object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.drBootSpline}}.
 #' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).
 #' @param log ("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.
@@ -1122,7 +1128,7 @@ plot.drFit <- function(drFit, combine = TRUE, names = NULL, exclude.nm = NULL, p
 #' @export plot.drFitSpline
 #' @export
 #'
-plot.drFitSpline <- function (drFitSpline,
+plot.drFitSpline <- function (x,
                               add = FALSE,
                               ec50line = TRUE,
                               log = "",
@@ -1136,8 +1142,9 @@ plot.drFitSpline <- function (drFitSpline,
                               height = 7, width = 9, out.dir = NULL,
                               ...)
 {
+  drFitSpline <- x
   # drFitSpline an object of class drFitSpline
-  if(methods::is(drFitSpline) != "drFitSpline") stop("drFitSpline needs to be an object created with growth.drFitSpline.")
+  if(methods::is(drFitSpline) != "drFitSpline") stop("x needs to be an object created with growth.drFitSpline.")
   # /// check input parameters
   if (is.logical(add) == FALSE)
     stop("Need logical value for: add")
@@ -1253,7 +1260,7 @@ plot.drFitSpline <- function (drFitSpline,
 
 #' Generic plot function for \code{drFitModel} objects.
 #'
-#' @param drFitModel object of class \code{drFitModel}, created with \code{\link{growth.drFitModel}}.
+#' @param x object of class \code{drFitModel}, created with \code{\link{growth.drFitModel}}.
 #' @param type (Character) Specify how to plot the data. There are currently 5 options: "average" (averages and fitted curve(s); default), "none" (only the fitted curve(s)), "obs" (only the data points), "all" (all data points and fitted curve(s)), "bars" (averages and fitted curve(s) with model-based standard errors (see Details)), and "confidence" (confidence bands for fitted curve(s)).
 #' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 values (\code{TRUE}) or not (\code{FALSE}).
 #' @param add (Logical) If \code{TRUE} then add to already existing plot.
@@ -1278,13 +1285,16 @@ plot.drFitSpline <- function (drFitSpline,
 #' @param legendText (Character) Specify the legend text (the position of the upper right corner of the legend box).
 #' @param legendPos (Numeric) Vector of length 2 giving the position of the legend.
 #' @param cex.legend numeric specifying the legend text size.
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.drFitModel
 #' @export
 #'
+#' @import drc
+#'
 #' @references Christian Ritz, Florent Baty, Jens C. Streibig, Daniel Gerhard (2015). _Dose-Response Analysis Using R_. PLoS ONE 10(12): e0146021. DOI: 10.1371/journal.pone.0146021
 #'
-plot.drFitModel <- function(drFitModel,
+plot.drFitModel <- function(x,
                             type = c("confidence", "all", "bars", "none", "obs", "average"),
                             ec50line = TRUE,
                             add = FALSE,
@@ -1308,9 +1318,10 @@ plot.drFitModel <- function(drFitModel,
                             legend = T,
                             legendText,
                             legendPos,
-                            cex.legend = NULL
-                            )
+                            cex.legend = NULL,
+                            ...)
 {
+  drFitModel <- x
   type <- match.arg(type)
   model <- drFitModel$model
   conc <- drFitModel$raw.conc
@@ -1394,8 +1405,10 @@ plot.drFitModel <- function(drFitModel,
   }
 
   par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
+
+  requireNamespace("drc", quietly = TRUE)
   try(
-    drc:::plot.drc(x = model,
+    plot(x = model,
                    broken = broken,
                    type = "all",
                    add = add,
@@ -1430,7 +1443,7 @@ plot.drFitModel <- function(drFitModel,
   if(any(grep("y", log))){
     axis(side=2, at=yt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
   }
-  try(drc:::plot.drc(model,
+  try(plot(model,
                      pch = pch,
                      xlim = x.lim,
                      ylim = y.lim,
@@ -1468,7 +1481,7 @@ plot.drFitModel <- function(drFitModel,
 
 #' Generic plot function for \code{gcBootSpline} objects.
 #'
-#' @param gcBootSpline object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.
+#' @param x object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.
 #' @param pch (Numeric) Symbol used to plot data points.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param deriv (Logical) Show the derivatives (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
@@ -1491,13 +1504,14 @@ plot.drFitModel <- function(drFitModel,
 #' @export plot.gcBootSpline
 #' @export
 #'
-plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
+plot.gcBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                               colSpline=ggplot2::alpha("dodgerblue3", 0.2),
                               cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
                               lwd = 2, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
                               plot = TRUE, export = FALSE,
                               height = 7, width = 9, out.dir = NULL, shiny = FALSE, ...)
 {
+  gcBootSpline <- x
   # gcBootSpline an object of class gcBootSpline
   if(methods::is(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
   # /// initialize "Empty Plot" function
@@ -1780,7 +1794,7 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #'
 #' code{plot.gcFitSpline} generates the spline fit plot for a single sample.
 #'
-#' @param gcFittedSpline object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.
+#' @param x object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.
 #' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
 #' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
@@ -1810,16 +1824,17 @@ plot.gcBootSpline <- function(gcBootSpline, pch=1, colData=1, deriv = TRUE,
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
-#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
-plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
+#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab .data
+plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = T,
                              pch=1, colData=1, colSpline="dodgerblue3", basesize=16, cex.point = 2, lwd = 0.7,
                              y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL, n.ybreaks = 6,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
 {
+  gcFittedSpline <- x
   n.ybreaks <- as.numeric(n.ybreaks)
   # x an object of class gcFittedSpline
-  if(methods::is(gcFittedSpline) != "gcFitSpline") stop("gcFittedSpline needs to be an object created with growth.gcFitSpline().")
+  if(methods::is(gcFittedSpline) != "gcFitSpline") stop("x needs to be an object created with growth.gcFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -1902,9 +1917,9 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
       }
 
 
-      p <- ggplot(df, aes(x=time, y=data)) +
+      p <- ggplot(df, aes(x=.data$time, y=.data$data)) +
         geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData) +
-        geom_line(aes(x=fit.time, y = fit.data, color = "spline"), size = lwd) +
+        geom_line(aes(x=.data$fit.time, y = .data$fit.data, color = "spline"), size = lwd) +
         xlab("Time") +
         ylab(label = "Growth [y(t)]") +
         theme_classic(base_size = basesize) +
@@ -2021,23 +2036,23 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                                          })
 
             if(gcFittedSpline$control$log.y.spline){
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
 
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = time2, y = bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time2, y = .data$bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
             }
 
             if(!(lagtime2 <0)){
-              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal2,
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
                                     linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
             }
           } # if(lagtime2 < lagtime)
@@ -2078,23 +2093,23 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                                       "y" = bla2)
 
             if(gcFittedSpline$control$log.y.spline){
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
 
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = time, y = y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = time2, y = y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time2, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
             }
 
             if(!(lagtime <0)){
-              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
                                     linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
             }
           }
@@ -2121,17 +2136,17 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                                       })
 
           if(gcFittedSpline$control$log.y.spline){
-            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+            p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                      xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
           }
 
           if(!(lagtime <0)){
-            p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+            p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
                                   linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
           }
         } # else of if(gcFittedSpline$fitFlag2)
@@ -2180,23 +2195,23 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                                          })
 
             if(gcFittedSpline$control$log.y.spline){
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
 
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = time2, y = bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time2, y = .data$bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
             }
 
             if(!(lagtime2 <0)){
-              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal2,
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
                                     linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
             }
           } # if(lagtime2 < lagtime)
@@ -2235,23 +2250,23 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                                       "y" = bla2)
 
             if(!gcFittedSpline$control$log.y.spline){
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
 
-              p <- p + geom_segment(aes(x = time[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                        xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = time2, y = bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time2, y = .data$bla2), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
             }
 
             if(!(lagtime <0)){
-              p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
                                     linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
             }
           }
@@ -2276,16 +2291,16 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
                                         gcFittedSpline[["fit.data"]][1]
                                       })
           if(!gcFittedSpline$control$log.y.spline){
-            p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                      xend = time[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+            p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                      xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = time, y = bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$bla), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
           }
           if(!(lagtime <0)){
-            p <- p + geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
+            p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
                                   linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
           }
         } # else of if(gcFittedSpline$fitFlag2)
@@ -2296,10 +2311,10 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
         df.mu <- data.frame(spline(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y))
         #add missing time values due to min.density and t0
         df.mu <-
-          dplyr::bind_rows(data.frame(x = df$time[is.na(df$fit.data)], y = rep(NA, length(df$time[is.na(df$fit.data)]))),
+          dplyr::bind_rows(data.frame("x" = df$time[is.na(df$fit.data)], "y" = rep(NA, length(df$time[is.na(df$fit.data)]))),
                            df.mu)
 
-        p.mu <- ggplot(df.mu, aes(x=x, y=y)) +
+        p.mu <- ggplot(df.mu, aes(x=.data$x, y=.data$y)) +
           geom_line(color = colSpline, size = lwd) +
           theme_classic(base_size = basesize) +
           xlab("Time") +
@@ -2333,7 +2348,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
       }
 
 
-      p <- ggplot(df, aes(x=time, y=data)) +
+      p <- ggplot(df, aes(x=.data$time, y=.data$data)) +
         geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData) +
         xlab("Time") +
         ylab(label = "Growth [y(t)]") +
@@ -2418,7 +2433,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 #' \code{plot.grofit} extracts the spline fits of a subset of samples in a \code{grofit} object calculates averages and standard deviations of conditions with replicates and combines them into a single plot.
 #'
 #'
-#' @param grofit A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.
+#' @param x A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.
 #' @param ... (_optional_) Additional \code{grofit} objects created in separate workflows.
 #' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
 #' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
@@ -2454,7 +2469,7 @@ plot.gcFitSpline <- function(gcFittedSpline, add=FALSE, raw = TRUE, slope=TRUE, 
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab xlim ylim
 #'
-plot.grofit <- function(grofit, ...,
+plot.grofit <- function(x, ...,
                         data.type = c("spline", "raw"),
                         IDs = NULL,
                         names = NULL,
@@ -2483,6 +2498,7 @@ plot.grofit <- function(grofit, ...,
                         shiny = FALSE
 )
 {
+  grofit <- x
   # Convert range  and selecting arguments
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
   conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
@@ -2642,10 +2658,10 @@ plot.grofit <- function(grofit, ...,
       name <- conditions_unique[n]
       # Create lists for density and time values for each sample
       if(data.type == "spline"){
-        time <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)) %>% as.list(.)
-        data <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)) %>% as.list(.)
+        time <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)))
+        data <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)))
       } else {
-        time <- lapply(1:length(ndx), function(i) cbind(grofit$time[ndx[[i]], ])) %>% as.list(.)
+        time <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$time[ndx[[i]], ])))
         if(methods::is(grofit) == "grofit"){
           data <- grofit$data[ndx, 4:ncol(grofit$data)]
         } else {
@@ -2657,8 +2673,8 @@ plot.grofit <- function(grofit, ...,
 
       # Create lists for derivatives and time values for each sample
       if(deriv){
-        time.deriv <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$x)) %>% as.list(.)
-        data.deriv <- lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$y)) %>% as.list(.)
+        time.deriv <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$x)))
+        data.deriv <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$y)))
       }
       # correct for unequal lengths of data series
       time.all <- Reduce(union, time)
@@ -2702,13 +2718,13 @@ plot.grofit <- function(grofit, ...,
       data <- do.call("cbind", data)
       avg <- rowMeans(data, na.rm = F)
       sd <- apply(data, 1, sd, na.rm = F)
-      plotdata.ls[[n]] <- data.frame(name = name, time = time, mean = avg, upper = avg+sd, lower = avg-sd)
+      plotdata.ls[[n]] <- data.frame("name" = name, "time" = time, "mean" = avg, "upper" = avg+sd, "lower" = avg-sd)
       if(deriv){
         time.deriv <- time.deriv[[1]]
         data.deriv <- do.call("cbind", data.deriv)
         avg.deriv <- rowMeans(data.deriv, na.rm = F)
         sd.deriv <- apply(data.deriv, 1, sd, na.rm = F)
-        deriv.ls[[n]] <- data.frame(name = name, time = time.deriv, mean = avg.deriv, upper = avg.deriv+sd.deriv, lower = avg.deriv-sd.deriv)
+        deriv.ls[[n]] <- data.frame("name" = name, "time" = time.deriv, "mean" = avg.deriv, "upper" = avg.deriv+sd.deriv, "lower" = avg.deriv-sd.deriv)
       }
     }
     names(plotdata.ls) <- gsub(" \\| NA", "", conditions_unique)
@@ -2730,9 +2746,9 @@ plot.grofit <- function(grofit, ...,
       df$lower[df$lower<0] <- 0
     }
 
-    p <- ggplot(df, aes(x=time, y=mean, col = name)) +
+    p <- ggplot(df, aes(x=.data$time, y=.data$mean, col = .data$name)) +
       geom_line(size=lwd) +
-      geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
+      geom_ribbon(aes(ymin=.data$lower, ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
@@ -2801,9 +2817,9 @@ plot.grofit <- function(grofit, ...,
     }
     if(deriv){
       # /// add panel with growth rate over time
-      p.deriv <- ggplot(df.deriv, aes(x=time, y=mean, col = name)) +
+      p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$mean, col = .data$name)) +
         geom_line(size=lwd) +
-        geom_ribbon(aes(ymin=lower,ymax=upper, fill=name), alpha = 0.3, colour = NA) +
+        geom_ribbon(aes(ymin=.data$lower,ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
         theme(legend.position="bottom",
@@ -2878,11 +2894,11 @@ plot.grofit <- function(grofit, ...,
       } else {
         df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
                                               "time" = as.vector(grofit$time[ndx.keep[i], ]),
-                                              "y" = unlist(unname(type.convert(grofit$data[ndx.keep[i], 4:ncol(grofit$data)], as.is=T)))))
+                                              "y" = unlist(unname(utils::type.convert(grofit$data[ndx.keep[i], 4:ncol(grofit$data)], as.is=T)))))
       }
 
     }
-    p <- ggplot(df, aes(x=time, y=y, col = name)) +
+    p <- ggplot(df, aes(x=.data$time, y=.data$y, col = .data$name)) +
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
@@ -2946,7 +2962,7 @@ plot.grofit <- function(grofit, ...,
                                               "time" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
                                               "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
       }
-      p.deriv <- ggplot(df.deriv, aes(x=time, y=y, col = name)) +
+      p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$y, col = .data$name)) +
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
@@ -3043,7 +3059,7 @@ base_breaks <- function(n = 10){
 #'
 #' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
 #'
-#' @param object A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}.
+#' @param x A \code{grofit}, \code{gcFit}, or \code{gcTable} object obtained with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}.
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 #' 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
 #' 'mu.model', 'lambda.model', 'A.model',
@@ -3065,6 +3081,7 @@ base_breaks <- function(n = 10){
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.parameter
 #' @export
@@ -3072,7 +3089,7 @@ base_breaks <- function(n = 10){
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab geom_hline geom_col
-plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
+plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                              'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                                              'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                              'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
@@ -3092,8 +3109,10 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
                            height = 7,
                            width = NULL,
                            out.dir = NULL,
-                           out.nm = NULL)
+                           out.nm = NULL,
+                           ...)
   {
+  object <- x
   # Convert range  and selecting arguments
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
   conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
@@ -3242,7 +3261,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
   CI.L <- mean - error #left confidence interval
   CI.R <- mean + error #right confidence interval
 
-  df <- data.frame(name = labels, mean = mean, CI.L = CI.L, CI.R = CI.R)
+  df <- data.frame("name" = labels, "mean" = mean, "CI.L" = CI.L, "CI.R" = CI.R)
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
   df$mean[is.na(df$mean)] <- 0
@@ -3251,9 +3270,9 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 
   if(is.null(label.size) || label.size == "") label.size <-  12-length(unique(df$name))^(1/3)
 
-  p <- ggplot(df, aes(x=name, y=mean, fill = group)) +
+  p <- ggplot(df, aes(x=.data$name, y=.data$mean, fill = .data$group)) +
     geom_bar(stat="identity", color = "black") +
-    geom_errorbar(aes(ymin = CI.L, ymax = CI.R), width = 0.2) +
+    geom_errorbar(aes(ymin = .data$CI.L, ymax = .data$CI.R), width = 0.2) +
     ggplot2::labs(x = "Condition", y = paste0(param, " (\u00B1 95% CI)")) +
     theme_minimal(base_size = basesize) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = label.size),
@@ -3271,11 +3290,12 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
     )
   )
   df_reps <-
-    data.frame(condition = unlist(lapply(1:length(ndx.filt), function(x) rep(labels[x], length(ndx.filt[[x]])))),
-               replicate = replicates,
-               value = unlist(lapply(1:length(ndx.filt), function (x) as.numeric(gcTable[ndx.filt[[x]], param])))
-               ) %>%
-    tibble::rownames_to_column()
+    tibble::rownames_to_column(
+      data.frame("condition" = unlist(lapply(1:length(ndx.filt), function(x) rep(labels[x], length(ndx.filt[[x]])))),
+                 "replicate" = replicates,
+                 "value" = unlist(lapply(1:length(ndx.filt), function (x) as.numeric(gcTable[ndx.filt[[x]], param])))
+      )
+    )
 
   df_reps$condition <- as.factor(df_reps$condition)
   df_reps$replicate <- as.factor(df_reps$replicate)
@@ -3293,7 +3313,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
      ggnewscale::new_scale_fill() +
      geom_point(
        data = df_reps,
-       aes(x = condition, y = value, fill = replicate),
+       aes(x = .data$condition, y = .data$value, fill = .data$replicate),
        shape = 23,
        size = shape.size,
        color = "black",
@@ -3333,7 +3353,7 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #'
 #' \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
 #'
-#' @param object A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{\link{growth.workflow}}, \code{\link{growth.drFit}}, \code{\link{fl.drFit}}, or \code{\link{fl.workflow}}.
+#' @param x A \code{grofit}, \code{drFit}, \code{drTable}, or \code{flFitRes} object obtained with \code{\link{growth.workflow}}, \code{\link{growth.drFit}}, \code{\link{fl.drFit}}, or \code{\link{fl.workflow}}.
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 #' 'y.max', 'y.min', 'fc', 'K', or 'n' for fluorescence dose-response analyses with \code{dr.type = 'model'} in the \code{control} argument,
 #' or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.
@@ -3348,14 +3368,16 @@ plot.parameter <- function(object, param = c('mu.linfit', 'lambda.linfit', 'dY.l
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.dr_parameter
 #' @export
 #'
-plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
+plot.dr_parameter <- function(x, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
                               names = NULL, exclude.nm = NULL, basesize = 12, reference.nm = NULL, label.size = NULL,
-                              plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL)
+                              plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL, ...)
 {
+  object <- x
   param <- match.arg(param)
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
   exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
@@ -3411,13 +3433,13 @@ plot.dr_parameter <- function(object, param = c('y.max', 'y.min', 'fc', 'K', 'n'
     values <- values/value.ref
   }
 
-  df <- data.frame(name = nm, values = values)
+  df <- data.frame("name" = nm, "values" = values)
   df$name <- factor(df$name, levels = df$name)
   df$values[is.na(df$values)] <- 0
 
   if(is.null(label.size) || label.size == "") label.size <-  12-length(unique(df$name))^(1/3)
 
-  p <- ggplot(df, aes(x=name, y=values)) +
+  p <- ggplot(df, aes(x=.data$name, y=.data$values)) +
     geom_bar(stat="identity", color = "black") +
     ggplot2::labs(x = "Condition", y = param) +
     theme_minimal(base_size = basesize) +

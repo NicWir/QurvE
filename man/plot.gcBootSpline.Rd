@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{gcBootSpline} objects.}
 \usage{
 \method{plot}{gcBootSpline}(
-  gcBootSpline,
+  x,
   pch = 1,
   colData = 1,
   deriv = TRUE,
@@ -27,7 +27,7 @@
 )
 }
 \arguments{
-\item{gcBootSpline}{object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.}
+\item{x}{object of class \code{gcBootSpline}, created with \code{\link{growth.gcBootSpline}}.}
 
 \item{pch}{(Numeric) Symbol used to plot data points.}
 

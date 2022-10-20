@@ -37,6 +37,8 @@
 #' \item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.density}.}
 #'
 #' @export
+#' @importFrom methods is
+#' @import dplyr stringr tidyr
 #' @md
 read_data <-
   function(data.density,
@@ -771,7 +773,7 @@ parse_data <-
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
-#' @param dr.model (Character) Provide a list of models from the R package \code{\link{drc}} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
+#' @param dr.model (Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See \code{\link{smooth.spline}} for further details. Default: \code{NULL}.
@@ -943,7 +945,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
-#' @param dr.model (Character) Provide a list of models from the R package \code{\link{drc}} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
+#' @param dr.model (Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
@@ -1042,7 +1044,7 @@ growth.workflow <- function (grodata = NULL,
   }
 
   # Test input
-  if(is.null(grodata) || !(class(grodata)=="list") && !(class(grodata)=="grodata")){
+  if(is.null(grodata) || !(is(grodata)=="list") && !(is(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
     if (is.numeric(as.matrix(data[-1:-3])) == FALSE)
@@ -1179,9 +1181,11 @@ growth.workflow <- function (grodata = NULL,
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 #' @importFrom foreach %dopar%
 #' @importFrom DT datatable
-#' @import kableExtra
+#' @importFrom stats AIC as.formula coef fitted.values formula integrate lm loess lowess median nls predict sd setNames smooth.spline terms time
+#' @importFrom magrittr %>%
 #' @import knitr
-#' @import plyr
+#' @importFrom plyr rbind.fill
+#' @importFrom kableExtra kable_styling column_spec linebreak
 #' @include general_misc_utils.R
 #' @family reports
 growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
@@ -1298,7 +1302,7 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
 #'   ggplot_build ggplot ggtitle labs position_dodge scale_color_manual scale_fill_brewer
 #'   scale_color_brewer scale_fill_manual scale_x_continuous scale_y_continuous
 #'   scale_y_log10 theme theme_classic theme_minimal xlab ylab
-#' @importFrom foreach %dopar%
+#' @import foreach
 growth.gcFit <- function(time, data, control= growth.control(), ...)
 {
   # Define objects based on additional function calls
@@ -1317,14 +1321,14 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
     }
   }
 
-  if(!(class(data)=="list") && !(class(data)=="grodata")){
+  if(!(is(data)=="list") && !(is(data)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
     if (is.numeric(as.matrix(data[-1:-3])) == FALSE)
       stop("Need a numeric matrix for 'data' or a grodata object created with read_data() or parse_data().")
   } else if(!is.null(data)){
-    time <- grodata$time
-    data <- grodata$density
+    time <- data$time
+    data <- data$density
   }
   # /// check if start density values are above min.density in all samples
   max.density <- unlist(lapply(1:nrow(data), function (x) max(as.numeric(as.matrix(data[x,-1:-3]))[!is.na(as.numeric(as.matrix(data[x,-1:-3])))])))
@@ -1380,7 +1384,6 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
 
     # Perform linear fits in parallel
     if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
-      require(foreach, quietly = TRUE)
       fitlinear.all <- foreach::foreach(i = 1:dim(data)[1]
       ) %dopar% {
         QurvE::growth.gcFitLinear(times.ls[[i]], wells.ls[[i]], gcID = gcIDs.ls[[i]], control = control)
@@ -1455,7 +1458,6 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
     # Perform spline bootstrappings in parallel
     if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
         (control$nboot.gc > 10) ){
-      require(foreach, quietly = TRUE)
       boot.all <- foreach::foreach(i = 1:dim(data)[1]
       ) %dopar% {
         QurvE::growth.gcBootSpline(times.ls[[i]], wells.ls[[i]], gcIDs.ls[[i]], control)
@@ -1665,9 +1667,9 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
             reliability_tag_nonpara <- NA
             while ("n" %in% answer_satisfied) {
               if(control$log.y.spline){
-                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, colData=1, cex=1, plot=T, export=F)
+                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, colData=1, cex.point = 1, plot=T, export=F)
               } else {
-                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, log.y = FALSE, colData=1, cex=1, plot=T, export=F)
+                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, log.y = FALSE, colData=1, cex.point = 1, plot=T, export=F)
               }
               answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
               if ("n" %in% answer_satisfied) {
@@ -4026,7 +4028,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   } else if(any(grep("NEC", best.model.nm))){
     ec50 <- best.model$coefficients[4]
   } else {
-    ec50 <- drc:::ED(best.model, 50, interval = "delta")
+    ec50 <- drc::ED(best.model, 50, interval = "delta")
   }
   # get response at ec50
   dataList <- best.model[["dataList"]]
@@ -4035,10 +4037,10 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   concgrid <- seq(min(dose), max(dose), length = 200)
   respgrid <- best.model$curve[[1]](concgrid)
 
-  y.ec50 <- drc:::PR(object = best.model, xVec = ec50[1])
+  y.ec50 <- drc::PR(object = best.model, xVec = ec50[1])
 
   # Plot best fit
-  drc.models <- drc:::getMeanFunctions(display = FALSE)
+  drc.models <- drc::getMeanFunctions(display = FALSE)
   drc.models.nm <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][1])), "NEC.4")
   drc.models.descr <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][2])), "model for estimation of\nno effect concentration (NEC)")
 
@@ -4590,32 +4592,32 @@ table_group_growth_linear <- function(gcTable)
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
 
   # calculate average param values
-  mu.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
-  mu.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
+  mu.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
+  mu.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.linfit", param2 = "mu2.linfit")
 
-  tD.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
-  tD.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
+  tD.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
+  tD.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.linfit", param2 = "tD2.linfit")
 
-  lambda.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
-  lambda.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+  lambda.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
+  lambda.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.linfit", param2 = "lambda2.linfit")
 
-  dY.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
-  dY.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+  dY.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
+  dY.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.linfit", param2 = "dY2.linfit")
 
-  A.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
-  A.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+  A.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
+  A.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.linfit", param2 = "A2.linfit")
 
-  tmu.start.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
-  tmu.start.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
+  tmu.start.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
+  tmu.start.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.start.linfit", param2 = "tmu2.start.linfit")
 
-  tmu.end.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
-  tmu.end.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
+  tmu.end.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
+  tmu.end.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmu.end.linfit", param2 = "tmu2.end.linfit")
 
 
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_linear_group <- data.frame("Sample|Conc." = labels,
-                                   "µ<sub>max</sub>" = paste0(mu.mean,
+                                   "\\u00b5<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4634,7 +4636,7 @@ table_group_growth_linear <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "λ" =  paste0(lambda.mean,
+                                   "\\u03bb" =  paste0(lambda.mean,
                                                  unlist(lapply(1:length(lambda.mean), function (x)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4643,7 +4645,7 @@ table_group_growth_linear <- function(gcTable)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                           "", lambda.sd[x])))),
-                                   "ΔY" = paste0(dY.mean,
+                                   "\\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4661,7 +4663,7 @@ table_group_growth_linear <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "t<sub>start</sub><br>(µ<sub>max</sub>)" = paste0(tmu.start.mean,
+                                   "t<sub>start</sub><br>(\\u00b5<sub>max</sub>)" = paste0(tmu.start.mean,
                                                                                      unlist(lapply(1:length(tmu.start.mean), function (x)
                                                                                        ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
@@ -4671,7 +4673,7 @@ table_group_growth_linear <- function(gcTable)
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
                                                                                               "", tmu.start.sd[x])))),
 
-                                   "t<sub>end</sub><br>(µ<sub>max</sub>)" = paste0(tmu.end.mean,
+                                   "t<sub>end</sub><br>(\\u00b5<sub>max</sub>)" = paste0(tmu.end.mean,
                                                                                    unlist(lapply(1:length(tmu.end.mean), function (x)
                                                                                      ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                                               tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
@@ -4711,28 +4713,28 @@ table_group_growth_spline <- function(gcTable)
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
 
   # calculate average param values
-  mu.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
-  mu.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
+  mu.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
+  mu.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.spline", param2 = "mu2.spline")
 
-  tD.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
-  tD.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
+  tD.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
+  tD.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.spline", param2 = "tD2.spline")
 
-  lambda.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
-  lambda.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+  lambda.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
+  lambda.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.spline", param2 = "lambda2.spline")
 
-  dY.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
-  dY.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+  dY.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
+  dY.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.spline", param2 = "dY2.spline")
 
-  A.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
-  A.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+  A.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
+  A.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.spline", param2 = "A2.spline")
 
-  tmax.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
-  tmax.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
+  tmax.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
+  tmax.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
 
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_spline_group <- data.frame("Sample|Conc." = labels,
-                                   "µ<sub>max</sub>" = paste0(mu.mean,
+                                   "\\u00b5<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4750,7 +4752,7 @@ table_group_growth_spline <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "λ" = paste0(lambda.mean,
+                                   "\\u03bb" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4768,7 +4770,7 @@ table_group_growth_spline <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "ΔY" = paste0(dY.mean,
+                                   "\\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4817,25 +4819,25 @@ table_group_growth_model <- function(gcTable)
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
 
   # calculate average param values
-  mu.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.model")
-  mu.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.model")
+  mu.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.model")
+  mu.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "mu.model")
 
-  tD.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.model")
-  tD.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.model")
+  tD.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.model")
+  tD.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tD.model")
 
-  lambda.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.model")
-  lambda.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.model")
+  lambda.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.model")
+  lambda.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "lambda.model")
 
-  dY.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.model")
-  dY.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.model")
+  dY.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.model")
+  dY.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "dY.model")
 
-  A.mean <- QurvE:::get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.model")
-  A.sd <- QurvE:::get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.model")
+  A.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.model")
+  A.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "A.model")
 
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_model_group <- data.frame("Sample|Conc." = labels,
-                                   "µ<sub>max</sub>" = paste0(mu.mean,
+                                   "\\u00b5<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4853,7 +4855,7 @@ table_group_growth_model <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "λ" = paste0(lambda.mean,
+                                   "\\u03bb" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4871,7 +4873,7 @@ table_group_growth_model <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "ΔY" = paste0(dY.mean,
+                                   "\\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",

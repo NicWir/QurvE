@@ -107,7 +107,7 @@ growth.workflow(
 
 \item{dr.method}{(Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).}
 
-\item{dr.model}{(Character) Provide a list of models from the R package \code{\link{drc}} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
+\item{dr.model}{(Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
 
 \item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 

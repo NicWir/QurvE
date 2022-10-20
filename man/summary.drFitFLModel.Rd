@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{object of class \code{drFitModel}}
 
-\item{...}{}
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \value{
 A dataframe with biosensor response parameters.

@@ -5,7 +5,7 @@
 \title{Compare fluorescence and density over time}
 \usage{
 \method{plot}{dual}(
-  object,
+  x,
   fluorescence = c("fl", "norm.fl"),
   IDs = NULL,
   names = NULL,
@@ -31,11 +31,12 @@
   width = NULL,
   out.dir = NULL,
   out.nm = NULL,
-  shiny = FALSE
+  shiny = FALSE,
+  ...
 )
 }
 \arguments{
-\item{object}{A \code{flFit}, \code{flFitRes}, or \code{grodata} object created with \code{\link{flFit}}, \code{\link{fl.workflow}} or \code{\link{read_data}}}
+\item{x}{A \code{flFit}, \code{flFitRes}, or \code{grodata} object created with \code{\link{flFit}}, \code{\link{fl.workflow}} or \code{\link{read_data}}}
 
 \item{fluorescence}{(Character) Indicate, which type of fluorescence data should be displayed.}
 
@@ -88,6 +89,8 @@
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
 
 \item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
+
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 \code{plot.dual} creates a two-panel plot in which fluorescence or density values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.

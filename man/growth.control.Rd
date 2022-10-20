@@ -84,7 +84,7 @@ growth.control(
 
 \item{dr.method}{(Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).}
 
-\item{dr.model}{(Character) Provide a list of models from the R package \code{\link{drc}} to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
+\item{dr.model}{(Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
 
 \item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 

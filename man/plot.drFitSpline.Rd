@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{drFitSpline} objects.}
 \usage{
 \method{plot}{drFitSpline}(
-  drFitSpline,
+  x,
   add = FALSE,
   ec50line = TRUE,
   log = "",
@@ -29,7 +29,7 @@
 )
 }
 \arguments{
-\item{drFitSpline}{object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.}
+\item{x}{object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.}
 
 \item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.drBootSpline}}.}
 

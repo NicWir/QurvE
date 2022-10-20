@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{gcBootSpline} objects.}
 \usage{
 \method{plot}{gcFitModel}(
-  gcFittedModel,
+  x,
   raw = TRUE,
   pch = 1,
   colData = 1,
@@ -25,7 +25,7 @@
 )
 }
 \arguments{
-\item{gcFittedModel}{A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.}
+\item{x}{A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.}
 
 \item{raw}{(Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -35,7 +35,7 @@
 
 \item{equation}{(Logical) Show the equation of the fitted model within the plot (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{eq.size}{}
+\item{eq.size}{(Numeric) Provide a value to scale the size of the displayed equation.}
 
 \item{colModel}{(Numeric or Character) Color used to plot the fitted model.}
 

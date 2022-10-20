@@ -5,7 +5,7 @@
 \title{Generic plot function for \code{flFitSpline} objects.}
 \usage{
 \method{plot}{flFitSpline}(
-  flFitSpline,
+  x,
   add = FALSE,
   raw = TRUE,
   slope = TRUE,
@@ -31,7 +31,7 @@
 )
 }
 \arguments{
-\item{flFitSpline}{Object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.}
+\item{x}{Object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.}
 
 \item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.flBootSpline}}.}
 
@@ -75,7 +75,7 @@
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
-\item{...}{Further arguments to refine the generated base R plot.}
+\item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \description{
 \code{plot.flFitSpline} generates the spline fit plot for a single sample.
