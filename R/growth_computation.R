@@ -810,7 +810,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             smooth.gc = 0.55,
                             model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
                             dr.method = c("model", "spline"),
-                            dr.model = c('weibull2x', 'gammadr', 'multi2',
+                            dr.model = c('gammadr', 'multi2',
                                          'LL.2', 'LL.3', 'LL.4', 'LL.5', 'W1.2',
                                          'W1.3', 'W1.4', 'W2.2', 'W2.3', 'W2.4', 'LL.3u',
                                          'LL2.2', 'LL2.3', 'LL2.3u', 'LL2.4',
@@ -1004,7 +1004,7 @@ growth.workflow <- function (grodata = NULL,
                              smooth.gc = 0.55,
                              model.type = c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi"),
                              dr.method = c("model", "spline"),
-                             dr.model = c('weibull2x', 'gammadr', 'multi2',
+                             dr.model = c('gammadr', 'multi2',
                                           'LL.2', 'LL.3', 'LL.4', 'LL.5', 'W1.2',
                                           'W1.3', 'W1.4', 'W2.2', 'W2.3', 'W2.4', 'LL.3u',
                                           'LL2.2', 'LL2.3', 'LL2.3u', 'LL2.4',
@@ -1321,7 +1321,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
     }
   }
 
-  if(!(is(data)=="list") && !(is(data)=="grodata")){
+  if(!(any(is(data)=="grodata"))){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
     if (is.numeric(as.matrix(data[-1:-3])) == FALSE)
@@ -1634,7 +1634,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
       if ((control$interactive == TRUE)) {
         if ((("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt))) {
           if (fitpara$fitFlag == TRUE) {
-            plot.gcFitModel(fitpara, colData=1, colModel=2, colLag = 3, cex.point=1.0, raw=T)
+            plot.gcFitModel(fitpara, colData=1, colModel=2, colLag = 3, cex.point=2.0, raw=T)
             # legend(x="bottomright", legend=fitpara$model, col="red", lty=1)
             # title("Parametric fit")
             # graphics::mtext(line = 0.5, side=3, outer = F, cex=1, wellname)
@@ -1667,9 +1667,9 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
             reliability_tag_nonpara <- NA
             while ("n" %in% answer_satisfied) {
               if(control$log.y.spline){
-                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, colData=1, cex.point = 1, plot=T, export=F)
+                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, colData=1, cex.point = 2, plot=T, export=F)
               } else {
-                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, log.y = FALSE, colData=1, cex.point = 1, plot=T, export=F)
+                plot.gcFitSpline(nonpara, add=FALSE, raw=TRUE, slope = T, log.y = FALSE, colData=1, cex.point = 2, plot=T, export=F)
               }
               answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
               if ("n" %in% answer_satisfied) {
@@ -4617,7 +4617,7 @@ table_group_growth_linear <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_linear_group <- data.frame("Sample|Conc." = labels,
-                                   "\\u00b5<sub>max</sub>" = paste0(mu.mean,
+                                   "\u00b5<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4636,7 +4636,7 @@ table_group_growth_linear <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "\\u03bb" =  paste0(lambda.mean,
+                                   "\u03bb" =  paste0(lambda.mean,
                                                  unlist(lapply(1:length(lambda.mean), function (x)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4645,7 +4645,7 @@ table_group_growth_linear <- function(gcTable)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                           "", lambda.sd[x])))),
-                                   "\\u0394Y" = paste0(dY.mean,
+                                   "\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4663,7 +4663,7 @@ table_group_growth_linear <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "t<sub>start</sub><br>(\\u00b5<sub>max</sub>)" = paste0(tmu.start.mean,
+                                   "t<sub>start</sub><br>(\u00b5<sub>max</sub>)" = paste0(tmu.start.mean,
                                                                                      unlist(lapply(1:length(tmu.start.mean), function (x)
                                                                                        ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
@@ -4673,7 +4673,7 @@ table_group_growth_linear <- function(gcTable)
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
                                                                                               "", tmu.start.sd[x])))),
 
-                                   "t<sub>end</sub><br>(\\u00b5<sub>max</sub>)" = paste0(tmu.end.mean,
+                                   "t<sub>end</sub><br>(\u00b5<sub>max</sub>)" = paste0(tmu.end.mean,
                                                                                    unlist(lapply(1:length(tmu.end.mean), function (x)
                                                                                      ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                                               tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
@@ -4734,7 +4734,7 @@ table_group_growth_spline <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_spline_group <- data.frame("Sample|Conc." = labels,
-                                   "\\u00b5<sub>max</sub>" = paste0(mu.mean,
+                                   "\u00b5<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4752,7 +4752,7 @@ table_group_growth_spline <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "\\u03bb" = paste0(lambda.mean,
+                                   "\u03bb" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4770,7 +4770,7 @@ table_group_growth_spline <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\\u0394Y" = paste0(dY.mean,
+                                   "\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4837,7 +4837,7 @@ table_group_growth_model <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_model_group <- data.frame("Sample|Conc." = labels,
-                                   "\\u00b5<sub>max</sub>" = paste0(mu.mean,
+                                   "\u00b5<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4855,7 +4855,7 @@ table_group_growth_model <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "\\u03bb" = paste0(lambda.mean,
+                                   "\u03bb" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4873,7 +4873,7 @@ table_group_growth_model <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\\u0394Y" = paste0(dY.mean,
+                                   "\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",

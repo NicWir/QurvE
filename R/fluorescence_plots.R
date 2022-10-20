@@ -659,7 +659,7 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                               plot = TRUE, export = FALSE,
                               height = 7, width = 9, out.dir = NULL, shiny = FALSE, ...)
 {
-  plot.flBootSpline <- x
+  flBootSpline <- x
   # flBootSpline an object of class flBootSpline
   if(methods::is(flBootSpline) != "flBootSpline") stop("x needs to be an object created with flBootSpline().")
   # /// initialize "Empty Plot" function

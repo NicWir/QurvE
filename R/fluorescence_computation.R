@@ -3076,7 +3076,7 @@ table_group_fluorescence_linear <- function(flTable)
                                                                              max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
                                                                            "", max_slope.sd[x])))),
 
-                                   "\\u03bb" =  paste0(lambda.mean,
+                                   "\u03bb" =  paste0(lambda.mean,
                                                  unlist(lapply(1:length(lambda.mean), function (x)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -3085,7 +3085,7 @@ table_group_fluorescence_linear <- function(flTable)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                           "", lambda.sd[x])))),
-                                   "\\u0394Y" = paste0(dY.mean,
+                                   "\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -3183,7 +3183,7 @@ table_group_fluorescence_spline <- function(flTable)
                                                                     ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
                                                                              max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
                                                                            "", max_slope.sd[x])))),
-                                   "\\u03bb" = paste0(lambda.mean,
+                                   "\u03bb" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -3201,7 +3201,7 @@ table_group_fluorescence_spline <- function(flTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\\u0394Y" = paste0(dY.mean,
+                                   "\u0394Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",

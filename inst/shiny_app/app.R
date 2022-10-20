@@ -11,7 +11,7 @@ for( i in new_packages ){
     #  If package was not able to be loaded then re-install
     install.packages( i , dependencies = TRUE )
     #  Load package after installing
-    require( i , character.only = TRUE )
+    require( i , character.only = TRUE , quietly = T)
   }
 }
 
@@ -5126,7 +5126,7 @@ server <- function(input, output, session){
     }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) &&
        exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed()) &&
-       all(results$custom_data$density == results$custom_data$fluorescence)){
+       all(results$custom_data$density == results$custom_data$fluorescence, na.rm = T)){
       showModal(modalDialog("Density and Fluorescence data are identical. Did you assign the correct files and/or sheets?", easyClose = T))
     }
   })
@@ -5936,7 +5936,7 @@ server <- function(input, output, session){
                         try(
                           results$growth <-
                             suppressWarnings(
-                              QurvE::growth.workflow(grodata = grodata,
+                              growth.workflow(grodata = grodata,
                                               ec50 = input$perform_ec50_growth,
                                               fit.opt = fit.opt,
                                               t0 = t0,
@@ -6950,7 +6950,7 @@ server <- function(input, output, session){
     )]]) > 1) {
       suppressWarnings(
         plot.gcFitLinear(
-          gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(
+          results$gcFit$gcFittedLinear[[ifelse(
             selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
               is.null(
                 selected_vals_validate_growth$sample_validate_growth_linear
@@ -7160,7 +7160,7 @@ server <- function(input, output, session){
         selected_vals_validate_growth$sample_validate_growth_linear
       )]]) > 1) {
         suppressWarnings(
-          plot.gcFitLinear(gcFittedLinear = results$gcFit$gcFittedLinear[[ifelse(selected_vals_validate_growth$sample_validate_growth_linear == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_linear), 1, selected_vals_validate_growth$sample_validate_growth_linear)]],
+          plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(selected_vals_validate_growth$sample_validate_growth_linear == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_linear), 1, selected_vals_validate_growth$sample_validate_growth_linear)]],
                            pch = input$shape_type_validate_growth_plot_linear,
                            log = log,
                            cex.point = input$shape_size_validate_growth_plot_linear,
@@ -7232,7 +7232,7 @@ server <- function(input, output, session){
       try(
         suppressWarnings(
           plot.gcFitSpline(
-            gcFittedSpline = results$gcFit$gcFittedSplines[[ifelse(
+            results$gcFit$gcFittedSplines[[ifelse(
               selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
                 is.null(
                   selected_vals_validate_growth$sample_validate_growth_spline
@@ -7612,7 +7612,7 @@ server <- function(input, output, session){
                                                   selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
                                                   is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]]) > 1){
 
-      plot.gcBootSpline(gcBootSpline = results$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
+      plot.gcBootSpline(results$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
                                                                              selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
                                                                              is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]],
                         pch = input$shape_type_validate_growth_spline_bt,
@@ -7680,7 +7680,7 @@ server <- function(input, output, session){
                   as.numeric(input$x_range_max_validate_growth_spline_bt))
       }
 
-      plot.gcBootSpline(gcBootSpline = results,
+      plot.gcBootSpline(results,
                         pch = input$shape_type_validate_growth_spline_bt,
                         cex.point = input$shape_size_validate_growth_spline_bt,
                         cex.lab = input$axis_size_validate_growth_spline_bt,
@@ -8254,7 +8254,7 @@ server <- function(input, output, session){
                 as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
     }
 
-    plot.flBootSpline(flBootSpline = results,
+    plot.flBootSpline(results,
                       pch = input$shape_type_validate_fluorescence_spline_bt,
                       cex.point = input$shape_size_validate_fluorescence_spline_bt,
                       cex.lab = input$axis_size_validate_fluorescence_spline_bt,
@@ -8325,7 +8325,7 @@ server <- function(input, output, session){
                   as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
       }
 
-      plot.flBootSpline(flBootSpline = results,
+      plot.flBootSpline(results,
                         pch = input$shape_type_validate_fluorescence_spline_bt,
                         cex.point = input$shape_size_validate_fluorescence_spline_bt,
                         cex.lab = input$axis_size_validate_fluorescence_spline_bt,
@@ -8471,7 +8471,7 @@ server <- function(input, output, session){
   dose_response_growth_plot_combined <- reactive({
     results <- results$growth$drFit
 
-    plot.drFit(drFit = results,
+    plot.drFit(results,
                combine = TRUE,
                pch = input$shape_type_dose_response_growth_plot,
                names = input$select_samples_based_on_string_dose_response_growth_plot,
@@ -8698,7 +8698,7 @@ server <- function(input, output, session){
         results <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
 
         try(
-          plot.drFitModel(drFitModel =  results,
+          plot.drFitModel(results,
                           pch = input$shape_type_dose_response_growth_plot_model,
                           cex.point = input$shape_size_dose_response_growth_plot_model,
                           cex.lab = input$axis_size_dose_response_growth_plot_model,
@@ -8772,7 +8772,7 @@ server <- function(input, output, session){
           results <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
 
           try(
-            plot.drFitModel(drFitModel =  results,
+            plot.drFitModel(results,
                             pch = input$shape_type_dose_response_growth_plot_model,
                             cex.point = input$shape_size_dose_response_growth_plot_model,
                             cex.lab = input$axis_size_dose_response_growth_plot_model,
@@ -8829,7 +8829,7 @@ server <- function(input, output, session){
                 as.numeric(input$x_range_max_dose_response_growth_plot))
     }
 
-    plot.drFitSpline(drFitSpline = results,
+    plot.drFitSpline(results,
                      combine = FALSE,
                      pch = input$shape_type_dose_response_growth_plot,
                      cex.point = input$shape_size_dose_response_growth_plot,
@@ -8896,7 +8896,7 @@ server <- function(input, output, session){
                   as.numeric(input$x_range_max_dose_response_growth_plot))
       }
 
-      plot.drFitSpline(drFitSpline = results,
+      plot.drFitSpline(results,
                        combine = FALSE,
                        pch = input$shape_type_dose_response_growth_plot,
                        cex.point = input$shape_size_dose_response_growth_plot,
@@ -9060,7 +9060,7 @@ server <- function(input, output, session){
   dose_response_growth_plot_individual_bt <- reactive({
     results <- results$growth$drFit$drBootSplines[[ifelse(input$individual_plots_dose_response_growth_plot_bt == "1" || is.null(input$individual_plots_dose_response_growth_plot_bt), 1, input$individual_plots_dose_response_growth_plot_bt)]]
 
-    plot.drBootSpline(drBootSpline = results,
+    plot.drBootSpline(results,
                      pch = input$shape_type_dose_response_growth_plot_bt,
                      cex.point = input$shape_size_dose_response_growth_plot_bt,
                      cex.lab = input$axis_size_dose_response_growth_plot_bt,
@@ -9093,7 +9093,7 @@ server <- function(input, output, session){
       }
       results <- results$growth$drFit$drBootSplines[[input$individual_plots_dose_response_growth_plot_bt]]
 
-      plot.drBootSpline(drBootSpline = results,
+      plot.drBootSpline(results,
                         pch = input$shape_type_dose_response_growth_plot_bt,
                         cex.point = input$shape_size_dose_response_growth_plot_bt,
                         cex.lab = input$axis_size_dose_response_growth_plot_bt,
@@ -10126,7 +10126,7 @@ server <- function(input, output, session){
       dose_response_fluorescence_plot_individual_bt <- reactive({
         results <- results$fluorescence$drFit$drBootSplines[[ifelse(input$individual_plots_dose_response_fluorescence_plot_bt == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot_bt), 1, input$individual_plots_dose_response_fluorescence_plot_bt)]]
 
-        plot.drBootSpline(drBootSpline = results,
+        plot.drBootSpline(results,
                           pch = input$shape_type_dose_response_fluorescence_plot_bt,
                           cex.point = input$shape_size_dose_response_fluorescence_plot_bt,
                           cex.lab = input$axis_size_dose_response_fluorescence_plot_bt,
@@ -10159,7 +10159,7 @@ server <- function(input, output, session){
           }
           results <- results$fluorescence$drFit$drBootSplines[[input$individual_plots_dose_response_fluorescence_plot_bt]]
 
-          plot.drBootSpline(drBootSpline = results,
+          plot.drBootSpline(results,
                             pch = input$shape_type_dose_response_fluorescence_plot_bt,
                             cex.point = input$shape_size_dose_response_fluorescence_plot_bt,
                             cex.lab = input$axis_size_dose_response_fluorescence_plot_bt,
@@ -10205,7 +10205,7 @@ server <- function(input, output, session){
         results <- results$fluorescence
         if(input$select_string_visualize_growth_group){
         suppressWarnings(
-          plot.dual(object = results,
+          plot.dual(results,
                     IDs = NULL,
                     fluorescence = input$fluorescence_type_dual_plot,
                     names = input$select_samples_based_on_string_dual_plot,
@@ -10229,7 +10229,7 @@ server <- function(input, output, session){
         )
         } else {
           suppressWarnings(
-            plot.dual(object = results,
+            plot.dual(results,
                       fluorescence = input$fluorescence_type_dual_plot,
                       IDs = input$samples_visualize_dual_plot,
                       names = NULL,

@@ -871,230 +871,241 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
   # x an object of class drFit
   if(methods::is(drFit) != "drFit") stop("x needs to be an object of class 'drFit', created with growth.drFit() or fl.drFit(control=fl.control(dr.method='spline').")
   if(length(drFit) == 1) stop("drFit is NA. Please run growth.drFit() with valid data input or growth.workflow() with 'ec50 = T'.")
-  n <- length(drFit$drFittedSplines)
-  if(combine == FALSE || n < 2){
-    # /// plot all drFitSpline objects
-    for (i in 1:n) {
-      try(plot(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch,
-               y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
-               cex.point = cex.point, export = export,
-               plot = plot, height = 7, width = 9, out.dir = out.dir))
-    }
-  } else {
-    if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == TRUE)) {
-      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.conc + 1))
-      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.test + 1))
-    } else if ((drFit$control$log.x.dr == FALSE) && (drFit$control$log.y.dr == TRUE)) {
-      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.conc))
-      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.test + 1))
-    } else if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == FALSE)) {
-      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.conc + 1))
-      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.test))
-    } else if ((drFit$control$log.x.dr == FALSE) && (drFit$control$log.y.dr == FALSE)) {
-      raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.conc))
-      raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.test))
-    }
-    sample.nm <- nm <- names(raw.x) <- names(raw.y) <- names(drFit$drFittedSplines)
-
-    # Convert range  and selecting arguments
-    names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
-    exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
-
-    # Get name of conditions with multiple replicates; apply selecting arguments
-    if(!is.null(names)  && length(names) > 0){
-      if(!is.na(names) && names != ""){
-        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-        nm <- nm[grep(paste(names, collapse="|"), nm)]
-      }
-    }
-    if(!is.null(names)  && !is.na(exclude.nm) && exclude.nm != ""){
-      names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
-      nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
-    }
-    if(length(nm)==0){
-      stop("Please run plot.drFit() with valid 'names' or 'conc' argument.")
-    }
-    raw.x <- raw.x[nm]
-    raw.y <- raw.y[nm]
-    raw.df <- lapply(1:length(raw.x), function(x) data.frame("x" = raw.x[[x]], "y" = raw.y[[x]], "Condition" = rep(names(raw.x)[[x]], length(raw.x[[x]]))))
-    # raw.df <- do.call("rbind", raw.df)
-
-    n <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
-    conc <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) unique(raw.x[[i]])[x]))
-    mean <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) mean(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
-    sd <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) sd(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
-    names <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) rep(names(drFit$drFittedSplines)[match(names(raw.x)[[i]], names(drFit$drFittedSplines))], length_out=length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]]))))
-    error <- stats::qnorm(0.975) * sd / sqrt(n) # standard error
-    CI.L <- mean - error #left confidence interval
-    CI.R <- mean + error #right confidence interval
-
-    raw.df <- data.frame("Condition" = as.vector(names), "conc" = as.vector(conc), "mean" = as.vector(mean), "CI.L" = as.vector(CI.L), "CI.R" = as.vector(CI.R))
-    if(log.x == TRUE) raw.df[raw.df[, "conc"] == 0, "conc"] <- 0.001
-    # raw.df$Condition <- factor(raw.df$Condition, levels = raw.df$Condition)
-    # raw.df$group <- gsub(" \\|.+", "", raw.df$name)
-    # raw.df$mean[is.na(raw.df$mean)] <- 0
-    # raw.df$CI.L[is.na(raw.df$CI.L)] <- 0
-    # raw.df$CI.R[is.na(raw.df$CI.R)] <- 0
-
-
-    res.df <- lapply(1:length(raw.x), function(x) data.frame("Condition" = names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]],
-                                                             "ec50" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["EC50"]],
-                                                             "yEC50" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["yEC50"]]))
-    res.df <- do.call("rbind", res.df)
-
-    spline.df  <- lapply(1:length(raw.x), function(x) data.frame("x" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.conc"]],
-                                                                 "y" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.test"]],
-                                                                 "Condition" = rep(names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
-    spline.df <- do.call("rbind", spline.df)
-
-    if(log.x == TRUE) spline.df[spline.df[, "x"] == 0, "x"] <- 0.001
-
-    nrow <- ceiling(length(drFit$drFittedSplines)/2)
-    p <- ggplot(data = raw.df, aes(.data$conc, .data$mean, colour = .data$Condition)) +
-      geom_point(size=cex.point, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
-      geom_errorbar(aes(ymin = .data$CI.L, ymax = .data$CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
-      geom_line(data = spline.df, aes(.data$x, .data$y, colour = .data$Condition), size = lwd) +
-      theme_classic(base_size = basesize) +
-      theme(legend.position="bottom") +
-      ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
-
-    if(log.y == TRUE){
-      if(!is.null(y.lim)){
-        p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = "log10")
-      } else {
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = "log10")
+  if(drFit$control$dr.method == "spline"){
+    n <- length(drFit$drFittedSplines)
+    if(combine == FALSE || n < 2){
+      # /// plot all drFitSpline objects
+      for (i in 1:n) {
+        try(plot(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch,
+                 y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
+                 cex.point = cex.point, export = export,
+                 plot = plot, height = 7, width = 9, out.dir = out.dir))
       }
     } else {
-      if(!is.null(y.lim)){
-        p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
-      } else {
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+      if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == TRUE)) {
+        raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.conc + 1))
+        raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.test + 1))
+      } else if ((drFit$control$log.x.dr == FALSE) && (drFit$control$log.y.dr == TRUE)) {
+        raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.conc))
+        raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.test + 1))
+      } else if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == FALSE)) {
+        raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) log(drFit$drFittedSplines[[x]]$raw.conc + 1))
+        raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.test))
+      } else if ((drFit$control$log.x.dr == FALSE) && (drFit$control$log.y.dr == FALSE)) {
+        raw.x <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.conc))
+        raw.y <- lapply(1:length(drFit$drFittedSplines), function(x) (drFit$drFittedSplines[[x]]$raw.test))
       }
-    }
+      sample.nm <- nm <- names(raw.x) <- names(raw.y) <- names(drFit$drFittedSplines)
 
-    if(is.null(y.title) || y.title == ""){
-      p <- p + ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, " + 1)"), paste0(drFit$control$dr.parameter)))
-    } else {
-      p <- p + ylab(label = y.title)
-    }
+      # Convert range  and selecting arguments
+      names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
+      exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
 
-    if(is.null(x.title) || x.title == ""){
-      p <- p + xlab(ifelse(drFit$control$log.x.dr == TRUE, "Ln(concentration + 1)", "Concentration"))
-    } else {
-      p <- p + xlab(label = x.title)
-    }
+      # Get name of conditions with multiple replicates; apply selecting arguments
+      if(!is.null(names)  && length(names) > 0){
+        if(!is.na(names) && names != ""){
+          names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+          nm <- nm[grep(paste(names, collapse="|"), nm)]
+        }
+      }
+      if(!is.null(names)  && !is.na(exclude.nm) && exclude.nm != ""){
+        names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+        nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+      }
+      if(length(nm)==0){
+        stop("Please run plot.drFit() with valid 'names' or 'conc' argument.")
+      }
+      raw.x <- raw.x[nm]
+      raw.y <- raw.y[nm]
+      raw.df <- lapply(1:length(raw.x), function(x) data.frame("x" = raw.x[[x]], "y" = raw.y[[x]], "Condition" = rep(names(raw.x)[[x]], length(raw.x[[x]]))))
+      # raw.df <- do.call("rbind", raw.df)
 
-    if(ec50line){
-      plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
-      plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
-      p <- p + geom_segment(data = res.df, aes(x = .data$plot.xmin, xend = .data$ec50, y = .data$yEC50, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd) +
-        geom_segment(data = res.df, aes(x = .data$ec50, xend = .data$ec50, y = .data$plot.ymin, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd)
+      n <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
+      conc <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) unique(raw.x[[i]])[x]))
+      mean <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) mean(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
+      sd <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) sd(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]])))
+      names <- sapply(1:length(raw.x), function(i) sapply(1:length(unique(raw.x[[i]])), function(x) rep(names(drFit$drFittedSplines)[match(names(raw.x)[[i]], names(drFit$drFittedSplines))], length_out=length(raw.y[[i]][raw.x[[i]]==unique(raw.x[[i]])[x]]))))
+      error <- stats::qnorm(0.975) * sd / sqrt(n) # standard error
+      CI.L <- mean - error #left confidence interval
+      CI.R <- mean + error #right confidence interval
+
+      raw.df <- data.frame("Condition" = as.vector(names), "conc" = as.vector(conc), "mean" = as.vector(mean), "CI.L" = as.vector(CI.L), "CI.R" = as.vector(CI.R))
+      if(log.x == TRUE) raw.df[raw.df[, "conc"] == 0, "conc"] <- 0.001
+      # raw.df$Condition <- factor(raw.df$Condition, levels = raw.df$Condition)
+      # raw.df$group <- gsub(" \\|.+", "", raw.df$name)
+      # raw.df$mean[is.na(raw.df$mean)] <- 0
+      # raw.df$CI.L[is.na(raw.df$CI.L)] <- 0
+      # raw.df$CI.R[is.na(raw.df$CI.R)] <- 0
+
+
+      res.df <- lapply(1:length(raw.x), function(x) data.frame("Condition" = names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]],
+                                                               "ec50" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["EC50"]],
+                                                               "yEC50" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["parameters"]][["yEC50"]]))
+      res.df <- do.call("rbind", res.df)
+
+      spline.df  <- lapply(1:length(raw.x), function(x) data.frame("x" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.conc"]],
+                                                                   "y" = drFit$drFittedSplines[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]][["fit.test"]],
+                                                                   "Condition" = rep(names(drFit$drFittedSplines)[[match(names(raw.x)[[x]], names(drFit$drFittedSplines))]], length(drFit$drFittedSplines[[x]][["fit.conc"]]))))
+      spline.df <- do.call("rbind", spline.df)
+
+      if(log.x == TRUE) spline.df[spline.df[, "x"] == 0, "x"] <- 0.001
+
+      nrow <- ceiling(length(drFit$drFittedSplines)/2)
+      p <- ggplot(data = raw.df, aes(.data$conc, .data$mean, colour = .data$Condition)) +
+        geom_point(size=cex.point, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
+        geom_errorbar(aes(ymin = .data$CI.L, ymax = .data$CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
+        geom_line(data = spline.df, aes(.data$x, .data$y, colour = .data$Condition), size = lwd) +
+        theme_classic(base_size = basesize) +
+        theme(legend.position="bottom") +
+        ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = scales::pretty_breaks(), trans = "log10")
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = "log10")
         } else {
-          p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = "log10")
         }
       } else {
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = scales::pretty_breaks())
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks())
         } else {
-          p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
         }
       }
 
-      if(log.x == TRUE){
-        if(!is.null(x.lim)){
-          p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
-        } else {
-          p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
-        }
+      if(is.null(y.title) || y.title == ""){
+        p <- p + ylab(label = ifelse(drFit$control$log.y.dr == TRUE, paste0("Ln(", drFit$control$dr.parameter, " + 1)"), paste0(drFit$control$dr.parameter)))
       } else {
-        if(!is.null(x.lim)){
-          p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+        p <- p + ylab(label = y.title)
+      }
+
+      if(is.null(x.title) || x.title == ""){
+        p <- p + xlab(ifelse(drFit$control$log.x.dr == TRUE, "Ln(concentration + 1)", "Concentration"))
+      } else {
+        p <- p + xlab(label = x.title)
+      }
+
+      if(ec50line){
+        plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
+        plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
+        p <- p + geom_segment(data = res.df, aes(x = .data$plot.xmin, xend = .data$ec50, y = .data$yEC50, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd) +
+          geom_segment(data = res.df, aes(x = .data$ec50, xend = .data$ec50, y = .data$plot.ymin, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd)
+
+        if(log.y == TRUE){
+          if(!is.null(y.lim)){
+            p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = scales::pretty_breaks(), trans = "log10")
+          } else {
+            p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+          }
         } else {
-          p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+          if(!is.null(y.lim)){
+            p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = scales::pretty_breaks())
+          } else {
+            p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+          }
+        }
+
+        if(log.x == TRUE){
+          if(!is.null(x.lim)){
+            p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+          } else {
+            p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+          }
+        } else {
+          if(!is.null(x.lim)){
+            p <- p + scale_x_continuous(limits = x.lim, expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+          } else {
+            p <- p + scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks())
+          }
+        }
+
+      } else {
+        if(log.x == TRUE){
+          if(!is.null(x.lim)){
+            p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(), trans = "log10")
+          } else {
+            p <- p + scale_x_continuous(breaks = scales::pretty_breaks(), trans = "log10")
+          }
+        } else {
+          if(!is.null(x.lim)){
+            p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks())
+          } else {
+            p <- p + scale_x_continuous(breaks = scales::pretty_breaks())
+          }
         }
       }
 
-    } else {
-      if(log.x == TRUE){
-        if(!is.null(x.lim)){
-          p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(), trans = "log10")
-        } else {
-          p <- p + scale_x_continuous(breaks = scales::pretty_breaks(), trans = "log10")
+
+
+
+      if(is.null(colors)){
+        if (length(drFit$drFittedSplines) <= 8) {
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else if (length(drFit$drFittedSplines) <=50){
+          p <- p + scale_fill_manual(name = "Condition",
+                                     values = c(
+                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                     )
+          ) + scale_color_manual(name = "Condition",
+                                 values = c(
+                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                 )
+          )
         }
-      } else {
-        if(!is.null(x.lim)){
-          p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks())
+      }
+      if (export == TRUE){
+        out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+        if(is.null(out.nm)) out.nm <- paste0("drFitPlot")
+        if(is.null(width)){
+          w <- 7 + ifelse(combine==TRUE,length(unique(names)), length(unique(names)))/15
         } else {
-          p <- p + scale_x_continuous(breaks = scales::pretty_breaks())
+          w <- width
         }
+        if(is.null(height)){
+          h <- 6
+        } else {
+          h <- height
+        }
+        dir.create(out.dir, showWarnings = F)
+        grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
+                       width = w, height = h, units = 'in', res = 300)
+        print(p)
+        grDevices::dev.off()
+        #grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+        #print(p)
+        #grDevices::dev.off()
+        cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
       }
-    }
-
-
-
-
-    if(is.null(colors)){
-      if (length(drFit$drFittedSplines) <= 8) {
-        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else if (length(drFit$drFittedSplines) <=50){
-        p <- p + scale_fill_manual(name = "Condition",
-                                   values = c(
-                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                   )
-        ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
-        )
-      }
-    }
-    if (export == TRUE){
-      out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-      if(is.null(out.nm)) out.nm <- paste0("drFitPlot")
-      if(is.null(width)){
-        w <- 7 + ifelse(combine==TRUE,length(unique(names)), length(unique(names)))/15
+      if (plot == TRUE){
+        print(p)
       } else {
-        w <- width
+        return(p)
       }
-      if(is.null(height)){
-        h <- 6
-      } else {
-        h <- height
-      }
-      dir.create(out.dir, showWarnings = F)
-      grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
-                     width = w, height = h, units = 'in', res = 300)
-      print(p)
-      grDevices::dev.off()
-      #grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
-      #print(p)
-      #grDevices::dev.off()
-      cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
-    }
-    if (plot == TRUE){
-      print(p)
-    } else {
-      return(p)
+    } # else of if(combine == FALSE || n < 2)
+  } # if(drFit$control$dr.method == "spline")
+  else {
+    n <- length(drFit$drFittedModels)
+    for (i in 1:n) {
+      try(plot(drFit$drFittedModels[[i]], ec50line = ec50line, pch = pch,
+               y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
+               cex.point = cex.point, export = export,
+               plot = plot, height = 7, width = 9, out.dir = out.dir))
     }
   }
 }
@@ -1326,7 +1337,7 @@ plot.drFitModel <- function(x,
   model <- drFitModel$model
   conc <- drFitModel$raw.conc
   test <- drFitModel$raw.test
-  bp <- ifelse(!exists("bp")||bp == "", rlang::missing_arg(), bp)
+  bp <- ifelse(missing(bp)||!exists("bp")||bp == "", rlang::missing_arg(), bp)
   if(missing(bp)){
     log10cl <- round(log10(min(conc[conc > 0]))) - 1
     bp <- 10^(log10cl)
@@ -1393,12 +1404,12 @@ plot.drFitModel <- function(x,
     cex.legend <- cex.lab
   }
 
-  x.lim <- if(!exists("x.lim") || x.lim == ""){
+  x.lim <- if(missing(x.lim) || !exists("x.lim") || x.lim == "" || is.null(x.lim) ){
     rlang::missing_arg()
   } else {
     x.lim
   }
-  y.lim <- if(!exists("y.lim") || y.lim == ""){
+  y.lim <- if(missing(x.lim) || !exists("y.lim") || y.lim == "" || is.null(y.lim) ){
     rlang::missing_arg()
   }else {
     y.lim
@@ -1408,28 +1419,31 @@ plot.drFitModel <- function(x,
 
   requireNamespace("drc", quietly = TRUE)
   try(
-    plot(x = model,
-                   broken = broken,
-                   type = "all",
-                   add = add,
-                   pch = pch,
-                   col = col,
-                   lwd = lwd,
-                   lty = lty,
-                   axes = FALSE,
-                   log = log,
-                   xlab = "",
-                   ylab = "",
-                   xlim = x.lim,
-                   ylim = y.lim,
-                   cex = cex.point,
-                   cex.axis = cex.axis,
-                   legend = legend,
-                   legendText = legendText,
-                   cex.legend = cex.legend,
-                   gridsize = gridsize,
-                   legendPos = legendPos,
-                   bp = bp,
+    suppressWarnings(
+      plot(
+        x = model,
+        broken = broken,
+        type = "all",
+        add = add,
+        pch = pch,
+        col = col,
+        lwd = lwd,
+        lty = lty,
+        axes = FALSE,
+        log = log,
+        xlab = "",
+        ylab = "",
+        xlim = x.lim,
+        ylim = y.lim,
+        cex = cex.point,
+        cex.axis = cex.axis,
+        legend = legend,
+        legendText = legendText,
+        cex.legend = cex.legend,
+        gridsize = gridsize,
+        legendPos = legendPos,
+        bp = bp,
+      )
     )
   )
   axis(1, at = xt, mgp=c(3,1+0.5*cex.axis,0), line = 0, labels = as.character(as.numeric(xt)))
@@ -1443,22 +1457,28 @@ plot.drFitModel <- function(x,
   if(any(grep("y", log))){
     axis(side=2, at=yt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
   }
-  try(plot(model,
-                     pch = pch,
-                     xlim = x.lim,
-                     ylim = y.lim,
-                     broken = broken,
-                     type = type,
-                     add = T,
-                     col = col,
-                     lwd = lwd,
-                     lty = lty,
-                     log = log,
-                     cex = cex.point,
-                     gridsize = gridsize,
-                     bp = bp,
-                     legend = FALSE)
+  try(
+    suppressWarnings(
+      plot(
+        model,
+        pch = pch,
+        xlim = x.lim,
+        ylim = y.lim,
+        broken = broken,
+        type = type,
+        add = T,
+        col = col,
+        lwd = lwd,
+        lty = lty,
+        log = log,
+        cex = cex.point,
+        gridsize = gridsize,
+        bp = bp,
+        legend = FALSE)
+    )
   )
+  # add title with condition
+  title(main = drFitModel$drID)
   if (ec50line == TRUE) {
     #vertical lines
     totmin = min(min(drFitModel$fit.conc), min(drFitModel$fit.test))
