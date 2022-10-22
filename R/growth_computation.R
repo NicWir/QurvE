@@ -1099,7 +1099,7 @@ growth.workflow <- function (grodata = NULL,
         (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
         (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
       ) &&
-      (unique(expdesign$concentration) >= 4)
+      (length(unique(expdesign$concentration)) >= 4)
   ) {
     out.drFit <- growth.drFit(summary.gcFit(out.gcFit), control)
     EC50.table <- out.drFit$drTable
