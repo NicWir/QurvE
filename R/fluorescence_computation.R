@@ -138,7 +138,7 @@ fl.control <- function(fit.opt = c("l", "s"),
                      neg.nan.act = neg.nan.act,
                      clean.bootstrap = clean.bootstrap)
   class(fl.control) <- "fl.control"
-  fl.control
+  invisible(fl.control)
 }
 
 #' Perform a smooth spline fit on fluorescence data
@@ -544,7 +544,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       control = control
     )
   class(flFitSpline) <- "flFitSpline"
-  flFitSpline
+  invisible(flFitSpline)
 }
 
 #' flBootSpline: Function to generate a bootstrap
@@ -736,7 +736,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     control = control
   )
   class(flBootSpline) <- "flBootSpline"
-  flBootSpline
+  invisible(flBootSpline)
 }
 
 #' Perform a fluorescence curve analysis on all samples in the provided dataset.
@@ -1218,7 +1218,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
   flFit           <- list(raw.x = x, raw.fl = fl_data, flTable = out.table, flFittedLinear = fitlinear.all, flFittedSplines = fitnonpara.all, flBootSplines = boot.all, control=control)
 
   class(flFit)    <- "flFit"
-  flFit
+  invisible(flFit)
 }
 
 #' Data fit via a heuristic linear method
@@ -2602,7 +2602,7 @@ fl.workflow <- function(grodata = NULL,
     }
   }
 
-  flFitRes
+  invisible(flFitRes)
 }
 
 #' Create a PDF and HTML report with results from a fluorescence analysis workflow
@@ -2822,7 +2822,7 @@ fl.drFit <- function(FitData, control = fl.control())
   drFitfl <- list(raw.data = FitData, drTable = EC50.table,
                 drFittedModels = EC50, control = control)
   class(drFitfl) <- "drFitfl"
-  drFitfl
+  invisible(drFitfl)
 }
 
 #' Perform a biosensor model fit on response vs. concentration data of a single sample.
@@ -3030,7 +3030,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
                                         yEC50.orig = EC.orig[2], K.orig = EC.orig[1], test = test.nm),
                       fitFlag = fitFlag, reliable = NULL, control = control)
   class(drFitModel) <- "drFitFLModel"
-  drFitModel
+  invisible(drFitModel)
 }
 
 

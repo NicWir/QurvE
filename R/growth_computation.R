@@ -744,7 +744,7 @@ parse_data <-
     #   names(data.ls) <- c("density", "fluorescence", "fluorescence2")
     #   grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration)
     # }
-    return(grodata)
+    invisible(grodata)
   }
 
 #' Create a \code{grofit.control} object.
@@ -910,7 +910,7 @@ growth.control <- function (neg.nan.act = FALSE,
                          log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
                          model.type = model.type, growth.thresh = growth.thresh)
   class(grofit.control) <- "grofit.control"
-  grofit.control
+  invisible(grofit.control)
 }
 
 #' Run a complete growth curve analysis and dose-reponse analysis workflow.
@@ -979,7 +979,7 @@ growth.control <- function (neg.nan.act = FALSE,
 growth.workflow <- function (grodata = NULL,
                              time = NULL,
                              data = NULL,
-                             ec50 = FALSE,
+                             ec50 = TRUE,
                              mean.grp = NA,
                              mean.conc = NA,
                              neg.nan.act = FALSE,
@@ -1016,7 +1016,7 @@ growth.workflow <- function (grodata = NULL,
                              log.x.dr = FALSE,
                              log.y.dr = FALSE,
                              nboot.dr = 0,
-                             report = c('pdf', 'html'),
+                             report = NULL,
                              out.dir = NULL,
                              out.nm = NULL,
                              export.fig = FALSE,
@@ -1071,6 +1071,10 @@ growth.workflow <- function (grodata = NULL,
     concentration <- dat.mat[, 3]
     expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
   }
+  if(ec50 == TRUE){
+    if(unique(expdesign$concentration) < 4)
+      message("No or not enough unique concentration information provided. Dose-Response analysis will be omitted.")
+  }
   control <- growth.control(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
                             suppress.messages = suppress.messages, fit.opt = fit.opt, t0 = t0, min.density = min.density, tmax = tmax, max.density = max.density,
                             log.x.gc = log.x.gc, log.y.lin = log.y.lin, log.y.spline = log.y.spline, log.y.model = log.y.model, biphasic = biphasic,
@@ -1094,7 +1098,8 @@ growth.workflow <- function (grodata = NULL,
       !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
         (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
         (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
-      )
+      ) &&
+      (unique(expdesign$concentration) >= 4)
   ) {
     out.drFit <- growth.drFit(summary.gcFit(out.gcFit), control)
     EC50.table <- out.drFit$drTable
@@ -1154,7 +1159,8 @@ growth.workflow <- function (grodata = NULL,
         !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
           (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
           (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
-        )
+        ) &&
+        (unique(expdesign$concentration) >= 4)
     ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
@@ -1172,7 +1178,7 @@ growth.workflow <- function (grodata = NULL,
     }
   } # if(!exists("shiny") || shiny != TRUE)
 
-  grofit
+  invisible(grofit)
 }
 
 #' Create a PDF and HTML report with results from a growth curve analysis workflow
@@ -1803,13 +1809,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
   # Combine results into list 'gcFit'
   gcFit           <- list(raw.time = time, raw.data = data, gcTable = out.table, gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all, gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all, control=control)
   class(gcFit)    <- "gcFit"
-  return(gcFit)
-  # names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(data[,1]), " | ", as.character(data[,2]), " | ", as.character(data[,3]))
-  # out.table <- data.frame(as.matrix(out.table))
-  # gcFit           <- list(raw.time = time, raw.data = data, gcTable = out.table, gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all, gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all, control=control)
-  #
-  # class(gcFit)    <- "gcFit"
-  # gcFit
+  invisible(gcFit)
 }
 
 #' Fit nonlinear growth models to density data
@@ -1895,7 +1895,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
   else{
       gcFitModel <- grofit.param(time, data, gcID, control)
   }
-  return(gcFitModel)
+  invisible(gcFitModel)
 }
 
 #' Internal function called within \code{\link{growth.gcFitModel}}.
@@ -2585,7 +2585,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       control = control
     )
   class(gcFitSpline) <- "gcFitSpline"
-  gcFitSpline
+  invisible(gcFitSpline)
 }
 
 #' Fit an exponential growth model with a heuristic linear method
@@ -3630,7 +3630,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
     control = control
   )
   class(gcBootSpline) <- "gcBootSpline"
-  gcBootSpline
+  invisible(gcBootSpline)
 }
 
 #' Perform smooth spline fits on response vs. concentration data
@@ -3758,7 +3758,7 @@ growth.drFit <- function (gcTable, control = growth.control())
   }
 
   class(drFit) <- "drFit"
-  drFit
+  invisible(drFit)
 }
 
 #' Perform a smooth spline fit on response vs. concentration data of a single sample to determine the EC50.
@@ -3961,7 +3961,7 @@ growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.
                                         EC50.orig = EC.orig[1], yEC50.orig = EC.orig[2], test = test.nm),
                       fitFlag = fitFlag, reliable = NULL, control = control)
   class(drFitSpline) <- "drFitSpline"
-  drFitSpline
+  invisible(drFitSpline)
 }
 
 
@@ -4078,7 +4078,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
                      control = control)
 
   class(drFitModel) <- "drFitModel"
-  return(drFitModel)
+  invisible(drFitModel)
 }
 
 #' Perform a smooth spline fit on response vs. concentration data of a single sample
@@ -4249,7 +4249,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
                        boot.conc = boot.x, boot.test = boot.y, boot.drSpline = splinefit,
                        ec50.boot = ECtest.boot, ec50y.boot = y.EC50.boot, bootFlag = TRUE, control = control)
   class(drBootSpline) <- "drBootSpline"
-  drBootSpline
+  invisible(drBootSpline)
 }
 
 lm_parms <- function (m)
