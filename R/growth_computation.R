@@ -1023,6 +1023,14 @@ growth.workflow <- function (grodata = NULL,
                              ...
 )
 {
+  if(ec50 == TRUE){
+    dr.parameter.fit.method <- gsub(".+\\.", "", dr.parameter)
+    if((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
+       (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
+       (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
+       )
+      message("The chosen 'dr.parameter' is not compatible with the selected fitting options ('fit.opt'). Dose-response analysis will not be performed.")
+  }
   if(exists("lin.h") && !is.null(lin.h) && (is.na(lin.h) || lin.h == "")) lin.h <- NULL
   # Define objects based on additional function calls
   call <- match.call()
@@ -1082,7 +1090,12 @@ growth.workflow <- function (grodata = NULL,
   else out.gcFit <- growth.gcFit(time, data, control)
 
   # /// Estimate EC50 values
-  if (ec50 == TRUE) {
+  if (ec50 == TRUE &&
+      !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
+        (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
+        (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
+      )
+  ) {
     out.drFit <- growth.drFit(summary.gcFit(out.gcFit), control)
     EC50.table <- out.drFit$drTable
     boot.ec <- out.drFit$boot.ec
@@ -1137,7 +1150,12 @@ growth.workflow <- function (grodata = NULL,
     #   cat(paste0("Per-group average results of growth fit analysis saved as tab-delimited text file in:\n",
     #              wd, "/mean_results.gc.txt\n\n"))
 
-    if (ec50 == TRUE) {
+    if (ec50 == TRUE &&
+        !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
+          (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
+          (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
+        )
+    ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
       cat(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
@@ -1857,10 +1875,20 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
   }
   # /// check if there are enough data points
   if (length(data)<5){
-    warning("gcFitModel: There is not enough valid data. Must have at least 5 unique values!")
+    if(control$suppress.messages==F) message("gcFitModel: There is not enough valid data. Must have at least 5 unique values!")
     gcFitModel <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
                          fit.data = NA, parameters = list(A=NA, mu=NA, tD = NA, lambda=NA, integral=NA),
                          model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
+    class(gcFitModel) <- "gcFitModel"
+    return(gcFitModel)
+  }
+  # /// check if there are enough density values above the start value
+  data.growth <- data[data > data[1]]
+  if (length(data.growth)<5){
+    if(control$suppress.messages==F) message("gcFitModel: No significant amount of density values above the start value!")
+    gcFitModel <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
+                       fit.data = NA, parameters = list(A=NA, mu=NA, tD = NA, lambda=NA, integral=NA),
+                       model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
     class(gcFitModel) <- "gcFitModel"
     return(gcFitModel)
   }
@@ -1981,7 +2009,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
             message(paste(rep(".", lmax + 3 - l[i])), " OK")
           }
           else{
-            warning(paste(
+            message(paste(
               rep(".", lmax + 3 - l[i]),
               " nls() failed to converge with stopCode ",
               as.character(y.model$convInfo$stopCode)
@@ -2053,7 +2081,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
   }
   else{
     if (control$suppress.messages == FALSE){
-      warning("gcFitModel: Unable to fit this curve parametrically!")
+      message("gcFitModel: Unable to fit this curve parametrically!")
     }
     Abest        <- c(NA, NA)
     mubest       <- c(NA, NA)
@@ -2315,7 +2343,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       data
     }, spar = control$smooth.gc, cv = NA, keep.data = FALSE))
     if (!exists("spline") || is.null(spline) == TRUE) {
-      warning("gcFitSpline: Spline could not be fitted to data!")
+      if(control$suppress.messages==F) message("gcFitSpline: Spline could not be fitted to data!")
 
       gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                           fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
@@ -2332,7 +2360,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       #consider only slopes at density values greater than the initial value
       deriv1.growth <- deriv1; deriv1.growth$x <- deriv1.growth$x[spline$y > spline$y[1]]; deriv1.growth$y <- deriv1.growth$y[spline$y > spline$y[1]]
       if(length(deriv1.growth$y) < 3){
-        warning("gcFitSpline: No significant amount of density values above the start value!")
+        if(control$suppress.messages==F) message("gcFitSpline: No significant amount of density values above the start value!")
 
         gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                             fit.time = spline$x, fit.data = spline$y, parameters = list(A = NA, dY = NA,
@@ -3504,7 +3532,7 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
     else stop("Bad values in gcBootSpline")
   }
   if (length(data) < 6) {
-    warning("gcBootSpline: There is not enough valid data. Must have at least 6 unique values!")
+    if(control$suppress.messages==F) message("gcBootSpline: There is not enough valid data. Must have at least 6 unique values!")
     gcBootSpline <- list(raw.time = time, raw.data = data,
                          gcID = gcID, boot.time = NA, boot.data = NA, boot.gcSpline = NA,
                          lambda = NA, mu = NA, A = NA, integral = NA, bootFlag = FALSE,
@@ -3801,7 +3829,7 @@ growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.
       stop("growth.drFitSpline: Non numeric values encountered. Program terminated")
   }
   if (length(test) < 6) {
-    warning("drFitSpline: There is not enough valid data. Must have at least 6 unique values!")
+    if(control$suppress.messages==F) message("drFitSpline: There is not enough valid data. Must have at least 6 unique values!")
     drFitSpline <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
@@ -3811,7 +3839,7 @@ growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.
     return(drFitSpline)
   }
   if (length(test) < control$dr.have.atleast) {
-    warning("drFitSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
+    if(control$suppress.messages==F) message("drFitSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
     drFitSpline <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
@@ -3979,7 +4007,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
       stop("growth.drFitModel: Non numeric values encountered. Program terminated")
   }
   if (length(test) < 6) {
-    warning("growth.drFitModel: There is not enough valid data. Must have at least 6 unique values!")
+    if(control$suppress.messages==F) message("growth.drFitModel: There is not enough valid data. Must have at least 6 unique values!")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
@@ -3989,7 +4017,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
     return(drFitModel)
   }
   if (length(test) < control$dr.have.atleast) {
-    warning("growth.drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
+    if(control$suppress.messages==F) message("growth.drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
@@ -4103,7 +4131,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
   }
   # Test if there are enough unique x-values (conc) to perform spline fit
   if (length(unique(conc)) < 4){
-    warning("drBootSpline: There are not enough concentration values. Must have at least 4 unique values!")
+    if(control$suppress.messages==F) message("drBootSpline: There are not enough concentration values. Must have at least 4 unique values!")
     drBootSpline <- list(raw.conc = conc, raw.test = test,
                          drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
                          ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE, control = control)
@@ -4119,7 +4147,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
       stop("growth.drFitSpline: Non numeric values encountered. Program terminated")
   }
   if (length(test) < 6) {
-    warning("drBootSpline: There is not enough valid data. Must have at least 6 unique values!")
+    if(control$suppress.messages==F) message("drBootSpline: There is not enough valid data. Must have at least 6 unique values!")
     drBootSpline <- list(raw.conc = conc, raw.test = test,
                          drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
                          ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE, control = control)
@@ -4127,7 +4155,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     return(drBootSpline)
   }
   if (length(test) < control$dr.have.atleast) {
-    warning("drBootSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
+    if(control$suppress.messages==F) message("drBootSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
     drBootSpline <- list(raw.conc = conc, raw.test = test,
                          drID = drID, boot.conc = NA, boot.test = NA, boot.drSpline = NA,
                          ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE, control = control)
@@ -4617,7 +4645,7 @@ table_group_growth_linear <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_linear_group <- data.frame("Sample|Conc." = labels,
-                                   "\u00b5<sub>max</sub>" = paste0(mu.mean,
+                                   "\u03bc<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4645,7 +4673,7 @@ table_group_growth_linear <- function(gcTable)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                           "", lambda.sd[x])))),
-                                   "\u0394Y" = paste0(dY.mean,
+                                   "\u2206Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4663,7 +4691,7 @@ table_group_growth_linear <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "t<sub>start</sub><br>(\u00b5<sub>max</sub>)" = paste0(tmu.start.mean,
+                                   "t<sub>start</sub><br>(\u03bc<sub>max</sub>)" = paste0(tmu.start.mean,
                                                                                      unlist(lapply(1:length(tmu.start.mean), function (x)
                                                                                        ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
@@ -4673,7 +4701,7 @@ table_group_growth_linear <- function(gcTable)
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
                                                                                               "", tmu.start.sd[x])))),
 
-                                   "t<sub>end</sub><br>(\u00b5<sub>max</sub>)" = paste0(tmu.end.mean,
+                                   "t<sub>end</sub><br>(\u03bc<sub>max</sub>)" = paste0(tmu.end.mean,
                                                                                    unlist(lapply(1:length(tmu.end.mean), function (x)
                                                                                      ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                                               tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
@@ -4734,7 +4762,7 @@ table_group_growth_spline <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_spline_group <- data.frame("Sample|Conc." = labels,
-                                   "\u00b5<sub>max</sub>" = paste0(mu.mean,
+                                   "\u03bc<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4770,7 +4798,7 @@ table_group_growth_spline <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\u0394Y" = paste0(dY.mean,
+                                   "\u2206Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4837,7 +4865,7 @@ table_group_growth_model <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_model_group <- data.frame("Sample|Conc." = labels,
-                                   "\u00b5<sub>max</sub>" = paste0(mu.mean,
+                                   "\u03bc<sub>max</sub>" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4873,7 +4901,7 @@ table_group_growth_model <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\u0394Y" = paste0(dY.mean,
+                                   "\u2206Y" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",

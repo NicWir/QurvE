@@ -5936,7 +5936,7 @@ server <- function(input, output, session){
                         try(
                           results$growth <-
                             suppressWarnings(
-                              growth.workflow(grodata = grodata,
+                              QurvE::growth.workflow(grodata = grodata,
                                               ec50 = input$perform_ec50_growth,
                                               fit.opt = fit.opt,
                                               t0 = t0,

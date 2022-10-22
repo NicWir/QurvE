@@ -393,7 +393,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
                                 fl_data
                               }, spar = control$smooth.fl, cv = NA, keep.data = FALSE))
   if (!exists("spline") || is.null(spline)) {
-    warning("flFitSpline: Spline could not be fitted to data!")
+    if(control$suppress.messages==F) message("flFitSpline: Spline could not be fitted to data!")
     flFitSpline <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
                         raw.x = get(ifelse(x_type == "density", "density", "time")), raw.fl = fl_data,
                         fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
@@ -642,7 +642,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   }
 
   if (length(fl_data) < 6) {
-    warning("flBootSpline: There is not enough valid data. Must have at least 6 unique values!")
+    if(control$suppress.messages==F) message("flBootSpline: There is not enough valid data. Must have at least 6 unique values!")
     flBootSpline <- list(raw.x = get(ifelse(x_type == "density", "density", "time")), raw.fl = fl_data,
                          ID = ID, boot.x = NA, boot.fl = NA, boot.flSpline = NA,
                          lambda = NA, max_slope = NA, A = NA, integral = NA, bootFlag = FALSE,
@@ -844,7 +844,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
   # /// check fitting options
   if (!all(control$fit.opt %in% c("s", "l"))){
     options(warn=1)
-    warning("fit.opt must contain 's', and/or 'l'. Changed to c('s', 'l') (both fit methods)!")
+    if(control$suppress.messages==F) message("fit.opt must contain 's', and/or 'l'. Changed to c('s', 'l') (both fit methods)!")
     fit.opt=c('s', 'l')
     options(warn=0)
   }
@@ -2359,6 +2359,13 @@ fl.workflow <- function(grodata = NULL,
                         export.fig = FALSE,
                         ...)
 {
+  if(ec50 == TRUE){
+    dr.parameter.fit.method <- gsub(".+\\.", "", dr.parameter)
+    if((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
+       (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("l")))
+    )
+      message("The chosen 'dr.parameter' is not compatible with the selected fitting options ('fit.opt'). Dose-response analysis will not be performed.")
+  }
   if(exists("lin.h") && !is.null(lin.h) && (is.na(lin.h) || lin.h == "")) lin.h <- NULL
 
   # Define objects based on additional function calls
@@ -2457,7 +2464,11 @@ fl.workflow <- function(grodata = NULL,
   # }
 
   # /// Estimate EC50 values
-  if (ec50 == TRUE) {
+  if (ec50 == TRUE &&
+      !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
+        (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("l")))
+      )
+  ) {
     if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
       if ((control$suppress.messages==FALSE)){
         cat("\n\n")
@@ -2554,7 +2565,11 @@ fl.workflow <- function(grodata = NULL,
     #   }
     # }
 
-    if (ec50 == TRUE) {
+    if (ec50 == TRUE &&
+        !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
+          (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("l")))
+        )
+    ) {
       if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
         if(!is.null(EC50.table1) && length(EC50.table1) > 1) {
           res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
@@ -2875,7 +2890,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
       stop("fl.drFitModel: Non numeric values encountered. Program terminated")
   }
   if (length(test) < 4) {
-    warning("drFitModel: There is not enough valid data. Must have at least 4 unique values!")
+    if(control$suppress.messages==F) message("drFitModel: There is not enough valid data. Must have at least 4 unique values!")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
@@ -2885,7 +2900,7 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
     return(drFitModel)
   }
   if (length(test) < control$dr.have.atleast) {
-    warning("drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See fl.control().")
+    if(control$suppress.messages==F) message("drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See fl.control().")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
                         parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,

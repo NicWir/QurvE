@@ -28,7 +28,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-
 colorize <- function(x, color) {
     if (knitr::is_latex_output()) {
         sprintf("\\textcolor{%s}{%s}", color, x)
@@ -37,7 +36,6 @@ colorize <- function(x, color) {
                 x)
     } else x
 }
-
 colorize_code <- function(x, color) {
     if (knitr::is_latex_output()) {
         sprintf("\\textcolor{%s}{`%s`}", color, x)
@@ -46,6 +44,7 @@ colorize_code <- function(x, color) {
                 x)
     } else x
 }
+library(QurvE)
 ```
 
 <strong>Please note:</strong> This vignette will be updated from time to time when new features are implemented. Please find the most recent version at the [QurvE GitHub repository](https://github.com/NicWir/QurvE).
@@ -129,6 +128,8 @@ Three methods are available to characterize growth curves:
 
 `QurvE` accepts files with the formats *.xls*, *.xlsx*, *.csv*, *.tsv*, and *.txt* (tab separated). The data in the files should be structured as shown in Figure \@ref(fig:data-layout). Alternatively, data parsers are available that allow direct import of raw data from different culture instruments. For a list of currently supported devices, please run `?parse_data`.
 
+*Please note: I recommend always converting .xls or .xlsx files to an alternate format first to speed up the parsing process. Reading Excel files may require orders of magnitude longer processing time.*
+
 ## Custom format
 
 To ensure compatibility with any type of measurement and data type (e.g., optical density, cell count, measured dimensions), `QurvE` uses a custom data layout. Here the first column contains *time values* and **'Time'** in the top cell, cells #2 and #3 are ignored. The remaining columns contain *measurement values* and the following sample identifiers in the top three rows:
@@ -139,14 +140,14 @@ To ensure compatibility with any type of measurement and data type (e.g., optica
 
 Several experiments (e.g., runs on different plate readers) can be combined into a single file and analyzed simultaneously. Therefore, different experiments are marked by the presence of separate time columns. Different lengths and values in these time columns are permitted.
 
-```{r data-layout, echo = FALSE, fig.cap = "\\label{fig:data-layout} Custom QurvE data layout", fig.align='center'}
-knitr::include_graphics("../man/figures/Data_layout.png", dpi = 300, error = F)
+```{r data-layout, echo = FALSE, fig.width = 10, out.width = "100%", fig.cap = "\\label{fig:data-layout} Custom QurvE data layout", fig.align='center'}
+knitr::include_graphics("../man/figures/Data_layout2.png", dpi = 600, error = F)
 ```
 
 `r cat("")`\
 To read data in custom format, run:
 
-```{r read-custom, echo = TRUE, eval = FALSE}
+```{r read-custom, echo = TRUE, eval = F}
 input <- read_data(data.density = 'path_to_data_file',
                    csvsep = ';', # or ','
                    dec = '.', # or ','
@@ -200,16 +201,16 @@ library(ggplot2) ### REMOVE AFTER QurvE UPDATE!!!
 
 we load experimental data from the publication @wirth2021 in which *Pseudomonas putida* KT2440 and an engineered strain were tested for their sensitivity towards the product 2-fluoromuconic acid:
 
-### Load data
+## Load data
 
 ```{r load-data, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
 input <- read_data(data.density = system.file('2-FMA_toxicity.xlsx', package = 'QurvE')
           )
 ```
 
-The created object `input` is a list of class `grodata` containing:
+The created object `input` can be inspected with `View(input)`. It is a list of class `grodata` containing:
 
--   a `time` matrix with time with 66 rows, each corresponding to one sample in the dataset, and 161 columns, i.e., time values for each sample.
+-   a `time` matrix with 66 rows, each corresponding to one sample in the dataset, and 161 columns, i.e., time values for each sample.
 
 -   a `density` data frame with 66 rows and 161+3 columns. The three additional columns contain the sample identifiers `condition`, `replicate`, and `concentration`.
 
@@ -228,7 +229,15 @@ head(input$expdesign)
 ```
 
 We can plot the raw data:
-```{r raw-plot, fig.width=9, fig.height=9, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
-plot.grofit(input, data.type = "raw", log.y = FALSE, x.lim = c(NA, 32))
 
+```{r raw-plot, fig.width=9, fig.height=9, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
+plot.grofit(input, data.type = "raw", log.y = FALSE, x.lim = c(NA, 32), names = "KT2440")
+```
+
+## Run Workflow
+
+To perform a complete growth profiling of all samples in the input dataset, we call the `growth.workflow()` function on our `input` object:
+
+```{r run-default-workflow}
+growth.workflow(grodata = input)
 ```
