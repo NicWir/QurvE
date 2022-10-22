@@ -4035,7 +4035,8 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
       invisible(
         drc::drm(
           test~as.numeric(as.character(conc)),
-          fct = get(models[i])()
+          fct = get(models[i])(),
+          control = drc::drmc(errorm = FALSE, noMessage = TRUE)
         )
       ), silent = T
     )
@@ -4054,11 +4055,11 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
 
   # get EC50 value
   if(any(grep("BC", best.model.nm)) ){
-    ec50 <- drc::ED(best.model, 50, lower = 0.1, upper = 1000, interval = "fls" )
+    ec50 <- drc::ED(best.model, 50, lower = 0.1, upper = 1000, interval = "fls", display = FALSE )
   } else if(any(grep("NEC", best.model.nm))){
     ec50 <- best.model$coefficients[4]
   } else {
-    ec50 <- drc::ED(best.model, 50, interval = "delta")
+    ec50 <- drc::ED(best.model, 50, interval = "delta", display = FALSE)
   }
   # get response at ec50
   dataList <- best.model[["dataList"]]
