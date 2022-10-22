@@ -2522,8 +2522,8 @@ fl.workflow <- function(grodata = NULL,
       flTable <- data.frame(apply(flFitRes[["flFit"]][["flTable"]],2,as.character))
       res.table.fl <- cbind(flTable[,1:3], Filter(function(x) !all(is.na(x)),flTable[,-(1:3)]))
       export_Table(table = res.table.fl, out.dir = wd, out.nm = "results.fl1")
-      cat(paste0("\nResults of fluorescence analysis saved as tab-delimited text file in:\n",
-                 wd, "/results.fl1.txt\n"))
+      message(paste0("\nResults of fluorescence analysis saved as tab-delimited text file in:\n",
+                 "...", gsub(".+/", "", wd), "/results.fl1.txt\n"))
       # Export grouped results table
       if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
         table_linear_group <- table_group_fluorescence_linear(res.table.fl)
@@ -2574,8 +2574,8 @@ fl.workflow <- function(grodata = NULL,
         if(!is.null(EC50.table1) && length(EC50.table1) > 1) {
           res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
           export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
-          cat(paste0("\nResults of EC50 analysis for fluorescence saved as tab-delimited in:\n",
-                     wd, "/results.fl_dr1.txt\n"))
+          message(paste0("\nResults of EC50 analysis for fluorescence saved as tab-delimited in:\n",
+                         "...", gsub(".+/", "", wd), "/results.fl_dr1.txt\n"))
         }
       }
       # if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){

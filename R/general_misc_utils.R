@@ -852,7 +852,7 @@ export_RData <- function(object, out.dir = getwd(), out.nm = class(object))
   # if(is(grofit) != "grofit" || is(grofit) != "flFitRes") stop("grofit needs to be an object created with growth.workflow() or fl.workflow().")
   dir.create(out.dir, showWarnings = F)
   out.nm <- gsub("\\.RData$", "", out.nm)
-  message(paste0("Save RData object to: '", gsub(getwd(), "", out.dir), "/", out.nm, ".RData'"))
+  message(paste0("Save RData object to: \n'", "...", gsub(getwd(), "", out.dir), "/", out.nm, ".RData'"))
   save(object, file = paste(out.dir, paste0(out.nm, ".RData"), sep = "/"))
 }
 

@@ -1124,8 +1124,8 @@ growth.workflow <- function (grodata = NULL,
     res.table.gc <- cbind(gcTable[,1:3], Filter(function(x) !all(is.na(x)),gcTable[,-(1:3)]))
     export_Table(table = res.table.gc, out.dir = wd, out.nm = "results.gc")
     # res.table.gc[, c(8:14, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
-    message(paste0("\n\nResults of growth fit analysis saved as tab-delimited text file in: '",
-                   wd, "/results.gc.txt'"))
+    message(paste0("\n\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
+                   "...", gsub(".+/", "", wd), "/results.gc.txt'"))
 
     # Export grouped results table
     if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
@@ -1166,8 +1166,8 @@ growth.workflow <- function (grodata = NULL,
     ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
-      cat(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
-                 wd, "/results.dr.txt'\n"))
+      message(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
+                     "...", gsub(".+/", "", wd), "/results.dr.txt'\n"))
     } else {
       res.table.dr <- NULL
     }
@@ -4418,8 +4418,9 @@ huang <- function (time, A, mu, lambda, addpar)
     stop("Need numeric vector for: lambda")
   if (is.numeric(A) == FALSE)
     stop("Need numeric vector for: A")
-
-  y <- y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu*(time+0.25*log((1+exp(-4*(time-lambda)))/(1+exp(4*lambda))))) )
+  suppressWarnings(
+    y <- y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu*(time+0.25*log((1+exp(-4*(time-lambda)))/(1+exp(4*lambda))))) )
+  )
   huang <- y
 }
 
@@ -4437,8 +4438,12 @@ huang <- function (time, A, mu, lambda, addpar)
      stop("Need numeric vector for: lambda")
    if (is.numeric(A) == FALSE)
      stop("Need numeric vector for: A")
-   B <- time + 1/mu * log(exp(-mu * time) + exp(-mu * lambda) - exp(-mu * (time + lambda)))
-   y <- y0 + mu * B - log(1 + (exp(mu * B) - 1)/exp(A - y0))
+   suppressWarnings(
+     B <- time + 1/mu * log(exp(-mu * time) + exp(-mu * lambda) - exp(-mu * (time + lambda)))
+   )
+   suppressWarnings(
+     y <- y0 + mu * B - log(1 + (exp(mu * B) - 1)/exp(A - y0))
+   )
    baranyi <- y
  }
 
