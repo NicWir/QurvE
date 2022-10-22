@@ -878,6 +878,8 @@ growth.control <- function (neg.nan.act = FALSE,
   if ((is.numeric(t0) == FALSE) | (length(t0) != 1) | (t0 < 0))
     stop("value of t0 must be numeric (>=0) and of one element")
 
+  dr.method <- match.arg(dr.method)
+
   dr.parameters.opt <- c('TestId', 'AddId', 'concentration', 'reliability_tag', 'used.model', 'log.x',
                       'log.y', 'nboot.gc', 'mu.linfit', 'lambda.linfit', 'stdmu.linfit', 'dY.linfit',
                       'A.linfit', 'tmu.start.linfit', 'tmu.end.linfit', 'r2mu.linfit',
@@ -1011,7 +1013,7 @@ growth.workflow <- function (grodata = NULL,
                                           'LL2.5', 'AR.2', 'AR.3'),
                              growth.thresh = 1.5,
                              dr.have.atleast = 6,
-                             dr.parameter = 34,
+                             dr.parameter = "mu.linfit",
                              smooth.dr = 0.1,
                              log.x.dr = FALSE,
                              log.y.dr = FALSE,
