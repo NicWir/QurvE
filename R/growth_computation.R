@@ -4032,17 +4032,19 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   model.fits <- list()
   for(i in 1:length(models)){
     model.fits[[i]] <- try(
-      invisible(
-        drc::drm(
-          test~as.numeric(as.character(conc)),
-          fct = get(models[i])(),
-          control = drc::drmc(errorm = FALSE, noMessage = TRUE)
+      suppressWarnings(
+        invisible(
+          drc::drm(
+            test~as.numeric(as.character(conc)),
+            fct = get(models[i])(),
+            control = drc::drmc(errorm = FALSE, noMessage = TRUE, otrace = TRUE)
+          )
         )
       ), silent = T
     )
   }
-  models <- models[unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) != "try-error"]
-  model.fits <- model.fits[unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) != "try-error"]
+  models <- models[!unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) %in% c("try-error","list")]
+  model.fits <- model.fits[!unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) %in% c("try-error","list")]
   names(model.fits) <- models
 
   # select best fitting model
