@@ -1072,7 +1072,7 @@ growth.workflow <- function (grodata = NULL,
     expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
   }
   if(ec50 == TRUE){
-    if(unique(expdesign$concentration) < 4)
+    if(length(unique(expdesign$concentration)) < 4)
       message("No or not enough unique concentration information provided. Dose-Response analysis will be omitted.")
   }
   control <- growth.control(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
@@ -1160,7 +1160,7 @@ growth.workflow <- function (grodata = NULL,
           (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
           (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
         ) &&
-        (unique(expdesign$concentration) >= 4)
+        (length(unique(expdesign$concentration)) >= 4)
     ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
