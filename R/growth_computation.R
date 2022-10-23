@@ -2098,6 +2098,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
     fitFlag      <- FALSE
     b.tangent <- NA
   }
+  dY <- ifelse(is.null(best), NA, max(fitted.values(best))-min(fitted.values(best)))
 
   gcFitModel <-
     list(
@@ -2119,7 +2120,7 @@ grofit.param <- function(time, data, gcID = "undefined", control)
         } else {
           Abest
         },
-        dY = ifelse(is.null(best), NA, max(fitted.values(best))-min(fitted.values(best))),
+        dY = dY,
         dY.orig = if(control$log.y.model == TRUE){
           data[1] * exp(dY)
         } else {
