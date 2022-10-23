@@ -73,6 +73,7 @@ summary.gcFitModel <- function(object, ...)
     # object of class gcFitModel
 
     contents.fitted.param     = c("mu.model", "tD.model", "lambda.model", "A.model", "dY.model",
+                                  "A.orig.model", "dY.orig.model",
                                   "integral.model",
                                   "parameter_nu.model",
                                   "parameter_alpha.model",
@@ -89,14 +90,14 @@ summary.gcFitModel <- function(object, ...)
 
     if ((is.na(object$fitFlag)==TRUE)|(object$fitFlag==FALSE)){
       if(is.na(object$parameters$mu[1])){
-        table <- c(rep(NA,13), "FALSE",  rep(NA,12))
+        table <- c(rep(NA,15), "FALSE",  rep(NA,12))
       } else {
-        table <- c(0, rep(NA,12), as.character(object$fitFlag),  rep(NA,12))
+        table <- c(0, rep(NA,14), as.character(object$fitFlag),  rep(NA,12))
       }
     }
     else{
-      table <- c(object$parameters$mu[1], object$parameters$tD[1], object$parameters$lambda[1],  object$parameters$A[1],
-                 object$parameters$dY[1],
+      table <- c(object$parameters$mu[1], object$parameters$tD[1], object$parameters$lambda[1],  object$parameters$A[1], object$parameters$dY[1],
+                 object$parameters$A.orig[1], object$parameters$dY.orig[1],
                  object$parameters$integral,
                  ifelse(!is.null(object$parameters$fitpar$nu[1]),object$parameters$fitpar$nu[1], NA),
                  ifelse(!is.null(object$parameters$fitpar$alpha[1]), object$parameters$fitpar$alpha[1], NA),

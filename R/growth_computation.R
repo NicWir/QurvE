@@ -775,7 +775,7 @@ parse_data <-
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
 #' @param dr.model (Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
-#' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
+#' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, \code{"dY.spline"}, \code{"mu.model"}, and \code{"A.model"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See \code{\link{smooth.spline}} for further details. Default: \code{NULL}.
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
@@ -815,14 +815,17 @@ growth.control <- function (neg.nan.act = FALSE,
                                          'W1.3', 'W1.4', 'W2.2', 'W2.3', 'W2.4', 'LL.3u',
                                          'LL2.2', 'LL2.3', 'LL2.3u', 'LL2.4',
                                          'LL2.5', 'AR.2', 'AR.3'),
-                            dr.have.atleast = 6, # Minimum number of different values for the response parameter one shoud have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: 6.
-                            dr.parameter = "mu.linfit", # parameter used for creating dose response curve. # 34 is µ determined with spline fit
+                            dr.have.atleast = 6,
+                            dr.parameter = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit",
+                                             "mu.spline", "lambda.spline", "dY.spline", "A.spline",
+                                             "mu.model", "lambda.model", "dY.orig.model", "A.orig.model"),
                             smooth.dr = NULL,
                             log.x.dr = FALSE,
                             log.y.dr = FALSE,
                             nboot.dr = 0,
                             growth.thresh = 1.5)
 {
+  dr.parameter <- match.arg(dr.parameter)
   if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
   if(nboot.gc == "" || is.null(nboot.gc)) nboot.gc <- 0
   if ((is.character(fit.opt) == FALSE) | !any(fit.opt %in% c("l", "s", "m", "a")))
@@ -950,7 +953,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param dr.model (Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
-#' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.
+#' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, \code{"dY.spline"}, \code{"mu.model"}, and \code{"A.model"}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
@@ -1013,7 +1016,9 @@ growth.workflow <- function (grodata = NULL,
                                           'LL2.5', 'AR.2', 'AR.3'),
                              growth.thresh = 1.5,
                              dr.have.atleast = 6,
-                             dr.parameter = "mu.linfit",
+                             dr.parameter = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit",
+                                              "mu.spline", "lambda.spline", "dY.spline", "A.spline",
+                                              "mu.model", "lambda.model", "dY.orig.model", "A.orig.model"),
                              smooth.dr = 0.1,
                              log.x.dr = FALSE,
                              log.y.dr = FALSE,
@@ -1025,6 +1030,7 @@ growth.workflow <- function (grodata = NULL,
                              ...
 )
 {
+  dr.parameter <- match.arg(dr.parameter)
   if(ec50 == TRUE){
     dr.parameter.fit.method <- gsub(".+\\.", "", dr.parameter)
     if((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
@@ -2108,7 +2114,17 @@ grofit.param <- function(time, data, gcID = "undefined", control)
           },
       parameters = list(
         A = Abest,
+        A.orig = if(control$log.y.model == TRUE){
+          data[1] * exp(Abest)
+        } else {
+          Abest
+        },
         dY = ifelse(is.null(best), NA, max(fitted.values(best))-min(fitted.values(best))),
+        dY.orig = if(control$log.y.model == TRUE){
+          data[1] * exp(dY)
+        } else {
+          dY
+        },
         mu = mubest,
         tD = log(2)/as.numeric(mubest),
         lambda = lambdabest,

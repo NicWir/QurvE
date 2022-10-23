@@ -31,7 +31,9 @@ growth.control(
     "W1.4", "W2.2", "W2.3", "W2.4", "LL.3u", "LL2.2", "LL2.3", "LL2.3u", "LL2.4",
     "LL2.5", "AR.2", "AR.3"),
   dr.have.atleast = 6,
-  dr.parameter = "mu.linfit",
+  dr.parameter = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit", "mu.spline",
+    "lambda.spline", "dY.spline", "A.spline", "mu.model", "lambda.model",
+    "dY.orig.model", "A.orig.model"),
   smooth.dr = NULL,
   log.x.dr = FALSE,
   log.y.dr = FALSE,
@@ -88,7 +90,7 @@ growth.control(
 
 \item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
-\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, and \code{"dY.spline"}.}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, \code{"dY.spline"}, \code{"mu.model"}, and \code{"A.model"}.}
 
 \item{smooth.dr}{(Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See \code{\link{smooth.spline}} for further details. Default: \code{NULL}.}
 
