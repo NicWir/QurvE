@@ -2116,13 +2116,13 @@ grofit.param <- function(time, data, gcID = "undefined", control)
       parameters = list(
         A = Abest,
         A.orig = if(control$log.y.model == TRUE){
-          data[1] * exp(Abest)
+          data.in[1] * exp(Abest)
         } else {
           Abest
         },
         dY = dY,
         dY.orig = if(control$log.y.model == TRUE){
-          data[1] * exp(dY)
+          data.in[1] * exp(dY)
         } else {
           dY
         },
