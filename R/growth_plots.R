@@ -38,7 +38,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
     switch(which,
            fit = {
 
-             par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(3.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
@@ -46,7 +46,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              title(xlab = "Time", line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
 
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
-             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
@@ -106,7 +106,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              abline(h=0, col="grey")
              title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
              title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
              axis(2, las=1)
              ## normal q-q-plot
              stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
@@ -114,7 +114,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
              title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
              title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(1, mgp=c(3,0.3+0.3*cex.axis,0))
              axis(2, las=1)
            },
            fit_diagnostics = {
@@ -129,7 +129,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              title(xlab = "Time", line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
 
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
-             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
@@ -189,7 +189,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              abline(h=0, col="grey")
              title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
              title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
              axis(2, las=1)
              ## normal q-q-plot
              stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
@@ -197,7 +197,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
              title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
              title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,1+0.5*cex.axis,0))
+             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
              axis(2, las=1)
            }
     )
