@@ -3121,7 +3121,7 @@ plot.grodata <- plot.grofit
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab geom_hline geom_col
 plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
-                                             'mu.model', 'lambda.model', 'A.model', "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
+                                             'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                                              'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                              'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                              'max_slope.linfit', 'max_slope.spline'),
