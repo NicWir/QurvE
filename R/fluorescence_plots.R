@@ -270,7 +270,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
-#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{axisTicks()}. Thus, the final number of breaks can deviate from the user input.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -440,9 +440,9 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(limits = y.lim, breaks = base_breaks(n = n.ybreaks), trans = 'log')
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(breaks = base_breaks(n = n.ybreaks), trans = 'log')
         }
       } else {
         if(!is.null(y.lim)){
@@ -1126,7 +1126,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
 #' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
 #' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
-#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{axisTicks()}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
 #' @param basesize (Numeric) Base font size.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
@@ -1479,9 +1479,9 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
-        p <- p + scale_y_log10(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
       } else {
-        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(breaks = base_breaks(n = n.ybreaks))
       }
     } else {
       if(!is.null(y.lim)){
@@ -1665,9 +1665,9 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
-        p <- p + scale_y_log10(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
       } else {
-        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(breaks = base_breaks(n = n.ybreaks))
       }
     } else {
       if(!is.null(y.lim)){

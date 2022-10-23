@@ -771,7 +771,7 @@ parse_data <-
 #' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
-#' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
+#' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi")}.
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
 #' @param dr.model (Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
@@ -945,7 +945,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
-#' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.
+#' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi")}.
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).
 #' @param dr.model (Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
 #' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
@@ -1124,7 +1124,7 @@ growth.workflow <- function (grodata = NULL,
     res.table.gc <- cbind(gcTable[,1:3], Filter(function(x) !all(is.na(x)),gcTable[,-(1:3)]))
     export_Table(table = res.table.gc, out.dir = wd, out.nm = "results.gc")
     # res.table.gc[, c(8:14, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
-    message(paste0("\n\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
+    message(paste0("\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
                    "...", gsub(".+/", "", wd), "/results.gc.txt'"))
 
     # Export grouped results table
@@ -1167,7 +1167,7 @@ growth.workflow <- function (grodata = NULL,
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
       message(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
-                     "...", gsub(".+/", "", wd), "/results.dr.txt'\n"))
+                     "...", gsub(".+/", "", wd), "/results.dr.txt'"))
     } else {
       res.table.dr <- NULL
     }

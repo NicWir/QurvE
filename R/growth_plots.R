@@ -956,14 +956,14 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
         geom_errorbar(aes(ymin = .data$CI.L, ymax = .data$CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
         geom_line(data = spline.df, aes(.data$x, .data$y, colour = .data$Condition), size = lwd) +
         theme_classic(base_size = basesize) +
-        theme(legend.position="bottom") +
+        theme(legend.position=legend.position) +
         ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(), trans = "log10")
+          p <- p + scale_y_continuous(limits = y.lim, base_breaks(n = 5), trans = "log10")
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = "log10")
+          p <- p + scale_y_continuous(breaks = base_breaks(n = 5), trans = "log10")
         }
       } else {
         if(!is.null(y.lim)){
@@ -993,9 +993,9 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
 
         if(log.y == TRUE){
           if(!is.null(y.lim)){
-            p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = scales::pretty_breaks(), trans = "log10")
+            p <- p + scale_y_continuous(limits = y.lim, expand = ggplot2::expansion(mult = c(0, 0.05)),breaks = base_breaks(n = 5), trans = "log10")
           } else {
-            p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = scales::pretty_breaks(), trans = "log10")
+            p <- p + scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.05)), breaks = base_breaks(n = 5), trans = "log10")
           }
         } else {
           if(!is.null(y.lim)){
@@ -1996,9 +1996,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(limits = y.lim, breaks = base_breaks(n = n.ybreaks), trans = 'log')
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(breaks = base_breaks(n = n.ybreaks), trans = 'log')
         }
       } else {
         if(!is.null(y.lim)){
@@ -2411,9 +2411,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(limits = y.lim, breaks = base_breaks(n = n.ybreaks), trans = 'log')
         } else {
-          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(breaks = base_breaks(n = n.ybreaks), trans = 'log')
         }
       } else {
         if(!is.null(y.lim)){
@@ -2474,6 +2474,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 #' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
 #' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
 #' @param lwd (Numeric) Line width of the individual plots.
+#' @param legend.position (Character) Position of the legend. One of "bottom", "top", "left", "right".
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -2509,6 +2510,7 @@ plot.grofit <- function(x, ...,
                         y.lim.deriv = NULL,
                         y.title.deriv = NULL,
                         lwd = 1.1,
+                        legend.position = "bottom",
                         plot = TRUE,
                         export = FALSE,
                         height = NULL,
@@ -2530,12 +2532,15 @@ plot.grofit <- function(x, ...,
   if(all(is.na(y.lim))) y.lim <- NULL
   suppressWarnings(assign("y.lim.deriv" ,as.numeric(y.lim.deriv)))
   if(all(is.na(y.lim.deriv))) y.lim.deriv <- NULL
+  # Change data.type for 'grodata' object
+  if(is(x) %in% "grodata")
+    data.type <- "raw"
 
   call <- match.call()
   # remove all function arguments from call to leave only multiple grofit objects
   call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <-
     call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
-    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- NULL
+    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- call$legend.position <- NULL
 
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
@@ -2772,7 +2777,7 @@ plot.grofit <- function(x, ...,
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
-      theme(legend.position="bottom",
+      theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
@@ -2781,9 +2786,9 @@ plot.grofit <- function(x, ...,
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
-        p <- p + scale_y_log10(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
       } else {
-        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(breaks = base_breaks(n = n.ybreaks))
       }
     } else {
       if(!is.null(y.lim)){
@@ -2842,7 +2847,7 @@ plot.grofit <- function(x, ...,
         geom_ribbon(aes(ymin=.data$lower,ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
-        theme(legend.position="bottom",
+        theme(legend.position=legend.position,
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
@@ -2854,9 +2859,9 @@ plot.grofit <- function(x, ...,
 
 
       if(!is.null(y.lim.deriv)){
-        p.deriv <- p.deriv + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p.deriv <- p.deriv + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 6, bounds = FALSE))
       } else {
-        p.deriv <- p.deriv + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p.deriv <- p.deriv + scale_y_continuous(breaks = scales::pretty_breaks(n = 6, bounds = FALSE))
       }
 
       if(!is.null(x.lim)){
@@ -2901,7 +2906,7 @@ plot.grofit <- function(x, ...,
           scale_color_manual(name = "Condition",
                              values = colors)
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p, position = "right"))
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p, position = "right"))
     }
   } # if(mean == TRUE)
   else {
@@ -2923,7 +2928,7 @@ plot.grofit <- function(x, ...,
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
-      theme(legend.position="bottom",
+      theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
@@ -2932,9 +2937,9 @@ plot.grofit <- function(x, ...,
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
-        p <- p + scale_y_log10(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
       } else {
-        p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+        p <- p + scale_y_log10(breaks = base_breaks(n = n.ybreaks))
       }
     } else {
       if(!is.null(y.lim)){
@@ -2986,7 +2991,7 @@ plot.grofit <- function(x, ...,
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
-        theme(legend.position="bottom",
+        theme(legend.position=legend.position,
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
@@ -3033,7 +3038,7 @@ plot.grofit <- function(x, ...,
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
     } # if(deriv)
 
   }
@@ -3075,6 +3080,11 @@ base_breaks <- function(n = 10){
   }
 }
 
+#' @rdname plot.grofit
+#' @export plot.grodata
+#' @export
+plot.grodata <- plot.grofit
+
 #' Compare growth parameters between samples or conditions
 #'
 #' \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95% confidence interval (only shown for > 2 replicates).
@@ -3090,11 +3100,12 @@ base_breaks <- function(n = 10){
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
 #' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
-#' @param basesize (Numeric) Base font size.
-#' @param label.size (Numeric) Font size for sample labels below x-axis.
 #' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
 #' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
+#' @param basesize (Numeric) Base font size.
+#' @param label.size (Numeric) Font size for sample labels below x-axis.
 #' @param shape.size (Numeric) The size of the symbols indicating replicate values. Default: 2.5
+#' @param legend.position (Character) Position of the legend. One of "bottom", "top", "left", "right".
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -3117,13 +3128,14 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                            IDs = NULL,
                            names = NULL,
                            conc = NULL,
-                           basesize = 12,
-                           label.size = NULL,
-                           reference.nm = NULL,
-                           reference.conc = NULL,
                            exclude.nm = NULL,
                            exclude.conc = NULL,
+                           reference.nm = NULL,
+                           reference.conc = NULL,
+                           basesize = 12,
+                           label.size = NULL,
                            shape.size = 2.5,
+                           legend.position = "bottom",
                            plot = T,
                            export = F,
                            height = 7,

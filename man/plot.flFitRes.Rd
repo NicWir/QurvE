@@ -70,15 +70,16 @@
 
 \method{plot}{grodata}(
   x,
-  data.type = c("spline", "raw", "norm.fl"),
+  ...,
+  data.type = c("spline", "raw"),
   IDs = NULL,
   names = NULL,
   conc = NULL,
-  mean = TRUE,
   exclude.nm = NULL,
   exclude.conc = NULL,
-  log.y = F,
-  deriv = F,
+  mean = TRUE,
+  log.y = T,
+  deriv = T,
   n.ybreaks = 6,
   colors = NULL,
   basesize = 20,
@@ -89,14 +90,14 @@
   y.lim.deriv = NULL,
   y.title.deriv = NULL,
   lwd = 1.1,
+  legend.position = "bottom",
   plot = TRUE,
   export = FALSE,
   height = NULL,
   width = NULL,
   out.dir = NULL,
   out.nm = NULL,
-  shiny = FALSE,
-  ...
+  shiny = FALSE
 )
 }
 \arguments{
@@ -120,7 +121,7 @@
 
 \item{deriv}{(Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?}
 
-\item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
+\item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{axisTicks()}. Thus, the final number of breaks can deviate from the user input.}
 
 \item{colors}{(vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
 

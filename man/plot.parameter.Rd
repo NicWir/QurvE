@@ -14,13 +14,14 @@
   IDs = NULL,
   names = NULL,
   conc = NULL,
-  basesize = 12,
-  label.size = NULL,
-  reference.nm = NULL,
-  reference.conc = NULL,
   exclude.nm = NULL,
   exclude.conc = NULL,
+  reference.nm = NULL,
+  reference.conc = NULL,
+  basesize = 12,
+  label.size = NULL,
   shape.size = 2.5,
+  legend.position = "bottom",
   plot = T,
   export = F,
   height = 7,
@@ -45,19 +46,21 @@
 
 \item{conc}{(Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.}
 
-\item{basesize}{(Numeric) Base font size.}
+\item{exclude.nm}{(String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.}
 
-\item{label.size}{(Numeric) Font size for sample labels below x-axis.}
+\item{exclude.conc}{(Numeric or numeric vector) Define concentrations to exclude from the plot.}
 
 \item{reference.nm}{(Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.}
 
 \item{reference.conc}{(Numeric) Concentration of the reference condition, to which parameter values are normalized.}
 
-\item{exclude.nm}{(String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.}
+\item{basesize}{(Numeric) Base font size.}
 
-\item{exclude.conc}{(Numeric or numeric vector) Define concentrations to exclude from the plot.}
+\item{label.size}{(Numeric) Font size for sample labels below x-axis.}
 
 \item{shape.size}{(Numeric) The size of the symbols indicating replicate values. Default: 2.5}
+
+\item{legend.position}{(Character) Position of the legend. One of "bottom", "top", "left", "right".}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

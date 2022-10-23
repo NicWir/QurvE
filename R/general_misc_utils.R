@@ -1141,3 +1141,9 @@ xgx_minor_breaks_log10 <-  function(data_range) {
   minor_breaks <-  minor_breaks[minor_breaks >= 10^r1[1]]
   return(minor_breaks)
 }
+
+base_breaks <- function(n = 10){
+  function(x) {
+    axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
+  }
+}

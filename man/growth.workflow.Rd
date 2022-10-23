@@ -8,7 +8,7 @@ growth.workflow(
   grodata = NULL,
   time = NULL,
   data = NULL,
-  ec50 = FALSE,
+  ec50 = TRUE,
   mean.grp = NA,
   mean.conc = NA,
   neg.nan.act = FALSE,
@@ -38,12 +38,12 @@ growth.workflow(
     "LL2.5", "AR.2", "AR.3"),
   growth.thresh = 1.5,
   dr.have.atleast = 6,
-  dr.parameter = 34,
+  dr.parameter = "mu.linfit",
   smooth.dr = 0.1,
   log.x.dr = FALSE,
   log.y.dr = FALSE,
   nboot.dr = 0,
-  report = c("pdf", "html"),
+  report = NULL,
   out.dir = NULL,
   out.nm = NULL,
   export.fig = FALSE,
@@ -103,7 +103,7 @@ growth.workflow(
 
 \item{smooth.gc}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}}
 
-\item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.}
+\item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi")}.}
 
 \item{dr.method}{(Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).}
 

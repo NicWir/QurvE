@@ -2,6 +2,11 @@
 title: "Quantitiative Growth Curve Evaluation with Package `QurvE`"
 author: "Nicolas T. Wirth"
 date: "`r Sys.Date()`"
+mainfont: Arial
+header-includes:
+  \usepackage{colortbl}
+  \usepackage{xcolor}
+  \arrayrulecolor{white}
 output:
   bookdown::pdf_document2:
     fig_caption: yes
@@ -24,27 +29,47 @@ bibliography: references.bib
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 60), 
+                      collapse = TRUE,
+                      comment = "#>")
+knit_table <- function(df, caption){
+  if (knitr::is_html_output()) {
+    table.formatted <- knitr::kable(df, escape = FALSE, row.names = F, col.names = NULL, format = "html", ) %>% kableExtra::column_spec(column=1, width = "3cm")
+    for(i in 1:nrow(df)){
+      table.formatted <- table.formatted %>% kableExtra::row_spec(i, extra_css = 'vertical-align: top !important; ')
+    }
+    table.formatted
+    
+  } else {
+    for(i in 1:ncol(df)){
+       df[,i] <- gsub("`", "$", arguments[,i])
+     }
+     df %>% knitr::kable("latex", linesep = "\\addlinespace", col.names = NULL, booktabs = TRUE, escape = F) %>% 
+      kableExtra::kable_styling(full_width = F, latex_options = "HOLD_position") %>% kableExtra::column_spec(column=1, width = "3cm") %>% kableExtra::column_spec(column=2, width = "14cm",)
+   }
+}
 colorize <- function(x, color) {
-    if (knitr::is_latex_output()) {
-        sprintf("\\textcolor{%s}{%s}", color, x)
-    } else if (knitr::is_html_output()) {
-        sprintf("<span style='color: %s;'>%s</span>", color,
-                x)
-    } else x
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+            x)
+  } else x
 }
 colorize_code <- function(x, color) {
     if (knitr::is_latex_output()) {
-        sprintf("\\textcolor{%s}{`%s`}", color, x)
+        sprintf("\\texttt{\\textcolor{%s}{%s}}", color, x)
     } else if (knitr::is_html_output()) {
         sprintf("<span style='color: %s;'>`%s`</span>", color,
                 x)
     } else x
 }
 library(QurvE)
+```
+```{=latex}
+\definecolor{codegray}{HTML}{efefef}
+\let\textttOrig\texttt
+\renewcommand{\texttt}[1]{\textttOrig{\colorbox{codegray}{#1}}}
 ```
 
 <strong>Please note:</strong> This vignette will be updated from time to time when new features are implemented. Please find the most recent version at the [QurvE GitHub repository](https://github.com/NicWir/QurvE).
@@ -64,6 +89,8 @@ With consideration for `R` novices, `QurvE` establishes a framework in which a c
 2.  *Run workflow*, including fitting of growth curves, dose-response analysis, and rendering a report that summarizes the results.
 
 All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fits by defining thresholds and quality criteria, allows the direct parsing of data from plate reader result files, and calculates parameters for an additional growth phase (bi-phasic growth).
+
+\pagebreak
 
 # Installation
 
@@ -94,7 +121,7 @@ Three methods are available to characterize growth curves:
 
     iv. Fit a new linear model to the extended data window identified in step iii.
 
-    If `biphasic = TRUE`, the following steps are performed to define a second growth phase:
+    If `biphasic = TRUE` (see section \@ref(run-workflow)), the following steps are performed to define a second growth phase:
 
     i.  Perform a smooth spline fit on the data with a smoothing factor of 0.5.
 
@@ -110,7 +137,7 @@ Three methods are available to characterize growth curves:
 
 3.  Perform a smooth spline fit on (log-transformed) growth data and extract µ~max~ as the maximum value of the first derivative^1^.
 
-    If `biphasic = TRUE`, the following steps are performed to define a second growth phase:
+    If `biphasic = TRUE` (see section \@ref(run-workflow)), the following steps are performed to define a second growth phase:
 
     i.  Determine local minima within the first derivative of the smooth spline fit.
 
@@ -123,6 +150,14 @@ Three methods are available to characterize growth curves:
     v.  Choose the greater of the two independently determined slopes as $\mu_{max}2$.
 
 [^1]: For linear and nonparametric (i.e, smooth spline) fits, the lag time is calculated as the intersect of the tangent at µ~max~ and a horizontal line at the first data point (y~0~). For the analysis of bi-phasic growth curves, the lag time is extracted as the lower of the two obtained $\lambda$ values.
+
+# Dose-response analysis methods
+
+The purpose of a dose-response analysis is to define the *sensitivity* of a given organism to the effects of a compound or the *potency* of a substance, respectively. Such effects can be either beneficial (e.g., a nutrient compound) or detrimental (e.g., an antibiotic). The sensitivity is reflected in the half-maximal effective concentration (*EC~50~*), i.e., the concentration (dose) at which the half-maximal response (e.g., $\mu_{max}$ or $\Delta$Y) is observed. `QurvE` provides two methods to determine the *EC~50~*:
+
+1.  Perform a smooth spline fit on response vs. concentration data and extract the *EC~50~* as the concentration at the midpoint between the largest and smallest response value.
+
+2.  Apply up to 20 (parametric) dose-response models to response vs. concentration data and choose the best model based on the Akaike information criterion (AIC). This is done using the excellent package `drc` [@ritz2016].
 
 # Data formats
 
@@ -139,25 +174,25 @@ To ensure compatibility with any type of measurement and data type (e.g., optica
 3.  (*optional*) Concentration values of an added compound; this information is used to perform a dose-response analysis.
 
 Several experiments (e.g., runs on different plate readers) can be combined into a single file and analyzed simultaneously. Therefore, different experiments are marked by the presence of separate time columns. Different lengths and values in these time columns are permitted.
-
+\
+\
 ```{r data-layout, echo = FALSE, fig.width = 10, out.width = "100%", fig.cap = "\\label{fig:data-layout} Custom QurvE data layout", fig.align='center'}
-knitr::include_graphics("../man/figures/Data_layout2.png", dpi = 600, error = F)
+knitr::include_graphics("../man/figures/Data_layout_large.png", dpi = 600, error = F)
 ```
-
-`r cat("")`\
+\
 To read data in custom format, run:
 
-```{r read-custom, echo = TRUE, eval = F}
+```{r read-custom, echo = TRUE, eval = FALSE}
 input <- read_data(data.density = 'path_to_data_file',
                    csvsep = ';', # or ','
                    dec = '.', # or ','
                    sheet.density = 1, # number (or "name") of the EXCEL file sheet containing data
                    subtract.blank = TRUE,
-                   calibration = NULL
-)
+                   calibration = NULL)
 ```
 
-The `r colorize_code("data.density", "red")` argument takes the path to the file containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.density", "red")` specifies the number or name (in quotes) of the sheet containing the data. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values.
+The `r colorize_code("data.density", "red")` argument takes the path to the file containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.density", "red")` specifies the number or name (in quotes) of the sheet containing the data.\
+If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values.
 
 ## Data parser
 
@@ -169,7 +204,7 @@ knitr::include_graphics("../man/figures/mapping_layout.png", dpi = 300, error = 
 
 To parse data, run:
 
-```{r parse-data, echo = TRUE, eval = FALSE}
+```{r parse-data, echo = TRUE, eval = FALSE, tidy.opts=list(width.cutoff=60)}
 input <- parse_data(data.file = 'path_to_data_file',
                     map.file = 'path_to_mapping_file',
                     software = 'used_software_or_device', 
@@ -182,8 +217,7 @@ input <- parse_data(data.file = 'path_to_data_file',
                                    # mapping information
                     subtract.blank = TRUE,
                     calibration = NULL,
-                    convert.time = NULL
-)
+                    convert.time = NULL)
 ```
 
 The `r colorize_code("data.file", "red")` argument takes the path to the file containing experimental data exported from a culture device, `r colorize_code("map.file", "red")` the path to the file with mapping information. With `r colorize_code("software", "red")`, you can specify the device (or software) that was used to generate the data. `r colorize_code("csvsep.data", "red")` and `r colorize_code("csvsep.map", "red")` specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`). `r colorize_code("dec.data", "red")` and `r colorize_code("dec.map", "red")` are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file, `r colorize_code("sheet.data", "red")` and/or `r colorize_code("sheet.map", "red")` specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. Similarly, `r colorize_code("convert.time", "red")` accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours).
@@ -196,16 +230,14 @@ After loading the package:
 
 ```{r library-QurvE, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
 library(QurvE)
-library(ggplot2) ### REMOVE AFTER QurvE UPDATE!!!
 ```
 
 we load experimental data from the publication @wirth2021 in which *Pseudomonas putida* KT2440 and an engineered strain were tested for their sensitivity towards the product 2-fluoromuconic acid:
 
 ## Load data
 
-```{r load-data, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
-input <- read_data(data.density = system.file('2-FMA_toxicity.xlsx', package = 'QurvE')
-          )
+```{r load-data, echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE}
+input <- read_data(data.density = system.file('2-FMA_toxicity.xlsx', package = 'QurvE') )
 ```
 
 The created object `input` can be inspected with `View(input)`. It is a list of class `grodata` containing:
@@ -224,20 +256,116 @@ The created object `input` can be inspected with `View(input)`. It is a list of 
 
 -   `expdesign`, a data frame containing the `label`, `condition`, `replicate`, and `concentration` for each sample:
 
-```{r head-input, echo = T, eval = TRUE}
+```{r head-input, echo = T, eval = T}
 head(input$expdesign)
 ```
 
-We can plot the raw data:
+We can plot the raw data. Applying the generic `plot()` function to `grodata` objects (here: *input*) calls the function `plot.grodata()`.:
 
-```{r raw-plot, fig.width=9, fig.height=9, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
-plot.grofit(input, data.type = "raw", log.y = FALSE, x.lim = c(NA, 32), names = "KT2440")
+```{r raw-data-plot, fig.width=9, fig.height=9, echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.", fig.subcap = "Conditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = TRUE}
+plot(input, data.type = "raw", log.y = FALSE, x.lim = c(NA, 32), names = "KT2440", legend.position = "right"
+)
 ```
 
 ## Run Workflow
 
-To perform a complete growth profiling of all samples in the input dataset, we call the `growth.workflow()` function on our `input` object:
+To perform a complete growth profiling of all samples in the input dataset, we call the `growth.workflow()` function on the `input` object. With `supress.messages = TRUE`, we avoid printing information about every sample's fit in the sample to the console.
 
-```{r run-default-workflow}
-growth.workflow(grodata = input)
+```{r run-default-workflow, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
+results <- growth.workflow(grodata = input, 
+                           fit.opt = "a",
+                           ec50 = T,
+                           suppress.messages = TRUE)
 ```
+Tab-delimited .txt files summarizing the computation results are created automatically, as well as the `results` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit`object.
+
+If you want to create a report summarizing all computational results including a graphical representation of every fit, provide the desired output format(s) as `report = 'pdf'`, `report = 'html'`, or `report = c('pdf', 'html')`. The advantage of having the report in HTML format is that every figure can be exported as (editable) PDF file.
+
+*`r colorize("In the spirit of good scientific practice (data transparency), I would encourage anyone using QurvE to attach the .RData file and generated reports to their publication.", "orange")`*
+
+Arguments that are commonly modified:
+
+```{r workflow-arguments, echo = F}
+if (knitr::is_html_output()) {
+  arguments <- data.frame(args = c("<span style='color: red;'>`fit.opt`</span>", 
+                                   "<span style='color: red;'>`model.type`</span>", 
+                                   "<span style='color: red;'>`log.y.lin`</span>\n<span style='color: red;'>`log.y.spline`</span>\n<span style='color: red;'>`log.y.model`</span>",
+                                 "<span style='color: red;'>`biphasic`</span>",
+                                 "<span style='color: red;'>`interactive`</span>",
+                                 "<span style='color: red;'>`nboot.gc`</span>",
+                                 "<span style='color: red;'>`dr.method`</span>",
+                                 "<span style='color: red;'>`dr.parameter`</span>"),
+                          descr = c("Which growth fitting methods to perform; a string containing `'l'` for linear fits, `'s'` for spline fits, `'m'` for model fits, or `'a'`(the default) for all three methods. Combinations can be also given as a vector of strings, e.g., `c('l', 's').`",
+                                    "Which growth models to apply; a string containing one of, or a vector of strings containing any combination of 'logistic', 'richards', 'gompertz', 'gompertz.exp', 'huang', and 'baranyi'.",
+                                    "Should Ln(y/y0) be applied to the growth data for the respective fits?",
+                                    "Extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts)",
+                                    "Controls interactive mode.  If `TRUE`, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample",
+                                    "Number of bootstrap samples used for nonparametric growth curve fitting. See `?growth.gcBootSpline` for details.",
+                                    "Define the method used to perform a dose-responde analysis: smooth spline fit (`'spline'`) or model fitting (`'model'`, the default). See section 4",
+                                    "The response parameter in the output table to be used for creating a dose response curve. See `?growth.drFit` for further details."
+                          ))
+  
+} else {
+  arguments <- data.frame(args = c("\\texttt{\\textcolor{red}{fit.opt}}", 
+                                   "\\texttt{\\textcolor{red}{model.type}}", 
+                                   "\\texttt{\\textcolor{red}{log.y.lin}}\n\\texttt{\\textcolor{red}{log.y.spline}}\n\\texttt{\\textcolor{red}{log.y.model}}",
+                                   "\\texttt{\\textcolor{red}{biphasic}}",
+                                   "\\texttt{\\textcolor{red}{interactive}}",
+                                   "\\texttt{\\textcolor{red}{nboot.gc}}",
+                                   "\\texttt{\\textcolor{red}{dr.method}}",
+                                   "\\texttt{\\textcolor{red}{dr.parameter}}"),
+                          descr = c("Which growth fitting methods to perform; a string containing \\texttt{\\textcolor{red}{'l'}} for linear fits, \\texttt{\\textcolor{red}{'s'}} for spline fits, \\texttt{\\textcolor{red}{'m'}} for model fits, or \\texttt{\\textcolor{red}{'a'}}(the default) for all three methods. Combinations can be also given as a vector of strings, e.g., \\texttt{\\textcolor{red}{c('l', 's').}}",
+                                    "Which growth models to apply; a string containing one of, or a vector of strings containing any combination of 'logistic', 'richards', 'gompertz', 'gompertz.exp', 'huang', and 'baranyi'.",
+                                    "Should Ln(y/y0) be applied to the growth data for the respective fits?",
+                                    "Extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts)",
+                                    "Controls interactive mode.  If \\texttt{\\textcolor{red}{TRUE}}, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample",
+                                    "Number of bootstrap samples used for nonparametric growth curve fitting. See \\texttt{?growth.gcBootSpline} for details.",
+                                    "Define the method used to perform a dose-responde analysis: smooth spline fit (\\texttt{\\textcolor{red}{'spline'}}) or model fitting (\\texttt{\\textcolor{red}{'model'}}, the default). See section 4",
+                                    "The response parameter in the output table to be used for creating a dose response curve. See \\texttt{?growth.drFit} for further details."
+                          ))
+}
+
+knit_table(arguments)
+```
+\
+Please consult `?growth.workflow` for further arguments to customize the workflow.
+\
+\
+```{r grofit-container, echo = FALSE, out.width = "100%", fig.cap = "\\label{fig:grofit-container} Internal structure of a `grofit`object generated by `growth.workflow()`.", fig.align='center'}
+knitr::include_graphics("../man/figures/grofit_container.png", dpi = 600, error = F)
+```
+
+## Visualize results
+
+Several generic `plot()` methods have been written to allow easy plotting of results by merely accessing list items within the `grofit` object structure (Figure \@ref(fig:grofit-container)).
+
+### Grouped spline fits
+
+Applying `plot()` to the results object of class `grofit` produces a figure of all spline fits performed as well as the first derivative (slope) over time. The generic function calls `plot.grofit()` with `data.type = 'spline'` and thus, the same options are available as described for Figure \@ref(fig:raw-data-plot).
+
+```{r group-spline-plot, fig.width=9, fig.height=9, echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:group-spline-plot} Combined plot of all spline fits performed.", fig.subcap = "In addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options.", tidy = TRUE}
+plot(results, 
+            data.type = "spline", 
+            log.y = TRUE, 
+            conc = c(0,5,10,15),
+            legend.position = "right",
+            x.lim = c(NA, 32), 
+            y.lim = c(0.01,NA), 
+            n.ybreaks = 10)
+```
+
+### Compare growth parameters
+
+A convenient way to compare the performance of different organisms under different conditions is to plot the calculated growth parameters by means of the function `plot.parameter()`. 
+
+```{r plot-parameter, fig.show="hold", out.width="50%", echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:plot-parameter} Parameter plots.", fig.subcap = "If `mean = TRUE`, the results of replicates are combined and shown are their average values \u00B1 95% confidence interval. As in the functions to combine different growth curves, the arguments `name`, `exclude.nm`, `conc`, and `exclude.conc` allow (de-)selection of specific samples or conditions.", tidy = TRUE}
+plot(results, 
+            data.type = "spline", 
+            log.y = TRUE, 
+            conc = c(0,5,10,15),
+            legend.position = "right",
+            x.lim = c(NA, 32), 
+    
+\pagebreak
+
+

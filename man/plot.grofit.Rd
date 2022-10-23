@@ -2,6 +2,7 @@
 % Please edit documentation in R/growth_plots.R
 \name{plot.grofit}
 \alias{plot.grofit}
+\alias{plot.grodata}
 \title{Generic plot function for \code{grofit} objects. Combine different groups of samples into a single plot}
 \usage{
 \method{plot}{grofit}(
@@ -26,6 +27,39 @@
   y.lim.deriv = NULL,
   y.title.deriv = NULL,
   lwd = 1.1,
+  legend.position = "bottom",
+  plot = TRUE,
+  export = FALSE,
+  height = NULL,
+  width = NULL,
+  out.dir = NULL,
+  out.nm = NULL,
+  shiny = FALSE
+)
+
+\method{plot}{grodata}(
+  x,
+  ...,
+  data.type = c("spline", "raw"),
+  IDs = NULL,
+  names = NULL,
+  conc = NULL,
+  exclude.nm = NULL,
+  exclude.conc = NULL,
+  mean = TRUE,
+  log.y = T,
+  deriv = T,
+  n.ybreaks = 6,
+  colors = NULL,
+  basesize = 20,
+  y.lim = NULL,
+  x.lim = NULL,
+  y.title = NULL,
+  x.title = NULL,
+  y.lim.deriv = NULL,
+  y.title.deriv = NULL,
+  lwd = 1.1,
+  legend.position = "bottom",
   plot = TRUE,
   export = FALSE,
   height = NULL,
@@ -77,6 +111,8 @@
 \item{y.title.deriv}{(Character) Optional: Provide a title for the y-axis of the derivative plot.}
 
 \item{lwd}{(Numeric) Line width of the individual plots.}
+
+\item{legend.position}{(Character) Position of the legend. One of "bottom", "top", "left", "right".}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

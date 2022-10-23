@@ -80,7 +80,7 @@ growth.control(
 
 \item{smooth.gc}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}}
 
-\item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("gompertz", "logistic", "gompertz.exp", "richards")}.}
+\item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi")}.}
 
 \item{dr.method}{(Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).}
 
