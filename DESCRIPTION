@@ -22,6 +22,7 @@ Depends:
     stringr,
     tidyr
 Imports: 
+    Cairo,
     data.table,
     doParallel,
     drc,

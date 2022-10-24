@@ -38,15 +38,15 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
     switch(which,
            fit = {
 
-             par(mar=c(3.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(2.1+cex.lab + 0.5*cex.axis, 2.1+1.3*cex.lab+1.2*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             title(ylab = "Density", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
-             title(xlab = "Time", line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
+             title(ylab = "Density", line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Time", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
 
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
-             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
+             axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
@@ -104,32 +104,34 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
              points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
-             title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
-             title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
+             title(ylab = "Density", line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Time", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
              ## normal q-q-plot
              stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              stats::qqline(gcFittedLinear$fit[["residuals"]])
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
-             title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
-             title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,0.3+0.3*cex.axis,0))
+             title(ylab = "Sample quantiles", line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Theoretical quantiles", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
            },
            fit_diagnostics = {
              opar <- par(no.readonly = TRUE)
              on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
-             par(mar=c(5.1+cex.lab, 4.1 + cex.lab, 4.1, 3.1), mai = c(0.7 + 0.05*cex.lab + 0.07*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.5), cex.lab = cex.lab, cex.axis = cex.axis)
+             par(mar=c(2.1+cex.lab + 0.5*cex.axis, 2.6+1.3*cex.lab+1.2*cex.axis, 4.1+0.2*cex.lab, 3.1),
+                 cex.lab = cex.lab, cex.axis = cex.axis)
+             # mai = c(0.5 + 0.05*cex.lab + 0.07*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.5),
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             title(ylab = "Density", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
-             title(xlab = "Time", line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
+             title(ylab = "Density", line = 1.3 + 0.9*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Time", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
 
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
-             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
+             axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
              try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
 
@@ -187,17 +189,17 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
              points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
-             title(ylab = "residuals", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
-             title(xlab = "fitted", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
+             title(ylab = "residuals", line = 1.3 + 0.9*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+             title(xlab = "fitted", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
              ## normal q-q-plot
              stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              stats::qqline(gcFittedLinear$fit[["residuals"]])
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
-             title(ylab = "Sample quantiles", line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
-             title(xlab = "Theoretical quantiles", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-             axis(1, mgp=c(3,0.5+0.3*cex.axis,0))
+             title(ylab = "Sample quantiles", line = 1.3 + 0.9*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Theoretical quantiles", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+             axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
            }
     )
@@ -2475,6 +2477,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 #' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
 #' @param lwd (Numeric) Line width of the individual plots.
 #' @param legend.position (Character) Position of the legend. One of "bottom", "top", "left", "right".
+#' @param legend.ncol (Numeric) Number of columns in the legend.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -2511,6 +2514,7 @@ plot.grofit <- function(x, ...,
                         y.title.deriv = NULL,
                         lwd = 1.1,
                         legend.position = "bottom",
+                        legend.ncol = 2,
                         plot = TRUE,
                         export = FALSE,
                         height = NULL,
@@ -2538,7 +2542,7 @@ plot.grofit <- function(x, ...,
 
   call <- match.call()
   # remove all function arguments from call to leave only multiple grofit objects
-  call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <-
+  call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <- call$legend.ncol <-
     call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
     call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- call$legend.position <- NULL
 
@@ -2779,10 +2783,9 @@ plot.grofit <- function(x, ...,
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank())
+            panel.grid.minor = element_blank()) +
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -2930,10 +2933,9 @@ plot.grofit <- function(x, ...,
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank())
+            panel.grid.minor = element_blank()) +
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -3106,6 +3108,7 @@ plot.grodata <- plot.grofit
 #' @param label.size (Numeric) Font size for sample labels below x-axis.
 #' @param shape.size (Numeric) The size of the symbols indicating replicate values. Default: 2.5
 #' @param legend.position (Character) Position of the legend. One of "bottom", "top", "left", "right".
+#' @param legend.ncol (Numeric) Number of columns in the legend.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -3135,7 +3138,8 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                            basesize = 12,
                            label.size = NULL,
                            shape.size = 2.5,
-                           legend.position = "bottom",
+                           legend.position = "right",
+                           legend.ncol = 1,
                            plot = T,
                            export = F,
                            height = 7,
@@ -3309,12 +3313,14 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
     ggplot2::labs(x = "Condition", y = paste0(param, " (\u00B1 95% CI)")) +
     theme_minimal(base_size = basesize) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = label.size),
+          legend.position=legend.position,
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"),
           # remove the vertical grid lines
           panel.grid.major.x = element_blank() ,
           # explicitly set the horizontal lines (or they will disappear too)
           ) +
-    scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10))+
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
 
   replicates <- unlist(

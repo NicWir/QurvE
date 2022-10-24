@@ -1550,8 +1550,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                               ),
 
                                                                  ),
+
                                                                  mainPanel(width = 7,
                                                                            plotOutput("validate_growth_plot_linear", width = "100%", height = "600px"),
+                                                                           HTML("<br>"),
+                                                                           HTML("<br>"),
                                                                            fluidRow(
                                                                              column(6, align = "center", offset = 3,
                                                                                     actionButton(inputId = "rerun_growth_linear",
@@ -2620,7 +2623,23 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                min = 10,
                                                                                max = 35,
                                                                                value = 23,
-                                                                               step = 0.5)
+                                                                               step = 0.5),
+
+                                                                   selectInput(inputId = "legend_position_group_plot",
+                                                                               label = "Legend position",
+                                                                               choices = c("Bottom" = "bottom",
+                                                                                           "Top" = "top",
+                                                                                           "Left" = "left",
+                                                                                           "Right" = "right")
+                                                                   ),
+
+                                                                   sliderInput(inputId = 'legend_ncol_group_plot',
+                                                                               label = 'Number of legend columns',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 4,
+                                                                               step = 1
+                                                                   ),
 
                                                                  ), # Side panel growth group plots
 
@@ -2746,7 +2765,24 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                min = 5,
                                                                                max = 35,
                                                                                value = 17,
-                                                                               step = 0.5)
+                                                                               step = 0.5),
+
+                                                                   selectInput(inputId = "legend_position_growth_parameter_plot",
+                                                                               label = "Legend position",
+                                                                               choices = c("Bottom" = "bottom",
+                                                                                           "Top" = "top",
+                                                                                           "Left" = "left",
+                                                                                           "Right" = "right"),
+                                                                               selected = "right"
+                                                                   ),
+
+                                                                   sliderInput(inputId = 'legend_ncol_growth_parameter_plot',
+                                                                               label = 'Number of legend columns',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 1,
+                                                                               step = 1
+                                                                   ),
 
 
                                                                  ),
@@ -3571,7 +3607,22 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                min = 10,
                                                                                max = 35,
                                                                                value = 23,
-                                                                               step = 0.5)
+                                                                               step = 0.5),
+
+                                                                   sliderInput(inputId = 'legend_ncol_fluorescence_group_plot',
+                                                                               label = 'Number of legend columns',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 4,
+                                                                               step = 1),
+
+                                                                   selectInput(inputId = "legend_position_fluorescence_group_plot",
+                                                                               label = "Legend position",
+                                                                               choices = c("Bottom" = "bottom",
+                                                                                           "Top" = "top",
+                                                                                           "Left" = "left",
+                                                                                           "Right" = "right")
+                                                                   ),
 
                                                                  ), # Side panel growth group plots
 
@@ -3764,7 +3815,23 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                min = 10,
                                                                                max = 35,
                                                                                value = 23,
-                                                                               step = 0.5)
+                                                                               step = 0.5),
+
+                                                                   selectInput(inputId = "legend_position_dual_plot",
+                                                                               label = "Legend position",
+                                                                               choices = c("Bottom" = "bottom",
+                                                                                           "Top" = "top",
+                                                                                           "Left" = "left",
+                                                                                           "Right" = "right")
+                                                                   ),
+
+                                                                   sliderInput(inputId = 'legend_ncol_dual_plot',
+                                                                               label = 'Number of legend columns',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 4,
+                                                                               step = 1
+                                                                   ),
                                                                  ),
 
                                                                  mainPanel(
@@ -3887,7 +3954,24 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                min = 5,
                                                                                max = 35,
                                                                                value = 17,
-                                                                               step = 0.5)
+                                                                               step = 0.5),
+
+                                                                   selectInput(inputId = "legend_position_fluorescence_parameter_plot",
+                                                                               label = "Legend position",
+                                                                               choices = c("Bottom" = "bottom",
+                                                                                           "Top" = "top",
+                                                                                           "Left" = "left",
+                                                                                           "Right" = "right"),
+                                                                               selected = "right"
+                                                                   ),
+
+                                                                   sliderInput(inputId = 'legend_ncol_fluorescence_parameter_plot',
+                                                                               label = 'Number of legend columns',
+                                                                               min = 1,
+                                                                               max = 10,
+                                                                               value = 1,
+                                                                               step = 1
+                                                                   ),
 
 
                                                                  ),
@@ -6934,11 +7018,8 @@ server <- function(input, output, session){
       x.lim <- NULL
     } else {
       x.lim <- c(as.numeric(input$x_range_min_validate_growth_plot_linear),
-                as.numeric(input$x_range_max_validate_growth_plot_linear))
+                 as.numeric(input$x_range_max_validate_growth_plot_linear))
     }
-
-
-
     if (length(results$gcFit$gcFittedLinear[[ifelse(
       selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
       is.null(
@@ -6948,27 +7029,6 @@ server <- function(input, output, session){
       1,
       selected_vals_validate_growth$sample_validate_growth_linear
     )]]) > 1) {
-      suppressWarnings(
-        plot.gcFitLinear(
-          results$gcFit$gcFittedLinear[[ifelse(
-            selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
-              is.null(
-                selected_vals_validate_growth$sample_validate_growth_linear
-              ),
-            1,
-            selected_vals_validate_growth$sample_validate_growth_linear
-          )]],
-          pch = input$shape_type_validate_growth_plot_linear,
-
-          log = logy_validate_growth_plot_linear(),
-          cex.point = input$shape_size_validate_growth_plot_linear,
-          cex.lab = input$axis_size_validate_growth_plot_linear,
-          cex.axis = input$lab_size_validate_growth_plot_linear,
-          lwd = input$line_width_validate_growth_plot_linear,
-          y.lim = y.lim,
-          x.lim = x.lim
-        )
-      )
       if(input$diagnostics_validate_growth_plot_linear){
         suppressWarnings(
           plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
@@ -6986,6 +7046,28 @@ server <- function(input, output, session){
           cex.lab = input$axis_size_validate_growth_plot_linear,
           cex.axis = input$lab_size_validate_growth_plot_linear,
           lwd = input$line_width_validate_growth_plot_linear
+          )
+        )
+      } else {
+        suppressWarnings(
+          plot.gcFitLinear(
+            results$gcFit$gcFittedLinear[[ifelse(
+              selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+                is.null(
+                  selected_vals_validate_growth$sample_validate_growth_linear
+                ),
+              1,
+              selected_vals_validate_growth$sample_validate_growth_linear
+            )]],
+            pch = input$shape_type_validate_growth_plot_linear,
+
+            log = logy_validate_growth_plot_linear(),
+            cex.point = input$shape_size_validate_growth_plot_linear,
+            cex.lab = input$axis_size_validate_growth_plot_linear,
+            cex.axis = input$lab_size_validate_growth_plot_linear,
+            lwd = input$line_width_validate_growth_plot_linear,
+            y.lim = y.lim,
+            x.lim = x.lim
           )
         )
       }
@@ -7367,7 +7449,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_validate_spline,
              height = input$height_download_growth_validate_spline,
-             dpi = input$dpi_download_growth_validate_spline)
+             dpi = input$dpi_download_growth_validate_spline,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_growth_validate_spline == ".pdf", "image/pdf", "image/png")
 
@@ -7547,7 +7630,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_validate_model,
              height = input$height_download_growth_validate_model,
-             dpi = input$dpi_download_growth_validate_model)
+             dpi = input$dpi_download_growth_validate_model,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_growth_validate_model == ".pdf", "image/pdf", "image/png")
 
@@ -8196,7 +8280,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_fluorescence_validate_spline,
              height = input$height_download_fluorescence_validate_spline,
-             dpi = input$dpi_download_fluorescence_validate_spline)
+             dpi = input$dpi_download_fluorescence_validate_spline,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_fluorescence_validate_spline == ".pdf", "image/pdf", "image/png")
 
@@ -8393,6 +8478,8 @@ server <- function(input, output, session){
                     n.ybreaks = input$nbreaks_growth_group_plot,
                     lwd = input$line_width_growth_group_plot,
                     basesize = input$base_size_growth_group_plot,
+                    legend.position = input$legend_position_group_plot,
+                    legend.ncol = input$legend_ncol_group_plot,
                     shiny = TRUE
         )
       )
@@ -8422,6 +8509,8 @@ server <- function(input, output, session){
                     n.ybreaks = input$nbreaks_growth_group_plot,
                     lwd = input$line_width_growth_group_plot,
                     basesize = input$base_size_growth_group_plot,
+                    legend.position = input$legend_position_group_plot,
+                    legend.ncol = input$legend_ncol_group_plot,
                     shiny = TRUE
         )
       )
@@ -8448,7 +8537,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_group_plot,
              height = input$height_download_growth_group_plot,
-             dpi = input$dpi_download_growth_group_plot)
+             dpi = input$dpi_download_growth_group_plot,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_growth_group_plot == ".pdf", "image/pdf", "image/png")
   )
@@ -8640,7 +8730,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_dose_response_growth_plot_combined,
              height = input$height_download_dose_response_growth_plot_combined,
-             dpi = input$dpi_download_dose_response_growth_plot_combined)
+             dpi = input$dpi_download_dose_response_growth_plot_combined,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_dose_response_growth_plot_combined == ".pdf", "image/pdf", "image/png")
   )
@@ -9146,7 +9237,9 @@ server <- function(input, output, session){
                        reference.conc = reference.conc,
                        shape.size = input$shape.size_growth_parameter_plot,
                        basesize = input$basesize_growth_parameter_plot,
-                       label.size = input$label.size_growth_parameter_plot
+                       label.size = input$label.size_growth_parameter_plot,
+                       legend.position = input$legend_position_growth_parameter_plot,
+                       legend.ncol = input$legend_ncol_growth_parameter_plot
         )
       )
     } else {
@@ -9162,7 +9255,9 @@ server <- function(input, output, session){
                        reference.conc = reference.conc,
                        shape.size = input$shape.size_growth_parameter_plot,
                        basesize = input$basesize_growth_parameter_plot,
-                       label.size = input$label.size_growth_parameter_plot
+                       label.size = input$label.size_growth_parameter_plot,
+                       legend.position = input$legend_position_growth_parameter_plot,
+                       legend.ncol = input$legend_ncol_growth_parameter_plot
         )
       )
     }
@@ -9179,7 +9274,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_parameter_plot,
              height = input$height_download_growth_parameter_plot,
-             dpi = input$dpi_download_growth_parameter_plot)
+             dpi = input$dpi_download_growth_parameter_plot,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_growth_parameter_plot == ".pdf", "image/pdf", "image/png")
 
@@ -9319,7 +9415,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_growth_dr_parameter_plot,
              height = input$height_download_growth_dr_parameter_plot,
-             dpi = input$dpi_download_growth_dr_parameter_plot)
+             dpi = input$dpi_download_growth_dr_parameter_plot,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_growth_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
 
@@ -9500,6 +9597,8 @@ server <- function(input, output, session){
           lwd = input$line_width_fluorescence_group_plot,
           basesize = input$base_size_fluorescence_group_plot,
           n.ybreaks = input$nbreaks_fluorescence_group_plot,
+          legend.position = input$legend_position_fluorescence_group_plot,
+          legend.ncol = input$legend_ncol_fluorescence_group_plot,
           shiny = TRUE
         )
       )
@@ -9529,6 +9628,8 @@ server <- function(input, output, session){
           lwd = input$line_width_fluorescence_group_plot,
           basesize = input$base_size_fluorescence_group_plot,
           n.ybreaks = input$nbreaks_fluorescence_group_plot,
+          legend.position = input$legend_position_fluorescence_group_plot,
+          legend.ncol = input$legend_ncol_fluorescence_group_plot,
           shiny = TRUE
         )
       )
@@ -9550,7 +9651,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_fluorescence_group_plot,
              height = input$height_download_fluorescence_group_plot,
-             dpi = input$dpi_download_fluorescence_group_plot)
+             dpi = input$dpi_download_fluorescence_group_plot,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_fluorescence_group_plot == ".pdf", "image/pdf", "image/png")
   )
@@ -9740,7 +9842,8 @@ server <- function(input, output, session){
     content = function(file) {
       ggsave(filename = file, width = input$width_download_dose_response_plot_fluorescence_combined,
              height = input$height_download_dose_response_plot_fluorescence_combined,
-             dpi = input$dpi_download_dose_response_plot_fluorescence_combined)
+             dpi = input$dpi_download_dose_response_plot_fluorescence_combined,
+             device = cairo_pdf)
     },
     contentType = ifelse(input$format_download_dose_response_plot_fluorescence_combined == ".pdf", "image/pdf", "image/png")
   )
@@ -9934,7 +10037,8 @@ server <- function(input, output, session){
         content = function(file) {
           ggsave(filename = file, width = input$width_download_dose_response_model_fluorescence_plot_individual,
                  height = input$height_download_dose_response_model_fluorescence_plot_individual,
-                 dpi = input$dpi_download_dose_response_model_fluorescence_plot_individual)
+                 dpi = input$dpi_download_dose_response_model_fluorescence_plot_individual,
+                 device = cairo_pdf)
         },
         contentType = ifelse(input$format_download_dose_response_model_fluorescence_plot_individual == ".pdf", "image/pdf", "image/png")
       )
@@ -9989,7 +10093,9 @@ server <- function(input, output, session){
                            reference.conc = reference.conc,
                            shape.size = input$shape.size_fluorescence_parameter_plot,
                            basesize = input$basesize_fluorescence_parameter_plot,
-                           label.size = input$label.size_fluorescence_parameter_plot
+                           label.size = input$label.size_fluorescence_parameter_plot,
+                           legend.position = input$legend_position_fluorescence_parameter_plot,
+                           legend.ncol = input$legend_ncol_fluorescence_parameter_plot
             )
           )
         } else {
@@ -10005,7 +10111,9 @@ server <- function(input, output, session){
                            reference.conc = reference.conc,
                            shape.size = input$shape.size_fluorescence_parameter_plot,
                            basesize = input$basesize_fluorescence_parameter_plot,
-                           label.size = input$label.size_fluorescence_parameter_plot
+                           label.size = input$label.size_fluorescence_parameter_plot,
+                           legend.position = input$legend_position_fluorescence_parameter_plot,
+                           legend.ncol = input$legend_ncol_fluorescence_parameter_plot
             )
           )
         }
@@ -10022,7 +10130,8 @@ server <- function(input, output, session){
         content = function(file) {
           ggsave(filename = file, width = input$width_download_fluorescence_parameter_plot,
                  height = input$height_download_fluorescence_parameter_plot,
-                 dpi = input$dpi_download_fluorescence_parameter_plot)
+                 dpi = input$dpi_download_fluorescence_parameter_plot,
+                 device = cairo_pdf)
         },
         contentType = ifelse(input$format_download_fluorescence_parameter_plot == ".pdf", "image/pdf", "image/png")
 
@@ -10224,6 +10333,8 @@ server <- function(input, output, session){
                     n.ybreaks = input$nbreaks_dual_plot,
                     lwd = input$line_width_dual_plot,
                     basesize = input$base_size_dual_plot,
+                    legend.position = input$legend_position_dual_plot,
+                    legend.ncol = input$legend_ncol_dual_plot,
                     shiny = TRUE
           )
         )
@@ -10248,6 +10359,8 @@ server <- function(input, output, session){
                       n.ybreaks = input$nbreaks_dual_plot,
                       lwd = input$line_width_dual_plot,
                       basesize = input$base_size_dual_plot,
+                      legend.position = input$legend_position_dual_plot,
+                      legend.ncol = input$legend_ncol_dual_plot,
                       shiny = TRUE
             )
           )
@@ -10265,7 +10378,8 @@ server <- function(input, output, session){
         content = function(file) {
           ggsave(filename = file, width = input$width_download_dual_plot,
                  height = input$height_download_dual_plot,
-                 dpi = input$dpi_download_dual_plot)
+                 dpi = input$dpi_download_dual_plot,
+                 device = cairo_pdf)
         },
         contentType = ifelse(input$format_download_dual_plot == ".pdf", "image/pdf", "image/png")
       )
@@ -10331,7 +10445,8 @@ server <- function(input, output, session){
         content = function(file) {
           ggsave(filename = file, width = input$width_download_fluorescence_dr_parameter_plot,
                  height = input$height_download_fluorescence_dr_parameter_plot,
-                 dpi = input$dpi_download_fluorescence_dr_parameter_plot)
+                 dpi = input$dpi_download_fluorescence_dr_parameter_plot,
+                 device = cairo_pdf)
         },
         contentType = ifelse(input$format_download_fluorescence_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
 

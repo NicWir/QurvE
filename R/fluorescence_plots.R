@@ -1136,6 +1136,8 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
 #' @param lwd (Numeric) Line width of the individual plots.
+#' @param legend.position (Character) Position of the legend. One of "bottom", "top", "left", "right".
+#' @param legend.ncol (Numeric) Number of columns in the legend.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -1168,6 +1170,8 @@ plot.flFitRes <-  function(x,
                         y.lim.deriv = NULL,
                         y.title.deriv = NULL,
                         lwd = 1.1,
+                        legend.position = "bottom",
+                        legend.ncol = 2,
                         plot = TRUE,
                         export = FALSE,
                         height = NULL,
@@ -1470,12 +1474,12 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
-      theme(legend.position="bottom",
+      theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -1538,7 +1542,7 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
         geom_ribbon(aes(ymin=.data$lower, ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-        theme(legend.position="bottom",
+        theme(legend.position=legend.position,
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
@@ -1596,7 +1600,7 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p, position = "right"))
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p, position = "right"))
     }
   } # if(mean == TRUE)
   else {
@@ -1650,12 +1654,12 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
-      theme(legend.position="bottom",
+      theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
+    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
+    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
@@ -1716,7 +1720,7 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
         geom_line(size=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-        theme(legend.position="bottom",
+        theme(legend.position=legend.position,
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
 
@@ -1769,7 +1773,7 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
     } # if(deriv)
 
   }
@@ -1837,6 +1841,8 @@ plot.grodata <- plot.flFitRes
 #' @param y.title.density (Character) Optional: Provide a title for the y-axis of the density plot.
 #' @param y.title.fl (Character) Optional: Provide a title for the y-axis of the fluorescence plot.
 #' @param lwd (Numeric) Line width of the individual plots.
+#' @param legend.position (Character) Position of the legend. One of "bottom", "top", "left", "right".
+#' @param legend.ncol (Numeric) Number of columns in the legend.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -1869,6 +1875,8 @@ plot.dual <-  function(x,
                        y.title.density = NULL,
                        y.title.fl = NULL,
                        lwd = 1.1,
+                       legend.position = "bottom",
+                       legend.ncol = 2,
                        plot = TRUE,
                        export = FALSE,
                        height = NULL,
@@ -2075,11 +2083,10 @@ plot.dual <-  function(x,
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title.density) || y.title.density == "", ylab.title.dens, y.title.density)) +
-      theme(panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank())
-
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
+      theme(legend.position=legend.position,
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(log.y.density == TRUE){
       if(!is.null(y.lim.density)){
@@ -2138,7 +2145,8 @@ plot.dual <-  function(x,
       geom_ribbon(aes(ymin=.data$fl.lower,ymax=.data$fl.upper, fill=.data$name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
-      theme(panel.grid.major = element_blank(),
+      theme(legend.position=legend.position,
+            panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
     if(log.y.fl == TRUE){
@@ -2203,7 +2211,7 @@ plot.dual <-  function(x,
         )
       }
     }
-    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
   } # if(mean == TRUE)
   else {
     df <- data.frame()
@@ -2226,11 +2234,10 @@ plot.dual <-  function(x,
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title.density) || y.title.density == "", ylab.title, y.title.density)) +
-      theme(panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank())
-
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=4))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=2))
+      theme(legend.position=legend.position,
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
@@ -2281,7 +2288,8 @@ plot.dual <-  function(x,
       geom_line(size=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
-      theme(panel.grid.major = element_blank(),
+      theme(legend.position=legend.position,
+            panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
 
     ylab.title <- if(any(grep("norm", fluorescence))){
@@ -2341,7 +2349,7 @@ plot.dual <-  function(x,
         )
       }
     }
-    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = "bottom", legend.grob = ggpubr::get_legend(p))
+    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
   }
   if(export == FALSE && plot == FALSE){
     return(p)
