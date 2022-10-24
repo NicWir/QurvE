@@ -22,7 +22,8 @@
   basesize = 12,
   label.size = NULL,
   shape.size = 2.5,
-  legend.position = "bottom",
+  legend.position = "right",
+  legend.ncol = 1,
   plot = T,
   export = F,
   height = 7,
@@ -62,6 +63,8 @@
 \item{shape.size}{(Numeric) The size of the symbols indicating replicate values. Default: 2.5}
 
 \item{legend.position}{(Character) Position of the legend. One of "bottom", "top", "left", "right".}
+
+\item{legend.ncol}{(Numeric) Number of columns in the legend.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

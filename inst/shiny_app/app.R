@@ -7194,11 +7194,11 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_growth_validate_linear == ".pdf"){
-        pdf(file = file,
+        Cairo::CairoPDF(file = file,
             width = input$width_download_growth_validate_linear,
             height = input$height_download_growth_validate_linear)
       } else {
-        png(file = file,
+        grDevices::png(file = file,
             width = input$width_download_growth_validate_linear,
             height = input$height_download_growth_validate_linear,
             units = "in",
@@ -7723,11 +7723,11 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_growth_validate_spline_bt == ".pdf"){
-        pdf(file = file,
+        Cairo::CairoPDF(file = file,
             width = input$width_download_growth_validate_spline_bt,
             height = input$height_download_growth_validate_spline_bt)
       } else {
-        png(file = file,
+        grDevices::png(file = file,
             width = input$width_download_growth_validate_spline_bt,
             height = input$height_download_growth_validate_spline_bt,
             units = "in",
@@ -8044,11 +8044,11 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_fluorescence_validate_linear == ".pdf"){
-        pdf(file = file,
+        Cairo::CairoPDF(file = file,
             width = input$width_download_fluorescence_validate_linear,
             height = input$height_download_fluorescence_validate_linear)
       } else {
-        png(file = file,
+        grDevices::png(file = file,
             width = input$width_download_fluorescence_validate_linear,
             height = input$height_download_fluorescence_validate_linear,
             units = "in",
@@ -8363,11 +8363,11 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_fluorescence_validate_spline_bt == ".pdf"){
-        pdf(file = file,
+        Cairo::CairoPDF(file = file,
             width = input$width_download_fluorescence_validate_spline_bt,
             height = input$height_download_fluorescence_validate_spline_bt)
       } else {
-        png(file = file,
+        grDevices::png(file = file,
             width = input$width_download_fluorescence_validate_spline_bt,
             height = input$height_download_fluorescence_validate_spline_bt,
             units = "in",
@@ -8827,11 +8827,11 @@ server <- function(input, output, session){
         },
         content = function(file) {
           if(input$format_download_dose_response_growth_plot_individual == ".pdf"){
-            pdf(file = file,
+            Cairo::CairoPDF(file = file,
                 width = input$width_download_dose_response_growth_plot_model,
                 height = input$height_download_dose_response_growth_plot_model)
           } else {
-            png(file = file,
+            grDevices::png(file = file,
                 width = input$width_download_dose_response_growth_plot_model,
                 height = input$height_download_dose_response_growth_plot_model,
                 units = "in",
@@ -8946,11 +8946,11 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_dose_response_growth_plot_individual == ".pdf"){
-        pdf(file = file,
+        Cairo::CairoPDF(file = file,
             width = input$width_download_dose_response_growth_plot_individual,
             height = input$height_download_dose_response_growth_plot_individual)
       } else {
-        png(file = file,
+        grDevices::png(file = file,
             width = input$width_download_dose_response_growth_plot_individual,
             height = input$height_download_dose_response_growth_plot_individual,
             units = "in",
@@ -9172,11 +9172,11 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_dose_response_growth_plot_individual_bt == ".pdf"){
-        pdf(file = file,
+        Cairo::CairoPDF(file = file,
             width = input$width_download_dose_response_growth_plot_individual_bt,
             height = input$height_download_dose_response_growth_plot_individual_bt)
       } else {
-        png(file = file,
+        grDevices::png(file = file,
             width = input$width_download_dose_response_growth_plot_individual_bt,
             height = input$height_download_dose_response_growth_plot_individual_bt,
             units = "in",
@@ -9903,11 +9903,11 @@ server <- function(input, output, session){
         },
         content = function(file) {
           if(input$format_download_dose_response_fluorescence_plot_individual == ".pdf"){
-            pdf(file = file,
+            Cairo::CairoPDF(file = file,
                 width = input$width_download_dose_response_fluorescence_plot_individual,
                 height = input$height_download_dose_response_fluorescence_plot_individual)
           } else {
-            png(file = file,
+            grDevices::png(file = file,
                 width = input$width_download_dose_response_fluorescence_plot_individual,
                 height = input$height_download_dose_response_fluorescence_plot_individual,
                 units = "in",
@@ -10256,11 +10256,11 @@ server <- function(input, output, session){
         },
         content = function(file) {
           if(input$format_download_dose_response_fluorescence_plot_individual_bt == ".pdf"){
-            pdf(file = file,
+            Cairo::CairoPDF(file = file,
                 width = input$width_download_dose_response_fluorescence_plot_individual_bt,
                 height = input$height_download_dose_response_fluorescence_plot_individual_bt)
           } else {
-            png(file = file,
+            grDevices::png(file = file,
                 width = input$width_download_dose_response_fluorescence_plot_individual_bt,
                 height = input$height_download_dose_response_fluorescence_plot_individual_bt,
                 units = "in",

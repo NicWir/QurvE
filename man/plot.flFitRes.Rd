@@ -27,6 +27,8 @@
   y.lim.deriv = NULL,
   y.title.deriv = NULL,
   lwd = 1.1,
+  legend.position = "bottom",
+  legend.ncol = 2,
   plot = TRUE,
   export = FALSE,
   height = NULL,
@@ -58,6 +60,8 @@
   y.lim.deriv = NULL,
   y.title.deriv = NULL,
   lwd = 1.1,
+  legend.position = "bottom",
+  legend.ncol = 2,
   plot = TRUE,
   export = FALSE,
   height = NULL,
@@ -91,6 +95,7 @@
   y.title.deriv = NULL,
   lwd = 1.1,
   legend.position = "bottom",
+  legend.ncol = 2,
   plot = TRUE,
   export = FALSE,
   height = NULL,
@@ -140,6 +145,10 @@
 \item{y.title.deriv}{(Character) Optional: Provide a title for the y-axis of the derivative plot.}
 
 \item{lwd}{(Numeric) Line width of the individual plots.}
+
+\item{legend.position}{(Character) Position of the legend. One of "bottom", "top", "left", "right".}
+
+\item{legend.ncol}{(Numeric) Number of columns in the legend.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

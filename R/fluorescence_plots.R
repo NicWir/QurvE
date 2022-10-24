@@ -241,7 +241,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
     p()
     grDevices::dev.off()
   }
@@ -615,7 +615,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                        width = w, height = h, units = 'in', res = 300)
         print(p)
         grDevices::dev.off()
-        grDevices::pdf(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h)
+        Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"))
         print(p)
         grDevices::dev.off()
       }
@@ -926,7 +926,7 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                    width = w1, height = h1, units = 'in', res = 300)
     p1()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.pdf"))
     p1()
     grDevices::dev.off()
 
@@ -936,7 +936,7 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                    width = w2, height = h2, units = 'in', res = 300)
     p2()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSplineParam.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSplineParam.pdf"))
     p2()
     grDevices::dev.off()
   }
@@ -1101,7 +1101,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.pdf"))
     p()
     grDevices::dev.off()
   }
@@ -1798,7 +1798,7 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
     print(p)
     grDevices::dev.off()
   }
@@ -2372,7 +2372,7 @@ plot.dual <-  function(x,
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
     print(p)
     grDevices::dev.off()
   }

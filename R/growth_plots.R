@@ -213,7 +213,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(gcFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(gcFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
     p()
     grDevices::dev.off()
   }
@@ -488,7 +488,7 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(gcFittedModel$gcID, collapse = "_"), "_ModelFitPlot.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(gcFittedModel$gcID, collapse = "_"), "_ModelFitPlot.pdf"))
     suppressWarnings( {print(p)}, "is.na" )
     grDevices::dev.off()
   }
@@ -800,7 +800,7 @@ plot.drBootSpline <- function (x,
                      width = w1, height = h1, units = 'in', res = 300)
       p1()
       grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplines.pdf"))
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplines.pdf"))
       p1()
       grDevices::dev.off()
 
@@ -811,7 +811,7 @@ plot.drBootSpline <- function (x,
                      width = w2, height = h2, units = 'in', res = 300)
       p2()
       grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplinesEC50.pdf"))
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplinesEC50.pdf"))
       p2()
       grDevices::dev.off()
     }
@@ -1089,7 +1089,7 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
                        width = w, height = h, units = 'in', res = 300)
         print(p)
         grDevices::dev.off()
-        #grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+        #Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
         #print(p)
         #grDevices::dev.off()
         cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
@@ -1261,7 +1261,7 @@ plot.drFitSpline <- function (x,
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(drFitSpline$drID, collapse = "_"), "_drFitSpline.pdf"))
     p()
     grDevices::dev.off()
   }
@@ -1782,7 +1782,7 @@ plot.gcBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                    width = w1, height = h1, units = 'in', res = 300)
     p1()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSpline.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSpline.pdf"))
     p1()
     grDevices::dev.off()
 
@@ -1792,7 +1792,7 @@ plot.gcBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                    width = w2, height = h2, units = 'in', res = 300)
     p2()
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSplineParam.pdf"))
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(gcBootSpline$gcID, collapse = "_"), "_gcBootSplineParam.pdf"))
     p2()
     grDevices::dev.off()
   }
@@ -2438,7 +2438,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                      width = w, height = h, units = 'in', res = 300)
       print(p)
       grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h)
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"))
       print(p)
       grDevices::dev.off()
     }
@@ -3065,7 +3065,7 @@ plot.grofit <- function(x, ...,
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
     print(p)
     grDevices::dev.off()
   }
@@ -3377,7 +3377,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
     print(p)
     grDevices::dev.off()
   }
@@ -3502,7 +3502,7 @@ plot.dr_parameter <- function(x, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC
                      width = w, height = h, units = 'in', res = 300)
       print(p)
       grDevices::dev.off()
-      grDevices::pdf(paste0(out.dir, "/", out.nm, ".pdf"), width = w, height = h)
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
       print(p)
       grDevices::dev.off()
   }
