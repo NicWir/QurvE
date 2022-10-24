@@ -1348,9 +1348,11 @@ plot.drFitModel <- function(x,
     xt <- NULL
     if(any(grep("x", log))){
       if(min(conc) <= 0){
+        xt <- xgx_breaks_log10(c(bp, max(conc)))
         xt.minor <- xgx_minor_breaks_log10(c(bp, max(conc)))[-1]
       }
       else{
+        xt <- xgx_breaks_log10(c(min(conc), max(conc)))
         xt.minor <- xgx_minor_breaks_log10(c(min(conc), max(conc)))
       }
     }
@@ -1431,7 +1433,7 @@ plot.drFitModel <- function(x,
         col = col,
         lwd = lwd,
         lty = lty,
-        axes = FALSE,
+        axes = T, xt = xt,
         log = log,
         xlab = "",
         ylab = "",
@@ -1448,13 +1450,13 @@ plot.drFitModel <- function(x,
       )
     )
   )
-  axis(1, at = xt, mgp=c(3,1+0.5*cex.axis,0), line = 0, labels = as.character(as.numeric(xt)))
+  # axis(1, lwd = 0, lwd.ticks = 1, at = xt, mgp=c(3,1+0.5*cex.axis,0), line = 0, labels = as.character(as.numeric(xt)))
 
-  axis(2, at = yt, las=1, line = 0, labels = as.character(as.numeric(yt)))
+  # axis(2, at = yt, las=1, line = 0, labels = as.character(as.numeric(yt)))
   title(ylab = ylab, line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
   title(xlab = xlab, line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
   if(any(grep("x", log))){
-    axis(side=1, at=xt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
+    axis(side=1, lwd = 0, lwd.ticks = 1, at=xt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
   }
   if(any(grep("y", log))){
     axis(side=2, at=yt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)

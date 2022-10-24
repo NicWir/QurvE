@@ -8787,7 +8787,6 @@ server <- function(input, output, session){
                      as.numeric(input$x_range_max_dose_response_growth_plot_model))
         }
         results <- results$growth$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), 1, input$individual_plots_dose_response_growth_plot_model)]]
-
         try(
           plot.drFitModel(results,
                           pch = input$shape_type_dose_response_growth_plot_model,
