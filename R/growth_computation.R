@@ -1583,7 +1583,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
                     wellname)
               answer_satisfied <- readline("Are you satisfied with the linear fit (y/n)?\n\n")
               if ("n" %in% answer_satisfied) {
-                test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
+                test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD, tmax, max.density                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
                 if ("n" %in% test_answer) {
                   cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
                   reliability_tag_linear              <- FALSE
@@ -1594,16 +1594,22 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
                 else {
                   new_params <- unlist(strsplit(test_answer, split = ","))
                   t0_new <- ifelse(!is.na(as.numeric(new_params[1])), as.numeric(new_params[1]), control$t0)
-                  h_new <- ifelse(!is.na(as.numeric(new_params[2])), as.numeric(new_params[2]), control$lin.h)
+                  h_new <- if_else(!is.na(as.numeric(new_params[2])), as.numeric(new_params[2]), control$lin.h)
                   quota_new <- ifelse(!is.na(as.numeric(new_params[3])), as.numeric(new_params[3]), 0.95)
                   min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
                   R2_new <- ifelse(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
                   RSD_new <- ifelse(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
+                  tmax_new <- ifelse(!is.na(as.numeric(new_params[7])), as.numeric(new_params[7]), control$tmax)
+                  max.density_new <- ifelse(!is.na(as.numeric(new_params[8])), as.numeric(new_params[8]), control$max.density)
+
                   control_new <- control
                   control_new$t0 <- t0_new
                   if(!is.na(h_new)) control_new$lin.h <- h_new
                   control_new$lin.R2 <- R2_new
                   control_new$lin.RSD <- RSD_new
+                  control_new$tmax <- tmax_new
+                  control_new$max.density <- max.density_new
+
                   if(is.numeric(min.density_new)){
                     if(!is.na(min.density_new) && all(as.vector(actwell) < min.density_new)){
                       message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
@@ -1705,7 +1711,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
               }
               answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
               if ("n" %in% answer_satisfied) {
-                    test_answer <- readline("Enter: smooth.gc, t0, min.density                                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.density (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
+                    test_answer <- readline("Enter: smooth.gc, t0, min.density, tmax, max.density                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.density (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
                     if ("n" %in% test_answer) {
                       cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
                       reliability_tag_nonpara              <- FALSE
@@ -1722,6 +1728,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
                       t0_new <- control$t0
                     }
                     smooth.gc_new <- as.numeric(new_params[1])
+
                     control_new <- control
                     if(!is.na(smooth.gc_new) && smooth.gc_new != ""){
                       control_new$smooth.gc <- smooth.gc_new
@@ -1736,6 +1743,16 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
                         control_new$min.density <- min.density_new
                       }
                     }
+
+                    tmax_new <- as.numeric(new_params[4])
+                    if(!is.na(tmax_new) && tmax_new != ""){
+                      control_new$tmax <- tmax_new
+                    }
+                    max.density_new <- as.numeric(new_params[5])
+                    if(!is.na(max.density_new) && max.density_new != ""){
+                      control_new$max.density <- max.density_new
+                    }
+
                     nonpara <- growth.gcFitSpline(acttime, actwell, gcID, control_new)
                     fitnonpara.all[[i]] <- nonpara
                   } #end else

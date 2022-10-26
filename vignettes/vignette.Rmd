@@ -11,6 +11,11 @@ header-includes:
   \usepackage{xcolor}
   \arrayrulecolor{white}
 output:
+  bookdown::html_document2:
+    fig_caption: yes
+    toc: true
+    toc_float: true
+    theme: united
   bookdown::pdf_document2:
     extra_dependencies: 
       - "flafter"
@@ -18,11 +23,6 @@ output:
     fig_caption: yes
     toc: false
     latex_engine: xelatex
-  bookdown::html_document2:
-    fig_caption: yes
-    toc: true
-    toc_float: true
-    theme: united
 vignette: >
   %\VignetteIndexEntry{Quantitiative Growth Curve Evaluation with Package `QurvE`}
   %\VignetteEncoding{UTF-8}
@@ -271,7 +271,7 @@ We can plot the raw data. Applying the generic `plot()` function to `grodata` ob
 
 ```{r raw-data-plot, fig.width=7, fig.height=3.5, fig.pos = "H", echo = T, eval = T, results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.\nConditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
 plot(grodata, data.type = "raw", log.y = FALSE, x.lim = c(NA, 32), 
-     names = "KT2440", legend.position = "right", basesize = 10)
+     names = "KT2440", legend.position = "right", basesize = 10, legend.ncol = 1)
 ```
 
 ## Run Workflow
@@ -285,7 +285,7 @@ grofit <- growth.workflow(grodata = grodata,
                            suppress.messages = TRUE)
 ```
 
-Tab-delimited .txt files summarizing the computation results are created automatically, as well as the `grofit` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit`object.
+Tab-delimited .txt files summarizing the computation results are created automatically, as well as the `grofit` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit`object. In RStudio, `View(grofit)` allows interactive inspection of the data container.
 
 If you want to create a report summarizing all computational results including a graphical representation of every fit, provide the desired output format(s) as `report = 'pdf'`, `report = 'html'`, or `report = c('pdf', 'html')`. The advantage of having the report in HTML format is that every figure can be exported as (editable) PDF file.
 
@@ -346,6 +346,25 @@ knitr::include_graphics("../man/figures/grofit_container.pdf", dpi = 600, error 
 
 \pagebreak
 
+## Tabular results
+
+A `grofit` object contains two tables summarizing the computational results:
+-   `grofit$gcFit$gcTable` lists all calculated physiological parameters for every sample and fit
+-   `grofit$drFit$drTable` contains the results of the dose-response analysis
+
+```{r echo = T, eval = T, results='asis', message=FALSE, error=FALSE, warning=FALSE, tidy = FALSE}
+# show the first three rows and first 14 columns of gcTable 
+gcTable <- grofit$gcFit$gcTable
+gcTable[1:3, 1:14]
+
+# Show drTable. The function as.data.frame() ensures that it is shown in table format.
+drTable <- as.data.frame(grofit$drFit$drTable)
+```
+
+Additionally, the dedicated functions `table_group_growth_linear()`, `table_group_growth_model()`, and `table_group_growth_spline()` allow the generation of grouped results tables for each of the three fit types with averages and standard deviations. The column headers in the resulting data frames are formatted with HTML for visualization in shiny and with `DT::datatable()`.
+
+A summary of results for each individual fit can be obtained by applying the generic function `summary()` to any fit object within `grofit`.
+
 ## Visualize results
 
 Several generic `plot()` methods have been written to allow easy plotting of results by merely accessing list items within the `grofit` object structure (Figure \@ref(fig:grofit-container)).
@@ -372,7 +391,7 @@ plot(grofit,
 
 A convenient way to compare the performance of different organisms under different conditions is to plot the calculated growth parameters by means of the function `plot.parameter()`.
 
-```{r plot-parameter, fig.show="hold", out.width="47%", fig.height = 3, results='hold' ,fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean \u00B1 95\\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions."}
+```{r plot-parameter, fig.show="hold", out.width="47%", fig.height = 3, results='hold' ,fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean \u00B1 95\\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically."}
 # Parameters obtained from linear regression
 plot.parameter(grofit, param = "mu.linfit", basesize = 8.5)
 plot.parameter(grofit, param = "dY.linfit", basesize = 8.5)
@@ -394,7 +413,9 @@ plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2, cex.axis = 1.2
 ```
 
 
-Apparently, the algorithm to find the maximum slope in the growth curve with the standard threshold of `lin.R2 = 0.97` could not find an appropriate fit within the first stage of growth due to insufficient linearity. We can manually re-run the fit for this sample with adjusted parameters. Thereby, we lower the R2 threshold and increase the size of the sliding window to cover a larger fraction of the growth curve. Then, we update the respective entries in the `gcTable` object that summarizes all fitting results (and that plot.parameter() accesses to extract relevant data). The generic function `summary()`, when applied to a the fit object of a single sample within `grofit`, provides the required parameters to update the table:
+Apparently, the algorithm to find the maximum slope in the growth curve with the standard threshold of `lin.R2 = 0.97` could not find an appropriate fit within the first stage of growth due to insufficient linearity. We can manually re-run the fit for this sample with adjusted parameters. Thereby, we lower the R2 threshold and increase the size of the sliding window to cover a larger fraction of the growth curve. Then, we update the respective entries in the `gcTable` object that summarizes all fitting results (and that plot.parameter() accesses to extract relevant data). The generic function `summary()`, when applied to a the fit object of a single sample within `grofit`, provides the required parameters to update the table. Lastly, we also have to re-run the dose-response analysis since 'mu.linfit' was used as response parameter (the default), including the erroneous value.
+
+*Note: This process of manually updating `grofit`elements with adjusted fits can be avoided by re-running `growth.workflow` with adjusted global parameters or my running the workflow in interactive mode (`interactive = TRUE`). In interactive mode, each individual fit is printed and the user can decide to re-run a single fit with adjusted parameters.* 
 
 ```{r message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = FALSE, eval = T}
 # Replace the existing linear fit entry for sample `KT2440 | 2 | 0` 
@@ -409,9 +430,15 @@ ndx.row <- grep("KT2440 \\| 2 \\| 0", grofit$expdesign$label)
 
 # get column indices of linear fit parameters (".linfit")
 ndx.col <- grep("\\.linfit", colnames(grofit$gcFit$gcTable) )
+
 # Replace previous growth parameters stored in gcTable
 grofit$gcFit$gcTable[ndx.row, ndx.col] <-
   summary(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`)
+
+# Replace existing dose-response analysis with new fit
+grofit$drFit <- growth.drFit(
+  gcTable = grofit$gcFit$gcTable, 
+  control = grofit$control) # we can copy the control object from the original workflow.
 ```
 
 And we can validate the quality of the updated fit:
@@ -425,6 +452,13 @@ That looks better!
 ```{r plot-parameter-update, out.width="70%", fig.height = 5.5, fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter-update} Parameter plot with updated fit."}
 # Parameters obtained from linear regression
 plot.parameter(grofit, param = "mu.linfit", basesize = 8.5)
+```
+
+### Dose-response analysis
+
+The results of the dose-response analysis can be visualized by calling `plot()` on the `drFit` object that is stored within `grofit`. This action calls `plot.drFit()` which in turn runs `plot.drFitSpline()` or `plot.drFitModel()` (depending on the choice of `dr.method` in the workflow) on every condition for which a dose-reponse analysis has been performed. Alternatively, you can call `plot()` on the list elements in `grofit$drFit$drFittedModels` or `grofit$drFit$drFittedSplines`, respectively.
+```{r plot-drFit, fig.ncol = 1, fig.show="hold", out.width="85%", fig.height = 5.5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drFit} Dose response analysis - model fits."}
+plot(grofit$drFit, cex.point = 1)
 ```
 
 \pagebreak
