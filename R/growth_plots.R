@@ -558,7 +558,7 @@ plot.drBootSpline <- function (x,
   }
   else{
     p1 <- function(){
-      par(cex.lab = cex.lab, cex.axis = cex.axis)
+      par(mar=c(2.1+cex.lab + 0.5*cex.axis, 2.1+1.3*cex.lab+1.2*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
       colSpline   <-
         rep(colSpline, (drBootSpline$control$nboot.dr %/% length(colSpline)) + 1)
@@ -580,8 +580,8 @@ plot.drBootSpline <- function (x,
           c(global.miny, global.maxy),
           type = "n", xlab="", ylab="", xaxt="n", main="")
 
-        title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-        title(xlab = "Ln(1+concentration)", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+        title(xlab = "Ln(1+concentration)", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
       }
       else{
         if ((drBootSpline$control$log.x.dr == FALSE) &&
@@ -591,8 +591,8 @@ plot.drBootSpline <- function (x,
             c(global.miny, global.maxy),
             type = "n", xlab="", ylab="", xaxt="n", main="")
 
-          title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-          title(xlab = "Concentration", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+          title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+          title(xlab = "Concentration", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
         }
         else{
           if ((drBootSpline$control$log.x.dr == TRUE) && (drBootSpline$control$log.y.dr == TRUE)) {
@@ -601,8 +601,8 @@ plot.drBootSpline <- function (x,
               c(global.miny, global.maxy),
               type = "n", xlab="", ylab="", xaxt="n", main="")
 
-            title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-            title(xlab = "Ln(1+Concentration)", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+            title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+            title(xlab = "Ln(1+Concentration)", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
           }
           else{
             if ((drBootSpline$control$log.x.dr == FALSE) && (drBootSpline$control$log.y.dr == TRUE)) {
@@ -611,8 +611,8 @@ plot.drBootSpline <- function (x,
                 c(global.miny, global.maxy),
                 type = "n", xlab="", ylab="", xaxt="n", main="")
 
-              title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-              title(xlab = "Concentration", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+              title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+              title(xlab = "Concentration", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
             }
           }
         }
@@ -677,7 +677,7 @@ plot.drBootSpline <- function (x,
       layout(matrix(c(1,1,1,2,2, 1,1,1,3,3), nrow = 5, ncol = 2))
 
       par(cex.lab = cex.lab, cex.axis = cex.axis)
-      par(mar=c(5.1, 4.1, 4.1, 2.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.3), mgp=c(3, 1, 0), las=0)
+      par(mar=c(2.1+cex.lab + 0.5*cex.axis, 2.6+1.3*cex.lab+1.2*cex.axis, 4.1+0.2*cex.lab, 3.1), mgp=c(3, 1, 0), las=0)
 
 
       colSpline   <-
@@ -700,8 +700,8 @@ plot.drBootSpline <- function (x,
           c(global.miny, global.maxy),
           type = "n", xlab="", ylab="", xaxt="n", main="")
 
-        title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-        title(xlab = "Ln(1+concentration)", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+        title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+        title(xlab = "Ln(1+concentration)", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
       }
       else{
         if ((drBootSpline$control$log.x.dr == FALSE) &&
@@ -711,8 +711,8 @@ plot.drBootSpline <- function (x,
             c(global.miny, global.maxy),
             type = "n", xlab="", ylab="", xaxt="n", main="")
 
-          title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-          title(xlab = "Concentration", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+          title(ylab = paste0("Response (", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+          title(xlab = "Concentration", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
         }
         else{
           if ((drBootSpline$control$log.x.dr == TRUE) && (drBootSpline$control$log.y.dr == TRUE)) {
@@ -721,8 +721,8 @@ plot.drBootSpline <- function (x,
               c(global.miny, global.maxy),
               type = "n", xlab="", ylab="", xaxt="n", main="")
 
-            title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-            title(xlab = "Ln(1+Concentration)", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+            title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+            title(xlab = "Ln(1+Concentration)", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
           }
           else{
             if ((drBootSpline$control$log.x.dr == FALSE) && (drBootSpline$control$log.y.dr == TRUE)) {
@@ -731,8 +731,8 @@ plot.drBootSpline <- function (x,
                 c(global.miny, global.maxy),
                 type = "n", xlab="", ylab="", xaxt="n", main="")
 
-              title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
-              title(xlab = "Concentration", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+              title(ylab = paste0("Ln(1+Response", drBootSpline$control$dr.parameter, ")"), line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
+              title(xlab = "Concentration", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
             }
           }
         }
@@ -770,8 +770,8 @@ plot.drBootSpline <- function (x,
           col = "gray",
           xaxt = "n",xlab="",ylab="", main=""
         )
-        title(xlab = "EC50", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        title(xlab = "EC50", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
         axis(1, mgp=c(3,1+0.5*cex.axis,0))
       }
       else{
@@ -783,8 +783,8 @@ plot.drBootSpline <- function (x,
           col = "gray",
           xaxt = "n",xlab="",ylab="", main=""
         )
-        title(xlab = "yEC50", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
-        title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+        title(xlab = "yEC50", line = 1 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+        title(ylab = "Frequency", line = 1.1 + 0.8*cex.lab+1.2*cex.axis, cex.lab = cex.lab)
         axis(1, mgp=c(3,1+0.5*cex.axis,0))
       }
       else{
