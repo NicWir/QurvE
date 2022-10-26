@@ -7708,7 +7708,7 @@ server <- function(input, output, session){
                         x.lim = x.lim,
                         y.lim.deriv = ylim.deriv,
                         deriv = input$plot_derivative_growth_spline_bt,
-                        shiny = TRUE
+                        combine = TRUE
       )
     }
   })
@@ -7774,7 +7774,7 @@ server <- function(input, output, session){
                         x.lim = x.lim,
                         y.lim.deriv = ylim.deriv,
                         deriv = input$plot_derivative_growth_spline_bt,
-                        shiny = TRUE
+                        combine = TRUE
       )
 
       dev.off()

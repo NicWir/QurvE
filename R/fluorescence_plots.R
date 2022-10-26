@@ -646,7 +646,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
+#' @param combine (Logical) Indicate whether both growth curves and parameter plots shall be shown within the same window.
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.flBootSpline
@@ -657,7 +657,7 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                               cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
                               lwd = 2, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
                               plot = TRUE, export = FALSE,
-                              height = 7, width = 9, out.dir = NULL, shiny = FALSE, ...)
+                              height = 7, width = 9, out.dir = NULL, combine = FALSE, ...)
 {
   flBootSpline <- x
   # flBootSpline an object of class flBootSpline
@@ -674,6 +674,7 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex.point")
   if (flBootSpline$bootFlag==FALSE){
+    message("Could not find successful bootstrapping operations for the provided flBootSpline object. Did you define ´nboot.fl´ in the control object when running computations?")
     empty.plot()
   }
   else{
@@ -917,7 +918,7 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
       par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p3 <- function()
   }
-  if (export == TRUE){
+  if (export == TRUE && flBootSpline$bootFlag==TRUE){
     w1 <- width
     h1 <- height
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
@@ -941,8 +942,8 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
     grDevices::dev.off()
   }
 
-  if (plot == TRUE){
-    if(!shiny){
+  if (plot == TRUE && flBootSpline$bootFlag==TRUE){
+    if(!combine){
       p1()
       dev.new()
       p2()

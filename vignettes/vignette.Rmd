@@ -276,7 +276,7 @@ plot(grodata, data.type = "raw", log.y = FALSE, x.lim = c(NA, 32),
 
 ## Run Workflow
 
-To perform a complete growth profiling of all samples in the input dataset, we call the `growth.workflow()` function on the `grodata` object. With `supress.messages = TRUE`, we avoid printing information about every sample's fit in the sample to the console. By default, the selected response parameter to perform a dose-response analysis is 'mu.linfit'. To choose a different parameter, provide the argument `dr.parameter = 'choice'`. A list of appropriate parameters is provided within the function documentation (`?growth.workflow`).
+To perform a complete growth profiling of all samples in the input dataset, we call the `growth.workflow()` function on the `grodata` object. With `r colorize_code("supress.messages = TRUE", "red")`, we avoid printing information about every sample's fit in the sample to the console. By default, the selected response parameter to perform a dose-response analysis is 'mu.linfit'. To choose a different parameter, provide the argument `r colorize_code("dr.parameter = 'choice'", "red")`. A list of appropriate parameters is provided within the function documentation (`?growth.workflow`).
 
 ```{r run-default-workflow, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
 grofit <- growth.workflow(grodata = grodata, 
@@ -287,7 +287,7 @@ grofit <- growth.workflow(grodata = grodata,
 
 Tab-delimited .txt files summarizing the computation results are created automatically, as well as the `grofit` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit`object. In RStudio, `View(grofit)` allows interactive inspection of the data container.
 
-If you want to create a report summarizing all computational results including a graphical representation of every fit, provide the desired output format(s) as `report = 'pdf'`, `report = 'html'`, or `report = c('pdf', 'html')`. The advantage of having the report in HTML format is that every figure can be exported as (editable) PDF file.
+If you want to create a report summarizing all computational results including a graphical representation of every fit, provide the desired output format(s) as `r colorize_code("report = 'pdf'", "red")`, `r colorize_code("report = 'html'", "red")`, or `r colorize_code("report = c('pdf', 'html')", "red")`. The advantage of having the report in HTML format is that every figure can be exported as (editable) PDF file.
 
 *`r colorize("In the spirit of good scientific practice (data transparency), I would encourage anyone using QurvE to attach the .RData file and generated reports to their publication.", "orange")`*
 
@@ -456,9 +456,29 @@ plot.parameter(grofit, param = "mu.linfit", basesize = 8.5)
 
 ### Dose-response analysis
 
-The results of the dose-response analysis can be visualized by calling `plot()` on the `drFit` object that is stored within `grofit`. This action calls `plot.drFit()` which in turn runs `plot.drFitSpline()` or `plot.drFitModel()` (depending on the choice of `dr.method` in the workflow) on every condition for which a dose-reponse analysis has been performed. Alternatively, you can call `plot()` on the list elements in `grofit$drFit$drFittedModels` or `grofit$drFit$drFittedSplines`, respectively.
+The results of the dose-response analysis can be visualized by calling `plot()` on the `drFit` object that is stored within `grofit`. This action calls `plot.drFit()` which in turn runs `plot.drFitSpline()` or `plot.drFitModel()` (depending on the choice of `r colorize_code("dr.method", "red")` in the workflow) on every condition for which a dose-response analysis has been performed. Alternatively, you can call `plot()` on the list elements in `grofit$drFit$drFittedModels` or `grofit$drFit$drFittedSplines`, respectively.
 ```{r plot-drFit, fig.ncol = 1, fig.show="hold", out.width="85%", fig.height = 5.5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drFit} Dose response analysis - model fits."}
 plot(grofit$drFit, cex.point = 1)
 ```
 
+# Bootstrapping
+
+When growth experiments are performed on a larger scale with manual density measurements, technical deviations can result in outliers. Such outliers can lead to a distortion of the curve fits, especially if fewer data points are available than is usual in plate reading experiments. In this instance, bootstrapping can provide a more realistic estimation of growth parameters. Bootstrapping is a statistical procedure that resamples a single dataset to create many simulated samples. This is done by randomly drawing data points from a dataset with replacement until the original number of data points has been reached. The analysis (here: growth fitting) is then performed individually on each bootstrapped replicate. The variation in the resulting estimated parameters is a reasonable approximation of the variance in those parameters. To include bootstrapping into the `QurvE` workflow, we define the argument `r colorize_code("nboot.gc", "red")`./
+
+Similarly, we can include bootstrapping in the dose-response analysis if done with `r colorize_code("dr.method = 'spline'", "red")` by defining argument `r colorize_code("nboot.dr", "red")`.. 
+
+```{r run-workflow_with-bootstrapping, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
+grofit_bt <- growth.workflow(grodata = grodata, 
+                           fit.opt = "s", # perform only nonparametric growth fitting
+                           nboot.gc = 100,
+                           ec50 = T,
+                           dr.method = "spline",
+                           nboot.dr = 100,
+                           suppress.messages = TRUE)
+```
+
+To plot the results of a growth fit with bootstrapping, we call `plot()` on a `gcBootSpline` object:
+```{r plot-gcBootSpline, fig.ncol = 1, fig.show="hold", out.width="85%", fig.height = 5.5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping."}
+plot(grofit_bt$gcFit$gcBootSpline[[5]])
+```
 \pagebreak
