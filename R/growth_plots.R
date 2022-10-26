@@ -514,7 +514,7 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
 #' @param height (Numeric) Height of the exported image in inches.
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
-#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
+#' @param combine (Logical) Indicate whether both dose-response curves and parameter plots shall be shown within the same window.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
 #' @export plot.drBootSpline
@@ -526,7 +526,7 @@ plot.drBootSpline <- function (x,
                                colSpline = scales::alpha("black", 0.15),
                                cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
                                lwd = 2, plot = TRUE, export = FALSE,
-                               height = 7, width = 9, out.dir = NULL, shiny = FALSE,
+                               height = 7, width = 9, out.dir = NULL, combine = FALSE,
                                ...)
 {
   drBootSpline <- x
@@ -817,7 +817,7 @@ plot.drBootSpline <- function (x,
     }
 
     if (plot == TRUE){
-      if(!shiny){
+      if(!combine){
         p1()
         p2()
       } else {
@@ -958,7 +958,7 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
         geom_errorbar(aes(ymin = .data$CI.L, ymax = .data$CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
         geom_line(data = spline.df, aes(.data$x, .data$y, colour = .data$Condition), size = lwd) +
         theme_classic(base_size = basesize) +
-        theme(legend.position=legend.position) +
+        theme(legend.position="bottom") +
         ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
 
       if(log.y == TRUE){
@@ -990,8 +990,8 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
       if(ec50line){
         plot.xmin <- ggplot_build(p)$layout$panel_params[[1]]$x.range[1]
         plot.ymin <- ggplot_build(p)$layout$panel_params[[1]]$y.range[1]
-        p <- p + geom_segment(data = res.df, aes(x = .data$plot.xmin, xend = .data$ec50, y = .data$yEC50, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd) +
-          geom_segment(data = res.df, aes(x = .data$ec50, xend = .data$ec50, y = .data$plot.ymin, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd)
+        p <- p + geom_segment(data = res.df, aes(x = plot.xmin, xend = .data$ec50, y = .data$yEC50, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd) +
+          geom_segment(data = res.df, aes(x = .data$ec50, xend = .data$ec50, y = plot.ymin, yend = .data$yEC50), alpha = 0.7, linetype = 3, size = 0.7*lwd)
 
         if(log.y == TRUE){
           if(!is.null(y.lim)){

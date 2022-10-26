@@ -465,20 +465,33 @@ plot(grofit$drFit, cex.point = 1)
 
 When growth experiments are performed on a larger scale with manual density measurements, technical deviations can result in outliers. Such outliers can lead to a distortion of the curve fits, especially if fewer data points are available than is usual in plate reading experiments. In this instance, bootstrapping can provide a more realistic estimation of growth parameters. Bootstrapping is a statistical procedure that resamples a single dataset to create many simulated samples. This is done by randomly drawing data points from a dataset with replacement until the original number of data points has been reached. The analysis (here: growth fitting) is then performed individually on each bootstrapped replicate. The variation in the resulting estimated parameters is a reasonable approximation of the variance in those parameters. To include bootstrapping into the `QurvE` workflow, we define the argument `r colorize_code("nboot.gc", "red")`./
 
-Similarly, we can include bootstrapping in the dose-response analysis if done with `r colorize_code("dr.method = 'spline'", "red")` by defining argument `r colorize_code("nboot.dr", "red")`.. 
+Similarly, we can include bootstrapping in the dose-response analysis if done with `r colorize_code("dr.method = 'spline'", "red")` by defining argument `r colorize_code("nboot.dr", "red")`.
 
 ```{r run-workflow_with-bootstrapping, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
 grofit_bt <- growth.workflow(grodata = grodata, 
                            fit.opt = "s", # perform only nonparametric growth fitting
-                           nboot.gc = 100,
+                           nboot.gc = 50,
                            ec50 = T,
                            dr.method = "spline",
+                           dr.parameter = "mu.spline",
                            nboot.dr = 100,
                            suppress.messages = TRUE)
 ```
 
 To plot the results of a growth fit with bootstrapping, we call `plot()` on a `gcBootSpline` object:
-```{r plot-gcBootSpline, fig.ncol = 1, fig.show="hold", out.width="85%", fig.height = 5.5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping."}
-plot(grofit_bt$gcFit$gcBootSpline[[5]])
+
+```{r plot-gcBootSpline, fig.show="hold", out.width="85%", fig.height = 10, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping."}
+plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces '[[]]' save as an alternative to 
+                                        # access list items and allow their access by number
+     combine = TRUE # combine both growth curves and parameter plots in the same window
+     )
+```
+
+And by applying `plot()` to a `drBootSpline` object, we can plot the dose-response bootstrap results:
+
+```{r plot-drBootSpline, fig.show="hold", out.width="85%", fig.height = 10, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping."}
+plot(grofit_bt$drFit$drBootSpline[[1]], 
+     combine = TRUE # combine both dose-response curves and parameter plots in the same window
+     )
 ```
 \pagebreak

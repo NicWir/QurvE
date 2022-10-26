@@ -9156,7 +9156,7 @@ server <- function(input, output, session){
                      cex.lab = input$axis_size_dose_response_growth_plot_bt,
                      cex.axis = input$lab_size_dose_response_growth_plot_bt,
                      lwd = input$line_width_dose_response_growth_plot_bt,
-                     shiny = TRUE
+                     combine = TRUE
 
     )
   })
@@ -9189,7 +9189,7 @@ server <- function(input, output, session){
                         cex.lab = input$axis_size_dose_response_growth_plot_bt,
                         cex.axis = input$lab_size_dose_response_growth_plot_bt,
                         lwd = input$line_width_dose_response_growth_plot_bt,
-                        shiny = TRUE
+                        combine = TRUE
 
       )
       dev.off()
@@ -10240,7 +10240,7 @@ server <- function(input, output, session){
                           cex.lab = input$axis_size_dose_response_fluorescence_plot_bt,
                           cex.axis = input$lab_size_dose_response_fluorescence_plot_bt,
                           lwd = input$line_width_dose_response_fluorescence_plot_bt,
-                          shiny = TRUE
+                          combine = TRUE
 
         )
       })
@@ -10273,7 +10273,7 @@ server <- function(input, output, session){
                             cex.lab = input$axis_size_dose_response_fluorescence_plot_bt,
                             cex.axis = input$lab_size_dose_response_fluorescence_plot_bt,
                             lwd = input$line_width_dose_response_fluorescence_plot_bt,
-                            shiny = TRUE
+                            combine = TRUE
 
           )
           dev.off()
