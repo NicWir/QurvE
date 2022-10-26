@@ -2392,7 +2392,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
     } # if(!exists("spline") || is.null(spline) == TRUE)
     else {
       # Perform first derivative and extract parameters
-      deriv1 <- stats::predict(spline, time, deriv = 1)
+      deriv1 <- stats::predict(spline, deriv = 1)
       #consider only slopes at density values greater than the initial value
       deriv1.growth <- deriv1; deriv1.growth$x <- deriv1.growth$x[spline$y > spline$y[1]]; deriv1.growth$y <- deriv1.growth$y[spline$y > spline$y[1]]
       if(length(deriv1.growth$y) < 3){
