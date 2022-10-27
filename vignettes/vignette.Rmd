@@ -284,7 +284,8 @@ To perform a complete growth profiling of all samples in the input dataset, we c
 grofit <- growth.workflow(grodata = grodata, 
                            fit.opt = "a",
                            ec50 = T,
-                           suppress.messages = TRUE)
+                           suppress.messages = TRUE,
+                           export.res = F) # prevent creating of results table and RData files)
 ```
 
 Tab-delimited .txt files summarizing the computation results are created automatically, as well as the `grofit` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit`object. In RStudio, `View(grofit)` allows interactive inspection of the data container.
@@ -480,12 +481,13 @@ grofit_bt <- growth.workflow(grodata = grodata,
                            dr.parameter = "mu.spline",
                            nboot.dr = 50,
                            smooth.dr = 0.25,
-                           suppress.messages = TRUE)
+                           suppress.messages = TRUE,
+                           export.res = F) 
 ```
 
 To plot the results of a growth fit with bootstrapping, we call `plot()` on a `gcBootSpline` object:
 
-```{r plot-gcBootSpline, fig.show="hold", out.width="100%", fig.height = 4, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`."}
+```{r plot-gcBootSpline, fig.show="hold", out.width="100%", fig.height = 5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`."}
 plot(grofit_bt$gcFit$gcBootSpline[[8]], # Double braces serve as an alternative to 
                                         # access list items and allow their access by number
      combine = TRUE, # combine both growth curves and parameter plots in the same window
