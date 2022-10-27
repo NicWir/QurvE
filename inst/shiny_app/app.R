@@ -7194,9 +7194,17 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_growth_validate_linear == ".pdf"){
-        Cairo::CairoPDF(file = file,
-            width = input$width_download_growth_validate_linear,
-            height = input$height_download_growth_validate_linear)
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          Cairo::CairoPDF(file = file,
+                          width = input$width_download_growth_validate_linear,
+                          height = input$height_download_growth_validate_linear)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          grDevices::pdf(file = file,
+                         width = input$width_download_growth_validate_linear,
+                         height = input$height_download_growth_validate_linear)
+        }
+
       } else {
         grDevices::png(file = file,
             width = input$width_download_growth_validate_linear,
@@ -7447,10 +7455,27 @@ server <- function(input, output, session){
       paste("spline_fit_",  gsub(" \\| ", "_", selected_vals_validate_growth$sample_validate_growth_spline), input$format_download_growth_validate_spline, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_growth_validate_spline,
-             height = input$height_download_growth_validate_spline,
-             dpi = input$dpi_download_growth_validate_spline,
-             device = cairo_pdf)
+      if(input$format_download_growth_validate_spline == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_growth_validate_spline,
+                 height = input$height_download_growth_validate_spline,
+                 dpi = input$dpi_download_growth_validate_spline,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_growth_validate_spline,
+                 height = input$height_download_growth_validate_spline,
+                 dpi = input$dpi_download_growth_validate_spline,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_growth_validate_spline,
+               height = input$height_download_growth_validate_spline,
+               dpi = input$dpi_download_growth_validate_spline,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_growth_validate_spline == ".pdf", "image/pdf", "image/png")
 
@@ -7628,10 +7653,27 @@ server <- function(input, output, session){
       paste("model_fit_",  gsub(" \\| ", "_", selected_vals_validate_growth$sample_validate_growth_model), input$format_download_growth_validate_model, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_growth_validate_model,
-             height = input$height_download_growth_validate_model,
-             dpi = input$dpi_download_growth_validate_model,
-             device = cairo_pdf)
+      if(input$format_download_growth_validate_model == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_growth_validate_model,
+                 height = input$height_download_growth_validate_model,
+                 dpi = input$dpi_download_growth_validate_model,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_growth_validate_model,
+                 height = input$height_download_growth_validate_model,
+                 dpi = input$dpi_download_growth_validate_model,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_growth_validate_model,
+               height = input$height_download_growth_validate_model,
+               dpi = input$dpi_download_growth_validate_model,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_growth_validate_model == ".pdf", "image/pdf", "image/png")
 
@@ -7723,9 +7765,17 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_growth_validate_spline_bt == ".pdf"){
-        Cairo::CairoPDF(file = file,
-            width = input$width_download_growth_validate_spline_bt,
-            height = input$height_download_growth_validate_spline_bt)
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          Cairo::CairoPDF(file = file,
+                          width = input$width_download_growth_validate_spline_bt,
+                          height = input$height_download_growth_validate_spline_bt)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          grDevices::pdf(file = file,
+                         width = input$width_download_growth_validate_spline_bt,
+                         height = input$height_download_growth_validate_spline_bt)
+        }
+
       } else {
         grDevices::png(file = file,
             width = input$width_download_growth_validate_spline_bt,
@@ -8044,9 +8094,17 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_fluorescence_validate_linear == ".pdf"){
-        Cairo::CairoPDF(file = file,
-            width = input$width_download_fluorescence_validate_linear,
-            height = input$height_download_fluorescence_validate_linear)
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          Cairo::CairoPDF(file = file,
+                          width = input$width_download_fluorescence_validate_linear,
+                          height = input$height_download_fluorescence_validate_linear)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          grDevices::pdf(file = file,
+                         width = input$width_download_fluorescence_validate_linear,
+                         height = input$height_download_fluorescence_validate_linear)
+        }
+
       } else {
         grDevices::png(file = file,
             width = input$width_download_fluorescence_validate_linear,
@@ -8278,10 +8336,26 @@ server <- function(input, output, session){
       paste("spline_fit_",  gsub(" \\| ", "_", selected_vals_validate_fluorescence$sample_validate_fluorescence_spline), input$format_download_fluorescence_validate_spline, sep="")
     },
     content = function(file) {
+      if(input$format_download_fluorescence_validate_spline == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_fluorescence_validate_spline,
+                 height = input$height_download_fluorescence_validate_spline,
+                 dpi = input$dpi_download_fluorescence_validate_spline,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_fluorescence_validate_spline,
+                 height = input$height_download_fluorescence_validate_spline,
+                 dpi = input$dpi_download_fluorescence_validate_spline,
+                 device = pdf)
+        }
+
+      } else {
       ggsave(filename = file, width = input$width_download_fluorescence_validate_spline,
              height = input$height_download_fluorescence_validate_spline,
              dpi = input$dpi_download_fluorescence_validate_spline,
-             device = cairo_pdf)
+             device = png)
+      }
     },
     contentType = ifelse(input$format_download_fluorescence_validate_spline == ".pdf", "image/pdf", "image/png")
 
@@ -8363,9 +8437,17 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_fluorescence_validate_spline_bt == ".pdf"){
-        Cairo::CairoPDF(file = file,
-            width = input$width_download_fluorescence_validate_spline_bt,
-            height = input$height_download_fluorescence_validate_spline_bt)
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          Cairo::CairoPDF(file = file,
+                          width = input$width_download_fluorescence_validate_spline_bt,
+                          height = input$height_download_fluorescence_validate_spline_bt)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          grDevices::pdf(file = file,
+                         width = input$width_download_fluorescence_validate_spline_bt,
+                         height = input$height_download_fluorescence_validate_spline_bt)
+        }
+
       } else {
         grDevices::png(file = file,
             width = input$width_download_fluorescence_validate_spline_bt,
@@ -8535,10 +8617,27 @@ server <- function(input, output, session){
       paste("growth_group_plot",  input$format_download_growth_group_plot, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_growth_group_plot,
-             height = input$height_download_growth_group_plot,
-             dpi = input$dpi_download_growth_group_plot,
-             device = cairo_pdf)
+      if(input$format_download_growth_group_plot == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_growth_group_plot,
+                 height = input$height_download_growth_group_plot,
+                 dpi = input$dpi_download_growth_group_plot,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_growth_group_plot,
+                 height = input$height_download_growth_group_plot,
+                 dpi = input$dpi_download_growth_group_plot,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_growth_group_plot,
+               height = input$height_download_growth_group_plot,
+               dpi = input$dpi_download_growth_group_plot,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_growth_group_plot == ".pdf", "image/pdf", "image/png")
   )
@@ -8728,10 +8827,27 @@ server <- function(input, output, session){
       paste("dose_response_growth_combined",  input$format_download_dose_response_growth_plot_combined, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_dose_response_growth_plot_combined,
-             height = input$height_download_dose_response_growth_plot_combined,
-             dpi = input$dpi_download_dose_response_growth_plot_combined,
-             device = cairo_pdf)
+      if(input$format_download_dose_response_growth_plot_combined == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_dose_response_growth_plot_combined,
+                 height = input$height_download_dose_response_growth_plot_combined,
+                 dpi = input$dpi_download_dose_response_growth_plot_combined,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_dose_response_growth_plot_combined,
+                 height = input$height_download_dose_response_growth_plot_combined,
+                 dpi = input$dpi_download_dose_response_growth_plot_combined,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_dose_response_growth_plot_combined,
+               height = input$height_download_dose_response_growth_plot_combined,
+               dpi = input$dpi_download_dose_response_growth_plot_combined,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_dose_response_growth_plot_combined == ".pdf", "image/pdf", "image/png")
   )
@@ -8826,9 +8942,17 @@ server <- function(input, output, session){
         },
         content = function(file) {
           if(input$format_download_dose_response_growth_plot_individual == ".pdf"){
-            Cairo::CairoPDF(file = file,
-                width = input$width_download_dose_response_growth_plot_model,
-                height = input$height_download_dose_response_growth_plot_model)
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              Cairo::CairoPDF(file = file,
+                              width = input$width_download_dose_response_growth_plot_model,
+                              height = input$height_download_dose_response_growth_plot_model)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              grDevices::pdf(file = file,
+                             width = input$width_download_dose_response_growth_plot_model,
+                             height = input$height_download_dose_response_growth_plot_model)
+            }
+
           } else {
             grDevices::png(file = file,
                 width = input$width_download_dose_response_growth_plot_model,
@@ -8945,9 +9069,17 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_dose_response_growth_plot_individual == ".pdf"){
-        Cairo::CairoPDF(file = file,
-            width = input$width_download_dose_response_growth_plot_individual,
-            height = input$height_download_dose_response_growth_plot_individual)
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          Cairo::CairoPDF(file = file,
+                          width = input$width_download_dose_response_growth_plot_individual,
+                          height = input$height_download_dose_response_growth_plot_individual)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          grDevices::pdf(file = file,
+                         width = input$width_download_dose_response_growth_plot_individual,
+                         height = input$height_download_dose_response_growth_plot_individual)
+        }
+
       } else {
         grDevices::png(file = file,
             width = input$width_download_dose_response_growth_plot_individual,
@@ -9171,9 +9303,17 @@ server <- function(input, output, session){
     },
     content = function(file) {
       if(input$format_download_dose_response_growth_plot_individual_bt == ".pdf"){
-        Cairo::CairoPDF(file = file,
-            width = input$width_download_dose_response_growth_plot_individual_bt,
-            height = input$height_download_dose_response_growth_plot_individual_bt)
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          Cairo::CairoPDF(file = file,
+                          width = input$width_download_dose_response_growth_plot_individual_bt,
+                          height = input$height_download_dose_response_growth_plot_individual_bt)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          grDevices::pdf(file = file,
+                         width = input$width_download_dose_response_growth_plot_individual_bt,
+                         height = input$height_download_dose_response_growth_plot_individual_bt)
+        }
+
       } else {
         grDevices::png(file = file,
             width = input$width_download_dose_response_growth_plot_individual_bt,
@@ -9271,10 +9411,27 @@ server <- function(input, output, session){
       paste("growth_parameter_plot",  input$format_download_growth_parameter_plot, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_growth_parameter_plot,
-             height = input$height_download_growth_parameter_plot,
-             dpi = input$dpi_download_growth_parameter_plot,
-             device = cairo_pdf)
+      if(input$format_download_growth_parameter_plot == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_growth_parameter_plot,
+                 height = input$height_download_growth_parameter_plot,
+                 dpi = input$dpi_download_growth_parameter_plot,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_growth_parameter_plot,
+                 height = input$height_download_growth_parameter_plot,
+                 dpi = input$dpi_download_growth_parameter_plot,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_growth_parameter_plot,
+               height = input$height_download_growth_parameter_plot,
+               dpi = input$dpi_download_growth_parameter_plot,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_growth_parameter_plot == ".pdf", "image/pdf", "image/png")
 
@@ -9412,10 +9569,27 @@ server <- function(input, output, session){
       paste("growth_dr_parameter_plot",  input$format_download_growth_dr_parameter_plot, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_growth_dr_parameter_plot,
-             height = input$height_download_growth_dr_parameter_plot,
-             dpi = input$dpi_download_growth_dr_parameter_plot,
-             device = cairo_pdf)
+      if(input$format_download_growth_dr_parameter_plot == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_growth_dr_parameter_plot,
+                 height = input$height_download_growth_dr_parameter_plot,
+                 dpi = input$dpi_download_growth_dr_parameter_plot,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_growth_dr_parameter_plot,
+                 height = input$height_download_growth_dr_parameter_plot,
+                 dpi = input$dpi_download_growth_dr_parameter_plot,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_growth_dr_parameter_plot,
+               height = input$height_download_growth_dr_parameter_plot,
+               dpi = input$dpi_download_growth_dr_parameter_plot,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_growth_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
 
@@ -9648,10 +9822,27 @@ server <- function(input, output, session){
       paste("fluorescence_group_plot",  input$format_download_fluorescence_group_plot, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_fluorescence_group_plot,
-             height = input$height_download_fluorescence_group_plot,
-             dpi = input$dpi_download_fluorescence_group_plot,
-             device = cairo_pdf)
+      if(input$format_download_growth_dr_parameter_plot == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_fluorescence_group_plot,
+                 height = input$height_download_fluorescence_group_plot,
+                 dpi = input$dpi_download_fluorescence_group_plot,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_fluorescence_group_plot,
+                 height = input$height_download_fluorescence_group_plot,
+                 dpi = input$dpi_download_fluorescence_group_plot,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_fluorescence_group_plot,
+               height = input$height_download_fluorescence_group_plot,
+               dpi = input$dpi_download_fluorescence_group_plot,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_fluorescence_group_plot == ".pdf", "image/pdf", "image/png")
   )
@@ -9839,10 +10030,27 @@ server <- function(input, output, session){
       paste("dose_response_fluorescence_combined",  input$format_download_dose_response_plot_fluorescence_combined, sep="")
     },
     content = function(file) {
-      ggsave(filename = file, width = input$width_download_dose_response_plot_fluorescence_combined,
-             height = input$height_download_dose_response_plot_fluorescence_combined,
-             dpi = input$dpi_download_dose_response_plot_fluorescence_combined,
-             device = cairo_pdf)
+      if(input$format_download_dose_response_plot_fluorescence_combined == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_dose_response_plot_fluorescence_combined,
+                 height = input$height_download_dose_response_plot_fluorescence_combined,
+                 dpi = input$dpi_download_dose_response_plot_fluorescence_combined,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_dose_response_plot_fluorescence_combined,
+                 height = input$height_download_dose_response_plot_fluorescence_combined,
+                 dpi = input$dpi_download_dose_response_plot_fluorescence_combined,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_dose_response_plot_fluorescence_combined,
+               height = input$height_download_dose_response_plot_fluorescence_combined,
+               dpi = input$dpi_download_dose_response_plot_fluorescence_combined,
+               device = png)
+      }
+
     },
     contentType = ifelse(input$format_download_dose_response_plot_fluorescence_combined == ".pdf", "image/pdf", "image/png")
   )
@@ -9902,9 +10110,17 @@ server <- function(input, output, session){
         },
         content = function(file) {
           if(input$format_download_dose_response_fluorescence_plot_individual == ".pdf"){
-            Cairo::CairoPDF(file = file,
-                width = input$width_download_dose_response_fluorescence_plot_individual,
-                height = input$height_download_dose_response_fluorescence_plot_individual)
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              Cairo::CairoPDF(file = file,
+                              width = input$width_download_dose_response_fluorescence_plot_individual,
+                              height = input$height_download_dose_response_fluorescence_plot_individual)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              grDevices::pdf(file = file,
+                             width = input$width_download_dose_response_fluorescence_plot_individual,
+                             height = input$height_download_dose_response_fluorescence_plot_individual)
+            }
+
           } else {
             grDevices::png(file = file,
                 width = input$width_download_dose_response_fluorescence_plot_individual,
@@ -10034,10 +10250,27 @@ server <- function(input, output, session){
           paste("biosensor_model_fluorescence_",  gsub(" \\| ", "_", input$individual_plots_dose_response_model_fluorescence_plot), input$format_download_dose_response_model_fluorescence_plot_individual, sep="")
         },
         content = function(file) {
-          ggsave(filename = file, width = input$width_download_dose_response_model_fluorescence_plot_individual,
-                 height = input$height_download_dose_response_model_fluorescence_plot_individual,
-                 dpi = input$dpi_download_dose_response_model_fluorescence_plot_individual,
-                 device = cairo_pdf)
+          if(input$format_download_dose_response_model_fluorescence_plot_individual == ".pdf"){
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              ggsave(filename = file, width = input$width_download_dose_response_model_fluorescence_plot_individual,
+                     height = input$height_download_dose_response_model_fluorescence_plot_individual,
+                     dpi = input$dpi_download_dose_response_model_fluorescence_plot_individual,
+                     device = cairo_pdf)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              ggsave(filename = file, width = input$width_download_dose_response_model_fluorescence_plot_individual,
+                     height = input$height_download_dose_response_model_fluorescence_plot_individual,
+                     dpi = input$dpi_download_dose_response_model_fluorescence_plot_individual,
+                     device = pdf)
+            }
+
+          } else {
+            ggsave(filename = file, width = input$width_download_dose_response_model_fluorescence_plot_individual,
+                   height = input$height_download_dose_response_model_fluorescence_plot_individual,
+                   dpi = input$dpi_download_dose_response_model_fluorescence_plot_individual,
+                   device = png)
+          }
+
         },
         contentType = ifelse(input$format_download_dose_response_model_fluorescence_plot_individual == ".pdf", "image/pdf", "image/png")
       )
@@ -10127,10 +10360,27 @@ server <- function(input, output, session){
           paste("fluorescence_parameter_plot",  input$format_download_fluorescence_parameter_plot, sep="")
         },
         content = function(file) {
-          ggsave(filename = file, width = input$width_download_fluorescence_parameter_plot,
-                 height = input$height_download_fluorescence_parameter_plot,
-                 dpi = input$dpi_download_fluorescence_parameter_plot,
-                 device = cairo_pdf)
+          if(input$format_download_fluorescence_parameter_plot == ".pdf"){
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              ggsave(filename = file, width = input$width_download_fluorescence_parameter_plot,
+                     height = input$height_download_fluorescence_parameter_plot,
+                     dpi = input$dpi_download_fluorescence_parameter_plot,
+                     device = cairo_pdf)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              ggsave(filename = file, width = input$width_download_fluorescence_parameter_plot,
+                     height = input$height_download_fluorescence_parameter_plot,
+                     dpi = input$dpi_download_fluorescence_parameter_plot,
+                     device = pdf)
+            }
+
+          } else {
+            ggsave(filename = file, width = input$width_download_fluorescence_parameter_plot,
+                   height = input$height_download_fluorescence_parameter_plot,
+                   dpi = input$dpi_download_fluorescence_parameter_plot,
+                   device = png)
+          }
+
         },
         contentType = ifelse(input$format_download_fluorescence_parameter_plot == ".pdf", "image/pdf", "image/png")
 
@@ -10255,9 +10505,17 @@ server <- function(input, output, session){
         },
         content = function(file) {
           if(input$format_download_dose_response_fluorescence_plot_individual_bt == ".pdf"){
-            Cairo::CairoPDF(file = file,
-                width = input$width_download_dose_response_fluorescence_plot_individual_bt,
-                height = input$height_download_dose_response_fluorescence_plot_individual_bt)
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              Cairo::CairoPDF(file = file,
+                              width = input$width_download_dose_response_fluorescence_plot_individual_bt,
+                              height = input$height_download_dose_response_fluorescence_plot_individual_bt)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              grDevices::pdf(file = file,
+                             width = input$width_download_dose_response_fluorescence_plot_individual_bt,
+                             height = input$height_download_dose_response_fluorescence_plot_individual_bt)
+            }
+
           } else {
             grDevices::png(file = file,
                 width = input$width_download_dose_response_fluorescence_plot_individual_bt,
@@ -10375,10 +10633,27 @@ server <- function(input, output, session){
           paste("fluorescence_group_plot",  input$format_download_dual_plot, sep="")
         },
         content = function(file) {
-          ggsave(filename = file, width = input$width_download_dual_plot,
-                 height = input$height_download_dual_plot,
-                 dpi = input$dpi_download_dual_plot,
-                 device = cairo_pdf)
+          if(input$format_download_dual_plot == ".pdf"){
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              ggsave(filename = file, width = input$width_download_dual_plot,
+                     height = input$height_download_dual_plot,
+                     dpi = input$dpi_download_dual_plot,
+                     device = cairo_pdf)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              ggsave(filename = file, width = input$width_download_dual_plot,
+                     height = input$height_download_dual_plot,
+                     dpi = input$dpi_download_dual_plot,
+                     device = pdf)
+            }
+
+          } else {
+            ggsave(filename = file, width = input$width_download_dual_plot,
+                   height = input$height_download_dual_plot,
+                   dpi = input$dpi_download_dual_plot,
+                   device = png)
+          }
+
         },
         contentType = ifelse(input$format_download_dual_plot == ".pdf", "image/pdf", "image/png")
       )
@@ -10442,10 +10717,27 @@ server <- function(input, output, session){
           paste("fluorescence_dr_parameter_plot",  input$format_download_fluorescence_dr_parameter_plot, sep="")
         },
         content = function(file) {
-          ggsave(filename = file, width = input$width_download_fluorescence_dr_parameter_plot,
-                 height = input$height_download_fluorescence_dr_parameter_plot,
-                 dpi = input$dpi_download_fluorescence_dr_parameter_plot,
-                 device = cairo_pdf)
+          if(input$format_download_fluorescence_dr_parameter_plot == ".pdf"){
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              ggsave(filename = file, width = input$width_download_fluorescence_dr_parameter_plot,
+                     height = input$height_download_fluorescence_dr_parameter_plot,
+                     dpi = input$dpi_download_fluorescence_dr_parameter_plot,
+                     device = cairo_pdf)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              ggsave(filename = file, width = input$width_download_fluorescence_dr_parameter_plot,
+                     height = input$height_download_fluorescence_dr_parameter_plot,
+                     dpi = input$dpi_download_fluorescence_dr_parameter_plot,
+                     device = pdf)
+            }
+
+          } else {
+            ggsave(filename = file, width = input$width_download_fluorescence_dr_parameter_plot,
+                   height = input$height_download_fluorescence_dr_parameter_plot,
+                   dpi = input$dpi_download_fluorescence_dr_parameter_plot,
+                   device = png)
+          }
+
         },
         contentType = ifelse(input$format_download_fluorescence_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
 
