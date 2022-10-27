@@ -42,6 +42,7 @@ Imports:
     stats,
     utils
 Suggests:
+    bookdown,
     Cairo,
     htmltools,
     rlang,

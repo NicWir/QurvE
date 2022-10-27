@@ -1149,7 +1149,7 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
     for (i in 1:n) {
       try(plot(drFit$drFittedModels[[i]], ec50line = ec50line, pch = pch,
                y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
-               cex.point = cex.point, export = export,
+               cex.point = cex.point, export = export, cex.axis = basesize/15, cex.lab = basesize*1.2/15,
                plot = plot, height = 7, width = 9, out.dir = out.dir))
     }
   }
@@ -1373,7 +1373,7 @@ plot.drFitModel <- function(x,
                             pch = 1,
                             cex.point,
                             cex.axis = 1,
-                            cex.lab = 1.5,
+                            cex.lab = 1.3,
                             col = 1,
                             lwd = 2,
                             lty = 2,
@@ -3241,6 +3241,7 @@ plot.grodata <- function(x,
                          shiny = FALSE,
                          ...)
 {
+  data.type <- match.arg(data.type)
   if(!(is(x) %in% "grodata")) stop("x needs to be a grodata object created with read_data() or parse_data().")
   if(!(any(data.type %in% c("dens", "fl", "norm.fl")))) stop("data.type needs to be either a 'dens' (density), 'fl' (fluorescence), or 'norm.fl' (fluorescence normalized by density).")
   if(data.type == "fl" && length(x$fluorescence)<2) stop("x does not contain fluorescence data.")
