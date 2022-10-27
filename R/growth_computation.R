@@ -1046,7 +1046,7 @@ growth.workflow <- function (grodata = NULL,
   call <- match.call()
 
   ## remove strictly defined arguments
-  call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <-
+  call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <-
     call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <- call$tmax <- call$max.density <-
     call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <- call$dr.method <- call$dr.model <-
     call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
