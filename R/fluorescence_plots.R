@@ -241,7 +241,12 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
+    if (requireNamespace("Cairo", quietly = TRUE)) {
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
+    } else {
+      message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+      grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf"))
+    }
     p()
     grDevices::dev.off()
   }
@@ -615,7 +620,12 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                        width = w, height = h, units = 'in', res = 300)
         print(p)
         grDevices::dev.off()
-        Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"))
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"))
+        } else {
+          message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+          grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"))
+        }
         print(p)
         grDevices::dev.off()
       }
@@ -919,27 +929,56 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
     } # p3 <- function()
   }
   if (export == TRUE && flBootSpline$bootFlag==TRUE){
-    w1 <- width
-    h1 <- height
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
     dir.create(out.dir, showWarnings = F)
-    grDevices::png(paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.png"),
-                   width = w1, height = h1, units = 'in', res = 300)
-    p1()
-    grDevices::dev.off()
-    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.pdf"))
-    p1()
-    grDevices::dev.off()
+    if(!combine){
+      w1 <- width
+      h1 <- height
 
-    w2 <- width
-    h2 <- width
-    grDevices::png(paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSplineParam.png"),
-                   width = w2, height = h2, units = 'in', res = 300)
-    p2()
-    grDevices::dev.off()
-    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSplineParam.pdf"))
-    p2()
-    grDevices::dev.off()
+      grDevices::png(paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.png"),
+                     width = w1, height = h1, units = 'in', res = 300)
+      p1()
+      grDevices::dev.off()
+      if (requireNamespace("Cairo", quietly = TRUE)) {
+        Cairo::CairoPDF(width = w1, height = h1, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.pdf"))
+      } else {
+        message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+        grDevices::pdf(width = w1, height = h1, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.pdf"))
+      }
+      p1()
+      grDevices::dev.off()
+
+      w2 <- width
+      h2 <- width
+      grDevices::png(paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSplineParam.png"),
+                     width = w2, height = h2, units = 'in', res = 300)
+      p2()
+      grDevices::dev.off()
+      if (requireNamespace("Cairo", quietly = TRUE)) {
+        Cairo::CairoPDF(width = w2, height = h2, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSplineParam.pdf"))
+      } else {
+        message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+        grDevices::pdf(width = w2, height = h2, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSplineParam.pdf"))
+      }
+      p2()
+      grDevices::dev.off()
+    } else {
+      w <- width
+      h <- height
+
+      grDevices::png(paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.png"),
+                     width = w, height = h, units = 'in', res = 300)
+      p1()
+      grDevices::dev.off()
+      if (requireNamespace("Cairo", quietly = TRUE)) {
+        Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.pdf"))
+      } else {
+        message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+        grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", paste(flBootSpline$gcID, collapse = "_"), "_flBootSpline.pdf"))
+      }
+      p1()
+      grDevices::dev.off()
+    }
   }
 
   if (plot == TRUE && flBootSpline$bootFlag==TRUE){
@@ -1102,7 +1141,12 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
                    width = w, height = h, units = 'in', res = 300)
     p()
     grDevices::dev.off()
-    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.pdf"))
+    if (requireNamespace("Cairo", quietly = TRUE)) {
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.pdf"))
+    } else {
+      message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+      grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.pdf"))
+    }
     p()
     grDevices::dev.off()
   }
@@ -1799,7 +1843,12 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    if (requireNamespace("Cairo", quietly = TRUE)) {
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    } else {
+      message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+      grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    }
     print(p)
     grDevices::dev.off()
   }
@@ -1812,11 +1861,6 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
 #' @export plot.flFit
 #' @export
 plot.flFit <- plot.flFitRes
-
-#' @rdname plot.flFitRes
-#' @export plot.grodata
-#' @export
-plot.grodata <- plot.flFitRes
 
 #' Compare fluorescence and density over time
 #'
@@ -2373,7 +2417,12 @@ plot.dual <-  function(x,
                    width = w, height = h, units = 'in', res = 300)
     print(p)
     grDevices::dev.off()
-    Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    if (requireNamespace("Cairo", quietly = TRUE)) {
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    } else {
+      message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+      grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    }
     print(p)
     grDevices::dev.off()
   }

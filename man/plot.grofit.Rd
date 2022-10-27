@@ -2,43 +2,9 @@
 % Please edit documentation in R/growth_plots.R
 \name{plot.grofit}
 \alias{plot.grofit}
-\alias{plot.grodata}
 \title{Generic plot function for \code{grofit} objects. Combine different groups of samples into a single plot}
 \usage{
 \method{plot}{grofit}(
-  x,
-  ...,
-  data.type = c("spline", "raw"),
-  IDs = NULL,
-  names = NULL,
-  conc = NULL,
-  exclude.nm = NULL,
-  exclude.conc = NULL,
-  mean = TRUE,
-  log.y = T,
-  deriv = T,
-  n.ybreaks = 6,
-  colors = NULL,
-  basesize = 20,
-  y.lim = NULL,
-  x.lim = NULL,
-  y.title = NULL,
-  x.title = NULL,
-  y.lim.deriv = NULL,
-  y.title.deriv = NULL,
-  lwd = 1.1,
-  legend.position = "bottom",
-  legend.ncol = 2,
-  plot = TRUE,
-  export = FALSE,
-  height = NULL,
-  width = NULL,
-  out.dir = NULL,
-  out.nm = NULL,
-  shiny = FALSE
-)
-
-\method{plot}{grodata}(
   x,
   ...,
   data.type = c("spline", "raw"),

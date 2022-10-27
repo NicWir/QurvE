@@ -49,6 +49,7 @@ growth.workflow(
   out.dir = NULL,
   out.nm = NULL,
   export.fig = FALSE,
+  export.res = FALSE,
   ...
 )
 }
@@ -132,6 +133,8 @@ growth.workflow(
 \item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.}
 
 \item{export.fig}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{export.res}{(Logical) Create tab-separated TXT files containing calculated growth parameters and dose-response analysis results as well as an .RData file for the resulting \code{grodata} object at the end of the workflow.}
 
 \item{...}{Further arguments passed to the shiny app.}
 }

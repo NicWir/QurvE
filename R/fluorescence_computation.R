@@ -2307,6 +2307,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 #' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "Fluorescenceeport_" and the current date and time.
 #' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
+#' @param export.res (Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting `flFitRes` object at the end of the workflow.
 #' @param ... Further arguments passed to the shiny app.
 #'
 #' @return A \code{flFitRes} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{fl.report}}.
@@ -2521,7 +2522,8 @@ fl.workflow <- function(grodata = NULL,
     if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
       flTable <- data.frame(apply(flFitRes[["flFit"]][["flTable"]],2,as.character))
       res.table.fl <- cbind(flTable[,1:3], Filter(function(x) !all(is.na(x)),flTable[,-(1:3)]))
-      export_Table(table = res.table.fl, out.dir = wd, out.nm = "results.fl1")
+      if(export.res)
+        export_Table(table = res.table.fl, out.dir = wd, out.nm = "results.fl1")
       message(paste0("\nResults of fluorescence analysis saved as tab-delimited text file in:\n",
                  "...", gsub(".+/", "", wd), "/results.fl1.txt\n"))
       # Export grouped results table
@@ -2530,7 +2532,8 @@ fl.workflow <- function(grodata = NULL,
         names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
         table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
         colnames(table_linear_group) <- names
-        export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence_linear")
+        if(export.res)
+          export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence_linear")
       }
 
       if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
@@ -2538,13 +2541,15 @@ fl.workflow <- function(grodata = NULL,
         names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
         table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
         colnames(table_spline_group) <- names
-        export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence_spline")
+        if(export.res)
+          export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence_spline")
       }
     }
     # if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
     #   flTable2 <- data.frame(apply(flFitRes[["flFit2"]][["flTable"]],2,as.character))
     #   res.table.fl2 <- cbind(flTable2[,1:3], Filter(function(x) !all(is.na(x)),flTable2[,-(1:3)]))
-    #   export_Table(table = res.table.fl2, out.dir = wd, out.nm = "results.fl2")
+    #   if(export.res)
+    #     export_Table(table = res.table.fl2, out.dir = wd, out.nm = "results.fl2")
     #   cat(paste0("Results of fluorescence 2 analysis saved as tab-delimited text file in:\n",
     #              wd, "/results.fl2.txt\n"))
     #   # Export grouped results table
@@ -2553,7 +2558,8 @@ fl.workflow <- function(grodata = NULL,
     #     names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
     #     table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
     #     colnames(table_linear_group) <- names
-    #     export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_linear")
+    #     if(export.res)
+    #       export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_linear")
     #   }
     #
     #   if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
@@ -2561,7 +2567,8 @@ fl.workflow <- function(grodata = NULL,
     #     names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
     #     table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
     #     colnames(table_spline_group) <- names
-    #     export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_spline")
+    #     if(export.res)
+    #       export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_spline")
     #   }
     # }
 
@@ -2573,7 +2580,8 @@ fl.workflow <- function(grodata = NULL,
       if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
         if(!is.null(EC50.table1) && length(EC50.table1) > 1) {
           res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
-          export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
+          if(export.res)
+            export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
           message(paste0("\nResults of EC50 analysis for fluorescence saved as tab-delimited in:\n",
                          "...", gsub(".+/", "", wd), "/results.fl_dr1.txt\n"))
         }
@@ -2581,7 +2589,8 @@ fl.workflow <- function(grodata = NULL,
       # if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
       #   if(!is.null(EC50.table2) && length(EC50.table2) > 1) {
       #     res.table.dr_fl2 <- Filter(function(x) !all(is.na(x)),EC50.table2)
-      #     export_Table(table = res.table.dr_fl2, out.dir = wd, out.nm = "results.fl_dr2")
+      #     if(export.res)
+      #       export_Table(table = res.table.dr_fl2, out.dir = wd, out.nm = "results.fl_dr2")
       #
       #     cat(paste0("Results of EC50 analysis for fluorescence 2 saved as tab-delimited in:\n",
       #                wd, "/results.fl_dr2.txt\n"))
@@ -2594,7 +2603,8 @@ fl.workflow <- function(grodata = NULL,
       res.table.dr_fl2 <- NULL
     }
     # Export RData object
-    export_RData(flFitRes, out.dir = wd)
+    if(export.res)
+      export_RData(flFitRes, out.dir = wd)
 
     if(any(report %in% c('pdf', 'html'))){
       try(fl.report(flFitRes, out.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc, ec50 = ec50,
@@ -2636,6 +2646,13 @@ fl.workflow <- function(grodata = NULL,
 #' @include general_misc_utils.R
 fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
 {
+  if(any(format) %in% "pdf"){
+    if (!requireNamespace("Cairo", quietly = TRUE)) {
+      stop("Please install package 'tinytex' to render PDF reports.")
+    } else if(!tinytex::is_tinytex()){
+      stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+    }
+  }
   try(showModal(modalDialog("Rendering report...\n(This can take up to several minutes)", footer=NULL)), silent = TRUE)
   # results an object of class grofit
   if(is(flFitRes) != "flFitRes") stop("flFitRes needs to be an object created with fl.workflow().")

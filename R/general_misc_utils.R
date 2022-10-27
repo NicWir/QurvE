@@ -12,9 +12,6 @@ utils::globalVariables(c("shiny"))
   k0 <- "\n"
   k2 <- paste("https://github.com/NicWir/QurvE")
   packageStartupMessage(c(k1,k0,k2))
-  if(!tinytex::is_tinytex()){
-    packageStartupMessage("TinyTex was not found on your system. To ensure full functionality of QurvE, please execute tinytex::install_tinytex().")
-  }
 
   # github_version <- gsub("Version: ", "", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n"))[grep("Version", unlist(str_split(remotes:::github_DESCRIPTION(username = "NicWir", repo = "QurvE", pat = "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"), "\\n")))])
   # installed_version <- paste(utils::packageVersion("QurvE"))
@@ -46,32 +43,6 @@ colFmt <- function(x, color) {
     ret <- x
   }
   return(ret)
-}
-
-#' Write object in CSV file
-#'
-#' @param dat An R data object (e.g., list, data frame)
-#' @param file (Character) The name of the CSV file.
-#' @param row.names (Logical) Add row names as column (\code{TRUE}) or not (\code{FALSE}).
-fast.write.csv <- function(dat, file, row.names = TRUE) {
-  tryCatch(
-    {
-      if (is.data.frame(dat)) {
-        # there is a rare bug in data.table (R 3.6) which kill the R process in some cases
-        data.table::fwrite(dat, file, row.names = row.names)
-      } else {
-        utils::write.csv(dat, file, row.names = row.names)
-      }
-    },
-    error = function(e) {
-      print(e)
-      utils::write.csv(dat, file, row.names = row.names)
-    },
-    warning = function(w) {
-      print(w)
-      utils::write.csv(dat, file, row.names = row.names)
-    }
-  )
 }
 
 #' Call the appropriate function required to read a table file and return the table as a dataframe object.

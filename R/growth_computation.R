@@ -962,6 +962,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "GrowthResults_" and the current date and time.
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.
 #' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
+#' @param export.res (Logical) Create tab-separated TXT files containing calculated growth parameters and dose-response analysis results as well as an .RData file for the resulting `grodata` object at the end of the workflow.
 #' @param ... Further arguments passed to the shiny app.
 #'
 #' @family workflows
@@ -1027,6 +1028,7 @@ growth.workflow <- function (grodata = NULL,
                              out.dir = NULL,
                              out.nm = NULL,
                              export.fig = FALSE,
+                             export.res = FALSE,
                              ...
 )
 {
@@ -1128,7 +1130,8 @@ growth.workflow <- function (grodata = NULL,
 
     gcTable <- data.frame(apply(grofit[["gcFit"]][["gcTable"]],2,as.character))
     res.table.gc <- cbind(gcTable[,1:3], Filter(function(x) !all(is.na(x)),gcTable[,-(1:3)]))
-    export_Table(table = res.table.gc, out.dir = wd, out.nm = "results.gc")
+    if(export.res)
+      export_Table(table = res.table.gc, out.dir = wd, out.nm = "results.gc")
     # res.table.gc[, c(8:14, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
     message(paste0("\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
                    "...", gsub(".+/", "", wd), "/results.gc.txt'"))
@@ -1139,7 +1142,8 @@ growth.workflow <- function (grodata = NULL,
       names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))))
       table_linear_group <- as.data.frame(lapply(1:ncol(table_linear_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_linear_group[,x]))))
       colnames(table_linear_group) <- names
-      export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_linear")
+      if(export.res)
+        export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_linear")
     }
 
     if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
@@ -1147,7 +1151,8 @@ growth.workflow <- function (grodata = NULL,
       names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
       table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))
       colnames(table_spline_group) <- names
-      export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_spline")
+      if(export.res)
+        export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_spline")
     }
 
     if(("m" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
@@ -1155,7 +1160,8 @@ growth.workflow <- function (grodata = NULL,
       names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_model_group))))
       table_model_group <- as.data.frame(lapply(1:ncol(table_model_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_model_group[,x]))))
       colnames(table_model_group) <- names
-      export_Table(table = table_model_group, out.dir = wd, out.nm = "grouped_results_model")
+      if(export.res)
+        export_Table(table = table_model_group, out.dir = wd, out.nm = "grouped_results_model")
     }
     #   # export table
     #   utils::write.table(combined.df, paste(wd, "mean_results.gc.txt",
@@ -1171,14 +1177,16 @@ growth.workflow <- function (grodata = NULL,
         (length(unique(expdesign$concentration)) >= 4)
     ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
-      export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
+      if(export.res)
+        export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
       message(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
                      "...", gsub(".+/", "", wd), "/results.dr.txt'"))
     } else {
       res.table.dr <- NULL
     }
     # Export RData object
-    export_RData(grofit, out.dir = wd)
+    if(export.res)
+      export_RData(grofit, out.dir = wd)
 
     if(any(report %in% c('pdf', 'html'))){
       try(growth.report(grofit, out.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ec50, mean.grp = mean.grp, mean.conc = mean.conc,
@@ -1222,6 +1230,14 @@ growth.workflow <- function (grodata = NULL,
 #' @family reports
 growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
   {
+  if(any(format) %in% "pdf"){
+    if (!requireNamespace("Cairo", quietly = TRUE)) {
+      stop("Please install package 'tinytex' to render PDF reports.")
+    } else if(!tinytex::is_tinytex()){
+      stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+    }
+  }
+
   try(showModal(modalDialog("Rendering report...\n(This can take up to several minutes)", footer=NULL)), silent = TRUE)
   # results an object of class grofit
   if(methods::is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")

@@ -18,7 +18,7 @@
   height = 7,
   width = 9,
   out.dir = NULL,
-  shiny = FALSE,
+  combine = FALSE,
   ...
 )
 }
@@ -49,7 +49,7 @@
 
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
-\item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
+\item{combine}{(Logical) Indicate whether both dose-response curves and parameter plots shall be shown within the same window.}
 
 \item{...}{Further arguments to refine the generated base R plot.}
 }
