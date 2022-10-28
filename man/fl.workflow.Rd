@@ -44,6 +44,7 @@ fl.workflow(
   out.dir = NULL,
   out.nm = NULL,
   export.fig = FALSE,
+  export.res = FALSE,
   ...
 )
 }
@@ -126,9 +127,9 @@ fl.workflow(
 
 \item{export.fig}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{...}{Further arguments passed to the shiny app.}
-
 \item{export.res}{(Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting \code{flFitRes} object at the end of the workflow.}
+
+\item{...}{Further arguments passed to the shiny app.}
 }
 \value{
 A \code{flFitRes} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{fl.report}}.

@@ -24,7 +24,7 @@
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
 #' @details
-#' \figure{Data_layout.png}
+#' \figure{Data_layout.jpg}
 #'
 #' @return An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with density and fluorescence data (if applicable),
 #' and an experimental design table. The \code{grodata} object can be directly
@@ -1126,7 +1126,8 @@ growth.workflow <- function (grodata = NULL,
       wd <- paste(getwd(), "/GrowthResults_", format(Sys.time(),
                                                      "%Y%m%d_%H%M%S"), sep = "")
     }
-    dir.create(wd, showWarnings = F)
+    if(export.res)
+      dir.create(wd, showWarnings = F)
 
     gcTable <- data.frame(apply(grofit[["gcFit"]][["gcTable"]],2,as.character))
     res.table.gc <- cbind(gcTable[,1:3], Filter(function(x) !all(is.na(x)),gcTable[,-(1:3)]))

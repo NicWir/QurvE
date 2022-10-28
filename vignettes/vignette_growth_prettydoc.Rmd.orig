@@ -4,24 +4,15 @@ author: "Nicolas T. Wirth"
 date: "`r Sys.Date()`"
 mainfont: Arial
 output:
-  bookdown::html_document2:
+  prettydoc::html_pretty:
     fig_caption: yes
     toc: true
-    toc_float: true
-    theme: united
-    # toc_float: true
-    # theme: united
-  # bookdown::pdf_document2:
-  #   extra_dependencies: 
-  #     - "flafter"
-  #     - "subfig"
-  #   fig_caption: yes
-  #   toc: false
-  #   latex_engine: xelatex
+    theme: "cayman"
+    highlight: vignette
 vignette: >
   %\VignetteIndexEntry{Quantitiative Growth Curve Evaluation with Package `QurvE`}
   %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{rmarkdown::render}
+  %\VignetteEngine{knitr::rmarkdown}
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/research-institute-for-nature-and-forest.csl
 link-citations: true
 lang: en-US
@@ -30,41 +21,41 @@ bibliography: references.bib
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 60), 
+knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 60),
                       collapse = TRUE,
                       comment = "#>",
-                      dev = 'png')
+                      dev = 'png',
+                      fig.path = "vigfig-")
 knit_table <- function(df, caption){
-  if (knitr::is_html_output()) {
+  if (knitr::is_latex_output()) {
+    for(i in 1:ncol(df)){
+       df[,i] <- gsub("`", "$", arguments[,i])
+     }
+     df %>% knitr::kable("latex", linesep = "\\addlinespace", col.names = NULL, booktabs = TRUE, escape = F) %>%
+      kableExtra::kable_styling(full_width = F, latex_options = "HOLD_position") %>% kableExtra::column_spec(column=1, width = "3cm") %>% kableExtra::column_spec(column=2, width = "14cm",)
+  } else {
     table.formatted <- knitr::kable(df, escape = FALSE, row.names = F, col.names = NULL, format = "html", ) %>% kableExtra::column_spec(column=1, width = "3cm")
     for(i in 1:nrow(df)){
       table.formatted <- table.formatted %>% kableExtra::row_spec(i, extra_css = 'vertical-align: top !important; ')
     }
     table.formatted
-    
-  } else {
-    for(i in 1:ncol(df)){
-       df[,i] <- gsub("`", "$", arguments[,i])
-     }
-     df %>% knitr::kable("latex", linesep = "\\addlinespace", col.names = NULL, booktabs = TRUE, escape = F) %>% 
-      kableExtra::kable_styling(full_width = F, latex_options = "HOLD_position") %>% kableExtra::column_spec(column=1, width = "3cm") %>% kableExtra::column_spec(column=2, width = "14cm",)
    }
 }
 colorize <- function(x, color) {
-  # if (knitr::is_latex_output()) {
-  #   sprintf("\\textcolor{%s}{%s}", color, x)
-  # } else if (knitr::is_html_output()) {
+  if (knitr::is_latex_output()) {
+     sprintf("\\textcolor{%s}{%s}", color, x)
+   } else {
     sprintf("<span style='color: %s;'>%s</span>", color,
             x)
-  # } else x
+   } 
 }
 colorize_code <- function(x, color) {
-    # if (knitr::is_latex_output()) {
-    #     sprintf("\\texttt{\\textcolor{%s}{%s}}", color, x)
-    # } else if (knitr::is_html_output()) {
+    if (knitr::is_latex_output()) {
+         sprintf("\\texttt{\\textcolor{%s}{%s}}", color, x)
+    } else if (knitr::is_html_output()) {
         sprintf("<span style='color: %s;'>`%s`</span>", color,
                 x)
-    # } else x
+    }
 }
 library(QurvE)
 ```
@@ -210,13 +201,13 @@ To parse data, run:
 ```{r parse-data, echo = TRUE, eval = FALSE, tidy.opts=list(width.cutoff=60)}
 grodata <- parse_data(data.file = 'path_to_data_file',
                     map.file = 'path_to_mapping_file',
-                    software = 'used_software_or_device', 
+                    software = 'used_software_or_device',
                     csvsep.data = ';', # or ','
                     dec.data = '.', # or ','
                     csvsep.map = ';', # or ','
                     dec.map = '.', # or ','
                     sheet.data = 1, # number (or "name") of the EXCEL file sheet containing data
-                    sheet.map = 1, # number (or "name") of the EXCEL file sheet containing 
+                    sheet.map = 1, # number (or "name") of the EXCEL file sheet containing
                                    # mapping information
                     subtract.blank = TRUE,
                     calibration = NULL,
@@ -265,9 +256,9 @@ head(grodata$expdesign)
 
 We can plot the raw data. Applying the generic `plot()` function to `grodata` objects calls the function `plot.grodata()`.:
 
-```{r raw-data-plot, dpi = 72, out.width="80%", fig.height=4.5, fig.pos = "H", echo = T, eval = T, results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.\nConditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
-plot(grodata, data.type = "dens", log.y = FALSE, 
-     x.lim = c(NA, 32), legend.position = "right", 
+```{r raw-data-plot, dpi = 120, out.width="80%", fig.height=4.5, fig.pos = "H", echo = T, eval = T, results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.\nConditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
+plot(grodata, data.type = "dens", log.y = FALSE,
+     x.lim = c(NA, 32), legend.position = "right",
      exclude.conc = c(50, 70, 90),
      basesize = 10, legend.ncol = 1, lwd = 0.7)
 ```
@@ -277,7 +268,7 @@ plot(grodata, data.type = "dens", log.y = FALSE,
 To perform a complete growth profiling of all samples in the input dataset, we call the `growth.workflow()` function on the `grodata` object. With `r colorize_code("supress.messages = TRUE", "red")`, we avoid printing information about every sample's fit in the sample to the console. By default, the selected response parameter to perform a dose-response analysis is 'mu.linfit'. To choose a different parameter, provide the argument `r colorize_code("dr.parameter = 'choice'", "red")`. A list of appropriate parameters is provided within the function documentation (`?growth.workflow`).
 
 ```{r run-default-workflow, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
-grofit <- growth.workflow(grodata = grodata, 
+grofit <- growth.workflow(grodata = grodata,
                           fit.opt = "a",
                           ec50 = T,
                           suppress.messages = TRUE,
@@ -294,8 +285,8 @@ Arguments that are commonly modified:
 
 ```{r workflow-arguments, echo = F}
 if (knitr::is_html_output()) {
-  arguments <- data.frame(args = c("<span style='color: red;'>`fit.opt`</span>", 
-                                   "<span style='color: red;'>`model.type`</span>", 
+  arguments <- data.frame(args = c("<span style='color: red;'>`fit.opt`</span>",
+                                   "<span style='color: red;'>`model.type`</span>",
                                    "<span style='color: red;'>`log.y.lin`</span>\n<span style='color: red;'>`log.y.spline`</span>\n<span style='color: red;'>`log.y.model`</span>",
                                  "<span style='color: red;'>`biphasic`</span>",
                                  "<span style='color: red;'>`interactive`</span>",
@@ -311,10 +302,10 @@ if (knitr::is_html_output()) {
                                     "Define the method used to perform a dose-responde analysis: smooth spline fit (`'spline'`) or model fitting (`'model'`, the default). See section 4",
                                     "The response parameter in the output table to be used for creating a dose response curve. See `?growth.drFit` for further details."
                           ))
-  
+
 } else {
-  arguments <- data.frame(args = c("\\texttt{\\textcolor{red}{fit.opt}}", 
-                                   "\\texttt{\\textcolor{red}{model.type}}", 
+  arguments <- data.frame(args = c("\\texttt{\\textcolor{red}{fit.opt}}",
+                                   "\\texttt{\\textcolor{red}{model.type}}",
                                    "\\texttt{\\textcolor{red}{log.y.lin}}\n\\texttt{\\textcolor{red}{log.y.spline}}\n\\texttt{\\textcolor{red}{log.y.model}}",
                                    "\\texttt{\\textcolor{red}{biphasic}}",
                                    "\\texttt{\\textcolor{red}{interactive}}",
@@ -352,7 +343,7 @@ A `grofit` object contains two tables summarizing the computational results:
 -   `grofit$drFit$drTable` contains the results of the dose-response analysis
 
 ```{r echo = T, eval = T, results='asis', message=FALSE, error=FALSE, warning=FALSE, tidy = FALSE}
-# show the first three rows and first 14 columns of gcTable 
+# show the first three rows and first 14 columns of gcTable
 gcTable <- grofit$gcFit$gcTable
 gcTable[1:3, 1:14]
 
@@ -372,15 +363,15 @@ Several generic `plot()` methods have been written to allow easy plotting of res
 
 Applying `plot()` to the `grofit` object produces a figure of all spline fits performed as well as the first derivative (slope) over time. The generic function calls `plot.grofit()` with `data.type = 'spline'` and thus, the same options are available as described for Figure \@ref(fig:raw-data-plot).
 
-```{r group-spline-plot, dpi = 72, out.width="80%", fig.height=6.5, fig.pos = "H", echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:group-spline-plot} Combined plot of all spline fits performed.\nIn addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options.", tidy = FALSE}
-plot(grofit, 
-     data.type = "spline", 
-     log.y = TRUE, 
+```{r group-spline-plot, dpi = 120, out.width="80%", fig.height=6.5, fig.pos = "H", echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:group-spline-plot} Combined plot of all spline fits performed.\nIn addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options.", tidy = FALSE}
+plot(grofit,
+     data.type = "spline",
+     log.y = TRUE,
      conc = c(0,5,10,15,20),
      legend.position = "right",
      legend.ncol = 1,
-     x.lim = c(NA, 32), 
-     y.lim = c(0.01,NA), 
+     x.lim = c(NA, 32),
+     y.lim = c(0.01,NA),
      n.ybreaks = 10,
      basesize=10,
      lwd = 0.7)
@@ -392,7 +383,7 @@ plot(grofit,
 
 A convenient way to compare the performance of different organisms under different conditions is to plot the calculated growth parameters by means of the function `plot.parameter()`.
 
-```{r plot-parameter, dpi = 72, fig.show="hold", out.width="47%", fig.height = 4, results='hold' ,fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean \u00B1 95\\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`."}
+```{r plot-parameter, dpi = 120, fig.show="hold", out.width="47%", fig.height = 4, results='hold' ,fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean \u00B1 95\\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`."}
 # Parameters obtained from linear regression
 plot.parameter(grofit, param = "mu.linfit", basesize = 10, legend.position = "bottom")
 plot.parameter(grofit, param = "dY.linfit", basesize = 10, legend.position = "bottom")
@@ -408,7 +399,7 @@ plot.parameter(grofit, param = "dY.orig.model", basesize = 10, legend.position =
 
 From the parameter plot for ´mu.linfit´ (the growth rates determined with linear regression), we can see that there is an outlier for strain KT2440 at concentration 0. We can plot the individual fits for this condition to find out if this is due to the fit quality:
 
-```{r plot-linear, dpi = 72, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='left', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`.", fig.subcap=c("Sample 'KT2440 | 1 | 0'", "Sample 'KT2440 | 2 | 0'")}
+```{r plot-linear, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='left', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`.", fig.subcap=c("Sample 'KT2440 | 1 | 0'", "Sample 'KT2440 | 2 | 0'")}
 plot(grofit$gcFit$gcFittedLinear$`KT2440 | 1 | 0`, cex.lab = 1.2, cex.axis = 1.2)
 plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2, cex.axis = 1.2)
 ```
@@ -416,10 +407,10 @@ plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2, cex.axis = 1.2
 
 Apparently, the algorithm to find the maximum slope in the growth curve with the standard threshold of `lin.R2 = 0.97` could not find an appropriate fit within the first stage of growth due to insufficient linearity. We can manually re-run the fit for this sample with adjusted parameters. Thereby, we lower the R2 threshold and increase the size of the sliding window to cover a larger fraction of the growth curve. Then, we update the respective entries in the `gcTable` object that summarizes all fitting results (and that plot.parameter() accesses to extract relevant data). The generic function `summary()`, when applied to a the fit object of a single sample within `grofit`, provides the required parameters to update the table. Lastly, we also have to re-run the dose-response analysis since 'mu.linfit' was used as response parameter (the default), including the erroneous value.
 
-*Note: This process of manually updating `grofit`elements with adjusted fits can be avoided by re-running `growth.workflow` with adjusted global parameters or my running the workflow in interactive mode (`interactive = TRUE`). In interactive mode, each individual fit is printed and the user can decide to re-run a single fit with adjusted parameters.* 
+*Note: This process of manually updating `grofit`elements with adjusted fits can be avoided by re-running `growth.workflow` with adjusted global parameters or my running the workflow in interactive mode (`interactive = TRUE`). In interactive mode, each individual fit is printed and the user can decide to re-run a single fit with adjusted parameters.*
 
 ```{r message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = FALSE, eval = T}
-# Replace the existing linear fit entry for sample `KT2440 | 2 | 0` 
+# Replace the existing linear fit entry for sample `KT2440 | 2 | 0`
 # with a new fit
 grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0` <-
   growth.gcFitLinear(time = grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`$raw.time,
@@ -438,19 +429,19 @@ grofit$gcFit$gcTable[ndx.row, ndx.col] <-
 
 # Replace existing dose-response analysis with new fit
 grofit$drFit <- growth.drFit(
-  gcTable = grofit$gcFit$gcTable, 
+  gcTable = grofit$gcFit$gcTable,
   control = grofit$control) # we can copy the control object from the original workflow.
 ```
 
 And we can validate the quality of the updated fit:
 
-```{r plot-linear-update, dpi = 72, fig.show="hold", out.width="70%", fig.height = 4.5, results='hold' ,fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'."}
+```{r plot-linear-update, dpi = 120, fig.show="hold", out.width="70%", fig.height = 4.5, results='hold' ,fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'."}
 plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2)
 ```
 
 That looks better!
 
-```{r plot-parameter-update, dpi = 72, out.width="70%", fig.height = 4, fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter-update} Parameter plot with updated fit."}
+```{r plot-parameter-update, dpi = 120, out.width="70%", fig.height = 4, fig.align="center", fig.pos = "H", echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter-update} Parameter plot with updated fit."}
 # Parameters obtained from linear regression
 plot.parameter(grofit, param = "mu.linfit", basesize = 8.5)
 ```
@@ -458,7 +449,7 @@ plot.parameter(grofit, param = "mu.linfit", basesize = 8.5)
 ### Dose-response analysis
 
 The results of the dose-response analysis can be visualized by calling `plot()` on the `drFit` object that is stored within `grofit`. This action calls `plot.drFit()` which in turn runs `plot.drFitSpline()` or `plot.drFitModel()` (depending on the choice of `r colorize_code("dr.method", "red")` in the workflow) on every condition for which a dose-response analysis has been performed. Alternatively, you can call `plot()` on the list elements in `grofit$drFit$drFittedModels` or `grofit$drFit$drFittedSplines`, respectively.
-```{r plot-drFit, dpi = 72, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`."}
+```{r plot-drFit, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`."}
 plot(grofit$drFit, cex.point = 1, basesize = 12)
 ```
 
@@ -468,8 +459,8 @@ When growth experiments are performed on a larger scale with manual density meas
 
 Similarly, we can include bootstrapping in the dose-response analysis if done with `r colorize_code("dr.method = 'spline'", "red")` by defining argument `r colorize_code("nboot.dr", "red")`.
 
-```{r run-workflow_with-bootstrapping, dpi = 72, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
-grofit_bt <- growth.workflow(grodata = grodata, 
+```{r run-workflow_with-bootstrapping, dpi = 120, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
+grofit_bt <- growth.workflow(grodata = grodata,
                              fit.opt = "s", # perform only nonparametric growth fitting
                              nboot.gc = 50,
                              ec50 = T,
@@ -483,8 +474,8 @@ grofit_bt <- growth.workflow(grodata = grodata,
 
 To plot the results of a growth fit with bootstrapping, we call `plot()` on a `gcBootSpline` object:
 
-```{r plot-gcBootSpline, dpi = 72, fig.show="hold", out.width="85%", fig.height = 8, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`."}
-plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative to 
+```{r plot-gcBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 8, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`."}
+plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative to
                                         # access list items and allow their access by number
      combine = TRUE, # combine both growth curves and parameter plots in the same window
      lwd = 0.7)
@@ -492,11 +483,13 @@ plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative 
 
 And by applying `plot()` to a `drBootSpline` object, we can plot the dose-response bootstrap results:
 
-```{r plot-drBootSpline, dpi = 72, fig.show="hold", out.width="85%", fig.height = 6, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`."}
-plot(grofit_bt$drFit$drBootSpline[[1]], 
+```{r plot-drBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 6, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`."}
+plot(grofit_bt$drFit$drBootSpline[[1]],
      combine = TRUE, # combine both dose-response curves and parameter plots in the same window
      lwd = 0.7)
 ```
 \pagebreak
+
 # References
+
 <div id="refs"></div>

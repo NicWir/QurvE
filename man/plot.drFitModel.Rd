@@ -20,7 +20,7 @@
   pch = 1,
   cex.point,
   cex.axis = 1,
-  cex.lab = 1.5,
+  cex.lab = 1.3,
   col = 1,
   lwd = 2,
   lty = 2,

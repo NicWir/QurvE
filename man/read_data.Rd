@@ -67,5 +67,5 @@ object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
 \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction, applies data transformation (calibration), and combines technical replicates.
 }
 \details{
-\figure{Data_layout.png}
+\figure{Data_layout.jpg}
 }

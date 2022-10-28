@@ -2358,6 +2358,7 @@ fl.workflow <- function(grodata = NULL,
                         out.dir = NULL,
                         out.nm = NULL,
                         export.fig = FALSE,
+                        export.res = FALSE,
                         ...)
 {
   if(ec50 == TRUE){
@@ -2517,7 +2518,8 @@ fl.workflow <- function(grodata = NULL,
       wd <- paste(getwd(), "/FluorescenceResults_", format(Sys.time(),
                                                      "%Y%m%d_%H%M%S"), sep = "")
     }
-    dir.create(wd, showWarnings = F)
+    if(export.res)
+      dir.create(wd, showWarnings = F)
 
     if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
       flTable <- data.frame(apply(flFitRes[["flFit"]][["flTable"]],2,as.character))

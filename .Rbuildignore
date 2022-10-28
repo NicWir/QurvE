@@ -4,3 +4,5 @@
 ^docs$
 ^pkgdown$
 ^QurvE\.Rproj$
+^vignettes\vignette_growth_prettydoc.Rmd.orig
+^vignettes\precompile.R

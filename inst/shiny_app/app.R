@@ -10814,8 +10814,8 @@ server <- function(input, output, session){
         suppressWarnings(
           suppressMessages(
             growth.report(grofit = results$growth,
-                          out.dir = gsub("\\\\file.+$", "", file),
-                          out.nm = gsub("^.+\\\\", "", file),
+                          out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                          out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                           ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
                           format = input$report_filetype_growth,
                           export = FALSE)
@@ -10835,8 +10835,8 @@ server <- function(input, output, session){
         suppressWarnings(
           suppressMessages(
             growth.report(grofit = results$growth,
-                          out.dir = gsub("\\\\file.+$", "", file),
-                          out.nm = gsub("^.+\\\\", "", file),
+                          out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                          out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                           ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
                           format = input$report_filetype_growth,
                           export = FALSE)
@@ -10860,8 +10860,8 @@ server <- function(input, output, session){
         suppressWarnings(
           suppressMessages(
             fl.report(flFitRes = results$fluorescence,
-                      out.dir = gsub("\\\\file.+$", "", file),
-                      out.nm = gsub("^.+\\\\", "", file),
+                      out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                      out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                       ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
                       format = input$report_filetype_fluorescence,
                       export = FALSE)
@@ -10881,8 +10881,8 @@ server <- function(input, output, session){
         suppressWarnings(
           suppressMessages(
             fl.report(flFitRes = results$fluorescence,
-                      out.dir = gsub("\\\\file.+$", "", file),
-                      out.nm = gsub("^.+\\\\", "", file),
+                      out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                      out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                       ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
                       format = input$report_filetype_fluorescence,
                       export = FALSE)
@@ -10923,8 +10923,8 @@ server <- function(input, output, session){
         suppressWarnings(
           suppressMessages(
             QurvE:::export_RData(object = results$growth,
-                         out.dir = gsub("\\\\file.+$", "", file),
-                         out.nm = gsub("^.+\\\\", "", file)
+                         out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                         out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file)
             )
           )
         )
@@ -10943,8 +10943,8 @@ server <- function(input, output, session){
         suppressWarnings(
           suppressMessages(
             QurvE:::export_RData(object = results$fluorescence,
-                         out.dir = gsub("\\\\file.+$", "", file),
-                         out.nm = gsub("^.+\\\\", "", file)
+                         out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                         out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file)
             )
           )
         )

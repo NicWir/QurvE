@@ -45,6 +45,7 @@ Suggests:
     bookdown,
     Cairo,
     htmltools,
+    prettydoc,
     rlang,
     shinyBS,
     shinycssloaders,
@@ -55,7 +56,7 @@ Suggests:
     tibble,
     tinytex
 VignetteBuilder: 
-    rmarkdown
+    knitr
 biocViews: 
 Encoding: UTF-8
 GithubRepo: QurvE
