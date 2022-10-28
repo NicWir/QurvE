@@ -4,10 +4,12 @@
 \alias{table_group_growth_model}
 \title{Generate a grouped results table for parametric fits with average and standard deviations}
 \usage{
-table_group_growth_model(gcTable)
+table_group_growth_model(gcTable, html = FALSE)
 }
 \arguments{
 \item{gcTable}{An object of class \code{gcTable}}
+
+\item{html}{(Logical) Should column headers contain html formatting?}
 }
 \value{
 A data frame with grouped model fit results

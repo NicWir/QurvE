@@ -1604,7 +1604,7 @@ plot.gcBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex")
   if (gcBootSpline$bootFlag==FALSE){
-    message("Could not find successful bootstrapping operations for the provided gcBootSpline object. Did you define ´nboot.gc´ in the control object when running computations?")
+    message("Could not find successful bootstrapping operations for the provided gcBootSpline object. Did you define 'nboot.gc' in the control object when running computations?")
     empty.plot()
   }
   else{
@@ -2109,11 +2109,11 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           growth.time <- gcFittedSpline$fit.time[which.max(gcFittedSpline$fit.data)]
           mu2 <- coef$mu2
           if(lagtime2 < lagtime && lagtime2 > gcFittedSpline$raw.time[1]){
-            # time values for tangent at µmax
+            # time values for tangent at mumax
             time_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max-0.15*growth.time)))
             time_start <- gcFittedSpline$fit.time[time_start.ndx]
             time <- seq(time_start, max(gcFittedSpline$fit.time), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
             } else {
@@ -2123,9 +2123,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             bla <- bla[bla >= 0.6* gcFittedSpline$data.in[1]][bla <= 1.15 * max(gcFittedSpline$fit.data)]
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
-            # time values for tangent at µmax2
+            # time values for tangent at mumax2
             time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(gcFittedSpline$"fit.time"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
             } else {
@@ -2165,9 +2165,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             }
           } # if(lagtime2 < lagtime)
           else {
-            # time values for tangent at µmax
+            # time values for tangent at mumax
             time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFittedSpline$"fit.time"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
             } else {
@@ -2185,11 +2185,11 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                           gcFittedSpline[["fit.data"]][1]
                                         })
 
-            # time values for tangent at µmax2
+            # time values for tangent at mumax2
             time2_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max2-0.15*growth.time)))
             time2_start <- gcFittedSpline$fit.time[time2_start.ndx]
             time2 <- seq(time2_start, max(gcFittedSpline$"fit.time"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
             } else {
@@ -2268,11 +2268,11 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           growth.time <- gcFittedSpline$fit.time[which.max(gcFittedSpline$fit.data)]
           mu2 <- coef$mu2
           if(lagtime2 < lagtime && lagtime2 > gcFittedSpline$raw.time[1]){
-            # time values for tangent at µmax
+            # time values for tangent at mumax
             time_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max-0.15*growth.time)))
             time_start <- gcFittedSpline$fit.time[time_start.ndx]
             time <- seq(time_start, max(gcFittedSpline$fit.time), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
             } else {
@@ -2282,9 +2282,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             bla <- bla[bla >= 0.6* gcFittedSpline$data.in[1]][bla <= 1.15 * max(gcFittedSpline$fit.data)]
             tangent.df <- data.frame("time" = time,
                                      "y" = bla)
-            # time values for tangent at µmax2
+            # time values for tangent at mumax2
             time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(gcFittedSpline$"fit.time"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
             } else {
@@ -2324,9 +2324,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             }
           } # if(lagtime2 < lagtime)
           else {
-            # time values for tangent at µmax
+            # time values for tangent at mumax
             time <- seq(ifelse(lagtime<0, 0, lagtime), max(gcFittedSpline$"fit.time"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla <- (exp(coef["b.tangent"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu*time)
             } else {
@@ -2342,11 +2342,11 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                         } else {
                                           gcFittedSpline[["fit.data"]][1]
                                         })
-            # time values for tangent at µmax2
+            # time values for tangent at mumax2
             time2_start.ndx <- which.min(abs(gcFittedSpline$fit.time-(coef$t.max2-0.15*growth.time)))
             time2_start <- gcFittedSpline$fit.time[time2_start.ndx]
             time2 <- seq(time2_start, max(gcFittedSpline$"fit.time"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(gcFittedSpline$control$log.y.spline){
               bla2 <- (exp(coef["b.tangent2"][[1]])*gcFittedSpline[["data.in"]][1])*exp(mu2*time2)
             } else {

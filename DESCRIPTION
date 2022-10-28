@@ -38,6 +38,7 @@ Imports:
     RColorBrewer,
     readxl,
     rmarkdown,
+    scales,
     shiny,
     stats,
     utils

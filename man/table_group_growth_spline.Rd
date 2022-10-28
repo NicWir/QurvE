@@ -4,10 +4,12 @@
 \alias{table_group_growth_spline}
 \title{Generate a grouped results table for spline fits with average and standard deviations}
 \usage{
-table_group_growth_spline(gcTable)
+table_group_growth_spline(gcTable, html = FALSE)
 }
 \arguments{
 \item{gcTable}{An object of class \code{gcTable}}
+
+\item{html}{(Logical) Should column headers contain html formatting?}
 }
 \value{
 A data frame with grouped spline fit results

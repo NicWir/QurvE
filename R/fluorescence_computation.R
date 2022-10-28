@@ -3056,11 +3056,12 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
 #' Generate a grouped results table for linear fits with average and standard deviations
 #'
 #' @param flTable An object of class \code{flTable}
+#' @param html (Logical) Should column headers contain html formatting?
 #'
 #' @return A data frame with grouped linear fit results
 #' @export
 #'
-table_group_fluorescence_linear <- function(flTable)
+table_group_fluorescence_linear <- function(flTable, html = FALSE)
 {
   nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
 
@@ -3100,7 +3101,7 @@ table_group_fluorescence_linear <- function(flTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_linear_group <- data.frame("Sample|Conc." = labels,
-                                   "slope<sub>max</sub>" = paste0(max_slope.mean,
+                                   "slope_max" = paste0(max_slope.mean,
                                                                   unlist(lapply(1:length(max_slope.mean), function (x)
                                                                     ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
                                                                              max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
@@ -3110,7 +3111,7 @@ table_group_fluorescence_linear <- function(flTable)
                                                                              max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
                                                                            "", max_slope.sd[x])))),
 
-                                   "\u03bb" =  paste0(lambda.mean,
+                                   "lagtime" =  paste0(lambda.mean,
                                                  unlist(lapply(1:length(lambda.mean), function (x)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -3119,7 +3120,7 @@ table_group_fluorescence_linear <- function(flTable)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                           "", lambda.sd[x])))),
-                                   "\u0394Y" = paste0(dY.mean,
+                                   "dY" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -3128,7 +3129,7 @@ table_group_fluorescence_linear <- function(flTable)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                           "", dY.sd[x])))),
-                                   "y<sub>max</sub>" = paste0(A.mean,
+                                   "Y_max" = paste0(A.mean,
                                                               unlist(lapply(1:length(A.mean), function (x)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
@@ -3137,7 +3138,7 @@ table_group_fluorescence_linear <- function(flTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "x<sub>start</sub><br>(slope<sub>max</sub>)" = paste0(tmu.start.mean,
+                                   "x_start(mumax)" = paste0(tmu.start.mean,
                                                                                          unlist(lapply(1:length(tmu.start.mean), function (x)
                                                                                            ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
                                                                                                     tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
@@ -3147,7 +3148,7 @@ table_group_fluorescence_linear <- function(flTable)
                                                                                                     tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
                                                                                                   "", tmu.start.sd[x])))),
 
-                                   "x<sub>end</sub><br>(slope<sub>max</sub>)" = paste0(tmu.end.mean,
+                                   "x_end(mumax)" = paste0(tmu.end.mean,
                                                                                        unlist(lapply(1:length(tmu.end.mean), function (x)
                                                                                          ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                                                   tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
@@ -3158,6 +3159,11 @@ table_group_fluorescence_linear <- function(flTable)
                                                                                                 "", tmu.end.sd[x])))),
                                    stringsAsFactors = F, check.names = F)
 
+  if(html == TRUE){
+    colnames(table_linear_group) <- c("Sample|Conc.", "slope<sub>max</sub>", "lagtime",
+                                      "dY", "y<sub>max</sub>", "x<sub>start</sub><br>(mu<sub>max</sub>)",
+                                      "x<sub>end</sub><br>(mu<sub>max</sub>)")
+  }
 
   return(table_linear_group)
 }
@@ -3166,11 +3172,12 @@ table_group_fluorescence_linear <- function(flTable)
 #' Generate a grouped results table for spline fits with average and standard deviations
 #'
 #' @param flTable An object of class \code{flTable}
+#' @param html (Logical) Should column headers contain html formatting?
 #'
 #' @return A data frame with grouped spline fit results
 #' @export
 #'
-table_group_fluorescence_spline <- function(flTable)
+table_group_fluorescence_spline <- function(flTable, html = FALSE)
 {
   nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
 
@@ -3208,7 +3215,7 @@ table_group_fluorescence_spline <- function(flTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_spline_group <- data.frame("Sample | Conc." = labels,
-                                   "slope<sub>max</sub>" = paste0(max_slope.mean,
+                                   "slope_max" = paste0(max_slope.mean,
                                                                   unlist(lapply(1:length(max_slope.mean), function (x)
                                                                     ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
                                                                              max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
@@ -3217,7 +3224,7 @@ table_group_fluorescence_spline <- function(flTable)
                                                                     ifelse(max_slope.mean[x] == 0 || max_slope.mean[x] == "" || max_slope.mean[x] == "" ||
                                                                              max_slope.sd[x] == 0 || max_slope.sd[x] == "" || max_slope.sd[x] == "",
                                                                            "", max_slope.sd[x])))),
-                                   "\u03bb" = paste0(lambda.mean,
+                                   "lagtime" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -3226,7 +3233,7 @@ table_group_fluorescence_spline <- function(flTable)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                          "", lambda.sd[x])))),
-                                   "y<sub>max</sub>" = paste0(A.mean,
+                                   "Y_max" = paste0(A.mean,
                                                               unlist(lapply(1:length(A.mean), function (x)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
@@ -3235,7 +3242,7 @@ table_group_fluorescence_spline <- function(flTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\u0394Y" = paste0(dY.mean,
+                                   "dY" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -3244,7 +3251,7 @@ table_group_fluorescence_spline <- function(flTable)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                           "", dY.sd)))),
-                                   "x<sub>max</sub>" = paste0(tmax.mean,
+                                   "x(slope_max)" = paste0(tmax.mean,
                                                               unlist(lapply(1:length(tmax.mean), function (x)
                                                                 ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                          tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
@@ -3254,6 +3261,11 @@ table_group_fluorescence_spline <- function(flTable)
                                                                          tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                        "", tmax.sd[x])))),
                                    check.names = F)
+
+  if(html == TRUE){
+    colnames(table_spline_group) <- c("Sample|Conc.", "slope<sub>max</sub>", "lagtime",
+                                      "dY", "y<sub>max</sub>", "x(slope<sub>max</sub>)")
+  }
 
   return(table_spline_group)
 }

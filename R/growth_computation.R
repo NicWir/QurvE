@@ -4657,11 +4657,12 @@ gompertz.exp <- function (time, A, mu, lambda, addpar)
 #' Generate a grouped results table for linear fits with average and standard deviations
 #'
 #' @param gcTable An object of class \code{gcTable}
+#' @param html (Logical) Should column headers contain html formatting?
 #'
 #' @return A data frame with grouped linear fit results
 #' @export
 #'
-table_group_growth_linear <- function(gcTable)
+table_group_growth_linear <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
 
@@ -4705,8 +4706,10 @@ table_group_growth_linear <- function(gcTable)
 
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
+
+
   table_linear_group <- data.frame("Sample|Conc." = labels,
-                                   "\u03bc<sub>max</sub>" = paste0(mu.mean,
+                                   "mumax" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4716,7 +4719,7 @@ table_group_growth_linear <- function(gcTable)
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
                                                                        "", mu.sd[x])))),
 
-                                   "t<sub>D</sub>" = paste0(tD.mean,
+                                   "tD" = paste0(tD.mean,
                                                             unlist(lapply(1:length(tD.mean), function (x)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
@@ -4725,7 +4728,7 @@ table_group_growth_linear <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "\u03bb" =  paste0(lambda.mean,
+                                   "lagtime" =  paste0(lambda.mean,
                                                  unlist(lapply(1:length(lambda.mean), function (x)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4734,7 +4737,7 @@ table_group_growth_linear <- function(gcTable)
                                                    ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                             lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                           "", lambda.sd[x])))),
-                                   "\u2206Y" = paste0(dY.mean,
+                                   "dY" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4743,7 +4746,7 @@ table_group_growth_linear <- function(gcTable)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                           "", dY.sd[x])))),
-                                   "y<sub>max</sub>" = paste0(A.mean,
+                                   "Y_max" = paste0(A.mean,
                                                               unlist(lapply(1:length(A.mean), function (x)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
@@ -4752,7 +4755,7 @@ table_group_growth_linear <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "t<sub>start</sub><br>(\u03bc<sub>max</sub>)" = paste0(tmu.start.mean,
+                                   "t_start(mumax)" = paste0(tmu.start.mean,
                                                                                      unlist(lapply(1:length(tmu.start.mean), function (x)
                                                                                        ifelse(tmu.start.mean[x] == 0 || tmu.start.mean[x] == "" || tmu.start.mean[x] == "" ||
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
@@ -4762,7 +4765,7 @@ table_group_growth_linear <- function(gcTable)
                                                                                                 tmu.start.sd[x] == 0 || tmu.start.sd[x] == "" || tmu.start.sd[x] == "",
                                                                                               "", tmu.start.sd[x])))),
 
-                                   "t<sub>end</sub><br>(\u03bc<sub>max</sub>)" = paste0(tmu.end.mean,
+                                   "t_end(mumax)" = paste0(tmu.end.mean,
                                                                                    unlist(lapply(1:length(tmu.end.mean), function (x)
                                                                                      ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                                               tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
@@ -4772,17 +4775,24 @@ table_group_growth_linear <- function(gcTable)
                                                                                               tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
                                                                                             "", tmu.end.sd[x])))),
                                    stringsAsFactors = F, check.names = F)
+
+  if(html == TRUE){
+    colnames(table_linear_group) <- c("Sample|Conc.", "mu<sub>max</sub>", "t<sub>D</sub>", "lagtime",
+                                      "dY", "y<sub>max</sub>", "t<sub>start</sub><br>(mu<sub>max</sub>)",
+                                      "t<sub>end</sub><br>(mu<sub>max</sub>)")
+  }
   return(table_linear_group)
 }
 
 #' Generate a grouped results table for spline fits with average and standard deviations
 #'
 #' @param gcTable An object of class \code{gcTable}
+#' @param html (Logical) Should column headers contain html formatting?
 #'
 #' @return A data frame with grouped spline fit results
 #' @export
 #'
-table_group_growth_spline <- function(gcTable)
+table_group_growth_spline <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
 
@@ -4823,7 +4833,7 @@ table_group_growth_spline <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_spline_group <- data.frame("Sample|Conc." = labels,
-                                   "\u03bc<sub>max</sub>" = paste0(mu.mean,
+                                   "mumax" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4832,7 +4842,7 @@ table_group_growth_spline <- function(gcTable)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
                                                                        "", mu.sd[x])))),
-                                   "t<sub>D</sub>" = paste0(tD.mean,
+                                   "tD" = paste0(tD.mean,
                                                             unlist(lapply(1:length(tD.mean), function (x)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
@@ -4841,7 +4851,7 @@ table_group_growth_spline <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "\u03bb" = paste0(lambda.mean,
+                                   "lagtime" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4850,7 +4860,7 @@ table_group_growth_spline <- function(gcTable)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                          "", lambda.sd[x])))),
-                                   "y<sub>max</sub>" = paste0(A.mean,
+                                   "Y_max" = paste0(A.mean,
                                                               unlist(lapply(1:length(A.mean), function (x)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
@@ -4859,7 +4869,7 @@ table_group_growth_spline <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\u2206Y" = paste0(dY.mean,
+                                   "dY" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4868,7 +4878,7 @@ table_group_growth_spline <- function(gcTable)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                           "", dY.sd[x])))),
-                                   "t<sub>max</sub>" = paste0(tmax.mean,
+                                   "t(mumax)" = paste0(tmax.mean,
                                                               unlist(lapply(1:length(tmax.mean), function (x)
                                                                 ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                          tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
@@ -4878,17 +4888,24 @@ table_group_growth_spline <- function(gcTable)
                                                                          tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                        "", tmax.sd[x])))),
                                    check.names = F)
+
+  if(html == TRUE){
+    colnames(table_spline_group) <- c("Sample|Conc.", "mu<sub>max</sub>", "t<sub>D</sub>", "lagtime",
+                                      "dY", "y<sub>max</sub>", "t(mu<sub>max</sub>)")
+  }
+
   return(table_spline_group)
 }
 
 #' Generate a grouped results table for parametric fits with average and standard deviations
 #'
 #' @param gcTable An object of class \code{gcTable}
+#' @param html (Logical) Should column headers contain html formatting?
 #'
 #' @return A data frame with grouped model fit results
 #' @export
 #'
-table_group_growth_model <- function(gcTable)
+table_group_growth_model <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
 
@@ -4926,7 +4943,7 @@ table_group_growth_model <- function(gcTable)
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_model_group <- data.frame("Sample|Conc." = labels,
-                                   "\u03bc<sub>max</sub>" = paste0(mu.mean,
+                                   "mumax" = paste0(mu.mean,
                                                               unlist(lapply(1:length(mu.mean), function (x)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
@@ -4935,7 +4952,7 @@ table_group_growth_model <- function(gcTable)
                                                                 ifelse(mu.mean[x] == 0 || mu.mean[x] == "" || mu.mean[x] == "" ||
                                                                          mu.sd[x] == 0 || mu.sd[x] == "" || mu.sd[x] == "",
                                                                        "", mu.sd[x])))),
-                                   "t<sub>D</sub>" = paste0(tD.mean,
+                                   "tD" = paste0(tD.mean,
                                                             unlist(lapply(1:length(tD.mean), function (x)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
@@ -4944,7 +4961,7 @@ table_group_growth_model <- function(gcTable)
                                                               ifelse(tD.mean[x] == 0 || tD.mean[x] == "" || tD.mean[x] == "" ||
                                                                        tD.sd[x] == 0 || tD.sd[x] == "" || tD.sd[x] == "",
                                                                      "", tD.sd[x])))),
-                                   "\u03bb" = paste0(lambda.mean,
+                                   "lagtime" = paste0(lambda.mean,
                                                 unlist(lapply(1:length(lambda.mean), function (x)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
@@ -4953,7 +4970,7 @@ table_group_growth_model <- function(gcTable)
                                                   ifelse(lambda.mean[x] == 0 || lambda.mean[x] == "" || lambda.mean[x] == "" ||
                                                            lambda.sd[x] == 0 || lambda.sd[x] == "" || lambda.sd[x] == "",
                                                          "", lambda.sd[x])))),
-                                   "y<sub>max</sub>" = paste0(A.mean,
+                                   "Y_max" = paste0(A.mean,
                                                               unlist(lapply(1:length(A.mean), function (x)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
@@ -4962,7 +4979,7 @@ table_group_growth_model <- function(gcTable)
                                                                 ifelse(A.mean[x] == 0 || A.mean[x] == "" || A.mean[x] == "" ||
                                                                          A.sd[x] == 0 || A.sd[x] == "" || A.sd[x] == "",
                                                                        "", A.sd[x])))),
-                                   "\u2206Y" = paste0(dY.mean,
+                                   "dY" = paste0(dY.mean,
                                                  unlist(lapply(1:length(dY.mean), function (x)
                                                    ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
@@ -4972,6 +4989,12 @@ table_group_growth_model <- function(gcTable)
                                                             dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                           "", dY.sd[x])))),
                                    check.names = F)
+
+  if(html == TRUE){
+    colnames(table_model_group) <- c("Sample|Conc.", "mu<sub>max</sub>", "t<sub>D</sub>", "lagtime",
+                                      "y<sub>max</sub>", "dY")
+  }
+
   return(table_model_group)
 }
 

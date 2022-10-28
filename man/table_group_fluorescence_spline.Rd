@@ -4,10 +4,12 @@
 \alias{table_group_fluorescence_spline}
 \title{Generate a grouped results table for spline fits with average and standard deviations}
 \usage{
-table_group_fluorescence_spline(flTable)
+table_group_fluorescence_spline(flTable, html = FALSE)
 }
 \arguments{
 \item{flTable}{An object of class \code{flTable}}
+
+\item{html}{(Logical) Should column headers contain html formatting?}
 }
 \value{
 A data frame with grouped spline fit results

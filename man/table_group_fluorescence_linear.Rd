@@ -4,10 +4,12 @@
 \alias{table_group_fluorescence_linear}
 \title{Generate a grouped results table for linear fits with average and standard deviations}
 \usage{
-table_group_fluorescence_linear(flTable)
+table_group_fluorescence_linear(flTable, html = FALSE)
 }
 \arguments{
 \item{flTable}{An object of class \code{flTable}}
+
+\item{html}{(Logical) Should column headers contain html formatting?}
 }
 \value{
 A data frame with grouped linear fit results

@@ -467,11 +467,11 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           fl.x <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
           mu2 <- coef$max_slope2
           if(lag2 < lag){
-            # x values for tangent at µmax
+            # x values for tangent at mumax
             x_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*fl.x)))
             x_start <- flFitSpline$fit.x[x_start.ndx]
             x <- seq(x_start, max(flFitSpline$fit.x), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(flFitSpline$control$log.y.spline){
               bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
             } else {
@@ -479,9 +479,9 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             }
             tangent.df <- data.frame("x" = x,
                                      "y" = bla)
-            # x values for tangent at µmax2
+            # x values for tangent at mumax2
             x2 <- seq(ifelse(lag2<0, 0, lag2), max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(flFitSpline$control$log.y.spline){
               bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
             } else {
@@ -507,9 +507,9 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             }
           } # if(lag2 < lag)
           else {
-            # x values for tangent at µmax
+            # x values for tangent at mumax
             x <- seq(ifelse(lag<0, 0, lag), max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(flFitSpline$control$log.y.spline){
               bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
             } else {
@@ -519,11 +519,11 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                      "y" = bla)
             df.horizontal <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag),
                                         "y" = flFitSpline[["raw.fl"]][1])
-            # x values for tangent at µmax2
+            # x values for tangent at mumax2
             x2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*fl.x)))
             x2_start <- flFitSpline$fit.x[x2_start.ndx]
             x2 <- seq(x2_start, max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent at mumax
             if(flFitSpline$control$log.y.spline){
               bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
             } else {
@@ -684,7 +684,7 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex.point")
   if (flBootSpline$bootFlag==FALSE){
-    message("Could not find successful bootstrapping operations for the provided flBootSpline object. Did you define ´nboot.fl´ in the control object when running computations?")
+    message("Could not find successful bootstrapping operations for the provided flBootSpline object. Did you define 'nboot.fl' in the control object when running computations?")
     empty.plot()
   }
   else{

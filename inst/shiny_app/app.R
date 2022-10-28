@@ -6322,7 +6322,11 @@ server <- function(input, output, session){
 
   table_growth_linear_group <- reactive({
     gcTable <- results$growth$gcFit$gcTable
-    QurvE:::table_group_growth_linear(gcTable)
+    table <- QurvE:::table_group_growth_linear(gcTable)
+    colnames(table) <- c("Sample|Conc.", "\u03bc<sub>max</sub>", "t<sub>D</sub>", "\u03bb",
+                         "\u2206Y", "y<sub>max</sub>", "t<sub>start</sub><br>(\u03bc<sub>max</sub>)",
+                         "t<sub>end</sub><br>(\u03bc<sub>max</sub>)")
+    table
   })
 
   output$results_table_growth_linear_group <- DT::renderDT({
@@ -6354,7 +6358,10 @@ server <- function(input, output, session){
 
   table_growth_spline_group <- reactive({
     gcTable <- results$growth$gcFit$gcTable
-    QurvE:::table_group_growth_spline(gcTable)
+    table <- QurvE:::table_group_growth_spline(gcTable)
+    colnames(table) <- c("Sample|Conc.", "\u03bc<sub>max</sub>", "t<sub>D</sub>", "\u03bb",
+                         "\u2206Y", "y<sub>max</sub>", "t(\u03bc<sub>max</sub>)")
+    table
   })
 
   output$results_table_growth_spline_group <- DT::renderDT({
@@ -6452,7 +6459,10 @@ server <- function(input, output, session){
 
   table_growth_model_group <- reactive({
     gcTable <- results$growth$gcFit$gcTable
-    QurvE:::table_group_growth_model(gcTable)
+    table <- QurvE:::table_group_growth_model(gcTable)
+    colnames(table) <- c("Sample|Conc.", "\u03bc<sub>max</sub>", "t<sub>D</sub>", "\u03bb",
+                         "y<sub>max</sub>", "\u2206Y")
+    table
   })
 
   output$results_table_growth_model_group <- DT::renderDT({
@@ -6663,7 +6673,11 @@ server <- function(input, output, session){
 
   table_fluorescence_linear_group <- reactive({
     flTable <- results$fluorescence$flFit$flTable
-    QurvE:::table_group_fluorescence_linear(flTable)
+    table <-  QurvE:::table_group_fluorescence_linear(flTable)
+    colnames(table) <- c("Sample|Conc.", "slope<sub>max</sub>", "\u03bb",
+                         "\u0394Y", "y<sub>max</sub>", "x<sub>start</sub><br>(\u03bc<sub>max</sub>)",
+                         "x<sub>end</sub><br>(\u03bc<sub>max</sub>)")
+    table
   })
 
   output$results_table_fluorescence_linear_group <- DT::renderDT({
@@ -6693,6 +6707,9 @@ server <- function(input, output, session){
   table_fluorescence_spline_group <- reactive({
     flTable <- results$fluorescence$flFit$flTable
     QurvE:::table_group_fluorescence_spline(flTable)
+    colnames(table) <- c("Sample|Conc.", "slope<sub>max</sub>", "\u03bb",
+                         "\u0394Y", "y<sub>max</sub>", "x(slope<sub>max</sub>)")
+    table
   })
 
   output$results_table_fluorescence_spline_group <- DT::renderDT({
