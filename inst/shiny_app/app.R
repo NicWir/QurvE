@@ -5025,7 +5025,6 @@ server <- function(input, output, session){
 
     if(input$convert_time_equation_custom == "" || is.na(input$convert_time_equation_custom)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_custom
-
     ## Read data
     try(
       results$custom_data <- read_data(data.density = density.file$datapath,
@@ -9372,7 +9371,6 @@ server <- function(input, output, session){
 
   growth_parameter_plot <- reactive({
     results <- results$growth
-
     if (input$normalize_to_reference_growth_parameter_plot){
       reference.conc <- as.numeric(input$reference_concentration_growth_parameter_plot)
       reference.nm <- input$reference_condition_growth_parameter_plot

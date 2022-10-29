@@ -23,7 +23,11 @@ summary.drFitSpline <- function (object,...)
 summary.drFitModel <- function (object,...)
 {
   # object of class drFitSpline
-  data.frame(object$parameters)
+  df <- data.frame(object$parameters)
+  nm <- names(df)
+  nm <- nm[!is.na(df)]
+  df <- df[!is.na(df)]
+  names(df) <- nm
 }
 
 #' Generic summary function for gcFitSpline objects

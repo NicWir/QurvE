@@ -83,6 +83,9 @@ read_data <-
     if(length(allNA.ndx) > 0)
       dat <- dat[-allNA.ndx, ]
 
+    #remove leading and trailing zeros
+    dat[,3] <- as.character(as.numeric(dat[,3]))
+
     if(data.format == "col"){
       message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
     } else {
@@ -110,6 +113,9 @@ read_data <-
       allNA.ndx <- which(unlist(lapply(1:nrow(fl), function(x) all(is.na(fl[x, -(1:3)])))))
       if(length(allNA.ndx) > 0)
         fl <- fl[-allNA.ndx, ]
+
+      #remove leading and trailing zeros
+      dat[,3] <- as.character(as.numeric(fl[,3]))
 
       # Convert time values
       if(!is.null(convert.time)){
@@ -814,7 +820,7 @@ growth.control <- function (neg.nan.act = FALSE,
                                          'LL.2', 'LL.3', 'LL.4', 'LL.5', 'W1.2',
                                          'W1.3', 'W1.4', 'W2.2', 'W2.3', 'W2.4', 'LL.3u',
                                          'LL2.2', 'LL2.3', 'LL2.3u', 'LL2.4',
-                                         'LL2.5', 'AR.2', 'AR.3'),
+                                         'LL2.5', 'AR.2', 'AR.3', 'MM.2'),
                             dr.have.atleast = 6,
                             dr.parameter = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit",
                                              "mu.spline", "lambda.spline", "dY.spline", "A.spline",
@@ -881,7 +887,8 @@ growth.control <- function (neg.nan.act = FALSE,
   if ((is.numeric(t0) == FALSE) | (length(t0) != 1) | (t0 < 0))
     stop("value of t0 must be numeric (>=0) and of one element")
 
-  dr.method <- match.arg(dr.method)
+  if(length(dr.method) != 1 && dr.method != "model.MM")
+    dr.method <- match.arg(dr.method)
 
   dr.parameters.opt <- c('TestId', 'AddId', 'concentration', 'reliability_tag', 'used.model', 'log.x',
                       'log.y', 'nboot.gc', 'mu.linfit', 'lambda.linfit', 'stdmu.linfit', 'dY.linfit',
@@ -1014,7 +1021,7 @@ growth.workflow <- function (grodata = NULL,
                                           'LL.2', 'LL.3', 'LL.4', 'LL.5', 'W1.2',
                                           'W1.3', 'W1.4', 'W2.2', 'W2.3', 'W2.4', 'LL.3u',
                                           'LL2.2', 'LL2.3', 'LL2.3u', 'LL2.4',
-                                          'LL2.5', 'AR.2', 'AR.3'),
+                                          'LL2.5', 'AR.2', 'AR.3', 'MM.2'),
                              growth.thresh = 1.5,
                              dr.have.atleast = 6,
                              dr.parameter = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit",
@@ -1112,8 +1119,10 @@ growth.workflow <- function (grodata = NULL,
       (length(unique(expdesign$concentration)) >= 4)
   ) {
     out.drFit <- growth.drFit(summary.gcFit(out.gcFit), control)
-    EC50.table <- out.drFit$drTable
-    boot.ec <- out.drFit$boot.ec
+    if(!is.na(out.drFit)){
+      EC50.table <- out.drFit$drTable
+      boot.ec <- out.drFit$boot.ec
+    }
   }
   # ///
   grofit <- list(time = time, data = data, gcFit = out.gcFit,
@@ -1175,7 +1184,8 @@ growth.workflow <- function (grodata = NULL,
           (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
           (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
         ) &&
-        (length(unique(expdesign$concentration)) >= 4)
+        (length(unique(expdesign$concentration)) >= 4) &&
+        !is.na(out.drFit)
     ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       if(export.res)
@@ -1190,7 +1200,7 @@ growth.workflow <- function (grodata = NULL,
       export_RData(grofit, out.dir = wd)
 
     if(any(report %in% c('pdf', 'html'))){
-      try(growth.report(grofit, out.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ec50, mean.grp = mean.grp, mean.conc = mean.conc,
+      try(growth.report(grofit, out.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ifelse(!is.na(out.drFit), ec50, FALSE), mean.grp = mean.grp, mean.conc = mean.conc,
                         export = export.fig, format = report, out.nm = out.nm))
     }
   } # if(!exists("shiny") || shiny != TRUE)
@@ -3716,7 +3726,6 @@ growth.drFit <- function (gcTable, control = growth.control())
   if (methods::is(control) != "grofit.control" && methods::is(control) != "fl.control")
     stop("control must be of class grofit.control or fl.control!")
   EC50.table <- NULL
-  all.EC50 <- NA
   if(is.character(control$dr.parameter)){
     dr.parameter <- match(control$dr.parameter, colnames(gcTable))
   }
@@ -3802,12 +3811,22 @@ growth.drFit <- function (gcTable, control = growth.control())
   }
   if(control$dr.method == "spline"){
     names(EC50) <- names(EC50.boot) <- distinct
-    drFit <- list(raw.data = FitData, drTable = EC50.table,
-                  drBootSplines = EC50.boot, drFittedSplines = EC50, control = control)
+    fitflags <- unlist(lapply(1:length(EC50), function(x) EC50[[x]]$fitFlag))
+    if(all(isFALSE(fitflags))){
+      drFit <- NA
+    } else {
+      drFit <- list(raw.data = FitData, drTable = EC50.table,
+                    drBootSplines = EC50.boot, drFittedSplines = EC50, control = control)
+    }
   } else {
     names(EC50) <- distinct
-    drFit <- list(raw.data = FitData, drTable = EC50.table,
-                  drFittedModels = EC50, control = control)
+    fitflags <-  unlist(lapply(1:length(EC50), function(x) EC50[[x]]$fitFlag))
+    if(all(isFALSE(fitflags))){
+      drFit <- NA
+    } else {
+      drFit <- list(raw.data = FitData, drTable = EC50.table,
+                    drFittedModels = EC50, control = control)
+    }
   }
 
   class(drFit) <- "drFit"
@@ -4079,6 +4098,9 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
     class(drFitModel) <- "drFitModel"
     return(drFitModel)
   }
+  if(control$dr.method == "model.MM"){
+    models <- "MM.2"
+  }
   # Perform model fits
   model.fits <- list()
   for(i in 1:length(models)){
@@ -4098,6 +4120,16 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   model.fits <- model.fits[!unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) %in% c("try-error","list")]
   names(model.fits) <- models
 
+  if(length(model.fits) < 1 ){
+    if(control$suppress.messages==F) message("growth.drFitModel: No DR model could be fit to the test and concentration data.")
+    drFitModel <- list(raw.conc = conc, raw.test = test,
+                       drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
+                       parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                                         yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
+                       control = control)
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
+  }
   # select best fitting model
   model.AIC <- lapply(1:length(model.fits), function(x) AIC(model.fits[[x]]))
   names(model.AIC) <- models
@@ -4123,15 +4155,22 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
 
   y.ec50 <- drc::PR(object = best.model, xVec = ec50[1])
 
-  # Plot best fit
-  drc.models <- drc::getMeanFunctions(display = FALSE)
-  drc.models.nm <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][1])), "NEC.4")
-  drc.models.descr <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][2])), "model for estimation of\nno effect concentration (NEC)")
+  # drc.models <- drc::getMeanFunctions(display = FALSE)
+  # drc.models.nm <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][1])), "NEC.4")
+  # drc.models.descr <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][2])), "model for estimation of\nno effect concentration (NEC)")
+  if(control$dr.method == "model.MM"){
+    drFitModel <- list(raw.conc = conc, raw.test = test,
+                       drID = drID, fit.conc = concgrid, fit.test = respgrid, model = best.model,
+                       parameters = list(EC50 = ec50, yEC50 = y.ec50, Vm = coef(best.model)[[1]], Km = coef(best.model)[[2]], test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
+                       control = control)
 
+  }
+  else {
   drFitModel <- list(raw.conc = conc, raw.test = test,
                      drID = drID, fit.conc = concgrid, fit.test = respgrid, model = best.model,
-                     parameters = list(EC50 = ec50, yEC50 = y.ec50, test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
+                     parameters = list(EC50 = ec50, yEC50 = y.ec50, Vm = NA, Km = NA, test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
                      control = control)
+  }
 
   class(drFitModel) <- "drFitModel"
   invisible(drFitModel)
