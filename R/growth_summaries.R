@@ -22,7 +22,7 @@ summary.drFitSpline <- function (object,...)
 #'
 summary.drFitModel <- function (object,...)
 {
-  # object of class drFitSpline
+  # object of class drFitModel
   df <- data.frame(object$parameters)
   if(object$control$dr.method != "model.MM")
     df <- df[, -grep("Km|Vmax", colnames(df))]

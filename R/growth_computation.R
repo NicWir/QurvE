@@ -1185,7 +1185,7 @@ growth.workflow <- function (grodata = NULL,
           (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("a", "l")))
         ) &&
         (length(unique(expdesign$concentration)) >= 4) &&
-        !is.na(out.drFit)
+        length(out.drFit) > 1
     ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
       if(export.res)
@@ -1945,7 +1945,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
     return(gcFitModel)
   }
   else{
-      gcFitModel <- grofit.param(time, data, gcID, control)
+      gcFitModel <- growth.param(time, data, gcID, control)
   }
   invisible(gcFitModel)
 }
@@ -1956,7 +1956,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
 #' @param data Vector of dependent variable (usually density values).
 #' @param gcID (Character) The name of the analyzed sample.
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
-grofit.param <- function(time, data, gcID = "undefined", control)
+growth.param <- function(time, data, gcID = "undefined", control)
 {
   time.in <- time
   data.in <- data
@@ -2012,6 +2012,13 @@ grofit.param <- function(time, data, gcID = "undefined", control)
   control.tmp$fit.opt <- "s"
   control.tmp$log.y.spline <- control$log.y.model
   nonpara     <- growth.gcFitSpline(time.in, data.in, gcID, control.tmp)
+  if(nonpara$fitFlag == FALSE){
+    gcFitModel   <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
+                         fit.data = NA, parameters = list(A=NA, mu=0, tD = NA, lambda=NA, integral=NA),
+                         model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
+    class(gcFitModel) <- "gcFitModel"
+    return(gcFitModel)
+  }
   mu.start     <- nonpara$parameters$mu
   lambda.start  <- nonpara$parameters$lambda
   A.start       <- nonpara$parameters$A

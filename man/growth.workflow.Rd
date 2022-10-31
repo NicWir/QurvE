@@ -35,7 +35,7 @@ growth.workflow(
   dr.method = c("model", "spline"),
   dr.model = c("gammadr", "multi2", "LL.2", "LL.3", "LL.4", "LL.5", "W1.2", "W1.3",
     "W1.4", "W2.2", "W2.3", "W2.4", "LL.3u", "LL2.2", "LL2.3", "LL2.3u", "LL2.4",
-    "LL2.5", "AR.2", "AR.3"),
+    "LL2.5", "AR.2", "AR.3", "MM.2"),
   growth.thresh = 1.5,
   dr.have.atleast = 6,
   dr.parameter = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit", "mu.spline",
