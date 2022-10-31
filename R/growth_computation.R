@@ -864,7 +864,7 @@ growth.control <- function (neg.nan.act = FALSE,
     stop("value of dr.have.atleast must be numeric (>=6) and of one element")
   if (((is.character(dr.parameter) == FALSE) && (is.numeric(dr.parameter) == FALSE)) | (length(dr.parameter) !=1))
     stop("value of dr.parameter must be a string or numeric and of one element")
-  if ((is.character(dr.method) == FALSE) | (length(dr.parameter) !=1))
+  if ((is.character(dr.method) == FALSE) | (length(dr.method) !=1))
     stop("value of dr.method must be a string and of one element")
   if ((is.numeric(nboot.dr) == FALSE) | (length(nboot.dr) != 1) | (nboot.dr < 0))
     stop("value of nboot.dr must be numeric (>=0) and of one element")
@@ -1042,9 +1042,9 @@ growth.workflow <- function (grodata = NULL,
   dr.parameter <- match.arg(dr.parameter)
   if(ec50 == TRUE){
     dr.parameter.fit.method <- gsub(".+\\.", "", dr.parameter)
-    if((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
-       (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
-       (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
+    if((dr.parameter.fit.method == "spline" && !any(fit.opt %in% c("a", "s"))) ||
+       (dr.parameter.fit.method == "model" && !any(fit.opt %in% c("a", "m"))) ||
+       (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("a", "l")))
        )
       message("The chosen 'dr.parameter' is not compatible with the selected fitting options ('fit.opt'). Dose-response analysis will not be performed.")
   }
@@ -1112,14 +1112,14 @@ growth.workflow <- function (grodata = NULL,
 
   # /// Estimate EC50 values
   if (ec50 == TRUE &&
-      !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
-        (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
-        (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
+      !((dr.parameter.fit.method == "spline" && !any(fit.opt %in% c("a", "s"))) ||
+        (dr.parameter.fit.method == "model" && !any(fit.opt %in% c("a", "m"))) ||
+        (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("a", "l")))
       ) &&
       (length(unique(expdesign$concentration)) >= 4)
   ) {
     out.drFit <- growth.drFit(summary.gcFit(out.gcFit), control)
-    if(!is.na(out.drFit)){
+    if(length(out.drFit)>1){
       EC50.table <- out.drFit$drTable
       boot.ec <- out.drFit$boot.ec
     }
@@ -1180,9 +1180,9 @@ growth.workflow <- function (grodata = NULL,
     #              wd, "/mean_results.gc.txt\n\n"))
 
     if (ec50 == TRUE &&
-        !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("a", "s"))) ||
-          (dr.parameter.fit.method == "model" && !(fit.opt %in% c("a", "m"))) ||
-          (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("a", "l")))
+        !((dr.parameter.fit.method == "spline" && !any(fit.opt %in% c("a", "s"))) ||
+          (dr.parameter.fit.method == "model" && !any(fit.opt %in% c("a", "m"))) ||
+          (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("a", "l")))
         ) &&
         (length(unique(expdesign$concentration)) >= 4) &&
         !is.na(out.drFit)
@@ -1200,7 +1200,7 @@ growth.workflow <- function (grodata = NULL,
       export_RData(grofit, out.dir = wd)
 
     if(any(report %in% c('pdf', 'html'))){
-      try(growth.report(grofit, out.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ifelse(!is.na(out.drFit), ec50, FALSE), mean.grp = mean.grp, mean.conc = mean.conc,
+      try(growth.report(grofit, out.dir = gsub(paste0(getwd(), "/"), "", wd), ec50 = ifelse(length(out.drFit)>1, ec50, FALSE), mean.grp = mean.grp, mean.conc = mean.conc,
                         export = export.fig, format = report, out.nm = out.nm))
     }
   } # if(!exists("shiny") || shiny != TRUE)
@@ -3800,7 +3800,13 @@ growth.drFit <- function (gcTable, control = growth.control())
                        summary.drBootSpline(EC50.boot[[i]]))
       else
         out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
-      EC50.table <- rbind(as.data.frame(EC50.table), out.row)
+
+      if(!is.na(out.row[1,5]) && out.row[1,5] != "NA")
+        EC50.table <- rbind(as.data.frame(EC50.table), out.row)
+      else{
+        return(NA)
+      }
+
       class(EC50.table) <- c("drTable", "list")
     }
   }
@@ -4082,7 +4088,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
     if(control$suppress.messages==F) message("growth.drFitModel: There is not enough valid data. Must have at least 6 unique values!")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
-                        parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                        parameters = list(EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA, EC50.orig = NA,
                                           yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
                         control = control)
     class(drFitModel) <- "drFitModel"
@@ -4092,14 +4098,14 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
     if(control$suppress.messages==F) message("growth.drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control().")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                         drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
-                        parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                        parameters = list(EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA, EC50.orig = NA,
                                           yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
                         control = control)
     class(drFitModel) <- "drFitModel"
     return(drFitModel)
   }
-  if(control$dr.method == "model.MM"){
-    models <- "MM.2"
+  if(control$dr.method == "model.MM" && !all(models %in% c("MM.2", "MM.3"))){
+    models <- c("MM.2", "MM.3")
   }
   # Perform model fits
   model.fits <- list()
@@ -4124,7 +4130,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
     if(control$suppress.messages==F) message("growth.drFitModel: No DR model could be fit to the test and concentration data.")
     drFitModel <- list(raw.conc = conc, raw.test = test,
                        drID = drID, fit.conc = NA, fit.test = NA, spline = NA,
-                       parameters = list(EC50 = NA, yEC50 = NA, EC50.orig = NA,
+                       parameters = list(EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA, EC50.orig = NA,
                                          yEC50.orig = NA, test = test.nm), fitFlag = FALSE, reliable = NULL,
                        control = control)
     class(drFitModel) <- "drFitModel"
@@ -4161,14 +4167,15 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   if(control$dr.method == "model.MM"){
     drFitModel <- list(raw.conc = conc, raw.test = test,
                        drID = drID, fit.conc = concgrid, fit.test = respgrid, model = best.model,
-                       parameters = list(EC50 = ec50, yEC50 = y.ec50, Vm = coef(best.model)[[1]], Km = coef(best.model)[[2]], test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
+                       parameters = list(EC50 = ec50, yEC50 = y.ec50, Vmax = coef(best.model)[grep("d:", names(coef(best.model)))],
+                                         Km = coef(best.model)[grep("e:", names(coef(best.model)))], test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
                        control = control)
 
   }
   else {
   drFitModel <- list(raw.conc = conc, raw.test = test,
                      drID = drID, fit.conc = concgrid, fit.test = respgrid, model = best.model,
-                     parameters = list(EC50 = ec50, yEC50 = y.ec50, Vm = NA, Km = NA, test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
+                     parameters = list(EC50 = ec50, yEC50 = y.ec50, Vmax = NA, Km = NA, test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
                      control = control)
   }
 

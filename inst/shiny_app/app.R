@@ -3123,7 +3123,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "input.log_transform_x_axis_dose_response_growth_plot_model",
-                                                                     sliderInput(inputId = "nbreaks_x_growth_plot_model",
+                                                                     sliderInput(inputId = "nbreaks_x_growth_dose_response_plot_model",
                                                                                  label = "Number of breaks on x-axis",
                                                                                  min = 1,
                                                                                  max = 20,
@@ -3132,7 +3132,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "input.log_transform_y_axis_dose_response_growth_plot_model",
-                                                                     sliderInput(inputId = "nbreaks_y_growth_plot_model",
+                                                                     sliderInput(inputId = "nbreaks_y_growth_dose_response_plot_model",
                                                                                  label = "Number of breaks on y-axis",
                                                                                  min = 1,
                                                                                  max = 20,
@@ -8893,6 +8893,18 @@ server <- function(input, output, session){
                           choices = select_inputs_individual_plots_dose_response_growth_plot_model())
       })
 
+      select_inputs_show_breaks_dose_response_growth_plot_model <- reactive({
+        if(!input$log_transform_x_axis_dose_response_growth_plot_model)
+          return(FALSE)
+        else
+          return(TRUE)
+      })
+
+      observe({
+        updateCheckboxInput(inputId = "show_break_dose_response_growth_plot_model",
+                            value  = select_inputs_show_breaks_dose_response_growth_plot_model())
+      })
+
       dose_response_growth_plot_model <- reactive({
 
         # Define log-transformation of axes
@@ -8939,8 +8951,8 @@ server <- function(input, output, session){
                             x.lim
                           },
                           broken = input$show_break_dose_response_growth_plot_model,
-                          n.xbreaks = input$nbreaks_x_growth_plot_model,
-                          n.ybreaks = input$nbreaks_y_growth_plot_model,
+                          n.xbreaks = input$nbreaks_x_growth_dose_response_plot_model,
+                          n.ybreaks = input$nbreaks_y_growth_dose_response_plot_model,
                           xlab = input$x_axis_title_dose_response_growth_plot_model,
                           ylab = input$y_axis_title_dose_response_growth_plot_model,
                           bp = ifelse(is.na(input$bp_dose_response_growth_plot_model)||(input$bp_dose_response_growth_plot_model == ""), rlang::missing_arg(), input$bp_dose_response_growth_plot_model)
@@ -9013,8 +9025,8 @@ server <- function(input, output, session){
                             y.lim = ifelse(!exists("y.lim"), substitute(), y.lim),
                             x.lim = ifelse(!exists("x.lim"), substitute(), x.lim),
                             broken = input$show_break_dose_response_growth_plot_model,
-                            n.xbreaks = input$nbreaks_x_growth_plot_model,
-                            n.ybreaks = input$nbreaks_y_growth_plot_model,
+                            n.xbreaks = input$nbreaks_x_growth_dose_response_plot_model,
+                            n.ybreaks = input$nbreaks_y_growth_dose_response_plot_model,
                             xlab = input$x_axis_title_dose_response_growth_plot_model,
                             ylab = input$y_axis_title_dose_response_growth_plot_model,
                             bp = ifelse(is.na(input$bp_dose_response_growth_plot_model)||(input$bp_dose_response_growth_plot_model == ""), rlang::missing_arg(), input$bp_dose_response_growth_plot_model)

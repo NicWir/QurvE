@@ -24,10 +24,9 @@ summary.drFitModel <- function (object,...)
 {
   # object of class drFitSpline
   df <- data.frame(object$parameters)
-  nm <- names(df)
-  nm <- nm[!is.na(df)]
-  df <- df[!is.na(df)]
-  names(df) <- nm
+  if(object$control$dr.method != "model.MM")
+    df <- df[, -grep("Km|Vmax", colnames(df))]
+  return(df)
 }
 
 #' Generic summary function for gcFitSpline objects

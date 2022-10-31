@@ -1419,7 +1419,11 @@ plot.drFitModel <- function(x,
       }
 
     } else {
-      xt <- pretty(conc, n.xbreaks)
+      if(is.null(n.xbreaks)){
+        xt <- pretty(conc)
+      } else {
+        xt <- pretty(conc, n.xbreaks)
+      }
     }
   }
   if(missing(n.ybreaks)){
@@ -1441,7 +1445,11 @@ plot.drFitModel <- function(x,
         yt.minor <- xgx_minor_breaks_log10(c(min(test), max(test)))
       }
     } else {
-      yt <- pretty(test, n.ybreaks)
+      if(is.null(n.ybreaks)){
+        yt <- pretty(test)
+      } else {
+        yt <- pretty(test, n.ybreaks)
+      }
     }
   }
   if(missing(legendText))
@@ -1464,7 +1472,7 @@ plot.drFitModel <- function(x,
   } else {
     x.lim
   }
-  y.lim <- if(missing(x.lim) || !exists("y.lim") || y.lim == "" || is.null(y.lim) ){
+  y.lim <- if(missing(y.lim) || !exists("y.lim") || y.lim == "" || is.null(y.lim) ){
     rlang::missing_arg()
   }else {
     y.lim
@@ -1473,34 +1481,69 @@ plot.drFitModel <- function(x,
   par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
 
   requireNamespace("drc", quietly = TRUE)
-  try(
-    suppressWarnings(
-      plot(
-        x = model,
-        broken = broken,
-        type = "all",
-        add = add,
-        pch = pch,
-        col = col,
-        lwd = lwd,
-        lty = lty,
-        axes = T, xt = xt,
-        log = log,
-        xlab = "",
-        ylab = "",
-        xlim = x.lim,
-        ylim = y.lim,
-        cex = cex.point,
-        cex.axis = cex.axis,
-        legend = legend,
-        legendText = legendText,
-        cex.legend = cex.legend,
-        gridsize = gridsize,
-        legendPos = legendPos,
-        bp = bp,
+  if(any(grep("x", log))){
+    try(
+      suppressWarnings(
+        plot(
+          x = model,
+          broken = broken,
+          type = "all",
+          add = add,
+          pch = pch,
+          col = col,
+          lwd = lwd,
+          lty = lty,
+          axes = T,
+          xt = xt,
+          yt = yt,
+          log = log,
+          xlab = "",
+          ylab = "",
+          xlim = x.lim,
+          ylim = y.lim,
+          cex = cex.point,
+          cex.axis = cex.axis,
+          legend = legend,
+          legendText = legendText,
+          cex.legend = cex.legend,
+          gridsize = gridsize,
+          legendPos = legendPos,
+          bp = bp,
+        )
       )
     )
-  )
+  } else {
+    try(
+      suppressWarnings(
+        plot(
+          x = model,
+          broken = FALSE,
+          type = "all",
+          add = add,
+          pch = pch,
+          col = col,
+          lwd = lwd,
+          lty = lty,
+          axes = F,
+          xt = xt,
+          log = log,
+          xlab = "",
+          ylab = "",
+          xlim = x.lim,
+          ylim = y.lim,
+          cex = cex.point,
+          cex.axis = cex.axis,
+          legend = legend,
+          legendText = legendText,
+          cex.legend = cex.legend,
+          gridsize = gridsize,
+          legendPos = legendPos
+        )
+      )
+    )
+    axis(1, lwd = 0, lwd.ticks = 1, at = xt, mgp=c(3,0.5+0.5*cex.axis,0), labels = as.character(as.numeric(xt)))
+    axis(2, at = yt, las=1, line = 0, labels = as.character(as.numeric(yt)))
+  }
   # axis(1, lwd = 0, lwd.ticks = 1, at = xt, mgp=c(3,1+0.5*cex.axis,0), line = 0, labels = as.character(as.numeric(xt)))
 
   # axis(2, at = yt, las=1, line = 0, labels = as.character(as.numeric(yt)))
@@ -1536,7 +1579,7 @@ plot.drFitModel <- function(x,
   title(main = drFitModel$drID)
   graphics::mtext(bquote(EC[50]: ~ .(round(x$parameters[["EC50"]][[1]], digits = 3)) ~ "\u00B1" ~ .(round(x$parameters[["EC50"]][[2]], digits = 3)) ~~~~
                            response(EC[50]): ~ .(round(x$parameters[["yEC50"]], digits = 3)) ),
-                  side = 4 , adj = 0.55, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7)
+                  side = 4 , adj = 0.55, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.9)
   if (ec50line == TRUE) {
     #vertical lines
     totmin = min(min(drFitModel$fit.conc), min(drFitModel$fit.test))
@@ -3650,13 +3693,14 @@ plot.dr_parameter <- function(x, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC
                               plot = T, export = F, height = 7, width = NULL, out.dir = NULL, out.nm = NULL, ...)
 {
   object <- x
-  param <- match.arg(param)
+  if(x$control$dr.method != "model.MM")
+    param <- match.arg(param)
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
   exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
   # check class of object
   if(!(any(methods::is(object) %in% c("drTable", "grofit", "drFit", "flFitRes")))) stop("object needs to be either a 'grofit', 'drTable', 'drFit', or 'flFitRes' object created with growth.workflow(), growth.drFit(), fl.workflow(), or growth.drFit().")
-  if(!is.character(param) || !(param %in% c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y')))
-    stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
+  if(!is.character(param) || !(param %in% c('y.max', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y', 'Km', 'Vmax', 'EC50.Estimate')))
+    stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'EC50.Estimate', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
   #extract drTable
   if(any(methods::is(object) %in% "drTable")){
     drTable <- object
@@ -3717,9 +3761,7 @@ plot.dr_parameter <- function(x, param = c('y.max', 'y.min', 'fc', 'K', 'n', 'EC
     theme_minimal(base_size = basesize) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size = label.size),
           plot.margin = unit(c(1, 1, 1, nchar(as.character(df$name)[1])/6), "lines"),
-          # remove the vertical grid lines
-          panel.grid.major.x = element_blank() ,
-          # explicitly set the horizontal lines (or they will disappear too)
+          panel.grid.major.x = element_blank() , # explicitly remove the horizontal lines
     ) +
     scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
   if(export == FALSE && plot == FALSE){
