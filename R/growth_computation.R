@@ -3676,6 +3676,24 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
       data.log <- data.log[!bad.values]
     }
   }
+  if (all(is.na(mu))) {
+    if(control$suppress.messages==F) message("gcBootSpline: No spline fit could be performed successfully!")
+    gcBootSpline <- list(raw.time = if (control$log.x.gc == TRUE) {
+      time.log
+    } else {
+      time
+    },
+    raw.data = if (control$log.y.spline == TRUE) {
+      data.log
+    } else {
+      data
+    },
+    gcID = gcID, boot.time = NA, boot.data = NA, boot.gcSpline = NA,
+    lambda = NA, mu = NA, A = NA, integral = NA, bootFlag = FALSE,
+    control = control)
+    class(gcBootSpline) <- "gcBootSpline"
+    return(gcBootSpline)
+  }
   gcBootSpline <- list(
     raw.time = if (control$log.x.gc == TRUE) {
       time.log
