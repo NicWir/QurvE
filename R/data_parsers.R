@@ -58,7 +58,7 @@ read_data <-
     if(is.null(data.fl)) data.fl <- NA
     # if(is.null(data.fluoro2)) data.fluoro2 <- NA
     if(!is.null(calibration) && calibration == "") calibration <- NULL
-    
+
     # Load density data
     if (any(is(data.density) %in% c("matrix", "list", "array")) || !is.character(data.density)) {
       dat <- data.density
@@ -71,9 +71,9 @@ read_data <-
     }
     # Convert time values
     if(!is.null(convert.time)){
-      
+
       conversion <- parse(text = convert.time)
-      
+
       x <- as.numeric(dat[1, -(1:3)])
       time_converted <- eval(conversion)
       dat[1, -(1:3)] <- time_converted
@@ -82,10 +82,12 @@ read_data <-
     allNA.ndx <- which(unlist(lapply(1:nrow(dat), function(x) all(is.na(dat[x, -(1:3)])))))
     if(length(allNA.ndx) > 0)
       dat <- dat[-allNA.ndx, ]
-    
+
     #remove leading and trailing zeros
-    dat[,3] <- as.character(as.numeric(dat[,3]))
-    
+    dat[,3] <- suppressWarnings(
+      as.character(as.numeric(dat[,3]))
+    )
+
     if(data.format == "col"){
       message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
     } else {
@@ -113,15 +115,15 @@ read_data <-
       allNA.ndx <- which(unlist(lapply(1:nrow(fl), function(x) all(is.na(fl[x, -(1:3)])))))
       if(length(allNA.ndx) > 0)
         fl <- fl[-allNA.ndx, ]
-      
+
       #remove leading and trailing zeros
       dat[,3] <- as.character(as.numeric(fl[,3]))
-      
+
       # Convert time values
       if(!is.null(convert.time)){
-        
+
         conversion <- parse(text = convert.time)
-        
+
         x <- as.numeric(fl[1, -(1:3)])
         time_converted <- eval(conversion)
         fl[1, -(1:3)] <- time_converted
@@ -159,7 +161,7 @@ read_data <-
         stop("Could not find 'time' in row 1 of any provided 'data.density' or 'data.fl'.")
       }
     }
-    
+
     if(!is.null(calibration)){
       calibrate <- function(df){
         #test if more than one time entity is present
@@ -179,7 +181,7 @@ read_data <-
           } else {
             x <- as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
           }
-          
+
           df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)] <- eval(calib)
           for (i in 2:(length(time.ndx))){
             x <- matrix(as.numeric(unlist(df[if (is.na(time.ndx[i + 1])) {
@@ -191,7 +193,7 @@ read_data <-
             } else {
               (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
             }, -(1:3)]))
-            
+
             df[if (is.na(time.ndx[i + 1])) {
               (time.ndx[i] + 1):nrow(df)
             } else {
@@ -204,9 +206,9 @@ read_data <-
       if(length(dat)>1)             dat <- calibrate(df = dat)
       if((length(fl) > 1 ) || !is.na(data.fl))    fl <- calibrate(df=fl)
       # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- calibrate(df=fluoro2)
-      
+
     }
-    
+
     # subtract blank
     if(subtract.blank){
       subtract_blank <- function(df){
@@ -240,7 +242,7 @@ read_data <-
             } else {
               (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
             }, 1], ignore.case = T) + time.ndx[i]
-            
+
             if(length(blank.ndx)>0){
               if(length(blank.ndx)>1){
                 blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
@@ -266,7 +268,7 @@ read_data <-
       if((length(fl) > 1 ) || !is.na(data.fl))    fl <- subtract_blank(df=fl)
       # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2 <- subtract_blank(df=fluoro2)
     }
-    
+
     ### Combine technical replicates
     combine_techrep <- function(df){
       sample_names <- as.character(paste0(df[2:nrow(df),1], "...", df[2:nrow(df),2], "___", df[2:nrow(df),3]))
@@ -282,7 +284,7 @@ read_data <-
       if(length(blankcond.ndx)>1){
         conditions <- conditions[-blankcond.ndx]
       }
-      
+
       remove <- c()
       for(i in 1:length(conditions)){
         ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
@@ -316,8 +318,8 @@ read_data <-
     if(length(dat)>1)              dat <- combine_techrep(dat)
     if((length(fl) > 1 ) || !is.na(data.fl))     fl <- combine_techrep(df=fl)
     # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- combine_techrep(df=fluoro2)
-    
-    
+
+
     # remove blank columns from dataset
     remove_blank <- function(df){
       blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
@@ -329,12 +331,12 @@ read_data <-
     if(length(dat)>1)              dat <- remove_blank(dat)
     if((length(fl) > 1 ) || !is.na(data.fl))     fl <- remove_blank(df=fl)
     # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- remove_blank(df=fluoro2)
-    
+
     # Remove columns with NA measurements in all samples
     if(length(dat)>1)              dat <- dat[, c(1:3, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))+3)]
     if((length(fl) > 1 ) || !is.na(data.fl))     fl <- fl[, c(1:3, which(unlist(lapply(4:ncol(fl), function(x)!all(is.na(fl[2:nrow(fl),x])))))+3)]
     # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))     fluoro2 <- fluoro2[, c(1:3, which(unlist(lapply(4:ncol(fluoro2), function(x)!all(is.na(fluoro2[2:nrow(fluoro2),x])))))+3)]
-    
+
     # add minimum negative value + 1 to all fluorescence data
     if((length(fl) > 1 ) || !is.na(data.fl)){
       num.fl <- t(apply(fl[2:nrow(fl), 4:ncol(fl)], 1, as.numeric))
@@ -350,7 +352,7 @@ read_data <-
     #     fluoro2[2:nrow(fluoro2), 4:ncol(fluoro2)] <- num.fluoro2+(-min.F2)+1
     #   }
     # }
-    
+
     # normalize fluorescence
     if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){
       fl.norm <- fl
@@ -364,7 +366,7 @@ read_data <-
     #   fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)] <-
     #     t(apply(fluoro2.norm[-time.ndx, 4:ncol(fluoro2.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
     # }
-    
+
     # Create time matrix
     if(length(dat) > 1) {
       time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
@@ -377,7 +379,7 @@ read_data <-
     #   time.ndx <- grep("time", unlist(fluoro2[,1]), ignore.case = TRUE)
     #   dat.time <- fluoro2
     # }
-    
+
     if(length(time.ndx)==1){
       time <- as.numeric(unlist(dat.time[time.ndx[1],4:ncol(dat.time)]))
       t.mat <- data.matrix(data.frame(matrix(
@@ -414,7 +416,7 @@ read_data <-
         )
       } # end of for (i in 2:(length(time.ndx)))
     } # end of else {}
-    
+
     # Create data matrix for density and fluorescence values
     create_datmat <- function(df, time.ndx){
       if(length(time.ndx)==1){
@@ -445,13 +447,13 @@ read_data <-
     # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2)){fluoro2.mat <- create_datmat(df=fluoro2, time.ndx=time.ndx);  fluoro2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.mat[,1])}else{fluoro2.mat <- NA}
     if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){fl.norm.mat <- create_datmat(df=fl.norm, time.ndx=time.ndx);  fl.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.norm.mat[,1])}else{fl.norm.mat <- NA}
     # if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1){fluoro2.norm.mat <- create_datmat(df=fluoro2.norm, time.ndx=time.ndx);  fluoro2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fluoro2.norm.mat[,1])}else{fluoro2.norm.mat <- NA}
-    
+
     if(length(dat)>1)             colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
     if((length(fl) > 1 ) || !is.na(data.fl))    colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
     # if((length(fluoro2) > 1 ) || !is.na(data.fluoro2))    colnames(fluoro2.mat)[1:3] <- c("condition", "replicate", "concentration")
     if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
     # if(((length(fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  colnames(fluoro2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
-    
+
     if(length(dat) > 1) {
       label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
       condition <- dat.mat[, 1]
@@ -469,10 +471,10 @@ read_data <-
     #   replicate <- fluoro2.mat[, 2]
     #   concentration <- fluoro2.mat[, 3]
     # }
-    
-    
+
+
     expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
-    
+
     if(length(dat)>1)             dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
     if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat <- as.data.frame(unclass(fl.mat), stringsAsFactors = TRUE)
     # if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat <- as.data.frame(unclass(fluoro2.mat), stringsAsFactors = TRUE)
@@ -484,17 +486,17 @@ read_data <-
     # if((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2))    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
     if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, -(1:3)]))
     # if(((length(data.fluoro2) > 1 ) || !is.na(data.fluoro2)) && length(dat)>1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
-    
+
     # if identical time values are present, combine the respective measurement as their mean
     ## create list with unique time values and their frequencies
     t.mat.freq <- lapply(1:nrow(t.mat), function(i) data.frame(table(t.mat[i,])))
-    
+
     if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1)){ #does any time value exist more than once in the same sample?
       ## create list with duplicated time values
       t.mult <- lapply(1:length(t.mat.freq), function(i) t.mat.freq[[i]][t.mat.freq[[i]]$Freq>1, ])
       t.mult <- lapply(1:length(t.mult), function(i) t.mat[i,][t.mat[i,] %in% t.mult[[i]]$Var1 ])
       unique.t.mult <- lapply(1:length(t.mult), function(i) unique(t.mult[[i]]))
-      
+
       ## combine measurements with duplicated time entries
       t.ls <- list()
       dat.ls <- list()
@@ -502,7 +504,7 @@ read_data <-
       f2.ls <- list()
       f1.norm.ls <- list()
       f2.norm.ls <- list()
-      
+
       for(i in 1:length(t.mult)){
         if(length(t.mult[[i]])>1){
           col.nm <- lapply(1:length(unique.t.mult[[i]]), function(j)
@@ -511,7 +513,7 @@ read_data <-
           col.ndx <- lapply(1:length(col.nm), function(j) which(colnames(t.mat) %in% col.nm[[j]])
           )
           # add column with average
-          
+
           ###### MAKE PER ROW AND ALSO IN TIME MATRIX!!!
           combine.ndx <- c(1:col.ndx[[1]][1]) # time values of sample up to first duplicated time
           if(length(col.ndx) == 2){
@@ -535,40 +537,40 @@ read_data <-
                                (col.ndx[[length(col.ndx)]][length(col.ndx[[length(col.ndx)]])]+1):length(t.mat[i, ]))
             }
           }
-          
+
           t.ls[[i]] <- t.mat[i, combine.ndx] # time values of sample up to duplicated time
-          
+
           combine.ndx.dat <- combine.ndx + 3 # account for three identifier columns
           ndx.average.first <- which(diff(combine.ndx.dat) > 1)+3
-          
+
           if(length(dat.mat) > 1){
             dat.ls[[i]] <- c(dat.mat[i, 1:3], dat.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
             for(j in 1:length(ndx.average.first)){
               dat.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(dat.mat[i, (col.ndx[[j]]+3)]))
             }
           }
-          
+
           if(length(fl.mat) > 1){
             f1.ls[[i]] <- c(fl.mat[i, 1:3], fl.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
             for(j in 1:length(ndx.average.first)){
               f1.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.mat[i, (col.ndx[[j]]+3)]))
             }
           }
-          
+
           # if(length(fluoro2.mat) > 1){
           #   f2.ls[[i]] <- c(fluoro2.mat[i, 1:3], fluoro2.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
           #   for(j in 1:length(ndx.average.first)){
           #     f2.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fluoro2.mat[i, (col.ndx[[j]]+3)]))
           #   }
           # }
-          
+
           if(length(fl.norm.mat) > 1){
             f1.norm.ls[[i]] <- c(fl.norm.mat[i, 1:3], fl.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
             for(j in 1:length(ndx.average.first)){
               f1.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.norm.mat[i, (col.ndx[[j]]+3)]))
             }
           }
-          
+
           # if(length(fluoro2.norm.mat) > 1){
           #   f2.norm.ls[[i]] <- c(fluoro2.norm.mat[i, 1:3], fluoro2.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
           #   for(j in 1:length(ndx.average.first)){
@@ -577,23 +579,23 @@ read_data <-
           # }
         } # if(length(t.mult[[i]])>1)
       } # for(i in 1:length(t.mult))
-      
+
       t.mat <- do.call(rbind, t.ls)
       if(length(dat.mat) > 1) dat.mat <- as.data.frame(unclass(do.call(rbind, dat.ls)), stringsAsFactors = TRUE)
       if(length(fl.mat) > 1) fl.mat <- as.data.frame(unclass(do.call(rbind, f1.ls)), stringsAsFactors = TRUE)
       # if(length(fluoro2.mat) > 1) fluoro2.mat <- as.data.frame(unclass(do.call(rbind, f2.ls)), stringsAsFactors = TRUE)
       if(length(fl.norm.mat) > 1) fl.norm.mat <- as.data.frame(unclass(do.call(rbind, f1.norm.ls)), stringsAsFactors = TRUE)
       # if(length(fluoro2.norm.mat) > 1) fluoro2.norm.mat <- as.data.frame(unclass(do.call(rbind, f2.norm.ls)), stringsAsFactors = TRUE)
-      
+
       #convert values from factor to numeric
       if(length(dat.mat) > 1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
       if(length(fl.mat) > 1)    fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, -(1:3)]))
       # if(length(fluoro2.mat) > 1)    fluoro2.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.mat[, -(1:3)]))
       if(length(fl.norm.mat) > 1)  fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, -(1:3)]))
       # if(length(fluoro2.norm.mat) > 1)  fluoro2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fluoro2.norm.mat[, -(1:3)]))
-      
+
     } # if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1))
-    
+
     dataset <- list("time" = t.mat,
                     "density" = dat.mat,
                     "fluorescence" = fl.mat,
@@ -601,7 +603,7 @@ read_data <-
                     "norm.fluorescence" = fl.norm.mat,
                     # "norm.fluorescence2" = fluoro2.norm.mat,
                     "expdesign" = expdesign)
-    
+
     class(dataset) <- "grodata"
     invisible(dataset)
   }
@@ -678,36 +680,36 @@ parse_data <-
       parsed.ls <- parse_tecan(input)
       data.ls <- parsed.ls[[1]]
     }
-    
+
     if(any(grep("Biolector", software, ignore.case = T))){
       parsed.ls <- parse_biolector(input)
       data.ls <- parsed.ls[[1]]
     }
-    
+
     if(any(grep("VictorNivo", software, ignore.case = T))){
       parsed.ls <- parse_victornivo(input)
       data.ls <- parsed.ls[[1]]
     }
-    
+
     if(any(grep("VictorX3", software, ignore.case = T))){
       parsed.ls <- parse_victorx3(input)
       data.ls <- parsed.ls[[1]]
     }
-    
+
     # Convert time values
     if(!is.null(convert.time)){
-      
+
       conversion <- parse(text = convert.time)
-      
+
       for(i in 1:length(data.ls[!is.na(data.ls)])){
         x <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])
         time_converted <- eval(conversion)
         data.ls[[i]][2:nrow(data.ls[[1]]),1] <- time_converted
       }
     }
-    
+
     noNA.ndx <- which(!is.na(data.ls))
-    
+
     if(any(c("Gen5", "Gen6") %in% software)){
       # Remove any columns between time and 'A1' (for plate readers)
       A1.ndx <- match("A1", data.ls[[1]][1,])
@@ -838,7 +840,7 @@ parse_Gen5Gen6 <- function(input)
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
   read.ndx <- time.ndx[!is.na(reads)]
   reads <- reads[!is.na(reads)]
-  
+
   read.data <- list()
   ncol <- length(input[read.ndx[1],][!is.na(input[read.ndx[1],])])
   if(length(read.ndx)>1){
@@ -862,9 +864,9 @@ parse_Gen5Gen6 <- function(input)
     }
   }
   names(read.data) <- reads
-  
+
   well_format <- str_extract(input[grep("Plate Type", input[,1]), 2], pattern = "[[:digit:]]+")
-  
+
   if(as.numeric(well_format) > 96){
     # Combine data tables with identical read name (for > 96-well plates )
     unique_reads <- unique(reads)
@@ -879,10 +881,10 @@ parse_Gen5Gen6 <- function(input)
     names(read.data.combined) <- unique_reads
     read.data <- read.data.combined
   }
-  
+
   data.ls <- list()
   if(length(reads)>1){
-    
+
     answer <- readline(paste0("Indicate where the density data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -892,7 +894,7 @@ parse_Gen5Gen6 <- function(input)
     } else {
       density <- read.data[[as.numeric(answer)]]
     }
-    
+
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -905,7 +907,7 @@ parse_Gen5Gen6 <- function(input)
     }
     data.ls[[1]] <- density
     data.ls[[2]] <- fluorescence
-    
+
     # if(length(reads)>2){
     #   answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
     #                             paste(unlist(lapply(1:length(reads), function (i)
@@ -933,10 +935,10 @@ parse_chibio <- function(input)
   time.ndx <- grep("time", input[1,], ignore.case = T)
   read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
   reads <- input[1, read.ndx]
-  
+
   data.ls <- list()
   if(length(reads)>1){
-    
+
     answer <- readline(paste0("Indicate where the density data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -949,7 +951,7 @@ parse_chibio <- function(input)
         density <- NA
       }
     }
-    
+
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -965,7 +967,7 @@ parse_chibio <- function(input)
     }
     data.ls[[1]] <- density
     data.ls[[2]] <- fluorescence
-    
+
     # if(length(reads)>2){
     #   answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
     #                             paste(unlist(lapply(1:length(reads), function (i)
@@ -988,7 +990,7 @@ parse_chibio <- function(input)
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }
-  
+
   return(list(data.ls))
 }
 
@@ -998,14 +1000,14 @@ parse_growthprofiler <- function(input)
   time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
   # get index of empty column at the and of the data series
   na.ndx <- which(is.na(input[time.ndx,]))
-  
+
   density <- input[time.ndx:nrow(input), 1:(na.ndx-1)]
-  
+
   data.ls <- list()
   data.ls[[1]] <- density
   data.ls[[2]] <- NA
   # data.ls[[3]] <- NA
-  
+
   return(list(data.ls))
 }
 
@@ -1018,7 +1020,7 @@ parse_tecan <- function(input)
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
   read.ndx <- time.ndx[!is.na(reads)]
   reads <- reads[!is.na(reads)]
-  
+
   read.data <- list()
   ncol <- length(input[read.ndx[1],][!is.na(input[read.ndx[1],])])
   if(length(read.ndx)>1){
@@ -1034,7 +1036,7 @@ parse_tecan <- function(input)
   # Remove temperature columns
   for(i in 1:length(read.data))
     read.data[[i]] <- read.data[[i]][ ,-(grep("^Temp.", read.data[[i]][1,]))]
-  
+
   # Remove time points with NA in all samples
   for(i in 1:length(read.data))
     read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
@@ -1048,7 +1050,7 @@ parse_tecan <- function(input)
   names(read.data) <- reads
   data.ls <- list()
   if(length(reads)>1){
-    
+
     answer <- readline(paste0("Indicate where the density data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -1058,7 +1060,7 @@ parse_tecan <- function(input)
     } else {
       density <- read.data[[as.numeric(answer)]]
     }
-    
+
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -1071,7 +1073,7 @@ parse_tecan <- function(input)
     }
     data.ls[[1]] <- density
     data.ls[[2]] <- fluorescence
-    
+
     # if(length(reads)>2){
     #   answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
     #                             paste(unlist(lapply(1:length(reads), function (i)
@@ -1102,7 +1104,7 @@ parse_biolector <- function(input)
   reads <- unique(input[,time.ndx[2]][grep("Biomass", input[,time.ndx[2]])])
   reads <- reads[!is.na(reads)]
   read.ndx <- lapply(1:length(reads), function(x) which(input[,time.ndx[2]] %in% reads[x]))
-  
+
   read.data <- list()
   n.time <- length(input[time.ndx[1], -(1:time.ndx[2])])
   if(length(read.ndx)>1){
@@ -1129,7 +1131,7 @@ parse_biolector <- function(input)
     # add time column
     read.data[[1]] <- cbind(t(data.frame(input[time.ndx[1], -(1:(time.ndx[2]-1))])), read.data[[1]])
   }
-  
+
   # Remove time points with NA in all samples
   for(i in 1:length(read.data))
     read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
@@ -1143,7 +1145,7 @@ parse_biolector <- function(input)
   names(read.data) <- reads
   data.ls <- list()
   if(length(reads)>1){
-    
+
     answer <- readline(paste0("Indicate where the density data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -1153,11 +1155,11 @@ parse_biolector <- function(input)
     } else {
       density <- read.data[[as.numeric(answer)]]
     }
-    
+
     data.ls[[1]] <- density
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
-    
+
   } else {
     density <- read.data[[1]]
     data.ls[[1]] <- density
@@ -1174,7 +1176,7 @@ parse_victornivo <- function(input)
   # extract different read data in dataset
   reads <- unlist(lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2]))
   reads <- reads[!is.na(reads)]
-  
+
   read.data <- list()
   n.sample <- as.numeric(gsub(" wells.+", "", input[grep("PLATE FORMAT", input[,1]),2]))
   if(length(time.ndx)>1){
@@ -1191,7 +1193,7 @@ parse_victornivo <- function(input)
     # add time column
     read.data[[1]] <-cbind(t(data.frame(input[time.ndx[1], -1])), read.data[[1]])
   }
-  
+
   # Remove time points with NA in all samples
   for(i in 1:length(read.data))
     read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
@@ -1205,7 +1207,7 @@ parse_victornivo <- function(input)
   names(read.data) <- reads
   data.ls <- list()
   if(length(reads)>1){
-    
+
     answer <- readline(paste0("Indicate where the density data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -1215,7 +1217,7 @@ parse_victornivo <- function(input)
     } else {
       density <- read.data[[as.numeric(answer)]]
     }
-    
+
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -1228,7 +1230,7 @@ parse_victornivo <- function(input)
     }
     data.ls[[1]] <- density
     data.ls[[2]] <- fluorescence
-    
+
     # if(length(reads)>2){
     #   answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
     #                             paste(unlist(lapply(1:length(reads), function (i)
@@ -1258,7 +1260,7 @@ parse_victorx3 <- function(input)
   # extract different read data in dataset
   reads <- unlist(lapply(1:length(time.ndx), function(x) input[1, time.ndx[x]+1]))
   reads <- reads[!is.na(reads)]
-  
+
   read.data <- list()
   nrow <- suppressWarnings(match(NA, as.numeric(input[-1,1]) ))
   if(length(time.ndx)>1){
@@ -1323,7 +1325,7 @@ parse_victorx3 <- function(input)
     # add column names as first row
     read.data[[1]] <- rbind(colnames(read.data[[1]]), read.data[[1]])
   }
-  
+
   # Remove time points with NA in all samples
   for(i in 1:length(read.data))
     read.data[[i]] <- cbind(read.data[[i]][,1][1:length(read.data[[i]][,2:ncol(read.data[[i]])][rowSums(is.na(read.data[[i]][,2:ncol(read.data[[i]])]))<ncol(read.data[[i]][,2:ncol(read.data[[i]])]), ][, 2])],
@@ -1337,7 +1339,7 @@ parse_victorx3 <- function(input)
   names(read.data) <- reads
   data.ls <- list()
   if(length(reads)>1){
-    
+
     answer <- readline(paste0("Indicate where the density data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -1347,7 +1349,7 @@ parse_victorx3 <- function(input)
     } else {
       density <- read.data[[as.numeric(answer)]]
     }
-    
+
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
@@ -1360,7 +1362,7 @@ parse_victorx3 <- function(input)
     }
     data.ls[[1]] <- density
     data.ls[[2]] <- fluorescence
-    
+
     # if(length(reads)>2){
     #   answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
     #                             paste(unlist(lapply(1:length(reads), function (i)

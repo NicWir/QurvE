@@ -38,9 +38,16 @@ suppress_warnings <- function(.expr, .f, ...) {
   )
 }
 
+
+#' Pretty ticks for log scale for ggplot2
+#'
+#' @param n Number of breaks
+#'
+#' @return
+
 base_breaks <- function(n = 10){
   function(x) {
-    axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
+    grDevices::axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
   }
 }
 
