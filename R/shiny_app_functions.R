@@ -1,3 +1,22 @@
+#' Run Shiny QurvE App
+#'
+#' @export
+#'
+#' @importFrom readxl read_excel excel_sheets
+#'
+#' @import shiny doParallel knitr
+run_app <- function() {
+
+  # Locate all the shiny apps that exist
+  valid_apps <- list.files(system.file("shiny_app", package = "QurvE"))
+
+
+
+  # Launch the app
+  appDir <- system.file("shiny_app", package = "QurvE")
+  suppressWarnings(shiny::runApp(appDir, display.mode = "normal"))
+}
+
 parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file

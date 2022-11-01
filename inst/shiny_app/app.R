@@ -3143,12 +3143,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                  label = 'Show EC50 indicator lines',
                                                                                  value = TRUE),
 
-                                                                   checkboxInput(inputId = 'show_break_dose_response_growth_plot_model',
-                                                                                 label = 'Show x axis break',
-                                                                                 value = TRUE),
+                                                                   conditionalPanel(
+                                                                     condition = "input.log_transform_x_axis_dose_response_growth_plot_model",
+                                                                     checkboxInput(inputId = 'show_break_dose_response_growth_plot_model',
+                                                                                   label = 'Show x axis break',
+                                                                                   value = TRUE)
+                                                                   ),
 
                                                                    conditionalPanel(
-                                                                     condition = "input.show_break_dose_response_growth_plot_model",
+                                                                     condition = "input.show_break_dose_response_growth_plot_model && input.log_transform_x_axis_dose_response_growth_plot_model",
                                                                      numberInput(inputId = 'bp_dose_response_growth_plot_model',
                                                                                  label = 'Break point position',
                                                                                  value = ""),
@@ -10837,18 +10840,26 @@ server <- function(input, output, session){
       paste0("GrowthReport.", input$report_filetype_growth)
     },
     content = function(file) {
-      try(
-        suppressWarnings(
-          suppressMessages(
-            growth.report(grofit = results$growth,
-                          out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
-                          out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
-                          ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                          format = input$report_filetype_growth,
-                          export = FALSE)
+      if (!requireNamespace("tinytex", quietly = TRUE)) {
+        showModal(
+          modalDialog("Please install package 'tinytex' to render PDF reports.", easyClose = T)
+        )
+      } else if(!tinytex::is_tinytex()){
+        stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+      } else {
+        try(
+          suppressWarnings(
+            suppressMessages(
+              growth.report(grofit = results$growth,
+                            out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                            out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
+                            ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                            format = input$report_filetype_growth,
+                            export = FALSE)
+            )
           )
         )
-      )
+      }
     },
     contentType = paste0(".", input$report_filetype_growth)
   )
@@ -10883,18 +10894,26 @@ server <- function(input, output, session){
       paste0("FluorescenceReport.", input$report_filetype_fluorescence)
     },
     content = function(file) {
-      try(
-        suppressWarnings(
-          suppressMessages(
-            fl.report(flFitRes = results$fluorescence,
-                      out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
-                      out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
-                      ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
-                      format = input$report_filetype_fluorescence,
-                      export = FALSE)
+      if (!requireNamespace("tinytex", quietly = TRUE)) {
+        showModal(
+          modalDialog("Please install package 'tinytex' to render PDF reports.", easyClose = T)
+        )
+      } else if(!tinytex::is_tinytex()){
+        stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+      } else {
+        try(
+          suppressWarnings(
+            suppressMessages(
+              fl.report(flFitRes = results$fluorescence,
+                        out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                        out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
+                        ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
+                        format = input$report_filetype_fluorescence,
+                        export = FALSE)
+            )
           )
         )
-      )
+      }
     },
     contentType = paste0(".", input$report_filetype_fluorescence)
   )
