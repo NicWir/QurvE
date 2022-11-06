@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{biosensor.eq}
 \alias{biosensor.eq}
-\title{Internal function used to fit a biosensor response model with minpack.lm::nlsLM()}
+\title{Internal function used to fit a biosensor response model with \code{\link[minpack.lm]{nlsLM}}}
 \usage{
 biosensor.eq(x, y.min, y.max, K, n)
 }
@@ -22,6 +22,11 @@ A vector of fluorescence values
 }
 \description{
 Calculates the values of biosensor response model for given time points and response parameters.
+}
+\examples{
+n <- seq(1:10)
+conc <- rev(10*(1/2)^n)
+fit <- biosensor.eq(conc, 300, 82000, 0.85, 2)
 }
 \references{
 Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. \emph{Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors.} Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3

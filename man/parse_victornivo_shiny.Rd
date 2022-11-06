@@ -21,3 +21,9 @@ a list of length two containing density and/or fluorescence dataframes in the fi
 \description{
 Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.
 }
+\examples{
+\dontrun{
+input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
+parsed <- parse_victornivo_shiny(input, "ABS (F) - Kinetics")
+}
+}

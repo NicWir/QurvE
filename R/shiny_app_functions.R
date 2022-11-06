@@ -654,7 +654,7 @@ parse_biolector_shiny <- function(input, density.nm)
 #' @examples
 #' \dontrun{
 #' input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
-#' parsed <- parse_victornivo_shiny(input, ""ABS (F) - Kinetics")
+#' parsed <- parse_victornivo_shiny(input, "ABS (F) - Kinetics")
 #' }
 parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
@@ -962,8 +962,6 @@ shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")
 #' Create an input control for entry of numeric values. This is identical to
 #' [shiny::numericInput()] but is more flexible in **not** requiring an initial
 #' value and in allowing placeholders.
-#'
-#'
 #'
 #' @param inputId The `input` slot that will be used to access the value.
 #' @param label Display label for the control, or `NULL` for no label.

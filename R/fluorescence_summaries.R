@@ -58,7 +58,7 @@ summary.flFitSpline <- function(object,...)
 #'
 #' @return A dataframe with parameters extracted from the linear fit.
 #' @export
-#'
+#' @examples
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -193,7 +193,7 @@ summary.flBootSpline <- function(object, ...)
 #'
 #' @return A dataframe with parameters extracted from all fits of a workflow.
 #' @export
-#'
+#' @examples
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),

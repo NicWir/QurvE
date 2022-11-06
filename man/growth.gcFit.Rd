@@ -35,6 +35,25 @@ various plotting functions of the QurvE package.
 \code{growth.gcFit} performs all computational growth fitting operations based on the
 user input.
 }
+\examples{
+# Create random growth data set
+  rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+  rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+
+  rnd.data <- list()
+  rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+  rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+
+# Run growth curve analysis workflow
+  res <- growth.gcFit(time = rnd.data$time,
+                      data = rnd.data$data,
+                      parallelize = FALSE,
+                      control = growth.control(suppress.messages = TRUE,
+                                               fit.opt = "s"))
+
+
+
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

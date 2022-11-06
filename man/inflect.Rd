@@ -39,3 +39,6 @@ legend("topleft", legend = c("Minima",1:n,"Maxima",1:n),
        pt.cex =  c(rep(c(1, c(1:n) / 1.5), 2)), cex = .75, ncol = 2)
 
 }
+\author{
+Evan Friedland
+}

@@ -73,7 +73,7 @@ base_breaks <- function(n = 10){
 #'
 #' @return a list with [[1]] a vector of minima and [[2]] a vector of maxima.
 #' @export
-#' @authored Evan Friedland
+#' @author Evan Friedland
 #' @examples
 #' # Pick a desired threshold to plot up to
 #' n <- 3
@@ -180,7 +180,7 @@ zipFastener <- function(df1, df2, along=2)
   return(res)
 }
 
-#' Internal function used to fit a biosensor response model with minpack.lm::nlsLM()
+#' Internal function used to fit a biosensor response model with \code{\link[minpack.lm]{nlsLM}}
 #'
 #' Calculates the values of biosensor response model for given time points and response parameters.
 #'
@@ -194,7 +194,10 @@ zipFastener <- function(df1, df2, along=2)
 #' @return A vector of fluorescence values
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
-#'
+#' @examples
+#' n <- seq(1:10)
+#' conc <- rev(10*(1/2)^n)
+#' fit <- biosensor.eq(conc, 300, 82000, 0.85, 2)
 biosensor.eq <- function (x, y.min, y.max, K, n)
 {
   y.min <- y.min[1]
@@ -383,8 +386,6 @@ match_arg <- function(arg, choices,
   choices[i]
 }
 
-
-
 #' Sets the default breaks for log10 (from R package 'xgxr')
 #'
 #' \code{xgx_breaks_log10} sets nice breaks for log10 scale.
@@ -430,7 +431,8 @@ match_arg <- function(arg, choices,
 #' print(xgx_breaks_log10(c(1, 1.000001)), digits = 10)
 #' }
 #'
-xgx_breaks_log10 <-  function(data_range) {
+xgx_breaks_log10 <-  function(data_range)
+  {
   data_min <- min(log10(data_range))
   data_max <- max(log10(data_range))
   n_breaks <- 5   # number of breaks to aim for
@@ -461,7 +463,6 @@ xgx_breaks_log10 <-  function(data_range) {
 #'
 #' \code{xgx_minor_breaks_log10} sets nice minor_breaks for log10 scale.
 #'
-#'
 #' @param data_range range of the data
 #'
 #' @return numeric vector of breaks
@@ -469,7 +470,6 @@ xgx_breaks_log10 <-  function(data_range) {
 #' @importFrom labeling extended
 #'
 #' @author Andrew Stein
-#'
 #'
 #' @examples
 #' \dontrun{
@@ -512,13 +512,13 @@ xgx_minor_breaks_log10 <-  function(data_range) {
 #'
 #' @return A list:
 #' \item{time}{numeric matrix of size \code{d}x\code{t}, each row represent the time points for which growth data is simulated and stored in each row of \code{data}.}
-#' \item{data}{data.frame of size \code{d}x(3+\code{t}), 1. column, character as an experiment identifier; 2. column: character, additional information about respecting experiment; 3. column: concentration of substrate of a compound under which the experiment is obtained; 4.-(3+t). column: growth data corresponding to the time points in \code{time}.}
+#' \item{data}{data.frame of size \code{d}x(3+\code{t}), 1. column, character as an experiment identifier; 2. column: Replicate number; 3. column: concentration of substrate of a compound under which the experiment is obtained; 4.-(3+t). column: growth data corresponding to the time points in \code{time}.}
 #'
 #' @export
 #'
-#' @references adapted from: Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
+#' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
-#' examples
+#' @examples
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -542,8 +542,7 @@ xgx_minor_breaks_log10 <-  function(data_range) {
 #' summary(drFit)
 #' plot(drFit)
 #'
-rdm.data <-
-  function (d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label = "Test1")
+rdm.data <-function (d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label = "Test1")
   {
     many.data  <- d <- d[1]
     max.time  <- tmax <- tmax[1]

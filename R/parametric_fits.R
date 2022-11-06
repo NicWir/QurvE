@@ -827,7 +827,7 @@ richards <- function (time, A, mu, lambda, addpar)
 #' @param A Maximum density value
 #' @param mu Growth rate
 #' @param lambda Lag time
-#' @param addpar Additional parameters have no effect in this type of model. They belong to the standard model description in \code{grofit} and are initialized as \code{addpar=NULL} in the function header.}
+#' @param addpar Additional parameters have no effect in this type of model. They belong to the standard model description in \code{grofit} and are initialized as \code{addpar=NULL} in the function header.
 #'
 #' @return A vector of density values
 #' @export

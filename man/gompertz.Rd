@@ -14,6 +14,8 @@ gompertz(time, A, mu, lambda, addpar = NULL)
 \item{mu}{Growth rate}
 
 \item{lambda}{Lag time}
+
+\item{addpar}{Additional parameters have no effect in this type of model. They belong to the standard model description in \code{grofit} and are initialized as \code{addpar=NULL} in the function header.}
 }
 \value{
 A vector of density values
