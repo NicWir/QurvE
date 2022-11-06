@@ -335,7 +335,7 @@ parse_data_shiny <-
 
 #' Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.
 #'
-#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param data A dataframe created by reading a table file with \code{\link{read_file}}
 #' @param density.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence data
 #'

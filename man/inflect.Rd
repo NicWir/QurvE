@@ -9,10 +9,10 @@ inflect(x, threshold = 1)
 \arguments{
 \item{x}{vector of values with minima and maxima}
 
-\item{threshold}{}
+\item{threshold}{Threshold to consider minima or maxima}
 }
 \value{
-a list with [\link{1}] a vector of minima and [\link{2}] a vector of maxima.
+a list with 1. a vector of minima and 2. a vector of maxima.
 }
 \description{
 Find indices of maxima an minima in a data series

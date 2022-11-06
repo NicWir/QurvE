@@ -69,9 +69,9 @@ base_breaks <- function(n = 10){
 #' Find indices of maxima an minima in a data series
 #'
 #' @param x vector of values with minima and maxima
-#' @param threshold
+#' @param threshold Threshold to consider minima or maxima
 #'
-#' @return a list with [[1]] a vector of minima and [[2]] a vector of maxima.
+#' @return a list with 1. a vector of minima and 2. a vector of maxima.
 #' @export
 #' @author Evan Friedland
 #' @examples

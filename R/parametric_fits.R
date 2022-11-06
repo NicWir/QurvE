@@ -950,7 +950,7 @@ initgompertz.exp <- function (time, y, A, mu, lambda)
 #' @param A Maximum density value
 #' @param mu Growth rate
 #' @param lambda Lag time
-#' @param addpar Numeric vector of size two, addpar[1] corresponds to scaling parameter \eqn{\alpha} and addpar[2] corresponds to shifting parameter \eqn{t_{shift}}.
+#' @param addpar Numeric vector of size two, addpar`[`1`]` corresponds to scaling parameter \eqn{\alpha} and addpar`[`2`]` corresponds to shifting parameter \eqn{t_{shift}}.
 #'
 #' @return A vector of density values
 #' @export

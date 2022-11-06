@@ -15,7 +15,7 @@ gompertz.exp(time, A, mu, lambda, addpar)
 
 \item{lambda}{Lag time}
 
-\item{addpar}{Numeric vector of size two, addpar\link{1} corresponds to scaling parameter \eqn{\alpha} and addpar\link{2} corresponds to shifting parameter \eqn{t_{shift}}.}
+\item{addpar}{Numeric vector of size two, addpar\code{[}1\verb{]} corresponds to scaling parameter \eqn{\alpha} and addpar\code{[}2\verb{]} corresponds to shifting parameter \eqn{t_{shift}}.}
 }
 \value{
 A vector of density values
