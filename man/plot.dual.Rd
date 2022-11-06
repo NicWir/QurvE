@@ -101,3 +101,21 @@
 \description{
 \code{plot.dual} creates a two-panel plot in which fluorescence or density values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
 }
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Run workflow
+res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+                   x_type = "time", norm_fl = TRUE,
+                   dr.parameter = "max_slope.spline",
+                   suppress.messages = TRUE,
+                   parallelize = FALSE)
+
+plot.dual(res, legend.ncol = 3, basesize = 15)
+
+
+}

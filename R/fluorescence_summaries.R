@@ -6,6 +6,25 @@
 #' @return A dataframe with parameters extracted from the nonparametric fit.
 #' @export
 #'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flFitSpline(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "s", x_type = "time"))
+#'
+#' summary(TestFit)
+#
 summary.flFitSpline <- function(object,...)
 {
 
@@ -40,6 +59,26 @@ summary.flFitSpline <- function(object,...)
 #' @return A dataframe with parameters extracted from the linear fit.
 #' @export
 #'
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flFitLinear(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "l", x_type = "time",
+#'                        lin.R2 = 0.95, lin.RSD = 0.1,
+#'                        lin.h = 20))
+#'
+#' summary(TestFit)
+#
 summary.flFitLinear <- function(object,...)
 {
   # object of class flFitLinear
@@ -84,6 +123,26 @@ summary.flFitLinear <- function(object,...)
 #' @return A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
 #' @export
 #'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flBootSpline(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "s", x_type = "time",
+#'                        nboot.fl = 50))
+#'
+#' summary(TestFit)
+#
 summary.flBootSpline <- function(object, ...)
 {
   # object of class flBootSpline
@@ -135,6 +194,21 @@ summary.flBootSpline <- function(object, ...)
 #' @return A dataframe with parameters extracted from all fits of a workflow.
 #' @export
 #'
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Run curve fitting workflow
+#' res <- flFit(fl_data = input$norm.fluorescence,
+#'              time = input$time,
+#'              parallelize = FALSE,
+#'              control = fl.control(fit.opt = c("s","l"), suppress.messages = TRUE,
+#'              x_type = "time", norm_fl = TRUE, nboot.fl = 20))
+#'
+#' summary(res)
+#'
 summary.flFit <- function(object,...)
 {
   # object of class flFit
@@ -150,8 +224,61 @@ summary.flFit <- function(object,...)
 #' @return A dataframe with biosensor response parameters.
 #' @export
 #'
+#' @examples
+#' # Create concentration values via a serial dilution
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#'
+#' # Simulate response values via biosensor equation
+#' response <- biosensor.eq(conc, y.min = 110, y.max = 6000, K = 0.5, n = 2) +
+#'             0.01*6000*rnorm(10)
+#'
+#' # Perform fit
+#' TestRun <- fl.drFitModel(conc, response, drID = "test", control = fl.control())
+#'
+#' print(summary(TestRun))
+#'
 summary.drFitFLModel <- function(object, ...)
 {
+  object$parameters[unlist(lapply(1:length(object$parameters), function(x) is.null(object$parameters[[x]])))]<-NA
   # object of class drFitModel
   data.frame(object$parameters)
+}
+
+#' Generic summary function for drFitfl objects
+#'
+#' @param object object of class \code{drFitfl}
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
+#'
+#' @return A dataframe with parameters for all samples extracted from the dose-response analysis.
+#' @export
+#'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Define fit controls
+#' control <- fl.control(fit.opt = "s",
+#'              x_type = "time", norm_fl = TRUE,
+#'              dr.parameter = "max_slope.spline",
+#'              dr.method = "model",
+#'              suppress.messages = TRUE)
+#'
+#' # Run curve fitting workflow
+#' res <- flFit(fl_data = input$norm.fluorescence,
+#'              time = input$time,
+#'              parallelize = FALSE,
+#'              control = control)
+#'
+#' # Perform dose-response analysis with biosensor model
+#' drFitfl <- fl.drFit(flTable = res$flTable, control = control)
+#'
+#' summary(drFitfl)
+#'
+summary.drFitfl <- function(object, ...)
+{
+  # object of class drFitModel
+  data.frame(object$drTable)
 }

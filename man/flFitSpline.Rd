@@ -86,6 +86,25 @@ smooth spline fit and identification of maximum slope for earlier time values th
 the local minimum before \eqn{mu_{max}}. \item Choose the greater of the two
 independently determined slopes as \eqn{mu_{max}2}. }
 }
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Extract time and normalized fluorescence data for single sample
+time <- input$time[4,]
+data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+
+# Perform linear fit
+TestFit <- flFitSpline(time = time,
+                       fl_data = data,
+                       ID = "TestFit",
+                       control = fl.control(fit.opt = "s", x_type = "time"))
+
+plot(TestFit)
+}
 \seealso{
 Other fluorescence fitting functions: 
 \code{\link{flBootSpline}()},

@@ -4,7 +4,7 @@
 \alias{growth.gcFit}
 \title{Perform a growth curve analysis on all samples in the provided dataset.}
 \usage{
-growth.gcFit(time, data, control = growth.control(), ...)
+growth.gcFit(time, data, control = growth.control(), parallelize = TRUE, ...)
 }
 \arguments{
 \item{time}{(optional) A matrix containing time values for each sample.}
@@ -13,8 +13,9 @@ growth.gcFit(time, data, control = growth.control(), ...)
 \item a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, a \code{'fluorescence'} dataframes,
 or \item a dataframe containing density values (if a \code{time} matrix is provided as separate argument).}}
 
-\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}},
-defining relevant fitting options.}
+\item{control}{A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
+
+\item{parallelize}{Run linear fits and bootstrapping operations in parallel using all but one available processor cores}
 
 \item{...}{Further arguments passed to the shiny app.}
 }

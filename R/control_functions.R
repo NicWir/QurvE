@@ -39,6 +39,13 @@
 #'
 #' @export
 #'
+#' @examples
+#' # default option
+#' control_default <- growth.control()
+#' # user defined
+#' control_manual <- growth.control(fit.opt = c("s", "m"),
+#'                                  smooth.gc = 0.5,
+#'                                  model.type = c("huang", "baranyi"))
 growth.control <- function (neg.nan.act = FALSE,
                             clean.bootstrap = TRUE,
                             suppress.messages = FALSE,
@@ -189,7 +196,7 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{flFitLinear}}.
 #' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{"max_slope.spline"}, which represents the maximum slope of the spline fit Typical options include: \code{"max_slope.linfit"}, \code{"dY.linfit"}, \code{"max_slope.spline"}, and \code{"dY.spline"}.
-#' @param dr.method (Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{"spline"}) or fit a biosensor response model (proposed by Meyer et al., 2019).
+#' @param dr.method (Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{"spline"}) or fit a biosensor response model with \code{"model"} (proposed by Meyer et al., 2019).
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See \code{\link{smooth.spline}} for further details. Default: \code{NULL}.
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
@@ -210,6 +217,14 @@ growth.control <- function (neg.nan.act = FALSE,
 #'
 #' @export
 #'
+#' @examples
+#' # default option
+#' control_default <- fl.control()
+#' # user defined
+#' control_manual <- fl.control(fit.opt = c("s"),
+#'                              smooth.fl = 0.6,
+#'                              x_type = "time",
+#'                              t0 = 2)
 fl.control <- function(fit.opt = c("l", "s"),
                        x_type = c("density", "time"),
                        norm_fl = TRUE,

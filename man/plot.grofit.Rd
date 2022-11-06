@@ -14,8 +14,8 @@
   exclude.nm = NULL,
   exclude.conc = NULL,
   mean = TRUE,
-  log.y = T,
-  deriv = T,
+  log.y = TRUE,
+  deriv = TRUE,
   n.ybreaks = 6,
   colors = NULL,
   basesize = 20,
@@ -100,4 +100,26 @@
 }
 \description{
 \code{plot.grofit} extracts the spline fits of a subset of samples in a \code{grofit} object calculates averages and standard deviations of conditions with replicates and combines them into a single plot.
+}
+\examples{
+# Create random growth data set
+rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+
+rnd.data <- list()
+rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+
+# Run growth curve analysis workflow
+res <- growth.workflow(time = rnd.data$time,
+                       data = rnd.data$data,
+                       fit.opt = "s",
+                       ec50 = FALSE,
+                       export.res = FALSE,
+                       suppress.messages = TRUE,
+                       parallelize = FALSE)
+
+
+plot(res, names = "Test1", legend.ncol = 4) # Show only samples for condition "Test1"
+
 }

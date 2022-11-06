@@ -49,6 +49,31 @@ dataset. The response parameter can be chosen from every physiological parameter
 calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBootSpline}} to
 generate a table with estimates for EC50 and respecting statistics.
 }
+\examples{
+# Create random growth data set
+rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+
+rnd.data <- list()
+rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+
+# Run growth curve analysis workflow
+gcFit <- growth.gcFit(time = rnd.data$time,
+                       data = rnd.data$data,
+                       parallelize = FALSE,
+                       control = growth.control(fit.opt = "s",
+                                                suppress.messages = TRUE))
+
+# Perform dose-response analysis
+drFit <- growth.drFit(gcTable = gcFit$gcTable,
+             control = growth.control(dr.parameter = "mu.spline"))
+
+# Inspect results
+summary(drFit)
+plot(drFit)
+
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

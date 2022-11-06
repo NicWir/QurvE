@@ -4,7 +4,14 @@
 \alias{flFit}
 \title{Perform a fluorescence curve analysis on all samples in the provided dataset.}
 \usage{
-flFit(fl_data, time = NULL, density = NULL, control = fl.control(), ...)
+flFit(
+  fl_data,
+  time = NULL,
+  density = NULL,
+  control = fl.control(),
+  parallelize = TRUE,
+  ...
+)
 }
 \arguments{
 \item{fl_data}{Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
@@ -15,8 +22,9 @@ or \item a dataframe containing (normalized) fluorescence values (if a \code{tim
 
 \item{density}{(optional) A dataframe containing density values for each sample and sample identifiers in the first three columns.}
 
-\item{control}{A \code{fl.control} object created with \code{\link{fl.control}},
-defining relevant fitting options.}
+\item{control}{A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.}
+
+\item{parallelize}{Run linear fits and bootstrapping operations in parallel using all but one available processor cores}
 
 \item{...}{Further arguments passed to the shiny app.}
 }
@@ -43,6 +51,29 @@ various plotting functions of the QurvE package.
 }
 \description{
 \code{flFit} performs all computational fluorescence fitting operations based on the user input.
+}
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Define fit controls
+control <- fl.control(fit.opt = "s",
+             x_type = "time", norm_fl = TRUE,
+             dr.parameter = "max_slope.spline",
+             dr.method = "model",
+             suppress.messages = TRUE)
+
+# Run curve fitting workflow
+res <- flFit(fl_data = input$norm.fluorescence,
+             time = input$time,
+             control = control,
+             parallelize = FALSE)
+
+summary(res)
+
 }
 \seealso{
 Other workflows: 

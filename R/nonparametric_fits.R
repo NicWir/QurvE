@@ -62,6 +62,21 @@
 #'
 #' @export
 #'
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+#'
+#' # Perform spline fit
+#' TestFit <- growth.gcFitSpline(time, data, gcID = "TestFit",
+#'                  control = growth.control(fit.opt = "s"))
+#'
+#' plot(TestFit)
+#'
+#'
 growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth.control(biphasic = FALSE))
 {
   if(!is.null(control$t0) && !is.na(control$t0) && control$t0 != ""){
@@ -71,7 +86,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
   }
   tmax <- control$tmax
   max.density <- control$max.density
-  
+
   if (methods::is(control) != "grofit.control")
     stop("control must be of class grofit.control!")
   if (!any(control$fit.opt %in% c("s","a")))
@@ -81,7 +96,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
   }
   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
   data.in <- data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
-  
+
   if (length(time) != length(data))
     stop("gcFitSpline: length of input vectors differ!")
   bad.values <- (is.na(time)) | (is.na(data)) |
@@ -212,7 +227,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
     }, spar = control$smooth.gc, cv = NA, keep.data = FALSE))
     if (!exists("spline") || is.null(spline) == TRUE) {
       if(control$suppress.messages==F) message("gcFitSpline: Spline could not be fitted to data!")
-      
+
       gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                           fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
                                                                                                                       mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
@@ -229,7 +244,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       deriv1.growth <- deriv1; deriv1.growth$x <- deriv1.growth$x[spline$y > spline$y[1]]; deriv1.growth$y <- deriv1.growth$y[spline$y > spline$y[1]]
       if(length(deriv1.growth$y) < 3){
         if(control$suppress.messages==F) message("gcFitSpline: No significant amount of density values above the start value!")
-        
+
         gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
                             fit.time = spline$x, fit.data = spline$y, parameters = list(A = NA, dY = NA,
                                                                                         mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
@@ -247,7 +262,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       b.spl <- y.max - mumax * t.max # the y-intercept of the tangent at µmax
       lambda.spl <- (spline$y[1] - b.spl)/mumax  # lag time
       integral <- low.integrate(spline$x, spline$y)
-      
+
       if(control$biphasic) {
         # determine number of data points in period until maximum density
         n.spl <- length(time[which.min(abs(time-t0)):which.max(data)])
@@ -256,7 +271,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
         minima <- inflect(deriv1$y, threshold = n)$minima
         # consider only minima with a slope value of <= 0.75 * µmax
         minima <- minima[deriv1$y[minima] <= 0.75 * mumax]
-        
+
         minima <- c(1, minima)
         for(i in 1:(length(minima)-1)){
           if(any(minima[i]:minima[i+1] %in% mumax.index.spl)){
@@ -411,7 +426,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
       #     )
       #     points(deriv2_spline$x[maxima], deriv2_spline$y[maxima], pch = 16, col = cf.1(1)[1], cex = 1.5)
       # }
-      
+
     } # else of if (!exists("spline") || is.null(spline) == TRUE)
   } # else of if (length(data) < 5)
   gcFitSpline <-
@@ -488,6 +503,23 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #'
 #' @export
 #'
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+#'
+#' # Introduce some noise into the measurements
+#' data <- data + stats::runif(97, -0.01, 0.09)
+#'
+#' # Perform bootstrapping spline fit
+#' TestFit <- growth.gcBootSpline(time, data, gcID = "TestFit",
+#'               control = growth.control(fit.opt = "s", nboot.gc = 50))
+#'
+#' plot(TestFit, combine = TRUE, lwd = 0.5)
+#'
 growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growth.control())
 {
   if (methods::is(control) != "grofit.control")
@@ -533,10 +565,9 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
   control.change$fit.opt <- "s"
   if (control$nboot.gc > 0) {
     for (j in 1:control$nboot.gc) {
-      choose <- sort(sample(1:length(time), length(time), replace = TRUE))
+      choose <- sort(c(1,sample(1:length(time[-1]), length(time)-1, replace = TRUE)))
       while (length(unique(choose)) < 5) {
-        choose <- sort(sample(1:length(time), length(time),
-                              replace = TRUE))
+        choose <- sort(c(1,sample(1:length(time[-1]), length(time)-1, replace = TRUE)))
       }
       time.cur <- time[choose]
       data.cur <- data[choose]
@@ -698,6 +729,25 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
 #'
 #' @export
 #'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flFitSpline(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "s", x_type = "time"))
+#'
+#' plot(TestFit)
+#
 flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
                         control = fl.control(biphasic = FALSE, x_type = c("density", "time"), log.x.spline = FALSE, log.y.spline = FALSE, smooth.fl = 0.75, t0 = 0, min.density = NA))
 {
@@ -707,12 +757,12 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   } else {
     t0 <- 0
   }
-  
+
   if (is(control) != "fl.control")
     stop("control must be of class fl.control!")
   if (!any(control$fit.opt %in% "s"))
     stop("Fit option is not set for a fluorescence spline fit. See fl.control()")
-  
+
   if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
   if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
   fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
@@ -774,7 +824,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       }
       density.log <- log(density/density[1])
     }
-    
+
     if(max(density) < control$growth.thresh * density[1]){
       if(control$suppress.messages==F) message(paste0("flFitSpline: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
       flFitSpline <- list(x.in = density.in, fl.in = fl_data.in, raw.x = density, raw.fl = fl_data,
@@ -826,7 +876,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       fl_data <- fl_data[!bad.values]
       fl_data.log <- fl_data.log[!bad.values]
     }
-    
+
     if (control$log.x.spline == TRUE) {
       bad.values <- (time <= 0)
       if (TRUE %in% bad.values) {
@@ -936,7 +986,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
     b.spl <- y.max - max_slope * x.max # the y-intercept of the tangent at mumax
     lambda.spl <- -b.spl/max_slope  # lag x
     integral <- low.integrate(spline$x, spline$y)
-    
+
     if(control$biphasic) {
       # determine number of data points in period until maximum density
       n.spl <- length(x[which.min(abs(x)):which.max(fl_data)])
@@ -998,7 +1048,7 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       fitFlag2 <- FALSE
     }
   } # else of if (!exists("spline") || is.null(spline) == TRUE)
-  
+
   flFitSpline <-
     list(
       x.in = get(ifelse(x_type == "density", "density.in", "time.in")),
@@ -1071,6 +1121,26 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #'
 #' @export
 #'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flBootSpline(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "s", x_type = "time",
+#'                        nboot.fl = 50))
+#'
+#' plot(TestFit, combine = TRUE, lwd = 0.5)
+#
 flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
                          control = fl.control())
 {
@@ -1085,7 +1155,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   if (control$log.y.spline == TRUE) {
     fl_data.log <- log(fl_data/fl_data[1])
   }
-  
+
   if(x_type == "density" && length(density) != length(fl_data))
     stop("flBootSpline: length of input vectors (density and fl_data) differ!")
   if(x_type == "time" && length(time) != length(fl_data))
@@ -1133,7 +1203,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
       time.log <- log(time+1)
     }
   }
-  
+
   if (length(fl_data) < 6) {
     if(control$suppress.messages==F) message("flBootSpline: There is not enough valid data. Must have at least 6 unique values!")
     flBootSpline <- list(raw.x = get(ifelse(x_type == "density", "density", "time")), raw.fl = fl_data,
@@ -1169,7 +1239,7 @@ flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
         } else {
           nonpara[[j]] <- flFitSpline(time = x.cur, fl_data = fl.cur, ID = ID, control = control.change)
         }
-        
+
         if(nonpara[[j]]$fitFlag==FALSE | is.na(nonpara[[j]]$fit.fl[1])){
           boot.y[j, 1:length(nonpara[[j]]$fit.x)] <- rep(NA, length(nonpara[[j]]$fit.fl))
           boot.x[j, 1:length(nonpara[[j]]$fit.fl)] <- rep(NA, length(nonpara[[j]]$fit.x))

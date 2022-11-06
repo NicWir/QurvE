@@ -16,8 +16,12 @@ read_file(filename, csvsep = ";", dec = ".", sheet = 1)
 \item{sheet}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files (\emph{optional}). Default: \code{";"}}
 }
 \value{
-A dataframe object
+A dataframe object with headers in the first row.
 }
 \description{
-Call the appropriate function required to read a table file and return the table as a dataframe object.
+\code{read_file} automatically detects the format of a file provided as \code{filename} and calls the appropriate function to read the table file.
+}
+\examples{
+input <- read_file(filename = system.file("2-FMA_toxicity.csv", package = "QurvE"), csvsep = ";" )
+
 }

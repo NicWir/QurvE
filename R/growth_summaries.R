@@ -6,8 +6,18 @@
 #' @return A dataframe with parameters extracted from the dose-response analysis of a single sample.
 #' @export
 #'
+#' @examples
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#' response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
+#'
+#' TestRun <- growth.drFitSpline(conc, response, drID = "test",
+#'               control = growth.control(log.x.dr = TRUE, smooth.dr = 0.8))
+#'
+#' print(summary(TestRun))
+#'
 summary.drFitSpline <- function (object,...)
   {
+  object$parameters[unlist(lapply(1:length(object$parameters), function(x) is.null(object$parameters[[x]])))]<-NA
     # object of class drFitSpline
     data.frame(object$parameters)
 }
@@ -19,6 +29,14 @@ summary.drFitSpline <- function (object,...)
 #'
 #' @return A dataframe with parameters extracted from the dose-response analysis of a single sample.
 #' @export
+#'
+#' @examples
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#' response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
+#'
+#' TestRun <- growth.drFitModel(conc, response, drID = "test")
+#'
+#' print(summary(TestRun))
 #'
 summary.drFitModel <- function (object,...)
 {
@@ -36,6 +54,20 @@ summary.drFitModel <- function (object,...)
 #'
 #' @return A dataframe with parameters extracted from the nonparametric fit.
 #' @export
+#'
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- growth.gcFitSpline(time, data, gcID = "TestFit",
+#'                  control = growth.control(fit.opt = "s"))
+#'
+#' summary(TestFit)
 #'
 summary.gcFitSpline <- function(object,...)
   {
@@ -70,6 +102,20 @@ summary.gcFitSpline <- function(object,...)
 #'
 #' @return A dataframe with parameters extracted from the growth model fit.
 #' @export
+#'
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+#'
+#' # Perform parametric fit
+#' TestFit <- growth.gcFitModel(time, data, gcID = "TestFit",
+#'                  control = growth.control(fit.opt = "m"))
+#'
+#' summary(TestFit)
 #'
 summary.gcFitModel <- function(object, ...)
   {
@@ -129,6 +175,29 @@ summary.gcFitModel <- function(object, ...)
 #' @return A dataframe with parameters for all samples extracted from the dose-response analysis.
 #' @export
 #'
+#' @examples
+#' # Create random growth data set
+#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#' rnd.data <- list()
+#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#' # Run growth curve analysis workflow
+#' gcFit <- growth.gcFit(time = rnd.data$time,
+#'                        data = rnd.data$data,
+#'                        parallelize = FALSE,
+#'                        control = growth.control(fit.opt = "s",
+#'                                                 suppress.messages = TRUE))
+#'
+#' # Perform dose-response analysis
+#' drFit <- growth.drFit(gcTable = gcFit$gcTable,
+#'                  control = growth.control(dr.parameter = "mu.spline"))
+#'
+#' # Inspect results
+#' summary(drFit)
+#'
 summary.drFit <- function(object, ...)
   {
     # object of class drFit
@@ -143,6 +212,23 @@ summary.drFit <- function(object, ...)
 #'
 #' @return A dataframe with statistical parameters extracted from the spline fit bootstrapping computation.
 #' @export
+#'
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+#'
+#' # Introduce some noise into the measurements
+#' data <- data + stats::runif(97, -0.01, 0.09)
+#'
+#' # Perform bootstrapping spline fit
+#' TestFit <- growth.gcBootSpline(time, data, gcID = "TestFit",
+#'               control = growth.control(fit.opt = "s", nboot.gc = 50))
+#'
+#' summary(TestFit)
 #'
 summary.gcBootSpline <- function(object, ...)
   {
@@ -195,6 +281,15 @@ summary.gcBootSpline <- function(object, ...)
 #' @return A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
 #' @export
 #'
+#' @examples
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#' response <- c(1/(1+exp(-0.7*(4-conc[-20])))+stats::rnorm(19)/50, 0)
+#'
+#' TestRun <- growth.drBootSpline(conc, response, drID = "test",
+#'         control = growth.control(log.x.dr = TRUE, smooth.dr = 0.8, nboot.dr = 50))
+#'
+#' print(summary(TestRun))
+#'
 summary.drBootSpline <- function(object, ...)
   {
     # object of class drBootSpline
@@ -234,6 +329,24 @@ summary.drBootSpline <- function(object, ...)
 #' @return A dataframe with parameters extracted from all fits of a workflow.
 #' @export
 #'
+#' @examples
+#' # Create random growth data set
+#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#' rnd.data <- list()
+#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#' # Run growth curve analysis workflow
+#' gcFit <- growth.gcFit(time = rnd.data$time,
+#'                        data = rnd.data$data,
+#'                        parallelize = FALSE,
+#'                        control = growth.control(fit.opt = "a",
+#'                                                 suppress.messages = TRUE,
+#'                                                 nboot.gc = 20))
+#' summary(gcFit)
+#'
 summary.gcFit <- function(object,...)
   {
     # object of class gcFit
@@ -248,6 +361,20 @@ summary.gcFit <- function(object,...)
 #'
 #' @return A dataframe with parameters extracted from the linear fit.
 #' @export
+#'
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- growth.gcFitLinear(time, data, gcID = "TestFit",
+#'                  control = growth.control(fit.opt = "l"))
+#'
+#' summary(TestFit)
 #'
 summary.gcFitLinear <- function(object,...)
   {

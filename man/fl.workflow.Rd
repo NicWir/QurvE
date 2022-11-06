@@ -9,7 +9,7 @@ fl.workflow(
   time = NULL,
   density = NULL,
   fl_data = NULL,
-  ec50 = FALSE,
+  ec50 = TRUE,
   mean.grp = NA,
   mean.conc = NA,
   fit.opt = c("l", "s"),
@@ -23,7 +23,7 @@ fl.workflow(
   log.y.spline = FALSE,
   lin.h = NULL,
   lin.R2 = 0.97,
-  lin.RSD = 0.05,
+  lin.RSD = 0.07,
   lin.dY = 0.05,
   biphasic = FALSE,
   interactive = FALSE,
@@ -40,11 +40,12 @@ fl.workflow(
   suppress.messages = FALSE,
   neg.nan.act = FALSE,
   clean.bootstrap = TRUE,
-  report = c("pdf", "html"),
+  report = NULL,
   out.dir = NULL,
   out.nm = NULL,
   export.fig = FALSE,
   export.res = FALSE,
+  parallelize = TRUE,
   ...
 )
 }
@@ -129,6 +130,8 @@ fl.workflow(
 
 \item{export.res}{(Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting \code{flFitRes} object at the end of the workflow.}
 
+\item{parallelize}{Run linear fits and bootstrapping operations in parallel using all but one available processor cores}
+
 \item{...}{Further arguments passed to the shiny app.}
 }
 \value{
@@ -142,4 +145,20 @@ A \code{flFitRes} object that contains all computation results, compatible with 
 }
 \description{
 \code{fl.workflow} runs \code{\link{fl.control}} to create a \code{fl.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF or HTML format that summarizes all results obtained.
+}
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Run workflow
+res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+                   x_type = "time", norm_fl = TRUE,
+                   dr.parameter = "max_slope.spline",
+                   parallelize = FALSE)
+
+plot(res, data.type = "raw", legend.ncol = 3, basesize = 15)
+
 }

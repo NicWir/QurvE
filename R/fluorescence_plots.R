@@ -22,6 +22,27 @@
 #' @export plot.flFitLinear
 #' @export
 #'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flFitLinear(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "l", x_type = "time",
+#'                        lin.R2 = 0.95, lin.RSD = 0.1,
+#'                        lin.h = 20))
+#'
+#' plot(TestFit)
+#
 plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
                              cex.axis = 1.3, lwd = 2, y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
@@ -90,25 +111,25 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
                try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=pch, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- flFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
-                 try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
-                 try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
+                 try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = TRUE)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
                } else {
-                 try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
 
                }
              } else if(flFittedLinear$fitFlag){
                if(lag < flFittedLinear$x.in[flFittedLinear$ndx.in[1]]){
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = TRUE)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
                } else {
-                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = TRUE)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
                }
              }
 
@@ -176,25 +197,25 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
                try(points(flFittedLinear$fl.in[flFittedLinear$ndx2.in] ~ flFittedLinear$x.in[flFittedLinear$ndx2.in], pch=pch, cex = cex.point*1.15, col="black", bg=ggplot2::alpha("magenta3", 1)))
                lag2 <- flFittedLinear$par["lag2"]
                if(lag2 < lag && lag2 > flFittedLinear$x.in[1]){
-                 try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
-                 try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(time2 <- seq(lag2, max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
+                 try(lines(c(min(flFittedLinear$"x.in"[1]), lag2), rep(flFittedLinear$"fl.in"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = TRUE)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
                } else {
-                 try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
-                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = T)
+                 try(time2 <- seq(coef_["x.max2_start"]-0.25*(coef_["x.max2_end"]-coef_["x.max2_start"]), max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"x.in"), length=200), silent = TRUE)
+                 try(lines(time, grow_linear(time, c(y0=unname(coef_["y0_lm"]), max_slope=unname(coef_["max_slope"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
+                 try(lines(time2, grow_linear(time2, c(y0=unname(coef_["y0_lm2"]), max_slope=unname(coef_["max_slope2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
 
                }
              } else if(flFittedLinear$fitFlag){
                if(lag < flFittedLinear$x.in[flFittedLinear$ndx.in[1]]){
-                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(time <- seq(coef_["x.max_start"]-0.25*(coef_["x.max_end"]-coef_["x.max_start"]), max(flFittedLinear$"filt.x"), length=200), silent = TRUE)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
                } else {
-                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = T)
-                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = T)
+                 try(time <- seq(flFittedLinear$filt.x[flFittedLinear$ndx.in[1]]/2, max(flFittedLinear$"filt.x"), length=200), silent = TRUE)
+                 try(lines(time, grow_linear(time, coef_)[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
                }
              }
              graphics::mtext(bquote(slope[max]: ~ .(round(flFittedLinear$par[["max_slope"]], digits = 3))~~~~
@@ -266,7 +287,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
 #' @param log.y (Logical) Log-transform the y-axis (\code{TRUE}) or not (\code{FALSE}).
-#' @param pch (Numeric) Size of the raw data circles.
+#' @param pch (Numeric) Symbol used to plot data points.
 #' @param colData (Numeric or character) Contour color of the raw data circles.
 #' @param colSpline (Numeric or character) Spline line colour.
 #' @param cex.point (Numeric) Size of the raw data points.
@@ -289,6 +310,26 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
+#'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flFitSpline(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "s", x_type = "time"))
+#'
+#' plot(TestFit)
+#
 plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = F, basesize = 16,
                              pch=1, colData=1, colSpline="dodgerblue3", cex.point=2, lwd = 0.7,
                              y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,  n.ybreaks = 6,
@@ -408,7 +449,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
       if(raw){
-        p <- p + geom_point(shape=pch, data = df.raw, shape=1, size = cex.point, alpha = 0.6, stroke=0.15)
+        p <- p + geom_point(shape=pch, data = df.raw, size = cex.point, alpha = 0.6, stroke=0.15)
       }
 
 
@@ -460,7 +501,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
       # /// add tangent at maximum slope
       if(slope == TRUE && (flFitSpline$control$log.y.spline==F && log.y == F) ||
-         (flFitSpline$control$log.y.spline==T && log.y == T)){
+         (flFitSpline$control$log.y.spline==T && log.y == TRUE)){
         mu     <- as.numeric(coef$max_slope[1])
         if(flFitSpline$fitFlag2){
           lag2 <- coef$lambda2
@@ -569,7 +610,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
           # }
         } # else of if(flFitSpline$fitFlag2)
-      } # if(slope == TRUE && log.y == T)
+      } # if(slope == TRUE && log.y == TRUE)
 
       # /// add panel with growth rate over x
       if(deriv == TRUE){
@@ -604,7 +645,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           p.mu <- p.mu + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
         }
 
-        p <- ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1))
+        p <- suppressWarnings( ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1)) )
 
       }
 
@@ -662,6 +703,26 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 #' @export plot.flBootSpline
 #' @export
 #'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flBootSpline(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "s", x_type = "time",
+#'                        nboot.fl = 50))
+#'
+#' plot(TestFit, combine = TRUE, lwd = 0.5)
+#
 plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
                               colSpline=ggplot2::alpha("dodgerblue3", 0.2),
                               cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
@@ -999,8 +1060,12 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
 #'
 #' @param x Object of class \code{drFitFLModel}, created with \code{\link{fl.drFitModel}}.
 #' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 value (\code{TRUE}) or not (\code{FALSE}).
-#' @param log ("x", "y", or "xy") Display the x- or y-axis on a logarithmic scale.
-#' @param pch (Numeric) Size of the raw data circles.
+#' @param broken (Logical) If TRUE the x axis is broken provided this axis is logarithmic (using functionality in the CRAN package 'plotrix').
+#' @param bp (Numeric) Specifying the break point below which the dose is zero (the amount of stretching on the dose axis above zero in order to create the visual illusion of a logarithmic scale including 0). The default is the base-10 value corresponding to the rounded value of the minimum of the log10 values of all positive dose values. This argument is only working for logarithmic dose axes.
+#' @param log (Character) String which contains '"x"' if the x axis is to be logarithmic, '"y"' if the y axis is to be logarithmic and '"xy"' or '"yx"' if both axes are to be logarithmic. The default is "x". The empty string "" yields the original axes.
+#' @param pch (Numeric) Symbol used to plot data points.
+#' @param n.xbreaks (Numeric) Number of breaks on the x-axis (if not log-transformed). The breaks are generated using \code{pretty}. Thus, the final number of breaks can deviate from the user input.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis (if not log-transformed). The breaks are generated using \code{pretty}. Thus, the final number of breaks can deviate from the user input.#' @param pch (Numeric) Size of the raw data circles.
 #' @param colData (Numeric or Character) Color used to plot the raw data.
 #' @param colSpline (Numeric or Character) Color used to plot the splines.
 #' @param cex.point (Numeric) Size of the raw data points.
@@ -1019,12 +1084,27 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
 #' @export plot.drFitFLModel
 #' @export
 #'
-plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
-                            colSpline = 1, colData = 1, cex.point = 1, cex.lab = 1.5,
-                            cex.axis = 1.3, y.lim = NULL, x.lim = NULL,
-                            lwd = 2, plot = TRUE, export = FALSE,
-                            height = 7, width = 9, out.dir = NULL,
-                            ...)
+#' @examples
+#' # Create concentration values via a serial dilution
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#'
+#' # Simulate response values via biosensor equation
+#' response <- biosensor.eq(conc, y.min = 110, y.max = 6000, K = 0.5, n = 2) +
+#'             0.01*6000*rnorm(10)
+#'
+#' # Perform fit
+#' TestRun <- fl.drFitModel(conc, response, drID = "test", control = fl.control())
+#'
+#' print(summary(TestRun))
+#' plot(TestRun)
+#'
+plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
+                              bp, n.xbreaks, n.ybreaks, log = c("xy"), pch = 1,
+                              colSpline = 1, colData = 1, cex.point = 1, cex.lab = 1.5,
+                              cex.axis = 1.3, y.lim = NULL, x.lim = NULL,
+                              lwd = 2, plot = TRUE, export = FALSE,
+                              height = 7, width = 9, out.dir = NULL,
+                              ...)
 {
   drFittedFLModel <- x
   # drFittedFLModel an object of class drFittedFLModel
@@ -1037,12 +1117,96 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
   if (is.numeric(cex.point) == FALSE)
     stop("Need numeric value for: cex.point")
   conc <- drFittedFLModel$raw.conc
+  test <- drFittedFLModel$raw.test
+  bp <- ifelse(missing(bp)||!exists("bp")||bp == "", rlang::missing_arg(), bp)
+  if(missing(bp)){
+    log10cl <- round(log10(min(conc[conc > 0]))) - 1
+    bp <- 10^(log10cl)
+  }
+  if(missing(n.xbreaks)){
+    xt <- NULL
+    if(any(grep("x", log))){
+      if(min(conc) <= 0){
+        xt <- xgx_breaks_log10(c(bp, max(conc)))
+        xt.minor <- xgx_minor_breaks_log10(c(bp, max(conc)))[-1]
+      }
+      else{
+        xt <- xgx_breaks_log10(c(min(conc), max(conc)))
+        xt.minor <- xgx_minor_breaks_log10(c(min(conc), max(conc)))
+      }
+      if(xt[1] == bp){
+        xt[1] <- 0.1*bp
+      }
+    }
+  } else {
+    if(any(grep("x", log))){
+      if(min(conc) <= 0){
+        xt <- xgx_breaks_log10(c(bp, max(conc)))
+        xt.minor <- xgx_minor_breaks_log10(c(bp, max(conc)))[-1]
+      }
+      else{
+        xt <- xgx_breaks_log10(c(min(conc), max(conc)))
+        xt.minor <- xgx_minor_breaks_log10(c(min(conc), max(conc)))
+      }
+
+    } else {
+      if(is.null(n.xbreaks)){
+        xt <- pretty(conc)
+      } else {
+        xt <- pretty(conc, n.xbreaks)
+      }
+    }
+  }
+  log10cly <- round(log10(0.5*min(drFittedFLModel$fit.test[drFittedFLModel$fit.test > 0]))) + 1
+  bpy <- 10^(log10cly)
+  if(missing(n.ybreaks)){
+    yt <- NULL
+    if(any(grep("y", log))){
+      if(min(test) <= 0){
+        yt <- xgx_breaks_log10(c(bpy, max(test)))
+        yt.minor <- xgx_minor_breaks_log10(c(bpy, max(test)))[-1]
+      }
+      else{
+        yt <- xgx_breaks_log10(c(min(test), max(test)))
+        yt.minor <- xgx_minor_breaks_log10(c(min(test), max(test)))
+      }
+      if(yt[1] == bpy){
+        yt[1] <- 0.1*bpy
+      }
+    }
+  } else {
+    if(any(grep("x", log))){
+      if(min(test) <= 0){
+        yt <- xgx_breaks_log10(c(bpy, max(test)))
+        yt.minor <- xgx_minor_breaks_log10(c(bpy, max(test)))[-1]
+      }
+      else{
+        yt <- xgx_breaks_log10(c(min(test), max(test)))
+        yt.minor <- xgx_minor_breaks_log10(c(min(test), max(test)))
+      }
+    } else {
+      if(is.null(n.ybreaks)){
+        yt <- pretty(test)
+      } else {
+        yt <- pretty(test, n.ybreaks)
+      }
+    }
+  }
+  x.lim <- if(x.lim == "" || is.null(x.lim) || any(is.na(x.lim)) ){
+    NULL
+  } else {
+    x.lim
+  }
+  y.lim <- if(y.lim == "" || is.null(y.lim) || any(is.na(x.lim)) ){
+    NULL
+  }else {
+    y.lim
+  }
   p <- function(){
     opar <- par(no.readonly = TRUE)
     on.exit(par(opar))
 
-    par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1))
-    par(cex.lab = cex.lab, cex.axis = cex.axis)
+    par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
     if ((drFittedFLModel$control$log.x.dr == TRUE) && (drFittedFLModel$control$log.y.dr == TRUE)) {
       plot(
         log(conc + 1),
@@ -1087,34 +1251,85 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
         {
           if ((drFittedFLModel$control$log.x.dr == FALSE) && (drFittedFLModel$control$log.y.dr == FALSE)) {
             if(any(grep("x", log))){
-              conc[conc==0] <- drFittedFLModel$fit.conc[2]
+              conc[conc==0] <- 0.5* bp
             }
             mean <- sapply(1:length(conc), function(x) mean(drFittedFLModel$raw.test[conc==unique(conc)[x]]))
             mean <- mean[!is.na(mean)]
+            if(any(grep("y", log))){
+              mean[mean==0] <- 0.5*drFittedFLModel$fit.test[2]
+            }
             sd <- sapply(1:length(conc), function(x) sd(drFittedFLModel$raw.test[conc==unique(conc)[x]]))
             sd <- sd[!is.na(sd)]
-            plot(
-              unique(conc)[order(unique(conc))],
-              mean,
-              log = log,
-              col = colData,
-              xlab = "Concentration",
-              ylab = paste0("Response", ifelse(!is.na(drFittedFLModel$parameters$test), paste0(" (", drFittedFLModel$parameters$test, ")"), "")),
-              type = "n", xlim = x.lim, ylim = y.lim, ...
+            plot(conc,
+                 mean,
+                 log = log,
+                 col = colData,
+                 type = "n",
+                 xaxt = "n",
+                 yaxt = "n",
+                 xlab = "",
+                 ylab = "",
+                 xlim = x.lim,
+                 ylim = y.lim,
+                 ...
             )
             points(unique(conc)[order(unique(conc))], mean, cex = cex.point, pch = pch)
             if(length(sd)>0){
-            try(arrows(x0=unique(conc)[order(unique(conc))], y0=mean-sd,
-                   x1=unique(conc)[order(unique(conc))], y1=mean+sd, code=3, angle=90, length=0.1), silent = T)
+              try(arrows(x0=unique(conc)[order(unique(conc))], y0=mean-sd,
+                         x1=unique(conc)[order(unique(conc))], y1=mean+sd, code=3, angle=90, length=0.1), silent = TRUE)
             }
+            if(broken && min(drFittedFLModel$raw.conc) <= 0)
+              plotrix::axis.break(1, bp)
+            if(broken && min(drFittedFLModel$raw.test) <= 0)
+              plotrix::axis.break(2, bpy)
+
+            if(min(drFittedFLModel$raw.conc) <= 0)
+              axis(1, lwd = 0, lwd.ticks = 1, at = c(0.5*bp,xt), mgp=c(3,0.5+0.5*cex.axis,0), labels = c("0", as.character(as.numeric(xt))))
+            else
+              axis(1, lwd = 0, lwd.ticks = 1, at = xt, mgp=c(3,0.5+0.5*cex.axis,0), labels = as.character(as.numeric(xt)))
+
+            if(min(drFittedFLModel$raw.test) <= 0)
+              axis(2, lwd = 0, lwd.ticks = 1, at = yt, las=1, line = 0, labels = c("0", as.character(as.numeric(yt[-1]))))
+            else
+              axis(2, lwd = 0, lwd.ticks = 1, at = yt, las=1, line = 0, labels = as.character(as.numeric(yt)))
+
+            title(ylab = paste0("Response", ifelse(!is.na(drFittedFLModel$parameters$test), paste0(" (", drFittedFLModel$parameters$test, ")"), "")),
+                  line = 2 + 0.5*cex.lab+0.9*cex.axis, cex.lab = cex.lab)
+            title(xlab = "Concentration", line = 1 + 0.7*cex.lab + 0.7*cex.axis, cex.lab = cex.lab)
+            if(any(grep("x", log))){
+              axis(side=1, lwd = 0, lwd.ticks = 1, at=xt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
+            }
+            if(any(grep("y", log))){
+              axis(side=2, lwd = 0, lwd.ticks = 1, at=yt.minor, las=0, tck=-0.01, labels=FALSE, line = 0)
+            }
+
+            points(unique(conc)[order(unique(conc))], mean, cex = cex.point, pch = pch)
+            if(length(sd)>0){
+              try(arrows(x0=unique(conc)[order(unique(conc))], y0=mean-sd,
+                         x1=unique(conc)[order(unique(conc))], y1=mean+sd, code=3, angle=90, length=0.1), silent = TRUE)
+            }
+            graphics::mtext(bquote(K: ~ .(signif(x$parameters[["K.orig"]][[1]], digits = 3)) ~~~~
+                                     fc: ~ .(round(x$parameters[["fc"]], digits = 2)) ~~~~
+                                     n: ~ .(round(x$parameters[["n"]], digits = 3)) ~~~~
+                                     y[min]: ~ .(round(x$parameters[["y.min"]], digits = 0)) ~~~~
+                              y[max]: ~ .(round(x$parameters[["y.max"]], digits = 0))),
+                            side = 4 , adj = 0.55, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.8)
           }
         }
       }
     }
 
     try(lines(
-      drFittedFLModel$fit.conc,
-      drFittedFLModel$fit.test,
+      x = if(min(drFittedFLModel$fit.conc) <=0){
+        c(0.5* bp, drFittedFLModel$fit.conc[-1])
+      }else{
+        drFittedFLModel$fit.conc
+      },
+      y = if(min(drFittedFLModel$fit.test) <=0){
+        c(0.5*drFittedFLModel$fit.test[2], drFittedFLModel$fit.test[-1])
+      }else{
+        drFittedFLModel$fit.test
+      },
       lwd = lwd,
       col = colSpline
     ), silent = F)
@@ -1123,10 +1338,13 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
       #vertical lines
       totmin = min(min(drFittedFLModel$fit.conc), min(drFittedFLModel$fit.test))
       lines(c(drFittedFLModel$parameters$K, drFittedFLModel$parameters$K),
-            c(1, drFittedFLModel$parameters$yEC50),
+            c(if(min(drFittedFLModel$fit.test) <=0){
+              0.1*drFittedFLModel$fit.test[2]
+            }else{
+              1}, drFittedFLModel$parameters$yEC50),
             lty = 2, lwd = lwd)
       #horizontal
-      lines(c(ifelse(any(grep("x", log)), 0.001, -1), drFittedFLModel$parameters$K),
+      lines(c(ifelse(any(grep("x", log)), conc[1], -1), drFittedFLModel$parameters$K),
             c(drFittedFLModel$parameters$yEC50, drFittedFLModel$parameters$yEC50),
             lty = 2, lwd = lwd)
     }
@@ -1194,6 +1412,27 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, log = c("xy"), pch = 1,
 #'
 #' @export plot.flFitRes
 #' @export
+#'
+#' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
+#'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
+#'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
+#'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab xlim ylim
+#'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Run workflow
+#' res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+#'                    x_type = "time", norm_fl = TRUE,
+#'                    dr.parameter = "max_slope.spline",
+#'                    parallelize = FALSE)
+#'
+#' plot(res, legend.ncol = 3, basesize = 15)
+#'
 #'
 plot.flFitRes <-  function(x,
                         data.type = c("spline", "raw", "norm.fl"),
@@ -1645,7 +1884,7 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p, position = "right"))
+      p <- suppressWarnings( ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p, position = "right")) )
     }
   } # if(mean == TRUE)
   else {
@@ -1818,7 +2057,9 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
           )
         }
       }
-      p <- ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+      p <- suppressWarnings(
+        ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+      )
     } # if(deriv)
 
   }
@@ -1860,6 +2101,23 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
 #' @rdname plot.flFitRes
 #' @export plot.flFit
 #' @export
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Run curve fitting workflow
+#' res <- flFit(fl_data = input$norm.fluorescence,
+#'              time = input$time,
+#'              parallelize = FALSE,
+#'              control = fl.control(fit.opt = "s", suppress.messages = TRUE,
+#'              x_type = "time", norm_fl = TRUE))
+#'
+#' plot(res, legend.ncol = 3, basesize = 15)
+#'
+#'
 plot.flFit <- plot.flFitRes
 
 #' Compare fluorescence and density over time
@@ -1899,6 +2157,23 @@ plot.flFit <- plot.flFitRes
 #'
 #' @export plot.dual
 #' @export
+#'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Run workflow
+#' res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+#'                    x_type = "time", norm_fl = TRUE,
+#'                    dr.parameter = "max_slope.spline",
+#'                    suppress.messages = TRUE,
+#'                    parallelize = FALSE)
+#'
+#' plot.dual(res, legend.ncol = 3, basesize = 15)
+#'
 #'
 plot.dual <-  function(x,
                        fluorescence = c("fl", "norm.fl"),
@@ -2256,7 +2531,9 @@ plot.dual <-  function(x,
         )
       }
     }
-    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+    p <- suppressWarnings(
+      ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+    )
   } # if(mean == TRUE)
   else {
     df <- data.frame()
@@ -2394,7 +2671,9 @@ plot.dual <-  function(x,
         )
       }
     }
-    p <- ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+    p <- suppressWarnings(
+      ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+    )
   }
   if(export == FALSE && plot == FALSE){
     return(p)
@@ -2429,4 +2708,80 @@ plot.dual <-  function(x,
   if (plot == TRUE){
     print(p)
   }
+}
+
+#' Generic plot function for \code{drFitFL} objects.
+#'
+#' code{drFitfl} calls \code{\link{plot.drFitFLModel}} for each group used in a dose-response analysis with \code{dr.method = "model"}
+#'
+#' @param x object of class \code{drFit}, created with \code{\link{growth.drFit}}.
+#' @param pch (Numeric) Shape of the raw data symbols.
+#' @param broken (Logical) If TRUE the x axis is broken provided this axis is logarithmic (using functionality in the CRAN package 'plotrix').
+#' @param bp (Numeric) Specifying the break point below which the dose is zero (the amount of stretching on the dose axis above zero in order to create the visual illusion of a logarithmic scale including 0). The default is the base-10 value corresponding to the rounded value of the minimum of the log10 values of all positive dose values. This argument is only working for logarithmic dose axes.
+#' @param log (Character) String which contains '"x"' if the x axis is to be logarithmic, '"y"' if the y axis is to be logarithmic and '"xy"' or '"yx"' if both axes are to be logarithmic. The default is "x". The empty string "" yields the original axes.
+#' @param n.xbreaks (Numeric) Number of breaks on the x-axis (if not log-transformed). The breaks are generated using \code{pretty}. Thus, the final number of breaks can deviate from the user input.
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis (if not log-transformed). The breaks are generated using \code{pretty}. Thus, the final number of breaks can deviate from the user input.
+#' @param colData (Numeric or character) Contour color of the raw data circles.
+#' @param cex.point (Numeric) Size of the raw data points.
+#' @param cex.lab (Numeric) Font size of axis titles.
+#' @param cex.axis (Numeric) Font size of axis annotations.
+#' @param colSpline (Numeric or character) Spline line colour.
+#' @param lwd (Numeric) Line width of the individual splines.
+#' @param ec50line (Logical) Show pointed horizontal and vertical lines at the EC50 values (\code{TRUE}) or not (\code{FALSE}).
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
+#'
+#' @export plot.drFitfl
+#' @export
+#'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Define fit controls
+#' control <- fl.control(fit.opt = "s",
+#'              x_type = "time", norm_fl = TRUE,
+#'              dr.parameter = "max_slope.spline",
+#'              dr.method = "model",
+#'              suppress.messages = TRUE)
+#'
+#' # Run curve fitting workflow
+#' res <- flFit(fl_data = input$norm.fluorescence,
+#'              time = input$time,
+#'              parallelize = FALSE,
+#'              control = control)
+#'
+#' # Perform dose-response analysis with biosensor model
+#' drFitfl <- fl.drFit(flTable = res$flTable, control = control)
+#'
+#' plot(drFitfl)
+#'
+plot.drFitfl <- function(x, ec50line = TRUE, log = c("xy"), pch = 1, broken = TRUE, bp, n.xbreaks, n.ybreaks,
+                         colSpline = 1, colData = 1, cex.point = 1, cex.lab = 1.5,
+                         cex.axis = 1.3, y.lim = NULL, x.lim = NULL,
+                         lwd = 2, plot = TRUE, export = FALSE,
+                         height = 7, width = 9, out.dir = NULL, ...)
+{
+  drFitfl <- x
+  # x an object of class drFitfl
+  if(methods::is(drFitfl) != "drFitfl") stop("x needs to be an object of class 'drFitfl', created with fl.drFit(control=fl.control(dr.method='model').")
+  if(length(drFitfl) == 1) stop("drFitfl is NA. Please run growth.drFitfl() with valid data input or growth.workflow() with 'ec50 = T'.")
+    n <- length(drFitfl$drFittedModels)
+      # /// plot all plot.drFitFLModel objects
+      for (i in 1:n) {
+        try(plot(drFitfl$drFittedModels[[i]], ec50line = ec50line, log = log, pch = pch, broken = broken, bp, n.xbreaks, n.ybreaks,
+                 colSpline = colSpline, colData = colData, cex.point = cex.point, cex.lab = cex.lab,
+                 cex.axis = cex.axis, y.lim = y.lim, x.lim = x.lim,
+                 lwd = lwd, plot = plot, export = export,
+                 height = height, width = width, out.dir = out.dir))
+      }
 }

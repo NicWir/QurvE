@@ -135,3 +135,36 @@
 \description{
 Visualize fluorescence, normalized fluorescence, or spline fits of multiple sample groups in a single plot.
 }
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Run workflow
+res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+                   x_type = "time", norm_fl = TRUE,
+                   dr.parameter = "max_slope.spline",
+                   parallelize = FALSE)
+
+plot(res, legend.ncol = 3, basesize = 15)
+
+
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Run curve fitting workflow
+res <- flFit(fl_data = input$norm.fluorescence,
+             time = input$time,
+             parallelize = FALSE,
+             control = fl.control(fit.opt = "s", suppress.messages = TRUE,
+             x_type = "time", norm_fl = TRUE))
+
+plot(res, legend.ncol = 3, basesize = 15)
+
+
+}

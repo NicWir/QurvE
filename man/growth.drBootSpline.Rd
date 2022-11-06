@@ -33,6 +33,18 @@ to visualize all bootstrapping splines as well as the distribution of EC50.
 \description{
 \code{growth.drBootSpline} resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.
 }
+\examples{
+conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
+
+TestRun <- growth.drBootSpline(conc, response, drID = "test",
+               control = growth.control(log.x.dr = TRUE, smooth.dr = 0.8,
+                                        nboot.dr = 50))
+
+print(summary(TestRun))
+plot(TestRun, combine = TRUE)
+
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

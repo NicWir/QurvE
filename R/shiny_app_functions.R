@@ -17,6 +17,19 @@ run_app <- function() {
   suppressWarnings(shiny::runApp(appDir, display.mode = "normal"))
 }
 
+#' Extract names of reads from experimental data created with the "Gen5" or "Gen6" software
+#'
+#' @param file path to file with experiment data
+#' @param csvsep CSV separator as string.
+#' @param dec Decimal separator as string (for CSV, TXT, and TSV files)
+#' @param sheet Sheet number or name (as string) for XLS and XLSX files.
+#'
+#' @return A vector of read name strings
+#'
+#' @examples
+#' \dontrun{
+#' parse_properties_Gen5Gen6(file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"))
+#' }
 parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -33,6 +46,19 @@ parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+#' Extract names of reads from experimental data created with a Chi.Bio bioreactor setup
+#'
+#' @param file path to file with experiment data
+#' @param csvsep CSV separator as string.
+#' @param dec Decimal separator as string (for CSV, TXT, and TSV files)
+#' @param sheet Sheet number or name (as string) for XLS and XLSX files.
+#'
+#' @return A vector of read name strings
+#'
+#' @examples
+#' \dontrun{
+#' parse_properties_chibio(file = system.file("ChiBio.csv", package = "QurvE"), csvsep = ",")
+#' }
 parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -50,6 +76,19 @@ parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+#' Extract names of reads from experimental data created with a Tecan plate reader
+#'
+#' @param file path to file with experiment data
+#' @param csvsep CSV separator as string.
+#' @param dec Decimal separator as string (for CSV, TXT, and TSV files)
+#' @param sheet Sheet number or name (as string) for XLS and XLSX files.
+#'
+#' @return A vector of read name strings
+#'
+#' @examples
+#' \dontrun{
+#' parse_properties_tecan(file = system.file("Tecan.csv", package = "QurvE"), csvsep = ";")
+#' }
 parse_properties_tecan <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -67,6 +106,19 @@ parse_properties_tecan <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+#' Extract names of biomass reads from experimental data created with a Biolector plate reader
+#'
+#' @param file path to file with experiment data
+#' @param csvsep CSV separator as string.
+#' @param dec Decimal separator as string (for CSV, TXT, and TSV files)
+#' @param sheet Sheet number or name (as string) for XLS and XLSX files.
+#'
+#' @return A vector of read name strings
+#'
+#' @examples
+#' \dontrun{
+#' parse_properties_biolector(file = system.file("biolector.csv", package = "QurvE"), csvsep = ";")
+#' }
 parse_properties_biolector <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -81,6 +133,19 @@ parse_properties_biolector <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+#' Extract names of reads from experimental data created with Pelkin Elmer's Victor Nivo plate readers
+#'
+#' @param file path to file with experiment data
+#' @param csvsep CSV separator as string.
+#' @param dec Decimal separator as string (for CSV, TXT, and TSV files)
+#' @param sheet Sheet number or name (as string) for XLS and XLSX files.
+#'
+#' @return A vector of read name strings
+#'
+#' @examples
+#' \dontrun{
+#' parse_properties_victornivo(file = system.file("nivo_output.csv", package = "QurvE"), csvsep = ",")
+#' }
 parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -93,6 +158,19 @@ parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+#' Extract names of reads from experimental data created with Pelkin Elmer's Victor X3 plate readers
+#'
+#' @param file path to file with experiment data
+#' @param csvsep CSV separator as string.
+#' @param dec Decimal separator as string (for CSV, TXT, and TSV files)
+#' @param sheet Sheet number or name (as string) for XLS and XLSX files.
+#'
+#' @return A vector of read name strings
+#'
+#' @examples
+#' \dontrun{
+#' parse_properties_victorx3(file = system.file("victorx3_output.txt", package = "QurvE"))
+#' }
 parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -105,6 +183,28 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
   return(reads)
 }
 
+
+#' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing raw plate reader (or similar device) data.
+#' @param map.file (Character) A table file in column format with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'  with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
+#' @param software (Character) The name of the software/device used to export the plate reader data.
+#' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
+#' For example: \code{convert.time = 'y = 24 * x'}
+#' @param sheet.data (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
+#' @param sheet.map (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
+#' @param csvsep.data (Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}
+#' @param dec.data (Character) decimal separator used in CSV, TSV or TXT data file.
+#' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
+#' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
+#' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
+#' @param density.nm Name of read corresponding to growth rate
+#' @param fl.nm Name of read corresponding to fluorescence data
+#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#'
+#' @rdname parse_data
+#' @export lm_parms
+#'
+#' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.
+#'
 parse_data_shiny <-
   function(data.file = NULL,
            map.file = NULL,
@@ -233,6 +333,19 @@ parse_data_shiny <-
     return(grodata)
   }
 
+#' Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param density.nm Name of read corresponding to growth rate
+#' @param fl.nm Name of read corresponding to fluorescence data
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE") )
+#' parsed <- parse_Gen5Gen6_shiny(input, "Read 3:630", "GFP:485,528")
+#' }
 parse_Gen5Gen6_shiny <- function(data, density.nm, fl.nm)
 {
   # get row numbers for "time" in column 2
@@ -311,6 +424,20 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl.nm)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of "Chi.Bio" bioreactors.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param density.nm Name of read corresponding to growth rate
+#' @param fl.nm Name of read corresponding to fluorescence data
+#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("ChiBio.csv", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_chibio(input, "od_measured", "FP1_emit1")
+#' }
 parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   time.ndx <- grep("time", input[1,], ignore.case = T)
@@ -358,6 +485,20 @@ parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of "Tecan" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param density.nm Name of read corresponding to growth rate
+#' @param fl.nm Name of read corresponding to fluorescence 1 data
+#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("Tecan.csv", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_tecan(input, "Label1_Copy1", "sfGFP", "mRFP1")
+#' }
 parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
@@ -424,6 +565,18 @@ parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of "Biolector" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param density.nm Name of read corresponding to growth rate
+#'
+#' @return a list of length two containing a density dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("biolector", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_biolector_shiny(input, "[1] Biomass Gain=3")
+#' }
 parse_biolector_shiny <- function(input, density.nm)
 {
   # get index (row,column) for "Time:"
@@ -489,6 +642,20 @@ parse_biolector_shiny <- function(input, density.nm)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param density.nm Name of read corresponding to growth rate
+#' @param fl.nm Name of read corresponding to fluorescence 1 data
+#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_victornivo_shiny(input, ""ABS (F) - Kinetics")
+#' }
 parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
@@ -555,6 +722,20 @@ parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor X3" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param density.nm Name of read corresponding to growth rate
+#' @param fl.nm Name of read corresponding to fluorescence 1 data
+#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("victorx3_output.txt", package = "QurvE") )
+#' parsed <- parse_victorx3_shiny(input, "Absorbance @ 600 (A)", "GFP (Counts)")
+#' }
 parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
@@ -680,93 +861,74 @@ write.csv.utf8.BOM <- function(df, filename)
   },finally = {close(con)})
 }
 
-# based on print.help_files_with_topic() in the sources of R-2.10.0.
-Rd_fun <- function(x, topic, pkgname   = ""
-                   , help_type        = "text"
-                   , verbose          = FALSE
-                   , try.all.packages = FALSE
-                   , keep_section     = TRUE
-)
-  {
-  rdo <- NULL         # prepare the "Rd" object rdo; # is it better to check with "inherit"?
-  if(methods::is(x) == "Rd"){  # if(inherits(file, "Rd")) ...
-    rdo <- x
-  }else{
-    if(methods::is(x) != "help_files_with_topic" ){
-      # The following comments baffle me now. Does `do.call' resolve the issues?
-      #
-      # help returns an object of class "help_files_with_topic" the
-      #  eval(substitute()) wrapper (I saw it in tkGUI, vzh sasto help.R, sasto:
-      #  .tryHelp in question.R) is needed to cover the case when x is a
-      #  function. Without this wrapper the result is not correct.
 
-      # Izglezhda, che bez substitute() argumentat se evvaluate-va na nepodochodyasto
-      #  myasto.  If x is a name of a function, then the wrapper is not needed.
-
-      # wrk <- eval(substitute(help(x, help_type=help_type
-      #            , verbose=verbose
-      #            , try.all.packages=try.all.packages)))
-
-      # cat("KUKUKUUUU: ", substitute(x), "   methods::is(x): ", methods::is(x), "\n\n" )
-
-      wrk <- do.call("help",list(x, help_type=help_type
-                                 , verbose=verbose
-                                 , try.all.packages=try.all.packages))
-      x <- wrk
-    }
-    ## Check for errors! ???
-
-    if(methods::is(x) == "help_files_with_topic"){
-      # from print.help_files_with_topic in help.R
-      #
-      # browser <- getOption("browser")
-      topic <- attr(x, "topic")
-      type <- attr(x, "type")
-      paths <- as.character(x) # removes attributes of x.
-      # If more matches are found will `paths' have length > 1?
-      file <- paths
-
-      # !!! check for length(paths)==0  !!!! ??
-      # but no error is raized, rdo simply remain NULL.
-      # the following commands are probably copied from utils:::.getHelpFile
-      path <- dirname(file)
-      dirpath <- dirname(path)
-      pkgname <- basename(dirpath)
-      RdDB <- file.path(path, pkgname)
-
-      # cat("\n\nx is: "    ,unclass(x)                      ,"\n\n\n")
-      # cat("paths is: ",paths                      ,"\n")
-      # cat("file is: ", file                       ,"\n")
-      # cat("path is: ", path                       ,"\n")
-      # cat("RdDB is: ", paste(RdDB, "rdx", sep="."),"\n")
-
-      if(file.exists(paste(RdDB, "rdx", sep="."))) {
-        rdo <- fetchRdDB(RdDB, basename(file))
-        # a debugging message, remove later!
-        # cat("Class of object returned by \"tools:::fetchRdDB: ", class(rdo),"\n")
-        # really returns "Rd".
-      }
-    }
-  }
-  if(is.null(rdo))                             # todo: should someting less radical be done?
-    stop("rdo object is NULL!")
-
-  if(is.character(keep_section) && length(keep_section)>0){
-    tags <- RdTags(rdo)
-    keep_tags <- unique(c("\\title","\\name",keep_section))
-    rdo[which(!(tags %in% keep_tags))] <-  NULL
-  }
-
-  rdo
-}
-
-fetchRdDB <- utils::getFromNamespace("fetchRdDB", "tools")
-RdTags <- utils::getFromNamespace("RdTags", "tools")
-
-
-
-
-
+#' Adjusted modalDialog()  function to include classes
+#'
+#' @param ... UI elements for the body of the modal dialog box.
+#' @param title An optional title for the dialog.
+#' @param footer UI for footer. Use NULL for no footer.
+#' @param size One of "s" for small, "m" (the default) for medium, or "l" for large.
+#' @param easyClose If \code{TRUE}, the modal dialog can be dismissed by clicking outside the dialog box, or be pressing the Escape key. If \code{FALSE} (the default), the modal dialog can't be dismissed in those ways; instead it must be dismissed by clicking on a modalButton(), or from a call to removeModal() on the server.
+#' @param fade If \code{FALSE}, the modal dialog will have no fade-in animation (it will simply appear rather than fade in to view).
+#' @param idcss CSS class of the modal
+#'
+#' @return \code{div} HTML tag for modal
+#' @export
+#'
+#' @author Stackoverflow user \code{mfindinge}
+#' @examples
+#' \dontrun{
+#' require(shiny)
+#'
+#' shinyApp(
+#'   ui = basicPage(
+#'     tags$style(
+#'       type = 'text/css',
+#'       '.modal-dialog.test{ width: fit-content !important; }'
+#'     ),
+#'     actionButton("show", "Show modal dialog"),
+#'     actionButton("shows", "Show modal dialog2")
+#'   ),
+#'
+#'   server = function(input, output) {
+#'
+#'     # Render DT
+#'     output$dt <- DT::renderDT(cbind(iris, iris))
+#'
+#'     # Modal management
+#'     observeEvent(input$show, {
+#'       showModal(
+#'         help_modal(easyClose = T,
+#'
+#'                 DT::DTOutput("dt"),
+#'
+#'                 footer = tagList(
+#'                   modalButton("Cancel"),
+#'                   actionButton("ok", "OK")
+#'                 ),
+#'                 idcss = "test"
+#'         )
+#'       )
+#'     })
+#'
+#'     observeEvent(input$shows, {
+#'       showModal(
+#'         help_modal(easyClose = T,
+#'
+#'                 DT::DTOutput("dt"),
+#'
+#'                 footer = tagList(
+#'                   modalButton("Cancel"),
+#'                   actionButton("ok", "OK")
+#'                 ),
+#'                 idcss = "tests"
+#'         )
+#'       )
+#'     })
+#'   }
+#' )
+#' }
+#'
 help_modal <- function (..., title = NULL, footer = NULL,
                      size = c("m", "s", "l"), easyClose = TRUE, fade = TRUE, idcss = "")
 {
@@ -820,7 +982,7 @@ shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")
 #' @seealso [shiny::updateNumericInput()]
 #'
 #' @examples
-#'
+#' \donttest{
 #' if (interactive()) {
 #' library(shiny)
 #' library(shinysurveys)
@@ -833,6 +995,7 @@ shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")
 #'   output$value <- renderText({ input$obs })
 #' }
 #' shinyApp(ui, server)
+#' }
 #' }
 #'
 #' @section Server value: A numeric vector of length 1.

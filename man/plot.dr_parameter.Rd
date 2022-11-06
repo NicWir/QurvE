@@ -6,15 +6,15 @@
 \usage{
 \method{plot}{dr_parameter}(
   x,
-  param = c("y.max", "y.min", "fc", "K", "n", "EC50", "yEC50", "drboot.meanEC50",
-    "drboot.meanEC50y"),
+  param = c("EC50", "EC50.Estimate", "y.max", "y.min", "fc", "K", "n", "yEC50",
+    "drboot.meanEC50", "drboot.meanEC50y"),
   names = NULL,
   exclude.nm = NULL,
   basesize = 12,
   reference.nm = NULL,
   label.size = NULL,
-  plot = T,
-  export = F,
+  plot = TRUE,
+  export = FALSE,
   height = 7,
   width = NULL,
   out.dir = NULL,
@@ -55,4 +55,28 @@ or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.}
 }
 \description{
 \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95\% confidence interval (only shown for > 2 replicates).
+}
+\examples{
+# Create random growth data set
+rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+rnd.data3 <- rdm.data(d = 35, mu = 0.7, A = 5.2, label = "Test3")
+
+rnd.data <- list()
+rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time, rnd.data3$time)
+rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data, rnd.data3$data)
+
+# Run growth curve analysis workflow
+gcFit <- growth.gcFit(time = rnd.data$time,
+                       data = rnd.data$data,
+                       parallelize = FALSE,
+                       control = growth.control(fit.opt = "s",
+                                                suppress.messages = TRUE))
+
+# Perform dose-response analysis
+drFit <- growth.drFit(gcTable = gcFit$gcTable,
+            control = growth.control(dr.parameter = "mu.spline"))
+
+plot.dr_parameter(drFit, param = 'EC50')
+
 }

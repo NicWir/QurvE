@@ -15,3 +15,21 @@ numeric vector of breaks
 \description{
 \code{xgx_minor_breaks_log10} sets nice minor_breaks for log10 scale.
 }
+\examples{
+\dontrun{
+xgx_minor_breaks_log10(c(1, 1000))
+xgx_minor_breaks_log10(c(0.001, 100))
+xgx_minor_breaks_log10(c(1e-4, 1e4))
+xgx_minor_breaks_log10(c(1e-9, 1e9))
+xgx_minor_breaks_log10(c(1, 2))
+xgx_minor_breaks_log10(c(1, 5))
+xgx_minor_breaks_log10(c(1, 10))
+xgx_minor_breaks_log10(c(1, 100))
+xgx_minor_breaks_log10(c(1, 1.01))
+xgx_minor_breaks_log10(c(1, 1.0001))
+print(xgx_minor_breaks_log10(c(1, 1.000001)), digits = 10)
+}
+}
+\author{
+Andrew Stein
+}

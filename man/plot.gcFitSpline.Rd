@@ -9,9 +9,9 @@
   add = FALSE,
   raw = TRUE,
   slope = TRUE,
-  deriv = T,
-  spline = T,
-  log.y = T,
+  deriv = TRUE,
+  spline = TRUE,
+  log.y = TRUE,
   pch = 1,
   colData = 1,
   colSpline = "dodgerblue3",
@@ -22,6 +22,9 @@
   x.lim = NULL,
   y.lim.deriv = NULL,
   n.ybreaks = 6,
+  y.title = NULL,
+  x.title = NULL,
+  y.title.deriv = NULL,
   plot = TRUE,
   export = FALSE,
   width = 8,
@@ -65,6 +68,12 @@
 
 \item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
 
+\item{y.title}{(Character) Optional: Provide a title for the y-axis of the growth curve plot.}
+
+\item{x.title}{(Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.}
+
+\item{y.title.deriv}{(Character) Optional: Provide a title for the y-axis of the derivative plot.}
+
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 
 \item{export}{(Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).}
@@ -79,4 +88,19 @@
 }
 \description{
 code{plot.gcFitSpline} generates the spline fit plot for a single sample.
+}
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Perform spline fit
+TestFit <- growth.gcFitSpline(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "s"))
+
+plot(TestFit)
+
 }

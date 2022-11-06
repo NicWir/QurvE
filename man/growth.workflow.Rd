@@ -50,6 +50,7 @@ growth.workflow(
   out.nm = NULL,
   export.fig = FALSE,
   export.res = FALSE,
+  parallelize = TRUE,
   ...
 )
 }
@@ -136,6 +137,8 @@ growth.workflow(
 
 \item{export.res}{(Logical) Create tab-separated TXT files containing calculated growth parameters and dose-response analysis results as well as an .RData file for the resulting \code{grodata} object at the end of the workflow.}
 
+\item{parallelize}{Run linear fits and bootstrapping operations in parallel using all but one available processor cores}
+
 \item{...}{Further arguments passed to the shiny app.}
 }
 \value{
@@ -149,6 +152,37 @@ A \code{grofit} object that contains all computation results, compatible with va
 }
 \description{
 \code{growth.workflow} runs \code{\link{growth.control}} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF or HTML format that summarizes all results obtained.
+}
+\examples{
+# Create random growth data set
+  rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+  rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+
+  rnd.data <- list()
+  rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+  rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+
+  # Run growth curve analysis workflow
+  res <- growth.workflow(time = rnd.data$time,
+                         data = rnd.data$data,
+                         fit.opt = "s",
+                         ec50 = FALSE,
+                         export.res = FALSE,
+                         suppress.messages = TRUE,
+                         parallelize = FALSE)
+
+# Load custom dataset
+  input <- read_data(data.density = system.file("2-FMA_toxicity.csv", package = "QurvE"))
+
+  res <- growth.workflow(grodata = input,
+                         fit.opt = c("s", "l"),
+                         ec50 = TRUE,
+                         export.res = FALSE,
+                         suppress.messages = TRUE,
+                         parallelize = FALSE)
+
+  plot(res)
+
 }
 \seealso{
 Other workflows: 

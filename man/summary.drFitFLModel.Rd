@@ -17,3 +17,17 @@ A dataframe with biosensor response parameters.
 \description{
 Generic summary function for drFitFLModel objects
 }
+\examples{
+# Create concentration values via a serial dilution
+conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+
+# Simulate response values via biosensor equation
+response <- biosensor.eq(conc, y.min = 110, y.max = 6000, K = 0.5, n = 2) +
+            0.01*6000*rnorm(10)
+
+# Perform fit
+TestRun <- fl.drFitModel(conc, response, drID = "test", control = fl.control())
+
+print(summary(TestRun))
+
+}

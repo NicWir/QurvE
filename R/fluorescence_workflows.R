@@ -7,8 +7,8 @@
 #'   or \item a dataframe containing (normalized) fluorescence values (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).}
 #' @param time (optional) A matrix containing time values for each sample.
 #' @param density (optional) A dataframe containing density values for each sample and sample identifiers in the first three columns.
-#' @param control A \code{fl.control} object created with \code{\link{fl.control}},
-#'   defining relevant fitting options.
+#' @param control A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.
+#' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
 #' @param ... Further arguments passed to the shiny app.
 #'
 #' @return An \code{flFit} object that contains all fluorescence fitting results, compatible with
@@ -38,15 +38,38 @@
 #' @export
 #'
 #' @importFrom foreach %dopar%
-flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), ...)
+#'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Define fit controls
+#' control <- fl.control(fit.opt = "s",
+#'              x_type = "time", norm_fl = TRUE,
+#'              dr.parameter = "max_slope.spline",
+#'              dr.method = "model",
+#'              suppress.messages = TRUE)
+#'
+#' # Run curve fitting workflow
+#' res <- flFit(fl_data = input$norm.fluorescence,
+#'              time = input$time,
+#'              control = control,
+#'              parallelize = FALSE)
+#'
+#' summary(res)
+#'
+flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), parallelize = TRUE, ...)
 {
   # Define objects based on additional function calls
   call <- match.call()
-  
+
   ## remove strictly defined arguments
-  call$time <- call$density <- call$fl_data <- call$control <- NULL
-  
-  
+  call$time <- call$density <- call$fl_data <- call$control<- call$parallelize <- NULL
+
+
   arglist <- sapply(call, function(x) x)
   arglist <- unlist(arglist)[-1]
   ## Assign additional arguments (...) as R objects
@@ -55,9 +78,9 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
       assign(names(arglist)[i], arglist[[i]])
     }
   }
-  
+
   x_type <- control$x_type
-  
+
   if(!(class(fl_data) %in% c("list", "grodata"))){
     if (x_type == "time" && is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' (for x_type = 'time') or a grodata object created with read_data() or parse_data() in the 'fl_data' argument.")
@@ -80,10 +103,10 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
       }
     }
   }
-  
+
   # /// check input parameters
   if (is(control)!="fl.control") stop("control must be of class fl.control!")
-  
+
   # Check presence of data for chosen fits
   if(x_type == "density" && is.null(density))
     stop("To perform a fits on fluorescence vs. density data, please provide a 'density' data matrix of the same dimensions as 'fl_data'.")
@@ -98,8 +121,8 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     if ( (dim(time)[1])!=(dim(fl_data)[1]) ) stop("flFit: Different number of datasets in fl_data and time")
     x <- time
   }
-  
-  
+
+
   # /// check fitting options
   if (!all(control$fit.opt %in% c("s", "l"))){
     options(warn=1)
@@ -107,7 +130,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     fit.opt=c('s', 'l')
     options(warn=0)
   }
-  
+
   # /// Initialize some parameters
   out.table       <- NULL
   fitnonpara.all  <- list()
@@ -118,8 +141,8 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
   bootstrap.param <- NULL
   reliability_tag_linear <- NA
   reliability_tag_nonpara <- NA
-  
-  if(control$interactive == FALSE &&
+
+  if(control$interactive == FALSE && parallelize == TRUE &&
      dim(fl_data)[1] > 30 &&
      (
        ("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ||
@@ -130,11 +153,11 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     wells.ls <- lapply(1:nrow(fl_data), function(j) as.numeric(fl_data[j, -1:-3][!is.na(x[j, ])][!is.na(fl_data[j, -1:-3])]))
     IDs.ls    <- lapply(1:nrow(fl_data), function(j) as.matrix(fl_data[j, 1:3]))
     wellnames.ls <- lapply(1:nrow(fl_data), function(j) paste(as.character(fl_data[j,1]), as.character(fl_data[j,2]),as.character(fl_data[j,3]), sep=" | "))
-    
+
     # Set up computing clusters (all available processor cores - 1)
     cl <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE)-1)
     doParallel::registerDoParallel(cl)
-    
+
     # Perform linear fits in parallel
     if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt)){
       fitlinear.all <- foreach::foreach(i = 1:dim(fl_data)[1]
@@ -165,7 +188,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
                                                                 fitFlag = FALSE, fitFlag2 = FALSE)
       )
     }
-    
+
     # Perform spline bootstrappings in parallel
     if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
         (control$nboot.fl > 10) ){
@@ -192,7 +215,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
       )
     }
     parallel::stopCluster(cl = cl)
-    
+
     # Assign classes to list elements
     for(i in 1:length(fitlinear.all)){
       class(fitlinear.all[[i]]) <- "flFitLinear"
@@ -207,11 +230,11 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
       class(boot.all[[i]]) <- "flBootSpline"
     }
   }
-  
+
   reliability_tag <- c()
-  
+
   # /// loop over all wells
-  
+
   for (i in 1:dim(fl_data)[1]){
     # Progress indicator for shiny app
     if(exists("shiny") && shiny == TRUE){
@@ -219,13 +242,13 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
         amount = 1/(dim(fl_data)[1]),
         message = "Computations completed")
     }
-    
+
     # /// conversion, to handle even data.frame inputs
     actx    <-
       as.numeric(as.matrix(x[i, ]))[!is.na(as.numeric(as.matrix(x[i, ])))][!is.na(as.numeric(as.matrix((fl_data[i, -1:-3]))))]
     actwell <-
       as.numeric(as.matrix((fl_data[i, -1:-3])))[!is.na(as.numeric(as.matrix(x[i, ])))][!is.na(as.numeric(as.matrix((fl_data[i, -1:-3]))))]
-    
+
     ID    <- as.matrix(fl_data[i,1:3])
     wellname <- paste(as.character(fl_data[i,1]), as.character(fl_data[i,2]),as.character(fl_data[i,3]), sep=" | ")
     if ((control$suppress.messages==FALSE)){
@@ -233,7 +256,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
       cat(paste("=== ", as.character(i), ". [", wellname, "] fluorescence curve =================================\n", sep=""))
       cat("----------------------------------------------------\n")
     }
-    if(control$interactive == TRUE ||
+    if(parallelize == FALSE || control$interactive == TRUE ||
        dim(fl_data)[1] <= 30 ||
        !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.fl > 10))
     ){
@@ -330,8 +353,8 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
         fitlinear.all[[i]]$reliable <- TRUE
       }
     } # # control$interactive == TRUE || dim(fl_data)[1] <= 30
-    
-    
+
+
     # /// Non parametric fit
     if ("s" %in% control$fit.opt){
       if(control$x_type == "density"){
@@ -416,8 +439,8 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     else{
       reliability_tag_nonpara <- TRUE
     }
-    
-    if(control$interactive == TRUE ||
+
+    if(parallelize == FALSE || control$interactive == TRUE ||
        dim(fl_data)[1] <= 30 ||
        !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.fl > 10))
     ){
@@ -447,12 +470,12 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
     #
     # out.table       <- rbind(out.table, fitted)
     # class(out.table) <- c("data.frame", "flTable")
-    
+
   } # /// end of for (i in 1:dim(fl_data)[1])
-  
+
   # Assign names to list elements
   names(fitlinear.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(as.character(fl_data[,1]), " | ", as.character(fl_data[,2]), " | ", as.character(fl_data[,3]))
-  
+
   # create output table
   description     <- lapply(1:nrow(fl_data), function(x) data.frame(TestId = fl_data[x,1], AddId = fl_data[x,2],concentration = fl_data[x,3],
                                                                     reliability_tag = reliability_tag[x],
@@ -463,7 +486,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
                                                                     nboot.fl = control$nboot.fl
   )
   )
-  
+
   fitted          <- lapply(1:length(fitlinear.all), function(x) cbind(description[[x]],
                                                                        summary.flFitLinear(fitlinear.all[[x]]),
                                                                        summary.flFitSpline(fitnonpara.all[[x]]),
@@ -471,11 +494,11 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
   )
   )
   df <- data.frame()
-  
+
   out.table       <- do.call(rbind, fitted)
   class(out.table) <- c("data.frame", "flTable")
   flFit           <- list(raw.x = x, raw.fl = fl_data, flTable = out.table, flFittedLinear = fitlinear.all, flFittedSplines = fitnonpara.all, flBootSplines = boot.all, control=control)
-  
+
   class(flFit)    <- "flFit"
   invisible(flFit)
 }
@@ -524,6 +547,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "Fluorescenceeport_" and the current date and time.
 #' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #' @param export.res (Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting `flFitRes` object at the end of the workflow.
+#' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
 #' @param ... Further arguments passed to the shiny app.
 #'
 #' @return A \code{flFitRes} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{fl.report}}.
@@ -535,11 +559,26 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), .
 #' \item{control}{Object of class \code{fl.control} created with the call of \code{\link{fl.control}}.}
 #' @export
 #'
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Run workflow
+#' res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+#'                    x_type = "time", norm_fl = TRUE,
+#'                    dr.parameter = "max_slope.spline",
+#'                    parallelize = FALSE)
+#'
+#' plot(res, data.type = "raw", legend.ncol = 3, basesize = 15)
+#'
 fl.workflow <- function(grodata = NULL,
                         time = NULL,
                         density = NULL,
                         fl_data = NULL,
-                        ec50 = FALSE,
+                        ec50 = TRUE,
                         mean.grp = NA,
                         mean.conc = NA,
                         fit.opt = c("l", "s"),
@@ -553,7 +592,7 @@ fl.workflow <- function(grodata = NULL,
                         log.y.spline = FALSE,
                         lin.h = NULL,
                         lin.R2 = 0.97,
-                        lin.RSD = 0.05,
+                        lin.RSD = 0.07,
                         lin.dY = 0.05,
                         biphasic = FALSE,
                         interactive = FALSE,
@@ -570,11 +609,12 @@ fl.workflow <- function(grodata = NULL,
                         suppress.messages = FALSE,
                         neg.nan.act = FALSE,
                         clean.bootstrap = TRUE,
-                        report = c('pdf', 'html'),
+                        report = NULL,
                         out.dir = NULL,
                         out.nm = NULL,
                         export.fig = FALSE,
                         export.res = FALSE,
+                        parallelize = TRUE,
                         ...)
 {
   if(ec50 == TRUE){
@@ -585,17 +625,17 @@ fl.workflow <- function(grodata = NULL,
       message("The chosen 'dr.parameter' is not compatible with the selected fitting options ('fit.opt'). Dose-response analysis will not be performed.")
   }
   if(exists("lin.h") && !is.null(lin.h) && (is.na(lin.h) || lin.h == "")) lin.h <- NULL
-  
+
   # Define objects based on additional function calls
   call <- match.call()
-  
+
   ## remove strictly defined arguments
   call$grodata <- call$time <- call$density <- call$fl_data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <-
     call$fit.opt <- call$t0 <- call$min.density <- call$log.x.lin <- call$log.x.spline <- call$log.y.spline <- call$log.y.lin <- call$biphasic <- call$norm_fl <- call$x_type <-
-    call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.fl <- call$smooth.fl <- call$dr.method <- call$growth.thresh <-
+    call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.fl <- call$smooth.fl <- call$dr.method <- call$growth.thresh <- call$parallelize <-
     call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
-  
-  
+
+
   arglist <- sapply(call, function(x) x)
   arglist <- unlist(arglist)[-1]
   ## Assign additional arguments (...) as R objects
@@ -604,8 +644,8 @@ fl.workflow <- function(grodata = NULL,
       assign(names(arglist)[i], arglist[[i]])
     }
   }
-  
-  
+
+
   if(!is.null(grodata) && !(is(grodata)=="list") && !(is(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)
       stop("Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data().")
@@ -621,7 +661,7 @@ fl.workflow <- function(grodata = NULL,
     # if(!is.null(grodata$fluorescence2)) fluorescence2 <- grodata$fluorescence2
     if(!is.null(grodata$norm.fluorescence)) norm.fluorescence <- grodata$norm.fluorescence
     # if(!is.null(grodata$norm.fluorescence2)) norm.fluorescence2 <- grodata$norm.fluorescence2
-    
+
     if(!is.null(time)) time <- time
     if(!is.null(density)) density <- density
     if(!is.null(fl_data)) fluorescence <- fl_data
@@ -636,7 +676,7 @@ fl.workflow <- function(grodata = NULL,
   nboot.dr <- control$nboot.dr
   out.flFit <- NA
   out.drFit <- NA
-  
+
   # /// fit of fluorescence curves -----------------------------------
   if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence) && length(norm.fluorescence) > 1 && !all(is.na(norm.fluorescence)))){
     if ((control$suppress.messages==FALSE)){
@@ -645,16 +685,16 @@ fl.workflow <- function(grodata = NULL,
       cat("----------------------------------------------------\n")
     }
     if(exists("shiny") && shiny == TRUE){
-      out.flFit <- flFit(time = time, density = density, fl_data = norm.fluorescence, control = control, shiny = TRUE)
+      out.flFit <- flFit(time = time, density = density, fl_data = norm.fluorescence, control = control, shiny = TRUE, parallelize = parallelize)
     } else {
-      out.flFit <- flFit(time = time, density = density, fl_data = norm.fluorescence, control = control, shiny = FALSE)
+      out.flFit <- flFit(time = time, density = density, fl_data = norm.fluorescence, control = control, shiny = FALSE, parallelize = parallelize)
     }
-    
+
   } else if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
     if(exists("shiny") && shiny == TRUE){
-      out.flFit <- flFit(time = time, density = density, fl_data = fluorescence, control = control, shiny = TRUE)
+      out.flFit <- flFit(time = time, density = density, fl_data = fluorescence, control = control, shiny = TRUE, parallelize = parallelize)
     } else {
-      out.flFit <- flFit(time = time, density = density, fl_data = fluorescence, control = control, shiny = FALSE)
+      out.flFit <- flFit(time = time, density = density, fl_data = fluorescence, control = control, shiny = FALSE, parallelize = parallelize)
     }
   }
   # if(norm_fl == TRUE && x_type == "time" && (!is.null(norm.fluorescence2) && length(norm.fluorescence2) > 1 && !all(is.na(norm.fluorescence2)))){
@@ -680,7 +720,7 @@ fl.workflow <- function(grodata = NULL,
   #     out.flFit2 <- flFit(time = time, density = density, fl_data = fluorescence2, control = control, shiny = FALSE)
   #   }
   # }
-  
+
   # /// Estimate EC50 values
   if (ec50 == TRUE &&
       !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
@@ -726,7 +766,7 @@ fl.workflow <- function(grodata = NULL,
                    # drFit2 = get(ifelse(exists("out.drFit2"), "out.drFit2", "na.obj")),
                    expdesign = expdesign, control = control)
   class(flFitRes) <- "flFitRes"
-  
+
   if(!exists("shiny") || shiny != TRUE){
     if(!is.null(out.dir)){
       wd <- paste0(out.dir)
@@ -736,14 +776,15 @@ fl.workflow <- function(grodata = NULL,
     }
     if(export.res)
       dir.create(wd, showWarnings = F)
-    
+
     if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
       flTable <- data.frame(apply(flFitRes[["flFit"]][["flTable"]],2,as.character))
       res.table.fl <- cbind(flTable[,1:3], Filter(function(x) !all(is.na(x)),flTable[,-(1:3)]))
-      if(export.res)
+      if(export.res){
         export_Table(table = res.table.fl, out.dir = wd, out.nm = "results.fl1")
-      message(paste0("\nResults of fluorescence analysis saved as tab-delimited text file in:\n",
+        message(paste0("\nResults of fluorescence analysis saved as tab-delimited text file in:\n",
                      "...", gsub(".+/", "", wd), "/results.fl1.txt\n"))
+      }
       # Export grouped results table
       if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
         table_linear_group <- table_group_fluorescence_linear(res.table.fl)
@@ -753,7 +794,7 @@ fl.workflow <- function(grodata = NULL,
         if(export.res)
           export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence_linear")
       }
-      
+
       if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
         table_spline_group <- table_group_fluorescence_spline(res.table.fl)
         names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
@@ -789,7 +830,7 @@ fl.workflow <- function(grodata = NULL,
     #       export_Table(table = table_spline_group, out.dir = wd, out.nm = "grouped_results_fluorescence2_spline")
     #   }
     # }
-    
+
     if (ec50 == TRUE &&
         !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
           (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("l")))
@@ -798,10 +839,11 @@ fl.workflow <- function(grodata = NULL,
       if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
         if(!is.null(EC50.table1) && length(EC50.table1) > 1) {
           res.table.dr_fl1 <- Filter(function(x) !all(is.na(x)),EC50.table1)
-          if(export.res)
+          if(export.res){
             export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
-          message(paste0("\nResults of EC50 analysis for fluorescence saved as tab-delimited in:\n",
+            message(paste0("\nResults of EC50 analysis for fluorescence saved as tab-delimited in:\n",
                          "...", gsub(".+/", "", wd), "/results.fl_dr1.txt\n"))
+          }
         }
       }
       # if (!is.null(fluorescence2) && length(fluorescence2) > 1 && !all(is.na(fluorescence2))){
@@ -814,8 +856,8 @@ fl.workflow <- function(grodata = NULL,
       #                wd, "/results.fl_dr2.txt\n"))
       #   }
       # }
-      
-      
+
+
     } else {
       res.table.dr_fl1 <- NULL
       res.table.dr_fl2 <- NULL
@@ -823,12 +865,12 @@ fl.workflow <- function(grodata = NULL,
     # Export RData object
     if(export.res)
       export_RData(flFitRes, out.dir = wd)
-    
+
     if(any(report %in% c('pdf', 'html'))){
       try(fl.report(flFitRes, out.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc, ec50 = ec50,
                     export = export.fig, format = report, out.nm = out.nm))
     }
   }
-  
+
   invisible(flFitRes)
 }

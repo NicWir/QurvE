@@ -40,8 +40,18 @@
 #' @importFrom methods is
 #' @import dplyr stringr tidyr
 #' @md
+#' @examples
+#' # Load CSV file containing only growth data
+#' data_growth <- read_data(data.density = system.file("2-FMA_toxicity.csv",
+#'                          package = "QurvE"), csvsep = ";" )
+#'
+#' # Load XLSX file containing both density and fluorescence data
+#' data_growth_fl <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                             sheet.density = "OD",
+#'                             data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                             sheet.fl = 2)
 read_data <-
-  function(data.density,
+  function(data.density = NA,
            data.fl = NA,
            data.format = "col",
            csvsep = ";",
@@ -84,9 +94,10 @@ read_data <-
       dat <- dat[-allNA.ndx, ]
 
     #remove leading and trailing zeros
-    dat[,3] <- suppressWarnings(
-      as.character(as.numeric(dat[,3]))
-    )
+    if(length(dat)>0)
+      dat[,3] <- suppressWarnings(
+        as.character(as.numeric(dat[,3]))
+      )
 
     if(data.format == "col"){
       message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
@@ -117,7 +128,7 @@ read_data <-
         fl <- fl[-allNA.ndx, ]
 
       #remove leading and trailing zeros
-      dat[,3] <- as.character(as.numeric(fl[,3]))
+      fl[,3] <- as.character(as.numeric(fl[,3]))
 
       # Convert time values
       if(!is.null(convert.time)){
@@ -215,10 +226,10 @@ read_data <-
         #test if more than one time entity is present
         time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
         if(length(time.ndx)==1){
-          blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
+          blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = TRUE)
           if(length(blank.ndx)>0){
             if(length(blank.ndx)>1){
-              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = T)
+              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = TRUE)
             } else {
               blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
             }
@@ -226,7 +237,7 @@ read_data <-
           }
         } else { # identify different datasets based on the occurence of multiple 'time' entities
           # identify additional time entities
-          blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = T)
+          blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = TRUE)
           if(length(blank.ndx)>0){
             if(length(blank.ndx)>1){
               blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
@@ -241,7 +252,7 @@ read_data <-
               (time.ndx[i] + 1):nrow(df)
             } else {
               (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
-            }, 1], ignore.case = T) + time.ndx[i]
+            }, 1], ignore.case = TRUE) + time.ndx[i]
 
             if(length(blank.ndx)>0){
               if(length(blank.ndx)>1){
@@ -277,7 +288,7 @@ read_data <-
       # remove "time" from samples in case of several time entities
       time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
       if(length(time.ndx)>1){
-        conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = T)]
+        conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = TRUE)]
       }
       # remove blanks from conditions
       blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
@@ -322,7 +333,7 @@ read_data <-
 
     # remove blank columns from dataset
     remove_blank <- function(df){
-      blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = T)
+      blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = TRUE)
       if(length(blank.ndx)>0){
         df <- df[-blank.ndx, ]
       }
@@ -410,7 +421,7 @@ read_data <-
                            } else {
                              time.ndx[i + 1] - time.ndx[i] - 1
                            },
-                           byrow = T)
+                           byrow = TRUE)
                        )
                        )
         )
@@ -608,12 +619,12 @@ read_data <-
     invisible(dataset)
   }
 
-#' Parse raw plate reader data and convert it to a format compatible with QurvE
+#'  (Experimental) Parse raw plate reader data and convert it to a format compatible with QurvE
 #'
-#' \code{parse_data} takes a raw export file from a plate reader experiment, extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}.
+#' \code{parse_data} takes a raw export file from a plate reader experiment (or similar device), extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}. If more than one read type is found the user is prompted to assign the correct reads to \code{density} or \code{fluorescence}.
 #'
-#' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
-#' @param map.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing plate reader data.
+#' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing raw plate reader (or similar device) data.
+#' @param map.file (Character) A table file in column format with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'  with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
 #' @param software (Character) The name of the software/device used to export the plate reader data.
 #' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 #' For example: \code{convert.time = 'y = 24 * x'}
@@ -623,15 +634,24 @@ read_data <-
 #' @param dec.data (Character) decimal separator used in CSV, TSV or TXT data file.
 #' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
 #' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
-#' @param map.file (Character) A table file in column format with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
-#' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for object structure.
+#' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.
 #'
 #' @export
 #'
+#' @examples
+#' if(interactive()){
+#' grodata <- parse_data(data.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+#'                       sheet.data = 1,
+#'                       map.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+#'                       sheet.map = "mapping",
+#'                       software = "Gen5",
+#'                       convert.time = "y = x * 24", # convert days to hours
+#'                       calibration = "y = x * 3.058") # convert absorbance to OD values
+#' }
 parse_data <-
   function(data.file = NULL,
            map.file = NULL,
@@ -664,34 +684,34 @@ parse_data <-
         stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
       }
     }
-    if(any(grep("Gen5|Gen6", software, ignore.case = T))){
+    if(any(grep("Gen5|Gen6", software, ignore.case = TRUE))){
       parsed.ls <- parse_Gen5Gen6(input)
       data.ls <- parsed.ls[[1]]
     } # if("Gen5" %in% software)
-    if(any(grep("Chi.Bio", software, ignore.case = T))){
+    if(any(grep("Chi.Bio", software, ignore.case = TRUE))){
       parsed.ls <- parse_chibio(input)
       data.ls <- parsed.ls[[1]]
     }
-    if(any(grep("GrowthProfiler", software, ignore.case = T))){
+    if(any(grep("GrowthProfiler", software, ignore.case = TRUE))){
       parsed.ls <- parse_growthprofiler(input)
       data.ls <- parsed.ls[[1]]
     }
-    if(any(grep("Tecan", software, ignore.case = T))){
+    if(any(grep("Tecan", software, ignore.case = TRUE))){
       parsed.ls <- parse_tecan(input)
       data.ls <- parsed.ls[[1]]
     }
 
-    if(any(grep("Biolector", software, ignore.case = T))){
+    if(any(grep("Biolector", software, ignore.case = TRUE))){
       parsed.ls <- parse_biolector(input)
       data.ls <- parsed.ls[[1]]
     }
 
-    if(any(grep("VictorNivo", software, ignore.case = T))){
+    if(any(grep("VictorNivo", software, ignore.case = TRUE))){
       parsed.ls <- parse_victornivo(input)
       data.ls <- parsed.ls[[1]]
     }
 
-    if(any(grep("VictorX3", software, ignore.case = T))){
+    if(any(grep("VictorX3", software, ignore.case = TRUE))){
       parsed.ls <- parse_victorx3(input)
       data.ls <- parsed.ls[[1]]
     }
@@ -757,13 +777,18 @@ parse_data <-
 
 #' Call the appropriate function required to read a table file and return the table as a dataframe object.
 #'
+#' \code{read_file} automatically detects the format of a file provided as \code{filename} and calls the appropriate function to read the table file.
+#'
 #' @param filename (Character) Name or path of the table file to read. Can be of type CSV, XLS, XLSX, TSV, or TXT.
 #' @param csvsep (Character) separator used in CSV file (ignored for other file types).
 #' @param dec (Character) decimal separator used in CSV, TSV and TXT files.
 #' @param sheet (Numeric or Character) Number or name of a sheet in XLS or XLSX files (_optional_). Default: \code{";"}
 #'
-#' @return A dataframe object
+#' @return A dataframe object with headers in the first row.
 #' @export
+#'
+#' @examples
+#' input <- read_file(filename = system.file("2-FMA_toxicity.csv", package = "QurvE"), csvsep = ";" )
 #'
 read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
   if (file.exists(filename)) {
@@ -832,10 +857,21 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
   return(dat)
 }
 
+#' Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE") )
+#' parsed <- parse_Gen5Gen6(input)
+#' }
 parse_Gen5Gen6 <- function(input)
 {
   # get row numbers for "time" in column 2
-  time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = T)
+  time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
   read.ndx <- time.ndx[!is.na(reads)]
@@ -930,10 +966,21 @@ parse_Gen5Gen6 <- function(input)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of "Chi.Bio" bioreactors.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("ChiBio.csv", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_chibio(input)
+#' }
 parse_chibio <- function(input)
 {
-  time.ndx <- grep("time", input[1,], ignore.case = T)
-  read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
+  time.ndx <- grep("time", input[1,], ignore.case = TRUE)
+  read.ndx <- grep("measured|emit", input[1,], ignore.case = TRUE)
   reads <- input[1, read.ndx]
 
   data.ls <- list()
@@ -994,10 +1041,21 @@ parse_chibio <- function(input)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of the "Growth Profiler".
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#'
+#' @return a list of length two containing a density dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("GrowthProfiler.csv", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_growthprofiler(input)
+#' }
 parse_growthprofiler <- function(input)
 {
   # get row numbers for "time" in column 1
-  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
+  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = TRUE)
   # get index of empty column at the and of the data series
   na.ndx <- which(is.na(input[time.ndx,]))
 
@@ -1011,10 +1069,21 @@ parse_growthprofiler <- function(input)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of "Tecan" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("Tecan.csv", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_tecan(input)
+#' }
 parse_tecan <- function(input)
 {
   # get row numbers for "time" in column 2
-  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
+  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = TRUE)
   time.ndx <- time.ndx[-1]
   # extract different read data in dataset
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
@@ -1096,10 +1165,21 @@ parse_tecan <- function(input)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of "Biolector" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#'
+#' @return a list of length two containing a density dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("biolector", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_biolector(input)
+#' }
 parse_biolector <- function(input)
 {
   # get index (row,column) for "Time:"
-  time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = T)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = T),], ignore.case = T))
+  time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = TRUE)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = TRUE),], ignore.case = TRUE))
   # extract different read data in dataset
   reads <- unique(input[,time.ndx[2]][grep("Biomass", input[,time.ndx[2]])])
   reads <- reads[!is.na(reads)]
@@ -1169,10 +1249,21 @@ parse_biolector <- function(input)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
+#' parsed <- parse_victornivo(input)
+#' }
 parse_victornivo <- function(input)
 {
   # get index (row,column) for "Time:"
-  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
+  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- unlist(lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2]))
   reads <- reads[!is.na(reads)]
@@ -1253,10 +1344,21 @@ parse_victornivo <- function(input)
   return(list(data.ls))
 }
 
+#' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor X3" plate readers.
+#'
+#' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#'
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#'
+#' @examples
+#' \dontrun{
+#' input <- read_file(filename = system.file("victorx3_output.txt", package = "QurvE") )
+#' parsed <- parse_victorx3(input)
+#' }
 parse_victorx3 <- function(input)
 {
   # get index (row,column) for "Time:"
-  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = T)
+  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- unlist(lapply(1:length(time.ndx), function(x) input[1, time.ndx[x]+1]))
   reads <- reads[!is.na(reads)]

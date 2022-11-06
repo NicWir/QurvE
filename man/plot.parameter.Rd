@@ -24,8 +24,8 @@
   shape.size = 2.5,
   legend.position = "right",
   legend.ncol = 1,
-  plot = T,
-  export = F,
+  plot = TRUE,
+  export = FALSE,
   height = 7,
   width = NULL,
   out.dir = NULL,
@@ -82,4 +82,31 @@
 }
 \description{
 \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95\% confidence interval (only shown for > 2 replicates).
+}
+\examples{
+# Create random growth data set
+rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+
+rnd.data <- list()
+rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+
+# Run growth curve analysis workflow
+res <- growth.workflow(time = rnd.data$time,
+                       data = rnd.data$data,
+                       fit.opt = "s",
+                       ec50 = FALSE,
+                       export.res = FALSE,
+                       parallelize = FALSE,
+                       suppress.messages = TRUE)
+
+
+plot.parameter(res,
+               param = "mu.spline",
+               legend.ncol = 4,
+               legend.position = "bottom",
+               basesize = 15,
+               label.size = 11)
+
 }

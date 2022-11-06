@@ -194,8 +194,8 @@ we load experimental data from the publication @wirth2021 in which *Pseudomonas 
 
 
 ```r
-grodata <- read_data(data.density = system.file("2-FMA_toxicity.xlsx",
-    package = "QurvE"))
+grodata <- read_data(data.density = system.file("2-FMA_toxicity.csv", package = "QurvE"),
+                    csvsep = ";")
 ```
 
 The created object `grodata` can be inspected with `View(grodata)`. It is a list of class `grodata` containing:

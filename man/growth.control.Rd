@@ -108,6 +108,14 @@ Generates a list with all arguments described above as entries.
 \description{
 A \code{grofit.control} object is required to perform various computations on growth data stored within \code{grodata} objects (created with \code{\link{read_data}} or \code{\link{parse_data}}). A \code{grofit.control} object is created automatically as part of \code{\link{growth.workflow}}.
 }
+\examples{
+# default option
+control_default <- growth.control()
+# user defined
+control_manual <- growth.control(fit.opt = c("s", "m"),
+                                 smooth.gc = 0.5,
+                                 model.type = c("huang", "baranyi"))
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

@@ -12,5 +12,5 @@
 \item{pkgname}{package name}
 }
 \description{
-Changes debug option for package \code{rgl} to avoid Rstudio crashing upon attaching it and prints welcome message
+Run upon attaching package QurvE
 }

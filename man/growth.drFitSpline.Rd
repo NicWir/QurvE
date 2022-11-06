@@ -46,6 +46,17 @@ assigned to data points with a concentration value of 0, as well as to x-y pairs
 a response parameter value of 0 and pairs at concentration values before
 zero-response parameter values.
 }
+\examples{
+conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
+
+TestRun <- growth.drFitSpline(conc, response, drID = "test",
+              control = growth.control(log.x.dr = TRUE, smooth.dr = 0.8))
+
+print(summary(TestRun))
+
+plot(TestRun)
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

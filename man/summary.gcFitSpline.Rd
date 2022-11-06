@@ -17,3 +17,18 @@ A dataframe with parameters extracted from the nonparametric fit.
 \description{
 Generic summary function for gcFitSpline objects
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Perform linear fit
+TestFit <- growth.gcFitSpline(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "s"))
+
+summary(TestFit)
+
+}

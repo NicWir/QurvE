@@ -13,7 +13,7 @@
   mean = TRUE,
   exclude.nm = NULL,
   exclude.conc = NULL,
-  log.y = F,
+  log.y = FALSE,
   n.ybreaks = 6,
   colors = NULL,
   basesize = 20,
@@ -91,4 +91,22 @@
 }
 \description{
 \code{plot.grodata} calls \code{link{plot.grofit}} or \code{link{plot.flFitRes}} based on the chosen \code{data.type}, respectively.
+}
+\examples{
+# Create random growth data sets
+rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+
+# Create dataframe with both data sets and a single time vector
+time <- as.data.frame(matrix(t(c("Time",NA,NA, rnd.data1$time[1,])),nrow=1),
+             stringsAsFactors=FALSE)
+colnames(time) <- colnames(rnd.data1$data)
+data <- rbind(time, rnd.data1$data, rnd.data2$data)
+
+
+# Create a grodata object
+grodata <- read_data(data.density = data, data.format = "row")
+
+plot(grodata, exclude.nm = "Test1", legend.ncol = 4)
+
 }

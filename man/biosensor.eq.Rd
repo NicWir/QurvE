@@ -17,8 +17,11 @@ biosensor.eq(x, y.min, y.max, K, n)
 
 \item{n}{Cooperativity parameter}
 }
+\value{
+A vector of fluorescence values
+}
 \description{
-Internal function used to fit a biosensor response model with minpack.lm::nlsLM()
+Calculates the values of biosensor response model for given time points and response parameters.
 }
 \references{
 Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. \emph{Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors.} Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3

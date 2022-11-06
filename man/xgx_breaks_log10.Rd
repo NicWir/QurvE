@@ -30,8 +30,27 @@ ticks do you get (default is 5)
 label overlap
 }
 }
+\examples{
+\dontrun{
+xgx_breaks_log10(c(1, 1000))
+xgx_breaks_log10(c(0.001, 100))
+xgx_breaks_log10(c(1e-4, 1e4))
+xgx_breaks_log10(c(1e-9, 1e9))
+xgx_breaks_log10(c(1, 2))
+xgx_breaks_log10(c(1, 5))
+xgx_breaks_log10(c(1, 10))
+xgx_breaks_log10(c(1, 100))
+xgx_breaks_log10(c(1, 1.01))
+xgx_breaks_log10(c(1, 1.0001))
+print(xgx_breaks_log10(c(1, 1.000001)), digits = 10)
+}
+
+}
 \references{
 Talbot, Justin, Sharon Lin, and Pat Hanrahan.
 "An extension of Wilkinson’s algorithm for positioning tick labels on axes." IEEE Transactions
 on visualization and computer graphics 16.6 (2010): 1036-1043.
+}
+\author{
+Andrew Stein
 }

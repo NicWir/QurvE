@@ -88,6 +88,19 @@
 #' @family growth fitting functions
 #'
 #' @export
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- growth.gcFitLinear(time, data, gcID = "TestFit",
+#'                  control = growth.control(fit.opt = "l"))
+#'
+#' plot(TestFit)
 #'
 growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                                control = growth.control(t0 = 0, tmax = NA, log.x.gc = FALSE, log.y.lin = TRUE, min.density = NA, max.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE))
@@ -100,11 +113,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   tmax <- control$tmax
   min.density <- control$min.density
   max.density <- control$max.density
-  
+
   if(length(data[data<0]) > 0){
     data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
   }
-  
+
   bad.values <- ((is.na(time))|(is.na(data)) | time < 0 | data <=0)
   data.in <- data <- data[!bad.values]
   time.in <- time <- time[!bad.values]
@@ -118,7 +131,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   } else {
     tmax <- NA
   }
-  
+
   if(length(data) < 4){
     if(control$suppress.messages==F) message(paste0("Linear fit: Not enough valid values in sample to perform fit."))
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = NA, filt.data = NA,
@@ -130,7 +143,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     class(gcFitLinear) <- "gcFitLinear"
     return(gcFitLinear)
   }
-  
+
   # extract period of growth (from defined t0 to tmax)
   t.growth <- time[which.min(abs(time-t0)):which.max(data)]
   if(!is.na(tmax)){
@@ -155,7 +168,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     # }
   }
   control$lin.h <- h
-  
+
   if(!is.null(quota) && !is.na(quota) && quota != ""){
     if(quota > 1){
       quota <- as.numeric(quota)/100
@@ -193,7 +206,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     max.density <- NA
   }
   bad.values <- ((is.na(data.log))|(is.infinite(data.log))|(is.na(time))|(is.na(data.log)))
-  
+
   # /// remove bad values or stop program
   if (TRUE%in%bad.values){
     if (control$neg.nan.act==FALSE){
@@ -206,13 +219,13 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     }
   }
   if (any(duplicated(time))) stop("time variable must not contain duplicated values")
-  
+
   # store filtered and transformed data
   obs <- data.frame(time, data)
   obs$ylog <- data.log
   obs.max.density <- max(obs$data)
   dY.total <- obs.max.density - obs$data[1]
-  
+
   if(max(data.in) < control$growth.thresh * data.in[1]){
     if(control$suppress.messages==F) message(paste0("Linear fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
@@ -227,7 +240,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   }
   ## number of values
   N <- nrow(obs)
-  
+
   if(N > h && N>3){
     # Perform linear regression for all N windows and save results in 'ret'
     ret <- matrix(0, nrow = N - h, ncol = 6)
@@ -247,10 +260,10 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     } else {
       ret <- data.frame(ret, time = time[ret[,1]], data = obs$data[ret[,1]])
     }
-    
+
     # add dY, i.e., the percentage of density that a regression window covers, to ret
     ret <- data.frame(ret, dY = ((obs$data[match(ret[, "time"], obs$time)+(h-1)] - obs$data[match(ret[, "time"], obs$time)]) / dY.total))
-    
+
     bad <- is.na(ret[,5]) | is.na(ret[,6])
     ret <- ret[!bad,]
     # Consider only regressions within the growth phase (from start to maximum density)
@@ -283,13 +296,13 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
           ret.check <- ret.check[unlist(lapply(1:nrow(ret.check), function(x) obs$data[ret.check[x, 1]+(h-1)])) <= max.density, ] # consider only slopes up to defined max.density
         }
       }
-      
+
       #Consider only slopes that span at least fit.dY
       ret.check <- ret.check[ret.check[,"dY"]>=fit.dY, ]
-      
+
       # Consider only positive slopes
       ret.check <- ret.check[ret.check[,"slope"]>0, ]
-      
+
       if(nrow(ret.check)<2){
         gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                             log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
@@ -340,12 +353,12 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               FUN = function(X)
                 any(X %in% index.max.ret)
             )))
-            
+
             candidates <-
               unlist(candidate_intervals[ndx])
           }
-          
-          
+
+
           if(length(candidates) > 0) {
             #perform linear regression with candidate data points
             tp <- seq(min(candidates), max(candidates) + h-1)
@@ -359,12 +372,12 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             p <- c(a=0, b=0, se=0, r2=0, cv=0, n=0)
             m = NULL
           }
-          
+
           if(length(candidates) > 0) {
             ## get time window of exponential fit
             tmax_start <- obs$time[tp[1]]
             tmax_end <- obs$time[tp[length(tp)]]
-            
+
             y0_lm    <- unname(coef(m)[1]) # y-intercept of tangent
             if (control$log.y.lin == TRUE) {
               y0_data  <- obs$ylog[1] # y0 in dataset
@@ -372,24 +385,24 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               y0_data  <- obs$data[1] # y0 in dataset
             }
             mumax <- unname(coef(m)[2])
-            
+
             ## estimate lag phase
             lambda <- (y0_data - y0_lm) / mumax
-            
+
             # correct y0 values for Ln(y(t)/y0)
             if (control$log.y.lin == TRUE) {
               y0_lm <- obs$data[1] * exp(y0_lm)
               y0_data <- obs$data[1]
             }
-            
-            
+
+
             # get indices of time points used in linear fit
             ndx <- seq(min(match(ret.check[match(candidates, ret.check[,1]), "time"], time.in)),
                        max(match(ret.check[match(candidates, ret.check[,1]), "time"], time.in)) + h-1)
-            
+
             mu.se <- as.numeric(p[3]) # standard error of slope
             fitFlag <- TRUE
-            
+
           }
           else { # of if(length(candidates) > 0)
             gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
@@ -417,7 +430,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             # Regard only (negative) minima and (positive) maxima with a deriv2 value of >= 10% mumax
             minima <- minima[deriv2_spline$y[minima] <= 0.1 * (-mumax)]
             maxima <- maxima[deriv2_spline$y[maxima] >= 0.1 * mumax]
-            
+
             # expand mumax window with more relaxed quota
             slope.quota.ext <- 0.8 * slope.max
             if(exists("min.density")){
@@ -433,9 +446,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                                             abs(ret[, 6]) <= 1.1 * RSD & # RSD criterion for candidates
                                             ret[, 7] >= t0), 1] # consider only slopes after defined t0
             }
-            
-            
-            
+
+
+
             #consider only candidate windows next to index.max.ret
             candidate_intervals.ext <- split(candidates.ext, cumsum(c(1, diff(candidates.ext) != 1)))
             if(any(index.max.ret %in% unlist(unname(candidate_intervals.ext)))){
@@ -444,14 +457,14 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 FUN = function(X)
                   any(X %in% index.max.ret)
               )))
-              
+
               candidates.ext <-
                 candidate_intervals.ext[[ndx.ext]]
             }
             tp.ext <- seq(min(candidates.ext), max(candidates.ext) + h-1)
-            
-            
-            
+
+
+
             # # # Color functions
             #   cf.1 <- grDevices::colorRampPalette(c("red", "red"))
             #   cf.2 <- grDevices::colorRampPalette(c("blue", "blue"))
@@ -478,8 +491,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             #     cex = 1.5
             #   )
             #   points(deriv2_spline$x[maxima], deriv2_spline$y[maxima], pch = 16, col = cf.1(1)[1], cex = 1.5)
-            
-            
+
+
             # get local deriv2-minimum after mumax
             # postmin.ndx <- minima[(minima - tp.ext[length(tp.ext)]) >= 0][which.min(minima[(minima - tp.ext[length(tp.ext)]) >= 0])]
             postmin.ndx <- minima[which.min(abs(minima - tp.ext[length(tp.ext)]))]
@@ -503,7 +516,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             if(!is.na(tmax)){
               ret.postmin.check <- ret.postmin.check[ret.postmin.check[,"time"] <= tmax, ] # consider only slopes up to defined t0
             }
-            
+
             if (any(ret.postmin.check[, 5] >= R2 &
                     abs(ret.postmin.check[, 6]) <= RSD)) {
               while (!success) {
@@ -533,11 +546,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                   FUN = function(X)
                     any(X %in% index.max.ret.postmin)
                 )))
-                
+
                 candidates.postmin <-
                   candidate_intervals.postmin[[ndx.postmin]]
               }
-              
+
               if (length(candidates.postmin) > 0) {
                 #perform linear regression with candidate data points
                 tp.postmin <- seq(min(candidates.postmin), max(candidates.postmin) + h - 1)
@@ -558,7 +571,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 )
                 m = NULL
               }
-              
+
               if (length(candidates.postmin) > 0) {
                 ## get time window of exponential fit
                 tmax_start.postmin <- obs$time[tp.postmin[1]]
@@ -566,19 +579,19 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 t_turn.postmin <- obs$time[postmin.ndx]
                 y0_lm.postmin <- unname(coef(m.postmin)[1]) # y-intercept of tangent
                 mumax.postmin <- unname(coef(m.postmin)[2])
-                
+
                 ## estimate lag phase between first and second growth phase
                 if (control$log.y.lin == TRUE) {
                   lambda.postmin <- (obs$ylog[1] - y0_lm.postmin) / mumax.postmin
                 } else {
                   lambda.postmin <- (obs$data[1] - y0_lm.postmin) / mumax.postmin
                 }
-                
+
                 # correct y0 values for Ln(y(t)/y0)
                 if (control$log.y.lin == TRUE) {
                   y0_lm.postmin <- obs$data[1] * exp(y0_lm.postmin)
                 }
-                
+
                 # get indices of time points used in linear fit
                 ndx.postmin <- seq(min(match(ret[match(candidates.postmin, ret[,1]), "time"], time.in)),
                                    max(match(ret[match(candidates.postmin, ret[,1]), "time"], time.in)) + h -
@@ -611,7 +624,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               rsquared.postmin = NA
               fitFlag.postmin = FALSE
             }
-            
+
             # get local deriv2-maximum before mumax
             # premin.ndx <- maxima[(maxima - tp.ext[1]) <= 0][which.max(maxima[(maxima - tp.ext[1]) <= 0])]
             premin.ndx <- maxima[which.min(abs(maxima - tp.ext[1]))]
@@ -656,7 +669,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                   ret.premin[, 5] >= 0.98 * R2 &
                   abs(ret.premin[, 6]) <= 1.02 * RSD &
                   ret.premin[, 7] >= t0), 1]
-              
+
               #consider only candidate windows next to index.max.ret.premin
               candidate_intervals.premin <- split(candidates.premin, cumsum(c(1, diff(candidates.premin) != 1)))
               if (any(unlist(candidate_intervals.premin) %in% index.max.ret.premin)) {
@@ -665,12 +678,12 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                   FUN = function(X)
                     any(X %in% index.max.ret.premin)
                 )))
-                
+
                 candidates.premin <-
                   candidate_intervals.premin[[ndx.premin]]
               }
-              
-              
+
+
               if (length(candidates.premin) > 0) {
                 #perform linear regression with candidate data points
                 tp.premin <- seq(min(candidates.premin), max(candidates.premin) + h - 1)
@@ -691,7 +704,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 )
                 m = NULL
               }
-              
+
               if (length(candidates.premin) > 0) {
                 ## get time window of exponential fit
                 tmax_start.premin <- obs$time[tp.premin[1]]
@@ -699,19 +712,19 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                 t_turn.premin <- obs$time[premin.ndx]
                 y0_lm.premin    <- unname(coef(m.premin)[1]) # y-intercept of tangent
                 mumax.premin <- unname(coef(m.premin)[2])
-                
+
                 ## estimate lag phase between first and second growth phase
                 if (control$log.y.lin == TRUE) {
                   lambda.premin <- (obs$ylog[1] - y0_lm.premin) / mumax.premin
                 } else {
                   lambda.premin <- (obs$data[1] - y0_lm.premin) / mumax.premin
                 }
-                
+
                 # correct y0 values for Ln(y(t)/y0)
                 if (control$log.y.lin == TRUE) {
                   y0_lm.premin <-  obs$data[1] * exp(y0_lm.premin)
                 }
-                
+
                 # get indices of time points used in linear fit
                 ndx.premin <- seq(min(match(ret[match(candidates.premin, ret[,1]), "time"], time.in)),
                                   max(match(ret[match(candidates.premin, ret[,1]), "time"], time.in)) + h -
@@ -744,7 +757,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
               rsquared.premin = NA
               fitFlag.premin = FALSE
             }
-            
+
             # Choose regression before or after mumax as second growth phase based on second growth rate
             if(!is.na(mumax.premin) && !is.na(mumax.postmin)){
               mumax2 <- ifelse(mumax.premin > mumax.postmin, mumax.premin, mumax.postmin)
@@ -836,7 +849,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     class(gcFitLinear) <- "gcFitLinear"
     return(gcFitLinear)
   }
-  
+
   gcFitLinear <- list(
     raw.time = time.in,
     raw.data = data.in,
@@ -879,9 +892,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     fitFlag2 = fitFlag2,
     reliable = NULL
   )
-  
+
   class(gcFitLinear) <- "gcFitLinear"
-  
+
   invisible(gcFitLinear)
 }
 
@@ -941,7 +954,27 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 #' @references Petzoldt T (2022). _growthrates: Estimate Growth Rates from Experimental Data_. R package version 0.8.3, <https://CRAN.R-project.org/package=growthrates>.
 #'
 #' @export
+#' @examples
+#' # load example dataset
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
 #'
+#' # Extract time and normalized fluorescence data for single sample
+#' time <- input$time[4,]
+#' data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+#'
+#' # Perform linear fit
+#' TestFit <- flFitLinear(time = time,
+#'                        fl_data = data,
+#'                        ID = "TestFit",
+#'                        control = fl.control(fit.opt = "l", x_type = "time",
+#'                        lin.R2 = 0.95, lin.RSD = 0.1,
+#'                        lin.h = 20))
+#'
+#' plot(TestFit)
+#
 flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined",  quota = 0.95,
                         control = fl.control(x_type = c("density", "time"), log.x.lin = FALSE, log.y.lin = FALSE, t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY = 0.05, biphasic = FALSE))
 {
@@ -951,16 +984,16 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   h <- control$lin.h
   t0 <- control$t0
   min.density <- control$min.density
-  
+
   if (is(control) != "fl.control")
     stop("control must be of class fl.control!")
   if (!any(control$fit.opt %in% "l"))
     stop("Fit option is not set for a fluorescence linear fit. See fl.control()")
-  
+
   if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))]
   if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))]
   fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
-  
+
   if(!is.null(t0) && !is.na(t0) && t0 != ""){
     t0 <- as.numeric(t0)
   } else {
@@ -977,7 +1010,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   if (length(fl_data) < 5) {
     cat("flFitLinear: There is not enough valid data. Must have at least 5!")
   }
-  
+
   # Consider only data points up to max density or time, respectively
   if(x_type == "time"){
     ndx.max <- which.max(time)
@@ -999,7 +1032,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       density <- density[!bad.values]
     }
   }
-  
+
   if(length(fl_data) < 4){
     if(control$suppress.messages==F) message(paste0("Linear fit: Not enough valid values in sample to perform fit."))
     flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
@@ -1012,9 +1045,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     class(flFitLinear) <- "flFitLinear"
     return(flFitLinear)
   }
-  
+
   fl_data.log <- log(fl_data/fl_data[1])
-  
+
   if(x_type == "density"){
     bad.values <- (is.na(density)) | (is.na(fl_data)) |
       (!is.numeric(density)) | (!is.numeric(fl_data) )
@@ -1030,7 +1063,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       }
       density.log <- log(density/density[1])
     }
-    
+
     if(max(density) < control$growth.thresh * density[1]){
       if(control$suppress.messages==F) message(paste0("flFitLinear: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
       flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
@@ -1058,7 +1091,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     #     }
     #   }
     # }
-    
+
     # Remove data points where y values stack on top of each other
     fl_data <- fl_data[density >= cummax(density)]
     fl_data.log <- fl_data.log[density >= cummax(density)]
@@ -1093,7 +1126,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
         fl_data <- fl_data[!bad.values]
       }
     }
-    
+
     if (control$log.x.lin == TRUE) {
       bad.values <- (time <= 0)
       if (TRUE %in% bad.values) {
@@ -1182,7 +1215,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     # }
   }
   control$lin.h <- h
-  
+
   if(!is.null(quota) && !is.na(quota) && quota != ""){
     if(quota > 1){
       quota <- as.numeric(quota)/100
@@ -1203,25 +1236,25 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     RSD <- 0.05
   }
   fl_data.log <- log(fl_data/fl_data[1])
-  
+
   bad.values <- ((is.na(fl_data.log))|(is.infinite(fl_data.log))|(is.na(x))|(is.na(fl_data.log)))
-  
+
   # /// remove bad values or stop program
   if (TRUE%in%bad.values){
     x    <- x[!bad.values]
     fl_data.log    <- fl_data.log[!bad.values]
     fl_data <- fl_data[!bad.values]
   }
-  
+
   # store filtered and transformed fl_data
   obs <- data.frame(x, fl_data)
   obs$ylog <- fl_data.log
-  
-  
-  
+
+
+
   ## number of values
   N <- nrow(obs)
-  
+
   if(N > h && N>3){
     # Perform linear regression for all N windows and save results in 'ret'
     ret <- matrix(0, nrow = N - h, ncol = 6)
@@ -1234,7 +1267,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
         ret[i, ] <- c(i, with(obs, (lm_parms(lm_window(x, fl_data, i0 = i, h = h)))))
       }
     }
-    
+
     colnames(ret) <- c("index", "y-intersect", "slope", "X4", "R2", "RSD")
     # add x and density values as columns in ret
     if (control$log.y.lin == TRUE) {
@@ -1242,18 +1275,18 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     } else {
       ret <- data.frame(ret, x = x[ret[,1]], fl_data = obs$fl_data[ret[,1]])
     }
-    
+
     bad <- is.na(ret[,5]) | is.na(ret[,6])
     ret <- ret[!bad,]
-    
-    
+
+
     if(x_type == "density"){
       ret <- ret[which.min(abs(ret$fl_data-min.density)) : nrow(ret),] # consider only slopes from defined t0 and min.density
     } else{
       ret <- ret[which.min(abs(x-t0)):nrow(ret),] # consider only slopes from defined t0
     }
     ret <- ret[!is.na(ret[,1]), ]
-    
+
     if(nrow(ret)<2){
       flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
                           raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
@@ -1269,10 +1302,10 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     else{
       # duplicate ret for further tuning of fit
       ret.check <- ret
-      
+
       # Consider only positive slopes
       ret.check <- ret.check[ret.check[,"slope"]>0, ]
-      
+
       if(nrow(ret.check)<2){
         flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
                             raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
@@ -1327,7 +1360,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
             }
           }
           candidates <- ret[candidates,1]
-          
+
           #consider only candidate windows next to index.max.ret
           candidate_intervals <- split(candidates, cumsum(c(1, diff(candidates) != 1)))
           if(any(index.max.ret %in% unlist(candidate_intervals))){
@@ -1340,7 +1373,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 )
               ))][[1]]
           }
-          
+
           if(length(candidates) > 0) {
             # perform linear regression with candidate fl_data points
             tp <- seq(min(candidates), max(candidates) + h-1)
@@ -1353,9 +1386,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
             ## get x window of linear fit
             x.max_start <- obs$x[tp[1]]
             x.max_end <- obs$x[tp[length(tp)]]
-            
+
             y0_lm    <- unname(coef(m)[1]) # y-intercept of tangent
-            
+
             if(x_type == "time"){
               if(control$log.y.lin == TRUE){
                 y0_data  <- obs$ylog[obs$x>=t0][1] # y0 in dataset
@@ -1369,26 +1402,26 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 y0_data  <- obs$fl_data[obs$x>=min.density][1] # y0 in dataset
               }
             }
-            
+
             max_slope <- unname(coef(m)[2])
-            
+
             ## estimate lag phase
             lambda <- (y0_data - y0_lm) / max_slope
-            
+
             # correct y0 values for Ln(y(t)/y0)
             if(control$log.y.lin == TRUE){
               y0_lm <- obs$fl_data[1] * exp(y0_lm)
             }
-            
+
             # get indices of x points used in linear fit
             # ndx <- seq(min(match(ret[candidates, "x"], x.in)),
             #            max(match(ret[candidates, "x"], x.in)) + h-1)
             ndx <- tp
             ndx.in <- match(fl_data[tp], fl_data.in)
-            
+
             slope.se <- as.numeric(p[3]) # standard error of slope
             fitFlag <- TRUE
-            
+
           }
           else { # of if(length(candidates) > 0)
             flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
@@ -1417,7 +1450,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
             # Regard only (negative) minima and (positive) maxima with a deriv2 value of >= 10% max_slope
             minima <- minima[deriv2_spline$y[minima] <= 0.1 * (-max_slope)]
             maxima <- maxima[deriv2_spline$y[maxima] >= 0.1 * max_slope]
-            
+
             # expand max_slope window with more relaxed quota
             slope.quota.ext <- 0.8 * quota * slope.max
             if(x_type == "density"){
@@ -1459,13 +1492,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                   )
                 ))][[1]]
             }
-            
+
             #Regard only local minima after candidates.ext
             minima <- minima[minima > candidates.ext[length(candidates.ext)]]
-            
+
             #Regard only local maxima before candidates.ext
             maxima <- maxima[maxima < candidates.ext[1]]
-            
+
             tp.ext <- seq(min(candidates.ext), max(candidates.ext) + h-1)
             if(length(minima)>0){
               # get local deriv2-minimum after max_slope
@@ -1484,7 +1517,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               } else {
                 ret.postmin.check <- ret.postmin
               }
-              
+
               if (any(ret.postmin.check[, 5] >= R2 &
                       abs(ret.postmin.check[, 6]) <= RSD)) {
                 while (!success) {
@@ -1501,7 +1534,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 }
                 index.max.ret.postmin <- ret.postmin[which(ret.postmin[, 3] == slope.max.postmin), 1] # index of maximum slope in fit table
                 slope.quota <- quota * slope.max.postmin
-                
+
                 if(x_type == "density"){
                   if(exists("min.density")){
                     candidates.postmin <- ret.postmin[which(
@@ -1535,7 +1568,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                   candidates.postmin <- candidate_intervals.postmin[
                     as.numeric(which(sapply(candidate_intervals.postmin,FUN = function(X) index.max.ret.postmin %in% X)))][[1]]
                 }
-                
+
                 if (length(candidates.postmin) > 0) {
                   #perform linear regression with candidate fl_data points
                   tp.postmin <- seq(min(candidates.postmin), max(candidates.postmin) + h - 1)
@@ -1556,7 +1589,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                   )
                   m = NULL
                 }
-                
+
                 if (length(candidates.postmin) > 0) {
                   ## get x window of exponential fit
                   x.max_start.postmin <- obs$x[tp.postmin[1]]
@@ -1569,19 +1602,19 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                   x.turn.postmin <- obs$x[postmin.ndx]
                   y0_lm.postmin    <- unname(coef(m.postmin)[1]) # y-intercept of tangent
                   max_slope.postmin <- unname(coef(m.postmin)[2])
-                  
+
                   ## estimate lag phase between first and second phase
                   if (control$log.y.lin == TRUE) {
                     lambda.postmin <- (obs$ylog[1] - y0_lm.postmin) / max_slope.postmin
                   } else {
                     lambda.postmin <- (obs$fl_data[1] - y0_lm.postmin) / max_slope.postmin
                   }
-                  
+
                   # correct y0 values for Ln(y(t)/y0)
                   if(control$log.y.lin == TRUE){
                     y0_lm.postmin <- obs$fl_data[1] * exp(y0_lm.postmin)
                   }
-                  
+
                   # get indices of x points used in linear fit
                   ndx.postmin <- seq(min(match(ret[candidates.postmin, "x"], x.in)),
                                      max(match(ret[candidates.postmin, "x"], x.in)) + h -
@@ -1626,7 +1659,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               rsquared.postmin = NA
               fitFlag.postmin = FALSE
             }
-            
+
             # get local deriv2-maximum before max_slope
             # premin.ndx <- maxima[(maxima - tp.ext[1]) <= 0][which.max(maxima[(maxima - tp.ext[1]) <= 0])]
             if(length(maxima)>0){
@@ -1668,15 +1701,15 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                       ret.premin[, 5] >= 0.98 * R2 &
                       abs(ret.premin[, 6]) <= 1.02 * RSD &
                       ret.premin[, 7] >= t0), 1]
-                  
+
                   #consider only candidate windows next to index.max.ret.premin
                   candidate_intervals.premin <-split(candidates.premin, cumsum(c(1, diff(candidates.premin) != 1)))
                   if (any(index.max.ret.premin %in% unlist(candidate_intervals.premin))) {
                     candidates.premin <- candidate_intervals.premin[
                       as.numeric(which(sapply(candidate_intervals.premin,FUN = function(X) index.max.ret.premin %in% X)))][[1]]
                   }
-                  
-                  
+
+
                   if (length(candidates.premin) > 0) {
                     #perform linear regression with candidate fl_data points
                     tp.premin <- seq(min(candidates.premin), max(candidates.premin) + h - 1)
@@ -1697,7 +1730,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                     )
                     m = NULL
                   }
-                  
+
                   if (length(candidates.premin) > 0) {
                     ## get x window of exponential fit
                     x.max_start.premin <- obs$x[tp.premin[1]]
@@ -1710,19 +1743,19 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                     x.turn.premin <- obs$x[premin.ndx]
                     y0_lm.premin    <- unname(coef(m.premin)[1]) # y-intercept of tangent
                     max_slope.premin <- unname(coef(m.premin)[2])
-                    
+
                     ## estimate lag phase between first and second phase
                     if (control$log.y.lin == TRUE) {
                       lambda.premin <- (obs$ylog[1] - y0_lm.premin) / max_slope.premin
                     } else {
                       lambda.premin <- (obs$fl_data[1] - y0_lm.premin) / max_slope.premin
                     }
-                    
+
                     # correct y0 values for Ln(y(t)/y0)
                     if(control$log.y.lin == TRUE){
                       y0_lm.premin <-  obs$fl_data[1] * exp(y0_lm.premin)
                     }
-                    
+
                     # get indices of x points used in linear fit
                     ndx.premin <- seq(min(match(ret[candidates.premin, "x"], x.in)),
                                       max(match(ret[candidates.premin, "x"], x.in)) + h -
@@ -1781,7 +1814,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               rsquared.premin = NA
               fitFlag.premin = FALSE
             }
-            
+
             # Choose regression before or after max_slope as second phase based on second slope
             if(!is.na(max_slope.premin) && !is.na(max_slope.postmin)){
               max_slope2 <- ifelse(max_slope.premin > max_slope.postmin, max_slope.premin, max_slope.postmin)
@@ -1878,9 +1911,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     class(flFitLinear) <- "flFitLinear"
     return(flFitLinear)
   }
-  
-  
-  
+
+
+
   flFitLinear <- list(
     x.in = get(ifelse(x_type == "density", "density.in", "time.in")),
     fl.in = fl_data.in,
@@ -1922,13 +1955,18 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     fitFlag = fitFlag,
     fitFlag2 = fitFlag2
   )
-  
+
   class(flFitLinear) <- "flFitLinear"
-  
+
   invisible(flFitLinear)
 }
 
 
+#' @param m linear model (\code{lm}) object
+#'
+#' @rdname lm_window
+#' @export lm_parms
+#'
 lm_parms <- function (m)
 {
   suppressWarnings(sm <- summary(m))
@@ -1944,6 +1982,38 @@ lm_parms <- function (m)
   }
 }
 
+#' Helper functions for handling linear fits.
+#'
+#' \code{lm_window} performs a linear regression with the Theil-Sen estimator on a subset of data.
+#'
+#' @param x vector of independent variable (e.g. time).
+#' @param y vector of dependent variable (concentration of organisms).
+#' @param i0 index of first value used for a window.
+#' @param h with of the window (number of data).
+#'
+#' @return linear model object of class \code{lm} (lm_window)
+#'         resp. vector with parameters of the fit (lm_parms).
+#'
+#' @references Hall, B. G., H. Acar and M. Barlow 2013. Growth Rates Made Easy.
+#'   Mol. Biol. Evol. 31: 232-238 \doi{10.1093/molbev/mst197}
+#'
+#' @export lm_window
+#'
+#' @examples
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- as.numeric(rnd.dataset$data[1,-(1:3)]) # Remove identifier columns
+#' data.log <- log(data/data[1])
+#'
+#' # Perform linear fit on 8th window of size 8
+#' linreg <- lm_window(time, data.log, 8, h=8)
+#'
+#' summary(linreg)
+#'
+#' lm_parms(linreg)
 lm_window <- function (x, y, i0, h = 5)
 {
   x <- x[i0 - 1 + (1:h)]
@@ -1952,7 +2022,39 @@ lm_window <- function (x, y, i0, h = 5)
   return(m)
 }
 
-# from the 'RobustLinearReg' package
+#' Compute Theil Sen Regression
+#'
+#' From the 'RobustLinearReg' package
+#'
+#' @param formula A formula in the form \code{y ~ x}.
+#' @param data optional: A dataframe in which numeric values for \code{x} and \code{y} are stored
+#'
+#' @return A model object of class \code{lm}.
+#'
+#' @references Henri Theil and Pranab K. Sen, 1950 and 1968 respectively
+#'
+#' @author Santiago I. Hurtado
+#'
+#' @examples
+#' \dontrun{
+#' # Create random growth dataset
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
+#' # Extract time and growth data for single sample
+#' time <- rnd.dataset$time[1,]
+#' data <- as.numeric(rnd.dataset$data[1,-(1:3)]) # Remove identifier columns
+#' data.log <- log(data/data[1])
+#'
+#' # Perform theil-sen regression
+#' regression <- theil_sen_regression(data.log ~ time)
+#' summary(regression)
+#'
+#' df <- data.frame("x" = time, "y" = data.log)
+#' regression <- theil_sen_regression(y ~ x, df)
+#'
+#' summary(regression)
+#'
+#' }
 theil_sen_regression <- function (formula, data = NULL)
 {
   aux_data <- is.null(data)
@@ -2005,55 +2107,64 @@ theil_sen_regression <- function (formula, data = NULL)
   return(output)
 }
 
-# from the 'RobustLinearReg' package
-siegel_regression <- function (formula, data = NULL)
-{
-  aux_data <- is.null(data)
-  if (aux_data) {
-    data <- environment(formula)
-  }
-  term <- as.character(attr(terms(formula), "variables")[-1])
-  if (length(term) > 2) {
-    stop("only linear models alow")
-  }
-  y <- as.vector(data[[term[1]]])
-  x <- as.vector(data[[term[2]]])
-  n <- length(y)
-  if (n != length(x)) {
-    stop("x and y must be of same length")
-  }
-  y1 <- matrix(y, n, n, byrow = T)
-  y2 <- t(y1)
-  x1 <- matrix(x, n, n, byrow = T)
-  x2 <- t(x1)
-  aux <- (y1 - y2)/(x1 - x2)
-  a <- median(apply(aux, 1, median, na.rm = T))
-  aux <- (x1 * y2 - x2 * y1)/(x1 - x2)
-  b <- median(apply(aux, 1, median, na.rm = T))
-  output = list()
-  output$coefficients <- c(b, a)
-  names(output$coefficients)[1:2] <- c("(Intercept)", term[[2]])
-  output$residuals <- y - a * x - b
-  output$fitted.values <- x * a + b
-  output$df.residual <- n - 2
-  output$rank <- 2
-  output$terms <- terms(formula)
-  output$call <- match.call()
-  output$model <- data.frame(y, x)
-  names(output$model) <- term
-  output$assign <- c(0, 1)
-  if (aux_data) {
-    output$effects <- lm(formula)$effects
-    output$qr <- lm(formula)$qr
-  }
-  else {
-    output$effects <- lm(formula, data)$effects
-    output$qr <- lm(formula, data)$qr
-  }
-  output$effects[2] <- sqrt(sum((output$fitted - mean(output$fitted))^2))
-  output$xlevels <- list()
-  names(output$model) <- term
-  attr(output$model, "terms") <- terms(formula)
-  class(output) <- c("lm")
-  return(output)
-}
+#' # from the 'RobustLinearReg' package
+#' #' Title
+#' #'
+#' #' @param formula
+#' #' @param data
+#' #'
+#' #' @return
+#' #' @export
+#' #'
+#' #' @examples
+#' siegel_regression <- function (formula, data = NULL)
+#' {
+#'   aux_data <- is.null(data)
+#'   if (aux_data) {
+#'     data <- environment(formula)
+#'   }
+#'   term <- as.character(attr(terms(formula), "variables")[-1])
+#'   if (length(term) > 2) {
+#'     stop("only linear models alow")
+#'   }
+#'   y <- as.vector(data[[term[1]]])
+#'   x <- as.vector(data[[term[2]]])
+#'   n <- length(y)
+#'   if (n != length(x)) {
+#'     stop("x and y must be of same length")
+#'   }
+#'   y1 <- matrix(y, n, n, byrow = T)
+#'   y2 <- t(y1)
+#'   x1 <- matrix(x, n, n, byrow = T)
+#'   x2 <- t(x1)
+#'   aux <- (y1 - y2)/(x1 - x2)
+#'   a <- median(apply(aux, 1, median, na.rm = T))
+#'   aux <- (x1 * y2 - x2 * y1)/(x1 - x2)
+#'   b <- median(apply(aux, 1, median, na.rm = T))
+#'   output = list()
+#'   output$coefficients <- c(b, a)
+#'   names(output$coefficients)[1:2] <- c("(Intercept)", term[[2]])
+#'   output$residuals <- y - a * x - b
+#'   output$fitted.values <- x * a + b
+#'   output$df.residual <- n - 2
+#'   output$rank <- 2
+#'   output$terms <- terms(formula)
+#'   output$call <- match.call()
+#'   output$model <- data.frame(y, x)
+#'   names(output$model) <- term
+#'   output$assign <- c(0, 1)
+#'   if (aux_data) {
+#'     output$effects <- lm(formula)$effects
+#'     output$qr <- lm(formula)$qr
+#'   }
+#'   else {
+#'     output$effects <- lm(formula, data)$effects
+#'     output$qr <- lm(formula, data)$qr
+#'   }
+#'   output$effects[2] <- sqrt(sum((output$fitted - mean(output$fitted))^2))
+#'   output$xlevels <- list()
+#'   names(output$model) <- term
+#'   attr(output$model, "terms") <- terms(formula)
+#'   class(output) <- c("lm")
+#'   return(output)
+#' }

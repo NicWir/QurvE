@@ -44,6 +44,26 @@ physiological parameters.
 \description{
 \code{fl.gcBootSpline} resamples the fluorescence-'x' value pairs in a dataset with replacement and performs a spline fit for each bootstrap sample.
 }
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Extract time and normalized fluorescence data for single sample
+time <- input$time[4,]
+data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+
+# Perform linear fit
+TestFit <- flBootSpline(time = time,
+                       fl_data = data,
+                       ID = "TestFit",
+                       control = fl.control(fit.opt = "s", x_type = "time",
+                       nboot.fl = 50))
+
+plot(TestFit, combine = TRUE, lwd = 0.5)
+}
 \seealso{
 Other fluorescence fitting functions: 
 \code{\link{flFitSpline}()},

@@ -28,6 +28,25 @@ Value(s) matched via partial matching.
 Wrapper around \link[base]{match.arg} that defaults to ignoring case and
 trimming white space
 }
+\examples{
+\dontrun{
+require(stats)
+center <- function(x, type = c("mean", "median", "trimmed")) {
+  type <- match_arg(type)
+    switch(type,
+           mean = mean(x),
+           median = median(x),
+           trimmed = mean(x, trim = .1))
+}
+x <- rcauchy(10)
+center(x, "t")       # Works
+center(x, "T")       # Works as well
+center(x, "T")       # Works as well
+center(x, "med")     # Works
+try(center(x, "m"))  # Error
+}
+
+}
 \author{
 Alban Sagouis
 }

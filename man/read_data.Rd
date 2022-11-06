@@ -5,7 +5,7 @@
 \title{Read growth and fluorescence data in table format}
 \usage{
 read_data(
-  data.density,
+  data.density = NA,
   data.fl = NA,
   data.format = "col",
   csvsep = ";",
@@ -68,4 +68,15 @@ object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
 }
 \details{
 \figure{Data_layout.jpg}
+}
+\examples{
+# Load CSV file containing only growth data
+data_growth <- read_data(data.density = system.file("2-FMA_toxicity.csv",
+                         package = "QurvE"), csvsep = ";" )
+
+# Load XLSX file containing both density and fluorescence data
+data_growth_fl <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                            sheet.density = "OD",
+                            data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                            sheet.fl = 2)
 }

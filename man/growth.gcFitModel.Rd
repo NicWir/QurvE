@@ -41,6 +41,21 @@ A \code{gcFitModel} object that contains physiological parameters and informatio
 \description{
 \code{growth.gcFitModel} determines a parametric growth model that best describes the data.
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Perform parametric fit
+TestFit <- growth.gcFitModel(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "m"))
+
+plot(TestFit, basesize = 18, eq.size = 1.5)
+
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

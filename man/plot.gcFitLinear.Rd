@@ -59,3 +59,18 @@
 \description{
 \code{plot.gcFitLinear} shows the results of a linear regression on log-transformed data and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Perform linear fit
+TestFit <- growth.gcFitLinear(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "l"))
+
+plot(TestFit)
+
+}

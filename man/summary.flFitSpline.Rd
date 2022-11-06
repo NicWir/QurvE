@@ -17,3 +17,22 @@ A dataframe with parameters extracted from the nonparametric fit.
 \description{
 Generic summary function for flFitSpline objects
 }
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Extract time and normalized fluorescence data for single sample
+time <- input$time[4,]
+data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+
+# Perform linear fit
+TestFit <- flFitSpline(time = time,
+                       fl_data = data,
+                       ID = "TestFit",
+                       control = fl.control(fit.opt = "s", x_type = "time"))
+
+summary(TestFit)
+}

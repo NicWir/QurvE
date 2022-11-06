@@ -17,3 +17,21 @@ A dataframe with statistical parameters extracted from the spline fit bootstrapp
 \description{
 Generic summary function for gcBootSpline objects
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Introduce some noise into the measurements
+data <- data + stats::runif(97, -0.01, 0.09)
+
+# Perform bootstrapping spline fit
+TestFit <- growth.gcBootSpline(time, data, gcID = "TestFit",
+              control = growth.control(fit.opt = "s", nboot.gc = 50))
+
+summary(TestFit)
+
+}

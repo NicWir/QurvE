@@ -30,6 +30,29 @@
 #' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
+#' @examples
+#' # Create random growth data set
+#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#' rnd.data <- list()
+#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#' # Run growth curve analysis workflow
+#' gcFit <- growth.gcFit(time = rnd.data$time,
+#'                        data = rnd.data$data,
+#'                        parallelize = FALSE,
+#'                        control = growth.control(fit.opt = "s",
+#'                                                 suppress.messages = TRUE))
+#'
+#' # Perform dose-response analysis
+#' drFit <- growth.drFit(gcTable = gcFit$gcTable,
+#'              control = growth.control(dr.parameter = "mu.spline"))
+#'
+#' # Inspect results
+#' summary(drFit)
+#' plot(drFit)
 #'
 growth.drFit <- function (gcTable, control = growth.control(dr.method = "model",
                                                             dr.model = c('gammadr', 'multi2',
@@ -83,20 +106,20 @@ growth.drFit <- function (gcTable, control = growth.control(dr.method = "model",
   }
   else {
     skip <- c()
-    
+
     for (i in 1:length(distinct)) {
       conc <- factor((FitData[, 3])[which(FitData[, 1] ==
                                             distinct[i])])
       test <- (as.numeric(FitData[, dr.parameter]))[FitData[, 1] == distinct[i]]
       conc <- as.factor(as.character(conc[!is.na(test)]))
       test <- test[!is.na(test)]
-      
+
       if(length(levels(conc)) <4){
         message(paste0(distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."))
         skip <- c(skip, i)
         next
       }
-      
+
       names(test) <- rep(names(FitData)[dr.parameter], length(test))
       drID <- distinct[i]
       if(control$dr.method == "spline"){
@@ -121,13 +144,13 @@ growth.drFit <- function (gcTable, control = growth.control(dr.method = "model",
                          summary.drBootSpline(EC50.boot[[i]]))
       else
         out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
-      
+
       if(!is.na(out.row[1,5]) && out.row[1,5] != "NA")
         EC50.table <- rbind(as.data.frame(EC50.table), out.row)
       else{
         return(NA)
       }
-      
+
       class(EC50.table) <- c("drTable", "list")
     }
   }
@@ -137,6 +160,9 @@ growth.drFit <- function (gcTable, control = growth.control(dr.method = "model",
     EC50.boot <- EC50.boot[-skip]
   }
   if(control$dr.method == "spline"){
+    if(length(EC50) == 0 ){
+      return(NA)
+    }
     names(EC50) <- names(EC50.boot) <- distinct
     fitflags <- unlist(lapply(1:length(EC50), function(x) EC50[[x]]$fitFlag))
     if(all(isFALSE(fitflags))){
@@ -146,6 +172,9 @@ growth.drFit <- function (gcTable, control = growth.control(dr.method = "model",
                     drBootSplines = EC50.boot, drFittedSplines = EC50, control = control)
     }
   } else {
+    if(length(EC50) == 0 ){
+      return(NA)
+    }
     names(EC50) <- distinct
     fitflags <-  unlist(lapply(1:length(EC50), function(x) EC50[[x]]$fitFlag))
     if(all(isFALSE(fitflags))){
@@ -155,7 +184,7 @@ growth.drFit <- function (gcTable, control = growth.control(dr.method = "model",
                     drFittedModels = EC50, control = control)
     }
   }
-  
+
   class(drFit) <- "drFit"
   invisible(drFit)
 }
@@ -200,7 +229,16 @@ growth.drFit <- function (gcTable, control = growth.control(dr.method = "model",
 #' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 #'
 #' @export
+#' @examples
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#' response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
 #'
+#' TestRun <- growth.drFitSpline(conc, response, drID = "test",
+#'               control = growth.control(log.x.dr = TRUE, smooth.dr = 0.8))
+#'
+#' print(summary(TestRun))
+#'
+#' plot(TestRun)
 growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.control())
 {
   if (methods::is(control) != "grofit.control" && methods::is(control) != "fl.control")
@@ -265,18 +303,18 @@ growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.
   }
   spltest <- NULL
   fitFlag <- TRUE
-  
+
   # perform first lowess spline fit followed by smooth.spline onf lowess results
-  try(spltest.low <- lowess(conc.fit, test.fit, f = 0.1), silent = T)
-  try(spltest.low$y <- spltest.low$y[!duplicated(spltest.low$x)], silent = T)
-  try(spltest.low$x <- spltest.low$x[!duplicated(spltest.low$x)], silent = T)
-  
+  try(spltest.low <- lowess(conc.fit, test.fit, f = 0.1), silent = TRUE)
+  try(spltest.low$y <- spltest.low$y[!duplicated(spltest.low$x)], silent = TRUE)
+  try(spltest.low$x <- spltest.low$x[!duplicated(spltest.low$x)], silent = TRUE)
+
   # assign high weights to concentration values of 0, response values of 0, and response values immediately before 0
   weights <- sapply(1:(length(spltest.low$x)-1), function(i) ifelse(spltest.low$x[[i]] == 0 | spltest.low$y[[i]]==0 | spltest.low$y[[i+1]]==0, 1, 0.05))
   weights <- c(weights, ifelse(spltest.low$x[length(spltest.low$x)] == 0 | spltest.low$y[length(spltest.low$y)]==0, 1, 0.05))
-  
-  try(spltest.smooth <- smooth.spline(spltest.low$x, spltest.low$y, spar = control$smooth.dr, keep.data = FALSE, w = weights), silent = T)
-  
+
+  try(spltest.smooth <- smooth.spline(spltest.low$x, spltest.low$y, spar = control$smooth.dr, keep.data = FALSE, w = weights), silent = TRUE)
+
   if (!exists("spltest.smooth") || is.null(spltest.smooth) == TRUE) {
     cat("Spline could not be fitted in dose-response analysis!\n")
     fitFlag <- FALSE
@@ -392,6 +430,17 @@ growth.drFitSpline <- function(conc, test, drID = "undefined", control = growth.
 #'
 #' @export
 #'
+#' @examples
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#' response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
+#'
+#' TestRun <- growth.drBootSpline(conc, response, drID = "test",
+#'                control = growth.control(log.x.dr = TRUE, smooth.dr = 0.8,
+#'                                         nboot.dr = 50))
+#'
+#' print(summary(TestRun))
+#' plot(TestRun, combine = TRUE)
+#'
 growth.drBootSpline <- function (conc, test, drID = "undefined", control = growth.control())
 {
   test <- as.vector(as.numeric(as.matrix(test)))
@@ -444,7 +493,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
     class(drBootSpline) <- "drBootSpline"
     return(drBootSpline)
   }
-  
+
   # /// transformation of data...
   if (control$log.x.dr == TRUE)
     conc.log <- log(conc + 1)
@@ -456,7 +505,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
   if (control$log.y.dr == TRUE)
     test.boot <- log(test + 1)
   else test.boot <- test
-  
+
   # /// Initialize some variables
   boot.x <- array(NA, c(control$nboot.dr, 1000))
   boot.y <- array(NA, c(control$nboot.dr, 1000))
@@ -464,7 +513,7 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
   y.EC50.boot <- seq(0, 0, length.out = control$nboot.dr)
   splinefit <- list()
   sa <- seq(1, length(conc.boot))
-  
+
   # /// begin bootstrapping
   for (b in 1:control$nboot.dr) {
     s <- sample(sa, length(conc.boot), replace = TRUE)
@@ -547,6 +596,15 @@ growth.drBootSpline <- function (conc, test, drID = "undefined", control = growt
 #' @export
 #'
 #' @import drc
+#'
+#' @examples
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#' response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
+#'
+#' TestRun <- growth.drFitModel(conc, response, drID = "test")
+#'
+#' print(summary(TestRun))
+#' plot(TestRun)
 growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.control())
 {
   if (methods::is(control) != "grofit.control" && methods::is(control) != "fl.control")
@@ -617,7 +675,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   models <- models[!unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) %in% c("try-error","list")]
   model.fits <- model.fits[!unlist(lapply(1:length(model.fits), function(x) class(model.fits[[x]]))) %in% c("try-error","list")]
   names(model.fits) <- models
-  
+
   if(length(model.fits) < 1 ){
     if(control$suppress.messages==F) message("growth.drFitModel: No DR model could be fit to the test and concentration data.")
     drFitModel <- list(raw.conc = conc, raw.test = test,
@@ -631,11 +689,11 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   # select best fitting model
   model.AIC <- lapply(1:length(model.fits), function(x) AIC(model.fits[[x]]))
   names(model.AIC) <- models
-  
+
   best.model.ndx <- which.min(unlist(model.AIC))
   best.model.nm <- models[best.model.ndx]
   best.model <- model.fits[[best.model.ndx]]
-  
+
   # get EC50 value
   if(any(grep("BC", best.model.nm)) ){
     ec50 <- drc::ED(best.model, 50, lower = 0.1, upper = 1000, interval = "fls", display = FALSE )
@@ -647,12 +705,12 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
   # get response at ec50
   dataList <- best.model[["dataList"]]
   dose <- dataList[["dose"]]
-  
+
   concgrid <- seq(min(dose), max(dose), length = 200)
   respgrid <- best.model$curve[[1]](concgrid)
-  
+
   y.ec50 <- drc::PR(object = best.model, xVec = ec50[1])
-  
+
   # drc.models <- drc::getMeanFunctions(display = FALSE)
   # drc.models.nm <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][1])), "NEC.4")
   # drc.models.descr <- c(unlist(lapply(1:length(drc.models), function(x) drc.models[[x]][2])), "model for estimation of\nno effect concentration (NEC)")
@@ -662,7 +720,7 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
                        parameters = list(EC50 = ec50, yEC50 = y.ec50, Vmax = coef(best.model)[grep("d:", names(coef(best.model)))],
                                          Km = coef(best.model)[grep("e:", names(coef(best.model)))], test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
                        control = control)
-    
+
   }
   else {
     drFitModel <- list(raw.conc = conc, raw.test = test,
@@ -670,15 +728,17 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
                        parameters = list(EC50 = ec50, yEC50 = y.ec50, Vmax = NA, Km = NA, test = test.nm, model = best.model.nm), fitFlag = TRUE, reliable = NULL,
                        control = control)
   }
-  
+
   class(drFitModel) <- "drFitModel"
   invisible(drFitModel)
 }
 
 #' Fit a biosensor model (Meyer et al., 2019) to response vs. concentration data
 #'
-#' @param FitData A dataframe containing the data for the dose-response model estimation. Such table of class \code{flTable} can be obtained by running \code{\link{flFit}} with \code{dr.method = "model"} as argument in the \code{fl.control} object.
+#' @param flTable A dataframe containing the data for the dose-response model estimation. Such table of class \code{flTable} can be obtained by running \code{\link{flFit}} with \code{dr.method = "model"} as argument in the \code{fl.control} object.
 #' @param control A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.
+#' @param dr.method (Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{"spline"}) or fit a biosensor response model with \code{"model"} (proposed by Meyer et al., 2019).
+#' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{"max_slope.spline"}, which represents the maximum slope of the spline fit Typical options include: \code{"max_slope.linfit"}, \code{"dY.linfit"}, \code{"max_slope.spline"}, and \code{"dY.spline"}.
 #'
 #' @return An object of class \code{drFit}.
 #' \item{raw.data}{Data that passed to the function as \code{flTable}.}
@@ -690,18 +750,39 @@ growth.drFitModel <- function(conc, test, drID = "undefined", control = growth.c
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
-fl.drFit <- function(FitData, control = fl.control())
+#' @examples
+#' # Load example dataset
+#' input <- read_data(data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.fl = 2 )
+#'
+#' # Run fluorescence curve analysis workflow
+#' fitres <- flFit(fl_data = input$fluorescence,
+#'                 time = input$time,
+#'                 parallelize = FALSE,
+#'                 control = fl.control(x_type = "time", norm_fl = FALSE,
+#'                                      suppress.messages = TRUE))
+#'
+#' # Perform dose-response analysis
+#' drFit <- fl.drFit(flTable = fitres$flTable,
+#'                   control = fl.control(dr.method = "model",
+#'                                        dr.parameter = "max_slope.linfit"))
+#'
+#' # Inspect results
+#' summary(drFit)
+#' plot(drFit)
+#'
+fl.drFit <- function(flTable, control = fl.control(dr.method = "model", dr.parameter = "max_slope.spline"))
 {
   if (is(control) != "fl.control")
     stop("control must be of class fl.control!")
   EC50.table <- NULL
   all.EC50 <- NA
   if(is.character(control$dr.parameter)){
-    dr.parameter <- match(control$dr.parameter, colnames(FitData))
+    dr.parameter <- match(control$dr.parameter, colnames(flTable))
   }
-  FitData <- FitData[!is.na(FitData[,1]), ]
-  table.tests <- table((FitData[, 1])[which((FitData[,
-                                                     4] == TRUE) & (is.na(FitData[, dr.parameter]) ==
+  flTable <- flTable[!is.na(flTable[,1]), ]
+  table.tests <- table((flTable[, 1])[which((flTable[,
+                                                     4] == TRUE) & (is.na(flTable[, dr.parameter]) ==
                                                                       FALSE))])
   distinct <- names(table.tests)
   EC50 <- list()
@@ -728,7 +809,7 @@ fl.drFit <- function(FitData, control = fl.control())
   if ((length(distinct)) == 0) {
     cat(paste("There are no tests having enough ( >", as.character(control$dr.have.atleast -
                                                                      1), ") datasets!\n"))
-    drFitfl <- list(raw.data = FitData, drTable = NA,
+    drFitfl <- list(raw.data = flTable, drTable = NA,
                     drFittedModels = NA, control = control)
     class(drFitfl) <- "drFitfl"
     return(drFitfl)
@@ -736,17 +817,17 @@ fl.drFit <- function(FitData, control = fl.control())
   else {
     skip <- c()
     for (i in 1:length(distinct)) {
-      conc <- factor((FitData[, 3])[which(FitData[, 1] ==
+      conc <- factor((flTable[, 3])[which(flTable[, 1] ==
                                             distinct[i])])
       if(length(levels(conc)) < 4){
         message(paste0(distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."))
         skip <- c(skip, i)
         next
       }
-      test <- (as.numeric(FitData[, dr.parameter]))[FitData[, 1] == distinct[i]]
-      names(test) <- rep(names(FitData)[dr.parameter], length(test))
+      test <- (as.numeric(flTable[, dr.parameter]))[flTable[, 1] == distinct[i]]
+      names(test) <- rep(names(flTable)[dr.parameter], length(test))
       drID <- distinct[i]
-      EC50[[i]] <- try(fl.drFitModel(conc, test, drID, control), silent = T)
+      EC50[[i]] <- try(fl.drFitModel(conc, test, drID, control), silent = TRUE)
       description <- data.frame(Test = distinct[i], log.x = control$log.x.dr,
                                 log.y = control$log.y.dr)
       if(is(EC50[[i]]) != "try-error"){
@@ -756,7 +837,7 @@ fl.drFit <- function(FitData, control = fl.control())
                                                  "yEC50.orig" = NA, "K.orig" = NA, "test" = NA))
       }
       EC50.table <- rbind(EC50.table, out.row)
-      
+
     }
   }
   class(EC50.table) <- c("drTable", "list")
@@ -765,7 +846,7 @@ fl.drFit <- function(FitData, control = fl.control())
     EC50 <- EC50[-skip]
   }
   names(EC50) <- distinct
-  drFitfl <- list(raw.data = FitData, drTable = EC50.table,
+  drFitfl <- list(raw.data = flTable, drTable = EC50.table,
                   drFittedModels = EC50, control = control)
   class(drFitfl) <- "drFitfl"
   invisible(drFitfl)
@@ -809,6 +890,19 @@ fl.drFit <- function(FitData, control = fl.control())
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
+#' @examples
+#' # Create concentration values via a serial dilution
+#' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+#'
+#' # Simulate response values via biosensor equation
+#' response <- biosensor.eq(conc, y.min = 110, y.max = 6000, K = 0.5, n = 2) +
+#'             0.01*6000*rnorm(10)
+#'
+#' # Perform fit
+#' TestRun <- fl.drFitModel(conc, response, drID = "test", control = fl.control())
+#'
+#' print(summary(TestRun))
+#' plot(TestRun)
 fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control())
 {
   if (is(control) != "fl.control")
@@ -914,12 +1008,12 @@ fl.drFitModel <- function(conc, test, drID = "undefined", control = fl.control()
   fc <- par[1,1]/y.min # fold-change
   K <- par[2,1] # sensitivity
   n <- par[3,1] # cooperativity
-  
+
   x_fit <- seq(0,max(conc.fit), length.out = 1000)
   y_fit <- biosensor.eq(x_fit, y.min=y.min, y.max=par[1,1], K=par[2,1], n=par[3,1])
   # plot(conc.fit, test.fit)
   # lines(xin,  biosensor.eq(xin, y.min=par[1,1], y.max=par[2,1], K=par[3,1], n=par[4,1]))
-  
+
   # /// estimating EC 50 values
   yEC.test <- y.min + (y.max - y.min) * ( K^n / (K^n + K^n) )
   EC.test <- K

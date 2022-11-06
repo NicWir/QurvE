@@ -21,6 +21,15 @@ A \code{drFitModel} object.
 \description{
 Fit various models to response vs. concentration data of a single sample to determine the EC50.
 }
+\examples{
+conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
+response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
+
+TestRun <- growth.drFitModel(conc, response, drID = "test")
+
+print(summary(TestRun))
+plot(TestRun)
+}
 \references{
 Christian Ritz, Florent Baty, Jens C. Streibig, Daniel Gerhard (2015). \emph{Dose-Response Analysis Using R}. PLoS ONE 10(12): e0146021. DOI: 10.1371/journal.pone.0146021
 }

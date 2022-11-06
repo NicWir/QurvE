@@ -75,6 +75,22 @@ smooth spline fit and identification of maximum slope for earlier time values th
 the local minimum before \eqn{mu_{max}}. \item Choose the greater of the two
 independently determined slopes as \eqn{mu_{max}2}. }
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Perform spline fit
+TestFit <- growth.gcFitSpline(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "s"))
+
+plot(TestFit)
+
+
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

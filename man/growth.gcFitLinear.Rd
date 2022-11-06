@@ -114,6 +114,21 @@ If \code{biphasic = TRUE}, the following steps are performed to define a second 
 \item Choose the greater of the two independently determined slopes as \eqn{mu_{max}2}.
 }
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Perform linear fit
+TestFit <- growth.gcFitLinear(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "l"))
+
+plot(TestFit)
+
+}
 \references{
 Hall, BG., Acar, H, Nandipati, A and Barlow, M (2014) Growth Rates Made Easy. \emph{Mol. Biol. Evol.} 31: 232-38, DOI: 10.1093/molbev/mst187
 

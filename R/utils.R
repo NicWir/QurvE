@@ -2,12 +2,10 @@ utils::globalVariables(c("shiny"))
 
 #' Run upon attaching package QurvE
 #'
-#' Changes debug option for package \code{rgl} to avoid Rstudio crashing upon attaching it and prints welcome message
 #'
 #' @param libname library name
 #' @param pkgname package name
 .onAttach <- function (libname, pkgname){
-  options(rgl.debug = TRUE)
   k1 <- paste("QurvE",utils::packageVersion( "QurvE"),"initialized Successfully !")
   k0 <- "\n"
   k2 <- paste("https://github.com/NicWir/QurvE")
@@ -39,18 +37,64 @@ suppress_warnings <- function(.expr, .f, ...) {
 }
 
 
-#' Pretty ticks for log scale for ggplot2
+#' Pretty ticks for log scale in ggplot
 #'
 #' @param n Number of breaks
 #'
-#' @return
-
+#' @return a call to\code{\link[grDevices]{axisTicks}} to create pretty axis ticks.
+#'
+#' @examples
+#' \dontrun{
+#' #Define values
+#' n <- seq(1:10)
+#' x <- 10*(1/2)^n
+#' y <- gompertz(time = x, A = 2, mu = 0.6, lambda = 3)
+#'
+#' df <- data.frame(x = x,
+#'                  y = y)
+#'
+#' ggplot(df, aes(x = x, y = y)) +
+#'        geom_point() +
+#'        scale_x_log10(breaks = base_breaks(n = 10)) +
+#'        scale_y_log10(breaks = base_breaks(n = 6))
+#' }
 base_breaks <- function(n = 10){
   function(x) {
     grDevices::axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
   }
 }
 
+
+
+#' Find indices of maxima an minima in a data series
+#'
+#' @param x vector of values with minima and maxima
+#' @param threshold
+#'
+#' @return a list with [[1]] a vector of minima and [[2]] a vector of maxima.
+#' @export
+#' @authored Evan Friedland
+#' @examples
+#' # Pick a desired threshold to plot up to
+#' n <- 3
+#' # Generate Data
+#' randomwalk <- 100 + cumsum(rnorm(50, 0.2, 1)) # climbs upwards most of the time
+#' bottoms <- lapply(1:n, function(x) inflect(randomwalk, threshold = x)$minima)
+#' tops <- lapply(1:n, function(x) inflect(randomwalk, threshold = x)$maxima)
+#' # Color functions
+#' cf.1 <- grDevices::colorRampPalette(c("pink","red"))
+#' cf.2 <- grDevices::colorRampPalette(c("cyan","blue"))
+#' plot(randomwalk, type = 'l', main = "Minima & Maxima\nVariable Thresholds")
+#' for(i in 1:n){
+#'   points(bottoms[[i]], randomwalk[bottoms[[i]]], pch = 16, col = cf.1(n)[i], cex = i/1.5)
+#' }
+#' for(i in 1:n){
+#'   points(tops[[i]], randomwalk[tops[[i]]], pch = 16, col = cf.2(n)[i], cex = i/1.5)
+#' }
+#' legend("topleft", legend = c("Minima",1:n,"Maxima",1:n),
+#'        pch = rep(c(NA, rep(16,n)), 2), col = c(1, cf.1(n),1, cf.2(n)),
+#'        pt.cex =  c(rep(c(1, c(1:n) / 1.5), 2)), cex = .75, ncol = 2)
+#'
 inflect <- function(x, threshold = 1){
   up   <- sapply(1:threshold, function(n) c(x[-(seq(n))], rep(NA, n)))
   down <-  sapply(-1:-threshold, function(n) c(rep(NA,abs(n)), x[-seq(length(x), length(x) - abs(n) + 1)]))
@@ -58,6 +102,36 @@ inflect <- function(x, threshold = 1){
   list(minima = which(apply(a, 1, min) == a[,1]), maxima = which(apply(a, 1, max) == a[,1]))
 }
 
+#' Combine two dataframes like a zip-fastener
+#'
+#' Combine rows or columns of two dataframes in an alternating manner
+#'
+#' @param df1 A first dataframe.
+#' @param df2 A second dataframe with the same dimensions as \code{df1}.
+#' @param along \code{1} to alternate rows or \code{2} to alternate columns.
+#'
+#' @return A dataframe with combined rows (or columns) of df1 and df2.
+#' @export
+#' @author Mark Heckmann
+#'
+#' @examples
+#' # data frames equal dimensions
+#' df1 <- plyr::rdply(3, rep("o",4))[ ,-1]
+#' df2 <- plyr::rdply(3, rep("X",4))[ ,-1]
+#'
+#' zipFastener(df1, df2)
+#' zipFastener(df1, df2, 2)
+#' zipFastener(df1, df2, 1)
+#'
+#' # data frames unequal in no. of rows
+#' df1 <- plyr::rdply(10, rep("o",4))[ ,-1]
+#' zipFastener(df1, df2, 1)
+#' zipFastener(df2, df1, 1)
+#'
+#' # data frames unequal in no. of columns
+#' df2 <- plyr::rdply(10, rep("X",3))[ ,-1]
+#' zipFastener(df1, df2)
+#' zipFastener(df2, df1, 2)
 zipFastener <- function(df1, df2, along=2)
 {
   # parameter checking
@@ -108,11 +182,16 @@ zipFastener <- function(df1, df2, along=2)
 
 #' Internal function used to fit a biosensor response model with minpack.lm::nlsLM()
 #'
+#' Calculates the values of biosensor response model for given time points and response parameters.
+#'
 #' @param x A vector of concentration values
 #' @param y.min The minimum fluorescence value
 #' @param y.max The maximum fluorescence value
 #' @param K Sensitivity parameter
 #' @param n Cooperativity parameter
+#'
+#' @export
+#' @return A vector of fluorescence values
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
@@ -136,6 +215,29 @@ biosensor.eq <- function (x, y.min, y.max, K, n)
   biosensor.eq <- y
 }
 
+#' Generate initial values for parameter estimation with the biosensor response model
+#'
+#' @param x A vector of concentration values with at least four elements.
+#' @param y A vector of response values with at least four elements.
+#' @param n Cooperativity parameter
+#'
+#' @return A list:
+#' \item{y.max}{Maximum response value.}
+#' \item{K}{Sensitivity parameter.}
+#' \item{n}{The initially defined cooperativity parameter.}
+#'
+#'
+#' @examples
+#' \dontrun{
+#' n <- seq(1:10)
+#' conc <- (10*(1/2)^n)
+#' response <- log10(y <- gompertz(conc, A = 2, mu = 0.6, lambda = 3))
+#'
+#' init <- initbiosensor(x = conc,
+#'                       y = response,
+#'                       n= 0.5)
+#' }
+#'
 initbiosensor <- function (x, y, n)
 {
   if (is.numeric(x) == FALSE || length(x) < 4)
@@ -152,6 +254,21 @@ initbiosensor <- function (x, y, n)
   return(list(y.max = y.max, K = K, n = n))
 }
 
+#' Export a tabular object as tab-separated .txt file
+#'
+#' @param table A tabular R object (dataframe, matrix, array)
+#' @param out.dir The path to the output directory. Default: the working directory
+#' @param out.nm The output filename (with or without ".txt" ending). Default: the name of \code{table} followed by ".txt".
+#'
+#' @return \code{NULL}
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' df <- data.frame("A" = seq(1:10), "B" = rev(seq(1:10)))
+#'
+#' export_Table(df)
+#' }
 export_Table <- function(table, out.dir = getwd(), out.nm = deparse(substitute(table)))
 {
   out.nm <- gsub("\\.txt$", "", out.nm)
@@ -163,6 +280,21 @@ export_Table <- function(table, out.dir = getwd(), out.nm = deparse(substitute(t
   )
 }
 
+#' Export an R object as .RData file
+#'
+#' @param object An R object.
+#' @param out.dir The path to the output directory. Default: the working directory
+#' @param out.nm The output filename (with or without ".RData" ending). Default: the class of \code{object} followed by ".RData".
+#'
+#' @return \code{NULL}
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' df <- data.frame("A" = seq(1:10), "B" = rev(seq(1:10)))
+#'
+#' export_RData(df)
+#' }
 export_RData <- function(object, out.dir = getwd(), out.nm = class(object))
 {
   # # an object of class grofit or flFitRes
@@ -190,6 +322,24 @@ export_RData <- function(object, out.dir = getwd(), out.nm = class(object))
 #' @return Value(s) matched via partial matching.
 #'
 #' @author Alban Sagouis
+#' @examples
+#' \dontrun{
+#' require(stats)
+#' center <- function(x, type = c("mean", "median", "trimmed")) {
+#'   type <- match_arg(type)
+#'     switch(type,
+#'            mean = mean(x),
+#'            median = median(x),
+#'            trimmed = mean(x, trim = .1))
+#' }
+#' x <- rcauchy(10)
+#' center(x, "t")       # Works
+#' center(x, "T")       # Works as well
+#' center(x, "T")       # Works as well
+#' center(x, "med")     # Works
+#' try(center(x, "m"))  # Error
+#' }
+#'
 match_arg <- function(arg, choices,
                       multiple = FALSE,
                       ignore_case = TRUE,
@@ -261,7 +411,24 @@ match_arg <- function(arg, choices,
 #'
 #' @return numeric vector of breaks
 #'
+#' @author Andrew Stein
+#'
 #' @importFrom labeling extended
+#'
+#' @examples
+#' \dontrun{
+#' xgx_breaks_log10(c(1, 1000))
+#' xgx_breaks_log10(c(0.001, 100))
+#' xgx_breaks_log10(c(1e-4, 1e4))
+#' xgx_breaks_log10(c(1e-9, 1e9))
+#' xgx_breaks_log10(c(1, 2))
+#' xgx_breaks_log10(c(1, 5))
+#' xgx_breaks_log10(c(1, 10))
+#' xgx_breaks_log10(c(1, 100))
+#' xgx_breaks_log10(c(1, 1.01))
+#' xgx_breaks_log10(c(1, 1.0001))
+#' print(xgx_breaks_log10(c(1, 1.000001)), digits = 10)
+#' }
 #'
 xgx_breaks_log10 <-  function(data_range) {
   data_min <- min(log10(data_range))
@@ -301,6 +468,23 @@ xgx_breaks_log10 <-  function(data_range) {
 #'
 #' @importFrom labeling extended
 #'
+#' @author Andrew Stein
+#'
+#'
+#' @examples
+#' \dontrun{
+#' xgx_minor_breaks_log10(c(1, 1000))
+#' xgx_minor_breaks_log10(c(0.001, 100))
+#' xgx_minor_breaks_log10(c(1e-4, 1e4))
+#' xgx_minor_breaks_log10(c(1e-9, 1e9))
+#' xgx_minor_breaks_log10(c(1, 2))
+#' xgx_minor_breaks_log10(c(1, 5))
+#' xgx_minor_breaks_log10(c(1, 10))
+#' xgx_minor_breaks_log10(c(1, 100))
+#' xgx_minor_breaks_log10(c(1, 1.01))
+#' xgx_minor_breaks_log10(c(1, 1.0001))
+#' print(xgx_minor_breaks_log10(c(1, 1.000001)), digits = 10)
+#' }
 xgx_minor_breaks_log10 <-  function(data_range) {
   r1 <- range(log10(data_range))
   r <-  r1
@@ -315,5 +499,136 @@ xgx_minor_breaks_log10 <-  function(data_range) {
   minor_breaks <-  minor_breaks[minor_breaks >= 10^r1[1]]
   return(minor_breaks)
 }
+
+#' The function calls the \code{\link{baranyi}} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
+#'
+#' @param d  Numeric value, number of data sets. If \code{d} is a vector, only the first entry is used.
+#' @param y0  Numeric value, start density. If \code{t} is a vector, only the first entry is used.
+#' @param tmax  Numeric value, number of time points per data set. If \code{t} is a vector, only the first entry is used.
+#' @param mu Numeric value, maximum slope. If \code{mu} is a vector, only the first entry is used.
+#' @param lambda Numeric value, lag-phase. If \code{lambda} is a vector, only the first entry is used.
+#' @param A Numeric value, maximum density. If \code{A} is a vector, only the first entry is used.
+#' @param label Character string, condition label  If \code{label} is a vector, only the first entry is used.
+#'
+#' @return A list:
+#' \item{time}{numeric matrix of size \code{d}x\code{t}, each row represent the time points for which growth data is simulated and stored in each row of \code{data}.}
+#' \item{data}{data.frame of size \code{d}x(3+\code{t}), 1. column, character as an experiment identifier; 2. column: character, additional information about respecting experiment; 3. column: concentration of substrate of a compound under which the experiment is obtained; 4.-(3+t). column: growth data corresponding to the time points in \code{time}.}
+#'
+#' @export
+#'
+#' @references adapted from: Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
+#'
+#' examples
+#' # Create random growth data set
+#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#' rnd.data <- list()
+#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#' # Run growth curve analysis workflow
+#' gcFit <- growth.gcFit(time = rnd.data$time,
+#'                        data = rnd.data$data,
+#'                        parallelize = FALSE,
+#'                        control = growth.control(fit.opt = "s",
+#'                                                 suppress.messages = TRUE))
+#'
+#' # Perform dose-response analysis
+#' drFit <- growth.drFit(gcTable = gcFit$gcTable,
+#'              control = growth.control(dr.parameter = "mu.spline"))
+#'
+#' # Inspect results
+#' summary(drFit)
+#' plot(drFit)
+#'
+rdm.data <-
+  function (d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label = "Test1")
+  {
+    many.data  <- d <- d[1]
+    max.time  <- tmax <- tmax[1]
+    mu         <- mu[1]
+    y0          <- y0[1]
+    lambda     <- lambda[1]
+    A          <- A[1]
+    label <- label[1]
+
+    # /// check input
+    if (is.numeric(many.data)==FALSE) stop("Need numeric value for: d")
+    if (many.data<30) stop("Need number of datasets d > 30")
+    if (is.numeric(max.time)==FALSE) stop("Need numeric value for: t")
+    if (is.numeric(mu)==FALSE) stop("Need numeric value for: mu")
+    if (is.numeric(y0)==FALSE) stop("Need numeric value for: y0")
+    if (is.numeric(lambda)==FALSE) stop("Need numeric value for: lambda")
+    if (is.numeric(A)==FALSE) stop("Need numeric value for: A")
+
+    # /// set up time matrix
+    time  <- t(array(data = rep(seq(from = 0, to = max.time, by = 0.25), many.data),
+                     dim = c(max.time*4+1,many.data)))
+
+    # /// set up growth data array
+    data  <- data.frame(array(data = 0,
+                              dim = c(many.data,(max.time*4+1+3))
+                              )
+                        )
+
+    # /// number of datasets per test
+    nT1   <- round(d/3)
+    nT2   <- round(d/3)
+    nT3   <- d - nT1 - nT2
+    test1 <- rep(label  , nT1)
+    test2 <- rep(label , nT2)
+    test3 <- rep(label, nT3)
+
+    # /// concentrations + noise
+    conc1 <- signif(c(0, rev(unlist(lapply(1:(nT1-2), function(x) 1*(2/3)^x))),1), digits = 2)
+    conc2 <- signif(c(0, rev(unlist(lapply(1:(nT2-2), function(x) 1*(2/3)^x))),1), digits = 2)
+    conc3 <- signif(c(0, rev(unlist(lapply(1:(nT3-2), function(x) 1*(2/3)^x))),1), digits = 2)
+
+    data[,1] <- (c(test1, test2, test3))
+    data[,2] <- (c(rep(1, length(conc1)), rep(2, length(conc2)), rep(3, length(conc3))))
+    data[,3] <- (c(conc1, conc2, conc3))
+
+    # /// set parameter changes
+    mu.loop     <- mu - mu * data[,3]^1.5/( (mu/2)^2 + data[,3]^2 ) + stats::runif(d, -0.01, 0.01)
+    mu.loop <- abs(mu.loop)
+    mu.loop[c(length(test1),
+              (length(test1) + length(test2)),
+              (length(test1) + length(test2) + length(test3))
+    )] <- 0.5* mu.loop[c(length(test1)-1,
+                         (length(test1) + length(test2))-1,
+                         (length(test1) + length(test2) + length(test3))-1
+    )]
+    A.loop      <- abs(A - 1 * A * (0.001+data[,3])^(0.5) + stats::runif(d, -0.1, 0.1))
+    lambda.loop <- lambda + 0.6 * lambda * data[,3]^(0.7) + stats::runif(d, -0.3, 0.3)
+    y0.loop <- rep(y0, nrow(data)) + stats::runif(nrow(data), -0.005, 0.005)
+
+
+    # /// create growth data
+    for (i in 1:many.data){
+      data[i,4:ncol(data)] <- baranyi(time = time[i,],
+                                        A = A.loop[i],
+                                        mu = mu.loop[i],
+                                        lambda = lambda.loop[i],
+                                        addpar = y0.loop[i]) + 0.003*A*stats::rnorm(max.time*4+1)
+    }
+
+    # /// add information columns
+    data     <- data.frame(data)
+
+    # make non-log transformed data
+    for (i in 1:many.data){
+      data[i,4:ncol(data)] <- y0.loop[i] * exp(data[i,4:ncol(data)])
+    }
+    # for (i in 1:many.data){
+    #   data[i,4:ncol(data)] <- data[i,4:ncol(data)] * (A.loop[i]*data[i,4:ncol(data)]) + (1/70 * A.loop[i])
+    # }
+
+
+    # data[,2] <- (rep(c("A", "B", "C", "D", "E", "F", "G"), many.data ))[1:many.data]
+
+    rdm.data <- list(data=data, time=time)
+
+  }
 
 

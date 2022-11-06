@@ -2,7 +2,7 @@
 % Please edit documentation in R/parametric_fits.R
 \name{growth.param}
 \alias{growth.param}
-\title{Internal function called within \code{\link{growth.gcFitModel}}.}
+\title{Internal function called within \code{\link{growth.gcFitModel}} to perform growth model fitting.}
 \usage{
 growth.param(time, data, gcID = "undefined", control)
 }
@@ -16,5 +16,25 @@ growth.param(time, data, gcID = "undefined", control)
 \item{control}{A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.}
 }
 \description{
-Internal function called within \code{\link{growth.gcFitModel}}.
+Internal function called within \code{\link{growth.gcFitModel}} to perform growth model fitting.
+}
+\examples{
+\dontrun{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# /// conversion to handle even data.frame inputs
+time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
+data    <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
+
+# Perform parametric fit
+TestFit <- growth.param(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "m"))
+
+plot(TestFit, basesize = 18, eq.size = 1.5)
+}
 }

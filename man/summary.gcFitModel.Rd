@@ -17,3 +17,18 @@ A dataframe with parameters extracted from the growth model fit.
 \description{
 Generic summary function for gcFitModel objects
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Perform parametric fit
+TestFit <- growth.gcFitModel(time, data, gcID = "TestFit",
+                 control = growth.control(fit.opt = "m"))
+
+summary(TestFit)
+
+}

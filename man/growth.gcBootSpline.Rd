@@ -36,6 +36,24 @@ physiological parameters.
 \description{
 \code{growth.gcBootSpline} resamples the density-time value pairs in a dataset with replacement and performs a spline fit for each bootstrap sample.
 }
+\examples{
+# Create random growth dataset
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+
+# Extract time and growth data for single sample
+time <- rnd.dataset$time[1,]
+data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
+
+# Introduce some noise into the measurements
+data <- data + stats::runif(97, -0.01, 0.09)
+
+# Perform bootstrapping spline fit
+TestFit <- growth.gcBootSpline(time, data, gcID = "TestFit",
+              control = growth.control(fit.opt = "s", nboot.gc = 50))
+
+plot(TestFit, combine = TRUE, lwd = 0.5)
+
+}
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
 }

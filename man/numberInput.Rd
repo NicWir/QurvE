@@ -48,7 +48,7 @@ value and in allowing placeholders.
 }
 
 \examples{
-
+\donttest{
 if (interactive()) {
 library(shiny)
 library(shinysurveys)
@@ -61,6 +61,7 @@ server <- function(input, output) {
   output$value <- renderText({ input$obs })
 }
 shinyApp(ui, server)
+}
 }
 
 }

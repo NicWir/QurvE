@@ -1,6 +1,6 @@
 Package: QurvE
 Title: Robust and user-friendly analysis of growth curves
-Version: 0.9.2.3
+Version: 0.9.2.4
 Authors@R: 
     c(
     person( given = "Nicolas T.", 
@@ -120,6 +120,7 @@ Suggests:
     bookdown,
     Cairo,
     htmltools,
+    plotrix,
     prettydoc,
     rlang,
     shinyBS,

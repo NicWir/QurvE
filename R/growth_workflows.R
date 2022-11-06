@@ -43,6 +43,7 @@
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.
 #' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
 #' @param export.res (Logical) Create tab-separated TXT files containing calculated growth parameters and dose-response analysis results as well as an .RData file for the resulting `grodata` object at the end of the workflow.
+#' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
 #' @param ... Further arguments passed to the shiny app.
 #'
 #' @family workflows
@@ -62,6 +63,37 @@
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
+#'
+#' @examples
+#' # Create random growth data set
+#'   rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'   rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#'   rnd.data <- list()
+#'   rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#'   rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#'   # Run growth curve analysis workflow
+#'   res <- growth.workflow(time = rnd.data$time,
+#'                          data = rnd.data$data,
+#'                          fit.opt = "s",
+#'                          ec50 = FALSE,
+#'                          export.res = FALSE,
+#'                          suppress.messages = TRUE,
+#'                          parallelize = FALSE)
+#'
+#' # Load custom dataset
+#'   input <- read_data(data.density = system.file("2-FMA_toxicity.csv", package = "QurvE"))
+#'
+#'   res <- growth.workflow(grodata = input,
+#'                          fit.opt = c("s", "l"),
+#'                          ec50 = TRUE,
+#'                          export.res = FALSE,
+#'                          suppress.messages = TRUE,
+#'                          parallelize = FALSE)
+#'
+#'   plot(res)
+#'
 growth.workflow <- function (grodata = NULL,
                              time = NULL,
                              data = NULL,
@@ -109,6 +141,7 @@ growth.workflow <- function (grodata = NULL,
                              out.nm = NULL,
                              export.fig = FALSE,
                              export.res = FALSE,
+                             parallelize = TRUE,
                              ...
 )
 {
@@ -127,7 +160,7 @@ growth.workflow <- function (grodata = NULL,
 
   ## remove strictly defined arguments
   call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <-
-    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <- call$tmax <- call$max.density <-
+    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <- call$tmax <- call$max.density <- call$parallelize <-
     call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <- call$dr.method <- call$dr.model <-
     call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
 
@@ -181,8 +214,8 @@ growth.workflow <- function (grodata = NULL,
   class(out.drFit) <- "drFit"
 
   # /// fit of growth curves -----------------------------------
-  if(exists("shiny") && shiny == TRUE) out.gcFit <- growth.gcFit(time, data, control, shiny = TRUE)
-  else out.gcFit <- growth.gcFit(time, data, control)
+  if(exists("shiny") && shiny == TRUE) out.gcFit <- growth.gcFit(time, data, control, shiny = TRUE, parallelize = parallelize)
+  else out.gcFit <- growth.gcFit(time, data, control, parallelize = parallelize)
 
   # /// Estimate EC50 values
   if (ec50 == TRUE &&
@@ -214,11 +247,12 @@ growth.workflow <- function (grodata = NULL,
 
     gcTable <- data.frame(apply(grofit[["gcFit"]][["gcTable"]],2,as.character))
     res.table.gc <- cbind(gcTable[,1:3], Filter(function(x) !all(is.na(x)),gcTable[,-(1:3)]))
-    if(export.res)
+    if(export.res){
       export_Table(table = res.table.gc, out.dir = wd, out.nm = "results.gc")
-    # res.table.gc[, c(8:14, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
-    message(paste0("\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
-                   "...", gsub(".+/", "", wd), "/results.gc.txt'"))
+      # res.table.gc[, c(8:14, 20:27, 29:44)] <- apply(res.table.gc[, c(8:16, 20:27, 29:44)], 2, as.numeric)
+      message(paste0("\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
+                     "...", gsub(".+/", "", wd), "/results.gc.txt'"))
+    }
 
     # Export grouped results table
     if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
@@ -262,10 +296,11 @@ growth.workflow <- function (grodata = NULL,
         length(out.drFit) > 1
     ) {
       res.table.dr <- Filter(function(x) !all(is.na(x)),EC50.table)
-      if(export.res)
+      if(export.res){
         export_Table(table = res.table.dr, out.dir = wd, out.nm = "results.dr")
-      message(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
-                     "...", gsub(".+/", "", wd), "/results.dr.txt'"))
+        message(paste0("Results of EC50 analysis saved as tab-delimited text file in:\n'",
+                       "...", gsub(".+/", "", wd), "/results.dr.txt'"))
+      }
     } else {
       res.table.dr <- NULL
     }
@@ -291,8 +326,8 @@ growth.workflow <- function (grodata = NULL,
 #' @param data  Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
 #'   \item a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, a \code{'fluorescence'} dataframes,
 #'   or \item a dataframe containing density values (if a \code{time} matrix is provided as separate argument).}
-#' @param control A \code{grofit.control} object created with \code{\link{growth.control}},
-#'   defining relevant fitting options.
+#' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
+#' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
 #' @param ... Further arguments passed to the shiny app.
 #'
 #' @return A \code{gcFit} object that contains all growth fitting results, compatible with
@@ -319,13 +354,31 @@ growth.workflow <- function (grodata = NULL,
 #'   scale_color_brewer scale_fill_manual scale_x_continuous scale_y_continuous
 #'   scale_y_log10 theme theme_classic theme_minimal xlab ylab
 #' @import foreach
-growth.gcFit <- function(time, data, control= growth.control(), ...)
+#'
+#' # Create random growth data set
+#'   rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'   rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#'   rnd.data <- list()
+#'   rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#'   rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#' # Run growth curve analysis workflow
+#'   res <- growth.gcFit(time = rnd.data$time,
+#'                       data = rnd.data$data,
+#'                       parallelize = FALSE,
+#'                       control = growth.control(suppress.messages = TRUE,
+#'                                                fit.opt = "s"))
+#'
+#'
+#'
+growth.gcFit <- function(time, data, control= growth.control(), parallelize = TRUE, ...)
 {
   # Define objects based on additional function calls
   call <- match.call()
 
   ## remove strictly defined arguments
-  call$time <- call$data <- call$control <- NULL
+  call$time <- call$data <- call$control <- call$parallelize <- NULL
 
 
   arglist <- sapply(call, function(x) x)
@@ -382,7 +435,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
   reliability_tag_param <- NA
   reliability_tag_nonpara <- NA
 
-  if(control$interactive == FALSE &&
+  if(control$interactive == FALSE && parallelize == TRUE &&
      dim(data)[1] > 30 &&
      (
        ("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ||
@@ -531,7 +584,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
       cat(paste("=== ", as.character(i), ". [", wellname, "] growth curve =================================\n", sep=""))
       cat("----------------------------------------------------\n")
     }
-    if(control$interactive == TRUE ||
+    if(parallelize == FALSE || control$interactive == TRUE ||
        dim(data)[1] <= 30 ||
        !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
     ){
@@ -760,7 +813,7 @@ growth.gcFit <- function(time, data, control= growth.control(), ...)
       fitnonpara.all[[i]]$reliable <- TRUE
       fitpara.all[[i]]$reliable <- TRUE
     }
-    if(control$interactive == TRUE ||
+    if(parallelize == FALSE || control$interactive == TRUE ||
        dim(data)[1] <= 30 ||
        !("l" %in% control$fit.opt || "a" %in% control$fit.opt || ("s" %in% control$fit.opt && control$nboot.gc > 10))
     ){

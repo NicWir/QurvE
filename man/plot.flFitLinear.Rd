@@ -59,3 +59,24 @@
 \description{
 \code{plot.flFitLinear} shows the results of a linear regression and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
 }
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Extract time and normalized fluorescence data for single sample
+time <- input$time[4,]
+data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
+
+# Perform linear fit
+TestFit <- flFitLinear(time = time,
+                       fl_data = data,
+                       ID = "TestFit",
+                       control = fl.control(fit.opt = "l", x_type = "time",
+                       lin.R2 = 0.95, lin.RSD = 0.1,
+                       lin.h = 20))
+
+plot(TestFit)
+}
