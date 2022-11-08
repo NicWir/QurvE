@@ -212,11 +212,13 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #'
 #' @examples
 #' \dontrun{
-#' grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+#' grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx",
+#'                                                     package = "QurvE"),
 #'                       sheet.data = 1,
 #'                       density.nm = "Read 3:630",
 #'                       fl.nm = "GFP:485,528",
-#'                       map.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+#'                       map.file = system.file("fluorescence_test_Gen5.xlsx",
+#'                                              package = "QurvE"),
 #'                       sheet.map = "mapping",
 #'                       software = "Gen5",
 #'                       convert.time = "y = x * 24", # convert days to hours
@@ -1033,7 +1035,7 @@ numberInput <- function(inputId, label, value = NULL, min = NA, max = NA, step =
   shiny::tagList(
     shiny::div(class = "surveyNumericInput form-group shiny-input-container",
                style = htmltools::css(width = shiny::validateCssUnit(width)),
-               shinyInputLabel(inputId, label), inputTag)
+               shiny:::shinyInputLabel(inputId, label), inputTag)
 
   )
 }

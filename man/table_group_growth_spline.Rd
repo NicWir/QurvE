@@ -18,6 +18,7 @@ A data frame with grouped spline fit results. Empty cells indicate that no relia
 Generate a grouped results table for spline fits with average and standard deviations
 }
 \examples{
+\dontrun{
 # Create random growth data set
 rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -41,4 +42,5 @@ table_group_growth_spline(res$gcFit$gcTable)
 DT::datatable(table_group_growth_spline(res$gcFit$gcTable, html = TRUE),
               escape = FALSE) # Do not escape HTML entities
 
+}
 }

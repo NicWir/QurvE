@@ -6,6 +6,7 @@
 #' @return A data frame with grouped linear fit results. Empty cells indicate that no reliable fit could be determined.
 #'
 #' @examples
+#' \dontrun{
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -25,7 +26,7 @@
 #' DT::datatable(table_group_fluorescence_linear(res$flFit$flTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
 #'
-#'
+#'}
 table_group_fluorescence_linear <- function(flTable, html = FALSE)
 {
   nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
@@ -142,6 +143,7 @@ table_group_fluorescence_linear <- function(flTable, html = FALSE)
 #' @return A data frame with grouped spline fit results. Empty cells indicate that no reliable fit could be determined.
 #'
 #' @examples
+#' \dontrun{
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -161,7 +163,7 @@ table_group_fluorescence_linear <- function(flTable, html = FALSE)
 #' DT::datatable(table_group_fluorescence_spline(res$flFit$flTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
 #'
-#'
+#' }
 table_group_fluorescence_spline <- function(flTable, html = FALSE)
 {
   nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
@@ -263,6 +265,7 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
 #' @return A data frame with grouped linear fit results. Empty cells indicate that no reliable fit could be determined.
 #'
 #' @examples
+#' \dontrun{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -285,7 +288,7 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
 #' # with HTML formatting
 #' DT::datatable(table_group_growth_linear(res$gcFit$gcTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
-#'
+#' }
 table_group_growth_linear <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
@@ -416,6 +419,7 @@ table_group_growth_linear <- function(gcTable, html = FALSE)
 #' @return A data frame with grouped spline fit results. Empty cells indicate that no reliable fit could be determined.
 #'
 #' @examples
+#' \dontrun{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -439,6 +443,7 @@ table_group_growth_linear <- function(gcTable, html = FALSE)
 #' DT::datatable(table_group_growth_spline(res$gcFit$gcTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
 #'
+#' }
 table_group_growth_spline <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
@@ -552,6 +557,7 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
 #' @return A data frame with grouped model fit results. Empty cells indicate that no reliable fit could be determined.
 #'
 #' @examples
+#' \dontrun{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -574,6 +580,7 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
 #' # with HTML formatting
 #' DT::datatable(table_group_growth_model(res$gcFit$gcTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
+#' }
 #'
 table_group_growth_model <- function(gcTable, html = FALSE)
 {
@@ -680,6 +687,7 @@ table_group_growth_model <- function(gcTable, html = FALSE)
 #' @return A vector of strings containing parameter averages.
 #'
 #' @examples
+#' \dontrun{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -701,6 +709,7 @@ table_group_growth_model <- function(gcTable, html = FALSE)
 #' ndx.rep <- lapply(1:length(conc), function(x) grep(paste0("Test1.+", conc[x]), res$expdesign$label))
 #'
 #' get_avg_param(res$gcFit$gcTable, ndx.rep, "mu.spline")
+#' }
 #'
 get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
 {
@@ -733,6 +742,7 @@ get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2
 #' @return A vector of strings containing parameter standard deviations.
 #'
 #' @examples
+#' \dontrun{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -754,6 +764,7 @@ get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2
 #' ndx.rep <- lapply(1:length(conc), function(x) grep(paste0("Test1.+", conc[x]), res$expdesign$label))
 #'
 #' get_sd_param(res$gcFit$gcTable, ndx.rep, "mu.spline")
+#' }
 #'
 get_sd_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
 {

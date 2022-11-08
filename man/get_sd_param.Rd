@@ -22,6 +22,7 @@ A vector of strings containing parameter standard deviations.
 Internal function used within the \code{table_group} set of functions.
 }
 \examples{
+\dontrun{
 # Create random growth data set
 rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -43,5 +44,6 @@ conc <- unique(res$expdesign$concentration)
 ndx.rep <- lapply(1:length(conc), function(x) grep(paste0("Test1.+", conc[x]), res$expdesign$label))
 
 get_sd_param(res$gcFit$gcTable, ndx.rep, "mu.spline")
+}
 
 }
