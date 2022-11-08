@@ -18,7 +18,7 @@ utils::globalVariables(c("shiny"))
   #     paste0(
   #       "Your installed QurvE is outdated! A new version (",
   #       github_version,
-  #       ") is available on Github. You can install the most recent development version by executing: devtools::install_github('NicWir/QurvE')."
+  #       ") is available on Github. You can install the most recent development version by installing package 'devtools' and running: devtools::install_github('NicWir/QurvE')."
   #     )
   #   )
   # }
@@ -58,6 +58,7 @@ suppress_warnings <- function(.expr, .f, ...) {
 #'        scale_x_log10(breaks = base_breaks(n = 10)) +
 #'        scale_y_log10(breaks = base_breaks(n = 6))
 #' }
+#'
 base_breaks <- function(n = 10){
   function(x) {
     grDevices::axisTicks(log10(range(x, na.rm = TRUE)), log = TRUE, n = n)
@@ -132,6 +133,7 @@ inflect <- function(x, threshold = 1){
 #' df2 <- plyr::rdply(10, rep("X",3))[ ,-1]
 #' zipFastener(df1, df2)
 #' zipFastener(df2, df1, 2)
+#'
 zipFastener <- function(df1, df2, along=2)
 {
   # parameter checking
@@ -198,6 +200,7 @@ zipFastener <- function(df1, df2, along=2)
 #' n <- seq(1:10)
 #' conc <- rev(10*(1/2)^n)
 #' fit <- biosensor.eq(conc, 300, 82000, 0.85, 2)
+#'
 biosensor.eq <- function (x, y.min, y.max, K, n)
 {
   y.min <- y.min[1]

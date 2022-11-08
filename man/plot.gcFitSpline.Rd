@@ -86,6 +86,9 @@
 
 \item{...}{Further arguments to refine the generated base R plot (if \code{add = TRUE}.}
 }
+\value{
+A plot with the nonparametric fit.
+}
 \description{
 code{plot.gcFitSpline} generates the spline fit plot for a single sample.
 }

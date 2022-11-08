@@ -14,7 +14,7 @@ parse_Gen5Gen6_shiny(data, density.nm, fl.nm)
 \item{fl.nm}{Name of read corresponding to fluorescence data}
 }
 \value{
-a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
 }
 \description{
 Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.

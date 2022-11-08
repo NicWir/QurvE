@@ -11,6 +11,15 @@ colFmt(x, color)
 
 \item{color}{(Character) A color.}
 }
+\value{
+A LaTeX- or HTML-formatted string to assign a color to text based on the output format.
+}
 \description{
 \code{colFmt} formats the input depending on PDF or HTML output to give colored text in reports.
+}
+\examples{
+\dontrun{
+# the example below is meaningless unless you put it in a markdown document
+colFmt("Test_text", "Red")
+}
 }

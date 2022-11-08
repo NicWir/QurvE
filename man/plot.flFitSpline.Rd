@@ -77,6 +77,9 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A plot with the nonparametric fit.
+}
 \description{
 \code{plot.flFitSpline} generates the spline fit plot for a single sample.
 }

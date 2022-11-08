@@ -71,6 +71,9 @@
 
 \item{...}{Further arguments to refine the generated base R plot.}
 }
+\value{
+A plot with the nonparametric dose-response fit.
+}
 \description{
 code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
 }

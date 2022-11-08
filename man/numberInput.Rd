@@ -48,7 +48,7 @@ value and in allowing placeholders.
 }
 
 \examples{
-\donttest{
+\dontrun{
 if (interactive()) {
 library(shiny)
 library(shinysurveys)
@@ -69,5 +69,5 @@ shinyApp(ui, server)
 Trattner, J. (2021) shinysurveys: Create and Deploy Surveys in 'Shiny' (R package version 0.2.0)
 }
 \seealso{
-\code{\link[shiny:updateNumericInput]{shiny::updateNumericInput()}}
+\code{\link[shiny]{updateNumericInput}}
 }

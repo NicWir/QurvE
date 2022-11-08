@@ -56,6 +56,9 @@
 
 \item{...}{Further arguments to refine the generated base R plot.}
 }
+\value{
+A plot with the linear fit.
+}
 \description{
 \code{plot.flFitLinear} shows the results of a linear regression and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
 }

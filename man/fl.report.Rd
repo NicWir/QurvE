@@ -33,6 +33,27 @@ fl.report(
 \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 }}
 }
+\value{
+\code{NULL}
+}
 \description{
 \code{fl.report} requires a \code{flFitRes} object and creates a report in PDF and HTML format that summarizes all results obtained.
+}
+\examples{
+# load example dataset
+\dontrun{
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Run workflow
+res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+                   x_type = "time", norm_fl = TRUE,
+                   dr.parameter = "max_slope.spline",
+                   suppress.messages = TRUE,
+                   parallelize = FALSE)
+
+fl.report(res)
+}
 }

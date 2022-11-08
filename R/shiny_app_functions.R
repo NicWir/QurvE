@@ -5,6 +5,12 @@
 #' @importFrom readxl read_excel excel_sheets
 #'
 #' @import shiny doParallel knitr
+#' @return Launches a browser with the shiny app
+#' @examples
+#' \dontrun{
+#' # Run the app
+#' run_app()
+#' }
 run_app <- function() {
 
   # Locate all the shiny apps that exist
@@ -201,10 +207,21 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 #'
 #' @rdname parse_data
-#' @export lm_parms
 #'
 #' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.
 #'
+#' @examples
+#' \dontrun{
+#' grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+#'                       sheet.data = 1,
+#'                       density.nm = "Read 3:630",
+#'                       fl.nm = "GFP:485,528",
+#'                       map.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+#'                       sheet.map = "mapping",
+#'                       software = "Gen5",
+#'                       convert.time = "y = x * 24", # convert days to hours
+#'                       calibration = "y = x * 3.058") # convert absorbance to OD values
+#' }
 parse_data_shiny <-
   function(data.file = NULL,
            map.file = NULL,
@@ -339,7 +356,7 @@ parse_data_shiny <-
 #' @param density.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence data
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
 #'
 #' @examples
 #' \dontrun{
@@ -872,8 +889,7 @@ write.csv.utf8.BOM <- function(df, filename)
 #' @param fade If \code{FALSE}, the modal dialog will have no fade-in animation (it will simply appear rather than fade in to view).
 #' @param idcss CSS class of the modal
 #'
-#' @return \code{div} HTML tag for modal
-#' @export
+#' @return \code{div} HTML tag for a modal dialog
 #'
 #' @author Stackoverflow user \code{mfindinge}
 #' @examples
@@ -954,9 +970,6 @@ help_modal <- function (..., title = NULL, footer = NULL,
     tags$script("$('#shiny-modal').modal().focus();"))
 }
 
-
-shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")
-
 #' Create a numeric input
 #'
 #' Create an input control for entry of numeric values. This is identical to
@@ -977,10 +990,10 @@ shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")
 #'
 #' @return A numeric input control that can be added to a UI definition.
 #'
-#' @seealso [shiny::updateNumericInput()]
+#' @seealso \code{\link[shiny]{updateNumericInput}}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' if (interactive()) {
 #' library(shiny)
 #' library(shinysurveys)
@@ -998,7 +1011,6 @@ shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")
 #'
 #' @section Server value: A numeric vector of length 1.
 #'
-#' @export
 #'
 #' @references Trattner, J. (2021) shinysurveys: Create and Deploy Surveys in 'Shiny' (R package version 0.2.0)
 #'

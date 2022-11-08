@@ -25,6 +25,8 @@
 #' @export plot.gcFitLinear
 #' @export
 #'
+#' @return A plot with the linear fit.
+#'
 #' @examples
 #' # Create random growth dataset
 #' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
@@ -262,6 +264,8 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated \code{ggplot2} plot.
+#'
+#' @return A plot with the parametric fit.
 #'
 #' @export plot.gcFitModel
 #' @export
@@ -555,6 +559,8 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param combine (Logical) Indicate whether both dose-response curves and parameter plots shall be shown within the same window.
 #' @param ... Further arguments to refine the generated base R plot.
+#'
+#' @return A plot with the all dose-response spline fits from the bootstrapping operation.
 #'
 #' @export plot.drBootSpline
 #' @export
@@ -937,6 +943,8 @@ plot.drBootSpline <- function (x,
 #' @param log.x (Logical) Log-transform the x-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
+#' @return One plot per condition tested in the dose-response analysis or a single plot showing all conditions if \code{control = growth.control(dr.method = "spline")} was used in \code{\link{growth.drFit}} and \code{combine = TRUE}.
+#'
 #' @export plot.drFit
 #' @export
 #' @importFrom ggplot2 aes element_text geom_errorbar geom_line
@@ -1248,6 +1256,8 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot.
 #'
+#' @return A plot with the nonparametric dose-response fit.
+#'
 #' @export plot.drFitSpline
 #' @export
 #'
@@ -1426,6 +1436,8 @@ plot.drFitSpline <- function (x,
 #' @param legendPos (Numeric) Vector of length 2 giving the position of the legend.
 #' @param cex.legend numeric specifying the legend text size.
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
+#'
+#' @return A plot with the dose-response model fit.
 #'
 #' @export plot.drFitModel
 #' @export
@@ -1705,6 +1717,8 @@ plot.drFitModel <- function(x,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param combine (Logical) Indicate whether both growth curves and parameter plots shall be shown within the same window.
 #' @param ... Further arguments to refine the generated base R plot.
+#'
+#' @return A single plot with the all spline growth fits from the bootstrapping operation and statistical distribution of growth parameters if \code{combine = TRUE} or separate plots for growth fits and parameter distributions (if \code{combine = FALSE}).
 #'
 #' @export plot.gcBootSpline
 #' @export
@@ -2071,6 +2085,8 @@ plot.gcBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Further arguments to refine the generated base R plot (if \code{add = TRUE}.
+#'
+#' @return A plot with the nonparametric fit.
 #'
 #' @export plot.gcFitSpline
 #' @export
@@ -2743,6 +2759,8 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab xlim ylim
 #'
+#' @return A plot with all growth curves (raw measurements or nonparametric fits) in a dataset, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
+#'
 #' @examples
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
@@ -3364,7 +3382,7 @@ base_breaks <- function(n = 10){
 
 #' Generic plot function for \code{grodata} objects. Plots raw density, fluorescence, or normalized fluorescence data of multiple samples or conditions.
 #'
-#' \code{plot.grodata} calls \code{link{plot.grofit}} or \code{link{plot.flFitRes}} based on the chosen \code{data.type}, respectively.
+#' \code{plot.grodata} calls \code{\link{plot.grofit}} or \code{\link{plot.flFitRes}} based on the chosen \code{data.type}, respectively.
 #'
 #'
 #' @param x A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}.
@@ -3397,6 +3415,8 @@ base_breaks <- function(n = 10){
 #'
 #' @export plot.grodata
 #' @export
+#'
+#' @return A plot with all growth curves (raw measurements) in a dataset, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
 #'
 #' @examples
 #' # Create random growth data sets
@@ -3553,6 +3573,8 @@ plot.grodata <- function(x,
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab geom_hline geom_col
+#'
+#' @return A column plot comparing a selected growth parameter between tested conditions.
 #'
 #' @examples
 #' # Create random growth data set
@@ -3873,6 +3895,8 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
 #'
 #' @export plot.dr_parameter
 #' @export
+#'
+#' @return A column plot comparing a selected parameter of a dose-response analysis between tested conditions.
 #'
 #' @examples
 #' # Create random growth data set

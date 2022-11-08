@@ -74,6 +74,9 @@
 
 \item{...}{Further arguments to refine the generated base R plot.}
 }
+\value{
+A plot with the biosensor dose-response model fit.
+}
 \description{
 Generic plot function for \code{drFitFLModel} objects.
 }

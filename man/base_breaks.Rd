@@ -30,4 +30,5 @@ ggplot(df, aes(x = x, y = y)) +
        scale_x_log10(breaks = base_breaks(n = 10)) +
        scale_y_log10(breaks = base_breaks(n = 6))
 }
+
 }

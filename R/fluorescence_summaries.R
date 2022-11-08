@@ -3,7 +3,8 @@
 #' @param object object of class \code{flFitSpline}
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
-#' @return A dataframe with parameters extracted from the nonparametric fit.
+#' @return A dataframe with parameters extracted from a nonparametric fit.
+#'
 #' @export
 #'
 #' @examples
@@ -56,8 +57,10 @@ summary.flFitSpline <- function(object,...)
 #' @param object object of class \code{flFitLinear}
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
-#' @return A dataframe with parameters extracted from the linear fit.
+#' @return A dataframe with parameters extracted from a linear fit.
+#'
 #' @export
+#'
 #' @examples
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -120,7 +123,8 @@ summary.flFitLinear <- function(object,...)
 #' @param object object of class \code{flBootSpline}
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
-#' @return A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
+#' @return A dataframe with statistical parameters extracted from a dose-response bootstrapping analysis.
+#'
 #' @export
 #'
 #' @examples
@@ -192,7 +196,9 @@ summary.flBootSpline <- function(object, ...)
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with parameters extracted from all fits of a workflow.
+#'
 #' @export
+#'
 #' @examples
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -222,6 +228,7 @@ summary.flFit <- function(object,...)
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @return A dataframe with biosensor response parameters.
+#'
 #' @export
 #'
 #' @examples
@@ -249,7 +256,8 @@ summary.drFitFLModel <- function(object, ...)
 #' @param object object of class \code{drFitfl}
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
-#' @return A dataframe with parameters for all samples extracted from the dose-response analysis.
+#' @return A dataframe with parameters for all samples extracted from a dose-response analysis.
+#'
 #' @export
 #'
 #' @examples

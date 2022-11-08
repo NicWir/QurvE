@@ -22,6 +22,8 @@
 #' @export plot.flFitLinear
 #' @export
 #'
+#' @return A plot with the linear fit.
+#'
 #' @examples
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -310,6 +312,8 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
+#'
+#' @return A plot with the nonparametric fit.
 #'
 #' @examples
 #' # load example dataset
@@ -703,6 +707,8 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 #' @export plot.flBootSpline
 #' @export
 #'
+#' @return A single plot with the all spline fits from the bootstrapping operation and statistical distribution of parameters if \code{combine = TRUE} or separate plots for fits and parameter distributions (if \code{combine = FALSE}).
+#'
 #' @examples
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -1084,6 +1090,8 @@ plot.flBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
 #' @export plot.drFitFLModel
 #' @export
 #'
+#' @return A plot with the biosensor dose-response model fit.
+#'
 #' @examples
 #' # Create concentration values via a serial dilution
 #' conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
@@ -1413,6 +1421,8 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #' @export plot.flFitRes
 #' @export
 #'
+#' @return A plot with all curves (nonparametric fits, raw fluorescence measurements, or raw normalized fluorescence over time) in a \code{flFitRes} object created with \code{\link{fl.workflow}}, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
+#'
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggtitle labs guides
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
@@ -1429,6 +1439,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #' res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
 #'                    x_type = "time", norm_fl = TRUE,
 #'                    dr.parameter = "max_slope.spline",
+#'                    suppress.messages = TRUE,
 #'                    parallelize = FALSE)
 #'
 #' plot(res, legend.ncol = 3, basesize = 15)
@@ -1754,13 +1765,16 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
     #   }
     p <- ggplot(df, aes(x=.data$time, y=.data$mean, col = .data$name)) +
       geom_line(size=lwd) +
-      geom_ribbon(aes(ymin=.data$lower,ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())
+
+    if(!all(is.na(df$upper)))
+      p <- suppressWarnings(p + geom_ribbon(data = df, aes(ymin=.data$lower,ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA)
+      )
 
     if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
     else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
@@ -1823,12 +1837,14 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
       }
       p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$mean, col = .data$name)) +
         geom_line(size=lwd) +
-        geom_ribbon(aes(ymin=.data$lower, ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
         theme(legend.position=legend.position,
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())
+
+      if(!all(is.na(df.deriv$upper)))
+        p.deriv <- p.deriv + geom_ribbon(data = df.deriv, aes(ymin=.data$lower, ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA)
 
       y.label.mu = if(object$control$log.y.spline == TRUE){
         paste0("Slope [d(Ln(F/F0))/d",xlab.title, "]")
@@ -2101,6 +2117,7 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
 #' @rdname plot.flFitRes
 #' @export plot.flFit
 #' @export
+#' @return A plot with all curves (raw fluorescence measurements or raw normalized fluorescence over time) in a \code{flFit} object with \code{\link{flFit}}, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
 #' @examples
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -2157,6 +2174,8 @@ plot.flFit <- plot.flFitRes
 #'
 #' @export plot.dual
 #' @export
+#'
+#' @return A two-panel plot, showing raw fluorescence (\code{fluorescence = "fl"}) or normalized fluorescence (\code{fluorescence = "norm.fl"}) over time in the top panel, and density over time in the bottom panel.
 #'
 #' @examples
 #' # load example dataset
@@ -2737,6 +2756,8 @@ plot.dual <-  function(x,
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
+#' @return One plot per condition tested in the dose-response analysis (\code{\link{fl.drFit}} with \code{control = fl.control(dr.method = "model")}).
+#'
 #' @export plot.drFitfl
 #' @export
 #'
@@ -2774,7 +2795,8 @@ plot.drFitfl <- function(x, ec50line = TRUE, log = c("xy"), pch = 1, broken = TR
   drFitfl <- x
   # x an object of class drFitfl
   if(methods::is(drFitfl) != "drFitfl") stop("x needs to be an object of class 'drFitfl', created with fl.drFit(control=fl.control(dr.method='model').")
-  if(length(drFitfl) == 1) stop("drFitfl is NA. Please run growth.drFitfl() with valid data input or growth.workflow() with 'ec50 = T'.")
+  if(length(drFitfl) == 1) stop("drFitfl is NA. Please run fl.drFit() with dr.method = 'model' in the control object.")
+  if(drFitfl$control$dr.method != "model") stop("x needs")
     n <- length(drFitfl$drFittedModels)
       # /// plot all plot.drFitFLModel objects
       for (i in 1:n) {

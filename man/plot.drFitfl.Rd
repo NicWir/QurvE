@@ -74,6 +74,9 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+One plot per condition tested in the dose-response analysis (\code{\link{fl.drFit}} with \code{control = fl.control(dr.method = "model")}).
+}
 \description{
 code{drFitfl} calls \code{\link{plot.drFitFLModel}} for each group used in a dose-response analysis with \code{dr.method = "model"}
 }

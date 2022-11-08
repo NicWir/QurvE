@@ -89,8 +89,11 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A plot with all growth curves (raw measurements) in a dataset, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
+}
 \description{
-\code{plot.grodata} calls \code{link{plot.grofit}} or \code{link{plot.flFitRes}} based on the chosen \code{data.type}, respectively.
+\code{plot.grodata} calls \code{\link{plot.grofit}} or \code{\link{plot.flFitRes}} based on the chosen \code{data.type}, respectively.
 }
 \examples{
 # Create random growth data sets

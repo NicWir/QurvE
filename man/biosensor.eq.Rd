@@ -27,6 +27,7 @@ Calculates the values of biosensor response model for given time points and resp
 n <- seq(1:10)
 conc <- rev(10*(1/2)^n)
 fit <- biosensor.eq(conc, 300, 82000, 0.85, 2)
+
 }
 \references{
 Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. \emph{Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors.} Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3

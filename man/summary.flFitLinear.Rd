@@ -12,7 +12,7 @@
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \value{
-A dataframe with parameters extracted from the linear fit.
+A dataframe with parameters extracted from a linear fit.
 }
 \description{
 Generic summary function for flFitLinear objects

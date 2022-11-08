@@ -12,7 +12,7 @@
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \value{
-A dataframe with parameters extracted from the nonparametric fit.
+A dataframe with parameters extracted from a nonparametric fit.
 }
 \description{
 Generic summary function for flFitSpline objects

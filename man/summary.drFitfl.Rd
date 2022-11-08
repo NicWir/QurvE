@@ -12,7 +12,7 @@
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \value{
-A dataframe with parameters for all samples extracted from the dose-response analysis.
+A dataframe with parameters for all samples extracted from a dose-response analysis.
 }
 \description{
 Generic summary function for drFitfl objects

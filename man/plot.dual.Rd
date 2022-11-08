@@ -98,6 +98,9 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A two-panel plot, showing raw fluorescence (\code{fluorescence = "fl"}) or normalized fluorescence (\code{fluorescence = "norm.fl"}) over time in the top panel, and density over time in the bottom panel.
+}
 \description{
 \code{plot.dual} creates a two-panel plot in which fluorescence or density values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
 }

@@ -59,6 +59,9 @@
 
 \item{...}{Further arguments to refine the generated \code{ggplot2} plot.}
 }
+\value{
+A plot with the parametric fit.
+}
 \description{
 Plot the results of a parametric model fit on density vs. time data
 }

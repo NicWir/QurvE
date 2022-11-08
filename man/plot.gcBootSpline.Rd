@@ -65,6 +65,9 @@
 
 \item{...}{Further arguments to refine the generated base R plot.}
 }
+\value{
+A single plot with the all spline growth fits from the bootstrapping operation and statistical distribution of growth parameters if \code{combine = TRUE} or separate plots for growth fits and parameter distributions (if \code{combine = FALSE}).
+}
 \description{
 Generic plot function for \code{gcBootSpline} objects.
 }

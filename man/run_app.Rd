@@ -6,6 +6,15 @@
 \usage{
 run_app()
 }
+\value{
+Launches a browser with the shiny app
+}
 \description{
 Run Shiny QurvE App
+}
+\examples{
+\dontrun{
+# Run the app
+run_app()
+}
 }

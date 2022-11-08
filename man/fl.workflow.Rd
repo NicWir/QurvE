@@ -157,6 +157,7 @@ input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "Q
 res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
                    x_type = "time", norm_fl = TRUE,
                    dr.parameter = "max_slope.spline",
+                   suppress.messages = TRUE,
                    parallelize = FALSE)
 
 plot(res, data.type = "raw", legend.ncol = 3, basesize = 15)

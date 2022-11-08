@@ -53,6 +53,9 @@ or 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'.}
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A column plot comparing a selected parameter of a dose-response analysis between tested conditions.
+}
 \description{
 \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95\% confidence interval (only shown for > 2 replicates).
 }

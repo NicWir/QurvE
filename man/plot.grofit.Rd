@@ -98,6 +98,9 @@
 
 \item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 }
+\value{
+A plot with all growth curves (raw measurements or nonparametric fits) in a dataset, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
+}
 \description{
 \code{plot.grofit} extracts the spline fits of a subset of samples in a \code{grofit} object calculates averages and standard deviations of conditions with replicates and combines them into a single plot.
 }

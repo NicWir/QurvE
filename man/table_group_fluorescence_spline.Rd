@@ -12,8 +12,30 @@ table_group_fluorescence_spline(flTable, html = FALSE)
 \item{html}{(Logical) Should column headers contain html formatting?}
 }
 \value{
-A data frame with grouped spline fit results
+A data frame with grouped spline fit results. Empty cells indicate that no reliable fit could be determined.
 }
 \description{
 Generate a grouped results table for spline fits with average and standard deviations
+}
+\examples{
+# load example dataset
+input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+                   sheet.density = 1,
+                   sheet.fl = 2 )
+
+# Run workflow
+res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+                   x_type = "time", norm_fl = TRUE,
+                   dr.parameter = "max_slope.spline",
+                   suppress.messages = TRUE,
+                   parallelize = FALSE)
+
+table_group_fluorescence_spline(res$flFit$flTable)
+
+# with HTML formatting
+DT::datatable(table_group_fluorescence_spline(res$flFit$flTable, html = TRUE),
+              escape = FALSE) # Do not escape HTML entities
+
+
 }

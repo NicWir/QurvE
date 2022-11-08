@@ -132,6 +132,11 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A plot with all curves (nonparametric fits, raw fluorescence measurements, or raw normalized fluorescence over time) in a \code{flFitRes} object created with \code{\link{fl.workflow}}, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
+
+A plot with all curves (raw fluorescence measurements or raw normalized fluorescence over time) in a \code{flFit} object with \code{\link{flFit}}, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
+}
 \description{
 Visualize fluorescence, normalized fluorescence, or spline fits of multiple sample groups in a single plot.
 }
@@ -146,6 +151,7 @@ input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "Q
 res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
                    x_type = "time", norm_fl = TRUE,
                    dr.parameter = "max_slope.spline",
+                   suppress.messages = TRUE,
                    parallelize = FALSE)
 
 plot(res, legend.ncol = 3, basesize = 15)

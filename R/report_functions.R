@@ -29,9 +29,31 @@
 #' @importFrom kableExtra kable_styling column_spec linebreak
 #' @include utils.R
 #' @family reports
+#' @return \code{NULL}
+#' @examples
+#' \dontrun{
+#' # Create random growth data set
+#'   rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'   rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#'   rnd.data <- list()
+#'   rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#'   rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#'   # Run growth curve analysis workflow
+#'   res <- growth.workflow(time = rnd.data$time,
+#'                          data = rnd.data$data,
+#'                          fit.opt = "s",
+#'                          ec50 = FALSE,
+#'                          export.res = FALSE,
+#'                          suppress.messages = TRUE,
+#'                          parallelize = FALSE)
+#'
+#'   growth.report(res)
+#' }
 growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
 {
-  if(any(format) %in% "pdf"){
+  if(any(format %in% "pdf")){
     if (!requireNamespace("tinytex", quietly = TRUE)) {
       stop("Please install package 'tinytex' to render PDF reports.")
     } else if(!tinytex::is_tinytex()){
@@ -112,6 +134,7 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
   message(paste0("Report files saved in: '/", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
   try(removeModal(), silent = TRUE)
+  NULL
 }
 
 #' Create a PDF and HTML report with results from a fluorescence analysis workflow
@@ -143,9 +166,27 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
 #' @importFrom kableExtra kable_styling column_spec linebreak
 #' @import knitr
 #' @include utils.R
+#' @return \code{NULL}
+#' @examples
+#' # load example dataset
+#' \dontrun{
+#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                    sheet.density = 1,
+#'                    sheet.fl = 2 )
+#'
+#' # Run workflow
+#' res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
+#'                    x_type = "time", norm_fl = TRUE,
+#'                    dr.parameter = "max_slope.spline",
+#'                    suppress.messages = TRUE,
+#'                    parallelize = FALSE)
+#'
+#' fl.report(res)
+#' }
 fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, format = c('pdf', 'html'), export = FALSE, ...)
 {
-  if(any(format) %in% "pdf"){
+  if(any(format %in% "pdf")){
     if (!requireNamespace("tinytex", quietly = TRUE)) {
       stop("Please install package 'tinytex' to render PDF reports.")
     } else if(!tinytex::is_tinytex()){
@@ -243,6 +284,7 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
   message(paste0("Files saved in: '", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
   try(removeModal(), silent = TRUE)
+  NULL
 }
 
 #' Format font color for Markdown reports
@@ -251,6 +293,12 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
 #'
 #' @param x A character string. The text to be colored.
 #' @param color (Character) A color.
+#' @return A LaTeX- or HTML-formatted string to assign a color to text based on the output format.
+#' @examples
+#' \dontrun{
+#' # the example below is meaningless unless you put it in a markdown document
+#' colFmt("Test_text", "Red")
+#' }
 colFmt <- function(x, color) {
   outputFormat <- knitr::opts_knit$get("rmarkdown.pandoc.to")
 

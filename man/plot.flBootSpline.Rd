@@ -65,6 +65,9 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A single plot with the all spline fits from the bootstrapping operation and statistical distribution of parameters if \code{combine = TRUE} or separate plots for fits and parameter distributions (if \code{combine = FALSE}).
+}
 \description{
 Generic plot function for \code{flBootSpline} objects.
 }

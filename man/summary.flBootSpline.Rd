@@ -12,7 +12,7 @@
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \value{
-A dataframe with statistical parameters extracted from the dose-response bootstrapping analysis.
+A dataframe with statistical parameters extracted from a dose-response bootstrapping analysis.
 }
 \description{
 Generic summary function for flBootSpline objects

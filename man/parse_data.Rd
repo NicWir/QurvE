@@ -86,4 +86,15 @@ grodata <- parse_data(data.file = system.file("fluorescence_test_Gen5.xlsx", pac
                       convert.time = "y = x * 24", # convert days to hours
                       calibration = "y = x * 3.058") # convert absorbance to OD values
 }
+\dontrun{
+grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+                      sheet.data = 1,
+                      density.nm = "Read 3:630",
+                      fl.nm = "GFP:485,528",
+                      map.file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"),
+                      sheet.map = "mapping",
+                      software = "Gen5",
+                      convert.time = "y = x * 24", # convert days to hours
+                      calibration = "y = x * 3.058") # convert absorbance to OD values
+}
 }

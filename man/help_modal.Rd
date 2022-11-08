@@ -30,7 +30,7 @@ help_modal(
 \item{idcss}{CSS class of the modal}
 }
 \value{
-\code{div} HTML tag for modal
+\code{div} HTML tag for a modal dialog
 }
 \description{
 Adjusted modalDialog()  function to include classes

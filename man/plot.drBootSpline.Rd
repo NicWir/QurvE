@@ -53,6 +53,9 @@
 
 \item{...}{Further arguments to refine the generated base R plot.}
 }
+\value{
+A plot with the all dose-response spline fits from the bootstrapping operation.
+}
 \description{
 Generic plot function for \code{gcBootSpline} objects.
 }

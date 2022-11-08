@@ -33,7 +33,32 @@ growth.report(
 \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 }}
 }
+\value{
+\code{NULL}
+}
 \description{
 \code{growth.report} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results.
+}
+\examples{
+\dontrun{
+# Create random growth data set
+  rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+  rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+
+  rnd.data <- list()
+  rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+  rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+
+  # Run growth curve analysis workflow
+  res <- growth.workflow(time = rnd.data$time,
+                         data = rnd.data$data,
+                         fit.opt = "s",
+                         ec50 = FALSE,
+                         export.res = FALSE,
+                         suppress.messages = TRUE,
+                         parallelize = FALSE)
+
+  growth.report(res)
+}
 }
 \concept{reports}

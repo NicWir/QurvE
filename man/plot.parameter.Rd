@@ -80,6 +80,9 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A column plot comparing a selected growth parameter between tested conditions.
+}
 \description{
 \code{plot.parameter} gathers physiological parameters from the results of a growth fit analysis and compares a chosen parameter between each sample or condition in a column plot. Error bars represent the 95\% confidence interval (only shown for > 2 replicates).
 }

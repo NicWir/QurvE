@@ -86,6 +86,9 @@
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
+\value{
+A plot with the dose-response model fit.
+}
 \description{
 Generic plot function for \code{drFitModel} objects.
 }

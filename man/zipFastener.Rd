@@ -37,6 +37,7 @@ zipFastener(df2, df1, 1)
 df2 <- plyr::rdply(10, rep("X",3))[ ,-1]
 zipFastener(df1, df2)
 zipFastener(df2, df1, 2)
+
 }
 \author{
 Mark Heckmann
