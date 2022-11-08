@@ -994,6 +994,8 @@ help_modal <- function (..., title = NULL, footer = NULL,
 #'
 #' @seealso \code{\link[shiny]{updateNumericInput}}
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
