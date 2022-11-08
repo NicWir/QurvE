@@ -335,7 +335,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      style="float:right")
                                                             )
                                                           )
-                                                        )
+                                                        ),
+                                                        HTML("<br>"),
+                                                        HTML("<br>"),
+                                                        tags$div(title="Simulate growth curves to generate a random demo dataset.",
+                                                                 actionButton(inputId = "random_data_growth",
+                                                                              label = "Create random growth dataset",
+                                                                              icon=icon("shuffle"),
+                                                                              style="padding:4px; font-size:80%; color: white; background-color: #35e51d")
+                                                        ),
                                                       ),# sidebar panel
                                              ), # Custom tabPanel
 
@@ -563,6 +571,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              sep = "<br>"),
                                              trigger = "hover", options = list(container = "body", template = widePopover)
                                    ),
+
                                    div(
                                      id = "mapping_layout",
                                      conditionalPanel(
@@ -4877,6 +4886,19 @@ server <- function(input, output, session){
     )
   })
 
+  output$rdm.data_tooltip <- renderText({
+    temp = tools::Rd2HTML("../../man/rdm.data.Rd", out = paste0(tempfile("docs_rdm.data"), ".txt"))
+    content = readLines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_rdm.data,{
+    showModal(QurvE:::help_modal(size = "l", idcss = "rdm.data",
+                                 htmlOutput("rdm.data_tooltip"), easyClose = T )
+    )
+  })
+
   output$gcFitSpline_tooltip <- renderText({
     temp = tools::Rd2HTML("../../man/growth.gcFitSpline.Rd", out = paste0(tempfile("docs_gcFitSpline"), ".txt"))
     content = readLines(temp)
@@ -5495,7 +5517,125 @@ server <- function(input, output, session){
   #                     choices = fluorescence2_excel_sheets()
   #   )})
 
+  observeEvent(input$random_data_growth, {
+    # display a modal dialog with a header, textinput and action buttons
+    showModal(
+      modalDialog(
+        tags$h2('Please enter parameters to simulate growth curves'),
+        textInput('d.random.growth', 'Number of samples', placeholder = "35"),
+        textInput('y0.random.growth', 'Start density', placeholder = "0.05"),
+        textInput('tmax.random.growth', 'Maximum time value', placeholder = "24"),
+        textInput('mu.random.growth', 'Maximum growth rate', placeholder = "0.6"),
+        textInput('lambda.random.growth', 'Minimum lag time', placeholder = "5"),
+        textInput('A.random.growth', 'Maximum density', placeholder = "3"),
 
+        footer=tagList(
+          fluidRow(
+            column(12,
+                   div(
+                     actionButton('submit.random.data.growth', 'Submit'),
+                     style="float:right"),
+                   div(
+                     modalButton('cancel'),
+                     style="float:right"),
+                   div(
+                     actionButton(inputId = "tooltip_rdm.data",
+                                  label = "",
+                                  icon=icon("question"),
+                                  style="padding:2px; font-size:100%"),
+                     style="float:left")
+
+            )
+          )
+        ) # footer
+      ) # modalDialog
+    ) # showModal
+  })
+
+  # Re-run selected linear fit with user-defined parameters upon click on 'submit'
+  observeEvent(input$submit.random.data.growth, {
+    d <- ifelse(input$d.random.growth == "", 35, as.numeric(input$d.random.growth))
+    y0 <- ifelse(input$y0.random.growth == "", 0.05, as.numeric(input$y0.random.growth))
+    tmax <- ifelse(input$tmax.random.growth == "", 24, as.numeric(input$tmax.random.growth))
+    mu <- ifelse(input$mu.random.growth == "", 0.6, as.numeric(input$mu.random.growth))
+    lambda <- ifelse(input$lambda.random.growth == "", 5, as.numeric(input$lambda.random.growth))
+    A <- ifelse(input$A.random.growth == "", 3, as.numeric(input$A.random.growth))
+
+    results$custom_data <- rdm.data(d, y0 = y0, tmax = tmax, mu = mu, lambda = lambda, A = A, label = "Test")
+
+    hide("data_instruction")
+    show("Custom_Data_Tables")
+    hide("Parsed_Data_Tables")
+    if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
+      # show [Run Computation] button in Computation-Growth
+      show("run_growth")
+    }
+    # if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+    #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+    # }
+
+    # Remove eventually pre-loaded parsed data
+    results$parsed_data <- NULL
+    hide("parsed_reads_density")
+    hide("parsed_reads_fluorescence")
+    # hide("parsed_reads_fluorescence2")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+    # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+    shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
+
+    results$df_random_data <- data.frame("time" = c("time", "","", results$custom_data$time[1,]),
+                     "data" = t(results$custom_data$data))
+    colnames(results$df_random_data ) <- results$df_random_data [1,]
+    write.csv(results$df_random_data[-1,], file = paste0(tempdir(), "/random_data.csv"))
+    results$random_data_density <- paste0(tempdir(), "/random_data.csv")
+    removeModal()
+  })
+
+  observe({
+    density.file <- results$random_data_density
+
+    if(is.null(density.file)) return(NULL)
+    ## Read data
+    try(
+      results$custom_data <- read_data(results$df_random_data,
+                                       # data.fluoro2 = fl2.file$datapath,
+                                       data.format = "col"
+
+      )
+    )
+
+    if(length(results$custom_data)<2){
+      showModal(modalDialog("Data could not be extracted from the provided file. Did you correctly format your custom data?", easyClose = T, footer=NULL))
+    } else {
+      hide("data_instruction")
+      show("Custom_Data_Tables")
+      hide("Parsed_Data_Tables")
+      if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
+        # show [Run Computation] button in Computation-Growth
+        show("run_growth")
+      }
+      # if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+      #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
+      # }
+
+      # Remove eventually pre-loaded parsed data
+      results$parsed_data <- NULL
+      hide("parsed_reads_density")
+      hide("parsed_reads_fluorescence")
+      # hide("parsed_reads_fluorescence2")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+      # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+      shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
+      hide("random_data_growth")
+      removeModal()
+    }
+  })
 
     ##__Parse data____####
   ### Hide elements to guide user

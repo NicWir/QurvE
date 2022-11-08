@@ -33,12 +33,8 @@
 #' @examples
 #' \dontrun{
 #' # Create random growth data set
-#'   rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#'   rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'   rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #'
-#'   rnd.data <- list()
-#'   rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-#'   rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
 #'
 #'   # Run growth curve analysis workflow
 #'   res <- growth.workflow(time = rnd.data$time,
@@ -133,8 +129,8 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
                     quiet = TRUE)
   message(paste0("Report files saved in: '/", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
-  try(removeModal(), silent = TRUE)
-  NULL
+
+  invisible(NULL)
 }
 
 #' Create a PDF and HTML report with results from a fluorescence analysis workflow
@@ -284,7 +280,7 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
   message(paste0("Files saved in: '", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
   try(removeModal(), silent = TRUE)
-  NULL
+  invisible(NULL)
 }
 
 #' Format font color for Markdown reports

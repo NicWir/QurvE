@@ -379,7 +379,12 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
                    angle = 90, parse = FALSE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "richards",
-                             values=c("model" = colModel, "richards" = colModel))
+                             values=c("model" = colModel, "richards" = colModel)) +
+          annotate("text",
+                   label = gcFittedModel$model,
+                   x = (1 + 0.25 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.02 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
+                   size = 0.3*basesize)
       }
       if(gcFittedModel$model == "baranyi"){
         p <- p + annotate(
@@ -399,7 +404,12 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
                    angle = 90, parse = FALSE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "baranyi",
-                             values=c("model" = colModel, "baranyi" = colModel))
+                             values=c("model" = colModel, "baranyi" = colModel)) +
+          annotate("text",
+                   label = gcFittedModel$model,
+                   x = (1 + 0.25 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.02 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
+                   size = 0.3*basesize)
       }
       if(gcFittedModel$model == "gompertz"){
         p <- p + annotate(
@@ -416,7 +426,12 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
                    angle = 90, parse = FALSE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "gompertz",
-                             values=c("model" = colModel, "gompertz" = colModel))
+                             values=c("model" = colModel, "gompertz" = colModel)) +
+          annotate("text",
+                   label = gcFittedModel$model,
+                   x = (1 + 0.25 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.02 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
+                   size = 0.3*basesize)
       }
       if(gcFittedModel$model == "gompertz.exp"){
         lagtime <- lagtime - gcFittedModel$parameters$A[1]*exp(gcFittedModel$parameters$fitpar$alpha[1]*(gcFittedModel$parameters$lambda[1]-gcFittedModel$parameters$fitpar$t_shift[1]))
@@ -435,7 +450,12 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
                    angle = 90, parse = FALSE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "gompertz.exp",
-                             values=c("model" = colModel, "gompertz.exp" = colModel))
+                             values=c("model" = colModel, "gompertz.exp" = colModel)) +
+          annotate("text",
+                   label = gcFittedModel$model,
+                   x = (1 + 0.25 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.02 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
+                   size = 0.3*basesize)
       }
       if(gcFittedModel$model == "huang"){
         p <- p + annotate(
@@ -454,7 +474,12 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
                    angle = 90, parse = FALSE, size = 2.3*eq.size) +
           scale_color_manual(name='Growth Model',
                              breaks = "huang",
-                             values=c("model" = colModel, "huang" = colModel))
+                             values=c("model" = colModel, "huang" = colModel)) +
+          annotate("text",
+                   label = gcFittedModel$model,
+                   x = (1 + 0.25 + log(eq.size)*0.1) * gcFittedModel$raw.time[length(gcFittedModel$raw.time)],
+                   y = 0.02 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
+                   size = 0.3*basesize)
       }
     } # if(equation == TRUE)
     else{
@@ -477,6 +502,16 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
         p <- p + scale_color_manual(name='Growth Model',
                                     breaks = "gompertz.exp",
                                     values=c("model" = colModel, "gompertz.exp" = colModel))
+      }
+      if(gcFittedModel$model == "baranyi"){
+        p <- p + scale_color_manual(name='Growth Model',
+                                    breaks = "baranyi",
+                                    values=c("model" = colModel, "baranyi" = colModel))
+      }
+      if(gcFittedModel$model == "huang"){
+        p <- p + scale_color_manual(name='Growth Model',
+                                    breaks = "huang",
+                                    values=c("model" = colModel, "huang" = colModel))
       }
     }
     p <- p + theme(legend.key = element_blank(),
@@ -3902,11 +3937,10 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
-#' rnd.data3 <- rdm.data(d = 35, mu = 0.7, A = 5.2, label = "Test3")
 #'
 #' rnd.data <- list()
-#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time, rnd.data3$time)
-#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data, rnd.data3$data)
+#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
 #'
 #' # Run growth curve analysis workflow
 #' gcFit <- growth.gcFit(time = rnd.data$time,

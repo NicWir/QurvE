@@ -503,7 +503,7 @@ xgx_minor_breaks_log10 <-  function(data_range) {
   return(minor_breaks)
 }
 
-#' The function calls the \code{\link{baranyi}} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
+#' The function calls the \code{\link{baranyi}} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
 #'
 #' @param d  Numeric value, number of data sets. If \code{d} is a vector, only the first entry is used.
 #' @param y0  Numeric value, start density. If \code{t} is a vector, only the first entry is used.
@@ -513,7 +513,7 @@ xgx_minor_breaks_log10 <-  function(data_range) {
 #' @param A Numeric value, maximum density. If \code{A} is a vector, only the first entry is used.
 #' @param label Character string, condition label  If \code{label} is a vector, only the first entry is used.
 #'
-#' @return A list:
+#' @return A list containing simulated data for three tests (e.g., 'organisms'):
 #' \item{time}{numeric matrix of size \code{d}x\code{t}, each row represent the time points for which growth data is simulated and stored in each row of \code{data}.}
 #' \item{data}{data.frame of size \code{d}x(3+\code{t}), 1. column, character as an experiment identifier; 2. column: Replicate number; 3. column: concentration of substrate of a compound under which the experiment is obtained; 4.-(3+t). column: growth data corresponding to the time points in \code{time}.}
 #'

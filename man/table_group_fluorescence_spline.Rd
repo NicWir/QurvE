@@ -18,7 +18,6 @@ A data frame with grouped spline fit results. Empty cells indicate that no relia
 Generate a grouped results table for spline fits with average and standard deviations
 }
 \examples{
-\dontrun{
 # load example dataset
 input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -38,5 +37,4 @@ table_group_fluorescence_spline(res$flFit$flTable)
 DT::datatable(table_group_fluorescence_spline(res$flFit$flTable, html = TRUE),
               escape = FALSE) # Do not escape HTML entities
 
-}
 }

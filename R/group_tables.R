@@ -5,8 +5,9 @@
 #'
 #' @return A data frame with grouped linear fit results. Empty cells indicate that no reliable fit could be determined.
 #'
+#' @export
+#'
 #' @examples
-#' \dontrun{
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -26,7 +27,6 @@
 #' DT::datatable(table_group_fluorescence_linear(res$flFit$flTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
 #'
-#'}
 table_group_fluorescence_linear <- function(flTable, html = FALSE)
 {
   nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
@@ -142,8 +142,9 @@ table_group_fluorescence_linear <- function(flTable, html = FALSE)
 #'
 #' @return A data frame with grouped spline fit results. Empty cells indicate that no reliable fit could be determined.
 #'
+#' @export
+#'
 #' @examples
-#' \dontrun{
 #' # load example dataset
 #' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -163,7 +164,6 @@ table_group_fluorescence_linear <- function(flTable, html = FALSE)
 #' DT::datatable(table_group_fluorescence_spline(res$flFit$flTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
 #'
-#' }
 table_group_fluorescence_spline <- function(flTable, html = FALSE)
 {
   nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
@@ -264,15 +264,12 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
 #'
 #' @return A data frame with grouped linear fit results. Empty cells indicate that no reliable fit could be determined.
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth data set
-#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#' @export
 #'
-#' rnd.data <- list()
-#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#' @examples
+#' # Create random growth data set
+#' rnd.data <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
 #'
 #' # Run growth curve analysis workflow
 #' res <- growth.workflow(time = rnd.data$time,
@@ -288,7 +285,6 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
 #' # with HTML formatting
 #' DT::datatable(table_group_growth_linear(res$gcFit$gcTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
-#' }
 table_group_growth_linear <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
@@ -418,15 +414,11 @@ table_group_growth_linear <- function(gcTable, html = FALSE)
 #'
 #' @return A data frame with grouped spline fit results. Empty cells indicate that no reliable fit could be determined.
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth data set
-#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#' @export
 #'
-#' rnd.data <- list()
-#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#' @examples
+#' # Create random growth data set
+#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #'
 #' # Run growth curve analysis workflow
 #' res <- growth.workflow(time = rnd.data$time,
@@ -443,7 +435,6 @@ table_group_growth_linear <- function(gcTable, html = FALSE)
 #' DT::datatable(table_group_growth_spline(res$gcFit$gcTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
 #'
-#' }
 table_group_growth_spline <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
@@ -556,15 +547,12 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
 #'
 #' @return A data frame with grouped model fit results. Empty cells indicate that no reliable fit could be determined.
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth data set
-#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#' @export
 #'
-#' rnd.data <- list()
-#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#' @examples
+#' # Create random growth data set
+#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#'
 #'
 #' # Run growth curve analysis workflow
 #' res <- growth.workflow(time = rnd.data$time,
@@ -580,7 +568,6 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
 #' # with HTML formatting
 #' DT::datatable(table_group_growth_model(res$gcFit$gcTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
-#' }
 #'
 table_group_growth_model <- function(gcTable, html = FALSE)
 {
@@ -689,12 +676,7 @@ table_group_growth_model <- function(gcTable, html = FALSE)
 #' @examples
 #' \dontrun{
 #' # Create random growth data set
-#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
-#'
-#' rnd.data <- list()
-#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #'
 #' # Run growth curve analysis workflow
 #' res <- growth.workflow(time = rnd.data$time,
@@ -744,12 +726,8 @@ get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2
 #' @examples
 #' \dontrun{
 #' # Create random growth data set
-#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #'
-#' rnd.data <- list()
-#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
 #'
 #' # Run growth curve analysis workflow
 #' res <- growth.workflow(time = rnd.data$time,
