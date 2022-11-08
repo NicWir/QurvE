@@ -1035,7 +1035,9 @@ numberInput <- function(inputId, label, value = NULL, min = NA, max = NA, step =
   shiny::tagList(
     shiny::div(class = "surveyNumericInput form-group shiny-input-container",
                style = htmltools::css(width = shiny::validateCssUnit(width)),
-               shiny:::shinyInputLabel(inputId, label), inputTag)
+               shinyInputLabel(inputId, label), inputTag)
 
   )
 }
+
+shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")
