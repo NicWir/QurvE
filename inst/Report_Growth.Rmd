@@ -84,7 +84,7 @@ The following parameters were used to fit the data:
 ```{r table_linear_group, echo=F, warning=F, message=F, results='asis'}
 if(any(c("a", "l") %in% control$fit.opt)){
   if(!all(is.na(res.table.gc$lambda.linfit))){
-    table_linear_group <- table_group_growth_linear(res.table.gc)
+    table_linear_group <- table_group_growth_linear(res.table.gc,html = F)
     table_linear_group <- as.data.frame(apply(table_linear_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_linear_group[is.na(table_linear_group)] <- ""
     if (knitr::is_html_output()) {
@@ -104,7 +104,7 @@ try(plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = paste
 ```{r table_model_group, echo=F, warning=F, message=F, results='asis', fig.align='center'}
 if(any(c("a", "b", "m") %in% control$fit.opt)){
   if(!all(is.na(res.table.gc$lambda.model))){
-        table_model_group <- table_group_growth_model(res.table.gc)
+        table_model_group <- table_group_growth_model(res.table.gc,html = F)
 
     table_model_group <- as.data.frame(apply(table_model_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
     table_model_group[is.na(table_model_group)] <- ""
@@ -124,7 +124,7 @@ try(plot.parameter(grofit, param = "lambda.model", export = export, out.dir = pa
 ```{r table_spline_group, echo=F, warning=F, message=F, results='asis', fig.align='center'}
 if(any(c("a", "b", "s") %in% control$fit.opt)){
   if(!all(is.na(res.table.gc$lambda.spline))){
-    table_spline_group <- table_group_growth_spline(res.table.gc)
+    table_spline_group <- table_group_growth_spline(res.table.gc,html = F)
 
   table_spline_group <- as.data.frame(apply(table_spline_group, 2, function(x) str_replace_all(x, "NA ± NA", "")))
   table_spline_group[is.na(table_spline_group)] <- ""

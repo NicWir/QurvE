@@ -129,7 +129,7 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
                     quiet = TRUE)
   message(paste0("Report files saved in: '/", wd, "'"))
   unlink(paste0(tempdir(), "/Plots"), recursive = TRUE)
-
+  try(removeModal(), silent = TRUE)
   invisible(NULL)
 }
 
