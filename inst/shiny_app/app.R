@@ -9918,7 +9918,7 @@ server <- function(input, output, session){
 
   output$fluorescence_group_plot <- renderPlot({
     results <- results$fluorescence
-    if(input$select_string_visualize_growth_group){
+    if(input$select_string_visualize_fluorescence_group){
       suppressWarnings(
         plot.flFitRes(
           results,
@@ -10738,7 +10738,7 @@ server <- function(input, output, session){
 
       dual_plot <- reactive({
         results <- results$fluorescence
-        if(input$select_string_visualize_growth_group){
+        if(input$select_string_visualize_dual_plot){
         suppressWarnings(
           plot.dual(results,
                     IDs = NULL,
