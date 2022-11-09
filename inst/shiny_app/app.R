@@ -10372,7 +10372,6 @@ server <- function(input, output, session){
 
       output$dose_response_model_fluorescence_plot_individual <- renderPlot({
         results <- results$fluorescence$drFit$drFittedModels[[ifelse(input$individual_plots_dose_response_model_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_model_fluorescence_plot), 1, input$individual_plots_dose_response_model_fluorescence_plot)]]
-
         # Define log-transformation of axes
         if(input$log_transform_y_axis_dose_response_model_fluorescence_plot &&
            input$log_transform_x_axis_dose_response_model_fluorescence_plot){
