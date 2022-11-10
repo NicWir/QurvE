@@ -4769,7 +4769,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                         tabPanel("About Us",
                                  mainPanel(
-                                   h2("Authors"),
+                                   h2("Creators"),
                                    'Nicolas Wirth, Jonathan Funk',
                                    h2("Bug reports"),
                                    uiOutput("bug_report"),
