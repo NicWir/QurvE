@@ -427,9 +427,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             n = ceiling(h/2)
             minima <- inflect(deriv2_spline$y, threshold = n)$minima
             maxima <- inflect(deriv2_spline$y, threshold = n)$maxima
-            # Regard only (negative) minima and (positive) maxima with a deriv2 value of >= 10% mumax
-            minima <- minima[deriv2_spline$y[minima] <= 0.1 * (-mumax)]
-            maxima <- maxima[deriv2_spline$y[maxima] >= 0.1 * mumax]
+            # Regard only (negative) minima and (positive) maxima with a deriv2 value of >= 20% mumax
+            minima <- minima[deriv2_spline$y[minima] <= 0.2 * (-mumax)]
+            maxima <- maxima[deriv2_spline$y[maxima] >= 0.2 * mumax]
 
             # expand mumax window with more relaxed quota
             slope.quota.ext <- 0.8 * slope.max

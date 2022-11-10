@@ -91,7 +91,6 @@ GithubUsername: NicWir
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
-Roxygen: list(markdown = TRUE)
 Collate: 
     'control_functions.R'
     'data_parsers.R'
