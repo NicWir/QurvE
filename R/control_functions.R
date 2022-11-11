@@ -84,7 +84,8 @@ growth.control <- function (neg.nan.act = FALSE,
                             growth.thresh = 1.5)
 {
   dr.parameter <- match.arg(dr.parameter)
-  dr.method <- match.arg(dr.method)
+  if(length(dr.method) != 1 && dr.method != "model.MM")
+    dr.method <- match.arg(dr.method)
   if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
   if(nboot.gc == "" || is.null(nboot.gc)) nboot.gc <- 0
   if ((is.character(fit.opt) == FALSE) | !any(fit.opt %in% c("l", "s", "m", "a")))
@@ -139,9 +140,6 @@ growth.control <- function (neg.nan.act = FALSE,
     stop("value of growth.thresh must be numeric (one element) or NA")
   if ((is.numeric(t0) == FALSE) | (length(t0) != 1) | (t0 < 0))
     stop("value of t0 must be numeric (>=0) and of one element")
-
-  if(length(dr.method) != 1 && dr.method != "model.MM")
-    dr.method <- match.arg(dr.method)
 
   dr.parameters.opt <- c('TestId', 'AddId', 'concentration', 'reliability_tag', 'used.model', 'log.x',
                          'log.y', 'nboot.gc', 'mu.linfit', 'lambda.linfit', 'stdmu.linfit', 'dY.linfit',
