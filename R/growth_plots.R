@@ -1190,7 +1190,7 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
       if(is.null(colors)){
         if (length(drFit$drFittedSplines) <= 8) {
           p <- p + scale_fill_brewer(name = "Condition", palette = "Dark2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else if (length(drFit$drFittedSplines) <=50){
+        } else if (length(drFit$drFittedSplines) <= 50){
           p <- p + scale_fill_manual(name = "Condition",
                                      values = big_palette
           ) + scale_color_manual(name = "Condition",
@@ -3068,6 +3068,13 @@ plot.grofit <- function(x, ...,
       deriv.ls <- deriv.ls[!is.na(deriv.ls)]
       df.deriv <- do.call(rbind.data.frame, deriv.ls)
       df.deriv$name <- gsub(" \\| NA", "", df.deriv$name)
+
+      df.deriv$concentration <- as.numeric(gsub(".+ \\| ", "", df.deriv$name))
+      df.deriv$group <- gsub(" \\| .+", "", df.deriv$name)
+
+      # sort names
+      df.deriv <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
+
       df.deriv$name <- factor(df.deriv$name, levels = unique(factor(df.deriv$name)))
     }
 
@@ -3152,11 +3159,12 @@ plot.grofit <- function(x, ...,
       }
     } else if (length(colors) < length(unique(df$name))){
       if (length(plotdata.ls) <= 8) {
-        p <- p + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
-          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+        p <- p + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
       } else if (length(plotdata.ls) <= 12) {
-        p <- p + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
-      } else if (length(plotdata.ls) <=50){
+        p <- p + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(plotdata.ls) <= 50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(colors, big_palette[-(1:length(colors))])) +
           scale_color_manual(name = "Condition",
@@ -3211,7 +3219,7 @@ plot.grofit <- function(x, ...,
             p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Dark2") + scale_color_brewer(name = "Condition", palette = "Dark2")
           } else if (length(plotdata.ls) <= 12) {
             p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-          } else if (length(plotdata.ls) <=50){
+          } else if (length(plotdata.ls) <= 50){
             p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
                                                    values = big_palette
             ) + scale_color_manual(name = "Condition",
@@ -3221,11 +3229,12 @@ plot.grofit <- function(x, ...,
         }
       } else if (length(colors) < length(unique(df$name))){
         if (length(plotdata.ls) <= 8) {
-          p.deriv <- p.deriv + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
-            scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition", values = c(colors, values = RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
         } else if (length(plotdata.ls) <= 12) {
-          p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
-        } else if (length(plotdata.ls) <=50){
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+        } else if (length(plotdata.ls) <= 50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
                                      values = c(colors, big_palette[-(1:length(colors))])) +
             scale_color_manual(name = "Condition",
@@ -3293,7 +3302,7 @@ plot.grofit <- function(x, ...,
         p <- p + scale_fill_brewer(name = "Condition", palette = "Dark2") + scale_color_brewer(name = "Condition", palette = "Dark2")
       } else if (length(ndx.keep) <= 12) {
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-      } else if (length(ndx.keep) <=50){
+      } else if (length(ndx.keep) <= 50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = big_palette) +
           scale_color_manual(name = "Condition",
@@ -3302,11 +3311,12 @@ plot.grofit <- function(x, ...,
       }
     } else if (length(colors) < length(unique(df$name))){
       if (length(ndx.keep) <= 8) {
-        p <- p + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
-          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+        p <- p + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
       } else if (length(ndx.keep) <= 12) {
-        p <- p + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
-      } else if (length(ndx.keep) <=50){
+        p <- p + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(ndx.keep) <= 50){
         p <- p + scale_fill_manual(name = "Condition",
                                    values = c(colors, big_palette[-(1:length(colors))])) +
           scale_color_manual(name = "Condition",
@@ -3357,13 +3367,32 @@ plot.grofit <- function(x, ...,
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Dark2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else if (length(ndx.keep) <= 12) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-        } else if (length(ndx.keep) <=50){
+        } else if (length(ndx.keep) <= 50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
                                      values = big_palette
           ) + scale_color_manual(name = "Condition",
                                  values = big_palette
           )
         }
+      } else if (length(colors) < length(unique(df$name))){
+        if (length(ndx.keep) <= 8) {
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition", values = c(colors, values = RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+        } else if (length(ndx.keep) <= 12) {
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+        } else if (length(ndx.keep) <= 50){
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                                 values = c(colors, big_palette[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition",
+                               values = c(colors, big_palette[-(1:length(colors))])
+            )
+        }
+      } else {
+        p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                               values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
       }
       p <- suppressWarnings(
         ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = TRUE, legend = legend.position, legend.grob = ggpubr::get_legend(p))
