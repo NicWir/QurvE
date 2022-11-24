@@ -2769,6 +2769,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 #' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param color_groups (Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?
 #' @param basesize (Numeric) Base font size.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
@@ -2829,6 +2830,7 @@ plot.grofit <- function(x, ...,
                         deriv = TRUE,
                         n.ybreaks = 6,
                         colors = NULL,
+                        color_groups = T,
                         basesize = 20,
                         y.lim = NULL,
                         x.lim = NULL,
@@ -2866,7 +2868,7 @@ plot.grofit <- function(x, ...,
 
   call <- match.call()
   # remove all function arguments from call to leave only multiple grofit objects
-  call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <- call$legend.ncol <-
+  call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <- call$legend.ncol <- call$color_groups <-
     call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
     call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- call$legend.position <- NULL
 
@@ -3092,12 +3094,18 @@ plot.grofit <- function(x, ...,
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
     df <- do.call(rbind.data.frame, plotdata.ls)
     df$name <- gsub(" \\| NA", "", df$name)
-    df$name <- factor(df$name, levels = unique(factor(df$name)))
+    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    df$group <- gsub(" \\| .+", "", df$name)
 
     # replace negative lower ribbon boundaries with 0 for log10 transformation
     if(log.y==TRUE){
       df$lower[df$lower<0] <- 0
     }
+
+    # sort names
+    df <- df[order(df$group, df$concentration), ]
+
+    df$name <- factor(df$name, levels = unique(factor(df$name)))
 
     p <- ggplot(df, aes(x=.data$time, y=.data$mean, col = .data$name)) +
       geom_line(size=lwd) +
@@ -3131,35 +3139,54 @@ plot.grofit <- function(x, ...,
       p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
     }
 
+    # apply color schemes
     if(is.null(colors)){
-      if (length(plotdata.ls) <= 8) {
-        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else if (length(plotdata.ls) <=50){
+      if(color_groups && length(unique(df$concentration)) > 2){
+        conditions <- str_replace_all(df$name, "\\| .+ \\| ", "| ")
+        conditions_unique <- unique(conditions)
+
+        groups <- str_replace_all(conditions_unique, " \\| .+", "")
+        groups_unique <- unique(groups)
+
+        colors <- c()
+        for(i in 1:length(groups_unique)){
+          colors <- c(colors, colorRampPalette(single_hue_palettes[[i]])(length(which(groups %in% groups_unique[i]))))
+        }
+
         p <- p + scale_fill_manual(name = "Condition",
-                                   values = c(
-                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                   )
-        ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
-        )
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                            values = colors)
+      } else {
+        if (length(plotdata.ls) <= 8) {
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else if (length(plotdata.ls) <=50){
+          p <- p + scale_fill_manual(name = "Condition",
+                                     values = c(
+                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                     )
+          ) + scale_color_manual(name = "Condition",
+                                 values = c(
+                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                 )
+          )
+        }
       }
     } else {
       p <- p + scale_fill_manual(name = "Condition",
@@ -3198,38 +3225,46 @@ plot.grofit <- function(x, ...,
       }
 
       if(is.null(colors)){
-        if (length(plotdata.ls) <= 8) {
-          p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else if (length(plotdata.ls) <=50){
+        if(color_groups &&  length(unique(df$concentration)) > 2){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                                 values = c(
-                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                                 )
-          ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
-          )
+                                     values = colors) +
+            scale_color_manual(name = "Condition",
+                              values = colors)
+        }
+        else{
+          if (length(plotdata.ls) <= 8) {
+            p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+          } else if (length(plotdata.ls) <=50){
+            p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                                   values = c(
+                                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                                   )
+            ) + scale_color_manual(name = "Condition",
+                                   values = c(
+                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                   )
+            )
+          }
         }
       } else {
         p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                   values = colors) +
+                                               values = colors) +
           scale_color_manual(name = "Condition",
                              values = colors)
       }
@@ -3431,6 +3466,7 @@ base_breaks <- function(n = 10){
 #' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param color_groups (Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?
 #' @param basesize (Numeric) Base font size.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
@@ -3481,6 +3517,7 @@ plot.grodata <- function(x,
                          log.y = FALSE,
                          n.ybreaks = 6,
                          colors = NULL,
+                         color_groups = T,
                          basesize = 20,
                          y.lim = NULL,
                          x.lim = NULL,
@@ -3521,6 +3558,7 @@ plot.grodata <- function(x,
                   deriv = FALSE,
                   n.ybreaks = n.ybreaks,
                   colors = colors,
+                  color_groups = color_groups,
                   basesize = basesize,
                   y.lim = y.lim,
                   x.lim = x.lim,
@@ -3552,6 +3590,7 @@ plot.grodata <- function(x,
                 deriv = FALSE,
                 n.ybreaks = n.ybreaks,
                 colors = colors,
+                color_groups = color_groups,
                 basesize = basesize,
                 y.lim = y.lim,
                 x.lim = x.lim,
@@ -3589,6 +3628,7 @@ plot.grodata <- function(x,
 #' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
 #' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
 #' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
+#' @param order_by_conc (Logical) Shall the columns be sorted in order of ascending concentrations (\code{TRUE}) or by sample groups \code{FALSE}?
 #' @param basesize (Numeric) Base font size.
 #' @param label.size (Numeric) Font size for sample labels below x-axis.
 #' @param shape.size (Numeric) The size of the symbols indicating replicate values. Default: 2.5
@@ -3649,6 +3689,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                            exclude.conc = NULL,
                            reference.nm = NULL,
                            reference.conc = NULL,
+                           order_by_conc = FALSE,
                            basesize = 12,
                            label.size = NULL,
                            shape.size = 2.5,
@@ -3815,6 +3856,15 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   df <- data.frame("name" = labels, "mean" = mean, "CI.L" = CI.L, "CI.R" = CI.R)
   df$name <- factor(df$name, levels = df$name)
   df$group <- gsub(" \\|.+", "", df$name)
+  df$concentration <- as.numeric(gsub(".+\\| ", "", df$name))
+  if (order_by_conc){
+    df <- df[order(df$concentration, df$group), ]
+  } else {
+    df <- df[order(df$group, df$concentration), ]
+  }
+
+  df$name <- factor(df$name, levels = unique(factor(df$name)))
+
   df$mean[is.na(df$mean)] <- 0
   df$CI.L[is.na(df$CI.L)] <- 0
   df$CI.R[is.na(df$CI.R)] <- 0
@@ -3852,6 +3902,16 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
 
   df_reps$condition <- as.factor(df_reps$condition)
   df_reps$replicate <- as.factor(df_reps$replicate)
+
+  df_reps$group <- gsub(" \\|.+", "", df_reps$condition)
+  df_reps$concentration <- as.numeric(gsub(".+\\| ", "", df_reps$condition))
+  if (order_by_conc){
+    df_reps <- df_reps[order(df_reps$concentration, df_reps$group), ]
+  } else {
+    df_reps <- df_reps[order(df_reps$group, df_reps$concentration), ]
+  }
+
+  df_reps$condition <- factor(df_reps$condition, levels = unique(factor(df_reps$condition)))
   # apply normalization to reference condition
   if(!is.null(reference.nm)){
     df_reps$value <- df_reps$value/mean.ref

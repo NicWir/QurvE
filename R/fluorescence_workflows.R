@@ -637,6 +637,10 @@ fl.workflow <- function(grodata = NULL,
     }
   }
 
+  x_type <- match.arg(x_type)
+  dr.method <- match.arg(dr.method)
+
+
 
   if(!is.null(grodata) && !(is(grodata)=="list") && !(is(grodata)=="grodata")){
     if (is.numeric(as.matrix(time)) == FALSE)

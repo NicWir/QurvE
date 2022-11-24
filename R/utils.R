@@ -633,4 +633,11 @@ rdm.data <-function (d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label
 
   }
 
-
+single_hue_palettes <- list("Green" = RColorBrewer::brewer.pal(9, "Greens")[c(2:9)],
+                            "Oranges" = RColorBrewer::brewer.pal(9, "Oranges")[c(2:8)],
+                            "Purple" = RColorBrewer::brewer.pal(9, "Purples")[c(3:9)],
+                            "Cyan" = c("#CCFFFF", "#009999"),
+                            "Grey" = RColorBrewer::brewer.pal(9, "Greys")[c(2,8)],
+                            "Red" = RColorBrewer::brewer.pal(9, "Reds")[c(2,8)],
+                            "Blue" = RColorBrewer::brewer.pal(9, "Blues")[c(2,8)],
+                            "Magenta" = c("#FFCCFF", "#990099"))

@@ -84,7 +84,7 @@ growth.control <- function (neg.nan.act = FALSE,
                             growth.thresh = 1.5)
 {
   dr.parameter <- match.arg(dr.parameter)
-  if(length(dr.method) != 1 && dr.method != "model.MM")
+  if(length(dr.method) != 1 || dr.method != "model.MM")
     dr.method <- match.arg(dr.method)
   if(!is.null(lin.h) && (lin.h == "" || lin.h == "NULL" || lin.h == 0)) lin.h <- NULL
   if(nboot.gc == "" || is.null(nboot.gc)) nboot.gc <- 0
@@ -160,7 +160,7 @@ growth.control <- function (neg.nan.act = FALSE,
                          'ci95.integral.bt.lo', 'ci95.integral.bt.up')
   parameter.in <- dr.parameter
   if(is.character(dr.parameter)){
-    if(is.na(dr.parameter)){
+    if(!any(dr.parameters.opt %in% parameter.in)){
       stop(paste0(parameter.in, " is not a valid parameter for the dose-response analysis. See ?growth.drFit for possible options"))
     }
   }
@@ -294,6 +294,24 @@ fl.control <- function(fit.opt = c("l", "s"),
     stop("value of biphasic must be logical and of one element")
   if ((is.numeric(t0) == FALSE) | (length(t0) != 1) | (t0 < 0))
     stop("value of t0 must be numeric (>=0) and of one element")
+
+  dr.parameters.opt <- c('TestId', 'AddId', 'concentration', 'reliability_tag', 'log.x',
+                         'log.y', 'nboot.gc', 'max_slope.linfit', 'lambda.linfit', 'stdmax_slope.linfit', 'dY.linfit',
+                         'A.linfit', 'tmax_slope.start.linfit', 'tmax_slope.end.linfit', 'r2max_slope.linfit',
+                         'reliable_fit.linfit','lambda.model', 'integral.model', 'max_slope.spline', 'lambda.spline', 'y0.spline',
+                         'A.spline', 'dY.spline', 'integral.spline', 'reliable_fit.spline', 'smooth.spline',
+                         'max_slope.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'stdmax_slope.bt', 'stdlambda.bt', 'stdA.bt',
+                         'stdintegral.bt', 'reliable_fit.bt', 'ci90.max_slope.bt.lo', 'ci90.max_slope.bt.up',
+                         'ci90.lambda.bt.lo', 'ci90.lambda.bt.up', 'ci90.A.bt.lo', 'ci90.A.bt.up',
+                         'ci90.integral.bt.lo', 'ci90.integral.bt.up', 'ci95.max_slope.bt.lo', 'ci95.max_slope.bt.up',
+                         'ci95.lambda.bt.lo', 'ci95.lambda.bt.up', 'ci95.A.bt.lo', 'ci95.A.bt.up',
+                         'ci95.integral.bt.lo', 'ci95.integral.bt.up')
+  parameter.in <- dr.parameter
+  if(is.character(dr.parameter)){
+    if(!any(dr.parameters.opt %in% parameter.in)){
+      stop(paste0(parameter.in, " is not a valid parameter for the dose-response analysis. See ?fl.drFit for possible options"))
+    }
+  }
 
   fl.control <- list(fit.opt = fit.opt,
                      x_type = x_type,

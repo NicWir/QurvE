@@ -1399,6 +1399,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #' @param deriv (Logical) Show derivatives over time in a separate panel below the plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{axisTicks()}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param color_groups (Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?
 #' @param basesize (Numeric) Base font size.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
@@ -1457,6 +1458,7 @@ plot.flFitRes <-  function(x,
                         deriv = F,
                         n.ybreaks = 6,
                         colors = NULL,
+                        color_groups = T,
                         basesize = 20,
                         y.lim = NULL,
                         x.lim = NULL,
@@ -1727,7 +1729,13 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
     df <- do.call(rbind.data.frame, plotdata.ls)
     df$name <- gsub(" \\| NA", "", df$name)
+    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    df$group <- gsub(" \\| .+", "", df$name)
+    # sort names
+    df <- df[order(df$group, df$concentration), ]
+
     df$name <- factor(df$name, levels = unique(factor(df$name)))
+
     df <- df[df[["mean"]]>0, ]
     df <- df[!apply(df, 1, function(x){all(is.na(x))}),]
     if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
@@ -1770,14 +1778,13 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
       ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank())
+            panel.grid.minor = element_blank()) +
+      ggplot2::guides(col=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(!all(is.na(df$upper)))
       p <- suppressWarnings(p + geom_ribbon(data = df, aes(ymin=.data$lower,ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA)
       )
 
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
@@ -1800,36 +1807,60 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
     }
 
     if(is.null(colors)){
-      if (length(plotdata.ls) <= 8) {
-        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else if (length(plotdata.ls) <=50){
+      if(color_groups && length(unique(df$concentration)) > 2){
+        conditions <- str_replace_all(df$name, "\\| .+ \\| ", "| ")
+        conditions_unique <- unique(conditions)
+
+        groups <- str_replace_all(conditions_unique, " \\| .+", "")
+        groups_unique <- unique(groups)
+
+        colors <- c()
+        for(i in 1:length(groups_unique)){
+          colors <- c(colors, colorRampPalette(single_hue_palettes[[i]])(length(which(groups %in% groups_unique[i]))))
+        }
+
         p <- p + scale_fill_manual(name = "Condition",
-                                   values = c(
-                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                   )
-        ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
-        )
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
+      } else {
+        if (length(plotdata.ls) <= 8) {
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else if (length(plotdata.ls) <=50){
+          p <- p + scale_fill_manual(name = "Condition",
+                                     values = c(
+                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                     )
+          ) + scale_color_manual(name = "Condition",
+                                 values = c(
+                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                 )
+          )
+        }
       }
+    } else {
+      p <- p + scale_fill_manual(name = "Condition",
+                                 values = colors) +
+        scale_color_manual(name = "Condition",
+                           values = colors)
     }
+
     if(deriv){
       # /// add panel with growth rate over time
       if(!is.null(x.lim)){
@@ -1899,6 +1930,11 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
                                  )
           )
         }
+      } else {
+        p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
       }
       p <- suppressWarnings( ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p, position = "right")) )
     }
@@ -1956,10 +1992,8 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
       ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank())
-
-    if(shiny == TRUE) p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
-    else p <- p + ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
+            panel.grid.minor = element_blank()) +
+      ggplot2::guides(col=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
@@ -2153,6 +2187,7 @@ plot.flFit <- plot.flFitRes
 #' @param log.y.fl (Logical) Log-transform the y-axis of the fluorescence plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
+#' @param color_groups (Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?
 #' @param basesize (Numeric) Base font size.
 #' @param y.lim.density (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the density plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.fl (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence plot as a vector in the form \code{c(l, u)}.
@@ -2206,6 +2241,7 @@ plot.dual <-  function(x,
                        log.y.fl = F,
                        n.ybreaks = 6,
                        colors = NULL,
+                       color_groups = T,
                        basesize = 20,
                        y.lim.density = NULL,
                        y.lim.fl = NULL,
@@ -2399,6 +2435,13 @@ plot.dual <-  function(x,
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
     df <- do.call(rbind.data.frame, plotdata.ls)
     df$name <- gsub(" \\| NA", "", df$name)
+
+    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    df$group <- gsub(" \\| .+", "", df$name)
+
+    # sort names
+    df <- df[order(df$group, df$concentration), ]
+
     df$name <- factor(df$name, levels = unique(factor(df$name)))
     df <- df[df[["dens.mean"]]>0, ]
     df <- df[df[["fl.mean"]]>0, ]
@@ -2448,35 +2491,58 @@ plot.dual <-  function(x,
     }
 
     if(is.null(colors)){
-      if (length(plotdata.ls) <= 8) {
-        p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-      } else if (length(plotdata.ls) <=50){
+      if(color_groups && length(unique(df$concentration)) > 2){
+        conditions <- str_replace_all(df$name, "\\| .+ \\| ", "| ")
+        conditions_unique <- unique(conditions)
+
+        groups <- str_replace_all(conditions_unique, " \\| .+", "")
+        groups_unique <- unique(groups)
+
+        colors <- c()
+        for(i in 1:length(groups_unique)){
+          colors <- c(colors, colorRampPalette(single_hue_palettes[[i]])(length(which(groups %in% groups_unique[i]))))
+        }
+
         p <- p + scale_fill_manual(name = "Condition",
-                                   values = c(
-                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                   )
-        ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
-        )
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
+      } else {
+        if (length(plotdata.ls) <= 8) {
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else if (length(plotdata.ls) <=50){
+          p <- p + scale_fill_manual(name = "Condition",
+                                     values = c(
+                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                     )
+          ) + scale_color_manual(name = "Condition",
+                                 values = c(
+                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
+                                 )
+          )
+        }
       }
+    } else {
+      p <- p + scale_fill_manual(name = "Condition",
+                                 values = colors) +
+        scale_color_manual(name = "Condition",
+                           values = colors)
     }
     # /// add panel with fluorescence over time
     p.fl <- ggplot(df, aes(x=.data$time, y=.data$fl.mean, col = .data$name)) +
@@ -2549,6 +2615,11 @@ plot.dual <-  function(x,
                                )
         )
       }
+    } else {
+      p.fl <- p.fl + scale_fill_manual(name = "Condition",
+                                 values = colors) +
+        scale_color_manual(name = "Condition",
+                           values = colors)
     }
     p <- suppressWarnings(
       ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
