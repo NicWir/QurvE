@@ -18,6 +18,7 @@
   deriv = TRUE,
   n.ybreaks = 6,
   colors = NULL,
+  color_groups = T,
   basesize = 20,
   y.lim = NULL,
   x.lim = NULL,
@@ -63,6 +64,8 @@
 \item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
 
 \item{colors}{(vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
+
+\item{color_groups}{(Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?}
 
 \item{basesize}{(Numeric) Base font size.}
 

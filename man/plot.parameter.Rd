@@ -19,6 +19,7 @@
   exclude.conc = NULL,
   reference.nm = NULL,
   reference.conc = NULL,
+  order_by_conc = FALSE,
   basesize = 12,
   label.size = NULL,
   shape.size = 2.5,
@@ -55,6 +56,8 @@
 \item{reference.nm}{(Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.}
 
 \item{reference.conc}{(Numeric) Concentration of the reference condition, to which parameter values are normalized.}
+
+\item{order_by_conc}{(Logical) Shall the columns be sorted in order of ascending concentrations (\code{TRUE}) or by sample groups \code{FALSE}?}
 
 \item{basesize}{(Numeric) Base font size.}
 
