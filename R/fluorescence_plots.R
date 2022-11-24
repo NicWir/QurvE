@@ -1825,34 +1825,29 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
                              values = colors)
       } else {
         if (length(plotdata.ls) <= 8) {
-          p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Dark2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+        } else if (length(plotdata.ls) <= 12) {
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
         } else if (length(plotdata.ls) <=50){
           p <- p + scale_fill_manual(name = "Condition",
-                                     values = c(
-                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                       "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                     )
+                                     values = big_palette
           ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
+                                 values = big_palette
           )
         }
+      }
+    } else if (length(colors) < length(unique(df$name))){
+      if (length(plotdata.ls) <= 8) {
+        p <- p + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+      } else if (length(plotdata.ls) <= 12) {
+        p <- p + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(plotdata.ls) <=50){
+        p <- p + scale_fill_manual(name = "Condition",
+                                               values = c(colors, big_palette[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition",
+                             values = c(colors, big_palette[-(1:length(colors))])
+          )
       }
     } else {
       p <- p + scale_fill_manual(name = "Condition",
@@ -1905,30 +1900,23 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else if (length(plotdata.ls) <=50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                                 values = c(
-                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                                 )
+                                                 values = big_palette
           ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
+                                 values = big_palette
           )
+        }
+      } else if (length(colors) < length(unique(df$name))){
+        if (length(plotdata.ls) <= 8) {
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+        } else if (length(plotdata.ls) <= 12) {
+          p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+        } else if (length(plotdata.ls) <=50){
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                     values = c(colors, big_palette[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition",
+                               values = c(colors, big_palette[-(1:length(colors))])
+            )
         }
       } else {
         p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
@@ -2022,23 +2010,29 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
       } else if (length(ndx.keep) <=50){
         p <- p + scale_fill_manual(name = "Condition",
-                                   values = c(
-                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                   )
+                                   values = big_palette
         ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
+                               values = big_palette
         )
       }
+    } else if (length(colors) < length(unique(df$name))){
+      if (length(ndx.keep) <= 8) {
+        p <- p + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+      } else if (length(ndx.keep) <= 12) {
+        p <- p + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(ndx.keep) <=50){
+        p <- p + scale_fill_manual(name = "Condition",
+                                               values = c(colors, big_palette[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition",
+                             values = c(colors, big_palette[-(1:length(colors))])
+          )
+      }
+    } else {
+      p <- p + scale_fill_manual(name = "Condition",
+                                             values = colors) +
+        scale_color_manual(name = "Condition",
+                           values = colors)
     }
     if(deriv){
       df.deriv <- data.frame()
@@ -2087,25 +2081,31 @@ if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE)
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else if (length(ndx.keep) <= 12) {
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
-        } else if (length(ndx.keep) <=50){
+        } else if (length(ndx.keep) <= 50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                                 values = c(
-                                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                                 )
+                                                 values = big_palette
           ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
+                                 values = big_palette
           )
         }
+      } else if (length(colors) < length(unique(df$name))){
+        if (length(ndx.keep) <= 8) {
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+        } else if (length(ndx.keep) <= 12) {
+          p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+        } else if (length(ndx.keep) <=50){
+          p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                     values = c(colors, big_palette[-(1:length(colors))])) +
+            scale_color_manual(name = "Condition",
+                               values = c(colors, big_palette[-(1:length(colors))])
+            )
+        }
+      } else {
+        p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
       }
       p <- suppressWarnings(
         ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
@@ -2510,33 +2510,28 @@ plot.dual <-  function(x,
       } else {
         if (length(plotdata.ls) <= 8) {
           p <- p + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
-        } else if (length(plotdata.ls) <=50){
+        } else if (length(plotdata.ls) <= 12){
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
+        } else if (length(plotdata.ls) <= 50){
           p <- p + scale_fill_manual(name = "Condition",
-                                     values = c(
-                                       "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                       "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                       "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                       "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                       "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                       "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                     )
+                                     values = big_palette
           ) + scale_color_manual(name = "Condition",
-                                 values = c(
-                                   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                   "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                   "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                   "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                   "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                 )
+                                 values = big_palette
           )
         }
+      }
+    } else if (length(colors) < length(unique(df$name))){
+      if (length(plotdata.ls) <= 8) {
+        p <- p + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+      } else if (length(plotdata.ls) <= 12) {
+        p <- p + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(plotdata.ls) <=50){
+        p <- p + scale_fill_manual(name = "Condition",
+                                               values = c(colors, big_palette[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition",
+                             values = c(colors, big_palette[-(1:length(colors))])
+          )
       }
     } else {
       p <- p + scale_fill_manual(name = "Condition",
@@ -2588,32 +2583,27 @@ plot.dual <-  function(x,
     if(is.null(colors)){
       if (length(plotdata.ls) <= 8) {
         p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set2") + scale_color_brewer(name = "Condition", palette = "Dark2")
+      } else if (length(plotdata.ls) <= 12){
+        p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
       } else if (length(plotdata.ls) <=50){
         p.fl <- p.fl + scale_fill_manual(name = "Condition",
-                                         values = c(
-                                           "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                           "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                           "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                           "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                           "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                           "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                           "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                           "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                           "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                         )
+                                         values = big_palette
         ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown", "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
+                               values = big_palette
         )
+      }
+    } else if (length(colors) < length(unique(df$name))){
+      if (length(plotdata.ls) <= 8) {
+        p.fl <- p.fl + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+      } else if (length(plotdata.ls) <= 12) {
+        p.fl <- p.fl + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(plotdata.ls) <=50){
+        p.fl <- p.fl + scale_fill_manual(name = "Condition",
+                                   values = c(colors, big_palette[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition",
+                             values = c(colors, big_palette[-(1:length(colors))])
+          )
       }
     } else {
       p.fl <- p.fl + scale_fill_manual(name = "Condition",
@@ -2678,23 +2668,29 @@ plot.dual <-  function(x,
         p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
       } else if (length(ndx.keep) <=50){
         p <- p + scale_fill_manual(name = "Condition",
-                                   values = c(
-                                     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                     "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                     "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                     "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                     "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                   )
+                                   values = big_palette
         ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
+                               values = big_palette
         )
       }
+    } else if (length(colors) < length(unique(df$name))){
+      if (length(ndx.keep) <= 8) {
+        p <- p + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+      } else if (length(ndx.keep) <= 12) {
+        p <- p + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(ndx.keep) <=50){
+        p <- p + scale_fill_manual(name = "Condition",
+                                         values = c(colors, big_palette[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition",
+                             values = c(colors, big_palette[-(1:length(colors))])
+          )
+      }
+    } else {
+      p <- p + scale_fill_manual(name = "Condition",
+                                       values = colors) +
+        scale_color_manual(name = "Condition",
+                           values = colors)
     }
     p.fl <- ggplot(df, aes(x=.data$time, y=.data$fl, col = .data$name)) +
       geom_line(size=lwd) +
@@ -2743,22 +2739,29 @@ plot.dual <-  function(x,
         p.fl <- p.fl + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
       } else if (length(ndx.keep) <=50){
         p.fl <- p.fl + scale_fill_manual(name = "Condition",
-                                         values = c(
-                                           "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                           "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                           "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                           "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                           "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                                         )
+                                         values = big_palette
         ) + scale_color_manual(name = "Condition",
-                               values = c(
-                                 "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
-                                 "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
-                                 "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
-                                 "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
-                                 "green1", "yellow4", "yellow3", "darkorange4", "brown"
-                               )
+                               values = big_palette
         )
+      }
+    } else if (length(colors) < length(unique(df$name))){
+      if (length(ndx.keep) <= 8) {
+        p.fl <- p.fl + scale_fill_manual(name = "Condition", palette = c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition", c(colors, RColorBrewer::brewer.pal(8, name = "Dark2")[-(1:length(colors))]))
+      } else if (length(ndx.keep) <= 12) {
+        p.fl <- p.fl + scale_fill_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))])) + scale_color_brewer(name = "Condition", c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
+      } else if (length(ndx.keep) <=50){
+        p.fl <-p.fl + scale_fill_manual(name = "Condition",
+                                   values = c(colors, big_palette[-(1:length(colors))])) +
+          scale_color_manual(name = "Condition",
+                             values = c(colors, big_palette[-(1:length(colors))])
+          )
+      }
+      else {
+        p <- p + scale_fill_manual(name = "Condition",
+                                   values = colors) +
+          scale_color_manual(name = "Condition",
+                             values = colors)
       }
     }
     p <- suppressWarnings(

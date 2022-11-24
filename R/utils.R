@@ -641,3 +641,16 @@ single_hue_palettes <- list("Green" = RColorBrewer::brewer.pal(9, "Greens")[c(2:
                             "Red" = RColorBrewer::brewer.pal(9, "Reds")[c(2,8)],
                             "Blue" = RColorBrewer::brewer.pal(9, "Blues")[c(2,8)],
                             "Magenta" = c("#FFCCFF", "#990099"))
+
+big_palette <- c(
+  "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+  "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+  "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+  "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+  "green1", "yellow4", "yellow3", "darkorange4", "brown",
+  "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",
+  "black", "gold1", "skyblue2", "#FB9A99", "palegreen2",
+  "#CAB2D6", "#FDBF6F", "gray70", "khaki2", "maroon",
+  "orchid1", "deeppink1", "blue1", "steelblue4", "darkturquoise",
+  "green1", "yellow4", "yellow3", "darkorange4", "brown"
+)

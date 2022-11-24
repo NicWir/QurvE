@@ -2650,6 +2650,20 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                step = 1
                                                                    ),
 
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc",
+                                                                     checkboxInput(inputId = "color_groups_group_plot",
+                                                                                   label = "Color samples by group",
+                                                                                   value = TRUE)
+                                                                   ),
+
+                                                                   textInput(
+                                                                     inputId = 'custom_colors_group_plot',
+                                                                     label = 'Custom colors',
+                                                                     value = "",
+                                                                   ),
+                                                                   bsPopover(id = "custom_colors_group_plot", title = HTML("<em>Provide custom colors</em>"), content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma."),
+
                                                                  ), # Side panel growth group plots
 
                                                                  mainPanel(
@@ -2792,6 +2806,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                value = 1,
                                                                                step = 1
                                                                    ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc",
+                                                                     checkboxInput(inputId = "sort_by_conc_growth_parameter_plot",
+                                                                                   label = "Sort samples by concentration",
+                                                                                   value = FALSE)
+                                                                   )
 
 
                                                                  ),
@@ -3636,6 +3657,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                            "Right" = "right")
                                                                    ),
 
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc",
+                                                                     checkboxInput(inputId = "color_groups_fluorescence_group_plot",
+                                                                                   label = "Color samples by group",
+                                                                                   value = TRUE)
+                                                                   ),
+
                                                                  ), # Side panel growth group plots
 
                                                                  mainPanel(
@@ -3844,6 +3872,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                value = 4,
                                                                                step = 1
                                                                    ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc",
+                                                                     checkboxInput(inputId = "color_groups_dual_plot",
+                                                                                   label = "Color samples by group",
+                                                                                   value = TRUE)
+                                                                   ),
                                                                  ),
 
                                                                  mainPanel(
@@ -3983,6 +4018,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                max = 10,
                                                                                value = 1,
                                                                                step = 1
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc",
+                                                                     checkboxInput(inputId = "sort_by_conc_fluorescence_parameter_plot",
+                                                                                   label = "Sort samples by concentration",
+                                                                                   value = FALSE)
                                                                    ),
 
 
@@ -4784,7 +4826,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                 verbatimTextOutput("debug")
 )
 
-#____SERVER____####
+#____SERVER____
 
 server <- function(input, output, session){
 
@@ -5015,6 +5057,21 @@ server <- function(input, output, session){
     } else return(FALSE)
   })
   outputOptions(output, 'fluorescence_present', suspendWhenHidden=FALSE)
+
+  # Test if more than one two concentrations are being tested
+  output$more_than_two_conc <-  reactive({
+    if(!is.null(results$custom_data)){
+      grodata <- results$custom_data
+    } else if(!is.null(results$parsed_data)){
+      grodata <- results$parsed_data
+    } else return(FALSE)
+
+    if(length(unique(grodata$expdesign$concentration)) > 2 )
+      return(TRUE)
+    else
+      return(FALSE)
+  })
+  outputOptions(output, 'more_than_two_conc', suspendWhenHidden=FALSE)
     ##___Custom____####
 
   hide("Custom_Data_Tables")
@@ -6051,7 +6108,6 @@ server <- function(input, output, session){
   })
 
   observeEvent(input$run_growth,{
-
     ## Read data
     # grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator_custom_density, dec = input$decimal_separator_custom_density)
     # Choose data input
@@ -8721,6 +8777,7 @@ server <- function(input, output, session){
                     basesize = input$base_size_growth_group_plot,
                     legend.position = input$legend_position_group_plot,
                     legend.ncol = input$legend_ncol_group_plot,
+                    color_groups = input$color_groups_group_plot,
                     shiny = TRUE
         )
       )
@@ -8751,6 +8808,7 @@ server <- function(input, output, session){
                     lwd = input$line_width_growth_group_plot,
                     basesize = input$base_size_growth_group_plot,
                     legend.position = input$legend_position_group_plot,
+                    color_groups = input$color_groups_group_plot,
                     legend.ncol = input$legend_ncol_group_plot,
                     shiny = TRUE
         )
@@ -9548,7 +9606,8 @@ server <- function(input, output, session){
                        basesize = input$basesize_growth_parameter_plot,
                        label.size = input$label.size_growth_parameter_plot,
                        legend.position = input$legend_position_growth_parameter_plot,
-                       legend.ncol = input$legend_ncol_growth_parameter_plot
+                       legend.ncol = input$legend_ncol_growth_parameter_plot,
+                       order_by_conc = input$sort_by_conc_growth_parameter_plot
         )
       )
     } else {
@@ -9566,7 +9625,9 @@ server <- function(input, output, session){
                        basesize = input$basesize_growth_parameter_plot,
                        label.size = input$label.size_growth_parameter_plot,
                        legend.position = input$legend_position_growth_parameter_plot,
-                       legend.ncol = input$legend_ncol_growth_parameter_plot
+                       legend.ncol = input$legend_ncol_growth_parameter_plot,
+                       order_by_conc = input$sort_by_conc_growth_parameter_plot
+
         )
       )
     }
@@ -9939,6 +10000,7 @@ server <- function(input, output, session){
           y.title.deriv = input$y_axis_title_derivative_fluorescence_group_plot,
           lwd = input$line_width_fluorescence_group_plot,
           basesize = input$base_size_fluorescence_group_plot,
+          color_groups = input$color_groups_fluorescence_group_plot,
           n.ybreaks = input$nbreaks_fluorescence_group_plot,
           legend.position = input$legend_position_fluorescence_group_plot,
           legend.ncol = input$legend_ncol_fluorescence_group_plot,
@@ -9971,6 +10033,7 @@ server <- function(input, output, session){
           lwd = input$line_width_fluorescence_group_plot,
           basesize = input$base_size_fluorescence_group_plot,
           n.ybreaks = input$nbreaks_fluorescence_group_plot,
+          color_groups = input$color_groups_fluorescence_group_plot,
           legend.position = input$legend_position_fluorescence_group_plot,
           legend.ncol = input$legend_ncol_fluorescence_group_plot,
           shiny = TRUE
@@ -10496,7 +10559,8 @@ server <- function(input, output, session){
                            basesize = input$basesize_fluorescence_parameter_plot,
                            label.size = input$label.size_fluorescence_parameter_plot,
                            legend.position = input$legend_position_fluorescence_parameter_plot,
-                           legend.ncol = input$legend_ncol_fluorescence_parameter_plot
+                           legend.ncol = input$legend_ncol_fluorescence_parameter_plot,
+                           order_by_conc = input$sort_by_conc_fluorescence_parameter_plot
             )
           )
         } else {
@@ -10514,7 +10578,8 @@ server <- function(input, output, session){
                            basesize = input$basesize_fluorescence_parameter_plot,
                            label.size = input$label.size_fluorescence_parameter_plot,
                            legend.position = input$legend_position_fluorescence_parameter_plot,
-                           legend.ncol = input$legend_ncol_fluorescence_parameter_plot
+                           legend.ncol = input$legend_ncol_fluorescence_parameter_plot,
+                           order_by_conc = input$sort_by_conc_fluorescence_parameter_plot
             )
           )
         }
@@ -10761,6 +10826,7 @@ server <- function(input, output, session){
                     basesize = input$base_size_dual_plot,
                     legend.position = input$legend_position_dual_plot,
                     legend.ncol = input$legend_ncol_dual_plot,
+                    color_groups = input$color_groups_dual_plot,
                     shiny = TRUE
           )
         )
@@ -10785,6 +10851,7 @@ server <- function(input, output, session){
                       n.ybreaks = input$nbreaks_dual_plot,
                       lwd = input$line_width_dual_plot,
                       basesize = input$base_size_dual_plot,
+                      color_groups = input$color_groups_dual_plot,
                       legend.position = input$legend_position_dual_plot,
                       legend.ncol = input$legend_ncol_dual_plot,
                       shiny = TRUE
