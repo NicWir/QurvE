@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth_plots.R
 \name{plot.gcFitModel}
 \alias{plot.gcFitModel}
-\title{Generic plot function for \code{gcBootSpline} objects.}
+\title{Generic plot function for \code{gcFitModel} objects.}
 \usage{
 \method{plot}{gcFitModel}(
   x,
@@ -11,7 +11,7 @@
   colData = 1,
   equation = TRUE,
   eq.size = 1,
-  colModel = ggplot2::alpha("forestgreen", 0.85),
+  colModel = "forestgreen",
   basesize = 16,
   cex.point = 2,
   lwd = 0.7,

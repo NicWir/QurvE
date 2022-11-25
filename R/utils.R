@@ -634,13 +634,16 @@ rdm.data <-function (d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label
   }
 
 single_hue_palettes <- list("Green" = RColorBrewer::brewer.pal(9, "Greens")[c(2:9)],
-                            "Oranges" = RColorBrewer::brewer.pal(9, "Oranges")[c(2:8)],
+                            "Orange" = RColorBrewer::brewer.pal(9, "Oranges")[c(2:8)],
                             "Purple" = RColorBrewer::brewer.pal(9, "Purples")[c(3:9)],
-                            "Cyan" = c("#CCFFFF", "#009999"),
-                            "Grey" = RColorBrewer::brewer.pal(9, "Greys")[c(2,8)],
-                            "Red" = RColorBrewer::brewer.pal(9, "Reds")[c(2,8)],
-                            "Blue" = RColorBrewer::brewer.pal(9, "Blues")[c(2,8)],
-                            "Magenta" = c("#FFCCFF", "#990099"))
+                            "Magenta" = c("#FFCAF3", "#ffb4e2", "#ff67c4", "#ff009b", "#c30076"),
+                            "Grey" = RColorBrewer::brewer.pal(9, "Greys")[c(2:8)],
+                            "Blue" = RColorBrewer::brewer.pal(9, "Blues")[c(2:8)],
+                            "Grey" = RColorBrewer::brewer.pal(9, "Greys")[c(2:8)],
+                            "Red" = rev(grDevices::hcl.colors(n=10, palette = "Reds"))[-(1:2)],
+                            "Cyan" = c("#CCFFFC", "#AAf2EF", "#75E9E5", "#3CDDDC", "#00d5d6", "#00ccd3", "#00bcc0", "#00a6a7", "#00918f", "#009999"),
+                            "Brown" = rev(grDevices::hcl.colors(n=8, palette = "BrwnYl")),
+                            "Mint" = grDevices::hcl.colors(n=7, palette = "Mint"))
 
 big_palette <- c(
   "dodgerblue2", "#E31A1C", "green4", "#6A3D9A", "#FF7F00",

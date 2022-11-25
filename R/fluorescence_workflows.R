@@ -611,8 +611,8 @@ fl.workflow <- function(grodata = NULL,
 {
   if(ec50 == TRUE){
     dr.parameter.fit.method <- gsub(".+\\.", "", dr.parameter)
-    if((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
-       (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("l")))
+    if((dr.parameter.fit.method == "spline" && !any(fit.opt %in% c("s"))) ||
+       (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("l")))
     )
       message("The chosen 'dr.parameter' is not compatible with the selected fitting options ('fit.opt'). Dose-response analysis will not be performed.")
   }
@@ -719,8 +719,8 @@ fl.workflow <- function(grodata = NULL,
 
   # /// Estimate EC50 values
   if (ec50 == TRUE &&
-      !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
-        (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("l")))
+      !((dr.parameter.fit.method == "spline" && !any(fit.opt %in% c("s"))) ||
+        (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("l")))
       )
   ) {
     if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
@@ -828,8 +828,8 @@ fl.workflow <- function(grodata = NULL,
     # }
 
     if (ec50 == TRUE &&
-        !((dr.parameter.fit.method == "spline" && !(fit.opt %in% c("s"))) ||
-          (dr.parameter.fit.method == "linfit" && !(fit.opt %in% c("l")))
+        !((dr.parameter.fit.method == "spline" && !any(fit.opt %in% c("s"))) ||
+          (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("l")))
         )
     ) {
       if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){

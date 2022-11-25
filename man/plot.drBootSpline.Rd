@@ -8,7 +8,7 @@
   x,
   pch = 19,
   colData = 1,
-  colSpline = scales::alpha("black", 0.15),
+  colSpline = "black",
   cex.point = 1,
   cex.lab = 1.5,
   cex.axis = 1.3,

@@ -17,6 +17,8 @@
   n.ybreaks = 6,
   colors = NULL,
   color_groups = T,
+  group_pals = c("Green", "Orange", "Purple", "Magenta", "Grey", "Blue", "Grey", "Red",
+    "Cyan", "Brown", "Mint"),
   basesize = 20,
   y.lim = NULL,
   x.lim = NULL,
@@ -59,6 +61,8 @@
 \item{colors}{(vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.}
 
 \item{color_groups}{(Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?}
+
+\item{group_pals}{(String vector) Define the colors used to display sample groups with identical concentrations. The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend. Available options: "Green", "Oranges", "Purple", "Cyan", "Grey", "Red", "Blue", and "Magenta".}
 
 \item{basesize}{(Numeric) Base font size.}
 

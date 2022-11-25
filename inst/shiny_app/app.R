@@ -601,7 +601,20 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    div(id = 'Custom_Data_Tables',
                                        h1("Your Data"),
                                        tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
+                                                   tabPanel(title = "Growth plot", value = "tabPanel_custom_plots_density",
+                                                            withSpinner(
+                                                              plotOutput("custom_raw_density_plot",
+                                                                         width = "100%", height = "1000px"),
 
+                                                            )
+                                                   ),
+                                                   tabPanel(title = "Fluorescence plot", value = "tabPanel_custom_plots_fluorescence",
+                                                            withSpinner(
+                                                              plotOutput("custom_raw_fluorescence_plot",
+                                                                         width = "100%", height = "1000px"),
+
+                                                            )
+                                                   ),
                                                    tabPanel(title = "Density", value = "tabPanel_custom_tables_density_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("growth_data_custom_processed")
@@ -631,6 +644,20 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    div(id = 'Parsed_Data_Tables',
                                        h1("Parsed Data"),
                                        tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
+                                                   tabPanel(title = "Growth plot", value = "tabPanel_parsed_plots_density",
+                                                            withSpinner(
+                                                              plotOutput("parsed_raw_density_plot",
+                                                                         width = "100%", height = "1000px"),
+
+                                                            )
+                                                   ),
+                                                   tabPanel(title = "Fluorescence plot", value = "tabPanel_parsed_plots_fluorescence",
+                                                            withSpinner(
+                                                              plotOutput("parsed_raw_fluorescence_plot",
+                                                                         width = "100%", height = "1000px"),
+
+                                                            )
+                                                   ),
                                                    tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
                                                             DT::dataTableOutput('parsed_data_table_density')
                                                    ),
@@ -1558,6 +1585,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 )
                                                                               ),
 
+                                                                              textInput(
+                                                                                inputId = 'color_validate_growth_plot_linear',
+                                                                                label = 'Change color',
+                                                                                value = "firebrick3"
+                                                                              ),
+                                                                              bsPopover(id = "color_validate_growth_plot_linear",
+                                                                                        title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
+                                                                                        content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                              ),
+
                                                                  ),
 
                                                                  mainPanel(width = 7,
@@ -1714,6 +1751,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           max = 20,
                                                                                           value = 6),
 
+                                                                              textInput(
+                                                                                inputId = 'color_validate_growth_plot_spline',
+                                                                                label = 'Change color',
+                                                                                value = "dodgerblue3"
+                                                                              ),
+                                                                              bsPopover(id = "color_validate_growth_plot_spline",
+                                                                                        title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
+                                                                                        content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                              ),
+
                                                                  ),
                                                                  mainPanel(width = 7,
                                                                            withSpinner(
@@ -1817,6 +1864,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           max = 10,
                                                                                           step = 0.1,
                                                                                           value = 1.9),
+
+                                                                              textInput(
+                                                                                inputId = 'color_validate_growth_plot_model',
+                                                                                label = 'Change color',
+                                                                                value = "forestgreen"
+                                                                              ),
+                                                                              bsPopover(id = "color_validate_growth_plot_model",
+                                                                                        title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
+                                                                                        content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                              ),
 
                                                                  ),
                                                                  mainPanel(width = 7,
@@ -1972,7 +2029,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                  label = NULL,
                                                                                                  value = "", placeholder = "max"
                                                                                        )
-                                                                                )
+                                                                                ),
+
+                                                                                textInput(
+                                                                                  inputId = 'color_validate_growth_plot_spline_bt',
+                                                                                  label = 'Change color',
+                                                                                  value = "dodgerblue3"
+                                                                                ),
+                                                                                bsPopover(id = "color_validate_growth_plot_spline_bt",
+                                                                                          title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
+                                                                                          content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                                ),
                                                                               ),
 
                                                                  ), # sidebarPanel
@@ -2107,6 +2174,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                  value = "", placeholder = "max"
                                                                                        )
                                                                                 )
+                                                                              ),
+
+                                                                              textInput(
+                                                                                inputId = 'color_validate_fluorescence_plot_linear',
+                                                                                label = 'Change color',
+                                                                                value = "firebrick3"
+                                                                              ),
+                                                                              bsPopover(id = "color_validate_fluorescence_plot_linear",
+                                                                                        title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
+                                                                                        content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
 
                                                                  ),
@@ -2260,6 +2337,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           max = 20,
                                                                                           value = 6),
 
+                                                                              textInput(
+                                                                                inputId = 'color_validate_fluorescence_plot_spline',
+                                                                                label = 'Change color',
+                                                                                value = "dodgerblue3"
+                                                                              ),
+                                                                              bsPopover(id = "color_validate_fluorescence_plot_spline",
+                                                                                        title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
+                                                                                        content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                              ),
+
                                                                  ),
                                                                  mainPanel(width = 7,
                                                                            #conditional if diagnostics
@@ -2313,6 +2400,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            ) # fluidRow
                                                                  ) # mainPanel
                                                         ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
+
+                                                        # Bootstrapping spline fit ####
 
                                                         tabPanel(title = "Bootstrapping Spline", value = "tabPanel_Validate_Fluorescence_Spline_bt",
                                                                  sidebarPanel(width = 4,
@@ -2415,6 +2504,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                  value = "", placeholder = "max"
                                                                                        )
                                                                                 )
+                                                                              ),
+
+                                                                              textInput(
+                                                                                inputId = 'color_validate_fluorescence_spline_bt',
+                                                                                label = 'Change color',
+                                                                                value = "dodgerblue3"
+                                                                              ),
+                                                                              bsPopover(id = "color_validate_fluorescence_spline_bt",
+                                                                                        title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
+                                                                                        content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
 
                                                                  ), # sidebarPanel
@@ -2659,10 +2758,30 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    textInput(
                                                                      inputId = 'custom_colors_group_plot',
-                                                                     label = 'Custom colors',
-                                                                     value = "",
+                                                                     label = 'Custom colors'
                                                                    ),
-                                                                   bsPopover(id = "custom_colors_group_plot", title = HTML("<em>Provide custom colors</em>"), content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma."),
+                                                                   bsPopover(id = "custom_colors_group_plot",
+                                                                             title = HTML("<em>Provide custom colors</em>"), placement = "top",
+                                                                             content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc && input.color_groups_group_plot",
+                                                                     selectizeInput(inputId = "color_palettes_group_plot",
+                                                                                    label = "Change color palettes",
+                                                                                    width = "100%",
+                                                                                    choices = names(single_hue_palettes),
+                                                                                    selected = names(single_hue_palettes),
+                                                                                    multiple = TRUE,
+                                                                                    options = list(closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     ),
+                                                                     bsPopover(id = "color_palettes_group_plot",
+                                                                               title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
+                                                                               content = "The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend."
+                                                                     ),
+
+                                                                   )
 
                                                                  ), # Side panel growth group plots
 
@@ -2812,7 +2931,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      checkboxInput(inputId = "sort_by_conc_growth_parameter_plot",
                                                                                    label = "Sort samples by concentration",
                                                                                    value = FALSE)
-                                                                   )
+                                                                   ),
+
+                                                                   textInput(
+                                                                     inputId = 'custom_colors_growth_parameter_plot',
+                                                                     label = 'Custom colors'
+                                                                   ),
+                                                                   bsPopover(id = "custom_colors_growth_parameter_plot",
+                                                                             title = HTML("<em>Provide custom colors</em>"), placement = "top",
+                                                                             content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                   ),
 
 
                                                                  ),
@@ -3664,11 +3792,39 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                    value = TRUE)
                                                                    ),
 
+                                                                   textInput(
+                                                                     inputId = 'custom_colors_fluorescence_group_plot',
+                                                                     label = 'Custom colors'
+                                                                   ),
+                                                                   bsPopover(id = "custom_colors_fluorescence_group_plot",
+                                                                             title = HTML("<em>Provide custom colors</em>"), placement = "top",
+                                                                             content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc && input.color_groups_fluorescence_group_plot",
+                                                                     selectizeInput(inputId = "color_palettes_fluorescence_group_plot",
+                                                                                    label = "Change color palettes",
+                                                                                    width = "100%",
+                                                                                    choices = names(single_hue_palettes),
+                                                                                    selected = names(single_hue_palettes),
+                                                                                    multiple = TRUE,
+                                                                                    options = list(closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     ),
+                                                                     bsPopover(id = "color_palettes_fluorescence_group_plot",
+                                                                               title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
+                                                                               content = "The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend."
+                                                                     ),
+                                                                   ),
+
                                                                  ), # Side panel growth group plots
 
                                                                  mainPanel(
+                                                                   withSpinner(
                                                                    plotOutput("fluorescence_group_plot",
-                                                                              width = "100%", height = "1000px"),
+                                                                              width = "100%", height = "1000px")
+                                                                   ),
 
                                                                    h3(strong("Export plot")),
 
@@ -3706,7 +3862,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                         ), # tabPanel Group_Plots
 
-                                                        ### Growth & Fluorescence Plots ####
+                                                        ### Dual Plots ####
 
                                                         tabPanel(title = "Growth & Flourescence Plot", value = "tabPabel_Visualize_Dual",
                                                                  h1("Growth & Flourescence Plot"),
@@ -3879,11 +4035,39 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                    label = "Color samples by group",
                                                                                    value = TRUE)
                                                                    ),
+
+                                                                   textInput(
+                                                                     inputId = 'custom_colors_dual_plot',
+                                                                     label = 'Custom colors'
+                                                                   ),
+                                                                   bsPopover(id = "custom_colors_dual_plot",
+                                                                             title = HTML("<em>Provide custom colors</em>"), placement = "top",
+                                                                             content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc && input.color_groups_dual_plot",
+                                                                     selectizeInput(inputId = "color_palettes_dual_plot",
+                                                                                    label = "Change color palettes",
+                                                                                    width = "100%",
+                                                                                    choices = names(single_hue_palettes),
+                                                                                    selected = names(single_hue_palettes),
+                                                                                    multiple = TRUE,
+                                                                                    options = list(closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     ),
+                                                                     bsPopover(id = "color_palettes_dual_plot",
+                                                                               title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
+                                                                               content = "The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend."
+                                                                     ),
+                                                                   ),
                                                                  ),
 
                                                                  mainPanel(
+                                                                   withSpinner(
                                                                    plotOutput("dual_plot",
-                                                                              width = "100%", height = "1000px"),
+                                                                              width = "100%", height = "1000px")
+                                                                   ),
 
                                                                    h3(strong("Export plot")),
 
@@ -4025,6 +4209,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      checkboxInput(inputId = "sort_by_conc_fluorescence_parameter_plot",
                                                                                    label = "Sort samples by concentration",
                                                                                    value = FALSE)
+                                                                   ),
+
+                                                                   textInput(
+                                                                     inputId = 'custom_colors_fluorescence_parameter_plot',
+                                                                     label = 'Custom colors'
+                                                                   ),
+                                                                   bsPopover(id = "custom_colors_fluorescence_parameter_plot",
+                                                                             title = HTML("<em>Provide custom colors</em>"), placement = "top",
+                                                                             content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                    ),
 
 
@@ -4826,7 +5019,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                 verbatimTextOutput("debug")
 )
 
-#____SERVER____
+#____SERVER____####
 
 server <- function(input, output, session){
 
@@ -5148,7 +5341,10 @@ server <- function(input, output, session){
       hide("parsed_reads_fluorescence")
       # hide("parsed_reads_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
       # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
@@ -5281,13 +5477,17 @@ server <- function(input, output, session){
     }
     if(exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed())){
       showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed", select = TRUE)
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_density", select = FALSE)
     } else {
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed")
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_density")
     }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) ){
       showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed", select = TRUE)
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_fluorescence", select = FALSE)
     } else {
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_fluorescence")
     }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) &&
        exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed()) &&
@@ -5500,6 +5700,42 @@ server <- function(input, output, session){
   #             escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f2)-3)))
   # })
 
+  custom_raw_density_plot <- reactive({
+    if(is.null(results$custom_data) || length(results$custom_data$density) < 2) return(NULL)
+
+    try(
+      suppressWarnings(
+        plot.grodata(x = results$custom_data,
+                     data.type = "dens",
+                    IDs = NULL,
+                    shiny = TRUE
+        )
+      )
+    )
+  })
+
+  output$custom_raw_density_plot <- renderPlot({
+    custom_raw_density_plot()
+  })
+
+  custom_raw_fluorescence_plot <- reactive({
+    if(is.null(results$custom_data) || length(results$custom_data$fluorescence) < 2) return(NULL)
+
+    try(
+      suppressWarnings(
+        plot.grodata(x = results$custom_data,
+                     data.type = "fl",
+                     IDs = NULL,
+                     shiny = TRUE
+        )
+      )
+    )
+  })
+
+  output$custom_raw_fluorescence_plot <- renderPlot({
+    custom_raw_fluorescence_plot()
+  })
+
 
 
   output$custom_density_format <- reactive({
@@ -5609,7 +5845,7 @@ server <- function(input, output, session){
     ) # showModal
   })
 
-  # Re-run selected linear fit with user-defined parameters upon click on 'submit'
+  # Generate random dataset
   observeEvent(input$submit.random.data.growth, {
     d <- ifelse(input$d.random.growth == "", 35, as.numeric(input$d.random.growth))
     y0 <- ifelse(input$y0.random.growth == "", 0.05, as.numeric(input$y0.random.growth))
@@ -5637,7 +5873,10 @@ server <- function(input, output, session){
     hide("parsed_reads_fluorescence")
     # hide("parsed_reads_fluorescence2")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
     # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
@@ -5684,7 +5923,10 @@ server <- function(input, output, session){
       hide("parsed_reads_fluorescence")
       # hide("parsed_reads_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
       # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
@@ -5702,9 +5944,34 @@ server <- function(input, output, session){
   # hide("parsed_reads_fluorescence2")
   hide("parse_data")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
   # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+
+  observe({
+    if(exists("parsed_data_table_expdesign") && !is.null(parsed_data_table_expdesign())){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+    } else {
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
+    }
+    if(exists("parsed_data_table_density") && !is.null(parsed_data_table_density())){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density", select = TRUE)
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density", select = FALSE)
+    } else {
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+    }
+    if(exists("parsed_data_table_fluorescence") && !is.null(parsed_data_table_fluorescence()) ){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence", select = TRUE)
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence", select = FALSE)
+    } else {
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
+    }
+  })
 
   # Update placeholder for time conversion based on selected software
   observe({
@@ -5983,12 +6250,15 @@ server <- function(input, output, session){
     show("Parsed_Data_Tables")
     if("density" %in% names(results$parsed_data) && length(results$parsed_data$density)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+
       # show [Run Computation] button in Computation-Growth
       show("run_growth")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
     if("fluorescence" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence)>1){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
     # if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
@@ -5996,8 +6266,12 @@ server <- function(input, output, session){
     # }
     # Remove eventually pre-loaded custom data
     results$custom_data <- NULL
-    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
-    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_density")
+
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_fluorescence")
+
     # hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
 
@@ -6005,7 +6279,7 @@ server <- function(input, output, session){
     removeModal()
   })
   #### Generate parsed tables to display in [DATA] tab
-  output$parsed_data_table_density <- DT::renderDT({
+  parsed_data_table_density <- reactive({
     if(is.null(results$parsed_data) || length(results$parsed_data$density) < 2) return(NULL)
 
     table_density <- t(results$parsed_data$density)
@@ -6017,28 +6291,32 @@ server <- function(input, output, session){
     rownames(table_density)[-(1:3)] <- ""
     table_density <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
                            table_density)
-
-    table_density <- DT::datatable(table_density,
-                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
-
     table_density
   })
-  output$parsed_data_table_fluorescence <- DT::renderDT({
 
+  output$parsed_data_table_density <- DT::renderDT({
+    DT::datatable(parsed_data_table_density(),
+                               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_density())-3)))
+
+  })
+
+  parsed_data_table_fluorescence <- reactive({
     if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence)<2) return(NULL)
 
     table_fl <- t(results$parsed_data$fluorescence)
     table_fl[-(1:3), ] <- apply(apply(table_fl[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
     rownames(table_fl)[-(1:3)] <- ""
     table_fl <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
-                       table_fl)
-
-    table_fl <- DT::datatable(table_fl,
-                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl)-3)))
-
+                      table_fl)
     table_fl
+  })
+
+  output$parsed_data_table_fluorescence <- DT::renderDT({
+    DT::datatable(parsed_data_table_fluorescence(),
+                           options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                           escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_fluorescence())-3)))
+
   })
   # output$parsed_data_table_fluorescence2 <- DT::renderDT({
   #
@@ -6067,6 +6345,42 @@ server <- function(input, output, session){
                            escape = FALSE, rownames = T)
 
     expdesign
+  })
+
+  parsed_raw_density_plot <- reactive({
+    if(is.null(results$parsed_data) || length(results$parsed_data$density) < 2) return(NULL)
+
+    try(
+      suppressWarnings(
+        plot.grodata(x = results$parsed_data,
+                     data.type = "dens",
+                     IDs = NULL,
+                     shiny = TRUE
+        )
+      )
+    )
+  })
+
+  output$parsed_raw_density_plot <- renderPlot({
+    parsed_raw_density_plot()
+  })
+
+  parsed_raw_fluorescence_plot <- reactive({
+    if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence) < 2) return(NULL)
+
+    try(
+      suppressWarnings(
+        plot.grodata(x = results$parsed_data,
+                     data.type = "fl",
+                     IDs = NULL,
+                     shiny = TRUE
+        )
+      )
+    )
+  })
+
+  output$parsed_raw_fluorescence_plot <- renderPlot({
+    parsed_raw_fluorescence_plot()
   })
 
   observe({
@@ -7245,28 +7559,9 @@ server <- function(input, output, session){
       selected_vals_validate_growth$sample_validate_growth_linear
     )]]) > 1) {
       if(input$diagnostics_validate_growth_plot_linear){
-        suppressWarnings(
-          plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
-            selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
-              is.null(
-                selected_vals_validate_growth$sample_validate_growth_linear
-              ),
-            1,
-            selected_vals_validate_growth$sample_validate_growth_linear
-          )]],
-          which = "fit_diagnostics",
-          pch = input$shape_type_validate_growth_plot_linear,
-          log = logy_validate_growth_plot_linear(),
-          cex.point = input$shape_size_validate_growth_plot_linear,
-          cex.lab = input$axis_size_validate_growth_plot_linear,
-          cex.axis = input$lab_size_validate_growth_plot_linear,
-          lwd = input$line_width_validate_growth_plot_linear
-          )
-        )
-      } else {
-        suppressWarnings(
-          plot.gcFitLinear(
-            results$gcFit$gcFittedLinear[[ifelse(
+        try(
+          suppressWarnings(
+            plot.gcFitLinear(results$gcFit$gcFittedLinear[[ifelse(
               selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
                 is.null(
                   selected_vals_validate_growth$sample_validate_growth_linear
@@ -7274,15 +7569,40 @@ server <- function(input, output, session){
               1,
               selected_vals_validate_growth$sample_validate_growth_linear
             )]],
+            which = "fit_diagnostics",
             pch = input$shape_type_validate_growth_plot_linear,
-
             log = logy_validate_growth_plot_linear(),
             cex.point = input$shape_size_validate_growth_plot_linear,
             cex.lab = input$axis_size_validate_growth_plot_linear,
             cex.axis = input$lab_size_validate_growth_plot_linear,
             lwd = input$line_width_validate_growth_plot_linear,
-            y.lim = y.lim,
-            x.lim = x.lim
+            color = input$color_validate_growth_plot_linear
+            )
+          )
+        )
+      } else {
+        try(
+          suppressWarnings(
+            plot.gcFitLinear(
+              results$gcFit$gcFittedLinear[[ifelse(
+                selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
+                  is.null(
+                    selected_vals_validate_growth$sample_validate_growth_linear
+                  ),
+                1,
+                selected_vals_validate_growth$sample_validate_growth_linear
+              )]],
+              pch = input$shape_type_validate_growth_plot_linear,
+
+              log = logy_validate_growth_plot_linear(),
+              cex.point = input$shape_size_validate_growth_plot_linear,
+              cex.lab = input$axis_size_validate_growth_plot_linear,
+              cex.axis = input$lab_size_validate_growth_plot_linear,
+              lwd = input$line_width_validate_growth_plot_linear,
+              y.lim = y.lim,
+              x.lim = x.lim,
+              color = input$color_validate_growth_plot_linear
+            )
           )
         )
       }
@@ -7389,6 +7709,42 @@ server <- function(input, output, session){
                            match(selected_vals_validate_growth$sample_validate_growth_linear, names(results$growth$gcFit$gcFittedLinear)))
       results$growth$gcFit$gcTable[sample.ndx, colnames(res.table.gc) %in% colnames(fit.summary)] <- fit.summary
 
+      # Re-run drFit if respective fit type (linear/spline/model) was chosen as dr.parameter
+      dr.parameter.fit.method <- gsub(".+\\.", "", results$growth$control$dr.parameter)
+
+      if(length(results$growth$drFit) > 1 && dr.parameter.fit.method == "linfit"){
+        # Store previous drFit in memory
+        selected_vals_validate_growth$restore_growth_drFit <- results$growth$drFit
+
+        # Re-run drFit
+        if (is.null(input$smoothing_factor_growth_dr) || is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL" || input$smoothing_factor_growth_dr == "") {
+          smooth.dr = NULL
+        } else {
+          smooth.dr <- as.numeric(input$smoothing_factor_growth_dr)
+        }
+        if (is.null(input$number_of_bootstrappings_dr_growth) || is.na(input$number_of_bootstrappings_dr_growth) || input$number_of_bootstrappings_dr_growth == "NULL" || input$number_of_bootstrappings_dr_growth == "") {
+          nboot.dr <- 0
+        } else {
+          nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_growth)
+        }
+        showModal(modalDialog("Re-calculating dose-response analysis...", footer = NULL))
+
+        try(
+          results$growth$drFit <-
+            suppressWarnings(
+              growth.drFit(gcTable = results$growth$gcFit$gcTable,
+                           control = growth.control(dr.method = input$dr_method_growth,
+                                                    dr.parameter = results$growth$control$dr.parameter,
+                                                    smooth.dr = smooth.dr,
+                                                    log.x.dr = input$log_transform_concentration_growth,
+                                                    log.y.dr = input$log_transform_response_growth,
+                                                    nboot.dr = nboot.dr
+                           )
+              )
+            )
+        )
+      }
+
       # Show [Restore fit] button
       show("restore_growth_linear")
     }
@@ -7398,8 +7754,12 @@ server <- function(input, output, session){
 
   # Restore previous linear fit upon click on [Restore Fit]
   observeEvent(input$restore_growth_linear, {
-    # store previous fit from memory
+    # restore previous fit from memory
     results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]] <- selected_vals_validate_growth$restore_growth_linear
+    dr.parameter.fit.method <- gsub(".+\\.", "", results$growth$control$dr.parameter)
+    if(length(results$growth$drFit) > 1 && dr.parameter.fit.method == "linfit"){
+      results$growth$drFit <- selected_vals_validate_growth$restore_growth_drFit
+    }
     hide("restore_growth_linear")
   })
 
@@ -7564,6 +7924,7 @@ server <- function(input, output, session){
             n.ybreaks = input$nbreaks_validate_growth_plot_spline,
             pch = input$shape_type_validate_growth_plot_spline,
             deriv = input$plot_derivative_validate_growth_plot_spline,
+            colSpline = input$color_validate_growth_plot_spline
           )
         )
       )
@@ -7650,6 +8011,41 @@ server <- function(input, output, session){
                            match(selected_vals_validate_growth$sample_validate_growth_spline, names(results$growth$gcFit$gcFittedSplines)))
       results$growth$gcFit$gcTable[sample.ndx, colnames(res.table.gc) %in% colnames(fit.summary)] <- fit.summary
 
+      # Re-run drFit if respective fit type (linear/spline/model) was chosen as dr.parameter
+      dr.parameter.fit.method <- gsub(".+\\.", "", results$growth$control$dr.parameter)
+
+      if(length(results$growth$drFit) > 1 && dr.parameter.fit.method == "spline"){
+        # Store previous drFit in memory
+        selected_vals_validate_growth$restore_growth_drFit <- results$growth$drFit
+
+        # Re-run drFit
+        if (is.null(input$smoothing_factor_growth_dr) || is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL" || input$smoothing_factor_growth_dr == "") {
+          smooth.dr = NULL
+        } else {
+          smooth.dr <- as.numeric(input$smoothing_factor_growth_dr)
+        }
+        if (is.null(input$number_of_bootstrappings_dr_growth) || is.na(input$number_of_bootstrappings_dr_growth) || input$number_of_bootstrappings_dr_growth == "NULL" || input$number_of_bootstrappings_dr_growth == "") {
+          nboot.dr <- 0
+        } else {
+          nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_growth)
+        }
+        showModal(modalDialog("Re-calculating dose-response analysis...", footer = NULL))
+
+        try(
+          results$growth$drFit <-
+            suppressWarnings(
+              growth.drFit(gcTable = results$growth$gcFit$gcTable,
+                           control = growth.control(dr.method = input$dr_method_growth,
+                                                    dr.parameter = results$growth$control$dr.parameter,
+                                                    smooth.dr = smooth.dr,
+                                                    log.x.dr = input$log_transform_concentration_growth,
+                                                    log.y.dr = input$log_transform_response_growth,
+                                                    nboot.dr = nboot.dr
+                           )
+              )
+            )
+        )
+      }
       # Show [Restore fit] button
       show("restore_growth_spline")
     }
@@ -7660,9 +8056,13 @@ server <- function(input, output, session){
 
   # Restore previous spline fit upon click on [Restore Fit]
   observeEvent(input$restore_growth_spline, {
-    # store previous fit from memory
+    # restore previous fit from memory
     results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]] <- selected_vals_validate_growth$restore_growth_spline
     hide("restore_growth_spline")
+    dr.parameter.fit.method <- gsub(".+\\.", "", results$growth$control$dr.parameter)
+    if(length(results$growth$drFit) > 1 && dr.parameter.fit.method == "spline"){
+      results$growth$drFit <- selected_vals_validate_growth$restore_growth_drFit
+    }
   })
 
   output$download_growth_validate_spline <- downloadHandler(
@@ -7721,18 +8121,18 @@ server <- function(input, output, session){
                                                    selected_vals_validate_growth$sample_validate_growth_model == "" ||
                                                    is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      suppressWarnings(
-        plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(selected_vals_validate_growth$sample_validate_growth_model == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]],
-                        colData = 1,
-                        colModel = 2,
-                        colLag = 3,
-                        pch = input$shape_type_validate_growth_plot_model,
-                        basesize = input$base_size_validate_growth_plot_model,
-                        cex.point = input$shape_size_validate_growth_plot_model,
-                        lwd = input$line_width_validate_growth_plot_model,
-                        n.ybreaks = input$nbreaks_validate_growth_plot_model,
-                        eq.size = input$eqsize_validate_growth_plot_model,
-                        export = FALSE
+      try(
+        suppressWarnings(
+          plot.gcFitModel(results$gcFit$gcFittedModels[[ifelse(selected_vals_validate_growth$sample_validate_growth_model == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]],
+                          colModel = input$color_validate_growth_plot_model,
+                          pch = input$shape_type_validate_growth_plot_model,
+                          basesize = input$base_size_validate_growth_plot_model,
+                          cex.point = input$shape_size_validate_growth_plot_model,
+                          lwd = input$line_width_validate_growth_plot_model,
+                          n.ybreaks = input$nbreaks_validate_growth_plot_model,
+                          eq.size = input$eqsize_validate_growth_plot_model,
+                          export = FALSE
+          )
         )
       )
       removeModal()
@@ -7848,6 +8248,42 @@ server <- function(input, output, session){
       results$growth$gcFit$gcTable[sample.ndx, colnames(res.table.gc) %in% colnames(fit.summary)] <- fit.summary
       results$growth$gcFit$gcTable[sample.ndx, "used.model"] <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$model
 
+      # Re-run drFit if respective fit type (linear/spline/model) was chosen as dr.parameter
+      dr.parameter.fit.method <- gsub(".+\\.", "", results$growth$control$dr.parameter)
+
+      if(length(results$growth$drFit) > 1 && dr.parameter.fit.method == "model"){
+        # Store previous drFit in memory
+        selected_vals_validate_growth$restore_growth_drFit <- results$growth$drFit
+
+        # Re-run drFit
+        if (is.null(input$smoothing_factor_growth_dr) || is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL" || input$smoothing_factor_growth_dr == "") {
+          smooth.dr = NULL
+        } else {
+          smooth.dr <- as.numeric(input$smoothing_factor_growth_dr)
+        }
+        if (is.null(input$number_of_bootstrappings_dr_growth) || is.na(input$number_of_bootstrappings_dr_growth) || input$number_of_bootstrappings_dr_growth == "NULL" || input$number_of_bootstrappings_dr_growth == "") {
+          nboot.dr <- 0
+        } else {
+          nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_growth)
+        }
+        showModal(modalDialog("Re-calculating dose-response analysis...", footer = NULL))
+
+        try(
+          results$growth$drFit <-
+            suppressWarnings(
+              growth.drFit(gcTable = results$growth$gcFit$gcTable,
+                           control = growth.control(dr.method = input$dr_method_growth,
+                                                    dr.parameter = results$growth$control$dr.parameter,
+                                                    smooth.dr = smooth.dr,
+                                                    log.x.dr = input$log_transform_concentration_growth,
+                                                    log.y.dr = input$log_transform_response_growth,
+                                                    nboot.dr = nboot.dr
+                           )
+              )
+            )
+        )
+      }
+
       # Show [Restore fit] button
       show("restore_growth_model")
     }
@@ -7860,6 +8296,10 @@ server <- function(input, output, session){
   observeEvent(input$restore_growth_model, {
     # store previous fit from memory
     results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]] <- selected_vals_validate_growth$restore_growth_model
+    dr.parameter.fit.method <- gsub(".+\\.", "", results$growth$control$dr.parameter)
+    if(length(results$growth$drFit) > 1 && dr.parameter.fit.method == "model"){
+      results$growth$drFit <- selected_vals_validate_growth$restore_growth_drFit
+    }
     hide("restore_growth_model")
   })
 
@@ -7893,7 +8333,6 @@ server <- function(input, output, session){
     contentType = ifelse(input$format_download_growth_validate_model == ".pdf", "image/pdf", "image/png")
 
   )
-
 
       ### Spline Fits BT ####
   # observe({
@@ -7953,19 +8392,22 @@ server <- function(input, output, session){
                                                   selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
                                                   is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]]) > 1){
 
-      plot.gcBootSpline(results$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
-                                                                             selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
-                                                                             is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]],
-                        pch = input$shape_type_validate_growth_spline_bt,
-                        cex.point = input$shape_size_validate_growth_spline_bt,
-                        cex.lab = input$axis_size_validate_growth_spline_bt,
-                        cex.axis = input$lab_size_validate_growth_spline_bt,
-                        lwd = input$line_width_validate_growth_spline_bt,
-                        y.lim = y.lim,
-                        x.lim = x.lim,
-                        y.lim.deriv = ylim.deriv,
-                        deriv = input$plot_derivative_growth_spline_bt,
-                        combine = TRUE
+      try(
+        plot.gcBootSpline(results$gcFit$gcBootSplines[[ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
+                                                                selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
+                                                                is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]],
+                          pch = input$shape_type_validate_growth_spline_bt,
+                          cex.point = input$shape_size_validate_growth_spline_bt,
+                          cex.lab = input$axis_size_validate_growth_spline_bt,
+                          cex.axis = input$lab_size_validate_growth_spline_bt,
+                          lwd = input$line_width_validate_growth_spline_bt,
+                          y.lim = y.lim,
+                          x.lim = x.lim,
+                          y.lim.deriv = ylim.deriv,
+                          deriv = input$plot_derivative_growth_spline_bt,
+                          combine = TRUE,
+                          colSpline = input$color_validate_growth_plot_spline_bt
+        )
       )
     }
   })
@@ -8153,26 +8595,9 @@ server <- function(input, output, session){
                                                    selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "" ||
                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]]) > 1){
 
-      suppressWarnings(
-        plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                         log = logy_validate_fluorescence_plot_linear(),
-                         pch = input$shape_type_validate_fluorescence_plot_linear,
-                         cex.point = input$shape_size_validate_fluorescence_plot_linear,
-                         cex.lab = input$axis_size_validate_fluorescence_plot_linear,
-                         cex.axis = input$lab_size_validate_fluorescence_plot_linear,
-                         lwd = input$line_width_validate_fluorescence_plot_linear,
-                         y.lim = y.lim,
-                         x.lim = x.lim
-                         # ADD FURTHER INPUT (see Notion)
-        )
-      )
-      if(input$diagnostics_validate_fluorescence_plot_linear){
+      try(
         suppressWarnings(
-          plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
-                                                                  is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
-                                                                1,
-                                                                selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
-                           which = "fit_diagnostics",
+          plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), 1, selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
                            log = logy_validate_fluorescence_plot_linear(),
                            pch = input$shape_type_validate_fluorescence_plot_linear,
                            cex.point = input$shape_size_validate_fluorescence_plot_linear,
@@ -8180,8 +8605,31 @@ server <- function(input, output, session){
                            cex.axis = input$lab_size_validate_fluorescence_plot_linear,
                            lwd = input$line_width_validate_fluorescence_plot_linear,
                            y.lim = y.lim,
-                           x.lim = x.lim
+                           x.lim = x.lim,
+                           color = input$color_validate_fluorescence_plot_linear
                            # ADD FURTHER INPUT (see Notion)
+          )
+        )
+      )
+      if(input$diagnostics_validate_fluorescence_plot_linear){
+        try(
+          suppressWarnings(
+            plot.flFitLinear(results$flFit$flFittedLinear[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
+                                                                    is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear),
+                                                                  1,
+                                                                  selected_vals_validate_fluorescence$sample_validate_fluorescence_linear)]],
+                             which = "fit_diagnostics",
+                             log = logy_validate_fluorescence_plot_linear(),
+                             pch = input$shape_type_validate_fluorescence_plot_linear,
+                             cex.point = input$shape_size_validate_fluorescence_plot_linear,
+                             cex.lab = input$axis_size_validate_fluorescence_plot_linear,
+                             cex.axis = input$lab_size_validate_fluorescence_plot_linear,
+                             lwd = input$line_width_validate_fluorescence_plot_linear,
+                             y.lim = y.lim,
+                             x.lim = x.lim,
+                             color = input$color_validate_fluorescence_plot_linear
+                             # ADD FURTHER INPUT (see Notion)
+            )
           )
         )
       }
@@ -8289,6 +8737,41 @@ server <- function(input, output, session){
                            match(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, names(results$fluorescence$flFit$flFittedLinear)))
       results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
+      # Re-run drFit if respective fit type (linear/spline) was chosen as dr.parameter
+      dr.parameter.fit.method <- gsub(".+\\.", "", results$fluorescence$control$dr.parameter)
+
+      if(length(results$fluorescence$drFit) > 1 && dr.parameter.fit.method == "linfit"){
+        # Store previous drFit in memory
+        selected_vals_validate_fluorescence$restore_fluorescence_drFit <- results$fluorescence$drFit
+
+        # Re-run drFit
+        if (is.null(input$smoothing_factor_fluorescence_dr) || is.na(input$smoothing_factor_fluorescence_dr) || input$smoothing_factor_fluorescence_dr == "NULL" || input$smoothing_factor_fluorescence_dr == "") {
+          smooth.dr = NULL
+        } else {
+          smooth.dr <- as.numeric(input$smoothing_factor_fluorescence_dr)
+        }
+        if (is.null(input$number_of_bootstrappings_dr_fluorescence) || is.na(input$number_of_bootstrappings_dr_fluorescence) || input$number_of_bootstrappings_dr_fluorescence == "NULL" || input$number_of_bootstrappings_dr_fluorescence == "") {
+          nboot.dr <- 0
+        } else {
+          nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_fluorescence)
+        }
+        showModal(modalDialog("Re-calculating dose-response analysis...", footer = NULL))
+
+        try(
+          results$fluorescence$drFit <-
+            suppressWarnings(
+              fl.drFit(flTable = results$fluorescence$flFit$flTable,
+                       control = fl.control(dr.method = input$dr_method_fluorescence,
+                                            dr.parameter = results$fluorescence$control$dr.parameter,
+                                            smooth.dr = smooth.dr,
+                                            log.x.dr = input$log_transform_concentration_fluorescence,
+                                            log.y.dr = input$log_transform_response_fluorescence,
+                                            nboot.dr = nboot.dr
+                       )
+              )
+            )
+        )
+      }
       # Show [Restore fit] button
       show("restore_fluorescence_linear")
     }
@@ -8300,6 +8783,10 @@ server <- function(input, output, session){
   observeEvent(input$restore_fluorescence_linear, {
     # store previous fit from memory
     results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <- selected_vals_validate_fluorescence$restore_fluorescence_linear
+    dr.parameter.fit.method <- gsub(".+\\.", "", results$fluorescence$control$dr.parameter)
+    if(length(results$fluorescence$drFit) > 1 && dr.parameter.fit.method == "linfit"){
+      results$fluorescence$drFit <- selected_vals_validate_fluorescence$restore_fluorescence_drFit
+    }
     hide("restore_fluorescence_linear")
   })
 
@@ -8426,21 +8913,24 @@ server <- function(input, output, session){
                                                     1,
                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      suppressWarnings(
-        plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
-                                                                 is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
-                                                               1,
-                                                               input$sample_validate_fluorescence_spline)]],
-                         log.y = input$logy_validate_fluorescence_plot_spline,
-                         x.lim = c(input$x_range_min_validate_fluorescence_plot_spline, input$x_range_max_validate_fluorescence_plot_spline),
-                         y.lim = c(input$y_range_min_validate_fluorescence_plot_spline,input$y_range_max_validate_fluorescence_plot_spline),
-                         y.lim.deriv = c(input$y_range_min_derivative_validate_fluorescence_plot_spline, input$y_range_max_derivative_validate_fluorescence_plot_spline),
-                         lwd = input$line_width_validate_fluorescence_plot_spline,
-                         basesize = input$base_size_validate_fluorescence_plot_spline,
-                         cex.point = input$shape_size_validate_fluorescence_plot_spline,
-                         n.ybreaks = input$nbreaks__validate_fluorescence_plot_spline,
-                         deriv = input$plot_derivative_validate_fluorescence_plot_spline,
-                         pch = input$shape_type_validate_fluorescence_plot_spline
+      try(
+        suppressWarnings(
+          plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+                                                                   is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                                 1,
+                                                                 input$sample_validate_fluorescence_spline)]],
+                           log.y = input$logy_validate_fluorescence_plot_spline,
+                           x.lim = c(input$x_range_min_validate_fluorescence_plot_spline, input$x_range_max_validate_fluorescence_plot_spline),
+                           y.lim = c(input$y_range_min_validate_fluorescence_plot_spline,input$y_range_max_validate_fluorescence_plot_spline),
+                           y.lim.deriv = c(input$y_range_min_derivative_validate_fluorescence_plot_spline, input$y_range_max_derivative_validate_fluorescence_plot_spline),
+                           lwd = input$line_width_validate_fluorescence_plot_spline,
+                           basesize = input$base_size_validate_fluorescence_plot_spline,
+                           cex.point = input$shape_size_validate_fluorescence_plot_spline,
+                           n.ybreaks = input$nbreaks__validate_fluorescence_plot_spline,
+                           deriv = input$plot_derivative_validate_fluorescence_plot_spline,
+                           pch = input$shape_type_validate_fluorescence_plot_spline,
+                           colSpline = input$color_validate_fluorescence_plot_spline
+          )
         )
       )
       removeModal()
@@ -8531,6 +9021,42 @@ server <- function(input, output, session){
                            match(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline, names(results$fluorescence$flFit$flFittedSplines)))
       results$fluorescence$flFit$flTable[sample.ndx, colnames(res.table.fl) %in% colnames(fit.summary)] <- fit.summary
 
+      # Re-run drFit if respective fit type (linear/spline) was chosen as dr.parameter
+      dr.parameter.fit.method <- gsub(".+\\.", "", results$fluorescence$control$dr.parameter)
+
+      if(length(results$fluorescence$drFit) > 1 && dr.parameter.fit.method == "spline"){
+        # Store previous drFit in memory
+        selected_vals_validate_fluorescence$restore_fluorescence_drFit <- results$fluorescence$drFit
+
+        # Re-run drFit
+        if (is.null(input$smoothing_factor_fluorescence_dr) || is.na(input$smoothing_factor_fluorescence_dr) || input$smoothing_factor_fluorescence_dr == "NULL" || input$smoothing_factor_fluorescence_dr == "") {
+          smooth.dr = NULL
+        } else {
+          smooth.dr <- as.numeric(input$smoothing_factor_fluorescence_dr)
+        }
+        if (is.null(input$number_of_bootstrappings_dr_fluorescence) || is.na(input$number_of_bootstrappings_dr_fluorescence) || input$number_of_bootstrappings_dr_fluorescence == "NULL" || input$number_of_bootstrappings_dr_fluorescence == "") {
+          nboot.dr <- 0
+        } else {
+          nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_fluorescence)
+        }
+        showModal(modalDialog("Re-calculating dose-response analysis...", footer = NULL))
+
+        try(
+          results$fluorescence$drFit <-
+            suppressWarnings(
+              fl.drFit(flTable = results$fluorescence$flFit$flTable,
+                       control = fl.control(dr.method = input$dr_method_fluorescence,
+                                            dr.parameter = results$fluorescence$control$dr.parameter,
+                                            smooth.dr = smooth.dr,
+                                            log.x.dr = input$log_transform_concentration_fluorescence,
+                                            log.y.dr = input$log_transform_response_fluorescence,
+                                            nboot.dr = nboot.dr
+                       )
+              )
+            )
+        )
+      }
+
       # Show [Restore fit] button
       show("restore_fluorescence_spline")
     }
@@ -8543,6 +9069,10 @@ server <- function(input, output, session){
   observeEvent(input$restore_fluorescence_spline, {
     # store previous fit from memory
     results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <- selected_vals_validate_fluorescence$restore_fluorescence_spline
+    dr.parameter.fit.method <- gsub(".+\\.", "", results$fluorescence$control$dr.parameter)
+    if(length(results$fluorescence$drFit) > 1 && dr.parameter.fit.method == "spline"){
+      results$fluorescence$drFit <- selected_vals_validate_fluorescence$restore_fluorescence_drFit
+    }
     hide("restore_fluorescence_spline")
   })
 
@@ -8625,20 +9155,23 @@ server <- function(input, output, session){
       x.lim <- NULL
     } else {
       x.lim <- c(as.numeric(input$x_range_min_validate_fluorescence_spline_bt),
-                as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
+                 as.numeric(input$x_range_max_validate_fluorescence_spline_bt))
     }
-
-    plot.flBootSpline(results,
-                      pch = input$shape_type_validate_fluorescence_spline_bt,
-                      cex.point = input$shape_size_validate_fluorescence_spline_bt,
-                      cex.lab = input$axis_size_validate_fluorescence_spline_bt,
-                      cex.axis = input$lab_size_validate_fluorescence_spline_bt,
-                      lwd = input$line_width_validate_fluorescence_spline_bt,
-                      y.lim = y.lim,
-                      x.lim = x.lim,
-                      y.lim.deriv = ylim.deriv,
-                      deriv = input$plot_derivative_fluorescence_spline_bt,
-                      shiny = TRUE
+    try(
+      plot.flBootSpline(results,
+                        pch = input$shape_type_validate_fluorescence_spline_bt,
+                        cex.point = input$shape_size_validate_fluorescence_spline_bt,
+                        cex.lab = input$axis_size_validate_fluorescence_spline_bt,
+                        cex.axis = input$lab_size_validate_fluorescence_spline_bt,
+                        lwd = input$line_width_validate_fluorescence_spline_bt,
+                        y.lim = y.lim,
+                        x.lim = x.lim,
+                        y.lim.deriv = ylim.deriv,
+                        deriv = input$plot_derivative_fluorescence_spline_bt,
+                        shiny = TRUE,
+                        combine = T,
+                        colSpline = input$color_validate_fluorescence_spline_bt
+      )
     )
   })
 
@@ -8754,6 +9287,12 @@ server <- function(input, output, session){
 
   growth_group_plot <- reactive({
     results <- results$growth
+
+    if(is.null(input$custom_colors_group_plot) || is.na(input$custom_colors_group_plot) || input$custom_colors_group_plot == ""){
+      cols <- NULL
+    } else {
+      cols <- unlist(str_split(input$custom_colors_group_plot, ",|;"))
+    }
     if(input$select_string_visualize_growth_group){
       suppressWarnings(
         plot.grofit(results,
@@ -8778,6 +9317,8 @@ server <- function(input, output, session){
                     legend.position = input$legend_position_group_plot,
                     legend.ncol = input$legend_ncol_group_plot,
                     color_groups = input$color_groups_group_plot,
+                    group_pals = input$color_palettes_group_plot,
+                    colors = cols,
                     shiny = TRUE
         )
       )
@@ -8809,7 +9350,9 @@ server <- function(input, output, session){
                     basesize = input$base_size_growth_group_plot,
                     legend.position = input$legend_position_group_plot,
                     color_groups = input$color_groups_group_plot,
+                    group_pals = input$color_palettes_group_plot,
                     legend.ncol = input$legend_ncol_group_plot,
+                    colors = cols,
                     shiny = TRUE
         )
       )
@@ -9591,6 +10134,11 @@ server <- function(input, output, session){
       reference.conc <- NULL
       reference.nm <- NULL
     }
+    if(is.null(input$custom_colors_growth_parameter_plot) || is.na(input$custom_colors_growth_parameter_plot) || input$custom_colors_growth_parameter_plot == ""){
+      cols <- NULL
+    } else {
+      cols <- unlist(str_split(input$custom_colors_growth_parameter_plot, ",|;"))
+    }
     if(input$select_string_visualize_parameter_growth_plot){
       suppressWarnings(
         plot.parameter(results,
@@ -9607,7 +10155,8 @@ server <- function(input, output, session){
                        label.size = input$label.size_growth_parameter_plot,
                        legend.position = input$legend_position_growth_parameter_plot,
                        legend.ncol = input$legend_ncol_growth_parameter_plot,
-                       order_by_conc = input$sort_by_conc_growth_parameter_plot
+                       order_by_conc = input$sort_by_conc_growth_parameter_plot,
+                       colors = cols
         )
       )
     } else {
@@ -9626,7 +10175,8 @@ server <- function(input, output, session){
                        label.size = input$label.size_growth_parameter_plot,
                        legend.position = input$legend_position_growth_parameter_plot,
                        legend.ncol = input$legend_ncol_growth_parameter_plot,
-                       order_by_conc = input$sort_by_conc_growth_parameter_plot
+                       order_by_conc = input$sort_by_conc_growth_parameter_plot,
+                       colors = cols
 
         )
       )
@@ -9933,22 +10483,13 @@ server <- function(input, output, session){
   observe({
     if (length(results$fluorescence$flFit)>1){
       if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$x_type == "density"){
-        updateCheckboxInput(
-          session =  session,
-          inputId =  "plot_group_averages_fluorescence_group_plot",
-          value = FALSE
-        )
         shinyjs::hide(id = "plot_group_averages_fluorescence_group_plot")
       } else {
-        updateCheckboxInput(
-          session =  session,
-          inputId =  "plot_group_averages_fluorescence_group_plot",
-          value = TRUE
-        )
         shinyjs::show(id = "plot_group_averages_fluorescence_group_plot")
       }
     }
   })
+
 
   selected_inputs_fluorescence_group_plot_data_type <- reactive({
     results <- results$fluorescence
@@ -9978,7 +10519,18 @@ server <- function(input, output, session){
   })
 
   output$fluorescence_group_plot <- renderPlot({
+
     results <- results$fluorescence
+    if(is.null(input$custom_colors_fluorescence_group_plot) || is.na(input$custom_colors_fluorescence_group_plot) || input$custom_colors_fluorescence_group_plot == ""){
+      cols <- NULL
+    } else {
+      cols <- unlist(str_split(input$custom_colors_fluorescence_group_plot, ",|;"))
+    }
+    if(input$data_type_fluorescence_group_plot == "spline" && results$control$x_type == "density"){
+      plot_mean <-  FALSE
+    } else {
+      plot_mean <- input$plot_group_averages_fluorescence_group_plot
+    }
     if(input$select_string_visualize_fluorescence_group){
       suppressWarnings(
         plot.flFitRes(
@@ -9989,7 +10541,7 @@ server <- function(input, output, session){
           conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
           exclude.nm = input$exclude_samples_based_on_string_fluorescence_group_plot,
           exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_group_plot,
-          mean = input$plot_group_averages_fluorescence_group_plot,
+          mean = plot_mean,
           deriv = input$plot_derivative_fluorescence_group_plot,
           log.y = input$log_transform_y_axis_fluorescence_group_plot,
           x.lim = c(input$x_range_min_fluorescence_group_plot, input$x_range_max_fluorescence_group_plot),
@@ -10004,6 +10556,8 @@ server <- function(input, output, session){
           n.ybreaks = input$nbreaks_fluorescence_group_plot,
           legend.position = input$legend_position_fluorescence_group_plot,
           legend.ncol = input$legend_ncol_fluorescence_group_plot,
+          group_pals = input$color_palettes_fluorescence_group_plot,
+          colors = cols,
           shiny = TRUE
         )
       )
@@ -10021,7 +10575,7 @@ server <- function(input, output, session){
           conc = input$select_samples_based_on_concentration_fluorescence_group_plot,
           exclude.nm = NULL,
           exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_group_plot,
-          mean = input$plot_group_averages_fluorescence_group_plot,
+          mean = plot_mean,
           deriv = input$plot_derivative_fluorescence_group_plot,
           log.y = input$log_transform_y_axis_fluorescence_group_plot,
           x.lim = c(input$x_range_min_fluorescence_group_plot, input$x_range_max_fluorescence_group_plot),
@@ -10036,6 +10590,8 @@ server <- function(input, output, session){
           color_groups = input$color_groups_fluorescence_group_plot,
           legend.position = input$legend_position_fluorescence_group_plot,
           legend.ncol = input$legend_ncol_fluorescence_group_plot,
+          colors = cols,
+          group_pals = input$color_palettes_fluorescence_group_plot,
           shiny = TRUE
         )
       )
@@ -10543,7 +11099,11 @@ server <- function(input, output, session){
           reference.conc <- NULL
           reference.nm <- NULL
         }
-
+        if(is.null(input$custom_colors_fluorescence_parameter_plot) || is.na(input$custom_colors_fluorescence_parameter_plot) || input$custom_colors_fluorescence_parameter_plot == ""){
+          cols <- NULL
+        } else {
+          cols <- unlist(str_split(input$custom_colors_fluorescence_parameter_plot, ",|;"))
+        }
         if(input$select_string_visualize_parameter_fluorescence_plot){
           suppressWarnings(
             plot.parameter(results,
@@ -10560,7 +11120,8 @@ server <- function(input, output, session){
                            label.size = input$label.size_fluorescence_parameter_plot,
                            legend.position = input$legend_position_fluorescence_parameter_plot,
                            legend.ncol = input$legend_ncol_fluorescence_parameter_plot,
-                           order_by_conc = input$sort_by_conc_fluorescence_parameter_plot
+                           order_by_conc = input$sort_by_conc_fluorescence_parameter_plot,
+                           colors = cols
             )
           )
         } else {
@@ -10579,7 +11140,8 @@ server <- function(input, output, session){
                            label.size = input$label.size_fluorescence_parameter_plot,
                            legend.position = input$legend_position_fluorescence_parameter_plot,
                            legend.ncol = input$legend_ncol_fluorescence_parameter_plot,
-                           order_by_conc = input$sort_by_conc_fluorescence_parameter_plot
+                           order_by_conc = input$sort_by_conc_fluorescence_parameter_plot,
+                           colors = cols
             )
           )
         }
@@ -10803,6 +11365,11 @@ server <- function(input, output, session){
 
       dual_plot <- reactive({
         results <- results$fluorescence
+        if(is.null(input$custom_colors_dual_plot) || is.na(input$custom_colors_dual_plot) || input$custom_colors_dual_plot == ""){
+          cols <- NULL
+        } else {
+          cols <- unlist(str_split(input$custom_colors_dual_plot, ",|;"))
+        }
         if(input$select_string_visualize_dual_plot){
         suppressWarnings(
           plot.dual(results,
@@ -10827,6 +11394,8 @@ server <- function(input, output, session){
                     legend.position = input$legend_position_dual_plot,
                     legend.ncol = input$legend_ncol_dual_plot,
                     color_groups = input$color_groups_dual_plot,
+                    colors = cols,
+                    group_pals = input$color_palettes_dual_plot,
                     shiny = TRUE
           )
         )
@@ -10854,6 +11423,8 @@ server <- function(input, output, session){
                       color_groups = input$color_groups_dual_plot,
                       legend.position = input$legend_position_dual_plot,
                       legend.ncol = input$legend_ncol_dual_plot,
+                      group_pals = input$color_palettes_dual_plot,
+                      colors = cols,
                       shiny = TRUE
             )
           )

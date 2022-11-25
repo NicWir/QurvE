@@ -20,6 +20,7 @@
   reference.nm = NULL,
   reference.conc = NULL,
   order_by_conc = FALSE,
+  colors = NULL,
   basesize = 12,
   label.size = NULL,
   shape.size = 2.5,
@@ -58,6 +59,8 @@
 \item{reference.conc}{(Numeric) Concentration of the reference condition, to which parameter values are normalized.}
 
 \item{order_by_conc}{(Logical) Shall the columns be sorted in order of ascending concentrations (\code{TRUE}) or by sample groups \code{FALSE}?}
+
+\item{colors}{(vector of strings) Define a color palette used to draw the columns. If \code{NULL}, default palettes are chosen. Note: The number of provided colors should at least match the number of groups.}
 
 \item{basesize}{(Numeric) Base font size.}
 

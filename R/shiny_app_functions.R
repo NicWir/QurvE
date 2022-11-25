@@ -298,8 +298,8 @@ parse_data_shiny <-
     if(!is.null(convert.time)){
 
       conversion <- parse(text = convert.time)
-
-      for(i in 1:length(data.ls[!is.na(data.ls)])){
+      not.na.ndx <- which()
+      for(i in noNA.ndx){
         x <- as.numeric(data.ls[[i]][2:nrow(data.ls[[1]]),1])
         time_converted <- eval(conversion)
         data.ls[[i]][2:nrow(data.ls[[1]]),1] <- time_converted

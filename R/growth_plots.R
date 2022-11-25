@@ -10,6 +10,7 @@
 #' @param cex.lab (Numeric) Font size of axis titles.
 #' @param cex.axis (Numeric) Font size of axis annotations.
 #' @param lwd (Numeric) Line width.
+#' @param color (Character string) Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}).
@@ -42,7 +43,7 @@
 #' plot(TestFit)
 #'
 plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diagnostics"), pch = 21, cex.point = 1, cex.lab = 1.5,
-                             cex.axis = 1.3, lwd = 2, y.lim = NULL, x.lim = NULL,
+                             cex.axis = 1.3, lwd = 2, color = "firebrick3", y.lim = NULL, x.lim = NULL,
                              plot = TRUE, export = FALSE, height = ifelse(which=="fit", 7, 5),
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
 {
@@ -64,7 +65,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
              axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
-             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
+             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg=color))
 
              ## lag phase
              lag <- gcFittedLinear$par["lag"]
@@ -79,19 +80,19 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
                  try(time <- seq(coef_["tmax_start"]-0.25*(coef_["tmax_end"]-coef_["tmax_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
                  try(lines(time2, gcFittedLinear$FUN(time2, unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
                  try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag2), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = TRUE)
-                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
+                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7), ...), silent = TRUE)
                } else {
                  try(time2 <- seq(coef_["tmax2_start"]-0.25*(coef_["tmax2_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
                  try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
-                 try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
-                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = TRUE)
+                 try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha(color, 0.7), ...), silent = TRUE)
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7)), silent = TRUE)
                  try(lines(time2, gcFittedLinear$FUN(time2, parms = unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
 
                }
              } else {
                try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
-               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
-               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = TRUE)
+               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7), ...), silent = TRUE)
+               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7)), silent = TRUE)
              }
 
              graphics::mtext(bquote(mu: ~ .(round(gcFittedLinear$par[["mumax"]], digits = 3))~~~~
@@ -149,7 +150,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
              axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1)
-             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg="red"))
+             try(points(gcFittedLinear$raw.data[gcFittedLinear$ndx] ~ gcFittedLinear$raw.time[gcFittedLinear$ndx], pch=pch, cex = cex.point*1.15, col="black", bg=color))
 
              ## lag phase
              lag <- gcFittedLinear$par["lag"]
@@ -164,19 +165,19 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
                  try(time <- seq(coef_["tmax_start"]-0.25*(coef_["tmax_end"]-coef_["tmax_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
                  try(lines(time2, gcFittedLinear$FUN(time2, unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
                  try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag2), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7)), silent = TRUE)
-                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
+                 try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7), ...), silent = TRUE)
                } else {
                  try(time2 <- seq(coef_["tmax2_start"]-0.25*(coef_["tmax2_start"]), max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
                  try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
-                 try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
-                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = TRUE)
+                 try(lines(time, gcFittedLinear$FUN(time, parms = coef_)[,"y"], lty=2, lwd=2, col=ggplot2::alpha(color, 0.7), ...), silent = TRUE)
+                 try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7)), silent = TRUE)
                  try(lines(time2, gcFittedLinear$FUN(time2, parms = unname(c(coef_["y0_lm2"], coef_["mumax2"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("magenta3", 0.7), ...), silent = TRUE)
 
                }
              } else {
                try(time <- seq(lag, max(gcFittedLinear$"raw.time"), length=200), silent = TRUE)
-               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7), ...), silent = TRUE)
-               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha("firebrick3", 0.7)), silent = TRUE)
+               try(lines(time, gcFittedLinear$FUN(time, unname(c(coef_["y0_lm"], coef_["mumax"])))[,"y"], lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7), ...), silent = TRUE)
+               try(lines(c(min(gcFittedLinear$"raw.time"[1]), lag), rep(gcFittedLinear$"raw.data"[1], 2), lty=2, lwd=lwd, col=ggplot2::alpha(color, 0.7)), silent = TRUE)
              }
              graphics::mtext(bquote(mu: ~ .(round(gcFittedLinear$par[["mumax"]], digits = 3))~~~~
                                       lambda: ~ .(round(gcFittedLinear$par[["lag"]], digits = 3))~~~~
@@ -243,7 +244,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
   }
 }
 
-#' Generic plot function for \code{gcBootSpline} objects.
+#' Generic plot function for \code{gcFitModel} objects.
 #'
 #' Plot the results of a parametric model fit on density vs. time data
 #'
@@ -289,11 +290,11 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
 #' plot(TestFit, basesize = 18, eq.size = 1.5)
 #'
 plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq.size = 1,
-                            colModel=ggplot2::alpha("forestgreen", 0.85), basesize=16, cex.point = 2, lwd = 0.7,
+                            colModel="forestgreen", basesize=16, cex.point = 2, lwd = 0.7,
                             n.ybreaks = 6, plot = TRUE, export = FALSE, height = 8, width = 6, out.dir = NULL,...)
 {
   gcFittedModel <- x
-
+  colModel <- ggplot2::alpha(colModel, 0.85)
   # /// check input parameters
   if (is.logical(raw)==FALSE)   stop("Need logical value for: raw")
   # if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
@@ -613,13 +614,14 @@ plot.gcFitModel <- function(x, raw = TRUE, pch=1, colData=1, equation = TRUE, eq
 plot.drBootSpline <- function (x,
                                pch = 19,
                                colData = 1,
-                               colSpline = scales::alpha("black", 0.15),
+                               colSpline = "black",
                                cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
                                lwd = 2, plot = TRUE, export = FALSE,
                                height = 7, width = 9, out.dir = NULL, combine = FALSE,
                                ...)
 {
   drBootSpline <- x
+  colSpline <- scales::alpha(colSpline, 0.15)
   # drBootSpline an object of class drBootSpline
   if(methods::is(drBootSpline) != "drBootSpline") stop("x needs to be an object created with growth.drBootSpline.")
   # /// initialize "Empty Plot" function
@@ -1754,14 +1756,15 @@ plot.drFitModel <- function(x,
 #'               control = growth.control(fit.opt = "s", nboot.gc = 50))
 #'
 #' plot(TestFit, combine = TRUE, lwd = 0.5)
-plot.gcBootSpline <- function(x, pch=1, colData=1, deriv = TRUE,
-                              colSpline=ggplot2::alpha("dodgerblue3", 0.2),
+plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
+                              colSpline = "dodgerblue3",
                               cex.point = 1, cex.lab = 1.5, cex.axis = 1.3,
                               lwd = 2, y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,
                               plot = TRUE, export = FALSE,
                               height = 7, width = 9, out.dir = NULL, combine = FALSE, ...)
 {
   gcBootSpline <- x
+  colSpline <- ggplot2::alpha(colSpline, 0.2)
   # gcBootSpline an object of class gcBootSpline
   if(methods::is(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
   # /// initialize "Empty Plot" function
@@ -2235,7 +2238,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
               plot.margin = unit(c(1,2,1,1), "lines")) +
         scale_color_manual(name='Growth fit',
                            breaks = "Spline fit",
-                           values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
+                           values=c("spline" = ggplot2::alpha(colSpline, 0.7), "Spline fit" = ggplot2::alpha(colSpline, 0.7)))
 
 
       p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
@@ -2335,21 +2338,21 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
             }
 
             if(!(lagtime2 <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
             }
           } # if(lagtime2 < lagtime)
           else {
@@ -2392,21 +2395,21 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
             }
 
             if(!(lagtime <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
             }
           }
         } # if(gcFittedSpline$fitFlag2)
@@ -2435,15 +2438,15 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
             p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                       xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                       yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
           }
 
           if(!(lagtime <0)){
             p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
           }
         } # else of if(gcFittedSpline$fitFlag2)
       } # if(slope == TRUE && log.y == TRUE)
@@ -2494,21 +2497,21 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
             }
 
             if(!(lagtime2 <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
             }
           } # if(lagtime2 < lagtime)
           else {
@@ -2549,21 +2552,21 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
             }
 
             if(!(lagtime <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
             }
           }
         } # if(gcFittedSpline$fitFlag2)
@@ -2590,14 +2593,14 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
             p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                       xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
                                       yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
           }
           if(!(lagtime <0)){
             p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = lwd)
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
           }
         } # else of if(gcFittedSpline$fitFlag2)
       } # if(slope == TRUE && log.y == TRUE)
@@ -2737,7 +2740,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 #'
 #'
 #' @param x A \code{grofit} object created with \code{\link{growth.workflow}} containing spline fits.
-#' @param ... (_optional_) Additional \code{grofit} objects created in separate workflows.
+#' @param ... (_optional_) Additional \code{grofit} objects created in separate workflows for joint plotting in a single graph.
 #' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
 #' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
@@ -2750,6 +2753,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
 #' @param color_groups (Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?
+#' @param group_pals (String vector) Define the colors used to display sample groups with identical concentrations. The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend. Available options: "Green", "Oranges", "Purple", "Cyan", "Grey", "Red", "Blue", and "Magenta".
 #' @param basesize (Numeric) Base font size.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
@@ -2811,6 +2815,7 @@ plot.grofit <- function(x, ...,
                         n.ybreaks = 6,
                         colors = NULL,
                         color_groups = T,
+                        group_pals = c('Green', 'Orange', 'Purple', 'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', 'Mint'),
                         basesize = 20,
                         y.lim = NULL,
                         x.lim = NULL,
@@ -2849,7 +2854,7 @@ plot.grofit <- function(x, ...,
   call <- match.call()
   # remove all function arguments from call to leave only multiple grofit objects
   call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <- call$legend.ncol <- call$color_groups <-
-    call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <-
+    call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <- call$group_pals <-
     call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- call$legend.position <- NULL
 
   arglist <- lapply(call[-1], function(x) x)
@@ -3126,18 +3131,23 @@ plot.grofit <- function(x, ...,
       p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
     }
 
+    conditions <- str_replace_all(df$name, "\\| .+ \\| ", "| ")
+    conditions_unique <- unique(conditions)
+
+    groups <- str_replace_all(conditions_unique, " \\| .+", "")
+    groups_unique <- unique(groups)
+    if(is.null(colors) && color_groups == TRUE && length(group_pals) < length(groups_unique)){
+      message("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled (color_groups set to FALSE).")
+      try(showModal(modalDialog("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled.", easyClose = T, footer=NULL)), silent = TRUE)
+      color_groups <- FALSE
+    }
     # apply color schemes
     if(is.null(colors)){
       if(color_groups && length(unique(df$concentration)) > 2){
-        conditions <- str_replace_all(df$name, "\\| .+ \\| ", "| ")
-        conditions_unique <- unique(conditions)
-
-        groups <- str_replace_all(conditions_unique, " \\| .+", "")
-        groups_unique <- unique(groups)
-
         colors <- c()
+
         for(i in 1:length(groups_unique)){
-          colors <- c(colors, colorRampPalette(single_hue_palettes[[i]])(length(which(groups %in% groups_unique[i]))))
+          colors <- c(colors, grDevices::colorRampPalette(single_hue_palettes[group_pals][[i]])(length(which(groups %in% groups_unique[i]))))
         }
 
         p <- p + scale_fill_manual(name = "Condition",
@@ -3460,6 +3470,7 @@ base_breaks <- function(n = 10){
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
 #' @param color_groups (Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?
+#' @param group_pals (String vector) Define the colors used to display sample groups with identical concentrations. The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend. Available options: "Green", "Oranges", "Purple", "Cyan", "Grey", "Red", "Blue", and "Magenta".
 #' @param basesize (Numeric) Base font size.
 #' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
@@ -3511,6 +3522,7 @@ plot.grodata <- function(x,
                          n.ybreaks = 6,
                          colors = NULL,
                          color_groups = T,
+                         group_pals = c('Green', 'Orange', 'Purple', 'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', 'Mint'),
                          basesize = 20,
                          y.lim = NULL,
                          x.lim = NULL,
@@ -3622,6 +3634,7 @@ plot.grodata <- function(x,
 #' @param reference.nm (Character) Name of the reference condition, to which parameter values are normalized. Partially matching strings are tolerated as long as they can uniquely identify the condition.
 #' @param reference.conc (Numeric) Concentration of the reference condition, to which parameter values are normalized.
 #' @param order_by_conc (Logical) Shall the columns be sorted in order of ascending concentrations (\code{TRUE}) or by sample groups \code{FALSE}?
+#' @param colors (vector of strings) Define a color palette used to draw the columns. If \code{NULL}, default palettes are chosen. Note: The number of provided colors should at least match the number of groups.
 #' @param basesize (Numeric) Base font size.
 #' @param label.size (Numeric) Font size for sample labels below x-axis.
 #' @param shape.size (Numeric) The size of the symbols indicating replicate values. Default: 2.5
@@ -3683,6 +3696,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                            reference.nm = NULL,
                            reference.conc = NULL,
                            order_by_conc = FALSE,
+                           colors = NULL,
                            basesize = 12,
                            label.size = NULL,
                            shape.size = 2.5,
@@ -3879,6 +3893,17 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
     scale_y_continuous(breaks = scales::pretty_breaks(n = 10))+
     ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
+  if(!is.null(colors)){
+    if(length(unique(df$group)) > length(colors)){
+      p <- p + scale_fill_manual(name = "Condition",
+                                 values = c(colors, scales::hue_pal()(length(unique(df$group)))[-(1:length(colors))])
+      )
+    }
+    else {
+      p <- p + scale_fill_manual(name = "Condition",
+                                 values = colors)
+    }
+  }
 
   replicates <- unlist(
     lapply(

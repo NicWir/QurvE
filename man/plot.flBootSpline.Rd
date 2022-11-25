@@ -9,7 +9,7 @@
   pch = 1,
   colData = 1,
   deriv = TRUE,
-  colSpline = ggplot2::alpha("dodgerblue3", 0.2),
+  colSpline = "dodgerblue3",
   cex.point = 1,
   cex.lab = 1.5,
   cex.axis = 1.3,

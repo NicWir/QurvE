@@ -13,6 +13,7 @@
   cex.lab = 1.5,
   cex.axis = 1.3,
   lwd = 2,
+  color = "firebrick3",
   y.lim = NULL,
   x.lim = NULL,
   plot = TRUE,
@@ -39,6 +40,8 @@
 \item{cex.axis}{(Numeric) Font size of axis annotations.}
 
 \item{lwd}{(Numeric) Line width.}
+
+\item{color}{(Character string) Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf}
 
 \item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis as a vector in the form \code{c(l, u)}.}
 
