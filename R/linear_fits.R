@@ -287,7 +287,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
         ret.check <- ret[which.min(abs(time-t0)):nrow(ret),] # consider only slopes from defined t0
       }
       if(!is.na(tmax)){
-        ret.check <- ret.check[(ret.check[,"time"]+(h*time[2]-time[1])) <= tmax, ] # consider only slopes up to defined t0
+        ret.check <- ret.check[(ret.check[,"time"]+(h*time[2]-time[1])) <= tmax, ] # consider only slopes up to defined tmax
       }
       if(!is.na(max.density)){
         if (control$log.y.lin) {
@@ -646,7 +646,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             }
             # apply max. time to list of linear regeressions
             if(!is.na(tmax)){
-              ret.premin.check <- ret.premin.check[ret.premin.check[,"time"] <= tmax, ] # consider only slopes up to defined t0
+              ret.premin.check <- ret.premin.check[ret.premin.check[,"time"] <= tmax, ] # consider only slopes up to defined tmax
             }
             if (any(ret.premin.check[, 5] >= R2 &
                     abs(ret.premin.check[, 6]) <= RSD)) {
@@ -983,7 +983,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   RSD <- control$lin.RSD
   h <- control$lin.h
   t0 <- control$t0
+  tmax <- control$tmax
   min.density <- control$min.density
+  max.density <- control$max.density
 
   if (is(control) != "fl.control")
     stop("control must be of class fl.control!")
@@ -1092,6 +1094,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     #   }
     # }
 
+
     # Remove data points where y values stack on top of each other
     fl_data <- fl_data[density >= cummax(density)]
     fl_data.log <- fl_data.log[density >= cummax(density)]
@@ -1100,6 +1103,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       x <- density
     } else {
       x <- density.log
+    }
+    if(!is.null(control$max.density) && !is.na(control$max.density)){
+      if(control$log.x.lin == TRUE){
+        max.density <- log(max.density / density[1])
+      }
+    } else {
+      max.density <- NA
     }
     if(length(x)<4){
       message("flFitLinear: Not enough data points above the chosen min.density.")
@@ -1126,7 +1136,6 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
         fl_data <- fl_data[!bad.values]
       }
     }
-
     if (control$log.x.lin == TRUE) {
       bad.values <- (time <= 0)
       if (TRUE %in% bad.values) {
@@ -1184,7 +1193,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       return(flFitLinear)
     }
   } # if(x_type == "time")
-  # extract period of fluorescence increase (from defined t0)
+  # extract period of fluorescence increase
   x.in = get(ifelse(x_type == "density", "density.in", "time.in"))
   end <- FALSE
   step <- 0
@@ -1195,12 +1204,15 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     if(fl.max.ndx == 1) next
     else fl.max.ndx <- fl.max.ndx + (step); end = TRUE
   }
-  t.growth <- x[which.min(abs(x)):fl.max.ndx]
+  x.inc <- x[which.min(abs(x)):fl.max.ndx]
+  if(x_type == "time" && !is.na(tmax)){
+    x.inc <-  x.inc[x.inc <= tmax]
+  }
   if(!is.null(h) && !is.na(h) && h != ""){
     h <- as.numeric(h)
   } else {
-    # determine number of fl_data points in period until maximum density
-    n.spl <- length(t.growth)
+    # determine number of fl_data points in period until maximum value
+    n.spl <- length(x.inc)
     # Calculate h via log-transformation of the number of fl_data points
     # if(n.spl <= 100){
     h <- round((log(n.spl+4, base=2.1))/0.75)
@@ -1269,7 +1281,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
 
     colnames(ret) <- c("index", "y-intersect", "slope", "X4", "R2", "RSD")
-    # add x and density values as columns in ret
+    # add x and fluorescence values as columns in ret
     if (control$log.y.lin == TRUE) {
       ret <- data.frame(ret, x = x[ret[,1]], fl_data = obs$ylog[ret[,1]])
     } else {
@@ -1281,9 +1293,17 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
 
     if(x_type == "density"){
-      ret <- ret[which.min(abs(ret$fl_data-min.density)) : nrow(ret),] # consider only slopes from defined t0 and min.density
+      if(!is.na(min.density)){
+        ret <- ret[which.min(abs(ret$fl_data-min.density)) : nrow(ret),] # consider only slopes from defined min.density
+      }
+      if(!is.na(max.density)){
+        ret <- ret[(ret[,"x"]+(h*x[2]-x[1])) <= max.density, ] # consider only slopes up to defined max.density
+      }
     } else{
       ret <- ret[which.min(abs(x-t0)):nrow(ret),] # consider only slopes from defined t0
+      if(!is.na(tmax)){
+        ret <- ret[(ret[,"x"]+(h*x[2]-x[1])) <= tmax, ] # consider only slopes up to defined tmax
+      }
     }
     ret <- ret[!is.na(ret[,1]), ]
 

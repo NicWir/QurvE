@@ -757,6 +757,10 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   } else {
     t0 <- 0
   }
+  if(!is.null(control$tmax))
+    tmax <- as.numeric(control$tmax)
+  if(!is.null(control$max.density))
+    max.density <- as.numeric(control$max.density)
 
   if (is(control) != "fl.control")
     stop("control must be of class fl.control!")
@@ -851,6 +855,21 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
         }
       }
     }
+    # Implement max.density into dataset
+    if(!is.null(control$max.density)) {
+      if (!is.na(control$max.density)) {
+        if (control$log.x.spline == TRUE) {
+          # perfom log transformation on max.density (Ln(y/y0))
+          max.density <- log(control$max.density / density[1])
+          fl_data.log <- fl_data.log[density.log <= max.density]
+          density.log <- density.log[density.log <= max.density]
+        } else {
+          max.density <- control$max.density
+          fl_data <- fl_data[density <= max.density]
+          density <- density[density <= max.density]
+        }
+      }
+    }
     if (control$log.x.spline == FALSE) {
       x <- density
     } else {
@@ -910,6 +929,15 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
         t0 <- log(t0)
         time.log <- time.log[which.min(abs(time.log-t0)):length(time.log)]
       }
+    }
+    # Implement tmax into dataset
+    if(is.numeric(tmax) && tmax > t0){
+      if (control$log.y.spline == TRUE) {
+        fl_data.log <- fl_data.log[time <= tmax]
+      } else{
+        fl_data <- fl_data[time <= tmax]
+      }
+      time <- time[time <= tmax]
     }
     if (control$log.x.spline == TRUE) {
       x <- time.log

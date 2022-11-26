@@ -9,7 +9,9 @@ fl.control(
   x_type = c("density", "time"),
   norm_fl = TRUE,
   t0 = 0,
+  tmax = NA,
   min.density = NA,
+  max.density = NA,
   log.x.lin = FALSE,
   log.x.spline = FALSE,
   log.y.lin = FALSE,
@@ -42,9 +44,13 @@ fl.control(
 
 \item{norm_fl}{(Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}}
 
-\item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
+\item{t0}{(Numeric) Minimum time value considered for linear and spline fits (if \code{x_type = 'time'}).}
 
-\item{min.density}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.}
+\item{tmax}{(Numeric) Maximum time value considered for linear and spline fits (if \code{x_type = 'time'})..}
+
+\item{min.density}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).}
+
+\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).}
 
 \item{log.x.lin}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the independent variable for \emph{linear} fits. Default: \code{FALSE}.}
 

@@ -284,7 +284,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), p
                   wellname)
             answer_satisfied <- readline("Are you satisfied with the linear fit (y/n)?\n\n")
             if ("n" %in% answer_satisfied) {
-              test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?flFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
+              test_answer <- readline("Enter: t0, h, quota, min.density, R2, RSD, tmax, density.max                >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?flFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
               if ("n" %in% test_answer) {
                 cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
                 reliability_tag_linear              <- FALSE
@@ -304,11 +304,16 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), p
                 min.density_new <- ifelse(!is.na(as.numeric(new_params[4])), as.numeric(new_params[4]), control$min.density)
                 R2_new <- ifelse(!is.na(as.numeric(new_params[5])), as.numeric(new_params[5]), control$lin.R2)
                 RSD_new <- ifelse(!is.na(as.numeric(new_params[6])), as.numeric(new_params[6]), control$lin.RSD)
+                tmax_new <- ifelse(!is.na(as.numeric(new_params[7])), as.numeric(new_params[7]), control$tmax)
+                max.density_new <- ifelse(!is.na(as.numeric(new_params[8])), as.numeric(new_params[8]), control$max.density)
                 control_new <- control
                 control_new$t0 <- t0_new
                 control_new$lin.h <- h_new
                 control_new$lin.R2 <- R2_new
                 control_new$lin.RSD <- RSD_new
+                control_new$tmax <- tmax_new
+                control_new$max.density <- max.density_new
+
                 if(is.numeric(min.density_new)){
                   if(!is.na(min.density_new) && all(as.vector(actwell) < min.density_new)){
                     message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
@@ -376,7 +381,7 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), p
             plot(nonpara, add=FALSE, raw=TRUE,slope = T, colData=1, cex=1, plot=T, export=F)
             answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
             if ("n" %in% answer_satisfied) {
-              test_answer <- readline("Enter: smooth.fl, t0, min.density                                        >>>> \n\n [Skip (enter 'n'), or smooth.fl, t0, and min.density (see ?fl.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
+              test_answer <- readline("Enter: smooth.fl, t0, min.density, tmax, max.density                        >>>> \n\n [Skip (enter 'n'), or smooth.fl, t0, and min.density (see ?fl.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
               if ("n" %in% test_answer) {
                 cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
                 reliability_tag_nonpara              <- FALSE
@@ -406,6 +411,14 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), p
                   } else if(!is.na(min.density_new)){
                     control_new$min.density <- min.density_new
                   }
+                }
+                tmax_new <- as.numeric(new_params[4])
+                if(!is.na(tmax_new) && tmax_new != ""){
+                  control_new$tmax <- tmax_new
+                }
+                max.density_new <- as.numeric(new_params[5])
+                if(!is.na(max.density_new) && max.density_new != ""){
+                  control_new$max.density <- max.density_new
                 }
                 if(control$x_type == "density"){
                   nonpara             <- flFitSpline(density = actx, fl_data = actwell, ID = ID, control = control_new)
@@ -507,8 +520,10 @@ flFit <- function(fl_data, time = NULL, density = NULL, control= fl.control(), p
 #' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default:  \code{fit.opt = c("l", "s")}.
 #' @param x_type (Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.
 #' @param norm_fl (Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}
-#' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
-#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
+#' @param t0 (Numeric) Minimum time value considered for linear and spline fits (if \code{x_type = 'time'}).
+#' @param tmax (Numeric) Maximum time value considered for linear and spline fits (if \code{x_type = 'time'})..
+#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).
+#' @param max.density (Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).
 #' @param log.x.lin (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _linear_ fits. Default: \code{FALSE}.
 #' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _linear_ fits. Default: \code{FALSE}
@@ -577,7 +592,9 @@ fl.workflow <- function(grodata = NULL,
                         x_type = c("density", "time"),
                         norm_fl = TRUE,
                         t0 = 0,
+                        tmax = NA,
                         min.density = 0,
+                        max.density = NA,
                         log.x.lin = FALSE,
                         log.x.spline = FALSE,
                         log.y.lin = FALSE,
@@ -623,7 +640,7 @@ fl.workflow <- function(grodata = NULL,
 
   ## remove strictly defined arguments
   call$grodata <- call$time <- call$density <- call$fl_data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <-
-    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.lin <- call$log.x.spline <- call$log.y.spline <- call$log.y.lin <- call$biphasic <- call$norm_fl <- call$x_type <-
+    call$fit.opt <- call$t0 <- call$min.density <- call$log.x.lin <- call$log.x.spline <- call$log.y.spline <- call$log.y.lin <- call$biphasic <- call$norm_fl <- call$x_type <- call$tmax <- call$max.density <-
     call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.fl <- call$smooth.fl <- call$dr.method <- call$growth.thresh <- call$parallelize <-
     call$dr.have.atleast <- call$dr.parameter  <- call$smooth.dr  <- call$log.x.dr  <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
 
@@ -663,7 +680,7 @@ fl.workflow <- function(grodata = NULL,
     if(!is.null(fl_data)) fluorescence <- fl_data
   }
   control <- fl.control(fit.opt = fit.opt, norm_fl = norm_fl, x_type = x_type, t0 = t0, min.density = min.density, log.x.lin = log.x.lin,
-                        log.x.spline = log.x.spline, log.y.lin = log.y.lin, log.y.spline = log.y.spline,
+                        log.x.spline = log.x.spline, log.y.lin = log.y.lin, log.y.spline = log.y.spline, tmax = tmax, max.density = max.density,
                         lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, dr.have.atleast = dr.have.atleast,
                         smooth.dr = smooth.dr, log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = nboot.dr,
                         biphasic = biphasic, interactive = interactive, nboot.fl = nboot.fl, dr.parameter = dr.parameter, dr.method = dr.method, clean.bootstrap = clean.bootstrap,

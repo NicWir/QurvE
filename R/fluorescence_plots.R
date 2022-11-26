@@ -413,14 +413,14 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
       if(flFitSpline$control$log.y.spline == TRUE){
 
-        df.raw <- data.frame("x" = flFitSpline[["raw.x"]],
-                             "data" = exp(flFitSpline[["raw.fl"]])*flFitSpline[["fl.in"]][1])
+        df.raw <- data.frame("x" = flFitSpline[["x.in"]],
+                             "data" = exp(flFitSpline[["fl.in"]])*flFitSpline[["fl.in"]][1])
         df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
                              "fit.fl" = fit.fl)
       } else {
 
-        df.raw <- data.frame("x" = flFitSpline[["raw.x"]],
-                             "data" = flFitSpline[["raw.fl"]])
+        df.raw <- data.frame("x" = flFitSpline[["x.in"]],
+                             "data" = flFitSpline[["fl.in"]])
         df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
                              "fit.fl" = fit.fl)
       }

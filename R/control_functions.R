@@ -164,14 +164,36 @@ growth.control <- function (neg.nan.act = FALSE,
       stop(paste0(parameter.in, " is not a valid parameter for the dose-response analysis. See ?growth.drFit for possible options"))
     }
   }
-  grofit.control <- list(neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
-                         suppress.messages = suppress.messages, fit.opt = fit.opt, t0 = t0, tmax = tmax, min.density = min.density, max.density = max.density,
-                         log.x.gc = log.x.gc, log.y.lin = log.y.lin, log.y.spline = log.y.spline, log.y.model=log.y.model, biphasic = biphasic,
-                         lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD, lin.dY = lin.dY, interactive = interactive,
-                         nboot.gc = round(nboot.gc), smooth.gc = smooth.gc, smooth.dr = smooth.dr, dr.method = dr.method, dr.model = dr.model,
-                         dr.have.atleast = round(dr.have.atleast), dr.parameter = dr.parameter,
-                         log.x.dr = log.x.dr, log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
-                         model.type = model.type, growth.thresh = growth.thresh)
+  grofit.control <- list(neg.nan.act = neg.nan.act,
+                         clean.bootstrap = clean.bootstrap,
+                         suppress.messages = suppress.messages,
+                         fit.opt = fit.opt,
+                         t0 = t0,
+                         tmax = tmax,
+                         min.density = min.density,
+                         max.density = max.density,
+                         log.x.gc = log.x.gc,
+                         log.y.lin = log.y.lin,
+                         log.y.spline = log.y.spline,
+                         log.y.model=log.y.model,
+                         biphasic = biphasic,
+                         lin.h = lin.h,
+                         lin.R2 = lin.R2,
+                         lin.RSD = lin.RSD,
+                         lin.dY = lin.dY,
+                         interactive = interactive,
+                         nboot.gc = round(nboot.gc),
+                         smooth.gc = smooth.gc,
+                         smooth.dr = smooth.dr,
+                         dr.method = dr.method,
+                         dr.model = dr.model,
+                         dr.have.atleast = round(dr.have.atleast),
+                         dr.parameter = dr.parameter,
+                         log.x.dr = log.x.dr,
+                         log.y.dr = log.y.dr,
+                         nboot.dr = round(nboot.dr),
+                         model.type = model.type,
+                         growth.thresh = growth.thresh)
   class(grofit.control) <- "grofit.control"
   invisible(grofit.control)
 }
@@ -183,8 +205,10 @@ growth.control <- function (neg.nan.act = FALSE,
 #' @param x_type (Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.
 #' @param fit.opt (Character or vector of strings) Indicates whether the program should perform a linear regression (\code{"l"}) and/or spline fit (\code{"s"}). Default:  \code{fit.opt = c("l", "s")}.
 #' @param norm_fl (Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}
-#' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
-#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits.
+#' @param t0 (Numeric) Minimum time value considered for linear and spline fits (if \code{x_type = 'time'}).
+#' @param tmax (Numeric) Maximum time value considered for linear and spline fits (if \code{x_type = 'time'})..
+#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).
+#' @param max.density (Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).
 #' @param log.x.lin (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _linear_ fits. Default: \code{FALSE}.
 #' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _linear_ fits. Default: \code{FALSE}
@@ -227,7 +251,9 @@ fl.control <- function(fit.opt = c("l", "s"),
                        x_type = c("density", "time"),
                        norm_fl = TRUE,
                        t0 = 0,
+                       tmax = NA,
                        min.density = NA,
+                       max.density = NA,
                        log.x.lin = FALSE,
                        log.x.spline = FALSE,
                        log.y.lin = FALSE,
@@ -317,6 +343,9 @@ fl.control <- function(fit.opt = c("l", "s"),
                      x_type = x_type,
                      norm_fl = norm_fl,
                      t0 = t0,
+                     tmax = tmax,
+                     min.density = min.density,
+                     max.density = max.density,
                      min.density = min.density,
                      log.x.lin = log.x.lin,
                      log.x.spline = log.x.spline,
