@@ -1083,7 +1083,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          condition = 'input.data_type_x_fluorescence.includes("density")',
                                                                          numberInput(
                                                                            inputId = 'growth_threshold_in_percent_fluorescence',
-                                                                           label = 'growth threshold (in %)',
+                                                                           label = 'Growth threshold (in %)',
                                                                            value = 1.5,
                                                                            min = NA,
                                                                            max = NA,
@@ -1096,13 +1096,25 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          condition = 'input.data_type_x_fluorescence.includes("density")',
                                                                          numberInput(
                                                                            inputId = 'minimum_density_fluorescence',
-                                                                           label = 'minimum density',
+                                                                           label = 'Minimum density',
                                                                            value = 0,
                                                                            min = NA,
                                                                            max = NA,
                                                                            placeholder = 0
                                                                          ),
                                                                          bsPopover(id = "minimum_density_fluorescence", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
+                                                                       ),
+
+                                                                       conditionalPanel(
+                                                                         condition = 'input.data_type_x_fluorescence.includes("density")',
+                                                                         numberInput(
+                                                                           inputId = 'maximum_density_fluorescence',
+                                                                           label = 'Maximum density',
+                                                                           value = NULL,
+                                                                           min = NA,
+                                                                           max = NA
+                                                                         ),
+                                                                         bsPopover(id = "maximum_density_fluorescence", title = HTML("<em>max.density</em>"), content = "Consider only density values below and including [Maximum density] for linear and spline fits."),
                                                                        ),
 
                                                                        conditionalPanel(
@@ -1118,6 +1130,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        ),
                                                                        bsPopover(id = "t0_fluorescence", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
 
+                                                                       conditionalPanel(
+                                                                         condition = 'input.data_type_x_fluorescence.includes("time")',
+                                                                         numberInput(
+                                                                           inputId = 'tmax_fluorescence',
+                                                                           label = 'tmax',
+                                                                           value = NULL,
+                                                                           min = NA,
+                                                                           max = NA
+                                                                         ),
+                                                                         bsPopover(id = "tmax_fluorescence", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits."),
+                                                                       ),
                                                                      ), # wellPanel
 
 
@@ -6706,6 +6729,19 @@ server <- function(input, output, session){
       min.density <- as.numeric(input$minimum_density_fluorescence)
     }
 
+    if (is.null(input$maximum_density_fluorescence) || is.na(input$maximum_density_fluorescence) || input$maximum_density_fluorescence == "NULL" || input$maximum_density_fluorescence == "") {
+      max.density <- NA
+    } else {
+      max.density <- as.numeric(input$maximum_density_fluorescence)
+    }
+
+
+    if (is.null(input$tmax_fluorescence) || is.na(input$tmax_fluorescence) || input$tmax_fluorescence == "NULL" || input$tmax_fluorescence == "") {
+      tmax <- NA
+    } else {
+      tmax <- as.numeric(input$tmax_fluorescence)
+    }
+
     fit.opt <- c()
     if(input$linear_regression_fluorescence){
       fit.opt <- c(fit.opt,
@@ -6757,7 +6793,9 @@ server <- function(input, output, session){
                                           out.dir = NULL,
                                           out.nm = NULL,
                                           export.fig = FALSE,
-                                          shiny = TRUE
+                                          shiny = TRUE,
+                                          tmax = tmax,
+                                          max.density = max.density
                               )
                             )
       )
@@ -8640,42 +8678,89 @@ server <- function(input, output, session){
 
   observeEvent(input$rerun_fluorescence_linear, {
     # display a modal dialog with a header, textinput and action buttons
-    showModal(
-      modalDialog(
-        tags$h2('Please enter adjusted parameters'),
-        textInput('t0.lin.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$t0)),
-        textInput('min.density.lin.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.density)),
-        textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
-                                                                                     "\n",
-                                                                                     "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
-        textInput('lin.h.rerun.fluorescence', 'Sliding window size (h)', placeholder = paste0("previously: ",
-                                                                                              ifelse(!is.null(results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h),
-                                                                                                     results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h,
-                                                                                                     "NULL"))),
-        textInput('lin.R2.rerun.fluorescence', 'R2 threshold', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.R2)),
-        textInput('lin.RSD.rerun.fluorescence', 'RSD threshold for slope', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.RSD)),
-        footer=tagList(
-          fluidRow(
-            column(12,
-                   div(
-                     actionButton(inputId = "submit.rerun.linear.fluorescence",
-                                  label = "Submit"),
-                     style="float:right"),
-                   div(
-                     modalButton('cancel'),
-                     style="float:right"),
-                   div(
-                     actionButton(inputId = "tooltip_flFitLinear_validate",
-                                  label = "",
-                                  icon=icon("question"),
-                                  style="padding:2px; font-size:100%"),
-                     style="float:left")
+    if(results$flFit$flFittedLinear[[ifelse(
+      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
+      is.null(
+        selected_vals_validate_fluorescence$sample_validate_fluorescence_linear
+      ),
+      1,
+      selected_vals_validate_fluorescence$sample_validate_fluorescence_linear
+    )]]$control$x_type == "time"){
+      showModal(
+        modalDialog(
+          tags$h2('Please enter adjusted parameters'),
+          textInput('t0.lin.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$t0)),
+          textInput('tmax.lin.rerun.fluorescence', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$tmax)),
+          textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
+                                                                                       "\n",
+                                                                                       "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
+          textInput('lin.h.rerun.fluorescence', 'Sliding window size (h)', placeholder = paste0("previously: ",
+                                                                                                ifelse(!is.null(results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h),
+                                                                                                       results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h,
+                                                                                                       "NULL"))),
+          textInput('lin.R2.rerun.fluorescence', 'R2 threshold', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.R2)),
+          textInput('lin.RSD.rerun.fluorescence', 'RSD threshold for slope', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.RSD)),
+          footer=tagList(
+            fluidRow(
+              column(12,
+                     div(
+                       actionButton(inputId = "submit.rerun.linear.fluorescence",
+                                    label = "Submit"),
+                       style="float:right"),
+                     div(
+                       modalButton('cancel'),
+                       style="float:right"),
+                     div(
+                       actionButton(inputId = "tooltip_flFitLinear_validate",
+                                    label = "",
+                                    icon=icon("question"),
+                                    style="padding:2px; font-size:100%"),
+                       style="float:left")
 
+              )
             )
           )
         )
       )
-    )
+    } else {
+      showModal(
+        modalDialog(
+          tags$h2('Please enter adjusted parameters'),
+          textInput('min.density.lin.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.density)),
+          textInput('max.density.lin.rerun.fluorescence', 'Maximum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$max.density)),
+          textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
+                                                                                       "\n",
+                                                                                       "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
+          textInput('lin.h.rerun.fluorescence', 'Sliding window size (h)', placeholder = paste0("previously: ",
+                                                                                                ifelse(!is.null(results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h),
+                                                                                                       results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.h,
+                                                                                                       "NULL"))),
+          textInput('lin.R2.rerun.fluorescence', 'R2 threshold', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.R2)),
+          textInput('lin.RSD.rerun.fluorescence', 'RSD threshold for slope', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$lin.RSD)),
+          footer=tagList(
+            fluidRow(
+              column(12,
+                     div(
+                       actionButton(inputId = "submit.rerun.linear.fluorescence",
+                                    label = "Submit"),
+                       style="float:right"),
+                     div(
+                       modalButton('cancel'),
+                       style="float:right"),
+                     div(
+                       actionButton(inputId = "tooltip_flFitLinear_validate",
+                                    label = "",
+                                    icon=icon("question"),
+                                    style="padding:2px; font-size:100%"),
+                       style="float:left")
+
+              )
+            )
+          )
+        )
+      )
+    }
+
   })
 
   # Re-run selected linear fit with user-defined parameters upon click on 'submit'
@@ -8699,15 +8784,20 @@ server <- function(input, output, session){
       control_new$lin.R2 <- ifelse(!is.na(as.numeric(input$lin.R2.rerun.fluorescence)), as.numeric(input$lin.R2.rerun.fluorescence), control$lin.R2)
       control_new$lin.RSD <- ifelse(!is.na(as.numeric(input$lin.RSD.rerun.fluorescence)), as.numeric(input$lin.RSD.rerun.fluorescence), control$lin.RSD)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun.fluorescence)), as.numeric(input$t0.lin.rerun.fluorescence), control$t0)
+      control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.lin.rerun.fluorescence)), as.numeric(input$tmax.lin.rerun.fluorescence), control$tmax)
+
       min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun.fluorescence)), as.numeric(input$min.density.lin.rerun.fluorescence), control$min.density)
       if(is.numeric(min.density.lin.new)){
         if(!is.na(min.density.lin.new) && all(as.vector(actwell) < min.density.lin.new)){
-          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
+          showModal(
+            modalDialog(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.density' was not adjusted."), easyClose = T)
+          )
         } else if(!is.na(min.density.lin.new)){
           control_new$min.density <- min.density.lin.new
         }
       }
+      control_new$max.density <-  ifelse(!is.na(as.numeric(input$max.density.lin.rerun.fluorescence)), as.numeric(input$max.density.lin.rerun.fluorescence), control$max.density)
       quota_new <- ifelse(!is.na(as.numeric(input$quota.rerun.fluorescence)), as.numeric(input$quota.rerun.fluorescence), 0.95)
 
       if(control$x_type == "time"){
@@ -8941,33 +9031,63 @@ server <- function(input, output, session){
 
   observeEvent(input$rerun_fluorescence_spline, {
     # display a modal dialog with a header, textinput and action buttons
-    showModal(
-      modalDialog(
-        tags$h2('Please enter adjusted parameters'),
-        textInput('t0.spline.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$t0)),
-        textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.density)),
-        textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
-        footer=tagList(
-          fluidRow(
-            column(12,
-                   div(
-                     actionButton('submit.rerun.spline.fluorescence', 'Submit'),
-                     style="float:right"),
-                   div(
-                     modalButton('cancel'),
-                     style="float:right"),
-                   div(
-                     actionButton(inputId = "tooltip_flFitSpline_validate",
-                                  label = "",
-                                  icon=icon("question"),
-                                  style="padding:2px; font-size:100%"),
-                     style="float:left")
+    if (results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$x_type == "time") {
+      showModal(
+        modalDialog(
+          tags$h2('Please enter adjusted parameters'),
+          textInput('t0.spline.rerun.fluorescence', 'Minimum time (t0)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$t0)),
+          textInput('tmax.spline.rerun.fluorescence', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$tmax)),
+          textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
+          footer=tagList(
+            fluidRow(
+              column(12,
+                     div(
+                       actionButton('submit.rerun.spline.fluorescence', 'Submit'),
+                       style="float:right"),
+                     div(
+                       modalButton('cancel'),
+                       style="float:right"),
+                     div(
+                       actionButton(inputId = "tooltip_flFitSpline_validate",
+                                    label = "",
+                                    icon=icon("question"),
+                                    style="padding:2px; font-size:100%"),
+                       style="float:left")
 
+              )
             )
           )
         )
       )
-    )
+    } else {
+      showModal(
+        modalDialog(
+          tags$h2('Please enter adjusted parameters'),
+          textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.density)),
+          textInput('max.density.spline.rerun.fluorescence', 'Maximum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$max.density)),
+          textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
+          footer=tagList(
+            fluidRow(
+              column(12,
+                     div(
+                       actionButton('submit.rerun.spline.fluorescence', 'Submit'),
+                       style="float:right"),
+                     div(
+                       modalButton('cancel'),
+                       style="float:right"),
+                     div(
+                       actionButton(inputId = "tooltip_flFitSpline_validate",
+                                    label = "",
+                                    icon=icon("question"),
+                                    style="padding:2px; font-size:100%"),
+                       style="float:left")
+
+              )
+            )
+          )
+        )
+      )
+    }
   })
 
   # Re-run selected spline fit with user-defined parameters upon click on 'submit'
@@ -8988,7 +9108,9 @@ server <- function(input, output, session){
 
       control_new$smooth.fl <- ifelse(!is.na(as.numeric(input$smooth.fl.rerun.fluorescence)), as.numeric(input$smooth.fl.rerun.fluorescence), control$smooth.fl)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun.fluorescence)), as.numeric(input$t0.spline.rerun.fluorescence), control$t0)
+      control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.spline.rerun.fluorescence)), as.numeric(input$tmax.spline.rerun.fluorescence), control$tmax)
       min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun.fluorescence)), as.numeric(input$min.density.spline.rerun.fluorescence), control$min.density)
+      control_new$max.density <-  ifelse(!is.na(as.numeric(input$max.density.spline.rerun.fluorescence)), as.numeric(input$max.density.spline.rerun.fluorescence), control$max.density)
       if(is.numeric(min.density.spline.new)){
         if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
           message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
