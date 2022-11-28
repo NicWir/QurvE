@@ -8678,7 +8678,7 @@ server <- function(input, output, session){
 
   observeEvent(input$rerun_fluorescence_linear, {
     # display a modal dialog with a header, textinput and action buttons
-    if(results$flFit$flFittedLinear[[ifelse(
+    if(results$fluorescence$flFit$flFittedLinear[[ifelse(
       selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" ||
       is.null(
         selected_vals_validate_fluorescence$sample_validate_fluorescence_linear
@@ -8768,7 +8768,6 @@ server <- function(input, output, session){
     if(!is.null(results$fluorescence$flFit)){
 
       showModal(modalDialog("Fitting sample data...", footer = NULL))
-
       # store previous fit in memory
       selected_vals_validate_fluorescence$restore_fluorescence_linear <- results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]
 
@@ -8783,10 +8782,16 @@ server <- function(input, output, session){
       if(!is.na(lin.h.new)) control_new$lin.h <- lin.h.new
       control_new$lin.R2 <- ifelse(!is.na(as.numeric(input$lin.R2.rerun.fluorescence)), as.numeric(input$lin.R2.rerun.fluorescence), control$lin.R2)
       control_new$lin.RSD <- ifelse(!is.na(as.numeric(input$lin.RSD.rerun.fluorescence)), as.numeric(input$lin.RSD.rerun.fluorescence), control$lin.RSD)
-      control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun.fluorescence)), as.numeric(input$t0.lin.rerun.fluorescence), control$t0)
-      control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.lin.rerun.fluorescence)), as.numeric(input$tmax.lin.rerun.fluorescence), control$tmax)
+      control_new$t0 <- ifelse(!is.na(input$t0.lin.rerun.fluorescence) && !is.null(input$t0.lin.rerun.fluorescence) && input$t0.lin.rerun.fluorescence != "",
+                               as.numeric(input$t0.lin.rerun.fluorescence),
+                               control$t0)
+      control_new$tmax <- ifelse(!is.na(input$tmax.lin.rerun.fluorescence) && !is.null(input$tmax.lin.rerun.fluorescence) && input$tmax.lin.rerun.fluorescence != "",
+                                 as.numeric(input$tmax.lin.rerun.fluorescence),
+                                 control$tmax)
 
-      min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun.fluorescence)), as.numeric(input$min.density.lin.rerun.fluorescence), control$min.density)
+      min.density.lin.new <- ifelse(!is.na(input$min.density.lin.rerun.fluorescence) && !is.null(input$min.density.lin.rerun.fluorescence) && input$min.density.lin.rerun.fluorescence != "",
+                                    as.numeric(input$min.density.lin.rerun.fluorescence),
+                                    control$min.density)
       if(is.numeric(min.density.lin.new)){
         if(!is.na(min.density.lin.new) && all(as.vector(actwell) < min.density.lin.new)){
           showModal(
@@ -9095,7 +9100,6 @@ server <- function(input, output, session){
     if(!is.null(results$fluorescence$flFit)){
 
       showModal(modalDialog("Fitting sample data...", footer = NULL))
-
       # store previous fit in memory
       selected_vals_validate_fluorescence$restore_fluorescence_spline <- results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]
 
@@ -9107,10 +9111,18 @@ server <- function(input, output, session){
       ID <- results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$ID
 
       control_new$smooth.fl <- ifelse(!is.na(as.numeric(input$smooth.fl.rerun.fluorescence)), as.numeric(input$smooth.fl.rerun.fluorescence), control$smooth.fl)
-      control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun.fluorescence)), as.numeric(input$t0.spline.rerun.fluorescence), control$t0)
-      control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.spline.rerun.fluorescence)), as.numeric(input$tmax.spline.rerun.fluorescence), control$tmax)
-      min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun.fluorescence)), as.numeric(input$min.density.spline.rerun.fluorescence), control$min.density)
-      control_new$max.density <-  ifelse(!is.na(as.numeric(input$max.density.spline.rerun.fluorescence)), as.numeric(input$max.density.spline.rerun.fluorescence), control$max.density)
+      control_new$t0 <- ifelse(!is.na(input$t0.spline.rerun.fluorescence) && !is.null(input$t0.spline.rerun.fluorescence) && input$t0.spline.rerun.fluorescence != "",
+                                as.numeric(input$t0.spline.rerun.fluorescence),
+                                control$t0)
+      control_new$tmax <- ifelse(!is.na(input$tmax.spline.rerun.fluorescence) && !is.null(input$tmax.spline.rerun.fluorescence) && input$tmax.spline.rerun.fluorescence != "",
+                                 as.numeric(input$tmax.spline.rerun.fluorescence),
+                                 control$tmax)
+      min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun.fluorescence)) && !is.null(input$min.density.spline.rerun.fluorescence),
+                                       as.numeric(input$min.density.spline.rerun.fluorescence),
+                                       control$min.density)
+      control_new$max.density <-  ifelse(!is.na(as.numeric(input$max.density.spline.rerun.fluorescence)) && !is.null(input$max.density.spline.rerun.fluorescence),
+                                         as.numeric(input$max.density.spline.rerun.fluorescence),
+                                         control$max.density)
       if(is.numeric(min.density.spline.new)){
         if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
           message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
