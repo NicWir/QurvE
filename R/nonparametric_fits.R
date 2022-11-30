@@ -757,7 +757,9 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
   } else {
     t0 <- 0
   }
-  if(!is.null(control$tmax))
+  if(is.na(control$tmax))
+    tmax <- NULL
+  if(!is.null(tmax))
     tmax <- as.numeric(control$tmax)
   if(!is.null(control$max.density))
     max.density <- as.numeric(control$max.density)

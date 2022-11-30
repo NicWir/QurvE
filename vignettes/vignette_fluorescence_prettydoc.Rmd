@@ -1,5 +1,5 @@
 ---
-title: "Quantitiative Growth Curve Evaluation with Package `QurvE`"
+title: "Quantitiative Fluorescence Curve Evaluation with Package `QurvE`"
 author: "Nicolas T. Wirth"
 date: "`r Sys.Date()`"
 mainfont: Arial
@@ -69,33 +69,9 @@ library(QurvE)
 
 # Introduction
 
-In virtually all disciplines of biology dealing with living organisms, from classical microbiology to applied biotechnology, it is routine to characterize the **growth** of the species under study. `QurvE` provides a suite of analysis tools to make such growth profiling quick, efficient, and reproducible. In addition, it allows the characterization of **fluorescence** data for, e.g., biosensor characterization in plate reader experiments (further discussed in the vignette *Quantitiative Fluorescence Curve Evaluation with Package `QurvE`*). All computational steps to obtain an in-depth characterization are combined into user-friendly *workflow* functions and a range of plotting functions allow the visualization of fits and the comparison of organism performances.
+For a general introduction to the `QurvE` package, see the vignette *Quantitiative Fluorescence Curve Evaluation with Package `QurvE`*.
 
-Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, density increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
-
-The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. `QurvE` was designed to be usable with minimal prior knowledge of the R programming language or programming in general. You will need to be familiar with the idea of running commands from a console or writing basic scripts. For R beginners, [this](https://moderndive.netlify.app/1-getting-started.html) is a great starting point, there are some good resources [here](https://education.rstudio.com/learn/beginner/) and we suggest using the [RStudio application](https://rstudio.com/products/rstudio/). It provides an environment for writing and running R code.
-
-With consideration for `R` novices, `QurvE` establishes a framework in which a complete, detailed growth curve analysis can be performed in two simple steps:
-
-1.  *Read data* in custom format or parse data from a plate reader experiment.
-
-2.  *Run workflow*, including fitting of growth curves, dose-response analysis, and rendering a report that summarizes the results.
-
-All computational results of a workflow are stored in a data container (list) and can be visualized by passing them to the generic function `plot(list_object)`. `QurvE` further extends the user's control over the fits by defining thresholds and quality criteria, allows the direct parsing of data from plate reader result files, and calculates parameters for an additional growth phase (bi-phasic growth).
-
-\pagebreak
-
-# Installation
-
-## Development version
-
-Install the most current version with package `devtools`:
-
-```{r eval = FALSE}
-install.packages("devtools")
-library(devtools)
-install_github("NicWir/QurvE")
-```
+Fluorescent reporter proteins are widely used to study the mechanisms of gene regulation or to develop biosensors that allow the detection of chemical compounds and provide insights into the intracellular environment.
 
 # Growth profiling methods
 

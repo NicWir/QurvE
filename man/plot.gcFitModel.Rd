@@ -15,11 +15,13 @@
   basesize = 16,
   cex.point = 2,
   lwd = 0.7,
+  x.lim = NULL,
+  y.lim = NULL,
   n.ybreaks = 6,
   plot = TRUE,
   export = FALSE,
-  height = 8,
-  width = 6,
+  height = 6,
+  width = 8,
   out.dir = NULL,
   ...
 )
@@ -44,6 +46,10 @@
 \item{cex.point}{(Numeric) Size of the raw data points.}
 
 \item{lwd}{(Numeric) Spline line width.}
+
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+
+\item{y.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
 \item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
 
