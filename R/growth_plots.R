@@ -59,8 +59,8 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             title(ylab = "Density", line = 0.9 + 0.4*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
-             title(xlab = "Time", line = 0.5 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
+             title(ylab = "Density", line = 0.9 + 0.5*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
+             title(xlab = "Time", line = 0.5 + 0.9*cex.lab + 0.6*cex.axis, cex.lab = cex.lab)
 
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
              axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
@@ -121,7 +121,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
              points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
-             title(ylab = "Density", line = 0.9 + 0.4*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
+             title(ylab = "Density", line = 0.9 + 0.5*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
              title(xlab = "Time", line = 0.5 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
              axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1, mgp = c(3,1,0))
@@ -129,7 +129,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              stats::qqline(gcFittedLinear$fit[["residuals"]])
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
-             title(ylab = "Sample quantiles", line = 0.9 + 0.4*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
+             title(ylab = "Sample quantiles", line = 0.9 + 0.5*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
              title(xlab = "Theoretical quantiles", line = 0.5 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
              axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1, mgp = c(3,1,0))
@@ -144,7 +144,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
 
              plot(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", xlab="", ylab = "", pch = pch,
                   log=log, las=1, yaxt="n", xaxt="n", type = "n", xlim = x.lim, ylim = y.lim, ...)
-             title(ylab = "Density", line = 0.9 + 0.4*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
+             title(ylab = "Density", line = 0.9 + 0.5*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
              title(xlab = "Time", line = 0.5 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
 
              points(gcFittedLinear$"raw.data" ~ gcFittedLinear$"raw.time", cex = cex.point, pch=pch)
@@ -206,7 +206,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              plot(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), xlab="", ylab="", type = "n", pch = pch, xaxt="n", yaxt="n")
              points(gcFittedLinear$fit[["residuals"]] ~ fitted(gcFittedLinear$fit), cex = cex.point, pch=pch)
              abline(h=0, col="grey")
-             title(ylab = "residuals", line = 0.9 + 0.4*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
+             title(ylab = "residuals", line = 0.9 + 0.5*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
              title(xlab = "fitted", line = 0.5 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
              axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1, mgp = c(3,1,0))
@@ -214,7 +214,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              stats::qqnorm(gcFittedLinear$fit[["residuals"]], cex = cex.point, xlab="", ylab="", xaxt="n", yaxt="n", main = "")
              stats::qqline(gcFittedLinear$fit[["residuals"]])
              title("Normal Q-Q Plot", line = 1, cex.main = cex.lab)
-             title(ylab = "Sample quantiles", line = 0.9 + 0.4*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
+             title(ylab = "Sample quantiles", line = 0.9 + 0.5*cex.lab+1.5*cex.axis, cex.lab = cex.lab)
              title(xlab = "Theoretical quantiles", line = 0.5 + 0.9*cex.lab + 0.5*cex.axis, cex.lab = cex.lab)
              axis(1, mgp=c(3,0.5+0.5*cex.axis,0))
              axis(2, las=1, mgp = c(3,1,0))
@@ -1876,8 +1876,28 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex")
   if (gcBootSpline$bootFlag==FALSE){
+    try(showModal(modalDialog("Could not find successful bootstrapping operations for the chosen sample.", easyClose = T)))
     message("Could not find successful bootstrapping operations for the provided gcBootSpline object. Did you define 'nboot.gc' in the control object when running computations?")
-    empty.plot()
+    par(cex.lab = cex.lab, cex.axis = cex.axis)
+    par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
+
+    fit.log.x     <- gcBootSpline$control$log.x.gc
+    fit.log.y     <- gcBootSpline$control$log.y.spline
+
+    # /// plot data
+    plot(gcBootSpline$raw.time, gcBootSpline$raw.data, col=colData, pch=pch, cex=cex.point,xlab="", ylab="")
+    if (fit.log.y==FALSE){
+      title(ylab = "Growth y(t) ", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+    }
+    else if (fit.log.y==TRUE){
+      title(ylab = "Growth [Ln(y(t)/y0)]", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+    }
+    if (fit.log.x==TRUE){
+      title(xlab = "Ln(1+time)", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
+    }
+    else if(fit.log.x==FALSE){
+      title(xlab = "Time", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
+    }
   }
   else{
     p1 <- function()
@@ -2340,7 +2360,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          if(y.lim[1] <= 0){
+          if(!is.na(y.lim[1]) && y.lim[1] <= 0){
             message("A lower y axis limit of <= 0 is not supported for log scaling. Lower limit set to 0.001")
             y.lim[1] <- 0.001
           }
@@ -2367,7 +2387,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 
       x_limit <- ggplot_build(p)$layout$panel_params[[1]]$x.range
       y_limit <- ggplot_build(p)$layout$panel_params[[1]]$y.range
-      y_limit[2] <- y_limit[2] * 1.25
+      y_limit[2] <- max(df$data)
 
       p <- p +
         # annotate(
@@ -2377,7 +2397,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
         #   y = ifelse(!is.null(y.lim) && !is.na(y.lim[2]), 1.05 * y.lim[2], 1.3 * y_limit[2]),
         #   angle = 0, parse = F, size = basesize*3.2/12) +
         labs(subtitle = paste("t0:", gcFittedSpline$control$t0,
+                              " tmax", gcFittedSpline$control$tmax,
                               "  min.density:", gcFittedSpline$control$min.density,
+                              "  max.density:", gcFittedSpline$control$max.density,
                               "  smoothing:", gcFittedSpline$control$smooth.gc)
                ) +
         annotate(
@@ -2385,13 +2407,13 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
           label = list(bquote(mu: ~ .(round(gcFittedSpline$parameters$mu, digits = 3))~~~~
                            lambda: ~ .(round(gcFittedSpline$parameters$lambda, digits = 3))~~~~
                            t[max]: ~ .(round(gcFittedSpline$parameters$t.max, digits = 2)))),
-          x = 1.01*x_limit[2],
+          x = 1.02*x_limit[2],
           y = 0.1 * ifelse(!is.null(y.lim) && !is.na(y.lim[2]), y.lim[2], y_limit[2]),
           angle = 90, parse = T, size = basesize*3.2/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
-        p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.95), ylim = c(y_limit[1], y.lim[2]), clip = "off")
+        p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y.lim[2]), clip = "off")
       } else {
-        p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.95), ylim = c(y_limit[1], y_limit[2]), clip = "off")
+        p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y_limit[2]), clip = "off")
       }
 
       # annotate(
@@ -2825,7 +2847,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
       dir.create(out.dir, showWarnings = FALSE)
       grDevices::png(paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.png"),
                      width = w, height = h, units = 'in', res = 300)
-      print(p)
+      suppressWarnings(print(p))
       grDevices::dev.off()
       if (requireNamespace("Cairo", quietly = TRUE)) {
         Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"))
@@ -2833,11 +2855,11 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
         message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
         grDevices::pdf(idth = w, height = h, file = paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"))
       }
-      print(p)
+      suppressWarnings(print(p))
       grDevices::dev.off()
     }
     if (plot == TRUE){
-      print(p)
+      suppressWarnings(print(p))
     } else{
       invisible(p)
     }
