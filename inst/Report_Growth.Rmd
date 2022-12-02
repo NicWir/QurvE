@@ -65,8 +65,8 @@ The following parameters were used to fit the data:
 
 * minimum density considered: `r colFmt(ifelse(!is.null(grofit$control$min.density), grofit$control$min.density, "none"), 'NavyBlue')`
 * minimum time considered for linear and spline fits (t0): `r colFmt(control$tmax, 'NavyBlue')`
-* maximum density considered: `r colFmt(ifelse(!is.null(grofit$control$max.density), grofit$control$min.density, "none"), 'NavyBlue')`
-* maximum time considered for linear and spline fits (t0): `r colFmt(control$t0, 'NavyBlue')`
+* maximum density considered: `r colFmt(ifelse(!is.null(grofit$control$max.density), grofit$control$max.density, "none"), 'NavyBlue')`
+* maximum time considered for linear and spline fits (tmax): `r colFmt(control$tmax, 'NavyBlue')`
 * log-transform density values for linear fits: `r colFmt(grofit$control$log.y.lin, 'NavyBlue')`
 * log-transform density values for spline fits: `r colFmt(grofit$control$log.y.spline, 'NavyBlue')`
 * log-transform density values for parametric fits: `r colFmt(grofit$control$log.y.model, 'NavyBlue')`
@@ -1096,6 +1096,5 @@ if(!all(is.na(mean.conc))){
     }
   }
 }
-```
 ```
 

@@ -63,8 +63,10 @@ _`r length(levels(data[["fluorescence"]][["concentration"]]))`_ different concen
   
 The following parameters were used to fit the data: 
 
-* minimum density considered: `r colFmt(ifelse(!is.null(control$min.density),control$min.density, "none"), 'NavyBlue')`
+* minimum density considered: `r colFmt(ifelse(!is.null(control$min.density), control$min.density, "none"), 'NavyBlue')`
 * minimum time considered for linear and spline fits (t0): `r colFmt(control$t0, 'NavyBlue')`
+* maximum density considered: `r colFmt(ifelse(!is.null(control$max.density), control$max.density, "none"), 'NavyBlue')`
+* maximum time considered for linear and spline fits (tmax): `r colFmt(control$tmax, 'NavyBlue')`
 * data type used as independent variable (x): `r colFmt(control$x_type, 'NavyBlue')`
 `r if(control$x_type == "time"){paste0("* normalized fluorescence used for fits:")}` `r if(control$x_type == "time"){colFmt(control$norm_fl, 'NavyBlue')}`
 * log-transform fluorescence values for spline fits: `r colFmt(control$log.y.spline, 'NavyBlue')`
@@ -875,7 +877,6 @@ if(!all(is.na(mean.conc))){
     }
   }
 }
-```
 ```
 
 
