@@ -86,7 +86,7 @@ The following parameters were used to fit the data:
 <!-- ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence)>1){"Graphical overview -  Fluorescence 1"}` -->
 ```{r dual_plot_fl, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence)>1}
 suppressWarnings(
-  plot.dual(flFitRes, fluorescence = "fl", export = export)
+  plot.dual(flFitRes, fluorescence = "fl", export = export, legend.position = "bottom", legend.ncol = 4)
 )
 ```
 
@@ -94,7 +94,7 @@ suppressWarnings(
 <!-- ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence)>1){"Graphical overview -  Normalized fluorescence 1"}` -->
 ```{r dual_plot_norm.fl, fig.height = 24, fig.width = 20, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = length(flFitRes$data$density)>1 && length(flFitRes$data$norm.fluorescence)>1}
 suppressWarnings(
-  plot.dual(flFitRes, fluorescence = "norm.fl", export = export)
+  plot.dual(flFitRes, fluorescence = "norm.fl", export = export, legend.position = "bottom", legend.ncol = 4)
 )
 ```
 <!-- ## `r if(length(flFitRes$data$density)>1 && length(flFitRes$data$fluorescence2)>1){"Graphical overview -  Fluorescence 2"}` -->
@@ -854,14 +854,14 @@ if("all" %in% mean.grp){
   if(length(flFitRes$flFit$flFittedSplines[[1]]$spline)>1){
     logy <- control$log.y.spline
     suppressWarnings(
-      plot.flFitRes(flFitRes, basesize = 15, export = export, log.y = logy, mean = T, out.dir = paste0(wd, "/Plots"))
+      plot.flFitRes(flFitRes, basesize = 15, export = export, log.y = logy, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
     )
   }
 } else if(!all(is.na(mean.grp))){
   for(i in 1:length(mean.grp)){
     if(length(grep(mean.grp[i], as.character(names(flFitRes$flFit$flFittedSplines))))>0){
       suppressWarnings(
-        plot.flFitRes(flFitRes, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+        plot.flFitRes(flFitRes, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
       )
     }
   }
@@ -870,7 +870,7 @@ if(!all(is.na(mean.conc))){
   for(i in 1:length(mean.conc)){
     if(length(grep(mean.conc[i], str_extract(names(flFitRes$flFit$flFittedSplines), "[:alnum:]+$")))>0){
       suppressWarnings(
-        plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"))
+        plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
       )
     }
   }

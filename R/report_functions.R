@@ -75,8 +75,8 @@ growth.report <- function(grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE, f
     }
   }
 
-  if(!exists("mean.grp") || mean.grp==mean.grp) mean.grp <- NA
-  if(!exists("mean.conc") || mean.conc==mean.conc) mean.conc <- NA
+  if(!exists("mean.grp")) mean.grp <- NA
+  if(!exists("mean.conc")) mean.conc <- NA
 
   gcFit <- grofit$gcFit
   drFit <- grofit$drFit
@@ -207,8 +207,8 @@ fl.report <- function(flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE, for
     }
   }
 
-  if(!exists("mean.grp") || mean.grp==mean.grp) mean.grp <- NA
-  if(!exists("mean.conc") || mean.conc==mean.conc) mean.conc <- NA
+  if(!exists("mean.grp")) mean.grp <- NA
+  if(!exists("mean.conc")) mean.conc <- NA
   flFit <- flFitRes$flFit
   drFit <- flFitRes$drFit
   # flFit2 <- flFitRes$flFit2

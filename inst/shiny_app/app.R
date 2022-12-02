@@ -11766,7 +11766,8 @@ server <- function(input, output, session){
                             out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                             ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
                             format = input$report_filetype_growth,
-                            export = FALSE)
+                            export = FALSE,
+                            mean.grp = "all")
             )
           )
         )
@@ -11788,7 +11789,8 @@ server <- function(input, output, session){
                           out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                           ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
                           format = input$report_filetype_growth,
-                          export = FALSE)
+                          export = FALSE,
+                          mean.grp = "all")
           )
         )
       )
@@ -11820,7 +11822,8 @@ server <- function(input, output, session){
                         out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                         ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
                         format = input$report_filetype_fluorescence,
-                        export = FALSE)
+                        export = FALSE,
+                        mean.grp = "all")
             )
           )
         )
@@ -11842,7 +11845,8 @@ server <- function(input, output, session){
                       out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
                       ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
                       format = input$report_filetype_fluorescence,
-                      export = FALSE)
+                      export = FALSE,
+                      mean.grp = "all")
           )
         )
       )
