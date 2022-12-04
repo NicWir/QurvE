@@ -20,7 +20,7 @@ run_app <- function(options = list()) {
 
   # Launch the app
   appDir <- system.file("shiny_app", package = "QurvE")
-  suppressWarnings(shiny::runApp(appDir, display.mode = "normal"), options = options)
+  suppressWarnings(shiny::runApp(appDir, display.mode = "normal", options = options))
 }
 
 #' Extract names of reads from experimental data created with the "Gen5" or "Gen6" software
