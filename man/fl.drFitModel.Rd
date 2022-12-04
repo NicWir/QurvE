@@ -52,7 +52,7 @@ response <- biosensor.eq(conc, y.min = 110, y.max = 6000, K = 0.5, n = 2) +
             0.01*6000*rnorm(10)
 
 # Perform fit
-TestRun <- fl.drFitModel(conc, response, drID = "test", control = fl.control())
+TestRun <- fl.drFitModel(conc, response, drID = 'test', control = fl.control())
 
 print(summary(TestRun))
 plot(TestRun)

@@ -11,7 +11,7 @@ export_RData(object, out.dir = getwd(), out.nm = class(object))
 
 \item{out.dir}{The path to the output directory. Default: the working directory}
 
-\item{out.nm}{The output filename (with or without ".RData" ending). Default: the class of \code{object} followed by ".RData".}
+\item{out.nm}{The output filename (with or without '.RData' ending). Default: the class of \code{object} followed by '.RData'.}
 }
 \value{
 \code{NULL}
@@ -21,7 +21,7 @@ Export an R object as .RData file
 }
 \examples{
 \dontrun{
-df <- data.frame("A" = seq(1:10), "B" = rev(seq(1:10)))
+df <- data.frame('A' = seq(1:10), 'B' = rev(seq(1:10)))
 
 export_RData(df)
 }

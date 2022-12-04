@@ -37,7 +37,7 @@ to visualize all bootstrapping splines as well as the distribution of EC50.
 conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
 response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
 
-TestRun <- growth.drBootSpline(conc, response, drID = "test",
+TestRun <- growth.drBootSpline(conc, response, drID = 'test',
                control = growth.control(log.x.dr = TRUE, smooth.dr = 0.8,
                                         nboot.dr = 50))
 

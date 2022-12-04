@@ -19,8 +19,8 @@ Generic summary function for flFitLinear objects
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.density = system.file('lac_promoters.xlsx', package = 'QurvE'),
+                   data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.density = 1,
                    sheet.fl = 2 )
 
@@ -31,8 +31,8 @@ data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
 # Perform linear fit
 TestFit <- flFitLinear(time = time,
                        fl_data = data,
-                       ID = "TestFit",
-                       control = fl.control(fit.opt = "l", x_type = "time",
+                       ID = 'TestFit',
+                       control = fl.control(fit.opt = 'l', x_type = 'time',
                        lin.R2 = 0.95, lin.RSD = 0.1,
                        lin.h = 20))
 

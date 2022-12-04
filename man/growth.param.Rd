@@ -44,7 +44,7 @@ Internal function called within \code{\link{growth.gcFitModel}} to perform growt
 \examples{
 \dontrun{
 # Create random growth dataset
-rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 
 # Extract time and growth data for single sample
 time <- rnd.dataset$time[1,]
@@ -55,8 +55,8 @@ time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
 data    <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
 
 # Perform parametric fit
-TestFit <- growth.param(time, data, gcID = "TestFit",
-                 control = growth.control(fit.opt = "m"))
+TestFit <- growth.param(time, data, gcID = 'TestFit',
+                 control = growth.control(fit.opt = 'm'))
 
 plot(TestFit, basesize = 18, eq.size = 1.5)
 }

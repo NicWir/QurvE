@@ -459,7 +459,7 @@ When growth experiments are performed on a larger scale with manual density meas
 
 Similarly, we can include bootstrapping in the dose-response analysis if done with `r colorize_code("dr.method = 'spline'", "red")` by defining argument `r colorize_code("nboot.dr", "red")`.
 
-```{r run-workflow_with-bootstrapping, dpi = 120, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
+```{r run-workflow_with-bootstrapping, dpi = 120, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = FALSE, eval = T}
 grofit_bt <- growth.workflow(grodata = grodata,
                              fit.opt = "s", # perform only nonparametric growth fitting
                              nboot.gc = 50,
@@ -474,7 +474,7 @@ grofit_bt <- growth.workflow(grodata = grodata,
 
 To plot the results of a growth fit with bootstrapping, we call `plot()` on a `gcBootSpline` object:
 
-```{r plot-gcBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 8, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`."}
+```{r plot-gcBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 8, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = FALSE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`."}
 plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative to
                                         # access list items and allow their access by number
      combine = TRUE, # combine both growth curves and parameter plots in the same window
@@ -483,7 +483,7 @@ plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative 
 
 And by applying `plot()` to a `drBootSpline` object, we can plot the dose-response bootstrap results:
 
-```{r plot-drBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 6, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`."}
+```{r plot-drBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 6, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = FALSE, fig.cap = "\\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`."}
 plot(grofit_bt$drFit$drBootSpline[[1]],
      combine = TRUE, # combine both dose-response curves and parameter plots in the same window
      lwd = 0.7)

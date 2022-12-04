@@ -63,7 +63,7 @@ growth.workflow(
 
 \item{ec50}{(Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{mean.grp}{(\code{"all"}, a string vector, or a list of string vectors) Define groups to combine into common plots in the final report based on sample identifiers (if \code{report == TRUE}). Partial matches with sample/group names are accepted. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.}
+\item{mean.grp}{(\code{'all'}, a string vector, or a list of string vectors) Define groups to combine into common plots in the final report based on sample identifiers (if \code{report == TRUE}). Partial matches with sample/group names are accepted. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{'all'} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.}
 
 \item{mean.conc}{(A numeric vector, or a list of numeric vectors) Define concentrations to combine into common plots in the final report (if \code{report == TRUE}).}
 
@@ -73,7 +73,7 @@ growth.workflow(
 
 \item{suppress.messages}{(Logical) Indicates whether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.}
 
-\item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default:  \code{fit.opt = c("l", "s")}.}
+\item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{'l'}), model fit (\code{'m'}), spline fit (\code{'s'}), or all (\code{'a'}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c('l', 's')} Default:  \code{fit.opt = c('l', 's')}.}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 
@@ -107,17 +107,17 @@ growth.workflow(
 
 \item{smooth.gc}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}}
 
-\item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c("logistic", "richards", "gompertz", "gompertz.exp", "huang", "baranyi")}.}
+\item{model.type}{(Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c('logistic', 'richards', 'gompertz', 'gompertz.exp', 'huang', 'baranyi')}.}
 
-\item{dr.method}{(Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{"spline"}) or model fitting (\code{"model"}).}
+\item{dr.method}{(Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{'spline'}) or model fitting (\code{'model'}).}
 
-\item{dr.model}{(Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = "model"}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
+\item{dr.model}{(Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = 'model'}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
 
 \item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
 
 \item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
-\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{"mu.linfit"}, which represents the maximum slope of the linear regression. Typical options include: \code{"mu.linfit"}, \code{"lambda.linfit"}, \code{"dY.linfit"}, \code{"mu.spline"}, \code{"dY.spline"}, \code{"mu.model"}, and \code{"A.model"}.}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{'mu.linfit'}, which represents the maximum slope of the linear regression. Typical options include: \code{'mu.linfit'}, \code{'lambda.linfit'}, \code{'dY.linfit'}, \code{'mu.spline'}, \code{'dY.spline'}, \code{'mu.model'}, and \code{'A.model'}.}
 
 \item{smooth.dr}{(Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.}
 
@@ -129,9 +129,9 @@ growth.workflow(
 
 \item{report}{(Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})}
 
-\item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "GrowthResults_" and the current date and time.}
+\item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of 'GrowthResults_' and the current date and time.}
 
-\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.}
+\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of 'GrowthReport_' and the current date and time.}
 
 \item{export.fig}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -155,27 +155,27 @@ A \code{grofit} object that contains all computation results, compatible with va
 }
 \examples{
 # Create random growth data set
-  rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-  rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+  rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
+  rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = 'Test2')
 
   rnd.data <- list()
-  rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-  rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+  rnd.data[['time']] <- rbind(rnd.data1$time, rnd.data2$time)
+  rnd.data[['data']] <- rbind(rnd.data1$data, rnd.data2$data)
 
   # Run growth curve analysis workflow
   res <- growth.workflow(time = rnd.data$time,
                          data = rnd.data$data,
-                         fit.opt = "s",
+                         fit.opt = 's',
                          ec50 = FALSE,
                          export.res = FALSE,
                          suppress.messages = TRUE,
                          parallelize = FALSE)
 
 # Load custom dataset
-  input <- read_data(data.density = system.file("2-FMA_toxicity.csv", package = "QurvE"))
+  input <- read_data(data.density = system.file('2-FMA_toxicity.csv', package = 'QurvE'))
 
   res <- growth.workflow(grodata = input,
-                         fit.opt = c("s", "l"),
+                         fit.opt = c('s', 'l'),
                          ec50 = TRUE,
                          export.res = FALSE,
                          suppress.messages = TRUE,

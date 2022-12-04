@@ -25,7 +25,7 @@ Fit various models to response vs. concentration data of a single sample to dete
 conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)
 response <- c(1/(1+exp(-0.7*(4-conc[-20])))+rnorm(19)/50, 0)
 
-TestRun <- growth.drFitModel(conc, response, drID = "test")
+TestRun <- growth.drFitModel(conc, response, drID = 'test')
 
 print(summary(TestRun))
 plot(TestRun)

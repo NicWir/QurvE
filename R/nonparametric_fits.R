@@ -64,411 +64,588 @@
 #'
 #' @examples
 #' # Create random growth dataset
-#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
 #' # Extract time and growth data for single sample
 #' time <- rnd.dataset$time[1,]
 #' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
 #'
 #' # Perform spline fit
-#' TestFit <- growth.gcFitSpline(time, data, gcID = "TestFit",
-#'                  control = growth.control(fit.opt = "s"))
+#' TestFit <- growth.gcFitSpline(time, data, gcID = 'TestFit',
+#'                  control = growth.control(fit.opt = 's'))
 #'
 #' plot(TestFit)
 #'
 #'
-growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth.control(biphasic = FALSE))
-{
-  if(!is.null(control$t0) && !is.na(control$t0) && control$t0 != ""){
-    t0 <- as.numeric(control$t0)
-  } else {
-    t0 <- 0
-  }
-  tmax <- control$tmax
-  max.density <- control$max.density
+growth.gcFitSpline <- function(
+    time, data, gcID = "undefined", control = growth.control(biphasic = FALSE)
+)
+    {
+    if (!is.null(control$t0) &&
+        !is.na(control$t0) &&
+        control$t0 != "")
+        {
+        t0 <- as.numeric(control$t0)
+    } else
+    {
+        t0 <- 0
+    }
+    tmax <- control$tmax
+    max.density <- control$max.density
 
-  if (methods::is(control) != "grofit.control")
-    stop("control must be of class grofit.control!")
-  if (!any(control$fit.opt %in% c("s","a")))
-    stop("Fit option is not set for a spline fit. See growth.control()")
-  if(length(data[data<0]) > 0){
-    data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
-  }
-  time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
-  data.in <- data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
+    if (methods::is(control) !=
+        "grofit.control")
+        stop("control must be of class grofit.control!")
+    if (!any(control$fit.opt %in% c("s", "a")))
+        stop(
+            "Fit option is not set for a spline fit. See growth.control()"
+        )
+    if (length(data[data < 0]) >
+        0)
+        {
+        data <- data + abs(min(data[data < 0])) +
+            0.01  # add the absolute value of the minimum negative density (+ 0.01) to the data
+    }
+    time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
+    data.in <- data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
 
-  if (length(time) != length(data))
-    stop("gcFitSpline: length of input vectors differ!")
-  bad.values <- (is.na(time)) | (is.na(data)) |
-    (!is.numeric(time)) | (!is.numeric(data) )
-  if (TRUE %in% bad.values) {
-    if (control$neg.nan.act == FALSE) {
-      time <- time[!bad.values]
-      data <- data[!bad.values]
-    }
-    else {
-      stop("Bad values in gcFitSpline")
-    }
-  }
-  if (control$log.y.spline == TRUE) {
-    bad.values <- (data <= 0)
-    if (TRUE %in% bad.values) {
-      if (control$neg.nan.act == FALSE) {
-        time <- time[!bad.values]
-        data <- data[!bad.values]
-      }
-      else {
-        stop("Bad values in gcFitSpline")
-      }
-    }
-  }
-  if(max(data) < control$growth.thresh * data[1]){
-    if(control$suppress.messages==F) message(paste0("gcFitSpline: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
-    gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
-                        fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = 0, dY = 0,
-                                                                                                                    mu = 0, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                                                                                    lambda2 = NA, b.tangent2 = NA, integral = NA),
-                        spline = NA, spline.deriv1 = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                        control = control)
-    class(gcFitSpline) <- "gcFitSpline"
-    return(gcFitSpline)
-  }
-  if (length(data) < 5) {
-    cat("gcFitSpline: There is not enough valid data. Must have at least 5!")
-    gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
-                        gcID = gcID, fit.time = NA, fit.data = NA, parameters = list(A = NA, dY = NA,
-                                                                                     mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                                                     lambda2 = NA, b.tangent2 = NA, integral = NA),
-                        spline = NA, spline.deriv1 = NA, reliable = NULL, fitFlag = TRUE, fitFlag2 = FALSE,
-                        control = control)
-    class(gcFitSpline) <- "gcFitSpline"
-    return(gcFitSpline)
-  }
-  else {
-    if (control$log.x.gc == TRUE) {
-      bad.values <- (time <= 0)
-      if (TRUE %in% bad.values) {
-        if (control$neg.nan.act == FALSE) {
-          time <- time[!bad.values]
-          data <- data[!bad.values]
+    if (length(time) !=
+        length(data))
+        stop("gcFitSpline: length of input vectors differ!")
+    bad.values <- (is.na(time)) |
+        (is.na(data)) |
+        (!is.numeric(time)) |
+        (!is.numeric(data))
+    if (TRUE %in% bad.values)
+    {
+        if (control$neg.nan.act == FALSE)
+        {
+            time <- time[!bad.values]
+            data <- data[!bad.values]
+        } else
+        {
+            stop("Bad values in gcFitSpline")
         }
-        else {
-          stop("Bad values in gcFitSpline")
+    }
+    if (control$log.y.spline == TRUE)
+    {
+        bad.values <- (data <= 0)
+        if (TRUE %in% bad.values)
+        {
+            if (control$neg.nan.act == FALSE)
+            {
+                time <- time[!bad.values]
+                data <- data[!bad.values]
+            } else
+            {
+                stop("Bad values in gcFitSpline")
+            }
         }
-      }
-      time <- log(1 + time)
     }
-    if (control$log.y.spline == TRUE) {
-      data.log <- log(data/data[1])
-    }
-    time.raw <- time
-    data.raw <- if (control$log.y.spline == TRUE) {
-      data.log
-    } else {
-      data
-    }
-    # Implement min.density into dataset
-    if(!is.null(control$min.density)) {
-      if (!is.na(control$min.density) && control$min.density != 0) {
-        if (control$log.y.spline == TRUE) {
-          # perfom log transformation on min.density (Ln(y/y0))
-          min.density <- log(control$min.density / data[1])
-          time <- time[max(which.min(abs(time - t0)), which.min(abs(data.log - min.density))):length(time)]
-          data.log <- data.log[max(which.min(abs(time.raw - t0)), which.min(abs(data.log - min.density))):length(data.log)]
-        } else {
-          min.density <- control$min.density
-          time <-
-            time[max(which.min(abs(time - t0)), which.min(abs(data - min.density))):length(data)]
-          data <-
-            data[max(which.min(abs(time.raw - t0)), which.min(abs(data - min.density))):length(data)]
-        }
-      }
-    }
-    # Implement max.density into dataset
-    if(!is.null(control$max.density)) {
-      if (!is.na(control$max.density)) {
-        if (control$log.y.spline == TRUE) {
-          # perfom log transformation on max.density (Ln(y/y0))
-          max.density <- log(control$max.density / data[1])
-          time <- time[data.log <= max.density]
-          data.log <- data.log[data.log <= max.density]
-        } else {
-          max.density <- control$max.density
-          time <-
-            time[data <= max.density]
-          data <-
-            data[data <= max.density]
-        }
-      }
-    }
-    # Implement t0 into dataset
-    if(is.numeric(t0) && t0 > 0){
-      if (control$log.y.spline == TRUE) {
-        data.log <- data.log[which.min(abs(time-t0)):length(data.log)]
-      } else{
-        data <- data[which.min(abs(time.raw-t0)):length(data)]
-      }
-      time <- time[which.min(abs(time.raw-t0)):length(time)]
-    }
-    # Implement tmax into dataset
-    if(is.numeric(tmax) && tmax > t0){
-      if (control$log.y.spline == TRUE) {
-        data.log <- data.log[time <= tmax]
-      } else{
-        data <- data[time <= tmax]
-      }
-      time <- time[time <= tmax]
-    }
-    # Run spline fit
-    try(spline <- smooth.spline(time, y = if(control$log.y.spline == TRUE){
-      data.log
-    } else {
-      data
-    }, spar = control$smooth.gc, cv = NA, keep.data = FALSE))
-    if (!exists("spline") || is.null(spline) == TRUE) {
-      if(control$suppress.messages==F) message("gcFitSpline: Spline could not be fitted to data!")
-
-      gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
-                          fit.time = rep(NA, length(time.in)), fit.data = rep(NA, length(data.in)), parameters = list(A = NA, dY = NA,
-                                                                                                                      mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                                                                                      lambda2 = NA, b.tangent2 = NA, integral = NA),
-                          spline = NA, spline.deriv1 = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                          control = control)
-      class(gcFitSpline) <- "gcFitSpline"
-      return(gcFitSpline)
-    } # if(!exists("spline") || is.null(spline) == TRUE)
-    else {
-      # Perform first derivative and extract parameters
-      deriv1 <- stats::predict(spline, deriv = 1)
-      #consider only slopes at density values greater than the initial value
-      deriv1.growth <- deriv1; deriv1.growth$x <- deriv1.growth$x[spline$y > spline$y[1]]; deriv1.growth$y <- deriv1.growth$y[spline$y > spline$y[1]]
-      if(length(deriv1.growth$y) < 3){
-        if(control$suppress.messages==F) message("gcFitSpline: No significant amount of density values above the start value!")
-
-        gcFitSpline <- list(time.in = time.in, data.in = data.in, raw.time = time, raw.data = data,
-                            fit.time = spline$x, fit.data = spline$y, parameters = list(A = NA, dY = NA,
-                                                                                        mu = NA, t.max = NA, lambda = NA, b.tangent = NA, mu2 = NA, t.max2 = NA,
-                                                                                        lambda2 = NA, b.tangent2 = NA, integral = NA),
-                            spline = spline, spline.deriv1 = deriv1, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                            control = control)
+    if (max(data) <
+        control$growth.thresh * data[1])
+        {
+        if (control$suppress.messages == F)
+            message(
+                paste0(
+                  "gcFitSpline: No significant growth detected (with all values below ",
+                  control$growth.thresh, " * start_value)."
+              )
+            )
+        gcFitSpline <- list(
+            time.in = time.in, data.in = data.in, raw.time = time,
+            raw.data = data, fit.time = rep(NA, length(time.in)),
+            fit.data = rep(NA, length(data.in)),
+            parameters = list(
+                A = 0, dY = 0, mu = 0, t.max = NA,
+                lambda = NA, b.tangent = NA, mu2 = NA,
+                t.max2 = NA, lambda2 = NA, b.tangent2 = NA,
+                integral = NA
+            ),
+            spline = NA, spline.deriv1 = NA, reliable = NULL,
+            fitFlag = FALSE, fitFlag2 = FALSE, control = control
+        )
         class(gcFitSpline) <- "gcFitSpline"
         return(gcFitSpline)
-      }
-      mumax.index <- which.max(deriv1.growth$y) # index of data point with maximum growth rate in first derivative fit
-      mumax.index.spl <- which(spline$x == deriv1.growth$x[mumax.index]) # index of data point with maximum growth rate in spline fit
-      t.max <- deriv1.growth$x[mumax.index] # time of maximum growth rate
-      mumax <- max(deriv1.growth$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
-      y.max <- spline$y[which(deriv1$y == deriv1.growth$y[mumax.index])] # cell density at time of max growth rate
-      b.spl <- y.max - mumax * t.max # the y-intercept of the tangent at µmax
-      lambda.spl <- (spline$y[1] - b.spl)/mumax  # lag time
-      integral <- low.integrate(spline$x, spline$y)
-
-      if(control$biphasic) {
-        # determine number of data points in period until maximum density
-        n.spl <- length(time[which.min(abs(time-t0)):which.max(data)])
-        # Find local minima that frame µmax and remove the 'peak' from deriv1
-        n <- round((log(n.spl+4, base=2.1))/0.75)/2
-        minima <- inflect(deriv1$y, threshold = n)$minima
-        # consider only minima with a slope value of <= 0.75 * µmax
-        minima <- minima[deriv1$y[minima] <= 0.75 * mumax]
-
-        minima <- c(1, minima)
-        for(i in 1:(length(minima)-1)){
-          if(any(minima[i]:minima[i+1] %in% mumax.index.spl)){
-            min.ndx <- c(minima[i], minima[i+1])
-          }
+    }
+    if (length(data) <
+        5)
+        {
+        cat(
+            "gcFitSpline: There is not enough valid data. Must have at least 5!"
+        )
+        gcFitSpline <- list(
+            time.in = time.in, data.in = data.in, raw.time = time,
+            raw.data = data, gcID = gcID, fit.time = NA,
+            fit.data = NA, parameters = list(
+                A = NA, dY = NA, mu = NA, t.max = NA,
+                lambda = NA, b.tangent = NA, mu2 = NA,
+                t.max2 = NA, lambda2 = NA, b.tangent2 = NA,
+                integral = NA
+            ),
+            spline = NA, spline.deriv1 = NA, reliable = NULL,
+            fitFlag = TRUE, fitFlag2 = FALSE, control = control
+        )
+        class(gcFitSpline) <- "gcFitSpline"
+        return(gcFitSpline)
+    } else
+    {
+        if (control$log.x.gc == TRUE)
+        {
+            bad.values <- (time <= 0)
+            if (TRUE %in% bad.values)
+            {
+                if (control$neg.nan.act == FALSE)
+                {
+                  time <- time[!bad.values]
+                  data <- data[!bad.values]
+                } else
+                {
+                  stop("Bad values in gcFitSpline")
+                }
+            }
+            time <- log(1 + time)
         }
-        if(exists("min.ndx")){
-          deriv1.2 <- deriv1
-          deriv1.2$y[min.ndx[1]:min.ndx[2]] <- 0
-          # find second mumax
-          mumax2 <- max(deriv1.2$y) # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
-          # accept second mumax only if it is at least 10% of the global mumax
-          if(mumax2 >= 0.1*mumax){
-            mumax2.index <- which.max(deriv1.2$y) # index of data point with maximum growth rate in first derivative fit
-            mumax2.index.spl <- which(spline$x == deriv1.2$x[mumax2.index]) # index of data point with maximum growth rate in spline fit
-            t.max2 <- deriv1.2$x[mumax2.index] # time of maximum growth rate
-            y.max2 <- spline$y[mumax2.index.spl] # cell density at time of max growth rate
-            b.spl2 <- y.max2 - mumax2 * t.max2 # the y-intercept of the tangent at µmax
-            lambda.spl2 <- (spline$y[1] - b.spl2)/mumax2  # lag time
-            fitFlag2 <- TRUE
-          } else {
-            mumax2.index <- NA
-            mumax2.index.spl <- NA
-            t.max2 <- NA
-            mumax2 <- NA
-            y.max2 <- NA
-            b.spl2 <- NA
-            lambda.spl2 <- NA
-            fitFlag2 <- FALSE
-          }
-        } else {
-          mumax2.index <- NA
-          mumax2.index.spl <- NA
-          t.max2 <- NA
-          mumax2 <- NA
-          y.max2 <- NA
-          b.spl2 <- NA
-          lambda.spl2 <- NA
-          fitFlag2 <- FALSE
+        if (control$log.y.spline == TRUE)
+        {
+            data.log <- log(data/data[1])
         }
-      } # if(control$biphasic)
-      else {
-        mumax2.index <- NA
-        mumax2.index.spl <- NA
-        t.max2 <- NA
-        mumax2 <- NA
-        y.max2 <- NA
-        b.spl2 <- NA
-        lambda.spl2 <- NA
-        fitFlag2 <- FALSE
-      }
-      #   # extract local minima and maxima of deriv2
-      #   n <- round((log(n.spl+4, base=2.1))/0.75)/2
-      #   minima <- inflect(deriv2_spline$y, threshold = n)$minima
-      #   maxima <- inflect(deriv2_spline$y, threshold = n)$maxima
-      #   # Regard only (negative) minima and (positive) maxima with a deriv2 value of >= 5% mumax
-      #   minima <- minima[deriv2_spline$y[minima] <= 0.05 * (-mumax)]
-      #   maxima <- maxima[deriv2_spline$y[maxima] >= 0.05 * mumax]
-      #   # Find roots with positive slope in deriv2 after µmax
-      #     # Find adjacent min - max pairs
-      #     minmax <- c(minima, maxima)[order(c(minima, maxima))] # combine minima and maxima in ascending order
-      #     minmax.min <- as.list(as.numeric(minmax %in% minima)) # list for each element in minmax vector, value 0 if maximum, value 1 if minimum
-      #     # get indices of minima in minmax that are followed by a maximum
-      #     ndx.minmax <- c()
-      #     for(i in 1:(length(minmax.min)-1)){
-      #       if(minmax.min[[i]]==1 & minmax.min[[i+1]]==0){
-      #         ndx.minmax <- c(ndx.minmax, i)
-      #       }
-      #     }
-      #     # define pair candidates; store in list
-      #     pairs.post <- list()
-      #     for(i in 1:length(ndx.minmax)){
-      #       pairs.post[[i]] <- c(minmax[[ndx.minmax[[i]]]], minmax[[ndx.minmax[[i]]+1]])
-      #     }
-      #     # extract candidate that is closest to µmax, and respective index of minimum and maximum
-      #     ndx.minima_cand <- c()
-      #     ndx.minima_cand <- unlist(lapply(1:length(pairs.post), function(x) c(ndx.minima_cand, pairs.post[[x]][1])))
-      #     min.ndx <- ndx.minima_cand[which.min((ndx.minima_cand- mumax.index.spl)[(ndx.minima_cand- mumax.index.spl)>0])]
-      #     max.ndx <- pairs.post[[which.min((ndx.minima_cand- mumax.index.spl)[(ndx.minima_cand- mumax.index.spl)>0])]][2]
-      #     # Linear interpolation between minimum and maximum to find root
-      #     interpol <- approxfun(y = c(deriv2$x[min.ndx], deriv2$x[max.ndx]), x = c(deriv2$y[min.ndx], deriv2$y[max.ndx]))
-      #     t.turn <- interpol(0)
-      #     t.turn_post.ndx <- which.min(abs(deriv2$x-t.turn)) # The time index closest to the turning point after µmax
-      #
-      #   # Find roots with negative slope in deriv2 before µmax
-      #     # get indices of maxima in minmax that are followed by a minimum
-      #     ndx.maxmin <- c()
-      #     for(i in 1:(length(minmax.min)-1)){
-      #       if(minmax.min[[i]]==0 & minmax.min[[i+1]]==1){
-      #         ndx.maxmin <- c(ndx.maxmin, i)
-      #       }
-      #     }
-      #     # define pair candidates; store in list
-      #     pairs.pre <- list()
-      #     for(i in 1:length(ndx.maxmin)){
-      #       pairs.pre[[i]] <- c(minmax[[ndx.maxmin[[i]]]], minmax[[ndx.maxmin[[i]]+1]])
-      #     }
-      #     # extract candidate that is closest to µmax, and respective index of minimum and maximum
-      #     ndx.maxima_cand <- c()
-      #     ndx.maxima_cand <- unlist(lapply(1:length(pairs.pre), function(x) c(ndx.maxima_cand, pairs.pre[[x]][1])))
-      #     min.ndx <- ndx.maxima_cand[which.min((ndx.maxima_cand- mumax.index.spl)[(ndx.maxima_cand- mumax.index.spl)>0])]
-      #     max.ndx <- pairs.pre[[which.min((ndx.maxima_cand- mumax.index.spl)[(ndx.maxima_cand- mumax.index.spl)>0])]][2]
-      #     # Linear interpolation between minimum and maximum to find root
-      #     interpol <- approxfun(y = c(deriv2$x[min.ndx], deriv2$x[max.ndx]), x = c(deriv2$y[min.ndx], deriv2$y[max.ndx]))
-      #     t.turn <- interpol(0)
-      #     t.turn_pre.ndx <- which.min(abs(deriv2$x-t.turn)) # The time index closest to the turning point after µmax
-      #
-      #   # Remove
-      #
-      #     plot(deriv1.2$x, deriv1.2$y, type = 'l')
-      #     points(
-      #       deriv1.2$x[minima],
-      #       deriv1.2$y[minima],
-      #       pch = 16,
-      #       col = "Blue",
-      #       cex = 1.5
-      #     )
-      #     points(deriv1.2$x[mumax2.index], deriv1.2$y[mumax2.index], pch = 16, col = "Red", cex = 1.5)
-      #     points(deriv1$x[mumax.index], deriv1$y[mumax.index], pch = 16, col = "Green", cex = 1.5)
-      #     points(deriv1$x[t.turn_pre.ndx], deriv1$y[t.turn_pre.ndx], pch = 16, col = "Black", cex = 1.5)
-      #     points(deriv1$x[t.turn_post.ndx], deriv1$y[t.turn_post.ndx], pch = 16, col = "Black", cex = 1.5)
-      #
-      #
-      #
-      #     plot(deriv2$x, deriv2$y, type = 'l', main = "Minima \nVariable Thresholds")
-      #     points(
-      #         deriv2$x[minima],
-      #         deriv2$y[minima],
-      #         pch = 16,
-      #         col = "Blue",
-      #         cex = 1.5
-      #       )
-      #     points(deriv2$x[maxima], deriv2$y[maxima], pch = 16, col = "Red", cex = 1.5)
-      #     points(deriv2$x[mumax.index], deriv2$y[mumax.index], pch = 16, col = "Green", cex = 1.5)
-      #     points(deriv2$x[t.turn_pre.ndx], deriv2$y[t.turn_pre.ndx], pch = 16, col = "Black", cex = 1.5)
-      #     points(deriv2$x[t.turn_post.ndx], deriv2$y[t.turn_post.ndx], pch = 16, col = "Black", cex = 1.5)
-      #
-      #
-      #
-      #
-      #     plot(spline$x, spline$y, type = "l")
-      #     points(spline$x[minima], spline$y[minima], pch = 16, col = cf.2(1)[1], cex = 1.5)
-      #     points(spline$x[maxima], spline$y[maxima], pch = 16, col = cf.1(1)[1], cex = 1.5)
-      #
-      #     plot(deriv2_spline$x, deriv2_spline$y, type = 'l', main = "Minima \nVariable Thresholds")
-      #     points(
-      #       deriv2_spline$x[minima],
-      #       deriv2_spline$y[minima],
-      #       pch = 16,
-      #       col = cf.2(1)[1],
-      #       cex = 1.5
-      #     )
-      #     points(deriv2_spline$x[maxima], deriv2_spline$y[maxima], pch = 16, col = cf.1(1)[1], cex = 1.5)
-      # }
+        time.raw <- time
+        data.raw <- if (control$log.y.spline == TRUE)
+        {
+            data.log
+        } else
+        {
+            data
+        }
+        # Implement min.density into dataset
+        if (!is.null(control$min.density))
+            {
+            if (!is.na(control$min.density) &&
+                control$min.density != 0)
+                {
+                if (control$log.y.spline == TRUE)
+                {
+                  # perfom log transformation on
+                  # min.density (Ln(y/y0))
+                  min.density <- log(control$min.density/data[1])
+                  time <- time[max(
+                    which.min(abs(time - t0)),
+                    which.min(abs(data.log - min.density))
+                ):length(time)]
+                  data.log <- data.log[max(
+                    which.min(abs(time.raw - t0)),
+                    which.min(abs(data.log - min.density))
+                ):length(data.log)]
+                } else
+                {
+                  min.density <- control$min.density
+                  time <- time[max(
+                    which.min(abs(time - t0)),
+                    which.min(abs(data - min.density))
+                ):length(data)]
+                  data <- data[max(
+                    which.min(abs(time.raw - t0)),
+                    which.min(abs(data - min.density))
+                ):length(data)]
+                }
+            }
+        }
+        # Implement max.density into dataset
+        if (!is.null(control$max.density))
+            {
+            if (!is.na(control$max.density))
+                {
+                if (control$log.y.spline == TRUE)
+                {
+                  # perfom log transformation on
+                  # max.density (Ln(y/y0))
+                  max.density <- log(control$max.density/data[1])
+                  time <- time[data.log <= max.density]
+                  data.log <- data.log[data.log <=
+                    max.density]
+                } else
+                {
+                  max.density <- control$max.density
+                  time <- time[data <= max.density]
+                  data <- data[data <= max.density]
+                }
+            }
+        }
+        # Implement t0 into dataset
+        if (is.numeric(t0) &&
+            t0 > 0)
+            {
+            if (control$log.y.spline == TRUE)
+            {
+                data.log <- data.log[which.min(abs(time - t0)):length(data.log)]
+            } else
+            {
+                data <- data[which.min(abs(time.raw - t0)):length(data)]
+            }
+            time <- time[which.min(abs(time.raw - t0)):length(time)]
+        }
+        # Implement tmax into dataset
+        if (is.numeric(tmax) &&
+            tmax > t0)
+            {
+            if (control$log.y.spline == TRUE)
+            {
+                data.log <- data.log[time <= tmax]
+            } else
+            {
+                data <- data[time <= tmax]
+            }
+            time <- time[time <= tmax]
+        }
+        # Run spline fit
+        try(
+            spline <- smooth.spline(
+                time, y = if (control$log.y.spline ==
+                  TRUE)
+                  {
+                  data.log
+                } else
+                {
+                  data
+                }, spar = control$smooth.gc, cv = NA,
+                keep.data = FALSE
+            )
+        )
+        if (!exists("spline") ||
+            is.null(spline) ==
+                TRUE)
+            {
+                if (control$suppress.messages == F)
+                  message(
+                    "gcFitSpline: Spline could not be fitted to data!"
+                )
 
-    } # else of if (!exists("spline") || is.null(spline) == TRUE)
-  } # else of if (length(data) < 5)
-  gcFitSpline <-
-    list(
-      time.in = time.in,
-      data.in = data.in,
-      raw.time = time.raw,
-      raw.data = data.raw,
-      gcID = gcID,
-      fit.time = spline$x,
-      fit.data = spline$y,
-      parameters = list(
-        A = if (control$log.y.spline == TRUE) {
-          # Correct ln(N/N0) transformation for max density value
-          data[1] * exp(max(spline$y))
-        } else {
-          max(spline$y)
-        },
-        dY = if (control$log.y.spline == TRUE) {
-          data[1] * exp(max(spline$y)) -  data[1] * exp(spline$y[1])
-        } else {
-          max(spline$y) - spline$y[1]
-        },
-        mu = mumax,
-        tD = log(2)/mumax,
-        t.max = t.max,
-        lambda = lambda.spl,
-        b.tangent = b.spl,
-        mu2 = mumax2,
-        tD2 = log(2)/mumax2,
-        t.max2 = t.max2,
-        lambda2 = lambda.spl2,
-        b.tangent2 = b.spl2,
-        integral = integral),
-      spline = spline,
-      spline.deriv1 = deriv1,
-      fitFlag = TRUE,
-      fitFlag2 = fitFlag2,
-      control = control
+                gcFitSpline <- list(
+                  time.in = time.in, data.in = data.in,
+                  raw.time = time, raw.data = data,
+                  fit.time = rep(NA, length(time.in)),
+                  fit.data = rep(NA, length(data.in)),
+                  parameters = list(
+                    A = NA, dY = NA, mu = NA, t.max = NA,
+                    lambda = NA, b.tangent = NA, mu2 = NA,
+                    t.max2 = NA, lambda2 = NA, b.tangent2 = NA,
+                    integral = NA
+                ),
+                  spline = NA, spline.deriv1 = NA,
+                  reliable = NULL, fitFlag = FALSE,
+                  fitFlag2 = FALSE, control = control
+              )
+                class(gcFitSpline) <- "gcFitSpline"
+                return(gcFitSpline)
+            }  # if(!exists('spline') || is.null(spline) == TRUE)
+ else
+        {
+            # Perform first derivative and
+            # extract parameters
+            deriv1 <- stats::predict(spline, deriv = 1)
+            # consider only slopes at density
+            # values greater than the initial
+            # value
+            deriv1.growth <- deriv1
+            deriv1.growth$x <- deriv1.growth$x[spline$y >
+                spline$y[1]]
+            deriv1.growth$y <- deriv1.growth$y[spline$y >
+                spline$y[1]]
+            if (length(deriv1.growth$y) <
+                3)
+                {
+                if (control$suppress.messages == F)
+                  message(
+                    "gcFitSpline: No significant amount of density values above the start value!"
+                )
+
+                gcFitSpline <- list(
+                  time.in = time.in, data.in = data.in,
+                  raw.time = time, raw.data = data,
+                  fit.time = spline$x, fit.data = spline$y,
+                  parameters = list(
+                    A = NA, dY = NA, mu = NA, t.max = NA,
+                    lambda = NA, b.tangent = NA, mu2 = NA,
+                    t.max2 = NA, lambda2 = NA, b.tangent2 = NA,
+                    integral = NA
+                ),
+                  spline = spline, spline.deriv1 = deriv1,
+                  reliable = NULL, fitFlag = FALSE,
+                  fitFlag2 = FALSE, control = control
+              )
+                class(gcFitSpline) <- "gcFitSpline"
+                return(gcFitSpline)
+            }
+            mumax.index <- which.max(deriv1.growth$y)  # index of data point with maximum growth rate in first derivative fit
+            mumax.index.spl <- which(spline$x == deriv1.growth$x[mumax.index])  # index of data point with maximum growth rate in spline fit
+            t.max <- deriv1.growth$x[mumax.index]  # time of maximum growth rate
+            mumax <- max(deriv1.growth$y)  # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
+            y.max <- spline$y[which(deriv1$y == deriv1.growth$y[mumax.index])]  # cell density at time of max growth rate
+            b.spl <- y.max - mumax * t.max  # the y-intercept of the tangent at µmax
+            lambda.spl <- (spline$y[1] - b.spl)/mumax  # lag time
+            integral <- low.integrate(spline$x, spline$y)
+
+            if (control$biphasic)
+                {
+                  # determine number of data
+                  # points in period until
+                  # maximum density
+                  n.spl <- length(time[which.min(abs(time - t0)):which.max(data)])
+                  # Find local minima that frame
+                  # µmax and remove the 'peak'
+                  # from deriv1
+                  n <- round((log(n.spl + 4, base = 2.1))/0.75)/2
+                  minima <- inflect(deriv1$y, threshold = n)$minima
+                  # consider only minima with a
+                  # slope value of <= 0.75 * µmax
+                  minima <- minima[deriv1$y[minima] <=
+                    0.75 * mumax]
+
+                  minima <- c(1, minima)
+                  for (i in 1:(length(minima) -
+                    1))
+                    {
+                    if (any(
+                      minima[i]:minima[i + 1] %in%
+                        mumax.index.spl
+                  ))
+                      {
+                      min.ndx <- c(minima[i], minima[i + 1])
+                    }
+                  }
+                  if (exists("min.ndx"))
+                    {
+                    deriv1.2 <- deriv1
+                    deriv1.2$y[min.ndx[1]:min.ndx[2]] <- 0
+                    # find second mumax
+                    mumax2 <- max(deriv1.2$y)  # maximum value of first derivative of spline fit (i.e., greatest slope in growth curve spline fit)
+                    # accept second mumax only if
+                    # it is at least 10% of the
+                    # global mumax
+                    if (mumax2 >= 0.1 * mumax)
+                    {
+                      mumax2.index <- which.max(deriv1.2$y)  # index of data point with maximum growth rate in first derivative fit
+                      mumax2.index.spl <- which(spline$x == deriv1.2$x[mumax2.index])  # index of data point with maximum growth rate in spline fit
+                      t.max2 <- deriv1.2$x[mumax2.index]  # time of maximum growth rate
+                      y.max2 <- spline$y[mumax2.index.spl]  # cell density at time of max growth rate
+                      b.spl2 <- y.max2 - mumax2 * t.max2  # the y-intercept of the tangent at µmax
+                      lambda.spl2 <- (spline$y[1] -
+                        b.spl2)/mumax2  # lag time
+                      fitFlag2 <- TRUE
+                    } else
+                    {
+                      mumax2.index <- NA
+                      mumax2.index.spl <- NA
+                      t.max2 <- NA
+                      mumax2 <- NA
+                      y.max2 <- NA
+                      b.spl2 <- NA
+                      lambda.spl2 <- NA
+                      fitFlag2 <- FALSE
+                    }
+                  } else
+                  {
+                    mumax2.index <- NA
+                    mumax2.index.spl <- NA
+                    t.max2 <- NA
+                    mumax2 <- NA
+                    y.max2 <- NA
+                    b.spl2 <- NA
+                    lambda.spl2 <- NA
+                    fitFlag2 <- FALSE
+                  }
+                }  # if(control$biphasic)
+ else
+            {
+                mumax2.index <- NA
+                mumax2.index.spl <- NA
+                t.max2 <- NA
+                mumax2 <- NA
+                y.max2 <- NA
+                b.spl2 <- NA
+                lambda.spl2 <- NA
+                fitFlag2 <- FALSE
+            }
+            # # extract local minima and maxima
+            # of deriv2 n <- round((log(n.spl+4,
+            # base=2.1))/0.75)/2 minima <-
+            # inflect(deriv2_spline$y, threshold
+            # = n)$minima maxima <-
+            # inflect(deriv2_spline$y, threshold
+            # = n)$maxima # Regard only
+            # (negative) minima and (positive)
+            # maxima with a deriv2 value of >= 5%
+            # mumax minima <-
+            # minima[deriv2_spline$y[minima] <=
+            # 0.05 * (-mumax)] maxima <-
+            # maxima[deriv2_spline$y[maxima] >=
+            # 0.05 * mumax] # Find roots with
+            # positive slope in deriv2 after µmax
+            # # Find adjacent min - max pairs
+            # minmax <- c(minima,
+            # maxima)[order(c(minima, maxima))] #
+            # combine minima and maxima in
+            # ascending order minmax.min <-
+            # as.list(as.numeric(minmax %in%
+            # minima)) # list for each element in
+            # minmax vector, value 0 if maximum,
+            # value 1 if minimum # get indices of
+            # minima in minmax that are followed
+            # by a maximum ndx.minmax <- c()
+            # for(i in 1:(length(minmax.min)-1)){
+            # if(minmax.min[[i]]==1 &
+            # minmax.min[[i+1]]==0){ ndx.minmax
+            # <- c(ndx.minmax, i) } } # define
+            # pair candidates; store in list
+            # pairs.post <- list() for(i in
+            # 1:length(ndx.minmax)){
+            # pairs.post[[i]] <-
+            # c(minmax[[ndx.minmax[[i]]]],
+            # minmax[[ndx.minmax[[i]]+1]]) } #
+            # extract candidate that is closest
+            # to µmax, and respective index of
+            # minimum and maximum ndx.minima_cand
+            # <- c() ndx.minima_cand <-
+            # unlist(lapply(1:length(pairs.post),
+            # function(x) c(ndx.minima_cand,
+            # pairs.post[[x]][1]))) min.ndx <-
+            # ndx.minima_cand[which.min((ndx.minima_cand-
+            # mumax.index.spl)[(ndx.minima_cand-
+            # mumax.index.spl)>0])] max.ndx <-
+            # pairs.post[[which.min((ndx.minima_cand-
+            # mumax.index.spl)[(ndx.minima_cand-
+            # mumax.index.spl)>0])]][2] # Linear
+            # interpolation between minimum and
+            # maximum to find root interpol <-
+            # approxfun(y = c(deriv2$x[min.ndx],
+            # deriv2$x[max.ndx]), x =
+            # c(deriv2$y[min.ndx],
+            # deriv2$y[max.ndx])) t.turn <-
+            # interpol(0) t.turn_post.ndx <-
+            # which.min(abs(deriv2$x-t.turn)) #
+            # The time index closest to the
+            # turning point after µmax # Find
+            # roots with negative slope in deriv2
+            # before µmax # get indices of maxima
+            # in minmax that are followed by a
+            # minimum ndx.maxmin <- c() for(i in
+            # 1:(length(minmax.min)-1)){
+            # if(minmax.min[[i]]==0 &
+            # minmax.min[[i+1]]==1){ ndx.maxmin
+            # <- c(ndx.maxmin, i) } } # define
+            # pair candidates; store in list
+            # pairs.pre <- list() for(i in
+            # 1:length(ndx.maxmin)){
+            # pairs.pre[[i]] <-
+            # c(minmax[[ndx.maxmin[[i]]]],
+            # minmax[[ndx.maxmin[[i]]+1]]) } #
+            # extract candidate that is closest
+            # to µmax, and respective index of
+            # minimum and maximum ndx.maxima_cand
+            # <- c() ndx.maxima_cand <-
+            # unlist(lapply(1:length(pairs.pre),
+            # function(x) c(ndx.maxima_cand,
+            # pairs.pre[[x]][1]))) min.ndx <-
+            # ndx.maxima_cand[which.min((ndx.maxima_cand-
+            # mumax.index.spl)[(ndx.maxima_cand-
+            # mumax.index.spl)>0])] max.ndx <-
+            # pairs.pre[[which.min((ndx.maxima_cand-
+            # mumax.index.spl)[(ndx.maxima_cand-
+            # mumax.index.spl)>0])]][2] # Linear
+            # interpolation between minimum and
+            # maximum to find root interpol <-
+            # approxfun(y = c(deriv2$x[min.ndx],
+            # deriv2$x[max.ndx]), x =
+            # c(deriv2$y[min.ndx],
+            # deriv2$y[max.ndx])) t.turn <-
+            # interpol(0) t.turn_pre.ndx <-
+            # which.min(abs(deriv2$x-t.turn)) #
+            # The time index closest to the
+            # turning point after µmax # Remove
+            # plot(deriv1.2$x, deriv1.2$y, type =
+            # 'l') points( deriv1.2$x[minima],
+            # deriv1.2$y[minima], pch = 16, col =
+            # 'Blue', cex = 1.5 )
+            # points(deriv1.2$x[mumax2.index],
+            # deriv1.2$y[mumax2.index], pch = 16,
+            # col = 'Red', cex = 1.5)
+            # points(deriv1$x[mumax.index],
+            # deriv1$y[mumax.index], pch = 16,
+            # col = 'Green', cex = 1.5)
+            # points(deriv1$x[t.turn_pre.ndx],
+            # deriv1$y[t.turn_pre.ndx], pch = 16,
+            # col = 'Black', cex = 1.5)
+            # points(deriv1$x[t.turn_post.ndx],
+            # deriv1$y[t.turn_post.ndx], pch =
+            # 16, col = 'Black', cex = 1.5)
+            # plot(deriv2$x, deriv2$y, type =
+            # 'l', main = 'Minima \nVariable
+            # Thresholds') points(
+            # deriv2$x[minima], deriv2$y[minima],
+            # pch = 16, col = 'Blue', cex = 1.5 )
+            # points(deriv2$x[maxima],
+            # deriv2$y[maxima], pch = 16, col =
+            # 'Red', cex = 1.5)
+            # points(deriv2$x[mumax.index],
+            # deriv2$y[mumax.index], pch = 16,
+            # col = 'Green', cex = 1.5)
+            # points(deriv2$x[t.turn_pre.ndx],
+            # deriv2$y[t.turn_pre.ndx], pch = 16,
+            # col = 'Black', cex = 1.5)
+            # points(deriv2$x[t.turn_post.ndx],
+            # deriv2$y[t.turn_post.ndx], pch =
+            # 16, col = 'Black', cex = 1.5)
+            # plot(spline$x, spline$y, type =
+            # 'l') points(spline$x[minima],
+            # spline$y[minima], pch = 16, col =
+            # cf.2(1)[1], cex = 1.5)
+            # points(spline$x[maxima],
+            # spline$y[maxima], pch = 16, col =
+            # cf.1(1)[1], cex = 1.5)
+            # plot(deriv2_spline$x,
+            # deriv2_spline$y, type = 'l', main =
+            # 'Minima \nVariable Thresholds')
+            # points( deriv2_spline$x[minima],
+            # deriv2_spline$y[minima], pch = 16,
+            # col = cf.2(1)[1], cex = 1.5 )
+            # points(deriv2_spline$x[maxima],
+            # deriv2_spline$y[maxima], pch = 16,
+            # col = cf.1(1)[1], cex = 1.5) }
+
+        }  # else of if (!exists('spline') || is.null(spline) == TRUE)
+    }  # else of if (length(data) < 5)
+    gcFitSpline <- list(
+        time.in = time.in, data.in = data.in, raw.time = time.raw,
+        raw.data = data.raw, gcID = gcID, fit.time = spline$x,
+        fit.data = spline$y, parameters = list(
+            A = if (control$log.y.spline == TRUE)
+            {
+                # Correct ln(N/N0) transformation
+                # for max density value
+                data[1] * exp(max(spline$y))
+            } else
+            {
+                max(spline$y)
+            }, dY = if (control$log.y.spline == TRUE)
+            {
+                data[1] * exp(max(spline$y)) -
+                  data[1] * exp(spline$y[1])
+            } else
+            {
+                max(spline$y) -
+                  spline$y[1]
+            }, mu = mumax, tD = log(2)/mumax,
+            t.max = t.max, lambda = lambda.spl, b.tangent = b.spl,
+            mu2 = mumax2, tD2 = log(2)/mumax2,
+            t.max2 = t.max2, lambda2 = lambda.spl2,
+            b.tangent2 = b.spl2, integral = integral
+        ),
+        spline = spline, spline.deriv1 = deriv1, fitFlag = TRUE,
+        fitFlag2 = fitFlag2, control = control
     )
-  class(gcFitSpline) <- "gcFitSpline"
-  invisible(gcFitSpline)
+    class(gcFitSpline) <- "gcFitSpline"
+    invisible(gcFitSpline)
 }
 
 #' Perform a bootstrap on density vs. time data followed by spline fits for each resample
@@ -505,7 +682,7 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #'
 #' @examples
 #' # Create random growth dataset
-#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
 #' # Extract time and growth data for single sample
 #' time <- rnd.dataset$time[1,]
@@ -515,152 +692,207 @@ growth.gcFitSpline <- function (time, data, gcID = "undefined", control = growth
 #' data <- data + stats::runif(97, -0.01, 0.09)
 #'
 #' # Perform bootstrapping spline fit
-#' TestFit <- growth.gcBootSpline(time, data, gcID = "TestFit",
-#'               control = growth.control(fit.opt = "s", nboot.gc = 50))
+#' TestFit <- growth.gcBootSpline(time, data, gcID = 'TestFit',
+#'               control = growth.control(fit.opt = 's', nboot.gc = 50))
 #'
 #' plot(TestFit, combine = TRUE, lwd = 0.5)
 #'
-growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growth.control())
-{
-  if (methods::is(control) != "grofit.control")
-    stop("control must be of class grofit.control!")
-  if (control$nboot.gc == 0)
-    stop("Number of bootstrap samples is zero! See growth.control()")
-  time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
-  data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
-  if (length(time) != length(data))
-    stop("gcBootSpline: length of input vectors differ!")
-  if(control$log.y.spline == TRUE){
-    bad.values <- (is.na(time)) | (is.na(data)) |
-      (!is.numeric(time)) | (!is.numeric(data) | (data<=0))
-  } else {
-    bad.values <- (is.na(time)) | (is.na(data)) | is.infinite(data) |
-      (!is.numeric(time)) | (!is.numeric(data))
-  }
-  if (TRUE %in% bad.values) {
-    if (control$neg.nan.act == FALSE) {
-      time <- time[!bad.values]
-      data <- data[!bad.values]
+growth.gcBootSpline <- function(
+    time, data, gcID = "undefined", control = growth.control()
+)
+    {
+    if (methods::is(control) !=
+        "grofit.control")
+        stop("control must be of class grofit.control!")
+    if (control$nboot.gc == 0)
+        stop(
+            "Number of bootstrap samples is zero! See growth.control()"
+        )
+    time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
+    data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
+    if (length(time) !=
+        length(data))
+        stop("gcBootSpline: length of input vectors differ!")
+    if (control$log.y.spline == TRUE)
+    {
+        bad.values <- (is.na(time)) |
+            (is.na(data)) |
+            (!is.numeric(time)) |
+            (!is.numeric(data) |
+                (data <= 0))
+    } else
+    {
+        bad.values <- (is.na(time)) |
+            (is.na(data)) |
+            is.infinite(data) |
+            (!is.numeric(time)) |
+            (!is.numeric(data))
     }
-    else stop("Bad values in gcBootSpline")
-  }
-  if (length(data) < 6) {
-    if(control$suppress.messages==F) message("gcBootSpline: There is not enough valid data. Must have at least 6 unique values!")
-    gcBootSpline <- list(raw.time = time, raw.data = data,
-                         gcID = gcID, boot.time = NA, boot.data = NA, boot.gcSpline = NA,
-                         lambda = NA, mu = NA, A = NA, integral = NA, bootFlag = FALSE,
-                         control = control)
-    class(gcBootSpline) <- "gcBootSpline"
-    return(gcBootSpline)
-  }
-  A <- NA
-  mu <- NA
-  lambda <- NA
-  integral <- NA
-  dY <- NA
-  boot.y <- array(NA, c(control$nboot.gc, length(time)))
-  boot.x <- array(NA, c(control$nboot.gc, length(time)))
-  nonpara <- list()
-  control.change <- control
-  control.change$fit.opt <- "s"
-  if (control$nboot.gc > 0) {
-    for (j in 1:control$nboot.gc) {
-      choose <- sort(c(1,sample(1:length(time[-1]), length(time)-1, replace = TRUE)))
-      while (length(unique(choose)) < 5) {
-        choose <- sort(c(1,sample(1:length(time[-1]), length(time)-1, replace = TRUE)))
-      }
-      time.cur <- time[choose]
-      data.cur <- data[choose]
-      if(stats::IQR(time.cur) > 0){
-        nonpara[[j]] <- growth.gcFitSpline(time.cur, data.cur, gcID,
-                                           control.change)
-        if(nonpara[[j]]$fitFlag==FALSE | is.na(nonpara[[j]]$fit.data[1])){
-          boot.y[j, 1:length(nonpara[[j]]$fit.data)] <- rep(NA, length(nonpara[[j]]$fit.data))
-          boot.x[j, 1:length(nonpara[[j]]$fit.time)] <- rep(NA, length(nonpara[[j]]$fit.time))
+    if (TRUE %in% bad.values)
+    {
+        if (control$neg.nan.act == FALSE)
+        {
+            time <- time[!bad.values]
+            data <- data[!bad.values]
+        } else stop("Bad values in gcBootSpline")
+    }
+    if (length(data) <
+        6)
+        {
+        if (control$suppress.messages == F)
+            message(
+                "gcBootSpline: There is not enough valid data. Must have at least 6 unique values!"
+            )
+        gcBootSpline <- list(
+            raw.time = time, raw.data = data, gcID = gcID,
+            boot.time = NA, boot.data = NA, boot.gcSpline = NA,
+            lambda = NA, mu = NA, A = NA, integral = NA,
+            bootFlag = FALSE, control = control
+        )
+        class(gcBootSpline) <- "gcBootSpline"
+        return(gcBootSpline)
+    }
+    A <- NA
+    mu <- NA
+    lambda <- NA
+    integral <- NA
+    dY <- NA
+    boot.y <- array(NA, c(control$nboot.gc, length(time)))
+    boot.x <- array(NA, c(control$nboot.gc, length(time)))
+    nonpara <- list()
+    control.change <- control
+    control.change$fit.opt <- "s"
+    if (control$nboot.gc > 0)
+    {
+        for (j in 1:control$nboot.gc)
+        {
+            choose <- sort(
+                c(
+                  1, sample(
+                    1:length(time[-1]),
+                    length(time) -
+                      1, replace = TRUE
+                )
+              )
+            )
+            while (length(unique(choose)) <
+                5)
+                {
+                choose <- sort(
+                  c(
+                    1, sample(
+                      1:length(time[-1]),
+                      length(time) -
+                        1, replace = TRUE
+                  )
+                )
+              )
+            }
+            time.cur <- time[choose]
+            data.cur <- data[choose]
+            if (stats::IQR(time.cur) >
+                0)
+                {
+                nonpara[[j]] <- growth.gcFitSpline(time.cur, data.cur, gcID, control.change)
+                if (nonpara[[j]]$fitFlag == FALSE |
+                  is.na(nonpara[[j]]$fit.data[1]))
+                    {
+                  boot.y[j, 1:length(nonpara[[j]]$fit.data)] <- rep(NA, length(nonpara[[j]]$fit.data))
+                  boot.x[j, 1:length(nonpara[[j]]$fit.time)] <- rep(NA, length(nonpara[[j]]$fit.time))
+                } else
+                {
+                  boot.y[j, 1:length(nonpara[[j]]$fit.data)] <- nonpara[[j]]$fit.data
+                  boot.x[j, 1:length(nonpara[[j]]$fit.time)] <- nonpara[[j]]$fit.time
+                }
+                lambda[j] <- nonpara[[j]]$parameters$lambda
+                mu[j] <- nonpara[[j]]$parameters$mu
+                A[j] <- nonpara[[j]]$parameters$A
+                integral[j] <- nonpara[[j]]$parameters$integral
+                dY[j] <- nonpara[[j]]$parameters$dY
+            }
         }
-        else{
-          boot.y[j, 1:length(nonpara[[j]]$fit.data)] <- nonpara[[j]]$fit.data
-          boot.x[j, 1:length(nonpara[[j]]$fit.time)] <- nonpara[[j]]$fit.time
+        lambda[which(!is.finite(lambda))] <- NA
+        mu[which(!is.finite(lambda))] <- NA
+        A[which(!is.finite(lambda))] <- NA
+        integral[which(!is.finite(lambda))] <- NA
+        dY[which(!is.finite(dY))] <- NA
+        if (control$clean.bootstrap == TRUE)
+        {
+            lambda[which(lambda < 0)] <- NA
+            mu[which(mu < 0)] <- NA
+            A[which(A < 0)] <- NA
+            integral[which(integral < 0)] <- NA
+            dY[which(dY < 0)] <- NA
         }
-        lambda[j] <- nonpara[[j]]$parameters$lambda
-        mu[j] <- nonpara[[j]]$parameters$mu
-        A[j] <- nonpara[[j]]$parameters$A
-        integral[j] <- nonpara[[j]]$parameters$integral
-        dY[j] <- nonpara[[j]]$parameters$dY
-      }
     }
-    lambda[which(!is.finite(lambda))] <- NA
-    mu[which(!is.finite(lambda))] <- NA
-    A[which(!is.finite(lambda))] <- NA
-    integral[which(!is.finite(lambda))] <- NA
-    dY[which(!is.finite(dY))] <- NA
-    if (control$clean.bootstrap == TRUE) {
-      lambda[which(lambda < 0)] <- NA
-      mu[which(mu < 0)] <- NA
-      A[which(A < 0)] <- NA
-      integral[which(integral < 0)] <- NA
-      dY[which(dY < 0)] <- NA
+    if (control$log.x.gc == TRUE)
+    {
+        bad.values <- (time <= -1)
+        if (TRUE %in% bad.values)
+        {
+            time <- time[!bad.values]
+            data <- data[!bad.values]
+        }
+        time.log <- log(1 + time)
     }
-  }
-  if (control$log.x.gc == TRUE) {
-    bad.values <- (time <= -1)
-    if (TRUE %in% bad.values) {
-      time <- time[!bad.values]
-      data <- data[!bad.values]
+    if (control$log.y.spline == TRUE)
+    {
+        data.log <- log(data/data[1])
+        bad.values <- (data.log <= 0)
+        if (TRUE %in% bad.values)
+        {
+            time <- time[!bad.values]
+            data.log <- data.log[!bad.values]
+        }
     }
-    time.log <- log(1 + time)
-  }
-  if (control$log.y.spline == TRUE) {
-    data.log <- log(data/data[1])
-    bad.values <- (data.log <= 0)
-    if (TRUE %in% bad.values) {
-      time <- time[!bad.values]
-      data.log <- data.log[!bad.values]
+    if (all(is.na(mu)))
+        {
+        if (control$suppress.messages == F)
+            message(
+                "gcBootSpline: No spline fit could be performed successfully!"
+            )
+        gcBootSpline <- list(
+            raw.time = if (control$log.x.gc == TRUE)
+            {
+                time.log
+            } else
+            {
+                time
+            }, raw.data = if (control$log.y.spline ==
+                TRUE)
+                {
+                data.log
+            } else
+            {
+                data
+            }, gcID = gcID, boot.time = NA, boot.data = NA,
+            boot.gcSpline = NA, lambda = NA, mu = NA,
+            A = NA, integral = NA, bootFlag = FALSE,
+            control = control
+        )
+        class(gcBootSpline) <- "gcBootSpline"
+        return(gcBootSpline)
     }
-  }
-  if (all(is.na(mu))) {
-    if(control$suppress.messages==F) message("gcBootSpline: No spline fit could be performed successfully!")
-    gcBootSpline <- list(raw.time = if (control$log.x.gc == TRUE) {
-      time.log
-    } else {
-      time
-    },
-    raw.data = if (control$log.y.spline == TRUE) {
-      data.log
-    } else {
-      data
-    },
-    gcID = gcID, boot.time = NA, boot.data = NA, boot.gcSpline = NA,
-    lambda = NA, mu = NA, A = NA, integral = NA, bootFlag = FALSE,
-    control = control)
+    gcBootSpline <- list(
+        raw.time = if (control$log.x.gc == TRUE)
+        {
+            time.log
+        } else
+        {
+            time
+        }, raw.data = if (control$log.y.spline == TRUE)
+        {
+            data.log
+        } else
+        {
+            data
+        }, gcID = gcID, boot.time = boot.x, boot.data = boot.y,
+        boot.gcSpline = nonpara, lambda = lambda, mu = mu,
+        A = A, dY = dY, integral = integral, bootFlag = TRUE,
+        control = control
+    )
     class(gcBootSpline) <- "gcBootSpline"
-    return(gcBootSpline)
-  }
-  gcBootSpline <- list(
-    raw.time = if (control$log.x.gc == TRUE) {
-      time.log
-    } else {
-      time
-    },
-    raw.data = if (control$log.y.spline == TRUE) {
-      data.log
-    } else {
-      data
-    },
-    gcID = gcID,
-    boot.time = boot.x,
-    boot.data = boot.y,
-    boot.gcSpline = nonpara,
-    lambda = lambda,
-    mu = mu,
-    A = A,
-    dY = dY,
-    integral = integral,
-    bootFlag = TRUE,
-    control = control
-  )
-  class(gcBootSpline) <- "gcBootSpline"
-  invisible(gcBootSpline)
+    invisible(gcBootSpline)
 }
 
 
@@ -731,8 +963,8 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.density = system.file('lac_promoters.xlsx', package = 'QurvE'),
+#'                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    sheet.density = 1,
 #'                    sheet.fl = 2 )
 #'
@@ -743,381 +975,627 @@ growth.gcBootSpline <- function (time, data, gcID = "undefined", control = growt
 #' # Perform linear fit
 #' TestFit <- flFitSpline(time = time,
 #'                        fl_data = data,
-#'                        ID = "TestFit",
-#'                        control = fl.control(fit.opt = "s", x_type = "time"))
+#'                        ID = 'TestFit',
+#'                        control = fl.control(fit.opt = 's', x_type = 'time'))
 #'
 #' plot(TestFit)
 #
-flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
-                        control = fl.control(biphasic = FALSE, x_type = c("density", "time"), log.x.spline = FALSE, log.y.spline = FALSE, smooth.fl = 0.75, t0 = 0, min.density = NA))
-{
-  x_type <- control$x_type
-  if(!is.null(control$t0) && !is.na(control$t0) && control$t0 != ""){
-    t0 <- as.numeric(control$t0)
-  } else {
-    t0 <- 0
-  }
-  if(is.na(control$tmax))
-    tmax <- NULL
-  if(!is.null(tmax))
-    tmax <- as.numeric(control$tmax)
-  if(!is.null(control$max.density))
-    max.density <- as.numeric(control$max.density)
-
-  if (is(control) != "fl.control")
-    stop("control must be of class fl.control!")
-  if (!any(control$fit.opt %in% "s"))
-    stop("Fit option is not set for a fluorescence spline fit. See fl.control()")
-
-  if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
-  if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
-  fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
-  bad.values <- (fl_data < 0)
-  if (TRUE %in% bad.values) {
-    fl_data <- fl_data.in <- fl_data[!bad.values]
-    if(x_type == "density"){
-      density <- density.in <- density[!bad.values]
-    } else {
-      time <- time.in <- time[!bad.values]
-    }
-  }
-  if(x_type == "density" && is.null(density))
-    stop("To perform a spline fit of fluorescence vs. density data, please provide a 'density' vector of the same length as 'fl_data'.")
-  if(x_type == "time" && is.null(time))
-    stop("To perform a spline fit of fluorescence vs. time data, please provide a 'time' vector of the same length as 'fl_data'.")
-  if(x_type == "density" && length(density) != length(fl_data))
-    stop("flFitSpline: length of input vectors (density and fl_data) differ!")
-  if(x_type == "time" && length(time) != length(fl_data))
-    stop("flFitSpline: length of input vectors (time and fl_data) differ!")
-  if (length(fl_data) < 5) {
-    cat("flFitSpline: There is not enough valid data. Must have at least 5!")
-    flFitSpline <- list(time.in = time.in, density.in = density.in , fl_data.in = fl_data.in, raw.time = time, raw.density = density, raw.fl = fl_data,
-                        fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
-                        parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
-                                          lambda2 = NA, b.tangent2 = NA, integral = NA),
-                        spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                        control = control)
-    class(flFitSpline) <- "flFitSpline"
-    return(flFitSpline)
-  }
-  # Consider only data points up to max density or time, respectively
-  if(x_type == "time"){
-    ndx.max <- which.max(time)
-    time <- time[1:ndx.max]
-    fl_data <- fl_data[1:ndx.max]
-  }
-  if(x_type == "density"){
-    ndx.max <- which.max(density)
-    density <- density[1:ndx.max]
-    fl_data <- fl_data[1:ndx.max]
-    bad.values <- (fl_data < 0)
-  }
-  fl_data.log <- log(fl_data/fl_data[1])
-  if(x_type == "density"){
-    bad.values <- (is.na(density)) | (is.na(fl_data)) | fl_data <0 |
-      (!is.numeric(density)) | (!is.numeric(fl_data) )
-    if (TRUE %in% bad.values) {
-      density <- density[!bad.values]
-      fl_data <- fl_data[!bad.values]
-      fl_data.log <- fl_data.log[!bad.values]
-    }
-    if (control$log.x.spline == TRUE) {
-      bad.values <- (density < 0)
-      if (TRUE %in% bad.values) {
-        density <- density[!bad.values]
-        fl_data <- fl_data[!bad.values]
-        fl_data.log <- fl_data.log[!bad.values]
-      }
-      density.log <- log(density/density[1])
-    }
-
-    if(max(density) < control$growth.thresh * density[1]){
-      if(control$suppress.messages==F) message(paste0("flFitSpline: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
-      flFitSpline <- list(x.in = density.in, fl.in = fl_data.in, raw.x = density, raw.fl = fl_data,
-                          fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
-                          parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
-                                            lambda2 = NA, b.tangent2 = NA, integral = NA),
-                          spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                          control = control)
-      class(flFitSpline) <- "flFitSpline"
-      return(flFitSpline)
-    }
-    # Implement min.density into dataset
-    if(!is.null(control$min.density)) {
-      if (!is.na(control$min.density) && control$min.density != 0) {
-        min.density <- control$min.density
-        if (control$log.y.spline == TRUE) {
-          # perfom log transformation on min.density (Ln(y/y0))
-          min.density <- log(min.density / density[1])
-          fl_data.log <- fl_data.log[density.log >= min.density]
-          density.log <- density.log[density.log >= min.density]
-        } else {
-          fl_data <- fl_data[density >= min.density]
-          density <- density[density >= min.density]
-        }
-      }
-    }
-    # Implement max.density into dataset
-    if(!is.null(control$max.density)) {
-      if (!is.na(control$max.density)) {
-        if (control$log.x.spline == TRUE) {
-          # perfom log transformation on max.density (Ln(y/y0))
-          max.density <- log(control$max.density / density[1])
-          fl_data.log <- fl_data.log[density.log <= max.density]
-          density.log <- density.log[density.log <= max.density]
-        } else {
-          max.density <- control$max.density
-          fl_data <- fl_data[density <= max.density]
-          density <- density[density <= max.density]
-        }
-      }
-    }
-    if (control$log.x.spline == FALSE) {
-      x <- density
-    } else {
-      x <- density.log
-    }
-    if(length(x)<4){
-      message("flFitSpline: Not enough data points above the chosen min.density.")
-      flFitSpline <- list(x.in = density.in, fl.in = fl_data.in, raw.x = density, raw.fl = fl_data,
-                          fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
-                          parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
-                                            lambda2 = NA, b.tangent2 = NA, integral = NA),
-                          spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                          control = control)
-      class(flFitSpline) <- "flFitSpline"
-      return(flFitSpline)
-    }
-  } # if(x_type == "density")
-  if(x_type == "time"){
-    bad.values <- (is.na(time)) | (is.na(fl_data)) | fl_data <0 |
-      (!is.numeric(time)) | (!is.numeric(fl_data) )
-    if (TRUE %in% bad.values) {
-      time <- time[!bad.values]
-      fl_data <- fl_data[!bad.values]
-      fl_data.log <- fl_data.log[!bad.values]
-    }
-
-    if (control$log.x.spline == TRUE) {
-      bad.values <- (time <= 0)
-      if (TRUE %in% bad.values) {
-        time <- time[!bad.values]
-        fl_data <- fl_data[!bad.values]
-        fl_data.log <- fl_data.log[!bad.values]
-      }
-      time.log <- log(time)
-    }
-    if(max(time) < control$t0){
-      if(control$suppress.messages==F) message(paste0("flFitSpline: All time values are below the chosen 't0'."))
-      flFitSpline <- list(x.in = time.in, fl.in = fl_data.in, raw.x = time, raw.fl = fl_data,
-                          fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
-                          parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
-                                            lambda2 = NA, b.tangent2 = NA, integral = NA),
-                          spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                          control = control)
-      class(flFitSpline) <- "flFitSpline"
-      return(flFitSpline)
-    }
-    # Implement t0 into dataset
-    if(is.numeric(t0) && t0 > 0){
-      if (control$log.y.spline == TRUE) {
-        fl_data.log <- fl_data.log[which.min(abs(time-t0)):length(fl_data.log)]
-      } else {
-        fl_data <- fl_data[which.min(abs(time-t0)):length(fl_data)]
-      }
-      if (control$log.x.spline == FALSE) {
-        time <- time[which.min(abs(time-t0)):length(time)]
-      } else {
-        t0 <- log(t0)
-        time.log <- time.log[which.min(abs(time.log-t0)):length(time.log)]
-      }
-    }
-    # Implement tmax into dataset
-    if(is.numeric(tmax) && tmax > t0){
-      if (control$log.y.spline == TRUE) {
-        fl_data.log <- fl_data.log[time <= tmax]
-      } else{
-        fl_data <- fl_data[time <= tmax]
-      }
-      time <- time[time <= tmax]
-    }
-    if (control$log.x.spline == TRUE) {
-      x <- time.log
-    } else {
-      x <- time
-    }
-    if(length(x)<4){
-      message("flFitSpline: Not enough data points above the chosen t0.")
-      flFitSpline <- list(x.in = density.in, fl.in = fl_data.in, raw.x = density, raw.fl = fl_data,
-                          fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
-                          parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
-                                            lambda2 = NA, b.tangent2 = NA, integral = NA),
-                          spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                          control = control)
-      class(flFitSpline) <- "flFitSpline"
-      return(flFitSpline)
-    }
-  } # if(x_type == "time")
-  x.in = get(ifelse(x_type == "density", "density.in", "time.in"))
-  try(spline <- smooth.spline(x = x,
-                              y = if(control$log.y.spline == TRUE){
-                                fl_data.log
-                              } else {
-                                fl_data
-                              }, spar = control$smooth.fl, cv = NA, keep.data = FALSE))
-  if (!exists("spline") || is.null(spline)) {
-    if(control$suppress.messages==F) message("flFitSpline: Spline could not be fitted to data!")
-    flFitSpline <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                        raw.x = get(ifelse(x_type == "density", "density", "time")), raw.fl = fl_data,
-                        fit.x = rep(NA, length(get(ifelse(x_type == "density", "density.in", "time.in")))), fit.fl = rep(NA, length(fl_data.in)),
-                        parameters = list(A = NA, dY = NA, max_slope = NA, x.max = NA, lambda = NA, b.tangent = NA, max_slope2 = NA, x.max2 = NA,
-                                          lambda2 = NA, b.tangent2 = NA, integral = NA),
-                        spline = NA, reliable = NULL, fitFlag = FALSE, fitFlag2 = FALSE,
-                        control = control)
-    class(flFitSpline) <- "flFitSpline"
-    return(flFitSpline)
-  } # if(!exists("spline") || is.null(spline) == TRUE)
-  else {
-    # Perform spline fit and extract parameters
-    deriv1 <- stats::predict(spline, x, deriv = 1)
-    # find maximum in deriv1, exclude maxima at beginning of fit, if x_type is "time"
-    deriv1.test <- deriv1
-    spline.test <- spline
-    # if(x_type == "time"){
-    # Take only max slope values that are not at the start of the curve
-    #   success <- FALSE
-    #   while (!success){
-    #     if(length(deriv1.test$y) > 2){
-    #       max_slope.index <- which.max(deriv1.test$y)
-    #       if(!(max_slope.index %in% 1:3)){
-    #         max_slope.index <- max_slope.index
-    #         success <- TRUE
-    #       } else {
-    #         deriv1.test <- lapply(1:length(deriv1.test), function(x) deriv1.test[[x]][-max_slope.index])
-    #         names(deriv1.test) <- c("x", "y")
-    #         spline.test$x <- spline$x[-max_slope.index]
-    #         spline.test$y <- spline$y[-max_slope.index]
-    #       }
-    #     } else{
-    #       max_slope.index <- which.max(deriv1$y)
-    #       spline.test <- spline
-    #       success <- TRUE
-    #     }
-    #   }
-    # } else {
-    #   max_slope.index <- which.max(deriv1$y)
-    # }
-    max_slope.index <- which.max(deriv1$y)
-    spline <- spline.test
-    max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index]) # index of data point with maximum slope in spline fit
-    x.max <- deriv1$x[max_slope.index] # x of maximum slope
-    max_slope <- max(deriv1$y) # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
-    y.max <- spline$y[max_slope.index.spl] # cell density at x of max slope
-    b.spl <- y.max - max_slope * x.max # the y-intercept of the tangent at mumax
-    lambda.spl <- -b.spl/max_slope  # lag x
-    integral <- low.integrate(spline$x, spline$y)
-
-    if(control$biphasic) {
-      # determine number of data points in period until maximum density
-      n.spl <- length(x[which.min(abs(x)):which.max(fl_data)])
-      # Find local minima that frame max_slope and remove the 'peak' from deriv1
-      n <- round((log(n.spl+4, base=2.1))/0.75)/2
-      minima <- inflect(deriv1$y, threshold = n)$minima
-      if(length(minima)>0){
-        if(length(minima)>1){
-          for(i in 1:(length(minima)-1)){
-            if(any(minima[i]:minima[i+1] %in% max_slope.index)){
-              min.ndx <- c(minima[i], minima[i+1])
-            }
-            else if(any(minima[i]:length(spline$x) %in% max_slope.index)){
-              min.ndx <- c(minima[i], length(spline$x))
-            }
-            else if(any(1:minima[i] %in% max_slope.index)){
-              min.ndx <- c(1, minima[i])
-            }
-          }
-        }
-        else if(any(minima:length(spline$x) %in% max_slope.index)){
-          min.ndx <- c(minima, length(spline$x))
-        }
-        else if(any(1:minima %in% max_slope.index)){
-          min.ndx <- c(1, minima)
-        }
-      }
-      if(exists("min.ndx")){
-        deriv1.2 <- deriv1
-        deriv1.2$y[min.ndx[1]:min.ndx[2]] <- 0
-        # find second max_slope
-        max_slope2.index <- which.max(deriv1.2$y) # index of data point with maximum slope in first derivative fit
-        max_slope2.index.spl <- which(spline$x == deriv1.2$x[max_slope2.index]) # index of data point with maximum slope in spline fit
-        x.max2 <- deriv1.2$x[max_slope2.index] # x of maximum slope
-        max_slope2 <- max(deriv1.2$y) # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
-        y.max2 <- spline$y[max_slope2.index.spl] # cell density at x of max slope
-        b.spl2 <- y.max2 - max_slope2 * x.max2 # the y-intercept of the tangent at mumax
-        lambda.spl2 <- -b.spl2/max_slope2  # lag x
-        fitFlag2 <- TRUE
-      } else {
-        max_slope2.index <- NA
-        max_slope2.index.spl <- NA
-        x.max2 <- NA
-        max_slope2 <- NA
-        y.max2 <- NA
-        b.spl2 <- NA
-        lambda.spl2 <- NA
-        fitFlag2 <- FALSE
-      }
-    } # if(control$biphasic)
-    else {
-      max_slope2.index <- NA
-      max_slope2.index.spl <- NA
-      x.max2 <- NA
-      max_slope2 <- NA
-      y.max2 <- NA
-      b.spl2 <- NA
-      lambda.spl2 <- NA
-      fitFlag2 <- FALSE
-    }
-  } # else of if (!exists("spline") || is.null(spline) == TRUE)
-
-  flFitSpline <-
-    list(
-      x.in = get(ifelse(x_type == "density", "density.in", "time.in")),
-      fl.in = fl_data.in,
-      raw.x = get(ifelse(x_type == "density", "density", "time")),
-      raw.fl = fl_data,
-      ID = ID,
-      fit.x = spline$x,
-      fit.fl = spline$y,
-      parameters = list(
-        A = if (control$log.y.spline == TRUE) {
-          # Correct ln(N/N0) transformation for max density value
-          fl_data[1] * exp(max(spline$y))
-        } else {
-          max(spline$y)
-        },
-        dY = if (control$log.y.spline == TRUE) {
-          fl_data[1] * exp(max(spline$y)) -  fl_data[1] * exp(spline$y[1])
-        } else {
-          max(spline$y) - spline$y[1]
-        },
-        max_slope = max_slope,
-        x.max = x.max,
-        lambda = lambda.spl,
-        b.tangent = b.spl,
-        max_slope2 = max_slope2,
-        x.max2 = x.max2,
-        lambda2 = lambda.spl2,
-        b.tangent2 = b.spl2,
-        integral = integral),
-      spline = spline,
-      spline.deriv1 = deriv1,
-      reliable = NULL,
-      fitFlag = TRUE,
-      fitFlag2 = fitFlag2,
-      control = control
+flFitSpline <- function(
+    time = NULL, density = NULL, fl_data, ID = "undefined",
+    control = fl.control(
+        biphasic = FALSE, x_type = c("density", "time"),
+        log.x.spline = FALSE, log.y.spline = FALSE,
+        smooth.fl = 0.75, t0 = 0, min.density = NA
     )
-  class(flFitSpline) <- "flFitSpline"
-  invisible(flFitSpline)
+)
+    {
+    x_type <- control$x_type
+    if (!is.null(control$t0) &&
+        !is.na(control$t0) &&
+        control$t0 != "")
+        {
+        t0 <- as.numeric(control$t0)
+    } else
+    {
+        t0 <- 0
+    }
+    if (is.na(control$tmax))
+        tmax <- NULL
+    if (!is.null(tmax))
+        tmax <- as.numeric(control$tmax)
+    if (!is.null(control$max.density))
+        max.density <- as.numeric(control$max.density)
+
+    if (is(control) !=
+        "fl.control")
+        stop("control must be of class fl.control!")
+    if (!any(control$fit.opt %in% "s"))
+        stop(
+            "Fit option is not set for a fluorescence spline fit. See fl.control()"
+        )
+
+    if (!is.null(time))
+        time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
+    if (!is.null(density))
+        density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))][!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
+    fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
+    bad.values <- (fl_data < 0)
+    if (TRUE %in% bad.values)
+    {
+        fl_data <- fl_data.in <- fl_data[!bad.values]
+        if (x_type == "density")
+        {
+            density <- density.in <- density[!bad.values]
+        } else
+        {
+            time <- time.in <- time[!bad.values]
+        }
+    }
+    if (x_type == "density" && is.null(density))
+        stop(
+            "To perform a spline fit of fluorescence vs. density data, please provide a 'density' vector of the same length as 'fl_data'."
+        )
+    if (x_type == "time" && is.null(time))
+        stop(
+            "To perform a spline fit of fluorescence vs. time data, please provide a 'time' vector of the same length as 'fl_data'."
+        )
+    if (x_type == "density" && length(density) !=
+        length(fl_data))
+        stop(
+            "flFitSpline: length of input vectors (density and fl_data) differ!"
+        )
+    if (x_type == "time" && length(time) !=
+        length(fl_data))
+        stop(
+            "flFitSpline: length of input vectors (time and fl_data) differ!"
+        )
+    if (length(fl_data) <
+        5)
+        {
+        cat(
+            "flFitSpline: There is not enough valid data. Must have at least 5!"
+        )
+        flFitSpline <- list(
+            time.in = time.in, density.in = density.in,
+            fl_data.in = fl_data.in, raw.time = time,
+            raw.density = density, raw.fl = fl_data,
+            fit.x = rep(
+                NA, length(
+                  get(
+                    ifelse(
+                      x_type == "density", "density.in",
+                      "time.in"
+                  )
+                )
+              )
+            ),
+            fit.fl = rep(NA, length(fl_data.in)),
+            parameters = list(
+                A = NA, dY = NA, max_slope = NA, x.max = NA,
+                lambda = NA, b.tangent = NA, max_slope2 = NA,
+                x.max2 = NA, lambda2 = NA, b.tangent2 = NA,
+                integral = NA
+            ),
+            spline = NA, reliable = NULL, fitFlag = FALSE,
+            fitFlag2 = FALSE, control = control
+        )
+        class(flFitSpline) <- "flFitSpline"
+        return(flFitSpline)
+    }
+    # Consider only data points up to max density
+    # or time, respectively
+    if (x_type == "time")
+    {
+        ndx.max <- which.max(time)
+        time <- time[1:ndx.max]
+        fl_data <- fl_data[1:ndx.max]
+    }
+    if (x_type == "density")
+    {
+        ndx.max <- which.max(density)
+        density <- density[1:ndx.max]
+        fl_data <- fl_data[1:ndx.max]
+        bad.values <- (fl_data < 0)
+    }
+    fl_data.log <- log(fl_data/fl_data[1])
+    if (x_type == "density")
+        {
+            bad.values <- (is.na(density)) |
+                (is.na(fl_data)) |
+                fl_data < 0 | (!is.numeric(density)) |
+                (!is.numeric(fl_data))
+            if (TRUE %in% bad.values)
+            {
+                density <- density[!bad.values]
+                fl_data <- fl_data[!bad.values]
+                fl_data.log <- fl_data.log[!bad.values]
+            }
+            if (control$log.x.spline == TRUE)
+            {
+                bad.values <- (density < 0)
+                if (TRUE %in% bad.values)
+                {
+                  density <- density[!bad.values]
+                  fl_data <- fl_data[!bad.values]
+                  fl_data.log <- fl_data.log[!bad.values]
+                }
+                density.log <- log(density/density[1])
+            }
+
+            if (max(density) <
+                control$growth.thresh * density[1])
+                {
+                if (control$suppress.messages == F)
+                  message(
+                    paste0(
+                      "flFitSpline: No significant growth detected (with all values below ",
+                      control$growth.thresh, " * start_value)."
+                  )
+                )
+                flFitSpline <- list(
+                  x.in = density.in, fl.in = fl_data.in,
+                  raw.x = density, raw.fl = fl_data,
+                  fit.x = rep(
+                    NA, length(
+                      get(
+                        ifelse(
+                          x_type == "density", "density.in",
+                          "time.in"
+                      )
+                    )
+                  )
+                ),
+                  fit.fl = rep(NA, length(fl_data.in)),
+                  parameters = list(
+                    A = NA, dY = NA, max_slope = NA,
+                    x.max = NA, lambda = NA, b.tangent = NA,
+                    max_slope2 = NA, x.max2 = NA, lambda2 = NA,
+                    b.tangent2 = NA, integral = NA
+                ),
+                  spline = NA, reliable = NULL, fitFlag = FALSE,
+                  fitFlag2 = FALSE, control = control
+              )
+                class(flFitSpline) <- "flFitSpline"
+                return(flFitSpline)
+            }
+            # Implement min.density into dataset
+            if (!is.null(control$min.density))
+                {
+                if (!is.na(control$min.density) &&
+                  control$min.density != 0)
+                  {
+                  min.density <- control$min.density
+                  if (control$log.y.spline == TRUE)
+                  {
+                    # perfom log transformation
+                    # on min.density (Ln(y/y0))
+                    min.density <- log(min.density/density[1])
+                    fl_data.log <- fl_data.log[density.log >=
+                      min.density]
+                    density.log <- density.log[density.log >=
+                      min.density]
+                  } else
+                  {
+                    fl_data <- fl_data[density >= min.density]
+                    density <- density[density >= min.density]
+                  }
+                }
+            }
+            # Implement max.density into dataset
+            if (!is.null(control$max.density))
+                {
+                if (!is.na(control$max.density))
+                  {
+                  if (control$log.x.spline == TRUE)
+                  {
+                    # perfom log transformation
+                    # on max.density (Ln(y/y0))
+                    max.density <- log(control$max.density/density[1])
+                    fl_data.log <- fl_data.log[density.log <=
+                      max.density]
+                    density.log <- density.log[density.log <=
+                      max.density]
+                  } else
+                  {
+                    max.density <- control$max.density
+                    fl_data <- fl_data[density <= max.density]
+                    density <- density[density <= max.density]
+                  }
+                }
+            }
+            if (control$log.x.spline == FALSE)
+            {
+                x <- density
+            } else
+            {
+                x <- density.log
+            }
+            if (length(x) <
+                4)
+                {
+                message(
+                  "flFitSpline: Not enough data points above the chosen min.density."
+              )
+                flFitSpline <- list(
+                  x.in = density.in, fl.in = fl_data.in,
+                  raw.x = density, raw.fl = fl_data,
+                  fit.x = rep(
+                    NA, length(
+                      get(
+                        ifelse(
+                          x_type == "density", "density.in",
+                          "time.in"
+                      )
+                    )
+                  )
+                ),
+                  fit.fl = rep(NA, length(fl_data.in)),
+                  parameters = list(
+                    A = NA, dY = NA, max_slope = NA,
+                    x.max = NA, lambda = NA, b.tangent = NA,
+                    max_slope2 = NA, x.max2 = NA, lambda2 = NA,
+                    b.tangent2 = NA, integral = NA
+                ),
+                  spline = NA, reliable = NULL, fitFlag = FALSE,
+                  fitFlag2 = FALSE, control = control
+              )
+                class(flFitSpline) <- "flFitSpline"
+                return(flFitSpline)
+            }
+        }  # if(x_type == 'density')
+    if (x_type == "time")
+        {
+            bad.values <- (is.na(time)) |
+                (is.na(fl_data)) |
+                fl_data < 0 | (!is.numeric(time)) |
+                (!is.numeric(fl_data))
+            if (TRUE %in% bad.values)
+            {
+                time <- time[!bad.values]
+                fl_data <- fl_data[!bad.values]
+                fl_data.log <- fl_data.log[!bad.values]
+            }
+
+            if (control$log.x.spline == TRUE)
+            {
+                bad.values <- (time <= 0)
+                if (TRUE %in% bad.values)
+                {
+                  time <- time[!bad.values]
+                  fl_data <- fl_data[!bad.values]
+                  fl_data.log <- fl_data.log[!bad.values]
+                }
+                time.log <- log(time)
+            }
+            if (max(time) <
+                control$t0)
+                {
+                if (control$suppress.messages == F)
+                  message(
+                    paste0(
+                      "flFitSpline: All time values are below the chosen 't0'."
+                  )
+                )
+                flFitSpline <- list(
+                  x.in = time.in, fl.in = fl_data.in,
+                  raw.x = time, raw.fl = fl_data, fit.x = rep(
+                    NA, length(
+                      get(
+                        ifelse(
+                          x_type == "density", "density.in",
+                          "time.in"
+                      )
+                    )
+                  )
+                ),
+                  fit.fl = rep(NA, length(fl_data.in)),
+                  parameters = list(
+                    A = NA, dY = NA, max_slope = NA,
+                    x.max = NA, lambda = NA, b.tangent = NA,
+                    max_slope2 = NA, x.max2 = NA, lambda2 = NA,
+                    b.tangent2 = NA, integral = NA
+                ),
+                  spline = NA, reliable = NULL, fitFlag = FALSE,
+                  fitFlag2 = FALSE, control = control
+              )
+                class(flFitSpline) <- "flFitSpline"
+                return(flFitSpline)
+            }
+            # Implement t0 into dataset
+            if (is.numeric(t0) &&
+                t0 > 0)
+                {
+                if (control$log.y.spline == TRUE)
+                {
+                  fl_data.log <- fl_data.log[which.min(abs(time - t0)):length(fl_data.log)]
+                } else
+                {
+                  fl_data <- fl_data[which.min(abs(time - t0)):length(fl_data)]
+                }
+                if (control$log.x.spline == FALSE)
+                {
+                  time <- time[which.min(abs(time - t0)):length(time)]
+                } else
+                {
+                  t0 <- log(t0)
+                  time.log <- time.log[which.min(abs(time.log - t0)):length(time.log)]
+                }
+            }
+            # Implement tmax into dataset
+            if (is.numeric(tmax) &&
+                tmax > t0)
+                {
+                if (control$log.y.spline == TRUE)
+                {
+                  fl_data.log <- fl_data.log[time <=
+                    tmax]
+                } else
+                {
+                  fl_data <- fl_data[time <= tmax]
+                }
+                time <- time[time <= tmax]
+            }
+            if (control$log.x.spline == TRUE)
+            {
+                x <- time.log
+            } else
+            {
+                x <- time
+            }
+            if (length(x) <
+                4)
+                {
+                message(
+                  "flFitSpline: Not enough data points above the chosen t0."
+              )
+                flFitSpline <- list(
+                  x.in = density.in, fl.in = fl_data.in,
+                  raw.x = density, raw.fl = fl_data,
+                  fit.x = rep(
+                    NA, length(
+                      get(
+                        ifelse(
+                          x_type == "density", "density.in",
+                          "time.in"
+                      )
+                    )
+                  )
+                ),
+                  fit.fl = rep(NA, length(fl_data.in)),
+                  parameters = list(
+                    A = NA, dY = NA, max_slope = NA,
+                    x.max = NA, lambda = NA, b.tangent = NA,
+                    max_slope2 = NA, x.max2 = NA, lambda2 = NA,
+                    b.tangent2 = NA, integral = NA
+                ),
+                  spline = NA, reliable = NULL, fitFlag = FALSE,
+                  fitFlag2 = FALSE, control = control
+              )
+                class(flFitSpline) <- "flFitSpline"
+                return(flFitSpline)
+            }
+        }  # if(x_type == 'time')
+    x.in = get(
+        ifelse(x_type == "density", "density.in", "time.in")
+    )
+    try(
+        spline <- smooth.spline(
+            x = x, y = if (control$log.y.spline ==
+                TRUE)
+                {
+                fl_data.log
+            } else
+            {
+                fl_data
+            }, spar = control$smooth.fl, cv = NA, keep.data = FALSE
+        )
+    )
+    if (!exists("spline") ||
+        is.null(spline))
+        {
+            if (control$suppress.messages == F)
+                message(
+                  "flFitSpline: Spline could not be fitted to data!"
+              )
+            flFitSpline <- list(
+                x.in = get(
+                  ifelse(
+                    x_type == "density", "density.in",
+                    "time.in"
+                )
+              ),
+                fl.in = fl_data.in, raw.x = get(
+                  ifelse(
+                    x_type == "density", "density",
+                    "time"
+                )
+              ),
+                raw.fl = fl_data, fit.x = rep(
+                  NA, length(
+                    get(
+                      ifelse(
+                        x_type == "density", "density.in",
+                        "time.in"
+                    )
+                  )
+                )
+              ),
+                fit.fl = rep(NA, length(fl_data.in)),
+                parameters = list(
+                  A = NA, dY = NA, max_slope = NA,
+                  x.max = NA, lambda = NA, b.tangent = NA,
+                  max_slope2 = NA, x.max2 = NA, lambda2 = NA,
+                  b.tangent2 = NA, integral = NA
+              ),
+                spline = NA, reliable = NULL, fitFlag = FALSE,
+                fitFlag2 = FALSE, control = control
+            )
+            class(flFitSpline) <- "flFitSpline"
+            return(flFitSpline)
+        }  # if(!exists('spline') || is.null(spline) == TRUE)
+ else
+    {
+        # Perform spline fit and extract
+        # parameters
+        deriv1 <- stats::predict(spline, x, deriv = 1)
+        # find maximum in deriv1, exclude maxima
+        # at beginning of fit, if x_type is
+        # 'time'
+        deriv1.test <- deriv1
+        spline.test <- spline
+        # if(x_type == 'time'){ Take only max
+        # slope values that are not at the start
+        # of the curve success <- FALSE while
+        # (!success){ if(length(deriv1.test$y) >
+        # 2){ max_slope.index <-
+        # which.max(deriv1.test$y)
+        # if(!(max_slope.index %in% 1:3)){
+        # max_slope.index <- max_slope.index
+        # success <- TRUE } else { deriv1.test <-
+        # lapply(1:length(deriv1.test),
+        # function(x)
+        # deriv1.test[[x]][-max_slope.index])
+        # names(deriv1.test) <- c('x', 'y')
+        # spline.test$x <-
+        # spline$x[-max_slope.index]
+        # spline.test$y <-
+        # spline$y[-max_slope.index] } } else{
+        # max_slope.index <- which.max(deriv1$y)
+        # spline.test <- spline success <- TRUE }
+        # } } else { max_slope.index <-
+        # which.max(deriv1$y) }
+        max_slope.index <- which.max(deriv1$y)
+        spline <- spline.test
+        max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index])  # index of data point with maximum slope in spline fit
+        x.max <- deriv1$x[max_slope.index]  # x of maximum slope
+        max_slope <- max(deriv1$y)  # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
+        y.max <- spline$y[max_slope.index.spl]  # cell density at x of max slope
+        b.spl <- y.max - max_slope * x.max  # the y-intercept of the tangent at mumax
+        lambda.spl <- -b.spl/max_slope  # lag x
+        integral <- low.integrate(spline$x, spline$y)
+
+        if (control$biphasic)
+            {
+                # determine number of data points
+                # in period until maximum density
+                n.spl <- length(x[which.min(abs(x)):which.max(fl_data)])
+                # Find local minima that frame
+                # max_slope and remove the 'peak'
+                # from deriv1
+                n <- round((log(n.spl + 4, base = 2.1))/0.75)/2
+                minima <- inflect(deriv1$y, threshold = n)$minima
+                if (length(minima) >
+                  0)
+                  {
+                  if (length(minima) >
+                    1)
+                    {
+                    for (i in 1:(length(minima) -
+                      1))
+                      {
+                      if (any(
+                        minima[i]:minima[i + 1] %in%
+                          max_slope.index
+                    ))
+                        {
+                        min.ndx <- c(minima[i], minima[i + 1])
+                      } else if (any(
+                        minima[i]:length(spline$x) %in%
+                          max_slope.index
+                    ))
+                        {
+                        min.ndx <- c(minima[i], length(spline$x))
+                      } else if (any(1:minima[i] %in% max_slope.index))
+                        {
+                        min.ndx <- c(1, minima[i])
+                      }
+                    }
+                  } else if (any(
+                    minima:length(spline$x) %in%
+                      max_slope.index
+                ))
+                    {
+                    min.ndx <- c(minima, length(spline$x))
+                  } else if (any(1:minima %in% max_slope.index))
+                    {
+                    min.ndx <- c(1, minima)
+                  }
+                }
+                if (exists("min.ndx"))
+                  {
+                  deriv1.2 <- deriv1
+                  deriv1.2$y[min.ndx[1]:min.ndx[2]] <- 0
+                  # find second max_slope
+                  max_slope2.index <- which.max(deriv1.2$y)  # index of data point with maximum slope in first derivative fit
+                  max_slope2.index.spl <- which(spline$x == deriv1.2$x[max_slope2.index])  # index of data point with maximum slope in spline fit
+                  x.max2 <- deriv1.2$x[max_slope2.index]  # x of maximum slope
+                  max_slope2 <- max(deriv1.2$y)  # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
+                  y.max2 <- spline$y[max_slope2.index.spl]  # cell density at x of max slope
+                  b.spl2 <- y.max2 - max_slope2 * x.max2  # the y-intercept of the tangent at mumax
+                  lambda.spl2 <- -b.spl2/max_slope2  # lag x
+                  fitFlag2 <- TRUE
+                } else
+                {
+                  max_slope2.index <- NA
+                  max_slope2.index.spl <- NA
+                  x.max2 <- NA
+                  max_slope2 <- NA
+                  y.max2 <- NA
+                  b.spl2 <- NA
+                  lambda.spl2 <- NA
+                  fitFlag2 <- FALSE
+                }
+            }  # if(control$biphasic)
+ else
+        {
+            max_slope2.index <- NA
+            max_slope2.index.spl <- NA
+            x.max2 <- NA
+            max_slope2 <- NA
+            y.max2 <- NA
+            b.spl2 <- NA
+            lambda.spl2 <- NA
+            fitFlag2 <- FALSE
+        }
+    }  # else of if (!exists('spline') || is.null(spline) == TRUE)
+
+    flFitSpline <- list(
+        x.in = get(
+            ifelse(
+                x_type == "density", "density.in",
+                "time.in"
+            )
+        ),
+        fl.in = fl_data.in, raw.x = get(ifelse(x_type == "density", "density", "time")),
+        raw.fl = fl_data, ID = ID, fit.x = spline$x,
+        fit.fl = spline$y, parameters = list(
+            A = if (control$log.y.spline == TRUE)
+            {
+                # Correct ln(N/N0) transformation
+                # for max density value
+                fl_data[1] * exp(max(spline$y))
+            } else
+            {
+                max(spline$y)
+            }, dY = if (control$log.y.spline == TRUE)
+            {
+                fl_data[1] * exp(max(spline$y)) -
+                  fl_data[1] * exp(spline$y[1])
+            } else
+            {
+                max(spline$y) -
+                  spline$y[1]
+            }, max_slope = max_slope, x.max = x.max,
+            lambda = lambda.spl, b.tangent = b.spl,
+            max_slope2 = max_slope2, x.max2 = x.max2,
+            lambda2 = lambda.spl2, b.tangent2 = b.spl2,
+            integral = integral
+        ),
+        spline = spline, spline.deriv1 = deriv1, reliable = NULL,
+        fitFlag = TRUE, fitFlag2 = fitFlag2, control = control
+    )
+    class(flFitSpline) <- "flFitSpline"
+    invisible(flFitSpline)
 }
 
 #' flBootSpline: Function to generate a bootstrap
@@ -1153,8 +1631,8 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.density = system.file('lac_promoters.xlsx', package = 'QurvE'),
+#'                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    sheet.density = 1,
 #'                    sheet.fl = 2 )
 #'
@@ -1165,169 +1643,231 @@ flFitSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
 #' # Perform linear fit
 #' TestFit <- flBootSpline(time = time,
 #'                        fl_data = data,
-#'                        ID = "TestFit",
-#'                        control = fl.control(fit.opt = "s", x_type = "time",
+#'                        ID = 'TestFit',
+#'                        control = fl.control(fit.opt = 's', x_type = 'time',
 #'                        nboot.fl = 50))
 #'
 #' plot(TestFit, combine = TRUE, lwd = 0.5)
 #
-flBootSpline <- function(time = NULL, density = NULL, fl_data, ID = "undefined",
-                         control = fl.control())
-{
-  x_type <- control$x_type
-  if (is(control) != "fl.control")
-    stop("control must be of class fl.control!")
-  if (control$nboot.fl == 0)
-    stop("Number of bootstrap samples is zero! See ?fl.control")
-  if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))]
-  if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))]
-  fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
-  if (control$log.y.spline == TRUE) {
-    fl_data.log <- log(fl_data/fl_data[1])
-  }
+flBootSpline <- function(
+    time = NULL, density = NULL, fl_data, ID = "undefined",
+    control = fl.control()
+)
+    {
+    x_type <- control$x_type
+    if (is(control) !=
+        "fl.control")
+        stop("control must be of class fl.control!")
+    if (control$nboot.fl == 0)
+        stop(
+            "Number of bootstrap samples is zero! See ?fl.control"
+        )
+    if (!is.null(time))
+        time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))]
+    if (!is.null(density))
+        density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))]
+    fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
+    if (control$log.y.spline == TRUE)
+    {
+        fl_data.log <- log(fl_data/fl_data[1])
+    }
 
-  if(x_type == "density" && length(density) != length(fl_data))
-    stop("flBootSpline: length of input vectors (density and fl_data) differ!")
-  if(x_type == "time" && length(time) != length(fl_data))
-    stop("flBootSpline: length of input vectors (time and fl_data) differ!")
-  # Consider only data points up to max density or time, respectively
-  if(x_type == "density"){
-    ndx.max <- which.max(density)
-    density <- density[1:ndx.max]
-    fl_data <- fl_data[1:ndx.max]
-    bad.values <- (is.na(density)) | (is.na(fl_data)) |
-      (!is.numeric(density)) | (!is.numeric(fl_data) )
-    if (TRUE %in% bad.values) {
-      density <- density[!bad.values]
-      fl_data <- fl_data[!bad.values]
+    if (x_type == "density" && length(density) !=
+        length(fl_data))
+        stop(
+            "flBootSpline: length of input vectors (density and fl_data) differ!"
+        )
+    if (x_type == "time" && length(time) !=
+        length(fl_data))
+        stop(
+            "flBootSpline: length of input vectors (time and fl_data) differ!"
+        )
+    # Consider only data points up to max density
+    # or time, respectively
+    if (x_type == "density")
+    {
+        ndx.max <- which.max(density)
+        density <- density[1:ndx.max]
+        fl_data <- fl_data[1:ndx.max]
+        bad.values <- (is.na(density)) |
+            (is.na(fl_data)) |
+            (!is.numeric(density)) |
+            (!is.numeric(fl_data))
+        if (TRUE %in% bad.values)
+        {
+            density <- density[!bad.values]
+            fl_data <- fl_data[!bad.values]
+        }
+        if (control$log.x.spline == TRUE)
+        {
+            bad.values <- (density < 0)
+            if (TRUE %in% bad.values)
+            {
+                density <- density[!bad.values]
+                fl_data <- fl_data[!bad.values]
+            }
+            density.log <- log(density/density[1])
+        }
     }
-    if (control$log.x.spline == TRUE) {
-      bad.values <- (density < 0)
-      if (TRUE %in% bad.values) {
-        density <- density[!bad.values]
-        fl_data <- fl_data[!bad.values]
-      }
-      density.log <- log(density/density[1])
+    if (x_type == "time")
+    {
+        ndx.max <- which.max(time)
+        time <- time[1:ndx.max]
+        fl_data <- fl_data[1:ndx.max]
+        bad.values <- (is.na(time)) |
+            (is.na(fl_data)) |
+            (!is.numeric(time)) |
+            (!is.numeric(fl_data))
+        if (TRUE %in% bad.values)
+        {
+            time <- time[!bad.values]
+            if (control$log.y.spline == TRUE)
+            {
+                fl_data.log <- fl_data.log[!bad.values]
+            } else
+            {
+                fl_data <- fl_data[!bad.values]
+            }
+        }
+        if (control$log.x.spline == TRUE)
+        {
+            bad.values <- (time < 0)
+            if (TRUE %in% bad.values)
+            {
+                time <- time[!bad.values]
+                fl_data <- fl_data[!bad.values]
+            }
+            time.log <- log(time + 1)
+        }
     }
-  }
-  if(x_type == "time"){
-    ndx.max <- which.max(time)
-    time <- time[1:ndx.max]
-    fl_data <- fl_data[1:ndx.max]
-    bad.values <- (is.na(time)) | (is.na(fl_data)) |
-      (!is.numeric(time)) | (!is.numeric(fl_data) )
-    if (TRUE %in% bad.values) {
-      time <- time[!bad.values]
-      if (control$log.y.spline == TRUE) {
-        fl_data.log <- fl_data.log[!bad.values]
-      } else {
-        fl_data <- fl_data[!bad.values]
-      }
-    }
-    if (control$log.x.spline == TRUE) {
-      bad.values <- (time < 0)
-      if (TRUE %in% bad.values) {
-        time <- time[!bad.values]
-        fl_data <- fl_data[!bad.values]
-      }
-      time.log <- log(time+1)
-    }
-  }
 
-  if (length(fl_data) < 6) {
-    if(control$suppress.messages==F) message("flBootSpline: There is not enough valid data. Must have at least 6 unique values!")
-    flBootSpline <- list(raw.x = get(ifelse(x_type == "density", "density", "time")), raw.fl = fl_data,
-                         ID = ID, boot.x = NA, boot.fl = NA, boot.flSpline = NA,
-                         lambda = NA, max_slope = NA, A = NA, integral = NA, bootFlag = FALSE,
-                         control = control)
+    if (length(fl_data) <
+        6)
+        {
+        if (control$suppress.messages == F)
+            message(
+                "flBootSpline: There is not enough valid data. Must have at least 6 unique values!"
+            )
+        flBootSpline <- list(
+            raw.x = get(ifelse(x_type == "density", "density", "time")),
+            raw.fl = fl_data, ID = ID, boot.x = NA,
+            boot.fl = NA, boot.flSpline = NA, lambda = NA,
+            max_slope = NA, A = NA, integral = NA,
+            bootFlag = FALSE, control = control
+        )
+        class(flBootSpline) <- "flBootSpline"
+        return(flBootSpline)
+    }
+    x <- get(ifelse(x_type == "density", "density", "time"))
+    A <- NA
+    max_slope <- NA
+    lambda <- NA
+    integral <- NA
+    dY = NA
+    boot.y <- array(NA, c(control$nboot.fl, length(x)))
+    boot.x <- array(NA, c(control$nboot.fl, length(x)))
+    nonpara <- list()
+    control.change <- control
+    control.change$fit.opt <- "s"
+    if (control$nboot.fl > 0)
+    {
+        for (j in 1:control$nboot.fl)
+        {
+            choose <- sort(
+                sample(
+                  1:length(x),
+                  length(x),
+                  replace = TRUE
+              )
+            )
+            while (length(unique(choose)) <
+                5)
+                {
+                choose <- sort(
+                  sample(
+                    1:length(x),
+                    length(x),
+                    replace = TRUE
+                )
+              )
+            }
+            x.cur <- x[choose]
+            fl.cur <- fl_data[choose]
+            if (stats::IQR(x.cur) >
+                0)
+                {
+                if (x_type == "density")
+                {
+                  nonpara[[j]] <- flFitSpline(
+                    density = x.cur, fl_data = fl.cur,
+                    ID = ID, control = control.change
+                )
+                } else
+                {
+                  nonpara[[j]] <- flFitSpline(
+                    time = x.cur, fl_data = fl.cur,
+                    ID = ID, control = control.change
+                )
+                }
+
+                if (nonpara[[j]]$fitFlag == FALSE |
+                  is.na(nonpara[[j]]$fit.fl[1]))
+                    {
+                  boot.y[j, 1:length(nonpara[[j]]$fit.x)] <- rep(NA, length(nonpara[[j]]$fit.fl))
+                  boot.x[j, 1:length(nonpara[[j]]$fit.fl)] <- rep(NA, length(nonpara[[j]]$fit.x))
+                } else
+                {
+                  boot.y[j, 1:length(nonpara[[j]]$fit.fl)] <- nonpara[[j]]$fit.fl
+                  boot.x[j, 1:length(nonpara[[j]]$fit.x)] <- nonpara[[j]]$fit.x
+                }
+                lambda[j] <- nonpara[[j]]$parameters$lambda
+                max_slope[j] <- nonpara[[j]]$parameters$max_slope
+                A[j] <- nonpara[[j]]$parameters$A
+                integral[j] <- nonpara[[j]]$parameters$integral
+                dY[j] <- nonpara[[j]]$parameters$dY
+            }
+        }
+        lambda[which(!is.finite(lambda))] <- NA
+        max_slope[which(!is.finite(lambda))] <- NA
+        A[which(!is.finite(lambda))] <- NA
+        integral[which(!is.finite(lambda))] <- NA
+        dY[which(!is.finite(dY))] <- NA
+        # remove negative values which occured
+        # during bootstrap
+        lambda[which(lambda < 0)] <- NA
+        max_slope[which(max_slope < 0)] <- NA
+        A[which(A < 0)] <- NA
+        integral[which(integral < 0)] <- NA
+        dY[which(dY < 0)] <- NA
+    }
+    if (control$log.x.spline == TRUE)
+    {
+        bad.values <- (x < 0)
+        if (TRUE %in% bad.values)
+        {
+            time <- x[!bad.values]
+            fl_data <- fl_data[!bad.values]
+        }
+        x.log <- log(1 + x)
+    }
+    flBootSpline <- list(
+        raw.x = if (control$log.x.spline == TRUE)
+        {
+            x.log
+        } else
+        {
+            x
+        }, raw.fl = if (control$log.y.spline == TRUE)
+        {
+            fl_data.log
+        } else
+        {
+            fl_data
+        }, ID = ID, boot.x = boot.x, boot.fl = boot.y,
+        boot.flSpline = nonpara, lambda = lambda, max_slope = max_slope,
+        A = A, dY = dY, integral = integral, bootFlag = TRUE,
+        control = control
+    )
     class(flBootSpline) <- "flBootSpline"
-    return(flBootSpline)
-  }
-  x <- get(ifelse(x_type == "density", "density", "time"))
-  A <- NA
-  max_slope <- NA
-  lambda <- NA
-  integral <- NA
-  dY = NA
-  boot.y <- array(NA, c(control$nboot.fl, length(x)))
-  boot.x <- array(NA, c(control$nboot.fl, length(x)))
-  nonpara <- list()
-  control.change <- control
-  control.change$fit.opt <- "s"
-  if (control$nboot.fl > 0) {
-    for (j in 1:control$nboot.fl) {
-      choose <- sort(sample(1:length(x), length(x), replace = TRUE))
-      while (length(unique(choose)) < 5) {
-        choose <- sort(sample(1:length(x), length(x),
-                              replace = TRUE))
-      }
-      x.cur <- x[choose]
-      fl.cur <- fl_data[choose]
-      if(stats::IQR(x.cur) > 0){
-        if(x_type == "density"){
-          nonpara[[j]] <- flFitSpline(density = x.cur, fl_data = fl.cur, ID = ID, control = control.change)
-        } else {
-          nonpara[[j]] <- flFitSpline(time = x.cur, fl_data = fl.cur, ID = ID, control = control.change)
-        }
-
-        if(nonpara[[j]]$fitFlag==FALSE | is.na(nonpara[[j]]$fit.fl[1])){
-          boot.y[j, 1:length(nonpara[[j]]$fit.x)] <- rep(NA, length(nonpara[[j]]$fit.fl))
-          boot.x[j, 1:length(nonpara[[j]]$fit.fl)] <- rep(NA, length(nonpara[[j]]$fit.x))
-        }
-        else{
-          boot.y[j, 1:length(nonpara[[j]]$fit.fl)] <- nonpara[[j]]$fit.fl
-          boot.x[j, 1:length(nonpara[[j]]$fit.x)] <- nonpara[[j]]$fit.x
-        }
-        lambda[j] <- nonpara[[j]]$parameters$lambda
-        max_slope[j] <- nonpara[[j]]$parameters$max_slope
-        A[j] <- nonpara[[j]]$parameters$A
-        integral[j] <- nonpara[[j]]$parameters$integral
-        dY[j] <- nonpara[[j]]$parameters$dY
-      }
-    }
-    lambda[which(!is.finite(lambda))] <- NA
-    max_slope[which(!is.finite(lambda))] <- NA
-    A[which(!is.finite(lambda))] <- NA
-    integral[which(!is.finite(lambda))] <- NA
-    dY[which(!is.finite(dY))] <- NA
-    # remove negative values which occured during bootstrap
-    lambda[which(lambda < 0)] <- NA
-    max_slope[which(max_slope < 0)] <- NA
-    A[which(A < 0)] <- NA
-    integral[which(integral < 0)] <- NA
-    dY[which(dY < 0)] <- NA
-  }
-  if (control$log.x.spline == TRUE) {
-    bad.values <- (x < 0)
-    if (TRUE %in% bad.values) {
-      time <- x[!bad.values]
-      fl_data <- fl_data[!bad.values]
-    }
-    x.log <- log(1 + x)
-  }
-  flBootSpline <- list(
-    raw.x = if (control$log.x.spline == TRUE) {
-      x.log
-    } else {
-      x
-    },
-    raw.fl = if (control$log.y.spline == TRUE) {
-      fl_data.log
-    } else {
-      fl_data
-    },
-    ID = ID,
-    boot.x = boot.x,
-    boot.fl = boot.y,
-    boot.flSpline = nonpara,
-    lambda = lambda,
-    max_slope = max_slope,
-    A = A,
-    dY = dY,
-    integral = integral,
-    bootFlag = TRUE,
-    control = control
-  )
-  class(flBootSpline) <- "flBootSpline"
-  invisible(flBootSpline)
+    invisible(flBootSpline)
 }

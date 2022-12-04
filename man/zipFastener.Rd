@@ -21,20 +21,20 @@ Combine rows or columns of two dataframes in an alternating manner
 }
 \examples{
 # data frames equal dimensions
-df1 <- plyr::rdply(3, rep("o",4))[ ,-1]
-df2 <- plyr::rdply(3, rep("X",4))[ ,-1]
+df1 <- plyr::rdply(3, rep('o',4))[ ,-1]
+df2 <- plyr::rdply(3, rep('X',4))[ ,-1]
 
 zipFastener(df1, df2)
 zipFastener(df1, df2, 2)
 zipFastener(df1, df2, 1)
 
 # data frames unequal in no. of rows
-df1 <- plyr::rdply(10, rep("o",4))[ ,-1]
+df1 <- plyr::rdply(10, rep('o',4))[ ,-1]
 zipFastener(df1, df2, 1)
 zipFastener(df2, df1, 1)
 
 # data frames unequal in no. of columns
-df2 <- plyr::rdply(10, rep("X",3))[ ,-1]
+df2 <- plyr::rdply(10, rep('X',3))[ ,-1]
 zipFastener(df1, df2)
 zipFastener(df2, df1, 2)
 

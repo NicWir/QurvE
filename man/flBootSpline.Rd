@@ -46,8 +46,8 @@ physiological parameters.
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.density = system.file('lac_promoters.xlsx', package = 'QurvE'),
+                   data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.density = 1,
                    sheet.fl = 2 )
 
@@ -58,8 +58,8 @@ data <- input$norm.fluorescence[4,-(1:3)] # Remove identifier columns
 # Perform linear fit
 TestFit <- flBootSpline(time = time,
                        fl_data = data,
-                       ID = "TestFit",
-                       control = fl.control(fit.opt = "s", x_type = "time",
+                       ID = 'TestFit',
+                       control = fl.control(fit.opt = 's', x_type = 'time',
                        nboot.fl = 50))
 
 plot(TestFit, combine = TRUE, lwd = 0.5)

@@ -37,19 +37,19 @@ user input.
 }
 \examples{
 # Create random growth data set
-  rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-  rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+  rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
+  rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = 'Test2')
 
   rnd.data <- list()
-  rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
-  rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+  rnd.data[['time']] <- rbind(rnd.data1$time, rnd.data2$time)
+  rnd.data[['data']] <- rbind(rnd.data1$data, rnd.data2$data)
 
 # Run growth curve analysis workflow
   res <- growth.gcFit(time = rnd.data$time,
                       data = rnd.data$data,
                       parallelize = FALSE,
                       control = growth.control(suppress.messages = TRUE,
-                                               fit.opt = "s"))
+                                               fit.opt = 's'))
 
 
 

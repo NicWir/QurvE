@@ -38,7 +38,7 @@ fl.control(
 )
 }
 \arguments{
-\item{fit.opt}{(Character or vector of strings) Indicates whether the program should perform a linear regression (\code{"l"}) and/or spline fit (\code{"s"}). Default:  \code{fit.opt = c("l", "s")}.}
+\item{fit.opt}{(Character or vector of strings) Indicates whether the program should perform a linear regression (\code{'l'}) and/or spline fit (\code{'s'}). Default:  \code{fit.opt = c('l', 's')}.}
 
 \item{x_type}{(Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.}
 
@@ -68,9 +68,9 @@ fl.control(
 
 \item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
 
-\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{"max_slope.spline"}, which represents the maximum slope of the spline fit Typical options include: \code{"max_slope.linfit"}, \code{"dY.linfit"}, \code{"max_slope.spline"}, and \code{"dY.spline"}.}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{'max_slope.spline'}, which represents the maximum slope of the spline fit Typical options include: \code{'max_slope.linfit'}, \code{'dY.linfit'}, \code{'max_slope.spline'}, and \code{'dY.spline'}.}
 
-\item{dr.method}{(Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{"spline"}) or fit a biosensor response model with \code{"model"} (proposed by Meyer et al., 2019).}
+\item{dr.method}{(Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{'spline'}) or fit a biosensor response model with \code{'model'} (proposed by Meyer et al., 2019).}
 
 \item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
@@ -108,9 +108,9 @@ A \code{fl.control} object is required to perform various computations on fluore
 # default option
 control_default <- fl.control()
 # user defined
-control_manual <- fl.control(fit.opt = c("s"),
+control_manual <- fl.control(fit.opt = c('s'),
                              smooth.fl = 0.6,
-                             x_type = "time",
+                             x_type = 'time',
                              t0 = 2)
 }
 \references{

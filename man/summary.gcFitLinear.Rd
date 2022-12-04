@@ -19,15 +19,15 @@ Generic summary function for gcFitLinear objects
 }
 \examples{
 # Create random growth dataset
-rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 
 # Extract time and growth data for single sample
 time <- rnd.dataset$time[1,]
 data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
 
 # Perform linear fit
-TestFit <- growth.gcFitLinear(time, data, gcID = "TestFit",
-                 control = growth.control(fit.opt = "l"))
+TestFit <- growth.gcFitLinear(time, data, gcID = 'TestFit',
+                 control = growth.control(fit.opt = 'l'))
 
 summary(TestFit)
 

@@ -10,7 +10,7 @@ output:
     theme: "cayman"
     highlight: vignette
 vignette: >
-  %\VignetteIndexEntry{Quantitiative Growth Curve Evaluation with Package `QurvE`}
+  %\VignetteIndexEntry{Quantitiative Fluorescence Curve Evaluation with Package `QurvE`}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 csl: https://raw.githubusercontent.com/citation-style-language/styles/master/research-institute-for-nature-and-forest.csl

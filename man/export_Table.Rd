@@ -11,7 +11,7 @@ export_Table(table, out.dir = getwd(), out.nm = deparse(substitute(table)))
 
 \item{out.dir}{The path to the output directory. Default: the working directory}
 
-\item{out.nm}{The output filename (with or without ".txt" ending). Default: the name of \code{table} followed by ".txt".}
+\item{out.nm}{The output filename (with or without '.txt' ending). Default: the name of \code{table} followed by '.txt'.}
 }
 \value{
 \code{NULL}
@@ -21,7 +21,7 @@ Export a tabular object as tab-separated .txt file
 }
 \examples{
 \dontrun{
-df <- data.frame("A" = seq(1:10), "B" = rev(seq(1:10)))
+df <- data.frame('A' = seq(1:10), 'B' = rev(seq(1:10)))
 
 export_Table(df)
 }

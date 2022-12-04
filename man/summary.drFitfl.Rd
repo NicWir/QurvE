@@ -19,16 +19,16 @@ Generic summary function for drFitfl objects
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.density = system.file('lac_promoters.xlsx', package = 'QurvE'),
+                   data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.density = 1,
                    sheet.fl = 2 )
 
 # Define fit controls
-control <- fl.control(fit.opt = "s",
-             x_type = "time", norm_fl = TRUE,
-             dr.parameter = "max_slope.spline",
-             dr.method = "model",
+control <- fl.control(fit.opt = 's',
+             x_type = 'time', norm_fl = TRUE,
+             dr.parameter = 'max_slope.spline',
+             dr.method = 'model',
              suppress.messages = TRUE)
 
 # Run curve fitting workflow

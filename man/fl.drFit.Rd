@@ -10,13 +10,13 @@ fl.drFit(
 )
 }
 \arguments{
-\item{flTable}{A dataframe containing the data for the dose-response model estimation. Such table of class \code{flTable} can be obtained by running \code{\link{flFit}} with \code{dr.method = "model"} as argument in the \code{fl.control} object.}
+\item{flTable}{A dataframe containing the data for the dose-response model estimation. Such table of class \code{flTable} can be obtained by running \code{\link{flFit}} with \code{dr.method = 'model'} as argument in the \code{fl.control} object.}
 
 \item{control}{A \code{fl.control} object created with \code{\link{fl.control}}, defining relevant fitting options.}
 
-\item{dr.method}{(Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{"spline"}) or fit a biosensor response model with \code{"model"} (proposed by Meyer et al., 2019).}
+\item{dr.method}{(Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{'spline'}) or fit a biosensor response model with \code{'model'} (proposed by Meyer et al., 2019).}
 
-\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{"max_slope.spline"}, which represents the maximum slope of the spline fit Typical options include: \code{"max_slope.linfit"}, \code{"dY.linfit"}, \code{"max_slope.spline"}, and \code{"dY.spline"}.}
+\item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{'max_slope.spline'}, which represents the maximum slope of the spline fit Typical options include: \code{'max_slope.linfit'}, \code{'dY.linfit'}, \code{'max_slope.spline'}, and \code{'dY.spline'}.}
 }
 \value{
 An object of class \code{drFit}.
@@ -30,20 +30,20 @@ Fit a biosensor model (Meyer et al., 2019) to response vs. concentration data
 }
 \examples{
 # Load example dataset
-input <- read_data(data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.fl = 2 )
 
 # Run fluorescence curve analysis workflow
 fitres <- flFit(fl_data = input$fluorescence,
                 time = input$time,
                 parallelize = FALSE,
-                control = fl.control(x_type = "time", norm_fl = FALSE,
+                control = fl.control(x_type = 'time', norm_fl = FALSE,
                                      suppress.messages = TRUE))
 
 # Perform dose-response analysis
 drFit <- fl.drFit(flTable = fitres$flTable,
-                  control = fl.control(dr.method = "model",
-                                       dr.parameter = "max_slope.linfit"))
+                  control = fl.control(dr.method = 'model',
+                                       dr.parameter = 'max_slope.linfit'))
 
 # Inspect results
 summary(drFit)

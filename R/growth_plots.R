@@ -1802,7 +1802,7 @@ plot.drFitModel <- function(x,
 
     }
     if(i < 3){
-      dev.off()
+      grDevices::dev.off()
     }
   }
   # restore standard plot parameters

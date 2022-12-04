@@ -17,9 +17,9 @@ growth.report(
 \arguments{
 \item{grofit}{A \code{grofit} object created with \code{\link{growth.workflow}}.}
 
-\item{out.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of "Report.growth_" and the current date and time.}
+\item{out.dir}{(Character) The path or name of the folder in which the report files are created.  If \code{NULL}, the folder will be named with a combination of 'Report.growth_' and the current date and time.}
 
-\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "GrowthReport_" and the current date and time.}
+\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of 'GrowthReport_' and the current date and time.}
 
 \item{ec50}{(Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -29,7 +29,7 @@ growth.report(
 
 \item{...}{Further arguments passed to create a report. Currently supported:
 \itemize{
-\item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{"all"}, a string vector, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{"all"} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
+\item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{'all'}, a string vector, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{'all'} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
 \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 }}
 }
@@ -42,13 +42,13 @@ growth.report(
 \examples{
 \dontrun{
 # Create random growth data set
-  rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+  rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 
 
   # Run growth curve analysis workflow
   res <- growth.workflow(time = rnd.data$time,
                          data = rnd.data$data,
-                         fit.opt = "s",
+                         fit.opt = 's',
                          ec50 = FALSE,
                          export.res = FALSE,
                          suppress.messages = TRUE,

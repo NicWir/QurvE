@@ -20,6 +20,6 @@ A LaTeX- or HTML-formatted string to assign a color to text based on the output 
 \examples{
 \dontrun{
 # the example below is meaningless unless you put it in a markdown document
-colFmt("Test_text", "Red")
+colFmt('Test_text', 'Red')
 }
 }

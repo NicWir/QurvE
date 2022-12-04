@@ -19,8 +19,8 @@ Generic summary function for flFit objects
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.density = system.file('lac_promoters.xlsx', package = 'QurvE'),
+                   data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.density = 1,
                    sheet.fl = 2 )
 
@@ -28,8 +28,8 @@ input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "Q
 res <- flFit(fl_data = input$norm.fluorescence,
              time = input$time,
              parallelize = FALSE,
-             control = fl.control(fit.opt = c("s","l"), suppress.messages = TRUE,
-             x_type = "time", norm_fl = TRUE, nboot.fl = 20))
+             control = fl.control(fit.opt = c('s','l'), suppress.messages = TRUE,
+             x_type = 'time', norm_fl = TRUE, nboot.fl = 20))
 
 summary(res)
 

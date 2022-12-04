@@ -6,6 +6,7 @@
 ^QurvE\.Rproj$
 ^/vignettes/\.orig$
 ^/vignettes/precompile\.R
+^/vignettes/prettydoc\.Rmd$
 aux$
 log$
 out$

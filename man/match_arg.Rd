@@ -31,7 +31,8 @@ trimming white space
 \examples{
 \dontrun{
 require(stats)
-center <- function(x, type = c("mean", "median", "trimmed")) {
+center <- function(x, type = c('mean', 'median', 'trimmed'))
+{
   type <- match_arg(type)
     switch(type,
            mean = mean(x),
@@ -39,11 +40,11 @@ center <- function(x, type = c("mean", "median", "trimmed")) {
            trimmed = mean(x, trim = .1))
 }
 x <- rcauchy(10)
-center(x, "t")       # Works
-center(x, "T")       # Works as well
-center(x, "T")       # Works as well
-center(x, "med")     # Works
-try(center(x, "m"))  # Error
+center(x, 't')       # Works
+center(x, 'T')       # Works as well
+center(x, 'T')       # Works as well
+center(x, 'med')     # Works
+try(center(x, 'm'))  # Error
 }
 
 }

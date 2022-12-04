@@ -37,65 +37,123 @@
 #'
 #' @examples
 #' # Create random growth dataset
-#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
 #' # Extract time and growth data for single sample
 #' time <- rnd.dataset$time[1,]
 #' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
 #'
 #' # Perform parametric fit
-#' TestFit <- growth.gcFitModel(time, data, gcID = "TestFit",
-#'                  control = growth.control(fit.opt = "m"))
+#' TestFit <- growth.gcFitModel(time, data, gcID = 'TestFit',
+#'                  control = growth.control(fit.opt = 'm'))
 #'
 #' plot(TestFit, basesize = 18, eq.size = 1.5)
 #'
-growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.control())
-{
-  # /// check input parameters
-  if (methods::is(control)!="grofit.control") stop("control must be of class grofit.control!")
-  if (!any(c("m","a") %in% control$fit.opt)) stop("Fit option is not set for a model fit. See growth.control()")
+growth.gcFitModel <- function(
+    time, data, gcID = "undefined", control = growth.control()
+)
+    {
+    # /// check input parameters
+    if (methods::is(control) !=
+        "grofit.control")
+        stop("control must be of class grofit.control!")
+    if (!any(
+        c("m", "a") %in%
+            control$fit.opt
+    ))
+        stop(
+            "Fit option is not set for a model fit. See growth.control()"
+        )
 
-  # /// conversion to handle even data.frame inputs
-  time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
-  data    <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
+    # /// conversion to handle even data.frame
+    # inputs
+    time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
+    data <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
 
-  if(length(data[data<0]) > 0){
-    data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
-  }
+    if (length(data[data < 0]) >
+        0)
+        {
+        data <- data + abs(min(data[data < 0])) +
+            0.01  # add the absolute value of the minimum negative density (+ 0.01) to the data
+    }
 
-  # /// check length of input data
-  if (length(time)!=length(data)) stop("gcFitModel: length of time and data input vectors differ!")
-  if(max(data) < control$growth.thresh * data[1]){
-    if(control$suppress.messages==F) message(paste0("Parametric fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
-    gcFitModel   <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
-                         fit.data = NA, parameters = list(A=NA, mu=0, tD = NA, lambda=NA, integral=NA),
-                         model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
-    class(gcFitModel) <- "gcFitModel"
-    return(gcFitModel)
-  }
-  # /// check if there are enough data points
-  if (length(data)<5){
-    if(control$suppress.messages==F) message("gcFitModel: There is not enough valid data. Must have at least 5 unique values!")
-    gcFitModel <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
-                       fit.data = NA, parameters = list(A=NA, mu=NA, tD = NA, lambda=NA, integral=NA),
-                       model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
-    class(gcFitModel) <- "gcFitModel"
-    return(gcFitModel)
-  }
-  # /// check if there are enough density values above the start value
-  data.growth <- data[data > data[1]]
-  if (length(data.growth)<5){
-    if(control$suppress.messages==F) message("gcFitModel: No significant amount of density values above the start value!")
-    gcFitModel <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
-                       fit.data = NA, parameters = list(A=NA, mu=NA, tD = NA, lambda=NA, integral=NA),
-                       model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
-    class(gcFitModel) <- "gcFitModel"
-    return(gcFitModel)
-  }
-  else{
-    gcFitModel <- growth.param(time, data, gcID, control)
-  }
-  invisible(gcFitModel)
+    # /// check length of input data
+    if (length(time) !=
+        length(data))
+        stop(
+            "gcFitModel: length of time and data input vectors differ!"
+        )
+    if (max(data) <
+        control$growth.thresh * data[1])
+        {
+        if (control$suppress.messages == F)
+            message(
+                paste0(
+                  "Parametric fit: No significant growth detected (with all values below ",
+                  control$growth.thresh, " * start_value)."
+              )
+            )
+        gcFitModel <- list(
+            time.in = time, data.in = data, raw.time = time,
+            raw.data = data, gcID = gcID, fit.time = NA,
+            fit.data = NA, parameters = list(
+                A = NA, mu = 0, tD = NA, lambda = NA,
+                integral = NA
+            ),
+            model = NA, nls = NA, reliable = NULL,
+            fitFlag = FALSE, control = control
+        )
+        class(gcFitModel) <- "gcFitModel"
+        return(gcFitModel)
+    }
+    # /// check if there are enough data points
+    if (length(data) <
+        5)
+        {
+        if (control$suppress.messages == F)
+            message(
+                "gcFitModel: There is not enough valid data. Must have at least 5 unique values!"
+            )
+        gcFitModel <- list(
+            time.in = time, data.in = data, raw.time = time,
+            raw.data = data, gcID = gcID, fit.time = NA,
+            fit.data = NA, parameters = list(
+                A = NA, mu = NA, tD = NA, lambda = NA,
+                integral = NA
+            ),
+            model = NA, nls = NA, reliable = NULL,
+            fitFlag = FALSE, control = control
+        )
+        class(gcFitModel) <- "gcFitModel"
+        return(gcFitModel)
+    }
+    # /// check if there are enough density
+    # values above the start value
+    data.growth <- data[data > data[1]]
+    if (length(data.growth) <
+        5)
+        {
+        if (control$suppress.messages == F)
+            message(
+                "gcFitModel: No significant amount of density values above the start value!"
+            )
+        gcFitModel <- list(
+            time.in = time, data.in = data, raw.time = time,
+            raw.data = data, gcID = gcID, fit.time = NA,
+            fit.data = NA, parameters = list(
+                A = NA, mu = NA, tD = NA, lambda = NA,
+                integral = NA
+            ),
+            model = NA, nls = NA, reliable = NULL,
+            fitFlag = FALSE, control = control
+        )
+        class(gcFitModel) <- "gcFitModel"
+        return(gcFitModel)
+    } else
+    {
+        gcFitModel <- growth.param(time, data, gcID, control)
+    }
+    invisible(gcFitModel)
 }
 
 #' Internal function called within \code{\link{growth.gcFitModel}} to perform growth model fitting.
@@ -130,7 +188,7 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
 #' @examples
 #' \dontrun{
 #' # Create random growth dataset
-#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
 #' # Extract time and growth data for single sample
 #' time <- rnd.dataset$time[1,]
@@ -141,253 +199,347 @@ growth.gcFitModel <- function(time, data, gcID ="undefined", control=growth.cont
 #' data    <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
 #'
 #' # Perform parametric fit
-#' TestFit <- growth.param(time, data, gcID = "TestFit",
-#'                  control = growth.control(fit.opt = "m"))
+#' TestFit <- growth.param(time, data, gcID = 'TestFit',
+#'                  control = growth.control(fit.opt = 'm'))
 #'
 #' plot(TestFit, basesize = 18, eq.size = 1.5)
 #' }
 growth.param <- function(time, data, gcID = "undefined", control)
-{
-  time.in <- time
-  data.in <- data
+    {
+    time.in <- time
+    data.in <- data
 
-  if(!is.null(control$t0) && !is.na(control$t0) && control$t0 != ""){
-    t0 <- as.numeric(control$t0)
-  } else {
-    t0 <- 0
-  }
-
-  # Implement min.density into dataset
-  if(!is.null(control$min.density)) {
-    if (!is.na(control$min.density) && control$min.density != 0) {
-      min.density <- control$min.density
-      time <- time[max(which.min(abs(time.in - t0)), which.min(abs(data - min.density))):length(time)]
-      data <- data[max(which.min(abs(time.in - t0)), which.min(abs(data - min.density))):length(data)]
+    if (!is.null(control$t0) &&
+        !is.na(control$t0) &&
+        control$t0 != "")
+        {
+        t0 <- as.numeric(control$t0)
+    } else
+    {
+        t0 <- 0
     }
-  }
 
-  # Perform log transformation of data
-  if (control$log.y.model == TRUE) {
-    data <- log(data/data[1])
-  }
-
-  #apply t0 to dataset
-  if(is.numeric(t0) && t0 > 0){
-    data <- data[which.min(abs(time-t0)):length(data)]
-    time <- time[which.min(abs(time-t0)):length(time)]
-  }
-
-  # /// determine which values are not valid
-  bad.values <- (is.na(time))|(time<0)|(is.na(data))|(data<0)
-
-  # /// remove bad values or stop program
-  if (TRUE%in%bad.values){
-    if (control$neg.nan.act==FALSE){
-      time    <- time[!bad.values]
-      data    <- data[!bad.values]
-    }
-    else{
-      stop("Bad values in gcFitModel")
-    }
-  }
-
-  # fitting parametric growth curves
-  y.model     <- NULL
-  bestAIC     <- NULL
-  best        <- NULL
-  used        <- NULL
-
-  # starting values for parametric fitting from spline fit
-  control.tmp <- control
-  control.tmp$fit.opt <- "s"
-  control.tmp$log.y.spline <- control$log.y.model
-  nonpara     <- growth.gcFitSpline(time.in, data.in, gcID, control.tmp)
-  if(nonpara$fitFlag == FALSE){
-    gcFitModel   <- list(time.in =  time, data.in = data, raw.time = time, raw.data = data, gcID = gcID, fit.time = NA,
-                         fit.data = NA, parameters = list(A=NA, mu=0, tD = NA, lambda=NA, integral=NA),
-                         model = NA, nls = NA, reliable=NULL, fitFlag=FALSE, control = control)
-    class(gcFitModel) <- "gcFitModel"
-    return(gcFitModel)
-  }
-  mu.start     <- nonpara$parameters$mu
-  lambda.start  <- nonpara$parameters$lambda
-  A.start       <- nonpara$parameters$A
-
-  # /// determine length of model names
-  l               <- 10
-  for (i in 1:length(control$model.type)) {
-    l[i] <- nchar((control$model.type)[i])
-  }
-  lmax <- max(l)
-
-  # /// loop over all parametric models requested
-  for (i in 1:length(control$model.type)) {
-    if (control$suppress.messages == FALSE) {
-      cat(paste("--> Try to fit model", (control$model.type)[i]))
-    }
-    initmodel    <- paste("init", (control$model.type)[i], sep = "")
-
-    formulamodel <-
-      as.formula(paste(
-        "data ~ ",
-        (control$model.type)[i],
-        "(time, A, mu, lambda, addpar)",
-        sep = ""
-      ))
-    if ((exists((control$model.type)[i])) && (exists(initmodel))) {
-      init.model  <-
-        do.call(initmodel,
-                list(
-                  y = data,
-                  time = time,
-                  A = A.start,
-                  mu = mu.start,
-                  lambda = lambda.start
-                ))
-
-      y.model <-
-        try(nls(formulamodel, start = init.model), silent = TRUE)
-
-      if (methods::is(y.model) == "nls") {
-        AIC       <- stats::AIC(y.model)
-      }
-
-      if (control$suppress.messages == FALSE) {
-        if (methods::is(y.model) == "nls") {
-          if (y.model$convInfo$isConv == TRUE) {
-            message(paste(rep(".", lmax + 3 - l[i])), " OK")
-          }
-          else{
-            message(paste(
-              rep(".", lmax + 3 - l[i]),
-              " nls() failed to converge with stopCode ",
-              as.character(y.model$convInfo$stopCode)
-            ))
-          }
+    # Implement min.density into dataset
+    if (!is.null(control$min.density))
+        {
+        if (!is.na(control$min.density) &&
+            control$min.density != 0)
+            {
+            min.density <- control$min.density
+            time <- time[max(
+                which.min(abs(time.in - t0)),
+                which.min(abs(data - min.density))
+            ):length(time)]
+            data <- data[max(
+                which.min(abs(time.in - t0)),
+                which.min(abs(data - min.density))
+            ):length(data)]
         }
-        else{
-          message(paste(rep(".", lmax + 3 - l[i])),
-                  " ERROR in nls(). For further information see help(growth.gcFitModel)")
-        }
-      }
-      if (exists("AIC", inherits = FALSE) && FALSE %in% is.null(AIC)) {
-        if (is.null(best) || AIC < bestAIC) {
-          bestAIC <- AIC
-          best    <- y.model
-          used    <- (control$model.type)[i]
-        }
-      }
-    } # of if ( (exists((control$model.type)[i])) ...
-    else{
-      cat((control$model.type)[i])
-      cat("\n")
-      cat(initmodel)
-      cat("\n")
-      stop("The model definition above does not exist! Spelling error?")
     }
+
+    # Perform log transformation of data
+    if (control$log.y.model == TRUE)
+    {
+        data <- log(data/data[1])
+    }
+
+    # apply t0 to dataset
+    if (is.numeric(t0) &&
+        t0 > 0)
+        {
+        data <- data[which.min(abs(time - t0)):length(data)]
+        time <- time[which.min(abs(time - t0)):length(time)]
+    }
+
+    # /// determine which values are not valid
+    bad.values <- (is.na(time)) |
+        (time < 0) | (is.na(data)) |
+        (data < 0)
+
+    # /// remove bad values or stop program
+    if (TRUE %in% bad.values)
+    {
+        if (control$neg.nan.act == FALSE)
+        {
+            time <- time[!bad.values]
+            data <- data[!bad.values]
+        } else
+        {
+            stop("Bad values in gcFitModel")
+        }
+    }
+
+    # fitting parametric growth curves
     y.model <- NULL
-  }
+    bestAIC <- NULL
+    best <- NULL
+    used <- NULL
 
-  if (control$suppress.messages == FALSE){
-    cat("\n")
-    cat(paste0("Best fitting model: ", sub("\\(.+", "", sub("data", "", paste(formula(best), collapse = "")))))
-  }
-  # /// extract parameters from data fit
-  if (is.null(best) == FALSE) {
-    Abest      <- summary(best)$parameters["A", 1:2]
-    mubest     <- summary(best)$parameters["mu", 1:2]
-
-    if(any(grepl("addpar", rownames(summary(best)$parameters)))){
-      fitparbest <- summary(best)$parameters[grep("addpar", rownames(summary(best)$parameters)), 1:2]
-      if(summary(best)[["formula"]][[3]][[1]] == "richards"){
-        fitparbest <- list(nu = as.data.frame(t(fitparbest)))
-      } else if (summary(best)[["formula"]][[3]][[1]] == "gompertz.exp"){
-        fitparbest <- list(alpha = fitparbest[1,], t_shift = fitparbest[2,])
-      } else if (summary(best)[["formula"]][[3]][[1]] == "huang"){
-        fitparbest <- list(y0 = as.data.frame(t(fitparbest)))
-      } else if (summary(best)[["formula"]][[3]][[1]] == "baranyi"){
-        fitparbest <- list(y0 = as.data.frame(t(fitparbest)))
-      }
+    # starting values for parametric fitting from
+    # spline fit
+    control.tmp <- control
+    control.tmp$fit.opt <- "s"
+    control.tmp$log.y.spline <- control$log.y.model
+    nonpara <- growth.gcFitSpline(time.in, data.in, gcID, control.tmp)
+    if (nonpara$fitFlag == FALSE)
+    {
+        gcFitModel <- list(
+            time.in = time, data.in = data, raw.time = time,
+            raw.data = data, gcID = gcID, fit.time = NA,
+            fit.data = NA, parameters = list(
+                A = NA, mu = 0, tD = NA, lambda = NA,
+                integral = NA
+            ),
+            model = NA, nls = NA, reliable = NULL,
+            fitFlag = FALSE, control = control
+        )
+        class(gcFitModel) <- "gcFitModel"
+        return(gcFitModel)
     }
-    fitFlag    <- TRUE
-    lambdabest <- summary(best)$parameters["lambda", 1:2]
+    mu.start <- nonpara$parameters$mu
+    lambda.start <- nonpara$parameters$lambda
+    A.start <- nonpara$parameters$A
 
-    best.spline <- stats::smooth.spline(time, fitted.values(best), spar = 0, keep.data = FALSE)
-    best.deriv1 <-  stats::predict(best.spline, deriv=1)
-    mumax.index <- which.max(best.deriv1$y)
-
-    y.max <- fitted.values(best)[mumax.index]
-    t.max <- time[mumax.index]
-    b.tangent <- y.max - max(best.deriv1$y) * t.max
-
-    if (length(time) == length(as.numeric(fitted.values(best)))) {
-      Integralbest <-
-        low.integrate(time, as.numeric(fitted.values(best)))
+    # /// determine length of model names
+    l <- 10
+    for (i in 1:length(control$model.type))
+        {
+        l[i] <- nchar((control$model.type)[i])
     }
-    else{
-      Integralbest <- NA
-    }
-  }
-  else{
-    if (control$suppress.messages == FALSE){
-      message("gcFitModel: Unable to fit this curve parametrically!")
-    }
-    Abest        <- c(NA, NA)
-    mubest       <- c(NA, NA)
-    lambdabest   <- c(NA, NA)
-    Integralbest <- NA
-    fitFlag      <- FALSE
-    b.tangent <- NA
-  }
-  dY <- ifelse(is.null(best), NA, max(fitted.values(best))-min(fitted.values(best)))
+    lmax <- max(l)
 
-  gcFitModel <-
-    list(
-      time.in = time.in,
-      data.in = data.in,
-      raw.time = time,
-      raw.data = data,
-      gcID = gcID,
-      fit.time = time,
-      fit.data = if(is.null(best)){
-        NA
-      } else {
-        as.numeric(fitted.values(best))
-      },
-      parameters = list(
-        A = Abest,
-        A.orig = if(control$log.y.model == TRUE){
-          data.in[1] * exp(Abest)
-        } else {
-          Abest
-        },
-        dY = dY,
-        dY.orig = if(control$log.y.model == TRUE){
-          data.in[1] * exp(dY)
-        } else {
-          dY
-        },
-        mu = mubest,
-        tD = log(2)/as.numeric(mubest),
-        lambda = lambdabest,
-        b.tangent = b.tangent,
-        fitpar = if(exists("fitparbest")){
-          fitparbest
-        } else {
-          NULL
-        },
-        integral = Integralbest
-      ),
-      model = used,
-      nls = best,
-      reliable = NULL,
-      fitFlag = fitFlag,
-      control = control
+    # /// loop over all parametric models
+    # requested
+    for (i in 1:length(control$model.type))
+        {
+        if (control$suppress.messages == FALSE)
+        {
+            cat(
+                paste("--> Try to fit model", (control$model.type)[i])
+            )
+        }
+        initmodel <- paste("init", (control$model.type)[i], sep = "")
+
+        formulamodel <- as.formula(
+            paste(
+                "data ~ ", (control$model.type)[i],
+                "(time, A, mu, lambda, addpar)", sep = ""
+            )
+        )
+        if ((exists((control$model.type)[i])) &&
+            (exists(initmodel)))
+            {
+                init.model <- do.call(
+                  initmodel, list(
+                    y = data, time = time, A = A.start,
+                    mu = mu.start, lambda = lambda.start
+                )
+              )
+
+                y.model <- try(
+                  nls(formulamodel, start = init.model),
+                  silent = TRUE
+              )
+
+                if (methods::is(y.model) ==
+                  "nls")
+                  {
+                  AIC <- stats::AIC(y.model)
+                }
+
+                if (control$suppress.messages == FALSE)
+                {
+                  if (methods::is(y.model) ==
+                    "nls")
+                    {
+                    if (y.model$convInfo$isConv ==
+                      TRUE)
+                      {
+                      message(
+                        paste(rep(".", lmax + 3 - l[i])),
+                        " OK"
+                    )
+                    } else
+                    {
+                      message(
+                        paste(
+                          rep(".", lmax + 3 - l[i]),
+                          " nls() failed to converge with stopCode ",
+                          as.character(y.model$convInfo$stopCode)
+                      )
+                    )
+                    }
+                  } else
+                  {
+                    message(
+                      paste(rep(".", lmax + 3 - l[i])),
+                      " ERROR in nls(). For further information see help(growth.gcFitModel)"
+                  )
+                  }
+                }
+                if (exists("AIC", inherits = FALSE) &&
+                  FALSE %in% is.null(AIC))
+                    {
+                  if (is.null(best) ||
+                    AIC < bestAIC)
+                    {
+                    bestAIC <- AIC
+                    best <- y.model
+                    used <- (control$model.type)[i]
+                  }
+                }
+            }  # of if ( (exists((control$model.type)[i])) ...
+ else
+        {
+            cat((control$model.type)[i])
+            cat("\n")
+            cat(initmodel)
+            cat("\n")
+            stop(
+                "The model definition above does not exist! Spelling error?"
+            )
+        }
+        y.model <- NULL
+    }
+
+    if (control$suppress.messages == FALSE)
+    {
+        cat("\n")
+        cat(
+            paste0(
+                "Best fitting model: ", sub(
+                  "\\(.+", "", sub(
+                    "data", "", paste(
+                      formula(best),
+                      collapse = ""
+                  )
+                )
+              )
+            )
+        )
+    }
+    # /// extract parameters from data fit
+    if (is.null(best) ==
+        FALSE)
+        {
+        Abest <- summary(best)$parameters["A",
+            1:2]
+        mubest <- summary(best)$parameters["mu",
+            1:2]
+
+        if (any(
+            grepl("addpar", rownames(summary(best)$parameters))
+        ))
+            {
+            fitparbest <- summary(best)$parameters[grep("addpar", rownames(summary(best)$parameters)),
+                1:2]
+            if (summary(best)[["formula"]][[3]][[1]] ==
+                "richards")
+                {
+                fitparbest <- list(nu = as.data.frame(t(fitparbest)))
+            } else if (summary(best)[["formula"]][[3]][[1]] ==
+                "gompertz.exp")
+                {
+                fitparbest <- list(
+                  alpha = fitparbest[1, ], t_shift = fitparbest[2,
+                    ]
+              )
+            } else if (summary(best)[["formula"]][[3]][[1]] ==
+                "huang")
+                {
+                fitparbest <- list(y0 = as.data.frame(t(fitparbest)))
+            } else if (summary(best)[["formula"]][[3]][[1]] ==
+                "baranyi")
+                {
+                fitparbest <- list(y0 = as.data.frame(t(fitparbest)))
+            }
+        }
+        fitFlag <- TRUE
+        lambdabest <- summary(best)$parameters["lambda",
+            1:2]
+
+        best.spline <- stats::smooth.spline(
+            time, fitted.values(best),
+            spar = 0, keep.data = FALSE
+        )
+        best.deriv1 <- stats::predict(best.spline, deriv = 1)
+        mumax.index <- which.max(best.deriv1$y)
+
+        y.max <- fitted.values(best)[mumax.index]
+        t.max <- time[mumax.index]
+        b.tangent <- y.max - max(best.deriv1$y) *
+            t.max
+
+        if (length(time) ==
+            length(as.numeric(fitted.values(best))))
+                {
+            Integralbest <- low.integrate(time, as.numeric(fitted.values(best)))
+        } else
+        {
+            Integralbest <- NA
+        }
+    } else
+    {
+        if (control$suppress.messages == FALSE)
+        {
+            message(
+                "gcFitModel: Unable to fit this curve parametrically!"
+            )
+        }
+        Abest <- c(NA, NA)
+        mubest <- c(NA, NA)
+        lambdabest <- c(NA, NA)
+        Integralbest <- NA
+        fitFlag <- FALSE
+        b.tangent <- NA
+    }
+    dY <- ifelse(
+        is.null(best),
+        NA, max(fitted.values(best)) -
+            min(fitted.values(best))
     )
 
-  class(gcFitModel) <- "gcFitModel"
+    gcFitModel <- list(
+        time.in = time.in, data.in = data.in, raw.time = time,
+        raw.data = data, gcID = gcID, fit.time = time,
+        fit.data = if (is.null(best))
+            {
+            NA
+        } else
+        {
+            as.numeric(fitted.values(best))
+        }, parameters = list(
+            A = Abest, A.orig = if (control$log.y.model ==
+                TRUE)
+                {
+                data.in[1] * exp(Abest)
+            } else
+            {
+                Abest
+            }, dY = dY, dY.orig = if (control$log.y.model ==
+                TRUE)
+                {
+                data.in[1] * exp(dY)
+            } else
+            {
+                dY
+            }, mu = mubest, tD = log(2)/as.numeric(mubest),
+            lambda = lambdabest, b.tangent = b.tangent,
+            fitpar = if (exists("fitparbest"))
+                {
+                fitparbest
+            } else
+            {
+                NULL
+            }, integral = Integralbest
+        ),
+        model = used, nls = best, reliable = NULL,
+        fitFlag = fitFlag, control = control
+    )
 
-  invisible(gcFitModel)
+    class(gcFitModel) <- "gcFitModel"
+
+    invisible(gcFitModel)
 }
 
 #' Calculate the values of the exponential growth model for given time points and growth parameters.
@@ -402,18 +554,22 @@ growth.param <- function(time, data, gcID = "undefined", control)
 #' time <- seq(from = 0, to = 24, by = 0.25)
 #' data.exp <- grow_exponential(time, parms = c(0.05, 0.6))
 #' plot(data.exp)
-grow_exponential <- function (time, parms)
-{
-  if (is.null(names(parms))) {
-    y0 <- parms[1]
-    mumax <- parms[2]
-  }
-  else {
-    y0 <- parms["y0_lm"]
-    mumax <- ifelse(!is.na(parms["max_slope"]), parms["max_slope"], parms["mumax"])
-  }
-  y <- y0 * exp(mumax * time)
-  return(as.matrix(data.frame(time = time, y = y)))
+grow_exponential <- function(time, parms)
+    {
+    if (is.null(names(parms)))
+        {
+        y0 <- parms[1]
+        mumax <- parms[2]
+    } else
+    {
+        y0 <- parms["y0_lm"]
+        mumax <- ifelse(
+            !is.na(parms["max_slope"]),
+            parms["max_slope"], parms["mumax"]
+        )
+    }
+    y <- y0 * exp(mumax * time)
+    return(as.matrix(data.frame(time = time, y = y)))
 }
 
 #' Calculate the values of the linear growth model for given time points and growth parameters.
@@ -429,17 +585,19 @@ grow_exponential <- function (time, parms)
 #' data.lin <- grow_linear(time, parms = c(0.05, 0.6))
 #' plot(data.lin)
 grow_linear <- function(time, parms)
-{
-  if (length(parms)>2) {
-    y0 <- parms[4]
-    mumax <- parms[5]
-  }
-  else {
-    y0 <- parms[1]
-    mumax <- parms[2]
-  }
-  y <- y0 + mumax * time
-  return(as.matrix(data.frame(time = time, y = y)))
+    {
+    if (length(parms) >
+        2)
+        {
+        y0 <- parms[4]
+        mumax <- parms[5]
+    } else
+    {
+        y0 <- parms[1]
+        mumax <- parms[2]
+    }
+    y <- y0 + mumax * time
+    return(as.matrix(data.frame(time = time, y = y)))
 }
 
 #' Function to estimate the area under a curve given as x and y(x) values
@@ -455,7 +613,7 @@ grow_linear <- function(time, parms)
 #'
 #' @examples
 #' # Create random growth dataset
-#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
 #' # Extract time and growth data for single sample
 #' time <- rnd.dataset$time[1,]
@@ -465,27 +623,44 @@ grow_linear <- function(time, parms)
 #'
 #' print(low.integrate(time, data))
 #'
-low.integrate <- function (x, y)
-{
-  if (is.vector(x) == FALSE || is.vector(y) == FALSE)
-    stop("low.integrate: two vectors x and y are needed !")
-  if (length(x) != length(y))
-    stop("low.integrate: x and y have to be of same length !")
-  spline <- NULL
-  try(spline <- smooth.spline(x, y, keep.data = FALSE))
-  if (is.null(spline)){
-    try(spline <- smooth.spline(x, y, keep.data = FALSE, spar = 0.1))
-  }
-  if (is.null(spline)){
-    try(spline <- smooth.spline(x, y, keep.data = FALSE, spar = 0.1))
-    warning("Spline could not be fitted to data!")
-    stop()
-  }
-  f <- function(t) {
-    p <- stats::predict(spline, t)
-    f <- p$y
-  }
-  low.integrate <- integrate(f, min(x), max(x))$value
+low.integrate <- function(x, y)
+    {
+    if (is.vector(x) ==
+        FALSE || is.vector(y) ==
+        FALSE)
+        stop(
+            "low.integrate: two vectors x and y are needed !"
+        )
+    if (length(x) !=
+        length(y))
+        stop(
+            "low.integrate: x and y have to be of same length !"
+        )
+    spline <- NULL
+    try(spline <- smooth.spline(x, y, keep.data = FALSE))
+    if (is.null(spline))
+        {
+        try(
+            spline <- smooth.spline(x, y, keep.data = FALSE, spar = 0.1)
+        )
+    }
+    if (is.null(spline))
+        {
+        try(
+            spline <- smooth.spline(x, y, keep.data = FALSE, spar = 0.1)
+        )
+        warning("Spline could not be fitted to data!")
+        stop()
+    }
+    f <- function(t)
+        {
+        p <- stats::predict(spline, t)
+        f <- p$y
+    }
+    low.integrate <- integrate(
+        f, min(x),
+        max(x)
+    )$value
 }
 
 #' Calculate the values of the logistic growth model for given time points and growth parameters.
@@ -505,21 +680,25 @@ low.integrate <- function (x, y)
 #' density <- logistic(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 #'
 #' plot(time, density)
-logistic <- function (time, A, mu, lambda, addpar = NULL)
-{
-  A <- A[1]
-  mu <- mu[1]
-  lambda <- lambda[1]
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  y <- A/(1 + exp(4 * mu * (lambda - time)/A + 2))
-  logistic <- y
+logistic <- function(time, A, mu, lambda, addpar = NULL)
+    {
+    A <- A[1]
+    mu <- mu[1]
+    lambda <- lambda[1]
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    y <- A/(1 + exp(4 * mu * (lambda - time)/A + 2))
+    logistic <- y
 }
 
 #' Generate initial values for parameter estimation with the logistic growth model
@@ -547,22 +726,27 @@ logistic <- function (time, A, mu, lambda, addpar = NULL)
 #'
 #' init <- initlogistic(time, y, A = 3, mu = 0.6, lambda = 2)
 #'
-initlogistic <- function (time, y, A, mu, lambda)
-{
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(y) == FALSE)
-    stop("Need numeric vector for: y")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  A <- max(y)
-  mu <- mu[1]
-  lambda <- lambda[1]
-  initlogistic <- list(A = A, mu = mu, lambda = lambda, addpar = NULL)
+initlogistic <- function(time, y, A, mu, lambda)
+    {
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(y) ==
+        FALSE)
+        stop("Need numeric vector for: y")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    A <- max(y)
+    mu <- mu[1]
+    lambda <- lambda[1]
+    initlogistic <- list(A = A, mu = mu, lambda = lambda, addpar = NULL)
 }
 
 #' Generate initial values for parameter estimation with the Richard's growth model
@@ -590,23 +774,28 @@ initlogistic <- function (time, y, A, mu, lambda)
 #'
 #' init <- initrichards(time, y, A = 3, mu = 0.6, lambda = 2)
 #'
-initrichards <- function (time, y, A, mu, lambda)
-{
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(y) == FALSE)
-    stop("Need numeric vector for: y")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  nu <- 0.1
-  A <- max(y)
-  mu <- mu[1]
-  lambda <- lambda[1]
-  initrichards <- list(A = A, mu = mu, lambda = lambda, addpar = nu)
+initrichards <- function(time, y, A, mu, lambda)
+    {
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(y) ==
+        FALSE)
+        stop("Need numeric vector for: y")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    nu <- 0.1
+    A <- max(y)
+    mu <- mu[1]
+    lambda <- lambda[1]
+    initrichards <- list(A = A, mu = mu, lambda = lambda, addpar = nu)
 }
 
 #' Generate initial values for parameter estimation with the Huang's growth model
@@ -635,22 +824,27 @@ initrichards <- function (time, y, A, mu, lambda)
 #' init <- inithuang(time, y, A = 3, mu = 0.6, lambda = 2)
 #'
 inithuang <- function(time, y, A, mu, lambda)
-{
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(y) == FALSE)
-    stop("Need numeric vector for: y")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  y0 <- y[1]
-  A <- max(y)
-  mu <- mu[1]
-  lambda <- lambda[1]
-  inithuang <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
+    {
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(y) ==
+        FALSE)
+        stop("Need numeric vector for: y")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    y0 <- y[1]
+    A <- max(y)
+    mu <- mu[1]
+    lambda <- lambda[1]
+    inithuang <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
 }
 
 #' Calculate the values of the Huang growth model for given time points and growth parameters.
@@ -669,24 +863,38 @@ inithuang <- function(time, y, A, mu, lambda)
 #' density <- huang(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 #'
 #' plot(time, density)
-huang <- function (time, A, mu, lambda, addpar)
-{
-  A <- A[1]
-  mu <- mu[1]
-  lambda <- lambda[1]
-  y0 <- addpar[1]
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  suppressWarnings(
-    y <- y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu*(time+0.25*log((1+exp(-4*(time-lambda)))/(1+exp(4*lambda))))) )
-  )
-  huang <- y
+huang <- function(time, A, mu, lambda, addpar)
+    {
+    A <- A[1]
+    mu <- mu[1]
+    lambda <- lambda[1]
+    y0 <- addpar[1]
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    suppressWarnings(
+        y <- y0 + A - log(
+            exp(y0) +
+                (exp(A) -
+                  exp(y0)) *
+                  exp(
+                    -mu * (time + 0.25 * log(
+                      (1 + exp(-4 * (time - lambda)))/(1 +
+                        exp(4 * lambda))
+                  ))
+                )
+        )
+    )
+    huang <- y
 }
 
 #' Calculate the values of the Baranyi growth model for given time points and growth parameters.
@@ -706,26 +914,37 @@ huang <- function (time, A, mu, lambda, addpar)
 #'
 #' plot(time, density)
 baranyi <- function(time, A, mu, lambda, addpar)
-{
-  A <- A[1]
-  mu <- mu[1]
-  lambda <- lambda[1]
-  y0 <- addpar[1]
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  suppressWarnings(
-    B <- time + 1/mu * log(exp(-mu * time) + exp(-mu * lambda) - exp(-mu * (time + lambda)))
-  )
-  suppressWarnings(
-    y <- y0 + mu * B - log(1 + (exp(mu * B) - 1)/exp(A - y0))
-  )
-  baranyi <- y
+    {
+    A <- A[1]
+    mu <- mu[1]
+    lambda <- lambda[1]
+    y0 <- addpar[1]
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    suppressWarnings(
+        B <- time + 1/mu * log(
+            exp(-mu * time) +
+                exp(-mu * lambda) -
+                exp(-mu * (time + lambda))
+        )
+    )
+    suppressWarnings(
+        y <- y0 + mu * B - log(
+            1 + (exp(mu * B) -
+                1)/exp(A - y0)
+        )
+    )
+    baranyi <- y
 }
 
 #' Generate initial values for parameter estimation with the Baranyi's growth model
@@ -754,57 +973,51 @@ baranyi <- function(time, A, mu, lambda, addpar)
 #' init <- initbaranyi(time, y, A = 3, mu = 0.6, lambda = 2)
 #'
 initbaranyi <- function(time, y, A, mu, lambda)
-{
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(y) == FALSE)
-    stop("Need numeric vector for: y")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  y0 <- y[1]
-  A <- max(y)
-  mu <- mu[1]
-  lambda <- lambda[1]
-  initbaranyi <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
+    {
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(y) ==
+        FALSE)
+        stop("Need numeric vector for: y")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    y0 <- y[1]
+    A <- max(y)
+    mu <- mu[1]
+    lambda <- lambda[1]
+    initbaranyi <- list(A = A, mu = mu, lambda = lambda, addpar = y0)
 }
 
 
-# liquori <- function (time, A, mu, addpar)
-# {
-#   A <- A[1]
-#   mu <- mu[1]
-#   y0 <- addpar[1]
-#   t_a1 <- addpar[2]
-#   t_a2 <- addpar[3]
-#   t_b1 <- addpar[4]
-#   t_b2 <- addpar[5]
-#   x <- addpar[6]
-#   if (is.numeric(time) == FALSE)
-#     stop("Need numeric vector for: time")
-#   if (is.numeric(mu) == FALSE)
-#     stop("Need numeric vector for: mu")
-#   if (is.numeric(y0) == FALSE)
-#     stop("Need numeric vector for: y0")
-#   if (is.numeric(A) == FALSE)
-#     stop("Need numeric vector for: A")
-#   if (is.numeric(t_a1) == FALSE)
-#     stop("Need numeric vector for: addpar[2]")
-#   if (is.numeric(t_a2) == FALSE)
-#     stop("Need numeric vector for: addpar[3]")
-#   if (is.numeric(t_b1) == FALSE)
-#     stop("Need numeric vector for: addpar[4]")
-#   if (is.numeric(t_b2) == FALSE)
-#     stop("Need numeric vector for: addpar[5]")
-#   t <- time
-#   y1 <- (1-exp(-(t/t_a1)))/(1-exp(-(t/t_a1))+exp(-(t/t_a2)))
-#   y2 <- (1-exp(-(t/t_b1)))/(1-exp(-(t/t_b1))+exp(-(t/t_b2)))
-#   y <- y0 + A*x*y1 + A*(1-x)*y2
-#   liquori <- y
-# }
+# liquori <- function (time, A, mu, addpar) { A
+# <- A[1] mu <- mu[1] y0 <- addpar[1] t_a1 <-
+# addpar[2] t_a2 <- addpar[3] t_b1 <- addpar[4]
+# t_b2 <- addpar[5] x <- addpar[6] if
+# (is.numeric(time) == FALSE) stop('Need numeric
+# vector for: time') if (is.numeric(mu) == FALSE)
+# stop('Need numeric vector for: mu') if
+# (is.numeric(y0) == FALSE) stop('Need numeric
+# vector for: y0') if (is.numeric(A) == FALSE)
+# stop('Need numeric vector for: A') if
+# (is.numeric(t_a1) == FALSE) stop('Need numeric
+# vector for: addpar[2]') if (is.numeric(t_a2) ==
+# FALSE) stop('Need numeric vector for:
+# addpar[3]') if (is.numeric(t_b1) == FALSE)
+# stop('Need numeric vector for: addpar[4]') if
+# (is.numeric(t_b2) == FALSE) stop('Need numeric
+# vector for: addpar[5]') t <- time y1 <-
+# (1-exp(-(t/t_a1)))/(1-exp(-(t/t_a1))+exp(-(t/t_a2)))
+# y2 <-
+# (1-exp(-(t/t_b1)))/(1-exp(-(t/t_b1))+exp(-(t/t_b2)))
+# y <- y0 + A*x*y1 + A*(1-x)*y2 liquori <- y }
 
 #' Calculate the values of the Richards growth model for given time points and growth parameters.
 #'
@@ -822,25 +1035,30 @@ initbaranyi <- function(time, y, A, mu, lambda)
 #' density <- richards(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 #'
 #' plot(time, density)
-richards <- function (time, A, mu, lambda, addpar)
-{
-  A <- A[1]
-  mu <- mu[1]
-  lambda <- lambda[1]
-  nu <- addpar[1]
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  if (is.numeric(nu) == FALSE)
-    stop("Need numeric vector for: addpar[1]")
-  y <- A * (1 + nu * exp(1 + nu) * exp(mu * (1 + nu)^(1 + 1/nu) *
-                                         (lambda - time)/A))^(-1/nu)
-  richards <- y
+richards <- function(time, A, mu, lambda, addpar)
+    {
+    A <- A[1]
+    mu <- mu[1]
+    lambda <- lambda[1]
+    nu <- addpar[1]
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    if (is.numeric(nu) ==
+        FALSE)
+        stop("Need numeric vector for: addpar[1]")
+    y <- A * (1 + nu * exp(1 + nu) *
+        exp(mu * (1 + nu)^(1 + 1/nu) * (lambda - time)/A))^(-1/nu)
+    richards <- y
 }
 
 #' Calculate the values of the Gompertz growth model for given time points and growth parameters.
@@ -859,22 +1077,26 @@ richards <- function (time, A, mu, lambda, addpar)
 #' density <- gompertz(time, A = 3, mu=0.6, lambda = 3)
 #'
 #' plot(time, density)
-gompertz <- function (time, A, mu, lambda, addpar = NULL)
-{
-  A <- A[1]
-  mu <- mu[1]
-  lambda <- lambda[1]
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  e <- exp(1)
-  y <- A * exp(-exp(mu * e * (lambda - time)/A + 1))
-  gompertz <- y
+gompertz <- function(time, A, mu, lambda, addpar = NULL)
+    {
+    A <- A[1]
+    mu <- mu[1]
+    lambda <- lambda[1]
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    e <- exp(1)
+    y <- A * exp(-exp(mu * e * (lambda - time)/A + 1))
+    gompertz <- y
 }
 
 #' Generate initial values for parameter estimation with the Gompertz's growth model
@@ -902,22 +1124,27 @@ gompertz <- function (time, A, mu, lambda, addpar = NULL)
 #'
 #' init <- initgompertz(time, y, A = 3, mu = 0.6, lambda = 2)
 #'
-initgompertz <- function (time, y, A, mu, lambda)
-{
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(y) == FALSE)
-    stop("Need numeric vector for: y")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  A <- max(y)
-  mu <- mu[1]
-  lambda <- lambda[1]
-  initgompertz <- list(A = A, mu = mu, lambda = lambda, addpar = NULL)
+initgompertz <- function(time, y, A, mu, lambda)
+    {
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(y) ==
+        FALSE)
+        stop("Need numeric vector for: y")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    A <- max(y)
+    mu <- mu[1]
+    lambda <- lambda[1]
+    initgompertz <- list(A = A, mu = mu, lambda = lambda, addpar = NULL)
 }
 
 #' Generate initial values for parameter estimation with the modified Gompertz growth model
@@ -945,25 +1172,31 @@ initgompertz <- function (time, y, A, mu, lambda)
 #'
 #' init <- initgompertz(time, y, A = 3, mu = 0.6, lambda = 2)
 #'
-initgompertz.exp <- function (time, y, A, mu, lambda)
-{
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(y) == FALSE)
-    stop("Need numeric vector for: y")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  alpha <- 0.1
-  t_shift <- max(time)/10
-  A <- max(y)
-  mu <- mu[1]
-  lambda <- lambda[1]
-  initgompertz.exp <- list(A = A, mu = mu, lambda = lambda,
-                           addpar = c(alpha, t_shift))
+initgompertz.exp <- function(time, y, A, mu, lambda)
+    {
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(y) ==
+        FALSE)
+        stop("Need numeric vector for: y")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    alpha <- 0.1
+    t_shift <- max(time)/10
+    A <- max(y)
+    mu <- mu[1]
+    lambda <- lambda[1]
+    initgompertz.exp <- list(
+        A = A, mu = mu, lambda = lambda, addpar = c(alpha, t_shift)
+    )
 }
 
 #' Calculate the values of the modified Gompertz growth model for given time points and growth parameters.
@@ -982,27 +1215,33 @@ initgompertz.exp <- function (time, y, A, mu, lambda)
 #' density <- gompertz.exp(time, A = 3, mu=0.6, lambda = 3, addpar = c(0.1, 12))
 #'
 #' plot(time, density)
-gompertz.exp <- function (time, A, mu, lambda, addpar)
-{
-  A <- A[1]
-  mu <- mu[1]
-  lambda <- lambda[1]
-  alpha <- addpar[1]
-  t_shift <- addpar[2]
-  if (is.numeric(time) == FALSE)
-    stop("Need numeric vector for: time")
-  if (is.numeric(mu) == FALSE)
-    stop("Need numeric vector for: mu")
-  if (is.numeric(lambda) == FALSE)
-    stop("Need numeric vector for: lambda")
-  if (is.numeric(A) == FALSE)
-    stop("Need numeric vector for: A")
-  if (is.numeric(alpha) == FALSE)
-    stop("Need numeric vector for: addpar[1]")
-  if (is.numeric(t_shift) == FALSE)
-    stop("Need numeric vector for: addpar[2]")
-  e <- exp(1)
-  y <- A * exp(-exp(mu * e * (lambda - time)/A + 1)) + A *
-    exp(alpha * (time - t_shift))
-  gompertz.exp <- y
+gompertz.exp <- function(time, A, mu, lambda, addpar)
+    {
+    A <- A[1]
+    mu <- mu[1]
+    lambda <- lambda[1]
+    alpha <- addpar[1]
+    t_shift <- addpar[2]
+    if (is.numeric(time) ==
+        FALSE)
+        stop("Need numeric vector for: time")
+    if (is.numeric(mu) ==
+        FALSE)
+        stop("Need numeric vector for: mu")
+    if (is.numeric(lambda) ==
+        FALSE)
+        stop("Need numeric vector for: lambda")
+    if (is.numeric(A) ==
+        FALSE)
+        stop("Need numeric vector for: A")
+    if (is.numeric(alpha) ==
+        FALSE)
+        stop("Need numeric vector for: addpar[1]")
+    if (is.numeric(t_shift) ==
+        FALSE)
+        stop("Need numeric vector for: addpar[2]")
+    e <- exp(1)
+    y <- A * exp(-exp(mu * e * (lambda - time)/A + 1)) +
+        A * exp(alpha * (time - t_shift))
+    gompertz.exp <- y
 }
