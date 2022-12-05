@@ -18,7 +18,8 @@ parse_data(
   csvsep.map = ";",
   dec.map = ".",
   subtract.blank = T,
-  calibration = NULL
+  calibration = NULL,
+  fl.normtype = c("density", "fl2")
 )
 
 parse_data_shiny(
@@ -35,7 +36,9 @@ parse_data_shiny(
   subtract.blank = T,
   density.nm = NULL,
   fl.nm = NULL,
-  calibration = NULL
+  fl2.nm = NULL,
+  calibration = NULL,
+  fl.normtype = c("density", "fl2")
 )
 }
 \arguments{
@@ -64,9 +67,11 @@ For example: \code{convert.time = 'y = 24 * x'}}
 
 \item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.}
 
+\item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'density'} or by fluorescence2 values (\code{'fl2'}).}
+
 \item{density.nm}{Name of read corresponding to growth rate}
 
-\item{fl.nm}{Name of read corresponding to fluorescence data}
+\item{fl.nm}{Name of read corresponding to fluorescence2 data}
 }
 \value{
 A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.

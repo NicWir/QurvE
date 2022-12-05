@@ -4,7 +4,7 @@
 \alias{parse_Gen5Gen6_shiny}
 \title{Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.}
 \usage{
-parse_Gen5Gen6_shiny(data, density.nm, fl.nm)
+parse_Gen5Gen6_shiny(data, density.nm, fl.nm, fl2.nm)
 }
 \arguments{
 \item{data}{A dataframe created by reading a table file with \code{\link{read_file}}}

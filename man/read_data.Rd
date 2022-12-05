@@ -7,13 +7,18 @@
 read_data(
   data.density = NA,
   data.fl = NA,
+  data.fl2 = NA,
   data.format = "col",
   csvsep = ";",
   dec = ".",
   csvsep.fl = ";",
   dec.fl = ".",
+  csvsep.fl2 = ";",
+  dec.fl2 = ".",
   sheet.density = 1,
   sheet.fl = 1,
+  sheet.fl2 = 1,
+  fl.normtype = c("density", "fl2"),
   subtract.blank = T,
   convert.time = NULL,
   calibration = NULL
@@ -30,6 +35,8 @@ In column format, the first three table rows contain
 
 \item{data.fl}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
 
+\item{data.fl2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence2 data (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.density}.}
+
 \item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}}
 
 \item{csvsep}{(Character) separator used in CSV file storing density data (ignored for other file types). Default: \code{";"}}
@@ -38,11 +45,19 @@ In column format, the first three table rows contain
 
 \item{csvsep.fl}{(Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}}
 
-\item{dec.fl}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence data. Default: \code{"."}}
+\item{dec.fl}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}}
+
+\item{csvsep.fl2}{(Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}}
+
+\item{dec.fl2}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}}
 
 \item{sheet.density}{(Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (\emph{optional}).}
 
 \item{sheet.fl}{(Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (\emph{optional}).}
+
+\item{sheet.fl2}{(Numeric or Character) Number or name of the sheet with fluorescence2 data (used for normalization of fluorescence data) in XLS or XLSX files (\emph{optional}).}
+
+\item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'density'} or by fluorescence2 values (\code{'fl2'}).}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}). If \code{calibration = TRUE}, blanks are subtracted after value conversion.}
 

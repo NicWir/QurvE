@@ -147,7 +147,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                         # load input file
                         #____DATA____####
-                        tabPanel(span("Data", title = "Upload custom formatted data or parse results from a plate reader experiment."),
+                        tabPanel(span("Data", title = "Upload custom formatted data or parse results from plate readers and similar devices."),
                                  icon = icon("file-lines"),
                                  value = "tabPanel",
                                  tabsetPanel(type = "tabs", id = "tabs_data",
@@ -203,7 +203,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
 
                                                           fileInput(inputId = 'custom_file_fluorescence',
-                                                                    label = 'Fluorescence data',
+                                                                    label = 'Choose fluorescence data file',
                                                                     accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
                                                           ),
 
@@ -239,54 +239,65 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             )
                                                           )
                                                         ),
+
+                                                        checkboxInput(inputId = 'load_fl2_data_custom',
+                                                                     label = 'Use second fluorescence to normalize fluorescence.',
+                                                                     value = FALSE),
+                                                        bsPopover("load_fl2_data_custom", title = "Provide a table file with fluorescence 2 data",
+                                                                  content = "Table layout must mimic that of density data. Fluorescence 2 data is only used to normalize of fluorescence!"),
                                                         # #_____Fluorescence 2___________
-                                                        # wellPanel(
-                                                        #   h4(strong("Fluorescence 2 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
-                                                        #   style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
-                                                        #
-                                                        #   fileInput(inputId = 'custom_file_fluorescence2',
-                                                        #             label = 'Fluorescence data 2',
-                                                        #             accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
-                                                        #   ),
-                                                        #
-                                                        #   conditionalPanel(
-                                                        #     condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
-                                                        #     wellPanel(
-                                                        #       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                        #       selectInput(inputId = "custom_fluorescence2_sheets",
-                                                        #                   label = "Select Sheet",
-                                                        #                   choices = "Sheet1")
-                                                        #     )
-                                                        #   ), # select sheet: conditional
-                                                        #   conditionalPanel(
-                                                        #     condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'csv'",
-                                                        #     wellPanel(
-                                                        #       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                        #       selectInput(inputId = "separator_custom_fluorescence2",
-                                                        #                   label = "Select separator",
-                                                        #                   choices = c("," = ",",
-                                                        #                               ";" = ";")
-                                                        #       ),
-                                                        #
-                                                        #       selectInput(inputId = "decimal_separator_custom_fluorescence2",
-                                                        #                   label = "Select Decimal separator",
-                                                        #                   choices = c("." = ".",
-                                                        #                               "," = ",")
-                                                        #       )
-                                                        #     )
-                                                        #   ),
-                                                        #   conditionalPanel(
-                                                        #     condition = "output.fluorescence2fileUploaded && (output.custom_fluorescence2_format == 'tsv' || output.custom_fluorescence2_format == 'txt')",
-                                                        #     wellPanel(
-                                                        #       style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
-                                                        #       selectInput(inputId = "decimal_separator_custom_fluorescence2",
-                                                        #                   label = "Select Decimal separator",
-                                                        #                   choices = c("." = ".",
-                                                        #                               "," = ",")
-                                                        #       )
-                                                        #     )
-                                                        #   )
-                                                        # ),
+                                                        conditionalPanel(
+                                                          condition = "input.load_fl2_data_custom",
+                                                          wellPanel(
+                                                            h4(strong("Fluorescence 2 data"), style = "line-height: 1;font-size: 150%; margin-bottom: 15px;"),
+                                                            style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
+
+
+                                                            fileInput(inputId = 'custom_file_fluorescence2',
+                                                                      label = 'Choose fluorescence2 data file',
+                                                                      accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
+                                                            ),
+
+
+                                                            conditionalPanel(
+                                                              condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
+                                                              wellPanel(
+                                                                style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                selectInput(inputId = "custom_fluorescence2_sheets",
+                                                                            label = "Select Sheet",
+                                                                            choices = "Sheet1")
+                                                              )
+                                                            ), # select sheet: conditional
+                                                            conditionalPanel(
+                                                              condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'csv'",
+                                                              wellPanel(
+                                                                style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                selectInput(inputId = "separator_custom_fluorescence2",
+                                                                            label = "Select separator",
+                                                                            choices = c("," = ",",
+                                                                                        ";" = ";")
+                                                                ),
+
+                                                                selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                                            label = "Select Decimal separator",
+                                                                            choices = c("." = ".",
+                                                                                        "," = ",")
+                                                                )
+                                                              )
+                                                            ),
+                                                            conditionalPanel(
+                                                              condition = "output.fluorescence2fileUploaded && (output.custom_fluorescence2_format == 'tsv' || output.custom_fluorescence2_format == 'txt')",
+                                                              wellPanel(
+                                                                style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                selectInput(inputId = "decimal_separator_custom_fluorescence2",
+                                                                            label = "Select Decimal separator",
+                                                                            choices = c("." = ".",
+                                                                                        "," = ",")
+                                                                )
+                                                              )
+                                                            )
+                                                          )
+                                                        ),
 
                                                         tags$div(title="Shall blank values (the mean of samples identified by 'Blank' IDs) be subtracted from values within the same experiment?",
                                                                  checkboxInput(inputId = 'subtract_blank_custom',
@@ -349,7 +360,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                              ##____PLATE READER____####
 
-                                             tabPanel(value = "Plate Reader", span("Plate Reader", title="Upload a results table file generated with the default export function of a plate reader software. Sample information are provided in a separate table."),
+                                             tabPanel(value = "Parse Raw Data", span("Parse Raw Data", title="Upload a results table file generated with the default export function of a plate reader (or similar device) software. Sample information need to be provided in a separate table."),
                                                       sidebarPanel(
                                                         style='border-color: #ADADAD',
                                                         wellPanel(
@@ -358,7 +369,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           style='padding: 5px; border-color: #ADADAD;',
                                                           # select file type
                                                           fileInput(inputId = 'parse_file',
-                                                                    label = 'Choose plate reader export file',
+                                                                    label = 'Choose raw export file',
                                                                     accept = c('.xlsx', '.xls', '.csv', '.tsv', '.txt')),
                                                           div(style = "margin-top: -10px"),
                                                           conditionalPanel(
@@ -432,10 +443,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                               )
                                                             ),
 
-                                                            # selectInput(inputId = "parsed_reads_fluorescence2",
-                                                            #             label = "Fluorescence data 2",
-                                                            #             choices = ""
-                                                            # )
+                                                            selectInput(inputId = "parsed_reads_fluorescence2",
+                                                                        label = "Fluorescence data 2 (used only for normalization)",
+                                                                        choices = ""
+                                                            )
                                                           )
                                                         ),
                                                         div(style = "margin-top: -15px"),
@@ -491,6 +502,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             )
                                                           )
                                                         ),
+                                                        selectInput(inputId = 'norm_type_parse',
+                                                                      label = 'Select Read for fluorescence normalization',
+                                                                      choices = ""),
 
                                                         tags$div(title="Shall blank values (the mean of samples identified by 'Blank' IDs) be subtracted from values within the same experiment?",
                                                                  checkboxInput(inputId = 'subtract_blank_plate_reader',
@@ -615,6 +629,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                             )
                                                    ),
+                                                   tabPanel(title = "norm. Fluorescence plot", value = "tabPanel_custom_plots_norm_fluorescence",
+                                                            withSpinner(
+                                                              plotOutput("custom_raw_norm_fluorescence_plot",
+                                                                         width = "100%", height = "1000px"),
+
+                                                            )
+                                                   ),
                                                    tabPanel(title = "Density", value = "tabPanel_custom_tables_density_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("growth_data_custom_processed")
@@ -628,6 +649,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                    tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("custom_table_fluorescence_processed")
+                                                            )
+                                                   ),
+                                                   tabPanel(title = "normalized Fluorescence", value = "tabPanel_custom_tables_norm_fluorescence_processed",
+                                                            withSpinner(
+                                                              DT::dataTableOutput("custom_table_norm_fluorescence_processed")
                                                             )
                                                    ),
                                                    # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
@@ -1071,10 +1097,19 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        bsPopover(id = "data_type_x_fluorescence", title = HTML("<em>x_type</em>"), content = "Select the data type that is used as the independent variable for all fits."),
 
                                                                        conditionalPanel(
-                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present",
+                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present && input.norm_type_parse == 'density'",
                                                                          tags$div(title="Use normalized fluorescence (divided by density values) for all fits.",
                                                                                   checkboxInput(inputId = 'normalize_fluorescence',
                                                                                                 label = 'Normalize fluorescence to density'
+                                                                                  )
+                                                                         )
+                                                                       ),
+
+                                                                       conditionalPanel(
+                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present && input.norm_type_parse == 'fluorescence 2'",
+                                                                         tags$div(title="Use normalized fluorescence (divided by density values) for all fits.",
+                                                                                  checkboxInput(inputId = 'normalize_fluorescence',
+                                                                                                label = 'Normalize fluorescence to fluorescence 2'
                                                                                   )
                                                                          )
                                                                        ),
@@ -5305,42 +5340,45 @@ server <- function(input, output, session){
   })
   outputOptions(output, 'fluorescencefileUploaded', suspendWhenHidden=FALSE)
 
-  ### Test if custom_file_fluorescence was loaded
-  # output$fluorescence2fileUploaded <- reactive({
-  #   if(is.null(input$custom_file_fluorescence2)) return(FALSE)
-  #   else return(TRUE)
-  # })
-  # outputOptions(output, 'fluorescence2fileUploaded', suspendWhenHidden=FALSE)
+  ## Test if custom_file_fluorescence was loaded
+  output$fluorescence2fileUploaded <- reactive({
+    if(is.null(input$custom_file_fluorescence2)) return(FALSE)
+    else return(TRUE)
+  })
+  outputOptions(output, 'fluorescence2fileUploaded', suspendWhenHidden=FALSE)
 
   # Read data upon click on [Read data]
   observeEvent(input$read_custom,{
     showModal(modalDialog("Reading data input...", footer=NULL))
     density.file <- input$custom_file_density
     fl.file <- input$custom_file_fluorescence
-    # fl2.file <- input$custom_file_fluorescence2
+    fl2.file <- input$custom_file_fluorescence2
 
-    if(is.null(density.file) && is.null(fl.file) && is.null(fl2.file)) return(NULL)
+    if(is.null(density.file) && is.null(fl.file) ) return(NULL)
 
     if(input$convert_time_equation_custom == "" || is.na(input$convert_time_equation_custom)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_custom
+
+    fl.normtype <- ifelse(input$load_fl2_data_custom, "fl2", "density")
     ## Read data
     try(
       results$custom_data <- read_data(data.density = density.file$datapath,
                                        data.fl = fl.file$datapath,
-                                       # data.fluoro2 = fl2.file$datapath,
+                                       data.fl2 = fl2.file$datapath,
                                        data.format = "col",
                                        sheet.density = input$custom_growth_sheets,
                                        sheet.fl = input$custom_fluorescence_sheets,
-                                       # sheet.fluoro2 = input$custom_fluorescence2_sheets,
+                                       sheet.fl2 = input$custom_fluorescence2_sheets,
                                        csvsep = input$separator_custom_density,
                                        dec = input$decimal_separator_custom_density,
-                                       csvsep.fl = input$separator_custom_density,
-                                       dec.fl = input$decimal_separator_custom_density,
-                                       # csvsep.fl2 = input$separator_custom_density,
-                                       # dec.fl2 = input$decimal_separator_custom_density,
+                                       csvsep.fl = input$separator_custom_fluorescence,
+                                       dec.fl = input$decimal_separator_custom_fluorescence,
+                                       csvsep.fl2 = input$separator_custom_fluorescence2,
+                                       dec.fl2 = input$decimal_separator_custom_fluorescence2,
                                        subtract.blank = input$subtract_blank_custom,
                                        convert.time = convert.time,
-                                       calibration = ifelse(input$calibration_custom, input$calibration_equation_custom, "")
+                                       calibration = ifelse(input$calibration_custom, input$calibration_equation_custom, ""),
+                                       fl.normtype = fl.normtype
       )
     )
 
@@ -5362,12 +5400,15 @@ server <- function(input, output, session){
       results$parsed_data <- NULL
       hide("parsed_reads_density")
       hide("parsed_reads_fluorescence")
-      # hide("parsed_reads_fluorescence2")
+      hide("parsed_reads_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
 
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
+
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_norm_fluorescence")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_norm_fluorescence")
       # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
@@ -5512,6 +5553,13 @@ server <- function(input, output, session){
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_fluorescence")
     }
+    if(exists("custom_table_norm_fluorescence_processed") && !is.null(custom_table_norm_fluorescence_processed()) ){
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_norm_fluorescence_processed", select = TRUE)
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_norm_fluorescence", select = FALSE)
+    } else {
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_norm_fluorescence_processed")
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_norm_fluorescence")
+    }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) &&
        exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed()) &&
        all(results$custom_data$density == results$custom_data$fluorescence, na.rm = T)){
@@ -5640,6 +5688,27 @@ server <- function(input, output, session){
                            escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl)-3)))
   })
 
+  # render processed normalized fluorescence table
+  custom_table_norm_fluorescence_processed <- reactive({
+
+    if(is.null(results$custom_data) || length(results$custom_data$norm.fluorescence)<2) return(NULL)
+
+    table_fl <- t(results$custom_data$norm.fluorescence)
+    table_fl[-(1:3), ] <- apply(apply(table_fl[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+    rownames(table_fl)[-(1:3)] <- ""
+    table_fl <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
+                      table_fl)
+
+    table_fl
+  })
+
+  output$custom_table_norm_fluorescence_processed <- DT::renderDT({
+    table_fl <- custom_table_norm_fluorescence_processed()
+    DT::datatable(table_fl,
+                  options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                  escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl)-3)))
+  })
+
   ### Render custom fluorescence 2 table
   # output$custom_table_fluorescence2 <- DT::renderDT({
   #   inFile <- input$custom_file_fluorescence2
@@ -5759,6 +5828,24 @@ server <- function(input, output, session){
     custom_raw_fluorescence_plot()
   })
 
+  custom_raw_norm_fluorescence_plot <- reactive({
+    if(is.null(results$custom_data) || length(results$custom_data$norm.fluorescence) < 2) return(NULL)
+
+    try(
+      suppressWarnings(
+        plot.grodata(x = results$custom_data,
+                     data.type = "norm.fl",
+                     IDs = NULL,
+                     shiny = TRUE
+        )
+      )
+    )
+  })
+
+  output$custom_raw_norm_fluorescence_plot <- renderPlot({
+    custom_raw_norm_fluorescence_plot()
+  })
+
 
 
   output$custom_density_format <- reactive({
@@ -5781,15 +5868,15 @@ server <- function(input, output, session){
   })
   outputOptions(output, 'custom_fluorescence_format', suspendWhenHidden=FALSE)
 
-  # output$custom_fluorescence2_format <- reactive({
-  #   if(is.null(input$custom_file_fluorescence2)) return(NULL)
-  #
-  #   filename <- input$custom_file_fluorescence2$name
-  #
-  #   format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
-  #   format
-  # })
-  # outputOptions(output, 'custom_fluorescence2_format', suspendWhenHidden=FALSE)
+  output$custom_fluorescence2_format <- reactive({
+    if(is.null(input$custom_file_fluorescence2)) return(NULL)
+
+    filename <- input$custom_file_fluorescence2$name
+
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    format
+  })
+  outputOptions(output, 'custom_fluorescence2_format', suspendWhenHidden=FALSE)
 
   growth_excel_sheets <- reactive({
     filename <- input$custom_file_density$datapath
@@ -5809,14 +5896,14 @@ server <- function(input, output, session){
     sheets
   })
 
-  # fluorescence2_excel_sheets <- reactive({
-  #   filename <- input$custom_file_fluorescence2$datapath
-  #   if(is.null(input$custom_file_fluorescence2)) return("")
-  #   format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
-  #   if(format != "xlsx" && format != "xls") return("")
-  #   sheets <- readxl::excel_sheets(input$custom_file_fluorescence2$datapath)
-  #   sheets
-  # })
+  fluorescence2_excel_sheets <- reactive({
+    filename <- input$custom_file_fluorescence2$datapath
+    if(is.null(input$custom_file_fluorescence2)) return("")
+    format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
+    if(format != "xlsx" && format != "xls") return("")
+    sheets <- readxl::excel_sheets(input$custom_file_fluorescence2$datapath)
+    sheets
+  })
 
   observe({
     updateSelectInput(inputId = "custom_growth_sheets",
@@ -5828,10 +5915,10 @@ server <- function(input, output, session){
                       choices = fluorescence_excel_sheets()
     )})
 
-  # observe({
-  #   updateSelectInput(inputId = "custom_fluorescence2_sheets",
-  #                     choices = fluorescence2_excel_sheets()
-  #   )})
+  observe({
+    updateSelectInput(inputId = "custom_fluorescence2_sheets",
+                      choices = fluorescence2_excel_sheets()
+    )})
 
   observeEvent(input$random_data_growth, {
     # display a modal dialog with a header, textinput and action buttons
@@ -5894,13 +5981,17 @@ server <- function(input, output, session){
     results$parsed_data <- NULL
     hide("parsed_reads_density")
     hide("parsed_reads_fluorescence")
-    # hide("parsed_reads_fluorescence2")
+    hide("parsed_reads_fluorescence2")
+    hide("norm_type_parse")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
 
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
-    # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
+
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_norm_fluorescence")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_norm_fluorescence")
+
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
     shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
@@ -5944,12 +6035,15 @@ server <- function(input, output, session){
       results$parsed_data <- NULL
       hide("parsed_reads_density")
       hide("parsed_reads_fluorescence")
-      # hide("parsed_reads_fluorescence2")
+      hide("parsed_reads_norm_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
 
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
+
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_norm_fluorescence")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_norm_fluorescence")
       # hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
@@ -5964,8 +6058,9 @@ server <- function(input, output, session){
   hide("Parsed_Data_Tables")
   hide("parsed_reads_density")
   hide("parsed_reads_fluorescence")
-  # hide("parsed_reads_fluorescence2")
+  hide("parsed_reads_fluorescence2")
   hide("parse_data")
+  hide("norm_type_parse")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
 
@@ -6145,8 +6240,16 @@ server <- function(input, output, session){
     }
     if(exists("reads") && length(reads) > 0){
       show("parsed_reads_density")
-      if(length(reads)>1) show("parsed_reads_fluorescence")
-      if(length(reads)>2) show("parsed_reads_fluorescence2")
+      if(length(reads)>1){
+        show("parsed_reads_fluorescence")
+      } else {
+        hide("parsed_reads_fluorescence")
+      }
+      if(length(reads)>2){
+        show("parsed_reads_fluorescence2")
+      } else {
+        hide("parsed_reads_fluorescence2")
+      }
       show("parse_data")
       removeModal()
       reads <- c(reads, "Ignore")
@@ -6163,6 +6266,32 @@ server <- function(input, output, session){
       removeModal()
     }
   })
+
+  observe({
+    reads <- selected_inputs_parsed_reads()
+    if(length(reads) < 2)
+      return(NULL)
+    if(length(reads) > 2 && input$parsed_reads_fluorescence != "Ignore"){
+      show("parsed_reads_fluorescence2")
+    } else {
+      hide("parsed_reads_fluorescence2")
+    }
+    norm.types <- c()
+    if(input$parsed_reads_density != "Ignore"){
+      norm.types <- c(norm.types, "density")
+    }
+    if(length(reads) > 2 && input$parsed_reads_fluorescence != "Ignore"){
+      if(input$parsed_reads_fluorescence2 != "Ignore")
+        norm.types <- c(norm.types, "fluorescence 2")
+      show("norm_type_parse")
+    } else {
+      hide("norm_type_parse")
+    }
+    updateSelectInput(inputId = "norm_type_parse",
+                      choices = norm.types
+    )
+  })
+
   observe({
     updateSelectInput(inputId = "parsed_reads_density",
                       choices = selected_inputs_parsed_reads()
@@ -6173,11 +6302,11 @@ server <- function(input, output, session){
                       choices = selected_inputs_parsed_reads()
     )
   })
-  # observe({
-  #   updateSelectInput(inputId = "parsed_reads_fluorescence2",
-  #                     choices = selected_inputs_parsed_reads()
-  #   )
-  # })
+  observe({
+    updateSelectInput(inputId = "parsed_reads_fluorescence2",
+                      choices = selected_inputs_parsed_reads()
+    )
+  })
   observeEvent(input$mapping_included_in_parse,{
     if(input$mapping_included_in_parse) hide("map_file")
     if(!input$mapping_included_in_parse) show("map_file")
@@ -6186,6 +6315,12 @@ server <- function(input, output, session){
 
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
+    if(input$norm_type_parse == "fluorescence 2"){
+      fl.normtype <- "fl2"
+    } else {
+      fl.normtype <- "density"
+    }
+    browser()
     showModal(modalDialog("Parsing data input...", footer=NULL))
     if(input$convert_time_equation_plate_reader == "" || is.na(input$convert_time_equation_plate_reader)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_plate_reader
@@ -6213,13 +6348,14 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence
           ),
-          calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, "")
-          # fl2.nm = ifelse(
-          #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
-          #   NA,
-          #   input$parsed_reads_fluorescence2
-          # )
+          calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, ""),
+          fl2.nm = ifelse(
+            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+              input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
+            NA,
+            input$parsed_reads_fluorescence2
+          ),
+          fl.normtype = fl.normtype
         )
       )
     } else {
@@ -6257,13 +6393,14 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence
           ),
-          calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, "")
-          # fl2.nm = ifelse(
-          #   input$parsed_reads_fluorescence2 == input$parsed_reads_density |
-          #     input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
-          #   NA,
-          #   input$parsed_reads_fluorescence
-          # )
+          calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, ""),
+          fl2.nm = ifelse(
+            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+              input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
+            NA,
+            input$parsed_reads_fluorescence
+          ),
+          fl.normtype = fl.normtype
         )
       )
     }
@@ -6294,6 +6431,10 @@ server <- function(input, output, session){
 
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_fluorescence")
+
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_norm_fluorescence_processed")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_norm_fluorescence")
+
 
     # hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")

@@ -15,4 +15,5 @@ README\.md
 README\.Rmd
 QurvE\.pdf
 cran-comments\.md
-^inst/icons
+^/inst/icons
+^/QurvE
