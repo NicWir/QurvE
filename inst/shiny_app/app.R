@@ -6320,7 +6320,6 @@ server <- function(input, output, session){
     } else {
       fl.normtype <- "density"
     }
-    browser()
     showModal(modalDialog("Parsing data input...", footer=NULL))
     if(input$convert_time_equation_plate_reader == "" || is.na(input$convert_time_equation_plate_reader)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_plate_reader
@@ -12111,9 +12110,9 @@ server <- function(input, output, session){
   }
 
   # Ensure that the application will stop the websocket server started by shiny::runApp() and the underlying R process when the browser window is closed.
-  session$onSessionEnded(function() {
-    stopApp()
-  })
+  # session$onSessionEnded(function() {
+  #   stopApp()
+  # })
 
 }
 

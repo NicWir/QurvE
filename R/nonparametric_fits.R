@@ -339,7 +339,7 @@ growth.gcFitSpline <- function(
                 class(gcFitSpline) <- "gcFitSpline"
                 return(gcFitSpline)
             }  # if(!exists('spline') || is.null(spline) == TRUE)
- else
+        else
         {
             # Perform first derivative and
             # extract parameters
@@ -456,7 +456,7 @@ growth.gcFitSpline <- function(
                     fitFlag2 <- FALSE
                   }
                 }  # if(control$biphasic)
- else
+            else
             {
                 mumax2.index <- NA
                 mumax2.index.spl <- NA
@@ -467,151 +467,73 @@ growth.gcFitSpline <- function(
                 lambda.spl2 <- NA
                 fitFlag2 <- FALSE
             }
-            # # extract local minima and maxima
-            # of deriv2 n <- round((log(n.spl+4,
-            # base=2.1))/0.75)/2 minima <-
-            # inflect(deriv2_spline$y, threshold
-            # = n)$minima maxima <-
-            # inflect(deriv2_spline$y, threshold
-            # = n)$maxima # Regard only
-            # (negative) minima and (positive)
-            # maxima with a deriv2 value of >= 5%
-            # mumax minima <-
-            # minima[deriv2_spline$y[minima] <=
-            # 0.05 * (-mumax)] maxima <-
-            # maxima[deriv2_spline$y[maxima] >=
-            # 0.05 * mumax] # Find roots with
-            # positive slope in deriv2 after µmax
-            # # Find adjacent min - max pairs
-            # minmax <- c(minima,
-            # maxima)[order(c(minima, maxima))] #
-            # combine minima and maxima in
-            # ascending order minmax.min <-
-            # as.list(as.numeric(minmax %in%
-            # minima)) # list for each element in
-            # minmax vector, value 0 if maximum,
-            # value 1 if minimum # get indices of
-            # minima in minmax that are followed
-            # by a maximum ndx.minmax <- c()
-            # for(i in 1:(length(minmax.min)-1)){
-            # if(minmax.min[[i]]==1 &
-            # minmax.min[[i+1]]==0){ ndx.minmax
-            # <- c(ndx.minmax, i) } } # define
-            # pair candidates; store in list
-            # pairs.post <- list() for(i in
-            # 1:length(ndx.minmax)){
-            # pairs.post[[i]] <-
-            # c(minmax[[ndx.minmax[[i]]]],
-            # minmax[[ndx.minmax[[i]]+1]]) } #
-            # extract candidate that is closest
-            # to µmax, and respective index of
-            # minimum and maximum ndx.minima_cand
-            # <- c() ndx.minima_cand <-
-            # unlist(lapply(1:length(pairs.post),
-            # function(x) c(ndx.minima_cand,
-            # pairs.post[[x]][1]))) min.ndx <-
+            # # extract local minima and maxima of deriv2 n <- round((log(n.spl+4,
+            # base=2.1))/0.75)/2 minima <- inflect(deriv2_spline$y, threshold = n)$minima
+            # maxima <- inflect(deriv2_spline$y, threshold = n)$maxima # Regard only
+            # (negative) minima and (positive) maxima with a deriv2 value of >= 5% mumax
+            # minima <- minima[deriv2_spline$y[minima] <= 0.05 * (-mumax)] maxima <-
+            # maxima[deriv2_spline$y[maxima] >= 0.05 * mumax] # Find roots with positive
+            # slope in deriv2 after µmax # Find adjacent min - max pairs minmax <-
+            # c(minima, maxima)[order(c(minima, maxima))] # combine minima and maxima in
+            # ascending order minmax.min <- as.list(as.numeric(minmax %in% minima)) # list
+            # for each element in minmax vector, value 0 if maximum, value 1 if minimum #
+            # get indices of minima in minmax that are followed by a maximum ndx.minmax <-
+            # c() for(i in 1:(length(minmax.min)-1)){ if(minmax.min[[i]]==1 &
+            # minmax.min[[i+1]]==0){ ndx.minmax <- c(ndx.minmax, i) } } # define pair
+            # candidates; store in list pairs.post <- list() for(i in
+            # 1:length(ndx.minmax)){ pairs.post[[i]] <- c(minmax[[ndx.minmax[[i]]]],
+            # minmax[[ndx.minmax[[i]]+1]]) } # extract candidate that is closest to µmax,
+            # and respective index of minimum and maximum ndx.minima_cand <- c()
+            # ndx.minima_cand <- unlist(lapply(1:length(pairs.post), function(x)
+            # c(ndx.minima_cand, pairs.post[[x]][1]))) min.ndx <-
             # ndx.minima_cand[which.min((ndx.minima_cand-
-            # mumax.index.spl)[(ndx.minima_cand-
-            # mumax.index.spl)>0])] max.ndx <-
-            # pairs.post[[which.min((ndx.minima_cand-
-            # mumax.index.spl)[(ndx.minima_cand-
-            # mumax.index.spl)>0])]][2] # Linear
-            # interpolation between minimum and
-            # maximum to find root interpol <-
-            # approxfun(y = c(deriv2$x[min.ndx],
-            # deriv2$x[max.ndx]), x =
-            # c(deriv2$y[min.ndx],
-            # deriv2$y[max.ndx])) t.turn <-
-            # interpol(0) t.turn_post.ndx <-
-            # which.min(abs(deriv2$x-t.turn)) #
-            # The time index closest to the
-            # turning point after µmax # Find
-            # roots with negative slope in deriv2
-            # before µmax # get indices of maxima
-            # in minmax that are followed by a
-            # minimum ndx.maxmin <- c() for(i in
-            # 1:(length(minmax.min)-1)){
-            # if(minmax.min[[i]]==0 &
-            # minmax.min[[i+1]]==1){ ndx.maxmin
-            # <- c(ndx.maxmin, i) } } # define
-            # pair candidates; store in list
-            # pairs.pre <- list() for(i in
-            # 1:length(ndx.maxmin)){
-            # pairs.pre[[i]] <-
-            # c(minmax[[ndx.maxmin[[i]]]],
-            # minmax[[ndx.maxmin[[i]]+1]]) } #
-            # extract candidate that is closest
-            # to µmax, and respective index of
-            # minimum and maximum ndx.maxima_cand
-            # <- c() ndx.maxima_cand <-
-            # unlist(lapply(1:length(pairs.pre),
-            # function(x) c(ndx.maxima_cand,
-            # pairs.pre[[x]][1]))) min.ndx <-
+            # mumax.index.spl)[(ndx.minima_cand- mumax.index.spl)>0])] max.ndx <-
+            # pairs.post[[which.min((ndx.minima_cand- mumax.index.spl)[(ndx.minima_cand-
+            # mumax.index.spl)>0])]][2] # Linear interpolation between minimum and maximum
+            # to find root interpol <- approxfun(y = c(deriv2$x[min.ndx],
+            # deriv2$x[max.ndx]), x = c(deriv2$y[min.ndx], deriv2$y[max.ndx])) t.turn <-
+            # interpol(0) t.turn_post.ndx <- which.min(abs(deriv2$x-t.turn)) # The time
+            # index closest to the turning point after µmax # Find roots with negative
+            # slope in deriv2 before µmax # get indices of maxima in minmax that are
+            # followed by a minimum ndx.maxmin <- c() for(i in 1:(length(minmax.min)-1)){
+            # if(minmax.min[[i]]==0 & minmax.min[[i+1]]==1){ ndx.maxmin <- c(ndx.maxmin,
+            # i) } } # define pair candidates; store in list pairs.pre <- list() for(i in
+            # 1:length(ndx.maxmin)){ pairs.pre[[i]] <- c(minmax[[ndx.maxmin[[i]]]],
+            # minmax[[ndx.maxmin[[i]]+1]]) } # extract candidate that is closest to µmax,
+            # and respective index of minimum and maximum ndx.maxima_cand <- c()
+            # ndx.maxima_cand <- unlist(lapply(1:length(pairs.pre), function(x)
+            # c(ndx.maxima_cand, pairs.pre[[x]][1]))) min.ndx <-
             # ndx.maxima_cand[which.min((ndx.maxima_cand-
-            # mumax.index.spl)[(ndx.maxima_cand-
-            # mumax.index.spl)>0])] max.ndx <-
-            # pairs.pre[[which.min((ndx.maxima_cand-
-            # mumax.index.spl)[(ndx.maxima_cand-
-            # mumax.index.spl)>0])]][2] # Linear
-            # interpolation between minimum and
-            # maximum to find root interpol <-
-            # approxfun(y = c(deriv2$x[min.ndx],
-            # deriv2$x[max.ndx]), x =
-            # c(deriv2$y[min.ndx],
-            # deriv2$y[max.ndx])) t.turn <-
-            # interpol(0) t.turn_pre.ndx <-
-            # which.min(abs(deriv2$x-t.turn)) #
-            # The time index closest to the
-            # turning point after µmax # Remove
-            # plot(deriv1.2$x, deriv1.2$y, type =
-            # 'l') points( deriv1.2$x[minima],
-            # deriv1.2$y[minima], pch = 16, col =
-            # 'Blue', cex = 1.5 )
-            # points(deriv1.2$x[mumax2.index],
-            # deriv1.2$y[mumax2.index], pch = 16,
-            # col = 'Red', cex = 1.5)
-            # points(deriv1$x[mumax.index],
-            # deriv1$y[mumax.index], pch = 16,
-            # col = 'Green', cex = 1.5)
-            # points(deriv1$x[t.turn_pre.ndx],
-            # deriv1$y[t.turn_pre.ndx], pch = 16,
-            # col = 'Black', cex = 1.5)
-            # points(deriv1$x[t.turn_post.ndx],
-            # deriv1$y[t.turn_post.ndx], pch =
-            # 16, col = 'Black', cex = 1.5)
-            # plot(deriv2$x, deriv2$y, type =
-            # 'l', main = 'Minima \nVariable
-            # Thresholds') points(
-            # deriv2$x[minima], deriv2$y[minima],
-            # pch = 16, col = 'Blue', cex = 1.5 )
-            # points(deriv2$x[maxima],
-            # deriv2$y[maxima], pch = 16, col =
-            # 'Red', cex = 1.5)
-            # points(deriv2$x[mumax.index],
-            # deriv2$y[mumax.index], pch = 16,
-            # col = 'Green', cex = 1.5)
-            # points(deriv2$x[t.turn_pre.ndx],
-            # deriv2$y[t.turn_pre.ndx], pch = 16,
-            # col = 'Black', cex = 1.5)
-            # points(deriv2$x[t.turn_post.ndx],
-            # deriv2$y[t.turn_post.ndx], pch =
-            # 16, col = 'Black', cex = 1.5)
-            # plot(spline$x, spline$y, type =
-            # 'l') points(spline$x[minima],
-            # spline$y[minima], pch = 16, col =
-            # cf.2(1)[1], cex = 1.5)
-            # points(spline$x[maxima],
-            # spline$y[maxima], pch = 16, col =
-            # cf.1(1)[1], cex = 1.5)
-            # plot(deriv2_spline$x,
-            # deriv2_spline$y, type = 'l', main =
-            # 'Minima \nVariable Thresholds')
-            # points( deriv2_spline$x[minima],
-            # deriv2_spline$y[minima], pch = 16,
-            # col = cf.2(1)[1], cex = 1.5 )
-            # points(deriv2_spline$x[maxima],
-            # deriv2_spline$y[maxima], pch = 16,
-            # col = cf.1(1)[1], cex = 1.5) }
+            # mumax.index.spl)[(ndx.maxima_cand- mumax.index.spl)>0])] max.ndx <-
+            # pairs.pre[[which.min((ndx.maxima_cand- mumax.index.spl)[(ndx.maxima_cand-
+            # mumax.index.spl)>0])]][2] # Linear interpolation between minimum and maximum
+            # to find root interpol <- approxfun(y = c(deriv2$x[min.ndx],
+            # deriv2$x[max.ndx]), x = c(deriv2$y[min.ndx], deriv2$y[max.ndx])) t.turn <-
+            # interpol(0) t.turn_pre.ndx <- which.min(abs(deriv2$x-t.turn)) # The time
+            # index closest to the turning point after µmax # Remove plot(deriv1.2$x,
+            # deriv1.2$y, type = 'l') points( deriv1.2$x[minima], deriv1.2$y[minima], pch
+            # = 16, col = 'Blue', cex = 1.5 ) points(deriv1.2$x[mumax2.index],
+            # deriv1.2$y[mumax2.index], pch = 16, col = 'Red', cex = 1.5)
+            # points(deriv1$x[mumax.index], deriv1$y[mumax.index], pch = 16, col =
+            # 'Green', cex = 1.5) points(deriv1$x[t.turn_pre.ndx],
+            # deriv1$y[t.turn_pre.ndx], pch = 16, col = 'Black', cex = 1.5)
+            # points(deriv1$x[t.turn_post.ndx], deriv1$y[t.turn_post.ndx], pch = 16, col =
+            # 'Black', cex = 1.5) plot(deriv2$x, deriv2$y, type = 'l', main = 'Minima
+            # \nVariable Thresholds') points( deriv2$x[minima], deriv2$y[minima], pch =
+            # 16, col = 'Blue', cex = 1.5 ) points(deriv2$x[maxima], deriv2$y[maxima], pch
+            # = 16, col = 'Red', cex = 1.5) points(deriv2$x[mumax.index],
+            # deriv2$y[mumax.index], pch = 16, col = 'Green', cex = 1.5)
+            # points(deriv2$x[t.turn_pre.ndx], deriv2$y[t.turn_pre.ndx], pch = 16, col =
+            # 'Black', cex = 1.5) points(deriv2$x[t.turn_post.ndx],
+            # deriv2$y[t.turn_post.ndx], pch = 16, col = 'Black', cex = 1.5)
+            # plot(spline$x, spline$y, type = 'l') points(spline$x[minima],
+            # spline$y[minima], pch = 16, col = cf.2(1)[1], cex = 1.5)
+            # points(spline$x[maxima], spline$y[maxima], pch = 16, col = cf.1(1)[1], cex =
+            # 1.5) plot(deriv2_spline$x, deriv2_spline$y, type = 'l', main = 'Minima
+            # \nVariable Thresholds') points( deriv2_spline$x[minima],
+            # deriv2_spline$y[minima], pch = 16, col = cf.2(1)[1], cex = 1.5 )
+            # points(deriv2_spline$x[maxima], deriv2_spline$y[maxima], pch = 16, col =
+            # cf.1(1)[1], cex = 1.5) }
 
         }  # else of if (!exists('spline') || is.null(spline) == TRUE)
     }  # else of if (length(data) < 5)
@@ -1120,6 +1042,9 @@ flFitSpline <- function(
                   fl_data.log <- fl_data.log[!bad.values]
                 }
                 density.log <- log(density/density[1])
+                density.raw <- density.log
+            } else {
+              density.raw <- density
             }
 
             if (max(density) <
@@ -1157,6 +1082,13 @@ flFitSpline <- function(
               )
                 class(flFitSpline) <- "flFitSpline"
                 return(flFitSpline)
+            }
+            fl_data.raw <- if (control$log.y.spline == TRUE)
+            {
+              fl_data.log
+            } else
+            {
+              fl_data
             }
             # Implement min.density into dataset
             if (!is.null(control$min.density))
@@ -1266,6 +1198,9 @@ flFitSpline <- function(
                   fl_data.log <- fl_data.log[!bad.values]
                 }
                 time.log <- log(time)
+                time.raw <- time.log
+            } else {
+              time.raw <- time
             }
             if (max(time) <
                 control$t0)
@@ -1300,6 +1235,13 @@ flFitSpline <- function(
               )
                 class(flFitSpline) <- "flFitSpline"
                 return(flFitSpline)
+            }
+            fl_data.raw <- if (control$log.y.spline == TRUE)
+            {
+              fl_data.log
+            } else
+            {
+              fl_data
             }
             # Implement t0 into dataset
             if (is.numeric(t0) &&
@@ -1443,110 +1385,114 @@ flFitSpline <- function(
         # 'time'
         deriv1.test <- deriv1
         spline.test <- spline
-        # if(x_type == 'time'){ Take only max
-        # slope values that are not at the start
-        # of the curve success <- FALSE while
-        # (!success){ if(length(deriv1.test$y) >
-        # 2){ max_slope.index <-
-        # which.max(deriv1.test$y)
+        # if(x_type == 'time'){ Take only max slope values that are not at the start of
+        # the curve
+        # success <- FALSE
+        # while (!success){
+        # if(length(deriv1.test$y) > 2){
+        # max_slope.index <- which.max(deriv1.test$y)
         # if(!(max_slope.index %in% 1:3)){
-        # max_slope.index <- max_slope.index
-        # success <- TRUE } else { deriv1.test <-
-        # lapply(1:length(deriv1.test),
-        # function(x)
-        # deriv1.test[[x]][-max_slope.index])
-        # names(deriv1.test) <- c('x', 'y')
-        # spline.test$x <-
-        # spline$x[-max_slope.index]
-        # spline.test$y <-
-        # spline$y[-max_slope.index] } } else{
+        # max_slope.index <- max_slope.index success <- TRUE
+        #} else {
+        # deriv1.test <- lapply(1:length(deriv1.test), function(x) deriv1.test[[x]][-max_slope.index])
+        # names(deriv1.test) <- c('x', 'y') spline.test$x <- spline$x[-max_slope.index]
+        # spline.test$y <- spline$y[-max_slope.index] }
+        # } else {
         # max_slope.index <- which.max(deriv1$y)
-        # spline.test <- spline success <- TRUE }
-        # } } else { max_slope.index <-
-        # which.max(deriv1$y) }
-        max_slope.index <- which.max(deriv1$y)
-        spline <- spline.test
+        # spline.test <- spline success <- TRUE
+        # }
+        # }
+        # } else {
+        # max_slope.index <- which.max(deriv1$y)
+        # }
+        max_slope.index <- which.max(deriv1$y) # index of data point with maximum growth rate in first derivative fit
         max_slope.index.spl <- which(spline$x == deriv1$x[max_slope.index])  # index of data point with maximum slope in spline fit
         x.max <- deriv1$x[max_slope.index]  # x of maximum slope
         max_slope <- max(deriv1$y)  # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
         y.max <- spline$y[max_slope.index.spl]  # cell density at x of max slope
         b.spl <- y.max - max_slope * x.max  # the y-intercept of the tangent at mumax
-        lambda.spl <- -b.spl/max_slope  # lag x
+        # lambda.spl <- -b.spl/max_slope  # lag x
+        lambda.spl <- (spline$y[1] - b.spl)/max_slope  # lag x
         integral <- low.integrate(spline$x, spline$y)
 
         if (control$biphasic)
-            {
-                # determine number of data points
-                # in period until maximum density
-                n.spl <- length(x[which.min(abs(x)):which.max(fl_data)])
-                # Find local minima that frame
-                # max_slope and remove the 'peak'
-                # from deriv1
-                n <- round((log(n.spl + 4, base = 2.1))/0.75)/2
-                minima <- inflect(deriv1$y, threshold = n)$minima
-                if (length(minima) >
-                  0)
-                  {
-                  if (length(minima) >
-                    1)
-                    {
-                    for (i in 1:(length(minima) -
-                      1))
-                      {
-                      if (any(
-                        minima[i]:minima[i + 1] %in%
-                          max_slope.index
-                    ))
-                        {
-                        min.ndx <- c(minima[i], minima[i + 1])
-                      } else if (any(
-                        minima[i]:length(spline$x) %in%
-                          max_slope.index
-                    ))
-                        {
-                        min.ndx <- c(minima[i], length(spline$x))
-                      } else if (any(1:minima[i] %in% max_slope.index))
-                        {
-                        min.ndx <- c(1, minima[i])
-                      }
-                    }
-                  } else if (any(
-                    minima:length(spline$x) %in%
-                      max_slope.index
-                ))
-                    {
-                    min.ndx <- c(minima, length(spline$x))
-                  } else if (any(1:minima %in% max_slope.index))
-                    {
-                    min.ndx <- c(1, minima)
-                  }
-                }
-                if (exists("min.ndx"))
-                  {
-                  deriv1.2 <- deriv1
-                  deriv1.2$y[min.ndx[1]:min.ndx[2]] <- 0
-                  # find second max_slope
-                  max_slope2.index <- which.max(deriv1.2$y)  # index of data point with maximum slope in first derivative fit
-                  max_slope2.index.spl <- which(spline$x == deriv1.2$x[max_slope2.index])  # index of data point with maximum slope in spline fit
-                  x.max2 <- deriv1.2$x[max_slope2.index]  # x of maximum slope
-                  max_slope2 <- max(deriv1.2$y)  # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
-                  y.max2 <- spline$y[max_slope2.index.spl]  # cell density at x of max slope
-                  b.spl2 <- y.max2 - max_slope2 * x.max2  # the y-intercept of the tangent at mumax
-                  lambda.spl2 <- -b.spl2/max_slope2  # lag x
-                  fitFlag2 <- TRUE
-                } else
+        {
+          # determine number of data points
+          # in period until maximum density
+          n.spl <- length(x[which.min(abs(x)):which.max(fl_data)])
+          # Find local minima that frame
+          # max_slope and remove the 'peak'
+          # from deriv1
+          n <- round((log(n.spl + 4, base = 2.1))/0.75)/2
+          minima <- inflect(deriv1$y, threshold = n)$minima
+          # consider only minima with a slope value of <= 0.75 * max_slope
+          minima <- minima[deriv1$y[minima] <= 0.75 * max_slope]
+
+          minima <- c(1, minima)
+          if (length(minima) > 0) {
+            if (length(minima) > 1) {
+              for (i in 1:(length(minima) -
+                           1))
+              {
+                if (any(minima[i]:minima[i + 1] %in% max_slope.index))
                 {
-                  max_slope2.index <- NA
-                  max_slope2.index.spl <- NA
-                  x.max2 <- NA
-                  max_slope2 <- NA
-                  y.max2 <- NA
-                  b.spl2 <- NA
-                  lambda.spl2 <- NA
-                  fitFlag2 <- FALSE
+                  min.ndx <- c(minima[i], minima[i + 1])
+                } else if (any(minima[i]:length(spline$x) %in% max_slope.index))
+                {
+                  min.ndx <- c(minima[i], length(spline$x))
                 }
-            }  # if(control$biphasic)
- else
+              }
+            } else if (any(minima:length(spline$x) %in%
+                           max_slope.index)
+            )
+            {
+              min.ndx <- c(minima, length(spline$x))
+            } else if (any(1:minima %in% max_slope.index))
+            {
+              min.ndx <- c(1, minima)
+            }
+          }
+          if (exists("min.ndx"))
+          {
+            deriv1.2 <- deriv1
+            deriv1.2$y[min.ndx[1]:min.ndx[2]] <- 0
+            # find second max_slope
+            max_slope2 <- max(deriv1.2$y)  # maximum value of first derivative of spline fit (i.e., greatest slope in fluorescence curve spline fit)
+
+            # accept second max_slope only if it is at least 10% of the global max_slope
+            if (max_slope2 >= 0.1 * max_slope)
+            {
+              max_slope2.index <- which.max(deriv1.2$y)  # index of data point with maximum slope in first derivative fit
+              max_slope2.index.spl <- which(spline$x == deriv1.2$x[max_slope2.index])  # index of data point with maximum slope in spline fit
+              x.max2 <- deriv1.2$x[max_slope2.index]  # x of maximum slope
+              y.max2 <- spline$y[max_slope2.index.spl]  # cell density at x of max slope
+              b.spl2 <- y.max2 - max_slope2 * x.max2  # the y-intercept of the tangent at mumax
+              # lambda.spl2 <- -b.spl2/max_slope2  # lag x
+              lambda.spl2 <- (spline$y[1] - b.spl2)/max_slope2  # lag time
+              fitFlag2 <- TRUE
+            } else {
+              max_slope2.index <- NA
+              max_slope2.index.spl <- NA
+              x.max2 <- NA
+              max_slope2 <- NA
+              y.max2 <- NA
+              b.spl2 <- NA
+              lambda.spl2 <- NA
+              fitFlag2 <- FALSE
+            }
+          } else
+          {
+            max_slope2.index <- NA
+            max_slope2.index.spl <- NA
+            x.max2 <- NA
+            max_slope2 <- NA
+            y.max2 <- NA
+            b.spl2 <- NA
+            lambda.spl2 <- NA
+            fitFlag2 <- FALSE
+          }
+        }  # if(control$biphasic)
+        else
         {
             max_slope2.index <- NA
             max_slope2.index.spl <- NA
@@ -1566,8 +1512,8 @@ flFitSpline <- function(
                 "time.in"
             )
         ),
-        fl.in = fl_data.in, raw.x = get(ifelse(x_type == "density", "density", "time")),
-        raw.fl = fl_data, ID = ID, fit.x = spline$x,
+        fl.in = fl_data.in, raw.x = get(ifelse(x_type == "density", "density.raw", "time.raw")),
+        raw.fl = fl_data.raw, ID = ID, fit.x = spline$x,
         fit.fl = spline$y, parameters = list(
             A = if (control$log.y.spline == TRUE)
             {

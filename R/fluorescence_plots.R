@@ -300,6 +300,9 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the x-axis of both fluorescence curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.deriv (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{axisTicks()}. Thus, the final number of breaks can deviate from the user input.
+#' @param y.title (Character) Optional: Provide a title for the y-axis of the growth curve plot.
+#' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
+#' @param y.title.deriv (Character) Optional: Provide a title for the y-axis of the derivative plot.
 #' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
 #' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
 #' @param height (Numeric) Height of the exported image in inches.
@@ -338,16 +341,20 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = F, basesize = 16,
                              pch=1, colData=1, colSpline="dodgerblue3", cex.point=2, lwd = 0.7,
                              y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,  n.ybreaks = 6,
+                             y.title = NULL, x.title = NULL, y.title.deriv = NULL,
                              plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
                              out.dir = NULL, ...)
   {
   flFitSpline <- x
+  n.ybreaks <- as.numeric(n.ybreaks)
+  # x an object of class flFitSpline
   if(methods::is(flFitSpline) != "flFitSpline") stop("x needs to be an object created with flFitSpline().")
   # /// check input parameters
   if (is.logical(add)==FALSE)   stop("Need logical value for: add")
   if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
+  if (is.logical(deriv)==FALSE) stop("Need logical value for: deriv")
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex.point")
+  if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
 
   suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
   if(all(is.na(x.lim))) x.lim <- NULL
@@ -360,48 +367,49 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
   if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE)){
     warning("plot.flFitSpline: no data fit available!")
   }
-  else{
-    if (add==TRUE){
-      if(spline == TRUE){
-        # /// try to plot data fit
-        if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==FALSE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
-        }
 
-        if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==TRUE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
-        }
-
-        if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==FALSE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
-        }
-
-        if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==TRUE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
-        }
-        # /// add tangent at maximum slope
-        if (slope==TRUE){
-          mu     <- as.numeric(flFitSpline$parameters$max_slope)
-          lambda <- as.numeric(flFitSpline$parameters$lambda)
-
-          x <- seq(lambda, max(flFitSpline$"fit.x"), length=200)
-          y_tangent <- flFitSpline$parameters["b.tangent"][[1]]+x*mu
-          try(lines(x, y_tangent, lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.85), ...))
-          try(lines(c(min(flFitSpline$"raw.x"[1]), lambda), rep(flFitSpline$"raw.fl"[1], 2), lty=2, lwd=2.8*lwd, col=ggplot2::alpha(colSpline, 0.7)))
-        }
+  if (add==TRUE){
+    if(spline == TRUE){
+      # /// try to plot data fit
+      if ((flFitSpline$control$log.x.gc==FALSE) && (flFitSpline$control$log.y.spline==FALSE)){
+        try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
       }
-      if (deriv  == TRUE){
-        if ((flFitSpline$control$log.x.spline==FALSE)){
-          try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline, lwd=2.8*lwd) )
-        }
-        if ((flFitSpline$control$log.x.spline==TRUE)){
-          try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline, lwd=2.8*lwd) )
-        }
+
+      if ((flFitSpline$control$log.x.gc==FALSE) && (flFitSpline$control$log.y.spline==TRUE)){
+        try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
       }
-    } # if (add == TRUE)
-    else {
+
+      if ((flFitSpline$control$log.x.gc==TRUE)  && (flFitSpline$control$log.y.spline==FALSE)){
+        try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
+      }
+
+      if ((flFitSpline$control$log.x.gc==TRUE)  && (flFitSpline$control$log.y.spline==TRUE)){
+        try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+      }
+      # /// add tangent at maximum slope
+      if (slope==TRUE){
+        max_slope     <- as.numeric(flFitSpline$parameters$max_slope)
+        lambda <- as.numeric(flFitSpline$parameters$lambda)
+
+        time <- seq(lambda, max(flFitSpline$"fit.x"), length=200)
+        y_tangent <- flFitSpline$parameters["b.tangent"][[1]]+time*max_slope
+        try(lines(time, y_tangent, lty=2, lwd= 2.8*lwd, col=ggplot2::alpha(colSpline, 0.85), ...))
+        try(lines(c(min(flFitSpline$"raw.x"[1]), lambda), rep(flFitSpline$"raw.fl"[1], 2), lty=2, lwd=2.8*lwd, col=ggplot2::alpha(colSpline, 0.7)))
+      }
+    }
+    if (deriv  == TRUE){
+      if ((flFitSpline$control$log.x.gc==FALSE)){
+        try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, lwd=2.8*lwd, xlab="", ylab="", col = colSpline) )
+      }
+      if ((flFitSpline$control$log.x.gc==TRUE)){
+        try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, lwd=2.8*lwd, xlab="", ylab="", col = colSpline) )
+      }
+    }
+  } # if (add == TRUE)
+  else {
+    if(flFitSpline$fitFlag == TRUE){
       coef <- flFitSpline[["parameters"]]
-      lag <- coef["lambda"][[1]][1]
+      lagtime <- coef["lambda"][[1]][1]
       # correct for log transformation
       if(flFitSpline$control$log.y.spline == TRUE){
         fit.fl <-
@@ -410,19 +418,16 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       } else {
         fit.fl <- c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), flFitSpline[["fit.fl"]])
       }
-
       if(flFitSpline$control$log.y.spline == TRUE){
-
-        df.raw <- data.frame("x" = flFitSpline[["x.in"]],
-                             "data" = exp(flFitSpline[["fl.in"]])*flFitSpline[["fl.in"]][1])
-        df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
-                             "fit.fl" = fit.fl)
-      } else {
-
-        df.raw <- data.frame("x" = flFitSpline[["x.in"]],
-                             "data" = flFitSpline[["fl.in"]])
-        df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
-                             "fit.fl" = fit.fl)
+        df <- data.frame("time" = flFitSpline[["raw.x"]],
+                         "data" = exp(flFitSpline[["raw.fl"]])*flFitSpline[["fl.in"]][1],
+                         "fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
+                         "fit.fl" = fit.fl)
+      } else{
+        df <- data.frame("time" = flFitSpline[["raw.x"]],
+                         "data" = flFitSpline[["raw.fl"]],
+                         "fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
+                         "fit.fl" = fit.fl)
       }
 
       x.label = if(flFitSpline$control$x_type == "density"){
@@ -435,13 +440,456 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       } else {
         "Fluorescence"
       }
-      p <- ggplot(NULL, aes(x=.data$x, y=.data$data)) +
-        geom_line(aes(x=.data$fit.x, y = .data$fit.fl, color = "spline"), data = df.fit, size = lwd) +
-        xlab(x.label) +
-        ylab(label = y.label) +
+
+      p <- ggplot(df, aes(x=.data$time, y=.data$data)) +
+        geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData) +
+        geom_line(aes(x=.data$fit.x, y = .data$fit.fl, color = "spline"), size = lwd) +
+        xlab(ifelse(is.null(x.title), x.label, x.title)) +
+        ylab(ifelse(is.null(y.title), y.label, y.title)) +
         theme_classic(base_size = basesize) +
-        ggtitle(gsub(" \\| NA", "", paste(flFitSpline$ID, collapse=" | "))) +
-        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+        ggtitle(gsub(" \\| NA", "", paste(flFitSpline$gcID, collapse=" | "))) +
+        theme(legend.key = element_blank(),
+              legend.background=element_blank(),
+              legend.title = element_blank(),
+              legend.position = c(0.90, 0.08),
+              plot.title = element_text(size = basesize*1.1, face = "bold", vjust = 3),
+              plot.subtitle = element_text(size = basesize*0.8),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              plot.margin = unit(c(1,2,1,1), "lines")) +
+        scale_color_manual(name='Fluorescence fit',
+                           breaks = "Spline fit",
+                           values=c("spline" = ggplot2::alpha(colSpline, 0.7), "Spline fit" = ggplot2::alpha(colSpline, 0.7)))
+
+      if(log.y == TRUE){
+        if(!is.null(y.lim)){
+          if(!is.na(y.lim[1]) && y.lim[1] <= 0){
+            message("A lower y axis limit of <= 0 is not supported for log scaling. Lower limit set to 0.001")
+            y.lim[1] <- 0.001
+          }
+          p <- p + scale_y_continuous(limits = y.lim, breaks = base_breaks(n = n.ybreaks), trans = 'log')
+        } else {
+          p <- p + scale_y_continuous(breaks = base_breaks(n = n.ybreaks), trans = 'log')
+        }
+      } else {
+        if(!is.null(y.lim)){
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks))
+        } else {
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
+        }
+      }
+
+
+      p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+
+      if(!is.null(x.lim)){
+        p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+      } else {
+        p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+      }
+
+      x_limit <- ggplot_build(p)$layout$panel_params[[1]]$x.range
+      y_limit <- ggplot_build(p)$layout$panel_params[[1]]$y.range
+      y_limit[2] <- max(df$data)
+
+      p <- p +
+        # annotate(
+        #   "text",
+        #   label = paste("t0:", flFitSpline$control$t0, "  min.density:", flFitSpline$control$min.density, "  smoothing:", flFitSpline$control$smooth.fl),
+        #   x = 0.5*x_limit[2],
+        #   y = ifelse(!is.null(y.lim) && !is.na(y.lim[2]), 1.05 * y.lim[2], 1.3 * y_limit[2]),
+        #   angle = 0, parse = F, size = basesize*3.2/12) +
+        labs(subtitle = paste("t0:", flFitSpline$control$t0,
+                              " tmax:", flFitSpline$control$tmax,
+                              "  min.density:", flFitSpline$control$min.density,
+                              "  max.density:", flFitSpline$control$max.density,
+                              "  smoothing:", flFitSpline$control$smooth.fl)
+        ) +
+        annotate(
+          "text",
+          label = list(bquote(slope[max]: ~ .(round(flFitSpline$parameters$max_slope, digits = 3))~~~~
+                                lambda: ~ .(round(flFitSpline$parameters$lambda, digits = 3))~~~~
+                                t[max]: ~ .(round(flFitSpline$parameters$x.max, digits = 2)))),
+          x = 1.02*x_limit[2],
+          y = 0.1 * ifelse(!is.null(y.lim) && !is.na(y.lim[2]), y.lim[2], y_limit[2]),
+          angle = 90, parse = T, size = basesize*3.2/12)
+      if(!is.null(y.lim) && !is.na(y.lim[2])){
+        p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y.lim[2]), clip = "off")
+      } else {
+        p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y_limit[2]), clip = "off")
+      }
+
+      # annotate(
+      #   "text",
+      #   label = paste("t0:", flFitSpline$control$t0, "  min.density:", flFitSpline$control$min.density, "  smoothing:", flFitSpline$control$smooth.fl),
+      #   x = 19,
+      #   y = 0.1 * y_limit[2],
+      #   angle = 90, parse = FALSE, size = basesize*3.2/12) +
+      #   coord_cartesian(xlim = c(x_limit[1], x_limit[2]), clip = "off")
+
+      # /// add tangent at maximum slope
+      if(slope == TRUE && log.y == TRUE){
+        max_slope     <- as.numeric(coef$max_slope[1])
+        if(flFitSpline$fitFlag2){
+          lagtime2 <- coef$lambda2
+          growth.time <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
+          max_slope2 <- coef$max_slope2
+          if(lagtime2 < lagtime && lagtime2 > flFitSpline$raw.x[1]){
+            # time values for tangent at mumax
+            time_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*growth.time)))
+            time_start <- flFitSpline$fit.x[time_start.ndx]
+            time <- seq(time_start, max(flFitSpline$fit.x), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (max_slope*time)
+            }
+            time <- time[bla >= 0.6* flFitSpline$fl.in[1]][bla <= 1.15 * max(flFitSpline$fit.fl)]
+            bla <- bla[bla >= 0.6* flFitSpline$fl.in[1]][bla <= 1.15 * max(flFitSpline$fit.fl)]
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+            # time values for tangent at mumax2
+            time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(flFitSpline$"fit.x"), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (max_slope2*time2)
+            }
+            time2 <- time2[bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+            bla2 <- bla2[bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+            df.horizontal2 <- data.frame("time" = c(flFitSpline[["raw.x"]][1], lagtime2),
+                                         "y" = if(flFitSpline$control$log.y.spline){
+                                           exp(flFitSpline[["fit.fl"]][1])*flFitSpline[["fl.in"]][1]
+                                         } else {
+                                           flFitSpline[["fit.fl"]][1]
+                                         })
+
+            if(flFitSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+            }
+
+            if(!(lagtime2 <0)){
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+            }
+          } # if(lagtime2 < lagtime)
+          else {
+            # time values for tangent at mumax
+            time <- seq(ifelse(lagtime<0, 0, lagtime), max(flFitSpline$"fit.x"), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (max_slope*time)
+            }
+            time <- time[bla <= 1.15 * max(flFitSpline$fit.fl)]
+            bla <- bla[bla <= 1.15 * max(flFitSpline$fit.fl)]
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+
+            df.horizontal <- data.frame("time" = c(flFitSpline[["raw.x"]][1], lagtime),
+                                        "y" = if(flFitSpline$control$log.y.spline){
+                                          exp(flFitSpline[["fit.fl"]][1])*flFitSpline[["fl.in"]][1]
+                                        } else {
+                                          flFitSpline[["fit.fl"]][1]
+                                        })
+
+            # time values for tangent at mumax2
+            time2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*growth.time)))
+            time2_start <- flFitSpline$fit.x[time2_start.ndx]
+            time2 <- seq(time2_start, max(flFitSpline$"fit.x"), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (max_slope2*time2)
+            }
+            time2 <- time2[bla2 >= 0.6* flFitSpline$fl.in[1]][bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+            bla2 <- bla2[bla2 >= 0.6* flFitSpline$fl.in[1]][bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+
+            if(flFitSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 2*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 2*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.9*lwd)
+
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 3.5*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 3.5*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.9*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+            }
+
+            if(!(lagtime <0)){
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+            }
+          }
+        } # if(flFitSpline$fitFlag2)
+        else {
+          # time values for tangent
+          time <- seq(ifelse(lagtime<0, 0, lagtime), max(flFitSpline$"fit.x"), length=200)
+          # y values for tangent
+          if(flFitSpline$control$log.y.spline){
+            bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope*time)
+          } else {
+            bla <- coef["b.tangent"][[1]] + (max_slope*time)
+          }
+          time <- time[bla <= 1.15 * max(flFitSpline$fit.fl)]
+          bla <- bla[bla <= 1.15 * max(flFitSpline$fit.fl)]
+
+          tangent.df <- data.frame("time" = time,
+                                   "y" = bla)
+          df.horizontal <- data.frame("time" = c(flFitSpline[["raw.x"]][1], lagtime),
+                                      "y" = if(flFitSpline$control$log.y.spline){
+                                        exp(flFitSpline[["fit.fl"]][1])*flFitSpline[["fl.in"]][1]
+                                      } else {
+                                        flFitSpline[["fit.fl"]][1]
+                                      })
+
+          if(flFitSpline$control$log.y.spline){
+            p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                      xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+          }
+          else {
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+          }
+
+          if(!(lagtime <0)){
+            p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+          }
+        } # else of if(flFitSpline$fitFlag2)
+      } # if(slope == TRUE && log.y == TRUE)
+
+      # /// add tangent at maximum slope
+      if(slope == TRUE && log.y == FALSE){
+        max_slope     <- as.numeric(coef$max_slope[1])
+        if(flFitSpline$fitFlag2){
+          lagtime2 <- coef$lambda2
+          growth.time <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
+          max_slope2 <- coef$max_slope2
+          if(lagtime2 < lagtime && lagtime2 > flFitSpline$raw.x[1]){
+            # time values for tangent at mumax
+            time_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*growth.time)))
+            time_start <- flFitSpline$fit.x[time_start.ndx]
+            time <- seq(time_start, max(flFitSpline$fit.x), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (max_slope*time)
+            }
+            time <- time[bla >= 0.6* flFitSpline$fl.in[1]][bla <= 1.15 * max(flFitSpline$fit.fl)]
+            bla <- bla[bla >= 0.6* flFitSpline$fl.in[1]][bla <= 1.15 * max(flFitSpline$fit.fl)]
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+            # time values for tangent at mumax2
+            time2 <- seq(ifelse(lagtime2<0, 0, lagtime2), max(flFitSpline$"fit.x"), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (max_slope2*time2)
+            }
+            time2 <- time2[bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+            bla2 <- bla2[bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+            df.horizontal2 <- data.frame("time" = c(flFitSpline[["raw.x"]][1], lagtime2),
+                                         "y" = if(flFitSpline$control$log.y.spline){
+                                           exp(flFitSpline[["fit.fl"]][1])*flFitSpline[["fl.in"]][1]
+                                         } else {
+                                           flFitSpline[["fit.fl"]][1]
+                                         })
+
+            if(flFitSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+            }
+
+            if(!(lagtime2 <0)){
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+            }
+          } # if(lagtime2 < lagtime)
+          else {
+            # time values for tangent at mumax
+            time <- seq(ifelse(lagtime<0, 0, lagtime), max(flFitSpline$"fit.x"), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope*time)
+            } else {
+              bla <- coef["b.tangent"][[1]] + (max_slope*time)
+            }
+            time <- time[bla <= 1.15 * max(flFitSpline$fit.fl)]
+            bla <- bla[bla <= 1.15 * max(flFitSpline$fit.fl)]
+            tangent.df <- data.frame("time" = time,
+                                     "y" = bla)
+            df.horizontal <- data.frame("time" = c(flFitSpline[["raw.x"]][1], lagtime),
+                                        "y" = if(flFitSpline$control$log.y.spline){
+                                          exp(flFitSpline[["fit.fl"]][1])*flFitSpline[["fl.in"]][1]
+                                        } else {
+                                          flFitSpline[["fit.fl"]][1]
+                                        })
+            # time values for tangent at mumax2
+            time2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*growth.time)))
+            time2_start <- flFitSpline$fit.x[time2_start.ndx]
+            time2 <- seq(time2_start, max(flFitSpline$"fit.x"), length=200)
+            # y values for tangent at mumax
+            if(flFitSpline$control$log.y.spline){
+              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope2*time2)
+            } else {
+              bla2 <- coef["b.tangent2"][[1]] + (max_slope2*time2)
+            }
+            time2 <- time2[bla2 >= 0.6* flFitSpline$fl.in[1]][bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+            bla2 <- bla2[bla2 >= 0.6* flFitSpline$fl.in[1]][bla2 <= 1.15 * max(flFitSpline$fit.fl)]
+            tangent.df2 <- data.frame("time" = time2,
+                                      "y" = bla2)
+
+            if(!flFitSpline$control$log.y.spline){
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+
+              p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
+            }
+            else {
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+            }
+
+            if(!(lagtime <0)){
+              p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+            }
+          }
+        } # if(flFitSpline$fitFlag2)
+        else {
+          # time values for tangent
+          time <- seq(ifelse(lagtime<0, 0, lagtime), max(flFitSpline$"fit.x"), length=200)
+          # y values for tangent
+          if(flFitSpline$control$log.y.spline){
+            bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["fl.in"]][1])*exp(max_slope*time)
+          } else {
+            bla <- coef["b.tangent"][[1]] + (max_slope*time)
+          }
+          time <- time[bla <= 1.15 * max(flFitSpline$fit.fl)]
+          bla <- bla[bla <= 1.15 * max(flFitSpline$fit.fl)]
+          tangent.df <- data.frame("time" = time,
+                                   "y" = bla)
+          df.horizontal <- data.frame("time" = c(flFitSpline[["raw.x"]][1], lagtime),
+                                      "y" = if(flFitSpline$control$log.y.spline){
+                                        exp(flFitSpline[["fit.fl"]][1])*flFitSpline[["fl.in"]][1]
+                                      } else {
+                                        flFitSpline[["fit.fl"]][1]
+                                      })
+          if(!flFitSpline$control$log.y.spline){
+            p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
+                                      xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
+                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+          }
+          else {
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+          }
+          if(!(lagtime <0)){
+            p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+          }
+        } # else of if(flFitSpline$fitFlag2)
+      } # if(slope == TRUE && log.y == TRUE)
+
+      # /// add panel with growth rate over time
+      if(deriv == TRUE){
+        df.max_slope <- data.frame(spline(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y))
+        #add missing time values due to min.density and t0
+        df.max_slope <-
+          dplyr::bind_rows(data.frame("x" = df$time[is.na(df$fit.fl)], "y" = rep(NA, length(df$time[is.na(df$fit.fl)]))),
+                           df.max_slope)
+
+        p.max_slope <- ggplot(df.max_slope, aes(x=.data$x, y=.data$y)) +
+          geom_line(color = colSpline, size = lwd) +
+          theme_classic(base_size = basesize) +
+          xlab(ifelse(is.null(x.title), x.label, x.title)) +
+          ylab(ifelse(is.null(y.title.deriv), "Slope", y.title.deriv)) +
+          coord_cartesian(xlim = c(0, x_limit[2]*0.95), clip = "off")
+
+        if(!is.null(y.lim.deriv)){
+          p.max_slope <- p.max_slope + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 6))
+        } else {
+          p.max_slope <- p.max_slope + scale_y_continuous(breaks = scales::pretty_breaks(n = 6))
+
+        }
+        if(!is.null(x.lim)){
+          p.max_slope <- p.max_slope + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+        } else {
+          p.max_slope <- p.max_slope + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
+        }
+
+        p <- suppressWarnings(
+          ggpubr::ggarrange(p, p.max_slope, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1))
+        )
+      }
+    } #if(flFitSpline$fitFlag == TRUE)
+    else {
+      if(flFitSpline$control$log.y.spline == TRUE){
+        df <- data.frame("time" = flFitSpline[["raw.x"]],
+                         "data" = exp(flFitSpline[["raw.fl"]])*flFitSpline[["fl.in"]][1]
+        )
+      } else{
+        df <- data.frame("time" = flFitSpline[["raw.x"]],
+                         "data" = flFitSpline[["raw.fl"]]
+        )
+      }
+
+
+      p <- ggplot(df, aes(x=.data$time, y=.data$data)) +
+        geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData) +
+        xlab(ifelse(is.null(x.title), x.label, x.title)) +
+        ylab(ifelse(is.null(y.title), y.label, y.title)) +
+        theme_classic(base_size = basesize) +
+        ggtitle(gsub(" \\| NA", "", paste(flFitSpline$gcID, collapse=" | "))) +
         theme(legend.key = element_blank(),
               legend.background=element_blank(),
               legend.title = element_blank(),
@@ -450,12 +898,9 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
               plot.margin = unit(c(1,2,1,1), "lines")) +
-        scale_color_manual(name='Fluorescence Fit',
+        scale_color_manual(name='Fluorescence fit',
                            breaks = "Spline fit",
                            values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
-      if(raw){
-        p <- p + geom_point(shape=pch, data = df.raw, size = cex.point, alpha = 0.6, stroke=0.15)
-      }
 
 
       p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
@@ -473,21 +918,12 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       p <- p +
         annotate(
           "text",
-          label = bquote(slope[max]: ~ .(round(coef$max_slope, digits = 3))~~~~
-                           lambda: ~ .(round(coef$lambda, digits = 3))~~~~
-                           x[max]: ~ .(round(coef$x.max, digits = 2))),
-          x = 1.01*x_limit[2],
-          y = 0.5 * y_limit[2],
-          angle = 90, parse = F, size = basesize*3.2/12) +
+          label = paste("t0:", flFitSpline$control$t0, "  min.density:", flFitSpline$control$min.density, "  smoothing:", flFitSpline$control$smooth.fl),
+          x = 0.5*x_limit[2],
+          y = 1.3 * y_limit[2],
+          angle = 0, parse = FALSE, size = basesize*3.2/12) +
         coord_cartesian(xlim = c(0, x_limit[2]*0.95), ylim = c(y_limit[1], y_limit[2]), clip = "off")
 
-      # p <- p +
-      #   annotate(
-      #     "text",
-      #     label = paste("t0:", flFittedSpline$control$t0, "  min.density:", flFittedSpline$control$min.density, "  smoothing:", flFittedSpline$control$smooth.gc),
-      #     x = 0.5 * ggplot_build(p)$layout$panel_params[[1]]$x.range[2],
-      #     y = 1.2 * ggplot_build(p)$layout$panel_params[[1]]$y.range[2],
-      #     angle = 0, parse = F, size = 3.2)
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
@@ -502,161 +938,11 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
         }
       }
+    }
 
-
-      # /// add tangent at maximum slope
-      if(slope == TRUE && (flFitSpline$control$log.y.spline==F && log.y == F) ||
-         (flFitSpline$control$log.y.spline==T && log.y == TRUE)){
-        mu     <- as.numeric(coef$max_slope[1])
-        if(flFitSpline$fitFlag2){
-          lag2 <- coef$lambda2
-          fl.x <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
-          mu2 <- coef$max_slope2
-          if(lag2 < lag){
-            # x values for tangent at mumax
-            x_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*fl.x)))
-            x_start <- flFitSpline$fit.x[x_start.ndx]
-            x <- seq(x_start, max(flFitSpline$fit.x), length=200)
-            # y values for tangent at mumax
-            if(flFitSpline$control$log.y.spline){
-              bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
-            } else {
-              bla <- coef["b.tangent"][[1]] + (mu*x)
-            }
-            tangent.df <- data.frame("x" = x,
-                                     "y" = bla)
-            # x values for tangent at mumax2
-            x2 <- seq(ifelse(lag2<0, 0, lag2), max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at mumax
-            if(flFitSpline$control$log.y.spline){
-              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
-            } else {
-              bla2 <- coef["b.tangent2"][[1]] + (mu2*x2)
-            }
-            tangent.df2 <- data.frame("x" = x2,
-                                      "y" = bla2)
-            df.horizontal2 <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag2),
-                                         "y" = flFitSpline[["raw.fl"]][1])
-
-            p <- p + geom_segment(aes(x = .data$x[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
-                                      xend = .data$x[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
-            p <- p + geom_segment(aes(x = .data$x[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
-                                      xend = .data$x[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
-
-            if(!(lag2 <0)){
-              p <- p + geom_segment(aes(x = .data$x[1], y = .data$y[1], xend = .data$x[2], yend = .data$y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
-            }
-          } # if(lag2 < lag)
-          else {
-            # x values for tangent at mumax
-            x <- seq(ifelse(lag<0, 0, lag), max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at mumax
-            if(flFitSpline$control$log.y.spline){
-              bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
-            } else {
-              bla <- coef["b.tangent"][[1]] + (mu*x)
-            }
-            tangent.df <- data.frame("x" = x,
-                                     "y" = bla)
-            df.horizontal <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag),
-                                        "y" = flFitSpline[["raw.fl"]][1])
-            # x values for tangent at mumax2
-            x2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*fl.x)))
-            x2_start <- flFitSpline$fit.x[x2_start.ndx]
-            x2 <- seq(x2_start, max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at mumax
-            if(flFitSpline$control$log.y.spline){
-              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
-            } else {
-              bla2 <- coef["b.tangent2"][[1]] + (mu2*x2)
-            }
-            tangent.df2 <- data.frame("x" = x2,
-                                      "y" = bla2)
-
-            p <- p + geom_segment(aes(x = .data$x[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
-                                      xend = .data$x[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
-            p <- p + geom_segment(aes(x = .data$x[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
-                                      xend = .data$x[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.7*lwd)
-
-            # if(!(lag <0)){
-            #   p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
-            #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-            # }
-          }
-        } # if(flFitSpline$fitFlag2)
-        else {
-          # x values for tangent
-          x <- seq(ifelse(lag<0, 0, lag), max(flFitSpline$"fit.x"), length=200)
-          # y values for tangent
-          if(flFitSpline$control$log.y.spline){
-            bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
-          } else {
-            bla <- coef["b.tangent"][[1]] + (mu*x)
-          }
-          tangent.df <- data.frame("x" = x,
-                                   "y" = bla)
-          df.horizontal <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag),
-                                      "y" = flFitSpline[["raw.fl"]][1])
-          p <- p + geom_segment(aes(x = .data$x[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
-                                    xend = .data$x[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                    yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.7*lwd)
-          # if(!(lag <0)){
-          #   p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
-          #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-          # }
-        } # else of if(flFitSpline$fitFlag2)
-      } # if(slope == TRUE && log.y == TRUE)
-
-      # /// add panel with growth rate over x
-      if(deriv == TRUE){
-        df.mu <- data.frame(spline(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y))
-        #add missing x values due to min.density and t0
-        x.missing <- df.raw[df.raw$x < df.mu$x[1], ]$x
-        df.mu <-
-          dplyr::bind_rows(data.frame("x" = x.missing, "y" = rep(NA, length(x.missing))),
-                    df.mu)
-
-        y.label.mu = if(flFitSpline$control$log.y.spline == TRUE){
-          paste0("Slope [d(Ln(F/F0))/d",x.label, "]")
-        } else {
-          paste0("Slope [dF/d", x.label,"]")
-        }
-        p.mu <- ggplot(df.mu, aes(x=.data$x, y=.data$y)) +
-          geom_line(color = colSpline, size = lwd) +
-          theme_classic(base_size = basesize) +
-          xlab(x.label) +
-          ylab(label = y.label.mu) +
-          coord_cartesian(xlim = c(0, x_limit[2]*0.95), clip = "off")
-
-        if(!is.null(y.lim.deriv)){
-          p.mu <- p.mu + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 10))
-        } else {
-          p.mu <- p.mu + scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
-
-        }
-        if(!is.null(x.lim)){
-          p.mu <- p.mu + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
-        } else {
-          p.mu <- p.mu + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
-        }
-
-        p <- suppressWarnings( ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1)) )
-
-      }
-
-      if(export == FALSE && plot == FALSE){
-        return(p)
-      }
+    if(export == FALSE && plot == FALSE){
+      invisible(p)
+    }
       if (export == TRUE){
         w <- width
         h <- height
@@ -677,9 +963,11 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       }
       if (plot == TRUE){
         print(p)
+      } else {
+        invisible(p)
       }
     } # else of if (add == TRUE)
-  } # else of if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE))
+
 }
 
 

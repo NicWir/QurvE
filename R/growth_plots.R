@@ -2397,7 +2397,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
         #   y = ifelse(!is.null(y.lim) && !is.na(y.lim[2]), 1.05 * y.lim[2], 1.3 * y_limit[2]),
         #   angle = 0, parse = F, size = basesize*3.2/12) +
         labs(subtitle = paste("t0:", gcFittedSpline$control$t0,
-                              " tmax", gcFittedSpline$control$tmax,
+                              " tmax:", gcFittedSpline$control$tmax,
                               "  min.density:", gcFittedSpline$control$min.density,
                               "  max.density:", gcFittedSpline$control$max.density,
                               "  smoothing:", gcFittedSpline$control$smooth.gc)
@@ -2525,14 +2525,14 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 
             if(gcFittedSpline$control$log.y.spline){
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
-                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+                                        xend = .data$time[which.min(abs(.data$y - 2*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 2*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.9*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
-                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
+                                        xend = .data$time[which.min(abs(.data$y - 3.5*p.yrange.end))],
+                                        yend = .data$y[which.min(abs(.data$y - 3.5*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.9*lwd)
             }
             else {
               p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)

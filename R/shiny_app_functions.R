@@ -314,12 +314,10 @@ parse_data_shiny <-
       # Remove any columns between time and 'A1' (for plate readers)
       A1.ndx <- match("A1", data.ls[[noNA.ndx[1]]][1,])
       if(A1.ndx>2){
-        for(i in 1:length(data.ls)){
-          if(length(data.ls[[i]]) > 1){
-            data.ls[[i]] <- data.ls[[i]][ ,c(1,A1.ndx:ncol(data.ls[[i]]))]
-          }
-        }
+        data.ls <- lapply(noNA.ndx, function(x) data.ls[[x]][ ,c(1,A1.ndx:ncol(data.ls[[x]]))])
       }
+    } else {
+      data.ls <-data.ls[noNA.ndx]
     }
 
     # apply identifiers specified in mapping file
@@ -327,18 +325,24 @@ parse_data_shiny <-
       if(!is.null(mapping)){
         # assign names to samples
         map.ndx <- match(data.ls[[i]][1,1:ncol( data.ls[[i]])], mapping[2:nrow(mapping),1])+1
-        names <- mapping[map.ndx, 2]
-        names <- names[2:length(names)]
-        data.ls[[i]][1,2:ncol( data.ls[[i]])] <- names
-        # assign replicate numbers to samples
-        replicates <- mapping[map.ndx, 3]
-        replicates <- as.numeric(replicates[2:length(replicates)])
-        data.ls[[i]] <- rbind(data.ls[[i]][1,], c(NA,replicates), data.ls[[i]][-1,])
-        # assign concentrations to samples
-        # assign replicate numbers to samples
-        conc <- mapping[map.ndx, 4]
-        conc <- as.numeric(conc[2:length(conc)])
-        data.ls[[i]] <- rbind(data.ls[[i]][1:2,], c(NA,conc), data.ls[[i]][-(1:2),])
+        if(!all(is.na(map.ndx))){
+          names <- mapping[map.ndx, 2]
+          names <- names[2:length(names)]
+          data.ls[[i]][1,2:ncol( data.ls[[i]])] <- names
+          # assign replicate numbers to samples
+          replicates <- mapping[map.ndx, 3]
+          replicates <- as.numeric(replicates[2:length(replicates)])
+          data.ls[[i]] <- rbind(data.ls[[i]][1,], c(NA,replicates), data.ls[[i]][-1,])
+          # assign concentrations to samples
+          # assign replicate numbers to samples
+          conc <- mapping[map.ndx, 4]
+          conc <- as.numeric(conc[2:length(conc)])
+          data.ls[[i]] <- rbind(data.ls[[i]][1:2,], c(NA,conc), data.ls[[i]][-(1:2),])
+        }
+        else {
+          data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
+          data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
+        }
       } else {
         data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
         data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
@@ -581,14 +585,14 @@ parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 
   if(!is.null(fl.nm) && fl.nm != "Ignore"){
     fluorescence <-  read.data[[match(fl.nm, reads)]]
-    fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
+    fluorescence[which(fluorescence == "OVER", arr.ind = TRUE)] <- NA
   }
   else
     fluorescence <- NA
 
   if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
     fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
-    fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+    fluorescence2[which(fluorescence2 == "OVER", arr.ind = TRUE)] <- NA
   }
   else
     fluorescence2 <- NA

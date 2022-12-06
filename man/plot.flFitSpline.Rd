@@ -22,6 +22,9 @@
   x.lim = NULL,
   y.lim.deriv = NULL,
   n.ybreaks = 6,
+  y.title = NULL,
+  x.title = NULL,
+  y.title.deriv = NULL,
   plot = TRUE,
   export = FALSE,
   width = 8,
@@ -64,6 +67,12 @@
 \item{y.lim.deriv}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds on the y-axis of the derivative plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
 \item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{axisTicks()}. Thus, the final number of breaks can deviate from the user input.}
+
+\item{y.title}{(Character) Optional: Provide a title for the y-axis of the growth curve plot.}
+
+\item{x.title}{(Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.}
+
+\item{y.title.deriv}{(Character) Optional: Provide a title for the y-axis of the derivative plot.}
 
 \item{plot}{(Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.}
 

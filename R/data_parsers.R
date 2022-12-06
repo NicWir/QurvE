@@ -1163,7 +1163,7 @@ parse_tecan <- function(input)
       fluorescence <- NA
     } else {
       fluorescence <- read.data[[as.numeric(answer)]]
-      fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
+      fluorescence[which(fluorescence == "OVER", arr.ind = TRUE)] <- NA
     }
     data.ls[[1]] <- density
     data.ls[[2]] <- fluorescence
@@ -1177,7 +1177,7 @@ parse_tecan <- function(input)
         fluorescence2 <- NA
       } else {
         fluorescence2 <- read.data[[as.numeric(answer)]]
-        fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+        fluorescence2[which(fluorescence2 == "OVER", arr.ind = TRUE)] <- NA
       }
       data.ls[[3]] <- fluorescence2
     }
