@@ -393,7 +393,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
                      "fit.data" = dat.fit)
 
     p <-    ggplot(df, aes(x=.data$time, y=.data$data)) +
-      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), size = lwd) +
+      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), linewidth = lwd) +
       xlab("Time") +
       ylab(label = ifelse(gcFittedModel$control$log.y.model == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
       theme_classic(base_size = basesize) +
@@ -607,9 +607,9 @@ plot.gcFitModel <- function(x, raw = TRUE,
   #   p <- p + geom_segment(aes(x = time[which.min(abs(bla))], y = y[which.min(abs(bla))],
   #                             xend = time[which.min(abs(y - p.yrange.end))],
   #                             yend = y[which.min(abs(y - p.yrange.end))]),
-  #                         data = tangent.df, linetype = "dashed", color = colModel, size = lwd) +
+  #                         data = tangent.df, linetype = "dashed", color = colModel, linewidth = lwd) +
   #     geom_segment(aes(x = time[1], y = y[1], xend = time[2], yend = y[2]), data = df.horizontal,
-  #                  linetype = "dashed", color = colModel, size = lwd)
+  #                  linetype = "dashed", color = colModel, linewidth = lwd)
   # }
   if(export == FALSE && plot == FALSE){
     return(p)
@@ -1163,7 +1163,7 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
       p <- ggplot(data = raw.df, aes(.data$conc, .data$mean, colour = .data$Condition)) +
         geom_point(size=cex.point, position = ggplot2::position_dodge( 0.015*max(conc)), shape = pch) +
         geom_errorbar(aes(ymin = .data$CI.L, ymax = .data$CI.R), width = 0.05*max(conc), position = ggplot2::position_dodge( 0.015*max(conc))) +
-        geom_line(data = spline.df, aes(.data$x, .data$y, colour = .data$Condition), size = lwd) +
+        geom_line(data = spline.df, aes(.data$x, .data$y, colour = .data$Condition), linewidth = lwd) +
         theme_classic(base_size = basesize) +
         theme(legend.position="bottom") +
         ggplot2::guides(color=ggplot2::guide_legend(nrow=nrow, byrow=TRUE))
@@ -2340,7 +2340,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 
       p <- ggplot(df, aes(x=.data$time, y=.data$data)) +
         geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData) +
-        geom_line(aes(x=.data$fit.time, y = .data$fit.data, color = "spline"), size = lwd) +
+        geom_line(aes(x=.data$fit.time, y = .data$fit.data, color = "spline"), linewidth = lwd) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
         ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
         theme_classic(base_size = basesize) +
@@ -2478,13 +2478,13 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime2 <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
           } # if(lagtime2 < lagtime)
           else {
@@ -2535,13 +2535,13 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.9*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
             }
           }
         } # if(gcFittedSpline$fitFlag2)
@@ -2573,12 +2573,12 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
 
           if(!(lagtime <0)){
             p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
         } # else of if(gcFittedSpline$fitFlag2)
       } # if(slope == TRUE && log.y == TRUE)
@@ -2637,13 +2637,13 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime2 <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
           } # if(lagtime2 < lagtime)
           else {
@@ -2692,13 +2692,13 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
             }
           }
         } # if(gcFittedSpline$fitFlag2)
@@ -2728,11 +2728,11 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
           if(!(lagtime <0)){
             p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
         } # else of if(gcFittedSpline$fitFlag2)
       } # if(slope == TRUE && log.y == TRUE)
@@ -2746,7 +2746,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                            df.mu)
 
         p.mu <- ggplot(df.mu, aes(x=.data$x, y=.data$y)) +
-          geom_line(color = colSpline, size = lwd) +
+          geom_line(color = colSpline, linewidth = lwd) +
           theme_classic(base_size = basesize) +
           xlab(ifelse(is.null(x.title), "Time", x.title)) +
           ylab(ifelse(is.null(y.title.deriv), "Growth rate", y.title.deriv)) +
@@ -2902,7 +2902,6 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
-#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #'
 #' @export plot.grofit
 #' @export
@@ -2963,8 +2962,7 @@ plot.grofit <- function(x, ...,
                         height = NULL,
                         width = NULL,
                         out.dir = NULL,
-                        out.nm = NULL,
-                        shiny = FALSE
+                        out.nm = NULL
 )
 {
   grofit <- x
@@ -2987,7 +2985,7 @@ plot.grofit <- function(x, ...,
   # remove all function arguments from call to leave only multiple grofit objects
   call$export <- call$plot <- call$out.nm <- call$out.dir <- call$width <- call$height <- call$lwd <- call$y.title.deriv <- call$IDs <- call$legend.ncol <- call$color_groups <-
     call$y.lim.deriv <- call$x.title <- call$y.title <- call$x.lim <- call$y.lim <- call$basesize <- call$colors <- call$n.ybreaks <- call$deriv <- call$group_pals <-
-    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$shiny <- call$legend.position <- NULL
+    call$log.y <- call$mean  <- call$conc  <- call$names  <- call$data.type <- call$exclude.conc <- call$exclude.nm <- call$legend.position <- NULL
 
   arglist <- lapply(call[-1], function(x) x)
   var.names <- vapply(arglist, deparse, character(1))
@@ -3232,7 +3230,7 @@ plot.grofit <- function(x, ...,
     df$name <- factor(df$name, levels = unique(factor(df$name)))
 
     p <- ggplot(df, aes(x=.data$time, y=.data$mean, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       geom_ribbon(aes(ymin=.data$lower, ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
@@ -3290,7 +3288,7 @@ plot.grofit <- function(x, ...,
         if (length(plotdata.ls) <= 8) {
           p <- p + scale_fill_brewer(name = "Condition", palette = "Dark2") + scale_color_brewer(name = "Condition", palette = "Dark2")
         } else if (length(plotdata.ls) <= 12) {
-          p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
+          p <- p + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
         } else if (length(plotdata.ls) <= 50){
           p <- p + scale_fill_manual(name = "Condition",
                                      values = big_palette
@@ -3322,7 +3320,7 @@ plot.grofit <- function(x, ...,
     if(deriv){
       # /// add panel with growth rate over time
       p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$mean, col = .data$name)) +
-        geom_line(size=lwd) +
+        geom_line(linewidth=lwd) +
         geom_ribbon(aes(ymin=.data$lower,ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
@@ -3409,7 +3407,7 @@ plot.grofit <- function(x, ...,
 
     }
     p <- ggplot(df, aes(x=.data$time, y=.data$y, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
@@ -3479,7 +3477,7 @@ plot.grofit <- function(x, ...,
                                               "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
       }
       p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$y, col = .data$name)) +
-        geom_line(size=lwd) +
+        geom_line(linewidth=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), "Time", x.title)) +
         theme(legend.position=legend.position,
@@ -3561,7 +3559,7 @@ plot.grofit <- function(x, ...,
     dir.create(out.dir, showWarnings = FALSE)
     grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
-    print(p)
+    suppressWarnings(print(p))
     grDevices::dev.off()
     if (requireNamespace("Cairo", quietly = TRUE)) {
       Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
@@ -3569,11 +3567,11 @@ plot.grofit <- function(x, ...,
       message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
       grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
     }
-    print(p)
+    suppressWarnings(print(p))
     grDevices::dev.off()
   }
   if (plot == TRUE){
-    print(p)
+    suppressWarnings(print(p))
   } else {
     return(p)
   }
@@ -3617,7 +3615,6 @@ base_breaks <- function(n = 10){
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
-#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.grodata
@@ -3669,7 +3666,6 @@ plot.grodata <- function(x,
                          width = NULL,
                          out.dir = NULL,
                          out.nm = NULL,
-                         shiny = FALSE,
                          ...)
 {
   data.type <- match.arg(data.type)
@@ -3711,8 +3707,7 @@ plot.grodata <- function(x,
                   height = height,
                   width = width,
                   out.dir = out.dir,
-                  out.nm = out.nm,
-                  shiny = shiny
+                  out.nm = out.nm
     )
   else
     plot.grofit(x,
@@ -3743,8 +3738,7 @@ plot.grodata <- function(x,
                 height = height,
                 width = width,
                 out.dir = out.dir,
-                out.nm = out.nm,
-                shiny = shiny
+                out.nm = out.nm
     )
 }
 
@@ -4286,6 +4280,797 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
   }
   if (plot == TRUE){
     print(p)
+  } else {
+    return(p)
+  }
+}
+
+#' Plot a matrix of growth curve panels
+#'
+#' \code{plot.grid} takes a \code{grofit} or \code{flFitRes} object and returns a facet grid of individual growth and fluorescence plots
+#'
+#' @param x A \code{grofit} or \code{flFitRes} object created with \code{\link{growth.workflow}} or code{\link{fl.workflow}} containing spline fits.
+#' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
+#' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
+#' 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',
+#' 'mu.model', 'lambda.model', 'A.model',
+#' 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
+#' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
+#' @param pal (Character string) Choose one of 'Green',   'Orange',  'Purple',  'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', or 'Mint' to visualize the value of the parameter chosen as \code{param} for each sample or condition.
+#' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}. The order of strings within the vector defines the order of samples within the grid.
+#' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
+#' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
+#' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
+#' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
+#' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
+#' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?#' @param n.ybreaks
+#' @param sort_by_conc (Logical) Shall the samples/conditions be sorted with concentrations in rows and groups in columns?
+#' @param nrow (Numeric) Defines the number of rows in the grid if \code{sort_by_conc} is \code{FALSE}.
+#' @param basesize (Numeric) Base font size.
+#' @param y.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth curve plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both growth curve and derivative plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param legend.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the color scale applied to \code{param} as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.title (Character) Optional: Provide a title for the y-axis of the growth curve plot.
+#' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
+#' @param lwd (Numeric) Line width of the individual plots.
+#' @param plot (Logical) Show the generated plot in the \code{Plots} pane (\code{TRUE}) or not (\code{FALSE}). If \code{FALSE}, a ggplot object is returned.
+#' @param export (Logical) Export the generated plot as PDF and PNG files (\code{TRUE}) or not (\code{FALSE}).
+#' @param height (Numeric) Height of the exported image in inches.
+#' @param width (Numeric) Width of the exported image in inches.
+#' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
+#' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
+#' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
+#'
+#' @export plot.grid
+#' @export
+#'
+#' @return A plot matrix with all growth curves (raw measurements or nonparametric fits) in a dataset, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
+#'
+#' @examples
+#' # Create random growth data set
+#' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+#'
+#' rnd.data <- list()
+#' rnd.data[["time"]] <- rbind(rnd.data1$time, rnd.data2$time)
+#' rnd.data[["data"]] <- rbind(rnd.data1$data, rnd.data2$data)
+#'
+#' # Run growth curve analysis workflow
+#' res <- growth.workflow(time = rnd.data$time,
+#'                        data = rnd.data$data,
+#'                        fit.opt = "s",
+#'                        ec50 = FALSE,
+#'                        export.res = FALSE,
+#'                        suppress.messages = TRUE,
+#'                        parallelize = FALSE)
+#'
+#'
+#' plot.grid(res, param = "mu.spline")
+#'
+plot.grid <- function(x,
+                            data.type = c("spline", "raw"),
+                            param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
+                                      'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
+                                      'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
+                                      'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
+                                      'max_slope.linfit', 'max_slope.spline'),
+                            pal = c("Green",   "Orange",  "Purple",  "Magenta", "Grey", "Blue", "Grey", "Red", "Cyan", "Brown", "Mint"),
+                            IDs = NULL,
+                            names = NULL,
+                            conc = NULL,
+                            exclude.nm = NULL,
+                            exclude.conc = NULL,
+                            mean = TRUE,
+                            log.y = TRUE,
+                            n.ybreaks = 6,
+                            sort_by_conc = TRUE,
+                            nrow = NULL,
+                            basesize = 20,
+                            y.lim = NULL,
+                            x.lim = NULL,
+                            legend.lim = NULL,
+                            y.title = NULL,
+                            x.title = NULL,
+                            lwd = 1.1,
+                            plot = TRUE,
+                            export = FALSE,
+                            height = NULL,
+                            width = NULL,
+                            out.dir = NULL,
+                            out.nm = NULL,
+                            ...
+)
+{
+  grofit <- x
+  pal <- match.arg(pal)
+  # Convert range  and selecting arguments
+  names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
+  conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
+  exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
+  exclude.conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.conc)), pattern = ";"))
+  param <- match.arg(param)
+  suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
+  if(all(is.na(x.lim))) x.lim <- NULL
+  suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
+  if(all(is.na(y.lim))) y.lim <- NULL
+
+  if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
+                                            'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
+                                            'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
+                                            'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
+                                            'max_slope.linfit', 'max_slope.spline')))
+    stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'mu2.linfit', 'lambda2.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'A.orig.model', 'dY.model', 'dY.orig.model',  'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
+
+  #extract gcTable
+  if (methods::is(x)=="grofit"){
+    gcTable <- x$gcFit$gcTable
+  } else if (methods::is(x)=="flFitRes"){
+    gcTable <- x$flFit$flTable
+  }
+
+  #check if param exists in gcTable and has a valid value
+  if(all(is.na(gcTable[[param]])) || all(gcTable[[param]] == 0)){
+    if(gsub(".+\\.", "", param)=="linfit") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'l' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'l' or 'a'."))
+    if(gsub(".+\\.", "", param)=="model") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'm' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'm' or 'a'."))
+    if(gsub(".+\\.", "", param)=="spline") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 's' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 's' or 'a'."))
+  }
+
+  data.type <- match.arg(data.type)
+
+  # grofit an object of class grofit
+  if(methods::is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
+  # /// check input parameters
+
+  if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
+  if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
+  if(data.type == "spline"){
+    if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("To plot spline fit results, please run growth.workflow() with 'a' or 's' in fit.opt.")
+  }
+
+  conc <- as.numeric(conc)
+  exclude.conc <- as.numeric(exclude.conc)
+
+  # Get name of conditions with multiple replicates; apply selecting arguments
+  sample.nm <- nm <- if(methods::is(grofit) == "grofit"){
+    as.character(names(grofit$gcFit$gcFittedSplines))} else {
+      as.character(grofit$expdesign$label)
+    }
+  if(!is.null(IDs)){
+    # Check if IDs refer to samples or conditions
+
+    ### SOLVE WITH MATCH TO GET ORDER OF INPUT!
+    if(any(grep(" \\| ", IDs))){
+      nm <- nm[
+        grepl(x = nm,
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
+    } else {
+      nm <- nm[
+        grepl(x = gsub(" \\| .+", "", nm),
+              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+      ]
+    }
+  }
+  else {
+    if(!is.null(names)  && length(names) > 0){
+      if(!is.na(names) && names != ""){
+        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+        nm <- nm[grep(paste(names, collapse="|"), gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm))]
+      }
+    }
+    if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
+      if(!is.na(exclude.nm) && exclude.nm != ""){
+        names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+        nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
+      }
+    }
+  }
+  if(!is.null(conc) && length(conc) > 0){
+    if(!all(is.na(conc))) nm <- nm[which(str_extract(nm, "[:graph:]+$") %in% conc)]
+  }
+  if(!is.null(exclude.conc)  && length(exclude.conc) > 0){
+    if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
+  }
+  if(length(nm)==0){
+    stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
+  }
+  # remove conditions with fitFlag = FALSE in all replicates
+  # Store each condition with its replicate indices in list filter.ls
+  ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i) which(gsub(" \\| .+ \\| ", "_", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1], "_", unlist(str_split(sample.nm[i], " \\| "))[3])))))
+  if(mean==TRUE){
+    #keep only replicate indices if condition defined in nm
+    # get indices of samples with selected names
+    ndx.keep <- grep(paste0(
+      gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), collapse = "|"), sample.nm)
+    ndx.filt.rep <- ndx.filt.rep[unlist(lapply(1:length(ndx.filt.rep), function(i) all(ndx.filt.rep[[i]] %in% ndx.keep)))]
+  }
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.rep)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), sample.nm[ndx.filt.rep[[j]]])]))
+  }
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
+  ndx.filt <- ndx.filt[lapply(ndx.filt,length)>0]
+  # Check FitFlag for each replicate, work per condition
+  if(data.type == "spline"){
+    for(i in 1:length(ndx.filt)){
+      if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
+        fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+        nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+      }
+    }
+  }
+
+  # get indices of samples with selected names
+  ndx.keep <- grep(paste0("^",
+                          gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), "$", collapse = "|"), sample.nm)
+
+  if(data.type == "spline"){
+    # correct for log transformation
+    if(grofit$control$log.y.spline == TRUE){
+      for(i in 1:length(ndx.keep)){
+        grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
+          exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
+      }
+    }
+  }
+
+  if(mean == TRUE){
+    # Combine replicates via their mean and standard deviation
+    conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
+    conditions_unique <- unique(conditions)
+
+    # Create lists for each selected condition, with density values and derivatives, respectively. Each list item represents one condition with their average and SD
+    plotdata.ls <- list()
+    deriv.ls <- list()
+    for(n in 1:length(conditions_unique)){
+      # find indexes of replicates
+      ndx <- intersect(ndx.keep, grep(paste0("^",
+                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(conditions_unique[n], " \\| "))[1]),
+                                             " \\|.+[[:space:]]",
+                                             unlist(str_split(conditions_unique[n], " \\| "))[2],
+                                             "$"), sample.nm))
+
+      name <- conditions_unique[n]
+      # Create lists for density, time, and param values for each sample
+      if(data.type == "spline"){
+        time <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)))
+        data <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)))
+        parameter <- as.list(lapply(1:length(ndx), function(i) cbind(as.numeric(rep(gcTable[ndx[[i]], param], length(data[[i]]))))))
+      } else {
+        time <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$time[ndx[[i]], ])))
+        data <- grofit$data[ndx, 4:ncol(grofit$data)]
+        data <- split(as.matrix(data), 1:nrow(as.matrix(data)))
+        data <- lapply(1:length(data), function(i) as.numeric(data[[i]]))
+
+        parameter <- as.list(lapply(1:length(ndx), function(i) as.numeric(cbind(rep(gcTable[ndx[[i]], param], length(data[[i]]))))))
+      }
+
+      # correct for unequal lengths of data series
+      time.all <- Reduce(union, time)
+      for(i in 1:length(time)){
+        assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
+        if(length(get(paste0("time.missing_", i))) > 0){
+          for(j in 1:length(get(paste0("time.missing_", i)))){
+            # extract density values into a separate list
+            data[[i]] <- append(data[[i]],
+                                values = NA,
+                                after = match(get(paste0("time.missing_", i))[j],
+                                              time.all) - 1)
+            # extract parameter values into a separate list
+            parameter[[i]] <- append(parameter[[i]],
+                                values = NA,
+                                after = match(get(paste0("time.missing_", i))[j],
+                                              time.all) - 1)
+            # extract time values into a separate list
+            time[[i]] <-
+              append(time[[i]],
+                     values = get(paste0("time.missing_", i))[j],
+                     after = match(get(paste0("time.missing_", i))[j], time.all) - 1)
+          }
+        }
+      }
+      time <- time[[1]]
+      data <- do.call("cbind", data)
+      avg <- rowMeans(data, na.rm = FALSE)
+      sd <- apply(data, 1, sd, na.rm = FALSE)
+      parameter <- do.call("cbind", parameter)
+      avg.param <- rowMeans(parameter, na.rm = FALSE)
+      plotdata.ls[[n]] <- data.frame("name" = name, "time" = time, "mean" = avg, "upper" = avg+sd, "lower" = avg-sd, "mean.param" = avg.param)
+    }
+    names(plotdata.ls) <- gsub(" \\| NA", "", conditions_unique)
+
+    plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
+    df <- do.call(rbind.data.frame, plotdata.ls)
+    # add chosen parameter
+    # df$param <- gcTable[df$]
+
+    df$name <- gsub(" \\| NA", "", df$name)
+
+    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    df$group <- gsub(" \\| .+", "", df$name)
+
+
+    # replace negative lower ribbon boundaries with 0 for log10 transformation
+    if(log.y==TRUE){
+      df$lower[df$lower<0] <- 0
+    }
+
+    if(is.null(IDs)){
+      # sort names
+      df <- df[order(df$group, df$concentration), ]
+    }
+
+    df$name <- factor(df$name, levels = unique(factor(df$name)))
+
+    p <- ggplot(df, aes(x=.data$time, y=.data$mean, group = .data$name), col = "black")
+    if(log.y == TRUE){
+      p <- p + geom_rect(aes(fill = .data$mean.param, xmin = -Inf, xmax = Inf,
+                             ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
+    } else {
+      p <- p + geom_rect(aes(fill = .data$mean.param), xmin = -Inf, xmax = Inf,
+                         ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
+    }
+    p <- p +
+      geom_line(linewidth = lwd) +
+      geom_ribbon(aes(ymin = .data$lower, ymax=.data$upper), fill = "black", alpha = 0.3, colour = NA) +
+      theme_bw(base_size = basesize) +
+      xlab(ifelse(is.null(x.title), "Time", x.title)) +
+      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
+      theme(strip.text.x = element_text(size = 0.8*basesize),
+            legend.position = "bottom",
+            panel.grid.major = element_blank(),
+            legend.justification = c(1,0),
+            panel.grid.minor = element_blank(),
+            panel.background = ggplot2::element_rect(fill = "white", color = "black",
+                                                     linewidth = basesize/22, linetype = "solid"),
+            strip.background = ggplot2::element_rect(fill = "white", color = "black",
+                                                     linewidth = basesize/22, linetype = "solid"))
+
+
+    if(!is.null(legend.lim)){
+      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
+                                              high = "white", limits = legend.lim) +
+        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+                                                        frame.linewidth = basesize/22,
+                                                        title.hjust = 0.5,
+                                                        title.vjust = 0.8,
+                                                        label.theme = element_text(angle = 90, size = 0.8 * basesize),
+                                                        label.vjust = 0.7,
+                                                        title.position = "bottom",
+                                                        title = param,
+                                                        nrow = 1,
+                                                        barwidth = basesize,
+                                                        barheight = basesize/10))
+    } else {
+      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
+                                              high = "white") +
+        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+                                                        frame.linewidth = basesize/22,
+                                                        title.hjust = 0.5,
+                                                        title.vjust = 0.8,
+                                                        label.theme = element_text(angle = 90, size = 0.8 * basesize),
+                                                        label.vjust = 0.7,
+                                                        title.position = "bottom",
+                                                        title = param,
+                                                        nrow = 1,
+                                                        barwidth = basesize,
+                                                        barheight = basesize/10))
+    }
+
+    if(sort_by_conc){
+      p <- p + ggh4x::facet_nested(concentration ~ group, scales = "free") +
+        facetted_pos_scales(
+          x = list(
+            group == unique(df$group)[1] ~
+              if(!is.null(x.lim)){
+                scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 6))
+              } else {
+                scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 6))
+              },
+            group != unique(df$group)[1] ~
+              if(!is.null(x.lim)){
+                scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 6), labels = NULL)
+              } else {
+                scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 6), labels = NULL)
+              }
+          ),
+          y = list(
+            concentration == unique(df$concentration)[length(unique(df$concentration))] ~
+              if(log.y == TRUE){
+                if(!is.null(y.lim)){
+                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+                } else {
+                  scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks))
+                }
+              } else {
+                if(!is.null(y.lim)){
+                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+                } else {
+                  scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+                }
+              }
+            ,
+            concentration != unique(df$concentration)[length(unique(df$concentration))] ~
+              if(log.y == TRUE){
+                if(!is.null(y.lim)){
+                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                } else {
+                  scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                }
+              } else {
+                if(!is.null(y.lim)){
+                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+                } else {
+                  scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+                }
+              }
+          )
+        )
+    } else {
+      if(!is.null(nrow)){
+        p <- p + ggh4x::facet_wrap2(~name, scales = "free", nrow = nrow)
+      } else {
+        rows <- ceiling(length(unique(df$name))/10)
+        p <- p + ggh4x::facet_wrap2(~name, scales = "free", nrow = rows)
+      }
+      # get number of facet in the bottom-left
+      g <- ggplot2::ggplotGrob(p)
+      number <- which(g$layout[grep("panel", g$layout$name), ]["t"] ==
+                        unique(g$layout[grep("panel", g$layout$name), ]["t"])[
+                          nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+                        ])[1]
+      # get number of facets in bottom row except the left
+      number_bottom <- which(g$layout[grep("panel", g$layout$name), ]["t"] ==
+                        unique(g$layout[grep("panel", g$layout$name), ]["t"])[
+                          nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+                        ])[-1]
+
+      # get number of facets on the left except the bottom one
+      number_left <- match(unique(g$layout[grep("panel", g$layout$name), ]["t"])[
+                                 -nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+                               ], g$layout[grep("panel", g$layout$name), ][,"t"])
+
+      p <- p + facetted_pos_scales(
+        x = list(
+          name == as.character(unique(df$name)[number]) ~
+            if(!is.null(x.lim)){
+              scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 6))
+            } else {
+              scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 6))
+            },
+          name %in% as.character(unique(df$name)[number_bottom]) ~
+            if(!is.null(x.lim)){
+              scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 6), labels = NULL)
+            } else {
+              scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 6), labels = NULL)
+            },
+          name %in% as.character(unique(df$name)[-c(number, number_bottom)]) ~
+            if(!is.null(x.lim)){
+              scale_x_continuous(limits = x.lim, breaks = NULL, labels = NULL)
+            } else {
+              scale_x_continuous(limits = range(df$time), breaks = NULL, labels = NULL)
+            }
+        ),
+        y = list(
+          name == as.character(unique(df$name)[number]) ~
+            if(log.y == TRUE){
+              if(!is.null(y.lim)){
+                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+              } else {
+                scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks))
+              }
+            } else {
+              if(!is.null(y.lim)){
+                scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+              } else {
+                scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+              }
+            }
+          ,
+          name %in% as.character(unique(df$name)[number_left]) ~
+            if(log.y == TRUE){
+              if(!is.null(y.lim)){
+                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+              } else {
+                scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+              }
+            } else {
+              if(!is.null(y.lim)){
+                scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+              } else {
+                scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+              }
+            }
+          ,
+          name %in% as.character(unique(df$name)[-c(number, number_left)]) ~
+            if(log.y == TRUE){
+              if(!is.null(y.lim)){
+                scale_y_log10(limits = y.lim, breaks = NULL, labels = NULL)
+              } else {
+                scale_y_log10(limits = range(df$mean), breaks = NULL, labels = NULL)
+              }
+            } else {
+              if(!is.null(y.lim)){
+                scale_y_continuous(limits = y.lim, breaks = NULL, labels = NULL)
+              } else {
+                scale_y_continuous(limits = range(df$mean), breaks = NULL, labels = NULL)
+              }
+            }
+        )
+      )
+    }
+  } # if(mean == TRUE)
+  else {
+    df <- data.frame()
+    for(i in 1:length(ndx.keep)){
+      if(data.type == "spline"){
+        df <- plyr::rbind.fill(df,
+                               data.frame("name" = sample.nm[ndx.keep[i]],
+                                          "time" = grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.time"]],
+                                          "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]],
+                                          "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
+                                                        length(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]))
+                                          )
+                               )
+        )
+      } else {
+        df <- plyr::rbind.fill(df,
+                               data.frame("name" = sample.nm[ndx.keep[i]],
+                                          "time" = as.vector(grofit$time[ndx.keep[i], ]),
+                                          "y" = unlist(unname(utils::type.convert(grofit$data[ndx.keep[i], 4:ncol(grofit$data)], as.is=T))),
+                                          "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
+                                                        length(as.vector(grofit$time[ndx.keep[i], ])))
+                                          )
+                               )
+        )
+      }
+
+    }
+    # add concentration column
+    df$concentration <- gsub(".+ \\| ", "", df$name)
+    # add group column
+    df$group <- gsub(" \\| .+", "", df$name)
+    if(is.null(IDs)){
+      # sort names
+      df <- df[order(df$group, df$concentration), ]
+    }
+
+    # remove "NA" from names
+    df$name <- gsub(" \\| NA", "", df$name)
+
+    p <- ggplot(df, aes(x=.data$time, y=.data$y, group = .data$name), col = "black")
+    if(log.y == TRUE){
+      p <- p + geom_rect(aes(fill = .data$param, xmin = -Inf, xmax = Inf,
+                             ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
+    } else {
+      p <- p + geom_rect(aes(fill = .data$param), xmin = -Inf, xmax = Inf,
+                         ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
+    }
+      p <- p +
+      geom_line(linewidth = lwd) +
+      theme_bw(base_size = basesize) +
+      xlab(ifelse(is.null(x.title), "Time", x.title)) +
+      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
+      theme(strip.text.x = element_text(size = 0.8*basesize),
+            legend.position = "bottom",
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            panel.background = element_rect(fill = "white", color = "black",
+                                            linewidth = basesize/22, linetype = "solid"),
+            strip.background = element_rect(fill = "white", color = "black",
+                                            linewidth = basesize/22, linetype = "solid"))
+
+    if(!is.null(legend.lim)){
+      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
+                                              high = "white", limits = legend.lim) +
+        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+                                                        frame.linewidth = basesize/22,
+                                                        title.hjust = 0.5,
+                                                        title.vjust = 0.8,
+                                                        title.position = "bottom",
+                                                        label.theme = element_text(angle = 90, size = 0.8 * basesize),
+                                                        label.vjust = 0.7,
+                                                        title = param,
+                                                        nrow = 1,
+                                                        barwidth = basesize,
+                                                        barheight = basesize/10))
+    } else {
+      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
+                                              high = "white") +
+        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+                                                        frame.linewidth = basesize/22,
+                                                        title.hjust = 0.5,
+                                                        title.vjust = 0.8,
+                                                        title.position = "bottom",
+                                                        title = param,
+                                                        label.theme = element_text(angle = 90, size = 0.8 * basesize),
+                                                        label.vjust = 0.7,
+                                                        nrow = 1,
+                                                        barwidth = basesize,
+                                                        barheight = basesize/10))
+    }
+
+    if(sort_by_conc){
+      p <- p + ggh4x::facet_nested(concentration ~ group, scales = "free") +
+        facetted_pos_scales(
+          x = list(
+            group == unique(df$group)[1] ~
+              if(!is.null(x.lim)){
+                scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))
+              } else {
+                scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 10))
+              },
+            group != unique(df$group)[1] ~
+              if(!is.null(x.lim)){
+                scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10), labels = NULL)
+              } else {
+                scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 10), labels = NULL)
+              }
+          ),
+          y = list(
+            concentration == unique(df$concentration)[length(unique(df$concentration))] ~
+              if(log.y == TRUE){
+                if(!is.null(y.lim)){
+                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+                } else {
+                  scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks))
+                }
+              } else {
+                if(!is.null(y.lim)){
+                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+                } else {
+                  scale_y_continuous(limits = range(df$y), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+                }
+              }
+            ,
+            concentration != unique(df$concentration)[length(unique(df$concentration))] ~
+              if(log.y == TRUE){
+                if(!is.null(y.lim)){
+                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                } else {
+                  scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                }
+              } else {
+                if(!is.null(y.lim)){
+                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+                } else {
+                  scale_y_continuous(limits = range(df$y), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+                }
+              }
+          )
+        )
+    } else {
+      if(!is.null(nrow)){
+        p <- p + ggh4x::facet_wrap2(~name, scales = "free", nrow = nrow)
+      } else {
+        rows <- ceiling(length(unique(df$name))/10)
+        p <- p + ggh4x::facet_wrap2(~name, scales = "free", nrow = rows)
+      }
+      # get number of facet in the bottom-left
+      g <- ggplot2::ggplotGrob(p)
+      number <- which(g$layout[grep("panel", g$layout$name), ]["t"] ==
+                        unique(g$layout[grep("panel", g$layout$name), ]["t"])[
+                          nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+                        ])[1]
+
+      # get number of facets in bottom row except the left
+      number_bottom <- which(g$layout[grep("panel", g$layout$name), ]["t"] ==
+                               unique(g$layout[grep("panel", g$layout$name), ]["t"])[
+                                 nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+                               ])[-1]
+
+      # get number of facets on the left except the bottom one
+      number_left <- match(unique(g$layout[grep("panel", g$layout$name), ]["t"])[
+        -nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+      ], g$layout[grep("panel", g$layout$name), ][,"t"])
+
+      p <- p + facetted_pos_scales(
+        x = list(
+          name == unique(df$name)[number] ~
+            if(!is.null(x.lim)){
+              scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 6))
+            } else {
+              scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 6))
+            },
+          name %in% unique(df$name)[number_bottom] ~
+            if(!is.null(x.lim)){
+              scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 6), labels = NULL)
+            } else {
+              scale_x_continuous(limits = range(df$time), breaks = scales::pretty_breaks(n = 6), labels = NULL)
+            },
+          name %in% unique(df$name)[-c(number, number_bottom)] ~
+            if(!is.null(x.lim)){
+              scale_x_continuous(limits = x.lim, breaks = NULL, labels = NULL)
+            } else {
+              scale_x_continuous(limits = range(df$time), breaks = NULL, labels = NULL)
+            }
+        ),
+        y = list(
+          name == unique(df$name)[number] ~
+            if(log.y == TRUE){
+              if(!is.null(y.lim)){
+                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+              } else {
+                scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks))
+              }
+            } else {
+              if(!is.null(y.lim)){
+                scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+              } else {
+                scale_y_continuous(limits = range(df$y), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+              }
+            }
+          ,
+          name %in% unique(df$name)[number_left] ~
+            if(log.y == TRUE){
+              if(!is.null(y.lim)){
+                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+              } else {
+                scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+              }
+            } else {
+              if(!is.null(y.lim)){
+                scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+              } else {
+                scale_y_continuous(limits = range(df$y), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+              }
+            }
+          ,
+          name %in% unique(df$name)[-c(number, number_left)] ~
+            if(log.y == TRUE){
+              if(!is.null(y.lim)){
+                scale_y_log10(limits = y.lim, breaks = NULL, labels = NULL)
+              } else {
+                scale_y_log10(limits = range(df$y), breaks = NULL, labels = NULL)
+              }
+            } else {
+              if(!is.null(y.lim)){
+                scale_y_continuous(limits = y.lim, breaks = NULL, labels = NULL)
+              } else {
+                scale_y_continuous(limits = range(df$y), breaks = NULL, labels = NULL)
+              }
+            }
+        )
+      )
+    }
+
+  }
+  if(export == FALSE && plot == FALSE){
+    return(p)
+  }
+  out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+  if (export == TRUE){
+    if(is.null(out.nm)) out.nm <- paste0("GroupPlot")
+    if(is.null(width)){
+      w <- 10 + 3*ifelse(mean==TRUE,length(conditions_unique), length(nm))/15
+    } else {
+      w <- width
+    }
+    if(is.null(height)){
+      h <- ifelse(deriv==T, 9, 6)
+    } else {
+      h <- height
+    }
+    dir.create(out.dir, showWarnings = FALSE)
+    grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
+                   width = w, height = h, units = 'in', res = 300)
+    suppressWarnings(print(p))
+    grDevices::dev.off()
+    if (requireNamespace("Cairo", quietly = TRUE)) {
+      Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    } else {
+      message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+      grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+    }
+    suppressWarnings( print(p))
+    grDevices::dev.off()
+  }
+  if (plot == TRUE){
+    suppressWarnings(print(p))
   } else {
     return(p)
   }

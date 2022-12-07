@@ -371,19 +371,19 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
   if (add==TRUE){
     if(spline == TRUE){
       # /// try to plot data fit
-      if ((flFitSpline$control$log.x.gc==FALSE) && (flFitSpline$control$log.y.spline==FALSE)){
+      if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==FALSE)){
         try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
       }
 
-      if ((flFitSpline$control$log.x.gc==FALSE) && (flFitSpline$control$log.y.spline==TRUE)){
+      if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==TRUE)){
         try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
       }
 
-      if ((flFitSpline$control$log.x.gc==TRUE)  && (flFitSpline$control$log.y.spline==FALSE)){
+      if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==FALSE)){
         try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
       }
 
-      if ((flFitSpline$control$log.x.gc==TRUE)  && (flFitSpline$control$log.y.spline==TRUE)){
+      if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==TRUE)){
         try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
       }
       # /// add tangent at maximum slope
@@ -398,10 +398,10 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       }
     }
     if (deriv  == TRUE){
-      if ((flFitSpline$control$log.x.gc==FALSE)){
+      if ((flFitSpline$control$log.x.spline == FALSE)){
         try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, lwd=2.8*lwd, xlab="", ylab="", col = colSpline) )
       }
-      if ((flFitSpline$control$log.x.gc==TRUE)){
+      if ((flFitSpline$control$log.x.spline == TRUE)){
         try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, lwd=2.8*lwd, xlab="", ylab="", col = colSpline) )
       }
     }
@@ -443,7 +443,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
       p <- ggplot(df, aes(x=.data$time, y=.data$data)) +
         geom_point(shape=pch, size = cex.point,alpha = 0.6, stroke=0.15*cex.point, color = colData) +
-        geom_line(aes(x=.data$fit.x, y = .data$fit.fl, color = "spline"), size = lwd) +
+        geom_line(aes(x=.data$fit.x, y = .data$fit.fl, color = "spline"), linewidth = lwd) +
         xlab(ifelse(is.null(x.title), x.label, x.title)) +
         ylab(ifelse(is.null(y.title), y.label, y.title)) +
         theme_classic(base_size = basesize) +
@@ -581,13 +581,13 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime2 <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
           } # if(lagtime2 < lagtime)
           else {
@@ -638,13 +638,13 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.9*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
             }
           }
         } # if(flFitSpline$fitFlag2)
@@ -676,12 +676,12 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
 
           if(!(lagtime <0)){
             p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
         } # else of if(flFitSpline$fitFlag2)
       } # if(slope == TRUE && log.y == TRUE)
@@ -740,13 +740,13 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime2 <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
           } # if(lagtime2 < lagtime)
           else {
@@ -795,13 +795,13 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
-              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
+              p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = lwd)
             }
 
             if(!(lagtime <0)){
               p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                    linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
             }
           }
         } # if(flFitSpline$fitFlag2)
@@ -831,11 +831,11 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
           }
           else {
-            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+            p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
           if(!(lagtime <0)){
             p <- p + geom_segment(aes(x = .data$time[1], y = .data$y[1], xend = .data$time[2], yend = .data$y[2]), data = df.horizontal,
-                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = lwd)
+                                  linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
           }
         } # else of if(flFitSpline$fitFlag2)
       } # if(slope == TRUE && log.y == TRUE)
@@ -849,7 +849,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                            df.max_slope)
 
         p.max_slope <- ggplot(df.max_slope, aes(x=.data$x, y=.data$y)) +
-          geom_line(color = colSpline, size = lwd) +
+          geom_line(color = colSpline, linewidth = lwd) +
           theme_classic(base_size = basesize) +
           xlab(ifelse(is.null(x.title), x.label, x.title)) +
           ylab(ifelse(is.null(y.title.deriv), "Slope", y.title.deriv)) +
@@ -2070,7 +2070,7 @@ plot.flFitRes <-  function(x,
     #     "Fluorescence 2"
     #   }
     p <- ggplot(df, aes(x=.data$time, y=.data$mean, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
@@ -2164,7 +2164,7 @@ plot.flFitRes <-  function(x,
         df.deriv <- df.deriv[df.deriv[,"time"]>=x.lim[1]&df.deriv[,"time"]<=x.lim[2],]
       }
       p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$mean, col = .data$name)) +
-        geom_line(size=lwd) +
+        geom_line(linewidth=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
         theme(legend.position=legend.position,
@@ -2277,7 +2277,7 @@ plot.flFitRes <-  function(x,
     #   "Normalized fluorescence 2"
     # }
     p <- ggplot(df, aes(x=.data$time, y=.data$y, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title) || y.title == "", ylab.title, y.title)) +
@@ -2349,7 +2349,7 @@ plot.flFitRes <-  function(x,
         df.deriv <- df.deriv[df.deriv[,"time"]>=x.lim[1]&df.deriv[,"time"]<=x.lim[2],]
       }
       p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$y, col = .data$name)) +
-        geom_line(size=lwd) +
+        geom_line(linewidth=lwd) +
         theme_classic(base_size = basesize) +
         xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
         theme(legend.position=legend.position,
@@ -2767,7 +2767,7 @@ plot.dual <-  function(x,
     ylab.title.dens <- "Density"
 
     p <- ggplot(df, aes(x=.data$time, y=.data$dens.mean, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       geom_ribbon(aes(ymin=.data$dens.lower,ymax=.data$dens.upper, fill=.data$name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
@@ -2852,7 +2852,7 @@ plot.dual <-  function(x,
     }
     # /// add panel with fluorescence over time
     p.fl <- ggplot(df, aes(x=.data$time, y=.data$fl.mean, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       geom_ribbon(aes(ymin=.data$fl.lower,ymax=.data$fl.upper, fill=.data$name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
@@ -2944,7 +2944,7 @@ plot.dual <-  function(x,
 
     ylab.title <- "Density"
     p <- ggplot(df, aes(x=.data$time, y=.data$density, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title.density) || y.title.density == "", ylab.title, y.title.density)) +
@@ -3006,7 +3006,7 @@ plot.dual <-  function(x,
                            values = colors)
     }
     p.fl <- ggplot(df, aes(x=.data$time, y=.data$fl, col = .data$name)) +
-      geom_line(size=lwd) +
+      geom_line(linewidth=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
       theme(legend.position=legend.position,

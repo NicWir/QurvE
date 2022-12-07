@@ -51,6 +51,7 @@ Imports:
     drc,
     DT,
     foreach,
+    ggh4x,
     ggnewscale,
     ggplot2,
     ggpubr,
