@@ -3222,8 +3222,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                   width = "100%",
                                                                                   choices = names(QurvE:::single_hue_palettes),
                                                                                   selected = names(QurvE:::single_hue_palettes),
-                                                                                  multiple = FALSE,
-                                                                                  options = list(closeAfterSelect = TRUE)
+                                                                                  multiple = FALSE
                                                                    ),
                                                                    bsPopover(id = "color_palettes_grid_plot",
                                                                              title = HTML("<em>Define the colors used to visualize the value of the chosen parameter</em>"), placement = "top",
@@ -6028,8 +6027,7 @@ server <- function(input, output, session){
       suppressWarnings(
         plot.grodata(x = results$custom_data,
                      data.type = "dens",
-                    IDs = NULL,
-                    shiny = TRUE
+                    IDs = NULL
         )
       )
     )
@@ -6046,8 +6044,7 @@ server <- function(input, output, session){
       suppressWarnings(
         plot.grodata(x = results$custom_data,
                      data.type = "fl",
-                     IDs = NULL,
-                     shiny = TRUE
+                     IDs = NULL
         )
       )
     )
@@ -6064,8 +6061,7 @@ server <- function(input, output, session){
       suppressWarnings(
         plot.grodata(x = results$custom_data,
                      data.type = "norm.fl",
-                     IDs = NULL,
-                     shiny = TRUE
+                     IDs = NULL
         )
       )
     )
@@ -6746,8 +6742,7 @@ server <- function(input, output, session){
       suppressWarnings(
         plot.grodata(x = results$parsed_data,
                      data.type = "dens",
-                     IDs = NULL,
-                     shiny = TRUE
+                     IDs = NULL
         )
       )
     )
@@ -6764,8 +6759,7 @@ server <- function(input, output, session){
       suppressWarnings(
         plot.grodata(x = results$parsed_data,
                      data.type = "fl",
-                     IDs = NULL,
-                     shiny = TRUE
+                     IDs = NULL
         )
       )
     )
@@ -9671,7 +9665,6 @@ server <- function(input, output, session){
                         x.lim = x.lim,
                         y.lim.deriv = ylim.deriv,
                         deriv = input$plot_derivative_fluorescence_spline_bt,
-                        shiny = TRUE,
                         combine = T,
                         colSpline = input$color_validate_fluorescence_spline_bt
       )
@@ -9752,8 +9745,7 @@ server <- function(input, output, session){
                         y.lim = y.lim,
                         x.lim = x.lim,
                         y.lim.deriv = ylim.deriv,
-                        deriv = input$plot_derivative_fluorescence_spline_bt,
-                        shiny = TRUE
+                        deriv = input$plot_derivative_fluorescence_spline_bt
       )
       dev.off()
     },
@@ -9821,8 +9813,7 @@ server <- function(input, output, session){
                     legend.ncol = input$legend_ncol_group_plot,
                     color_groups = input$color_groups_group_plot,
                     group_pals = input$color_palettes_group_plot,
-                    colors = cols,
-                    shiny = TRUE
+                    colors = cols
         )
       )
     }
@@ -9855,8 +9846,7 @@ server <- function(input, output, session){
                     color_groups = input$color_groups_group_plot,
                     group_pals = input$color_palettes_group_plot,
                     legend.ncol = input$legend_ncol_group_plot,
-                    colors = cols,
-                    shiny = TRUE
+                    colors = cols
         )
       )
     }
@@ -10817,6 +10807,8 @@ server <- function(input, output, session){
 
       ### Grid Plot ####
       observe({
+        if(!exists("output$more_than_two_conc") || is.null(output$more_than_two_conc))
+          return(NULL)
         if(!output$more_than_two_conc){
           updateSelectInput(session = session,
                             inputId = "sort_by_conc_growth_grid_plot",
@@ -10970,14 +10962,6 @@ server <- function(input, output, session){
     growth_grid_plot()
   })
 
-
-  observe({
-    if(input$plot_derivative_growth_grid_plot && input$data_type_growth_grid_plot == 'spline') h <- 9
-    else h <- 6
-    updateSelectInput(inputId = "height_download_growth_grid_plot",
-                      selected = h
-    )
-  })
 
   output$download_growth_grid_plot <- downloadHandler(
     filename = function() {

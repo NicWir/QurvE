@@ -3011,7 +3011,7 @@ plot.grofit <- function(x, ...,
   }
 
   # grofit an object of class grofit
-  if(methods::is(grofit) != "grofit" && methods::is(grofit) != "grodata") stop("grofit needs to be an object created with growth.workflow().")
+  if(methods::is(grofit) != "grofit" && methods::is(grofit) != "grodata") stop("Input objects needs to be an object created with growth.workflow().")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
