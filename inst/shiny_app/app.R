@@ -3212,12 +3212,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
 
                                                                    conditionalPanel(
-                                                                     condition = "!sort_by_conc_growth_grid_plot",
+                                                                     condition = "!input.sort_by_conc_growth_grid_plot",
                                                                      sliderInput(inputId = "nrows_growth_grid_plot",
                                                                                  label = "Number of rows in grid",
                                                                                  min = 1,
                                                                                  max = 20,
-                                                                                 value = 6)
+                                                                                 value = 2)
                                                                    ),
 
 

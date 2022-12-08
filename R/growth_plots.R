@@ -3589,7 +3589,7 @@ base_breaks <- function(n = 10){
 #'
 #'
 #' @param x A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}.
-#' @param data.type (Character) Plot either raw density (\code{data.type = "dens"}), raw fluorescence (\code{data.type = "fl"}), or fluorescence normalized to density (\code{data.type = "norm.fl"}).
+#' @param data.type (Character) Plot either raw density (\code{data.type = "growth"}), raw fluorescence (\code{data.type = "fl"}), or fluorescence normalized to density (\code{data.type = "norm.fl"}).
 #' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
@@ -3640,7 +3640,7 @@ base_breaks <- function(n = 10){
 #' plot(grodata, exclude.nm = "Test1", legend.ncol = 4)
 #'
 plot.grodata <- function(x,
-                         data.type = c("dens", "fl", "norm.fl"),
+                         data.type = c("growth", "fl", "norm.fl"),
                          IDs = NULL,
                          names = NULL,
                          conc = NULL,
@@ -3670,7 +3670,7 @@ plot.grodata <- function(x,
 {
   data.type <- match.arg(data.type)
   if(!(is(x) %in% "grodata")) stop("x needs to be a grodata object created with read_data() or parse_data().")
-  if(!(any(data.type %in% c("dens", "fl", "norm.fl")))) stop("data.type needs to be either a 'dens' (density), 'fl' (fluorescence), or 'norm.fl' (fluorescence normalized by density).")
+  if(!(any(data.type %in% c("growth", "fl", "norm.fl")))) stop("data.type needs to be either a 'dens' (density), 'fl' (fluorescence), or 'norm.fl' (fluorescence normalized by density).")
   if(data.type == "fl" && length(x$fluorescence)<2) stop("x does not contain fluorescence data.")
   if(data.type == "norm.fl" && length(x$fluorescence)<2) stop("x does not contain norm. fluorescence data. Did you read both density and fluorescence data when calling read_data() or parse_data()?")
 
@@ -4349,7 +4349,7 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
 #' plot.grid(res, param = "mu.spline")
 #'
 plot.grid <- function(x,
-                      data.type = c("spline", "raw"),
+                      data.type = c("spline", "raw", "norm.fl"),
                       param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                 'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
                                 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
@@ -4383,7 +4383,7 @@ plot.grid <- function(x,
                       ...
 )
 {
-  grofit <- x
+  object <- x
   pal <- match.arg(pal)
   # Convert range  and selecting arguments
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
@@ -4391,12 +4391,16 @@ plot.grid <- function(x,
   exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
   exclude.conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.conc)), pattern = ";"))
   param <- match.arg(param)
+  data.type <- match.arg(data.type)
   suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
   if(all(is.na(x.lim))) x.lim <- NULL
   suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
   if(all(is.na(y.lim))) y.lim <- NULL
   suppressWarnings(assign("legend.lim" ,as.numeric(legend.lim)))
   if(all(is.na(legend.lim))) legend.lim <- NULL
+
+  if(data.type == "norm.fl" && !any("flFitRes" %in% methods::is(object)))
+    stop("data.type 'norm.fl' is only compatible with an object created with fl.workflow().")
 
   if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                             'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
@@ -4419,33 +4423,37 @@ plot.grid <- function(x,
     if(gsub(".+\\.", "", param)=="spline") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 's' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 's' or 'a'."))
   }
 
-  data.type <- match.arg(data.type)
-
-  # grofit an object of class grofit
-  if(methods::is(grofit) != "grofit") stop("plot.grid: x needs to be an object created with growth.workflow().")
+  # object an object of class object
+  if(methods::is(object) != "grofit" && !any("flFitRes" %in% methods::is(object) )) stop("plot.grid: x needs to be an object created with growth.workflow() or fl.workflow().")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
   if(data.type == "spline"){
-    if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("plot.grid: To plot spline fit results, please run growth.workflow() with 'a' or 's' in fit.opt.")
+    if (!("s" %in% object$control$fit.opt | "a" %in% object$control$fit.opt)) stop("plot.grid: To plot spline fit results, please run growth.workflow() or fl.workflow() with 'a' or 's' in fit.opt.")
   }
 
   conc <- as.numeric(conc)
   exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates; apply selecting arguments
-  sample.nm <- nm <- if(methods::is(grofit) == "grofit"){
-    as.character(names(grofit$gcFit$gcFittedSplines))} else {
-      as.character(grofit$expdesign$label)
+  sample.nm <- nm <- if (methods::is(object) == "object") {
+    if(methods::is(object) == "grofit"){
+      as.character(names(object$gcFit$gcFittedSplines))
+    } else {
+      as.character(names(object$flFit$flFittedSplines))
     }
+  } else {
+    as.character(object$expdesign$label)
+  }
   if(!is.null(IDs)){
     # Check if IDs refer to samples or conditions
 
-    ### SOLVE WITH MATCH TO GET ORDER OF INPUT!
     if(sort_by_ID){
+      # preserve order of input IDs
       nm <- nm[unlist(lapply(1:length(IDs), function(x) which(nm %in% IDs[[x]] ) ) )]
     } else {
+      # preserve order in expdesign
       if(any(grep(" \\| ", IDs))){
         nm <- nm[
           grepl(x = nm,
@@ -4484,7 +4492,14 @@ plot.grid <- function(x,
   }
   # remove conditions with fitFlag = FALSE in all replicates
   # Store each condition with its replicate indices in list filter.ls
-  ndx.filt.rep <- unique(lapply(1:length(sample.nm), function(i) which(gsub(" \\| .+ \\| ", "_", sample.nm) %in% (paste0(unlist(str_split(sample.nm[i], " \\| "))[1], "_", unlist(str_split(sample.nm[i], " \\| "))[3])))))
+  ndx.filt.rep <-
+    unique(lapply(1:length(sample.nm), function(i)
+      which(
+        gsub(" \\| .+ \\| ", "_", sample.nm) %in% (paste0(
+          unlist(str_split(sample.nm[i], " \\| "))[1], "_", unlist(str_split(sample.nm[i], " \\| "))[3]
+        ))
+      )))
+
   if(mean==TRUE){
     #keep only replicate indices if condition defined in nm
     # get indices of samples with selected names
@@ -4503,27 +4518,72 @@ plot.grid <- function(x,
   ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt,length)>0]
   # Check FitFlag for each replicate, work per condition
-  if(data.type == "spline"){
-    for(i in 1:length(ndx.filt)){
-      if(!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]]))))){
-        fitflags <- unlist(lapply(1:length(ndx.filt[[i]]), function(j) (grofit[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
-        nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+  if(data.type == "spline") {
+    for (i in 1:length(ndx.filt)) {
+      if(methods::is(object) == "grofit"){
+        if (!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j)
+          (object[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))))
+        {
+          fitflags <-
+            unlist(lapply(1:length(ndx.filt[[i]]), function(j)
+              (object[["gcFit"]][["gcFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+          nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+        }
+      } else {
+        if (!all(unlist(lapply(1:length(ndx.filt[[i]]), function(j)
+          (object[["flFit"]][["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))))
+        {
+          fitflags <-
+            unlist(lapply(1:length(ndx.filt[[i]]), function(j)
+              (object[["flFit"]][["flFittedSplines"]][[ndx.filt[[i]][j]]][["fitFlag"]])))
+          nm <- nm[!(nm %in% sample.nm[(ndx.filt[[i]][!fitflags])])]
+        }
       }
     }
   }
 
   # get indices of samples with selected names
+  if(length(IDs)>1 && sort_by_ID){
+    ndx.keep <- unlist(lapply(1:length(nm), function(x) which(sample.nm %in% nm[x])))
+  } else {
   ndx.keep <- grep(paste0("^",
                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), "$", collapse = "|"), sample.nm)
+  }
 
   if(data.type == "spline"){
     # correct for log transformation
-    if(grofit$control$log.y.spline == TRUE){
+    if(object$control$log.y.spline == TRUE){
       for(i in 1:length(ndx.keep)){
-        grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
-          exp(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * grofit$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
+        if(methods::is(object) == "grofit"){
+        object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
+          exp(object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * object$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
+        } else {
+          object$flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]] <-
+            exp(object$flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]) * object$flFit$flFittedSplines[[ndx.keep[i]]]$fl.in[1]
+        }
       }
     }
+  }
+
+  xlab.title <- if (data.type == "spline" && methods::is(object) == "flFitRes" && object$control$x_type == "density")
+  {
+    "Growth"
+  } else {
+    "Time"
+  }
+
+  ylab.title <- if(methods::is(object) == "flFitRes" && data.type == "norm.fl"){
+    "Normalized fluorescence"
+  } else if(methods::is(object) == "flFitRes" && data.type == "raw"){
+    "Fluorescence"
+  } else if(methods::is(object) == "flFitRes" && data.type == "spline" && object$control$x_type == "time" && object$control$norm_fl){
+    "Normalized fluorescence"
+  } else if(methods::is(object) == "flFitRes" && data.type == "spline" && object$control$x_type == "time" && !flFit$control$norm_fl){
+    "Fluorescence"
+  } else if(methods::is(object) == "flFitRes" && data.type == "spline" && object$control$x_type == "density"){
+    "Fluorescence"
+  } else {
+    "Growth [y(t)]"
   }
 
   if(mean == TRUE){
@@ -4545,14 +4605,29 @@ plot.grid <- function(x,
       name <- conditions_unique[n]
       # Create lists for density, time, and param values for each sample
       if(data.type == "spline"){
-        time <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)))
-        data <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)))
-        parameter <- as.list(lapply(1:length(ndx), function(i) cbind(as.numeric(rep(gcTable[ndx[[i]], param], length(data[[i]]))))))
+        if(methods::is(object) == "grofit"){
+          time <- as.list(lapply(1:length(ndx), function(i) cbind(object$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)))
+          data <- as.list(lapply(1:length(ndx), function(i) cbind(object$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)))
+          parameter <- as.list(lapply(1:length(ndx), function(i) cbind(as.numeric(rep(gcTable[ndx[[i]], param], length(data[[i]]))))))
+        } else {
+          time <- as.list(lapply(1:length(ndx), function(i) cbind(object$flFit$flFittedSplines[[ndx[[i]]]]$fit.x)))
+          data <- as.list(lapply(1:length(ndx), function(i) cbind(object$flFit$flFittedSplines[[ndx[[i]]]]$fit.fl)))
+          parameter <- as.list(lapply(1:length(ndx), function(i) cbind(as.numeric(rep(gcTable[ndx[[i]], param], length(data[[i]]))))))
+        }
       } else {
-        time <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$time[ndx[[i]], ])))
-        data <- grofit$data[ndx, 4:ncol(grofit$data)]
+        time <- as.list(lapply(1:length(ndx), function(i) cbind(object$time[ndx[[i]], ])))
+        if(methods::is(object) == "grofit"){
+          data <- object$data[ndx, 4:ncol(object$data)]
+        } else {
+          if(data.type == "norm.fl"){
+            data <- object$data$norm.fluorescence[ndx, 4:ncol(object$data$norm.fluorescence)]
+          } else {
+            data <- object$data$fluorescence[ndx, 4:ncol(object$data$fluorescence)]
+          }
+        }
         data <- split(as.matrix(data), 1:nrow(as.matrix(data)))
         data <- lapply(1:length(data), function(i) as.numeric(data[[i]]))
+
 
         parameter <- as.list(lapply(1:length(ndx), function(i) as.numeric(cbind(rep(gcTable[ndx[[i]], param], length(data[[i]]))))))
       }
@@ -4607,7 +4682,7 @@ plot.grid <- function(x,
       df$lower[df$lower<0] <- 0
     }
 
-    if(is.null(IDs)){
+    if(is.null(IDs) || !sort_by_ID){
       # sort names
       df <- df[order(df$group, df$concentration), ]
     }
@@ -4626,8 +4701,8 @@ plot.grid <- function(x,
       geom_line(linewidth = lwd) +
       geom_ribbon(aes(ymin = .data$lower, ymax=.data$upper), fill = "black", alpha = 0.3, colour = NA) +
       ggplot2::theme_bw(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), "Time", x.title)) +
-      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
+      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
       theme(strip.text.x = element_text(size = 0.8*basesize),
             legend.position = "bottom",
             panel.grid.major = element_blank(),
@@ -4817,40 +4892,77 @@ plot.grid <- function(x,
   else {
     df <- data.frame()
     for(i in 1:length(ndx.keep)){
-      if(data.type == "spline"){
-        df <- plyr::rbind.fill(df,
-                               data.frame("name" = sample.nm[ndx.keep[i]],
-                                          "time" = grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.time"]],
-                                          "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]],
-                                          "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
-                                                        length(grofit$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]))
-                                          )
-                               )
-        )
+      if(any(is(object) %in% "flFitRes")){
+        if(data.type == "spline"){
+          df <- plyr::rbind.fill(df,
+                                 data.frame("name" = sample.nm[ndx.keep[i]],
+                                            "time" = object$flFit$flFittedSplines[[ndx.keep[i]]][["fit.x"]],
+                                            "y" = object$flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]],
+                                            "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
+                                                                     length(object$flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]))
+                                            )
+                                 )
+          )
+        } else {
+          if(data.type == "norm.fl"){
+            df <- plyr::rbind.fill(df,
+                                   data.frame("name" = sample.nm[ndx.keep[i]],
+                                              "time" = as.vector(object$time[ndx.keep[i], ]),
+                                              "y" = unlist(unname(utils::type.convert(object$data$norm.fluorescence[ndx.keep[i], 4:ncol(object$data$norm.fluorescence)], as.is=T))),
+                                              "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
+                                                                       length(as.vector(object$time[ndx.keep[i], ])))
+                                              )
+                                   )
+            )
+          } else {
+            df <- plyr::rbind.fill(df,
+                                   data.frame("name" = sample.nm[ndx.keep[i]],
+                                              "time" = as.vector(object$time[ndx.keep[i], ]),
+                                              "y" = unlist(unname(utils::type.convert(object$data$fluorescence[ndx.keep[i], 4:ncol(object$data$fluorescence)], as.is=T))),
+                                              "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
+                                                                       length(as.vector(object$time[ndx.keep[i], ])))
+                                              )
+                                   )
+            )
+          }
+        }
       } else {
-        df <- plyr::rbind.fill(df,
-                               data.frame("name" = sample.nm[ndx.keep[i]],
-                                          "time" = as.vector(grofit$time[ndx.keep[i], ]),
-                                          "y" = unlist(unname(utils::type.convert(grofit$data[ndx.keep[i], 4:ncol(grofit$data)], as.is=T))),
-                                          "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
-                                                        length(as.vector(grofit$time[ndx.keep[i], ])))
-                                          )
-                               )
-        )
+        if(data.type == "spline"){
+          df <- plyr::rbind.fill(df,
+                                 data.frame("name" = sample.nm[ndx.keep[i]],
+                                            "time" = object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.time"]],
+                                            "y" = object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]],
+                                            "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
+                                                                     length(object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]))
+                                            )
+                                 )
+          )
+        } else {
+          df <- plyr::rbind.fill(df,
+                                 data.frame("name" = sample.nm[ndx.keep[i]],
+                                            "time" = as.vector(object$time[ndx.keep[i], ]),
+                                            "y" = unlist(unname(utils::type.convert(object$data[ndx.keep[i], 4:ncol(object$data)], as.is=T))),
+                                            "param" = as.numeric(rep(gcTable[ndx.keep[i], param],
+                                                                     length(as.vector(object$time[ndx.keep[i], ])))
+                                            )
+                                 )
+          )
+        }
       }
-
     }
     # add concentration column
-    df$concentration <- gsub(".+ \\| ", "", df$name)
+    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
     # add group column
     df$group <- gsub(" \\| .+", "", df$name)
-    if(is.null(IDs)){
+    if(is.null(IDs) || !sort_by_ID){
       # sort names
       df <- df[order(df$group, df$concentration), ]
     }
 
     # remove "NA" from names
     df$name <- gsub(" \\| NA", "", df$name)
+
+    df$name <- factor(df$name, levels = unique(factor(df$name)))
 
     p <- ggplot(df, aes(x=.data$time, y=.data$y, group = .data$name), col = "black")
     if(log.y == TRUE){
@@ -4863,8 +4975,8 @@ plot.grid <- function(x,
       p <- p +
       geom_line(linewidth = lwd) +
         ggplot2::theme_bw(base_size = basesize) +
-      xlab(ifelse(is.null(x.title), "Time", x.title)) +
-      ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
+      xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
+      ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
       theme(strip.text.x = element_text(size = 0.8*basesize),
             legend.position = "bottom",
             panel.grid.major = element_blank(),
