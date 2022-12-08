@@ -3058,25 +3058,29 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                choices = ""
                                                                    ),
 
-                                                                   checkboxInput(inputId = "select_string_visualize_growth_group",
+                                                                   checkboxInput(inputId = "select_string_visualize_growth_grid",
                                                                                  label = "(De-)select samples based on string",
                                                                                  value = FALSE),
 
                                                                    conditionalPanel(
-                                                                     condition = "!input.select_string_visualize_growth_group && !input.plot_group_averages_growth_grid_plot",
-                                                                     selectizeInput(inputId = "samples_visualize_growth_group",
+                                                                     condition = "!input.select_string_visualize_growth_grid && !input.plot_group_averages_growth_grid_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_growth_grid",
                                                                                     label = "Samples:",
                                                                                     width = "100%",
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
-                                                                     )
+                                                                     ),
+                                                                     checkboxInput(inputId = "order_matters_visualize_growth_grid",
+                                                                                   label = "Select order matters",
+                                                                                   value = FALSE
+                                                                                   ),
                                                                    ),
 
                                                                    conditionalPanel(
-                                                                     condition = "!input.select_string_visualize_growth_group && input.plot_group_averages_growth_grid_plot",
-                                                                     selectizeInput(inputId = "groups_visualize_growth_group",
+                                                                     condition = "!input.select_string_visualize_growth_grid && input.plot_group_averages_growth_grid_plot",
+                                                                     selectizeInput(inputId = "groups_visualize_growth_grid",
                                                                                     label = "Conditions:",
                                                                                     width = "100%",
                                                                                     choices = "",
@@ -3087,7 +3091,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    ),
 
                                                                    conditionalPanel(
-                                                                     condition = "input.select_string_visualize_growth_group",
+                                                                     condition = "input.select_string_visualize_growth_grid",
                                                                      textInput(inputId = "select_samples_based_on_string_growth_grid_plot",
                                                                                label = "Select sample based on string (separate by ;)"
                                                                      ),
@@ -3098,7 +3102,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    ),
                                                                    conditionalPanel(
-                                                                     condition = "input.plot_group_averages_growth_grid_plot || input.select_string_visualize_growth_group",
+                                                                     condition = "input.plot_group_averages_growth_grid_plot || input.select_string_visualize_growth_grid",
                                                                      textInput(inputId = "select_samples_based_on_concentration_growth_grid_plot",
                                                                                label = "Select sample based on concentration (separate by ;)"
                                                                      ),
@@ -10816,6 +10820,13 @@ server <- function(input, output, session){
         }
       })
 
+  observe({
+    if(input$select_string_visualize_growth_grid)
+      updateSelectInput(session = session,
+                        inputId = "order_matters_visualize_growth_grid",
+                        selected = FALSE)
+  })
+
   selected_inputs_parameter_growth_grid_plot <- reactive({
     results <- results$growth
     gc_parameters <- c()
@@ -10877,7 +10888,7 @@ server <- function(input, output, session){
   selected_inputs_visualize_growth_grid <- reactive({
     results <- results$growth
     if(is.null(results)) return("")
-    if(input$plot_group_averages_growth_group_plot){
+    if(input$plot_group_averages_growth_grid_plot){
       select_samples <- results$expdesign$condition
     } else {
       select_samples <- results$expdesign$label
@@ -10901,12 +10912,12 @@ server <- function(input, output, session){
 
   growth_grid_plot <- reactive({
     results <- results$growth
-
-    if(input$select_string_visualize_growth_group){
+    if(input$select_string_visualize_growth_grid){
       suppressWarnings(
         plot.grid(results,
                   data.type = input$data_type_growth_grid_plot,
                   IDs = NULL,
+                  sort_by_ID = FALSE,
                   names = input$select_samples_based_on_string_growth_grid_plot,
                   conc = input$select_samples_based_on_concentration_growth_grid_plot,
                   exclude.nm = input$exclude_samples_based_on_string_growth_grid_plot,
@@ -10923,7 +10934,8 @@ server <- function(input, output, session){
                   pal = input$color_palettes_grid_plot,
                   sort_by_conc = input$sort_by_conc_growth_grid_plot,
                   legend.lim = c(input$legend_lim_min_growth_grid_plot, input$legend_lim_max_growth_grid_plot),
-                  nrow = input$nrows_growth_grid_plot
+                  nrow = input$nrows_growth_grid_plot,
+                  param = input$parameter_parameter_grid_plot
         )
       )
     }
@@ -10932,10 +10944,11 @@ server <- function(input, output, session){
         plot.grid(results,
                   data.type = input$data_type_growth_grid_plot,
                   IDs = if(input$plot_group_averages_growth_grid_plot){
-                    input$groups_visualize_growth_group
+                    input$groups_visualize_growth_grid
                   }else{
-                    input$samples_visualize_growth_group
+                    input$samples_visualize_growth_grid
                   },
+                  sort_by_ID = input$order_matters_visualize_growth_grid,
                   names = NULL,
                   conc = input$select_samples_based_on_concentration_growth_grid_plot,
                   exclude.nm = NULL,
@@ -10952,7 +10965,8 @@ server <- function(input, output, session){
                   pal = input$color_palettes_grid_plot,
                   sort_by_conc = input$sort_by_conc_growth_grid_plot,
                   legend.lim = c(input$legend_lim_min_growth_grid_plot, input$legend_lim_max_growth_grid_plot),
-                  nrow = input$nrows_growth_grid_plot
+                  nrow = input$nrows_growth_grid_plot,
+                  param = input$parameter_parameter_grid_plot
         )
       )
     }

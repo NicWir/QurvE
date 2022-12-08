@@ -2364,9 +2364,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
             message("A lower y axis limit of <= 0 is not supported for log scaling. Lower limit set to 0.001")
             y.lim[1] <- 0.001
           }
-          p <- p + scale_y_continuous(limits = y.lim, breaks = base_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10), trans = 'log')
         } else {
-          p <- p + scale_y_continuous(breaks = base_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(breaks = scales::log_breaks(n = n.ybreaks, base = 10), trans = 'log')
         }
       } else {
         if(!is.null(y.lim)){
@@ -2824,9 +2824,9 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 
       if(log.y == TRUE){
         if(!is.null(y.lim)){
-          p <- p + scale_y_continuous(limits = y.lim, breaks = base_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10), trans = 'log')
         } else {
-          p <- p + scale_y_continuous(breaks = base_breaks(n = n.ybreaks), trans = 'log')
+          p <- p + scale_y_continuous(breaks = scales::log_breaks(n = n.ybreaks, base = 10), trans = 'log')
         }
       } else {
         if(!is.null(y.lim)){
@@ -3243,9 +3243,9 @@ plot.grofit <- function(x, ...,
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
-        p <- p + scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+        p <- p + scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10))
       } else {
-        p <- p + scale_y_log10(breaks = base_breaks(n = n.ybreaks))
+        p <- p + scale_y_log10(breaks = scales::log_breaks(n = n.ybreaks, base = 10))
       }
     } else {
       if(!is.null(y.lim)){
@@ -3419,9 +3419,9 @@ plot.grofit <- function(x, ...,
 
     if(log.y == TRUE){
       if(!is.null(y.lim)){
-        p <- p + scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+        p <- p + scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10))
       } else {
-        p <- p + scale_y_log10(breaks = base_breaks(n = n.ybreaks))
+        p <- p + scale_y_log10(breaks = scales::log_breaks(n = n.ybreaks, base = 10))
       }
     } else {
       if(!is.null(y.lim)){
@@ -4298,6 +4298,7 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
 #' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
 #' @param pal (Character string) Choose one of 'Green',   'Orange',  'Purple',  'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', or 'Mint' to visualize the value of the parameter chosen as \code{param} for each sample or condition.
 #' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}. The order of strings within the vector defines the order of samples within the grid.
+#' @param sort_by_ID (Logical) Shall samples/conditions be ordered as entered in \code{IDs} (\code{TRUE}) or alphabetically (\code{FALSE})?
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
@@ -4348,37 +4349,38 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
 #' plot.grid(res, param = "mu.spline")
 #'
 plot.grid <- function(x,
-                            data.type = c("spline", "raw"),
-                            param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
-                                      'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
-                                      'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
-                                      'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
-                                      'max_slope.linfit', 'max_slope.spline'),
-                            pal = c("Green",   "Orange",  "Purple",  "Magenta", "Grey", "Blue", "Grey", "Red", "Cyan", "Brown", "Mint"),
-                            IDs = NULL,
-                            names = NULL,
-                            conc = NULL,
-                            exclude.nm = NULL,
-                            exclude.conc = NULL,
-                            mean = TRUE,
-                            log.y = TRUE,
-                            n.ybreaks = 6,
-                            sort_by_conc = TRUE,
-                            nrow = NULL,
-                            basesize = 20,
-                            y.lim = NULL,
-                            x.lim = NULL,
-                            legend.lim = NULL,
-                            y.title = NULL,
-                            x.title = NULL,
-                            lwd = 1.1,
-                            plot = TRUE,
-                            export = FALSE,
-                            height = NULL,
-                            width = NULL,
-                            out.dir = NULL,
-                            out.nm = NULL,
-                            ...
+                      data.type = c("spline", "raw"),
+                      param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
+                                'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
+                                'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
+                                'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
+                                'max_slope.linfit', 'max_slope.spline'),
+                      pal = c("Green",   "Orange",  "Purple",  "Magenta", "Grey", "Blue", "Grey", "Red", "Cyan", "Brown", "Mint"),
+                      IDs = NULL,
+                      sort_by_ID = FALSE,
+                      names = NULL,
+                      conc = NULL,
+                      exclude.nm = NULL,
+                      exclude.conc = NULL,
+                      mean = TRUE,
+                      log.y = TRUE,
+                      n.ybreaks = 6,
+                      sort_by_conc = TRUE,
+                      nrow = NULL,
+                      basesize = 20,
+                      y.lim = NULL,
+                      x.lim = NULL,
+                      legend.lim = NULL,
+                      y.title = NULL,
+                      x.title = NULL,
+                      lwd = 1.1,
+                      plot = TRUE,
+                      export = FALSE,
+                      height = NULL,
+                      width = NULL,
+                      out.dir = NULL,
+                      out.nm = NULL,
+                      ...
 )
 {
   grofit <- x
@@ -4393,6 +4395,8 @@ plot.grid <- function(x,
   if(all(is.na(x.lim))) x.lim <- NULL
   suppressWarnings(assign("y.lim" ,as.numeric(y.lim)))
   if(all(is.na(y.lim))) y.lim <- NULL
+  suppressWarnings(assign("legend.lim" ,as.numeric(legend.lim)))
+  if(all(is.na(legend.lim))) legend.lim <- NULL
 
   if(!is.character(param) || !(param %in% c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
                                             'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
@@ -4418,13 +4422,13 @@ plot.grid <- function(x,
   data.type <- match.arg(data.type)
 
   # grofit an object of class grofit
-  if(methods::is(grofit) != "grofit") stop("grofit needs to be an object created with growth.workflow().")
+  if(methods::is(grofit) != "grofit") stop("plot.grid: x needs to be an object created with growth.workflow().")
   # /// check input parameters
 
   if (is.numeric(basesize)==FALSE)   stop("Need numeric value for: basesize")
   if (is.numeric(lwd)==FALSE)   stop("Need numeric value for: lwd")
   if(data.type == "spline"){
-    if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("To plot spline fit results, please run growth.workflow() with 'a' or 's' in fit.opt.")
+    if (!("s" %in% grofit$control$fit.opt | "a" %in% grofit$control$fit.opt)) stop("plot.grid: To plot spline fit results, please run growth.workflow() with 'a' or 's' in fit.opt.")
   }
 
   conc <- as.numeric(conc)
@@ -4439,16 +4443,20 @@ plot.grid <- function(x,
     # Check if IDs refer to samples or conditions
 
     ### SOLVE WITH MATCH TO GET ORDER OF INPUT!
-    if(any(grep(" \\| ", IDs))){
-      nm <- nm[
-        grepl(x = nm,
-              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
-      ]
+    if(sort_by_ID){
+      nm <- nm[unlist(lapply(1:length(IDs), function(x) which(nm %in% IDs[[x]] ) ) )]
     } else {
-      nm <- nm[
-        grepl(x = gsub(" \\| .+", "", nm),
-              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
-      ]
+      if(any(grep(" \\| ", IDs))){
+        nm <- nm[
+          grepl(x = nm,
+                pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+        ]
+      } else {
+        nm <- nm[
+          grepl(x = gsub(" \\| .+", "", nm),
+                pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+        ]
+      }
     }
   }
   else {
@@ -4472,7 +4480,7 @@ plot.grid <- function(x,
     if(!all(is.na(exclude.conc))) nm <- nm[-which(str_extract(nm, "[:graph:]+$") %in% exclude.conc)]
   }
   if(length(nm)==0){
-    stop("Please run plot.grofit() with valid 'names' or 'conc' argument.")
+    stop("Please run plot.grid() with valid 'IDs', names' or 'conc' argument.")
   }
   # remove conditions with fitFlag = FALSE in all replicates
   # Store each condition with its replicate indices in list filter.ls
@@ -4684,30 +4692,30 @@ plot.grid <- function(x,
             concentration == unique(df$concentration)[length(unique(df$concentration))] ~
               if(log.y == TRUE){
                 if(!is.null(y.lim)){
-                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+                  scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10))
                 } else {
-                  scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks))
+                  scale_y_log10(limits = range(df$mean), breaks = scales::log_breaks(n = n.ybreaks, base = 10))
                 }
               } else {
                 if(!is.null(y.lim)){
-                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks))
                 } else {
-                  scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+                  scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks))
                 }
               }
             ,
             concentration != unique(df$concentration)[length(unique(df$concentration))] ~
               if(log.y == TRUE){
                 if(!is.null(y.lim)){
-                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                  scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
                 } else {
-                  scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                  scale_y_log10(limits = range(df$mean), breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
                 }
               } else {
                 if(!is.null(y.lim)){
-                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+                  scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks), labels = NULL)
                 } else {
-                  scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE), labels = NULL)
+                  scale_y_continuous(limits = range(df$mean), breaks = scales::pretty_breaks(n = n.ybreaks), labels = NULL)
                 }
               }
           )
@@ -4761,9 +4769,9 @@ plot.grid <- function(x,
           name == as.character(unique(df$name)[number]) ~
             if(log.y == TRUE){
               if(!is.null(y.lim)){
-                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+                scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10))
               } else {
-                scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks))
+                scale_y_log10(limits = range(df$mean), breaks = scales::log_breaks(n = n.ybreaks, base = 10))
               }
             } else {
               if(!is.null(y.lim)){
@@ -4776,9 +4784,9 @@ plot.grid <- function(x,
           name %in% as.character(unique(df$name)[number_left]) ~
             if(log.y == TRUE){
               if(!is.null(y.lim)){
-                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
               } else {
-                scale_y_log10(limits = range(df$mean), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                scale_y_log10(limits = range(df$mean), breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
               }
             } else {
               if(!is.null(y.lim)){
@@ -4917,9 +4925,9 @@ plot.grid <- function(x,
             concentration == unique(df$concentration)[length(unique(df$concentration))] ~
               if(log.y == TRUE){
                 if(!is.null(y.lim)){
-                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+                  scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10))
                 } else {
-                  scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks))
+                  scale_y_log10(limits = range(df$y), breaks = scales::log_breaks(n = n.ybreaks, base = 10))
                 }
               } else {
                 if(!is.null(y.lim)){
@@ -4932,9 +4940,9 @@ plot.grid <- function(x,
             concentration != unique(df$concentration)[length(unique(df$concentration))] ~
               if(log.y == TRUE){
                 if(!is.null(y.lim)){
-                  scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                  scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
                 } else {
-                  scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                  scale_y_log10(limits = range(df$y), breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
                 }
               } else {
                 if(!is.null(y.lim)){
@@ -4995,9 +5003,9 @@ plot.grid <- function(x,
           name == unique(df$name)[number] ~
             if(log.y == TRUE){
               if(!is.null(y.lim)){
-                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks))
+                scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10))
               } else {
-                scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks))
+                scale_y_log10(limits = range(df$y), breaks = scales::log_breaks(n = n.ybreaks, base = 10))
               }
             } else {
               if(!is.null(y.lim)){
@@ -5010,9 +5018,9 @@ plot.grid <- function(x,
           name %in% unique(df$name)[number_left] ~
             if(log.y == TRUE){
               if(!is.null(y.lim)){
-                scale_y_log10(limits = y.lim, breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                scale_y_log10(limits = y.lim, breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
               } else {
-                scale_y_log10(limits = range(df$y), breaks = base_breaks(n = n.ybreaks), labels = NULL)
+                scale_y_log10(limits = range(df$y), breaks = scales::log_breaks(n = n.ybreaks, base = 10), labels = NULL)
               }
             } else {
               if(!is.null(y.lim)){

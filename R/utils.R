@@ -82,7 +82,7 @@ base_breaks <- function(n = 10)
         {
         grDevices::axisTicks(
             log10(range(x, na.rm = TRUE)),
-            log = TRUE, n = n
+            log = TRUE, nint = n
         )
     }
 }
