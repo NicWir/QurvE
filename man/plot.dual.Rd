@@ -36,7 +36,6 @@
   width = NULL,
   out.dir = NULL,
   out.nm = NULL,
-  shiny = FALSE,
   ...
 )
 }
@@ -100,8 +99,6 @@
 \item{out.dir}{(Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.}
 
 \item{out.nm}{(Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.}
-
-\item{shiny}{(Logical) Indicate if plot is generated within the shiny app.}
 
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }

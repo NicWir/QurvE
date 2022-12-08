@@ -3042,6 +3042,235 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                  ) #  mainPanel
                                                         ),
 
+                                                        ### Growth Grid Plots ####
+
+                                                        tabPanel(title = "Plot Grid",
+                                                                 sidebarPanel(
+
+                                                                   selectInput(inputId = "data_type_growth_grid_plot",
+                                                                               label = "Data type",
+                                                                               choices = c("Raw density" = "raw",
+                                                                                           "Spline fits" = "spline")
+                                                                   ),
+
+                                                                   selectInput(inputId = "parameter_parameter_grid_plot",
+                                                                               label = "Parameter",
+                                                                               choices = ""
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "select_string_visualize_growth_group",
+                                                                                 label = "(De-)select samples based on string",
+                                                                                 value = FALSE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_growth_group && !input.plot_group_averages_growth_grid_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_growth_group",
+                                                                                    label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_growth_group && input.plot_group_averages_growth_grid_plot",
+                                                                     selectizeInput(inputId = "groups_visualize_growth_group",
+                                                                                    label = "Conditions:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.select_string_visualize_growth_group",
+                                                                     textInput(inputId = "select_samples_based_on_string_growth_grid_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_samples_based_on_string_growth_grid_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     ),
+
+                                                                   ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.plot_group_averages_growth_grid_plot || input.select_string_visualize_growth_group",
+                                                                     textInput(inputId = "select_samples_based_on_concentration_growth_grid_plot",
+                                                                               label = "Select sample based on concentration (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_samples_based_on_concentration_growth_grid_plot",
+                                                                               label = "Exclude sample based on concentration (separate by ;)"
+                                                                     )
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "plot_group_averages_growth_grid_plot",
+                                                                                 label = "Plot group averages",
+                                                                                 value = TRUE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc",
+                                                                     checkboxInput(inputId = "sort_by_conc_growth_grid_plot",
+                                                                                   label = "Sort by concentration",
+                                                                                   value = TRUE)
+                                                                   ),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_growth_grid_plot",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = TRUE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_growth_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_growth_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_growth_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_growth_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("Color scale limits"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "legend_lim_min_growth_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "legend_lim_max_growth_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+
+                                                                   textInput(inputId = "y_axis_title_growth_grid_plot",
+                                                                             label = "y-axis title",
+                                                                             value = "Growth [y(t)]"
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_growth_grid_plot",
+                                                                             label = "x-axis title",
+                                                                             value = "Time"
+                                                                   ),
+
+                                                                   sliderInput(inputId = "nbreaks_growth_grid_plot",
+                                                                               label = "Number of breaks on y-axis",
+                                                                               min = 1,
+                                                                               max = 20,
+                                                                               value = 6),
+
+                                                                   sliderInput(inputId = "line_width_growth_grid_plot",
+                                                                               label = "Line width",
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1.1),
+
+                                                                   sliderInput(inputId = 'base_size_growth_grid_plot',
+                                                                               label = 'Base font size',
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 23,
+                                                                               step = 0.5),
+
+
+                                                                   conditionalPanel(
+                                                                     condition = "!sort_by_conc_growth_grid_plot",
+                                                                     sliderInput(inputId = "nrows_growth_grid_plot",
+                                                                                 label = "Number of rows in grid",
+                                                                                 min = 1,
+                                                                                 max = 20,
+                                                                                 value = 6)
+                                                                   ),
+
+
+                                                                   selectInput(inputId = "color_palettes_grid_plot",
+                                                                                  label = "Change color palette",
+                                                                                  width = "100%",
+                                                                                  choices = names(QurvE:::single_hue_palettes),
+                                                                                  selected = names(QurvE:::single_hue_palettes),
+                                                                                  multiple = FALSE,
+                                                                                  options = list(closeAfterSelect = TRUE)
+                                                                   ),
+                                                                   bsPopover(id = "color_palettes_grid_plot",
+                                                                             title = HTML("<em>Define the colors used to visualize the value of the chosen parameter</em>"), placement = "top",
+                                                                             content = ""
+                                                                   ),
+
+                                                                 ), # Side panel growth group plots
+
+                                                                 mainPanel(
+                                                                   withSpinner(
+                                                                     plotOutput("growth_grid_plot",
+                                                                                width = "100%", height = "1000px"),
+
+                                                                   ),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_growth_grid_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 10)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_growth_grid_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 9)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_growth_grid_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_growth_grid_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_growth_grid_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ) # column
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
+                                                        ),
+
                                                         ### Growth DR Plots Spline ####
 
                                                         tabPanel(title = "Dose-Response Analysis", value = "tabPanel_Visualize_Growth_DoseResponse_Spline",
@@ -10586,6 +10815,200 @@ server <- function(input, output, session){
                       choices = select_inputs_individual_plots_dose_response_growth_plot_bt())
   })
 
+      ### Grid Plot ####
+      observe({
+        if(!output$more_than_two_conc){
+          updateSelectInput(session = session,
+                            inputId = "sort_by_conc_growth_grid_plot",
+                            selected = FALSE)
+        }
+      })
+
+  selected_inputs_parameter_growth_grid_plot <- reactive({
+    results <- results$growth
+    gc_parameters <- c()
+    if("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      if(results$control$biphasic){
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (Spline)' = 'mu.spline',
+                           'Growth rate phase 2 (Spline)' = 'mu.spline',
+                           "Doubling time (Spline)" = "tD.spline",
+                           "Doubling time phase 2 (Spline)" = "tD.spline",
+                           'Lag time (Spline)' = 'lambda.spline',
+                           'Maximum density (Spline)' = 'A.spline',
+                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Area under the curve (Spline)' = 'integral.spline')
+      } else {
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (Spline)' = 'mu.spline',
+                           "Doubling time (Spline)" = "tD.spline",
+                           'Lag time (Spline)' = 'lambda.spline',
+                           'Maximum density (Spline)' = 'A.spline',
+                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Area under the curve (Spline)' = 'integral.spline')
+      }
+    }
+    if("l" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      if(results$control$biphasic){
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (linear fit)' = 'mu.linfit',
+                           'Growth rate phase 2 (linear fit)' = 'mu.linfit',
+                           "Doubling time (linear fit)" = "tD.linfit",
+                           "Doubling time phase 2 (linear fit)" = "tD.linfit",
+                           'Lag time (linear fit)' = 'lambda.linfit',
+                           'Maximum density (linear fit)' = 'A.linfit',
+                           'ΔDensity (linear fit)' = 'dY.linfit')
+      } else {
+        gc_parameters <- c(gc_parameters,
+                           'Growth rate (linear fit)' = 'mu.linfit',
+                           "Doubling time (linear fit)" = "tD.linfit",
+                           'Lag time (linear fit)' = 'lambda.linfit',
+                           'Maximum density (linear fit)' = 'A.linfit',
+                           'ΔDensity (linear fit)' = 'dY.linfit')
+      }
+    }
+    if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+      gc_parameters <- c(gc_parameters,
+                         'Growth rate (model)' = 'mu.model',
+                         'Doubling time (model)' = 'tD.model',
+                         'Lag time (model)' = 'lambda.model',
+                         'Maximum density (model)' = 'A.model')
+    }
+    gc_parameters
+  })
+
+  observe({
+    updateSelectInput(inputId = "parameter_parameter_grid_plot",
+                      choices = selected_inputs_parameter_growth_grid_plot()
+    )})
+
+  selected_inputs_visualize_growth_grid <- reactive({
+    results <- results$growth
+    if(is.null(results)) return("")
+    if(input$plot_group_averages_growth_group_plot){
+      select_samples <- results$expdesign$condition
+    } else {
+      select_samples <- results$expdesign$label
+    }
+    select_samples
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "samples_visualize_growth_grid",
+                      choices = selected_inputs_visualize_growth_grid()
+    )
+  })
+
+  observe({
+    updateSelectInput(session,
+                      inputId = "groups_visualize_growth_grid",
+                      choices = selected_inputs_visualize_growth_grid()
+    )
+  })
+
+  growth_grid_plot <- reactive({
+    results <- results$growth
+
+    if(input$select_string_visualize_growth_group){
+      suppressWarnings(
+        plot.grid(results,
+                  data.type = input$data_type_growth_grid_plot,
+                  IDs = NULL,
+                  names = input$select_samples_based_on_string_growth_grid_plot,
+                  conc = input$select_samples_based_on_concentration_growth_grid_plot,
+                  exclude.nm = input$exclude_samples_based_on_string_growth_grid_plot,
+                  exclude.conc = input$exclude_samples_based_on_concentration_growth_grid_plot,
+                  mean = input$plot_group_averages_growth_grid_plot,
+                  log.y = input$log_transform_y_axis_growth_grid_plot,
+                  x.lim = c(input$x_range_min_growth_grid_plot, input$x_range_max_growth_grid_plot),
+                  y.lim = c(input$y_range_min_growth_grid_plot,input$y_range_max_growth_grid_plot),
+                  y.title = input$y_axis_title_growth_grid_plot,
+                  x.title = input$x_axis_title_growth_grid_plot,
+                  n.ybreaks = input$nbreaks_growth_grid_plot,
+                  lwd = input$line_width_growth_grid_plot,
+                  basesize = input$base_size_growth_grid_plot,
+                  pal = input$color_palettes_grid_plot,
+                  sort_by_conc = input$sort_by_conc_growth_grid_plot,
+                  legend.lim = c(input$legend_lim_min_growth_grid_plot, input$legend_lim_max_growth_grid_plot),
+                  nrow = input$nrows_growth_grid_plot
+        )
+      )
+    }
+    else{
+      suppressWarnings(
+        plot.grid(results,
+                  data.type = input$data_type_growth_grid_plot,
+                  IDs = if(input$plot_group_averages_growth_grid_plot){
+                    input$groups_visualize_growth_group
+                  }else{
+                    input$samples_visualize_growth_group
+                  },
+                  names = NULL,
+                  conc = input$select_samples_based_on_concentration_growth_grid_plot,
+                  exclude.nm = NULL,
+                  exclude.conc = input$exclude_samples_based_on_concentration_growth_grid_plot,
+                  mean = input$plot_group_averages_growth_grid_plot,
+                  log.y = input$log_transform_y_axis_growth_grid_plot,
+                  x.lim = c(input$x_range_min_growth_grid_plot, input$x_range_max_growth_grid_plot),
+                  y.lim = c(input$y_range_min_growth_grid_plot,input$y_range_max_growth_grid_plot),
+                  y.title = input$y_axis_title_growth_grid_plot,
+                  x.title = input$x_axis_title_growth_grid_plot,
+                  n.ybreaks = input$nbreaks_growth_grid_plot,
+                  lwd = input$line_width_growth_grid_plot,
+                  basesize = input$base_size_growth_grid_plot,
+                  pal = input$color_palettes_grid_plot,
+                  sort_by_conc = input$sort_by_conc_growth_grid_plot,
+                  legend.lim = c(input$legend_lim_min_growth_grid_plot, input$legend_lim_max_growth_grid_plot),
+                  nrow = input$nrows_growth_grid_plot
+        )
+      )
+    }
+  })
+
+  output$growth_grid_plot <- renderPlot({
+    growth_grid_plot()
+  })
+
+
+  observe({
+    if(input$plot_derivative_growth_grid_plot && input$data_type_growth_grid_plot == 'spline') h <- 9
+    else h <- 6
+    updateSelectInput(inputId = "height_download_growth_grid_plot",
+                      selected = h
+    )
+  })
+
+  output$download_growth_grid_plot <- downloadHandler(
+    filename = function() {
+      paste("growth_grid_plot",  input$format_download_growth_grid_plot, sep="")
+    },
+    content = function(file) {
+      if(input$format_download_growth_grid_plot == ".pdf"){
+        if (requireNamespace("Cairo", quietly = TRUE)) {
+          ggsave(filename = file, width = input$width_download_growth_grid_plot,
+                 height = input$height_download_growth_grid_plot,
+                 dpi = input$dpi_download_growth_grid_plot,
+                 device = cairo_pdf)
+        } else {
+          showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+          ggsave(filename = file, width = input$width_download_growth_grid_plot,
+                 height = input$height_download_growth_grid_plot,
+                 dpi = input$dpi_download_growth_grid_plot,
+                 device = pdf)
+        }
+
+      } else {
+        ggsave(filename = file, width = input$width_download_growth_grid_plot,
+               height = input$height_download_growth_grid_plot,
+               dpi = input$dpi_download_growth_grid_plot,
+               device = png)
+      }
+
+    },
+    contentType = ifelse(input$format_download_growth_grid_plot == ".pdf", "image/pdf", "image/png")
+  )
+
       ### DR Parameter Plots ####
   observe({
     if(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1){
@@ -10831,8 +11254,7 @@ server <- function(input, output, session){
           legend.position = input$legend_position_fluorescence_group_plot,
           legend.ncol = input$legend_ncol_fluorescence_group_plot,
           group_pals = input$color_palettes_fluorescence_group_plot,
-          colors = cols,
-          shiny = TRUE
+          colors = cols
         )
       )
     } else {
@@ -10865,8 +11287,7 @@ server <- function(input, output, session){
           legend.position = input$legend_position_fluorescence_group_plot,
           legend.ncol = input$legend_ncol_fluorescence_group_plot,
           colors = cols,
-          group_pals = input$color_palettes_fluorescence_group_plot,
-          shiny = TRUE
+          group_pals = input$color_palettes_fluorescence_group_plot
         )
       )
     }
@@ -11669,8 +12090,7 @@ server <- function(input, output, session){
                     legend.ncol = input$legend_ncol_dual_plot,
                     color_groups = input$color_groups_dual_plot,
                     colors = cols,
-                    group_pals = input$color_palettes_dual_plot,
-                    shiny = TRUE
+                    group_pals = input$color_palettes_dual_plot
           )
         )
         } else {
@@ -11698,8 +12118,7 @@ server <- function(input, output, session){
                       legend.position = input$legend_position_dual_plot,
                       legend.ncol = input$legend_ncol_dual_plot,
                       group_pals = input$color_palettes_dual_plot,
-                      colors = cols,
-                      shiny = TRUE
+                      colors = cols
             )
           )
         }

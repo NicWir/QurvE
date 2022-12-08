@@ -1705,7 +1705,6 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
-#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.flFitRes
@@ -1765,7 +1764,6 @@ plot.flFitRes <-  function(x,
                         width = NULL,
                         out.dir = NULL,
                         out.nm = NULL,
-                        shiny = FALSE,
                         ...
 )
 {
@@ -2510,7 +2508,6 @@ plot.flFit <- plot.flFitRes
 #' @param width (Numeric) Width of the exported image in inches.
 #' @param out.dir (Character) Name or path to a folder in which the exported files are stored. If \code{NULL}, a "Plots" folder is created in the current working directory to store the files in.
 #' @param out.nm (Character) The name of the PDF and PNG files if \code{export = TRUE}. If \code{NULL}, a name will be automatically generated including the chosen parameter.
-#' @param shiny (Logical) Indicate if plot is generated within the shiny app.
 #' @param ... Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.
 #'
 #' @export plot.dual
@@ -2565,7 +2562,6 @@ plot.dual <-  function(x,
                        width = NULL,
                        out.dir = NULL,
                        out.nm = NULL,
-                       shiny = FALSE,
                        ...
 )
 {

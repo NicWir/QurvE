@@ -4590,7 +4590,7 @@ plot.grid <- function(x,
 
     df$name <- gsub(" \\| NA", "", df$name)
 
-    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    df$concentration <- suppressWarnings(as.numeric(gsub(".+ \\| ", "", df$name)))
     df$group <- gsub(" \\| .+", "", df$name)
 
 
@@ -4608,16 +4608,16 @@ plot.grid <- function(x,
 
     p <- ggplot(df, aes(x=.data$time, y=.data$mean, group = .data$name), col = "black")
     if(log.y == TRUE){
-      p <- p + geom_rect(aes(fill = .data$mean.param, xmin = -Inf, xmax = Inf,
+      p <- p + ggplot2::geom_rect(aes(fill = .data$mean.param, xmin = -Inf, xmax = Inf,
                              ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
     } else {
-      p <- p + geom_rect(aes(fill = .data$mean.param), xmin = -Inf, xmax = Inf,
+      p <- p + ggplot2::geom_rect(aes(fill = .data$mean.param), xmin = -Inf, xmax = Inf,
                          ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
     }
     p <- p +
       geom_line(linewidth = lwd) +
       geom_ribbon(aes(ymin = .data$lower, ymax=.data$upper), fill = "black", alpha = 0.3, colour = NA) +
-      theme_bw(base_size = basesize) +
+      ggplot2::theme_bw(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
       theme(strip.text.x = element_text(size = 0.8*basesize),
@@ -4660,10 +4660,12 @@ plot.grid <- function(x,
                                                         barwidth = basesize,
                                                         barheight = basesize/10))
     }
+    if(length(unique(df$concentration))<2)
+      sort_by_conc <- FALSE
 
     if(sort_by_conc){
       p <- p + ggh4x::facet_nested(concentration ~ group, scales = "free") +
-        facetted_pos_scales(
+        ggh4x::facetted_pos_scales(
           x = list(
             group == unique(df$group)[1] ~
               if(!is.null(x.lim)){
@@ -4734,7 +4736,7 @@ plot.grid <- function(x,
                                  -nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
                                ], g$layout[grep("panel", g$layout$name), ][,"t"])
 
-      p <- p + facetted_pos_scales(
+      p <- p +  ggh4x::facetted_pos_scales(
         x = list(
           name == as.character(unique(df$name)[number]) ~
             if(!is.null(x.lim)){
@@ -4844,15 +4846,15 @@ plot.grid <- function(x,
 
     p <- ggplot(df, aes(x=.data$time, y=.data$y, group = .data$name), col = "black")
     if(log.y == TRUE){
-      p <- p + geom_rect(aes(fill = .data$param, xmin = -Inf, xmax = Inf,
+      p <- p + ggplot2::geom_rect(aes(fill = .data$param, xmin = -Inf, xmax = Inf,
                              ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
     } else {
-      p <- p + geom_rect(aes(fill = .data$param), xmin = -Inf, xmax = Inf,
+      p <- p + ggplot2::geom_rect(aes(fill = .data$param), xmin = -Inf, xmax = Inf,
                          ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
     }
       p <- p +
       geom_line(linewidth = lwd) +
-      theme_bw(base_size = basesize) +
+        ggplot2::theme_bw(base_size = basesize) +
       xlab(ifelse(is.null(x.title), "Time", x.title)) +
       ylab(ifelse(is.null(y.title), "Growth [y(t)]", y.title)) +
       theme(strip.text.x = element_text(size = 0.8*basesize),
@@ -4896,7 +4898,7 @@ plot.grid <- function(x,
 
     if(sort_by_conc){
       p <- p + ggh4x::facet_nested(concentration ~ group, scales = "free") +
-        facetted_pos_scales(
+        ggh4x::facetted_pos_scales(
           x = list(
             group == unique(df$group)[1] ~
               if(!is.null(x.lim)){
@@ -4968,7 +4970,7 @@ plot.grid <- function(x,
         -nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
       ], g$layout[grep("panel", g$layout$name), ][,"t"])
 
-      p <- p + facetted_pos_scales(
+      p <- p +  ggh4x::facetted_pos_scales(
         x = list(
           name == unique(df$name)[number] ~
             if(!is.null(x.lim)){
