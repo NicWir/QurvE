@@ -1395,157 +1395,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    ), # tabPanel("Fluorescence"
                         ), # navbarMenu('Computation'
 
-                        #____RESULTS____####
-
-                        navbarMenu(span("Results", title = "Tabular overview of computation results."),
-                                   menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
-                                   ##____Results_Growth___####
-                                   tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
-                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Growth",
-                                                        tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
-                                                                 conditionalPanel(condition = "input.biphasic_growth",
-                                                                                  h5("(Values in parentheses indicate parameters for secondary growth phase)")
-                                                                 ),
-
-                                                                 checkboxInput(inputId = 'grouped_results_growth_linear',
-                                                                               label = 'Group averages',
-                                                                               value = TRUE),
-
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_growth_linear",
-                                                                   DT::dataTableOutput('results_table_growth_linear')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_growth_linear",
-                                                                   DT::dataTableOutput('results_table_growth_linear_group')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_growth_linear",
-                                                                   downloadButton('download_table_growth_linear',"Download table")
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_growth_linear",
-                                                                   downloadButton('download_table_growth_linear_group',"Download table")
-                                                                 ),
-                                                        ),
-                                                        tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
-                                                                 conditionalPanel(condition = "input.biphasic_growth",
-                                                                                  h5("(Values in parentheses indicate parameters for secondary growth phase)")
-                                                                 ),
-                                                                 checkboxInput(inputId = 'grouped_results_growth_spline',
-                                                                               label = 'Group averages',
-                                                                               value = TRUE),
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_growth_spline",
-                                                                   DT::dataTableOutput('results_table_growth_spline')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_growth_spline",
-                                                                   DT::dataTableOutput('results_table_growth_spline_group')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_growth_spline",
-                                                                   downloadButton('download_table_growth_spline',"Download table")
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_growth_spline",
-                                                                   downloadButton('download_table_growth_spline_group',"Download table")
-                                                                 ),
-                                                        ),
-                                                        tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Growth_Spline_bt",
-                                                                 DT::dataTableOutput('results_table_growth_spline_bt'),
-                                                                 downloadButton('download_table_growth_spline_bt',"Download table")
-                                                        ),
-                                                        tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
-
-                                                                 checkboxInput(inputId = 'grouped_results_growth_model',
-                                                                               label = 'Group averages',
-                                                                               value = TRUE),
-
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_growth_model",
-                                                                   DT::dataTableOutput('results_table_growth_model'),
-                                                                   downloadButton('download_table_growth_model',"Download table")
-                                                                 ),
-
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_growth_model",
-                                                                   DT::dataTableOutput('results_table_growth_model_group'),
-                                                                   downloadButton('download_table_growth_model_group',"Download table")
-                                                                 ),
-                                                        ),
-                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Growth_DR",
-                                                                 DT::dataTableOutput('results_table_growth_dr_spline'),
-                                                                 downloadButton('download_table_growth_dr',"Download table")
-                                                        )
-                                            )
-                                   ),
-                                   ##____Results_Fluorescence___####
-                                   tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
-                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Fluorescence",
-                                                        tabPanel(title = "Linear Fit", value = "tabPanel_Results_Fluorescence_Linear",
-                                                                 conditionalPanel(condition = "input.biphasic_fluorescence",
-                                                                                  h5("(Values in parentheses indicate parameters for secondary phase)")
-                                                                 ),
-                                                                 checkboxInput(inputId = 'grouped_results_fluorescence_linear',
-                                                                               label = 'Group averages',
-                                                                               value = TRUE),
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_fluorescence_linear",
-                                                                   DT::dataTableOutput('results_table_fluorescence_linear')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_fluorescence_linear",
-                                                                   DT::dataTableOutput('results_table_fluorescence_linear_group')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_fluorescence_linear",
-                                                                   downloadButton('download_table_fluorescence_linear',"Download table")
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_fluorescence_linear",
-                                                                   downloadButton('download_table_fluorescence_linear_group',"Download table")
-                                                                 ),
-                                                        ),
-                                                        tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Fluorescence_Spline",
-                                                                 conditionalPanel(condition = "input.biphasic_fluorescence",
-                                                                                  h5("(Values in parentheses indicate parameters for secondary phase)")
-                                                                 ),
-                                                                 checkboxInput(inputId = 'grouped_results_fluorescence_spline',
-                                                                               label = 'Group averages',
-                                                                               value = TRUE),
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_fluorescence_spline",
-                                                                   DT::dataTableOutput('results_table_fluorescence_spline')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_fluorescence_spline",
-                                                                   DT::dataTableOutput('results_table_fluorescence_spline_group')
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "!input.grouped_results_fluorescence_spline",
-                                                                   downloadButton('download_table_fluorescence_spline',"Download table")
-                                                                 ),
-                                                                 conditionalPanel(
-                                                                   condition = "input.grouped_results_fluorescence_spline",
-                                                                   downloadButton('download_table_fluorescence_spline_group',"Download table")
-                                                                 ),
-                                                        ),
-                                                        tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Fluorescence_Spline_bt",
-                                                                 DT::dataTableOutput('results_table_fluorescence_spline_bt'),
-                                                                 downloadButton('download_table_fluorescence_spline_bt',"Download table")
-                                                        ),
-                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Spline",
-                                                                 DT::dataTableOutput('results_table_fluorescence_dr_spline'),
-                                                                 downloadButton('download_table_fluorescence_dr_spline',"Download table")
-                                                        ),
-                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Model",
-                                                                 DT::dataTableOutput('results_table_fluorescence_dr_model'),
-                                                                 downloadButton('download_table_fluorescence_dr_model',"Download table")
-                                                        )
-                                            )
-                                   )
-                        ),
                         #____VALIDATE____####
                         navbarMenu(span("Validation", title = "Graphical display for each fit."),
                                    menuName = "navbarMenu_Validate", icon = icon("user-check"),
@@ -2615,6 +2464,158 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                             ) # tabsetPanel(type = "tabs",
                                    ) # tabPanel(title = "Fluorescence Fits", value = "tabPanel_Validate_Fluorescence",
                         ), # navbarMenu("Validate", icon = icon("user-check"),
+                        #____RESULTS____####
+
+                        navbarMenu(span("Results", title = "Tabular overview of computation results."),
+                                   menuName = "navbarMenu_Results", icon = icon("magnifying-glass-chart"),
+                                   ##____Results_Growth___####
+                                   tabPanel(title = "Growth", value = "tabPanel_Results_Growth",
+                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Growth",
+                                                        tabPanel(title = "Linear Fit", value = "tabPanel_Results_Growth_Linear",
+                                                                 conditionalPanel(condition = "input.biphasic_growth",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary growth phase)")
+                                                                 ),
+
+                                                                 checkboxInput(inputId = 'grouped_results_growth_linear',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_linear",
+                                                                   DT::dataTableOutput('results_table_growth_linear')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_linear",
+                                                                   DT::dataTableOutput('results_table_growth_linear_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_linear",
+                                                                   downloadButton('download_table_growth_linear',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_linear",
+                                                                   downloadButton('download_table_growth_linear_group',"Download table")
+                                                                 ),
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Growth_Spline",
+                                                                 conditionalPanel(condition = "input.biphasic_growth",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary growth phase)")
+                                                                 ),
+                                                                 checkboxInput(inputId = 'grouped_results_growth_spline',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_spline",
+                                                                   DT::dataTableOutput('results_table_growth_spline')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_spline",
+                                                                   DT::dataTableOutput('results_table_growth_spline_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_spline",
+                                                                   downloadButton('download_table_growth_spline',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_spline",
+                                                                   downloadButton('download_table_growth_spline_group',"Download table")
+                                                                 ),
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Growth_Spline_bt",
+                                                                 DT::dataTableOutput('results_table_growth_spline_bt'),
+                                                                 downloadButton('download_table_growth_spline_bt',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Parametric Fit", value = "tabPanel_Results_Growth_Model",
+
+                                                                 checkboxInput(inputId = 'grouped_results_growth_model',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_growth_model",
+                                                                   DT::dataTableOutput('results_table_growth_model'),
+                                                                   downloadButton('download_table_growth_model',"Download table")
+                                                                 ),
+
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_growth_model",
+                                                                   DT::dataTableOutput('results_table_growth_model_group'),
+                                                                   downloadButton('download_table_growth_model_group',"Download table")
+                                                                 ),
+                                                        ),
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Growth_DR",
+                                                                 DT::dataTableOutput('results_table_growth_dr_spline'),
+                                                                 downloadButton('download_table_growth_dr',"Download table")
+                                                        )
+                                            )
+                                   ),
+                                   ##____Results_Fluorescence___####
+                                   tabPanel(title = "Fluorescence", value = "tabPanel_Results_Fluorescence",
+                                            tabsetPanel(type = "tabs", id = "tabsetPanel_Results_Fluorescence",
+                                                        tabPanel(title = "Linear Fit", value = "tabPanel_Results_Fluorescence_Linear",
+                                                                 conditionalPanel(condition = "input.biphasic_fluorescence",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary phase)")
+                                                                 ),
+                                                                 checkboxInput(inputId = 'grouped_results_fluorescence_linear',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_linear",
+                                                                   DT::dataTableOutput('results_table_fluorescence_linear')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_linear",
+                                                                   DT::dataTableOutput('results_table_fluorescence_linear_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_linear",
+                                                                   downloadButton('download_table_fluorescence_linear',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_linear",
+                                                                   downloadButton('download_table_fluorescence_linear_group',"Download table")
+                                                                 ),
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit", value = "tabPanel_Results_Fluorescence_Spline",
+                                                                 conditionalPanel(condition = "input.biphasic_fluorescence",
+                                                                                  h5("(Values in parentheses indicate parameters for secondary phase)")
+                                                                 ),
+                                                                 checkboxInput(inputId = 'grouped_results_fluorescence_spline',
+                                                                               label = 'Group averages',
+                                                                               value = TRUE),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_spline",
+                                                                   DT::dataTableOutput('results_table_fluorescence_spline')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_spline",
+                                                                   DT::dataTableOutput('results_table_fluorescence_spline_group')
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "!input.grouped_results_fluorescence_spline",
+                                                                   downloadButton('download_table_fluorescence_spline',"Download table")
+                                                                 ),
+                                                                 conditionalPanel(
+                                                                   condition = "input.grouped_results_fluorescence_spline",
+                                                                   downloadButton('download_table_fluorescence_spline_group',"Download table")
+                                                                 ),
+                                                        ),
+                                                        tabPanel(title = "Nonparametric Fit (Bootstrapping)", value = "tabPanel_Results_Fluorescence_Spline_bt",
+                                                                 DT::dataTableOutput('results_table_fluorescence_spline_bt'),
+                                                                 downloadButton('download_table_fluorescence_spline_bt',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Spline",
+                                                                 DT::dataTableOutput('results_table_fluorescence_dr_spline'),
+                                                                 downloadButton('download_table_fluorescence_dr_spline',"Download table")
+                                                        ),
+                                                        tabPanel(title = "Dose-response analysis", value = "tabPanel_Results_Fluorescence_DR_Model",
+                                                                 DT::dataTableOutput('results_table_fluorescence_dr_model'),
+                                                                 downloadButton('download_table_fluorescence_dr_model',"Download table")
+                                                        )
+                                            )
+                                   )
+                        ),
+
                         #____Visualize____####
                         navbarMenu(span("Visualization", title = "Visualize computation results for the entire dataset."),
                                    menuName = "navbarMenu_Visualize", icon = icon("chart-line"),
@@ -6261,7 +6262,7 @@ server <- function(input, output, session){
     try(
       suppressWarnings(
         plot.grodata(x = results$custom_data,
-                     data.type = "dens",
+                     data.type = "growth",
                     IDs = NULL
         )
       )
@@ -6976,7 +6977,7 @@ server <- function(input, output, session){
     try(
       suppressWarnings(
         plot.grodata(x = results$parsed_data,
-                     data.type = "dens",
+                     data.type = "growth",
                      IDs = NULL
         )
       )
@@ -12278,7 +12279,7 @@ server <- function(input, output, session){
 
       fluorescence_grid_plot <- reactive({
         results <- results$fluorescence
-        if(input$y_axis_title_fluorescence_grid_plot == "" || )
+        if(input$y_axis_title_fluorescence_grid_plot == "")
           y_axis_title <- NULL
         else
           y_axis_title <- input$y_axis_title_fluorescence_grid_plot
