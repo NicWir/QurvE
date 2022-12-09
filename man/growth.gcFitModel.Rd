@@ -2,14 +2,14 @@
 % Please edit documentation in R/parametric_fits.R
 \name{growth.gcFitModel}
 \alias{growth.gcFitModel}
-\title{Fit nonlinear growth models to density data}
+\title{Fit nonlinear growth models to growth data}
 \usage{
 growth.gcFitModel(time, data, gcID = "undefined", control = growth.control())
 }
 \arguments{
 \item{time}{Vector of the independent variable (usually time).}
 
-\item{data}{Vector of dependent variable (usually density values).}
+\item{data}{Vector of dependent variable (usually growth values).}
 
 \item{gcID}{(Character) The name of the analyzed sample.}
 
@@ -18,14 +18,14 @@ growth.gcFitModel(time, data, gcID = "undefined", control = growth.control())
 \value{
 A \code{gcFitModel} object that contains physiological parameters and information about the best fit. Use \code{\link{plot.gcFitModel}} to visualize the parametric fit and growth equation.
 \item{raw.time}{Raw time values provided to the function as \code{time}.}
-\item{raw.data}{Raw density data provided to the function as \code{data}.}
+\item{raw.data}{Raw growth data provided to the function as \code{data}.}
 \item{gcID}{(Character) Identifies the tested sample.}
 \item{fit.time}{Fitted time values.}
-\item{fit.data}{Fitted density values.}
+\item{fit.data}{Fitted growth values.}
 \item{parameters}{List of determined growth parameters.}
 \itemize{
-\item \code{A}: {Maximum density.}
-\item \code{dY}: {Difference in maximum density and minimum density of the fitted model.}
+\item \code{A}: {Maximum growth.}
+\item \code{dY}: {Difference in maximum growth and minimum growth of the fitted model.}
 \item \code{mu}: {Maximum growth rate (i.e., maximum in first derivative of the spline).}
 \item \code{lambda}: {Lag time.}
 \item \code{b.tangent}: {Intersection of the tangent at the maximum growth rate with the abscissa.}

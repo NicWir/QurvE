@@ -9,7 +9,7 @@
 #'   \item Fit linear regressions (Theil-Sen estimator) to all subsets of \code{h} consecutive, log-transformed data
 #'     points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear regression to points
 #'     1 \dots 5, 2 \dots 6, 3 \dots 7 and so on.
-#'   \item Find the subset with the highest slope \eqn{mu_{max}}. Do the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} and relative standard deviation (RSD) values of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
+#'   \item Find the subset with the highest slope \eqn{mu_{max}}. Do the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} and relative standard deviation (RSD) values of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total growth increase? If not, evaluate the subset with the second highest slope, and so on.
 #'   \item Include also the data points of adjacent subsets that have a slope of at least \eqn{quota \cdot mu{max}}, e.g., all regression windows that have at least 95% of the maximum slope.
 #'   \item Fit a new linear model to the extended data window identified in step 3.
 #' }
@@ -24,20 +24,20 @@
 #' }
 #'
 #' @param time Vector of the independent variable (usually: time).
-#' @param data Vector of dependent variable (usually: density values).
+#' @param data Vector of dependent variable (usually: growth values).
 #' @param quota (Numeric, between 0 an 1) Define what fraction of \eqn{mu_{max}} the slope of regression windows adjacent to the window with highest slope should have to be included in the overall linear fit.
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
 #' @param gcID (Character) The name of the analyzed sample.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{TRUE}
-#' @param min.density (Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions.
-#' @param max.density (Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions.
+#' @param min.growth (Numeric) Indicate whether only growth values above a certain threshold should be considered for linear regressions.
+#' @param max.growth (Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions.
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param tmax (Numeric) Minimum time value considered for linear and spline fits.
 #' @param lin.h (Numeric) Manually define the size of the sliding window . If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
 #' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}
-#' @param lin.dY (Numeric) Enter the minimum percentage of density increase that a linear regression should cover.
+#' @param lin.dY (Numeric) Enter the minimum percentage of growth increase that a linear regression should cover.
 #' @param biphasic (Logical) Shall \code{\link{growth.gcFitLinear}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?
 #'
 #' @return A \code{gcFitLinear} object with parameters of the fit. The lag time is
@@ -45,18 +45,18 @@
 #'   \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable.
 #'   Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
 #' \item{raw.time}{Raw time values provided to the function as \code{time}.}
-#' \item{raw.data}{Raw density data provided to the function as \code{data}.}
+#' \item{raw.data}{Raw growth data provided to the function as \code{data}.}
 #' \item{filt.time}{Filtered time values used for the heuristic linear method.}
-#' \item{filt.data}{Filtered density values.}
-#' \item{log.data}{Log-transformed, filtered density values used for the heuristic linear method.}
+#' \item{filt.data}{Filtered growth values.}
+#' \item{log.data}{Log-transformed, filtered growth values used for the heuristic linear method.}
 #' \item{gcID}{(Character) Identifies the tested sample.}
 #' \item{FUN}{Linear _function_ used for plotting the tangent at mumax.}
 #' \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
 #' \item{par}{List of determined growth parameters.}
 #' \itemize{
-#' \item \code{y0}: {Minimum density value considered for the heuristic linear method.}
-#' \item \code{dY}: {Difference in maximum density and minimum density.}
-#' \item \code{A}: {Maximum density.}
+#' \item \code{y0}: {Minimum growth value considered for the heuristic linear method.}
+#' \item \code{dY}: {Difference in maximum growth and minimum growth.}
+#' \item \code{A}: {Maximum growth.}
 #' \item \code{y0_lm}: {Intersection of the linear fit with the abscissa.}
 #' \item \code{mumax}: {Maximum growth rate (i.e., slope of the linear fit).}
 #' \item \code{tD}: {Doubling time.}
@@ -103,7 +103,7 @@
 #' plot(TestFit)
 #'
 growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
-                               control = growth.control(t0 = 0, tmax = NA, log.x.gc = FALSE, log.y.lin = TRUE, min.density = NA, max.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE))
+                               control = growth.control(t0 = 0, tmax = NA, log.x.gc = FALSE, log.y.lin = TRUE, min.growth = NA, max.growth = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE))
 {
   R2 <- control$lin.R2
   RSD <- control$lin.RSD
@@ -111,11 +111,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   fit.dY <- control$lin.dY
   t0 <- control$t0
   tmax <- control$tmax
-  min.density <- control$min.density
-  max.density <- control$max.density
+  min.growth <- control$min.growth
+  max.growth <- control$max.growth
 
   if(length(data[data<0]) > 0){
-    data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative density (+ 0.01) to the data
+    data <- data + abs(min(data[data<0]))+0.01 # add the absolute value of the minimum negative growth (+ 0.01) to the data
   }
 
   bad.values <- ((is.na(time))|(is.na(data)) | time < 0 | data <=0)
@@ -152,7 +152,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   if(!is.null(h) && !is.na(h) && h != ""){
     h <- as.numeric(h)
   } else {
-    # determine number of data points in period until maximum density
+    # determine number of data points in period until maximum growth
     n.spl <- length(t.growth)
     # Calculate h via log-transformation of the number of data points
     # if(n.spl <= 100){
@@ -189,21 +189,21 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     RSD <- 0.05
   }
   data.log <- log(data.in/data.in[1])
-  if(!is.null(control$min.density) && !is.na(control$min.density)){
-    if(control$min.density != 0 && control$log.y.lin == TRUE){
-      min.density <- log(control$min.density / data[1])
+  if(!is.null(control$min.growth) && !is.na(control$min.growth)){
+    if(control$min.growth != 0 && control$log.y.lin == TRUE){
+      min.growth <- log(control$min.growth / data[1])
     } else {
-      min.density <- 0
+      min.growth <- 0
     }
   } else {
-    min.density <- 0
+    min.growth <- 0
   }
-  if(!is.null(control$max.density) && !is.na(control$max.density)){
+  if(!is.null(control$max.growth) && !is.na(control$max.growth)){
     if(control$log.y.lin == TRUE){
-      max.density <- log(max.density / data[1])
+      max.growth <- log(max.growth / data[1])
     }
   } else {
-    max.density <- NA
+    max.growth <- NA
   }
   bad.values <- ((is.na(data.log))|(is.infinite(data.log))|(is.na(time))|(is.na(data.log)))
 
@@ -223,8 +223,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
   # store filtered and transformed data
   obs <- data.frame(time, data)
   obs$ylog <- data.log
-  obs.max.density <- max(obs$data)
-  dY.total <- obs.max.density - obs$data[1]
+  obs.max.growth <- max(obs$data)
+  dY.total <- obs.max.growth - obs$data[1]
 
   if(max(data.in) < control$growth.thresh * data.in[1]){
     if(control$suppress.messages==F) message(paste0("Linear fit: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
@@ -254,19 +254,19 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
       }
     }
     colnames(ret) <- c("index", "y-intersect", "slope", "X4", "R2", "RSD")
-    # add time and density values as columns in ret
+    # add time and growth values as columns in ret
     if (control$log.y.lin == TRUE) {
       ret <- data.frame(ret, time = time[ret[,1]], data = obs$ylog[ret[,1]])
     } else {
       ret <- data.frame(ret, time = time[ret[,1]], data = obs$data[ret[,1]])
     }
 
-    # add dY, i.e., the percentage of density that a regression window covers, to ret
+    # add dY, i.e., the percentage of growth that a regression window covers, to ret
     ret <- data.frame(ret, dY = ((obs$data[match(ret[, "time"], obs$time)+(h-1)] - obs$data[match(ret[, "time"], obs$time)]) / dY.total))
 
     bad <- is.na(ret[,5]) | is.na(ret[,6])
     ret <- ret[!bad,]
-    # Consider only regressions within the growth phase (from start to maximum density)
+    # Consider only regressions within the growth phase (from start to maximum growth)
     ret <- ret[ret$time <= t.growth[length(t.growth)], ]
     if(nrow(ret)<2){
       gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
@@ -281,19 +281,19 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     }
     else{
       # duplicate ret for further tuning of fit
-      if(exists("min.density")){
-        ret.check <- ret[max(which.min(abs(time-t0)), which.min(abs(ret$data-min.density))) : nrow(ret),] # consider only slopes from defined t0 and min.density
+      if(exists("min.growth")){
+        ret.check <- ret[max(which.min(abs(time-t0)), which.min(abs(ret$data-min.growth))) : nrow(ret),] # consider only slopes from defined t0 and min.growth
       } else {
         ret.check <- ret[which.min(abs(time-t0)):nrow(ret),] # consider only slopes from defined t0
       }
       if(!is.na(tmax)){
         ret.check <- ret.check[(ret.check[,"time"]+(h*time[2]-time[1])) <= tmax, ] # consider only slopes up to defined tmax
       }
-      if(!is.na(max.density)){
+      if(!is.na(max.growth)){
         if (control$log.y.lin) {
-          ret.check <- ret.check[unlist(lapply(1:nrow(ret.check), function(x) obs$ylog[ret.check[x, 1]+(h-1)])) <= max.density, ] # consider only slopes up to defined max.density
+          ret.check <- ret.check[unlist(lapply(1:nrow(ret.check), function(x) obs$ylog[ret.check[x, 1]+(h-1)])) <= max.growth, ] # consider only slopes up to defined max.growth
         } else {
-          ret.check <- ret.check[unlist(lapply(1:nrow(ret.check), function(x) obs$data[ret.check[x, 1]+(h-1)])) <= max.density, ] # consider only slopes up to defined max.density
+          ret.check <- ret.check[unlist(lapply(1:nrow(ret.check), function(x) obs$data[ret.check[x, 1]+(h-1)])) <= max.growth, ] # consider only slopes up to defined max.growth
         }
       }
 
@@ -316,8 +316,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
       } else {
         ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
         success <- FALSE
-        # apply min.density to list of linear regressions
-        ret.check <- ret.check[ret.check[, 8] >= min.density, ]
+        # apply min.growth to list of linear regressions
+        ret.check <- ret.check[ret.check[, 8] >= min.growth, ]
         ret.check2 <- ret.check
         if(any(ret.check2[,5] >= R2 & abs(ret.check2[,6]) <= RSD)){
           while (!success){
@@ -331,12 +331,12 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
           }
           index.max.ret <- ret.check[which(ret.check[,3]==slope.max),1] # index of maximum slope in fit table
           slope.quota <- quota * slope.max
-          if(exists("min.density")){
+          if(exists("min.growth")){
             candidates <- ret.check[which(ret.check[, 3] >= slope.quota & # indices of slopes greater than slope.quota
                                             ret.check[, 5] >= 0.98*R2 & # R2 criterion for candidates
                                             abs(ret.check[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
                                             ret.check[, 7] >= t0 & # consider only slopes after defined t0
-                                            ret.check[, 8] >= min.density # consider only slopes at densities higher than "min.density"
+                                            ret.check[, 8] >= min.growth # consider only slopes at densities higher than "min.growth"
             ), 1]
           } else{
             candidates <- ret.check[which(ret.check[, 3] >= slope.quota & # indices of slopes greater than slope.quota
@@ -412,7 +412,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
                                   tmax2_end = NA), ndx = NA, ndx2 = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE
             )
             class(gcFitLinear) <- "gcFitLinear"
-            if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", R2, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
+            if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", R2, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.growth = ", control$min.growth, "."))
             return(gcFitLinear)
           }
           if(control$biphasic) {
@@ -433,12 +433,12 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 
             # expand mumax window with more relaxed quota
             slope.quota.ext <- 0.8 * slope.max
-            if(exists("min.density")){
+            if(exists("min.growth")){
               candidates.ext <- ret[which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
                                             ret[, 5] >= 0.95*R2 & # R2 criterion for candidates
                                             abs(ret[, 6]) <= 1.1 * RSD & # RSD criterion for candidates
                                             ret[, 7] >= t0 & # consider only slopes after defined t0
-                                            ret[, 8] >= min.density # consider only slopes at densities higher than "min.density"
+                                            ret[, 8] >= min.growth # consider only slopes at densities higher than "min.growth"
               ), 1]
             } else{
               candidates.ext <- ret[which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
@@ -506,11 +506,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             ret.postmin <- ret.postmin[ret.postmin[, "slope"] > 0, ]
             ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
             success <- FALSE
-            # apply min.density to list of linear regressions
-            ret.postmin.check <- ret.postmin[ret.postmin[, 8] >= min.density, ]
-            # apply max.density to list of linear regressions
-            if(!is.na(max.density)){
-              ret.postmin.check <- ret.postmin.check[ret.postmin.check[,"data"] <= max.density, ] # consider only slopes up to defined max.density
+            # apply min.growth to list of linear regressions
+            ret.postmin.check <- ret.postmin[ret.postmin[, 8] >= min.growth, ]
+            # apply max.growth to list of linear regressions
+            if(!is.na(max.growth)){
+              ret.postmin.check <- ret.postmin.check[ret.postmin.check[,"data"] <= max.growth, ] # consider only slopes up to defined max.growth
             }
             # apply max. time to list of linear regeressions
             if(!is.na(tmax)){
@@ -638,11 +638,11 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
             ret.premin <- ret.premin[ret.premin[, "slope"] > 0, ]
             ## Determine index of window with maximum growth rate, iterate until regression is found that meets R2 and RSD criterion
             success <- FALSE
-            # apply min.density to list of linear regressions
-            ret.premin.check <- ret.premin[ret.premin[, 8] >= min.density, ]
-            # apply max.density to list of linear regressions
-            if(!is.na(max.density)){
-              ret.premin.check <- ret.premin.check[ret.premin.check[,"data"] <= max.density, ] # consider only slopes up to defined max.density
+            # apply min.growth to list of linear regressions
+            ret.premin.check <- ret.premin[ret.premin[, 8] >= min.growth, ]
+            # apply max.growth to list of linear regressions
+            if(!is.na(max.growth)){
+              ret.premin.check <- ret.premin.check[ret.premin.check[,"data"] <= max.growth, ] # consider only slopes up to defined max.growth
             }
             # apply max. time to list of linear regeressions
             if(!is.na(tmax)){
@@ -839,7 +839,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
     } # else of if(nrow(ret)<2)
   } # if(N >= 3)
   else {
-    message("Not enough observations in the dataset to perform linear fit. growth.gcFitLinear requires at least 3 data points between t0 and the time of maximum density.")
+    message("Not enough observations in the dataset to perform linear fit. growth.gcFitLinear requires at least 3 data points between t0 and the time of maximum growth.")
     gcFitLinear <- list(raw.time = time.in, raw.data = data.in, filt.time = obs$time, filt.data = obs$data,
                         log.data = obs$ylog, gcID = gcID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, y0_lm = NA, mumax = 0, mu.se = NA, lag = NA, tmax_start = NA, tmax_end = NA,
@@ -904,7 +904,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 #' Hall et al. (2013).
 #'
 #' @param time Vector of the independent time variable (if x_type = "time" in control object).
-#' @param density Vector of the independent time density (if x_type = "density" in control object).
+#' @param growth Vector of the independent time growth (if x_type = "growth" in control object).
 #' @param fl_data Vector of the dependent fluorescence variable.
 #' @param ID (Character) The name of the analyzed sample.
 #' @param quota (Numeric, between 0 an 1) Define what fraction of \code{max_slope} the slope of regression windows adjacent to the window with highest slope should have to be included in the overall linear fit.
@@ -956,9 +956,9 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 #' @export
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Extract time and normalized fluorescence data for single sample
@@ -975,8 +975,8 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 #'
 #' plot(TestFit)
 #
-flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined",  quota = 0.95,
-                        control = fl.control(x_type = c("density", "time"), log.x.lin = FALSE, log.y.lin = FALSE, t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY = 0.05, biphasic = FALSE))
+flFitLinear <- function(time = NULL, growth = NULL, fl_data, ID = "undefined",  quota = 0.95,
+                        control = fl.control(x_type = c("growth", "time"), log.x.lin = FALSE, log.y.lin = FALSE, t0 = 0, min.growth = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY = 0.05, biphasic = FALSE))
 {
   x_type <- control$x_type
   R2 <- control$lin.R2
@@ -984,8 +984,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   h <- control$lin.h
   t0 <- control$t0
   tmax <- control$tmax
-  min.density <- control$min.density
-  max.density <- control$max.density
+  min.growth <- control$min.growth
+  max.growth <- control$max.growth
 
   if (is(control) != "fl.control")
     stop("control must be of class fl.control!")
@@ -993,7 +993,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     stop("Fit option is not set for a fluorescence linear fit. See fl.control()")
 
   if(!is.null(time))   time.in <- time <- as.vector(as.numeric(as.matrix(time)))[!is.na(as.vector(as.numeric(as.matrix(time))))]
-  if(!is.null(density)) density.in <- density <- as.vector(as.numeric(as.matrix(density)))[!is.na(as.vector(as.numeric(as.matrix(density))))]
+  if(!is.null(growth)) growth.in <- growth <- as.vector(as.numeric(as.matrix(growth)))[!is.na(as.vector(as.numeric(as.matrix(growth))))]
   fl_data.in <- fl_data <- as.vector(as.numeric(as.matrix(fl_data)))[!is.na(as.vector(as.numeric(as.matrix(fl_data))))]
 
   if(!is.null(t0) && !is.na(t0) && t0 != ""){
@@ -1001,19 +1001,19 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
   } else {
     t0 <- 0
   }
-  if(x_type == "density" && is.null(density))
-    stop("flFitLinear: To perform a linear fit of fluorescence vs. density data, please provide a 'density' vector of the same length as 'fl_data'.")
+  if(x_type == "growth" && is.null(growth))
+    stop("flFitLinear: To perform a linear fit of fluorescence vs. growth data, please provide a 'growth' vector of the same length as 'fl_data'.")
   if(x_type == "time" && is.null(time))
     stop("flFitLinear: To perform a linear fit of fluorescence vs. time data, please provide a 'time' vector of the same length as 'fl_data'.")
-  if(x_type == "density" && length(density) != length(fl_data))
-    stop("flFitLinear: length of input vectors (density and fl_data) differ!")
+  if(x_type == "growth" && length(growth) != length(fl_data))
+    stop("flFitLinear: length of input vectors (growth and fl_data) differ!")
   if(x_type == "time" && length(time) != length(fl_data))
     stop("flFitLinear: length of input vectors (time and fl_data) differ!")
   if (length(fl_data) < 5) {
     cat("flFitLinear: There is not enough valid data. Must have at least 5!")
   }
 
-  # Consider only data points up to max density or time, respectively
+  # Consider only data points up to max growth or time, respectively
   if(x_type == "time"){
     ndx.max <- which.max(time)
     time <- time[1:ndx.max]
@@ -1024,22 +1024,22 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       time <- time[!bad.values]
     }
   }
-  if(x_type == "density"){
-    ndx.max <- which.max(density)
-    density <- density[1:ndx.max]
+  if(x_type == "growth"){
+    ndx.max <- which.max(growth)
+    growth <- growth[1:ndx.max]
     fl_data <- fl_data[1:ndx.max]
     bad.values <- (fl_data < 0)
     if (TRUE %in% bad.values) {
       fl_data <- fl_data[!bad.values]
-      density <- density[!bad.values]
+      growth <- growth[!bad.values]
     }
   }
 
   if(length(fl_data) < 4){
     if(control$suppress.messages==F) message(paste0("Linear fit: Not enough valid values in sample to perform fit."))
-    flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                        raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                        filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+    flFitLinear <- list(x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")), fl.in = fl_data.in,
+                        raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                        filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                         ID = ID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                           x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1050,27 +1050,27 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
   fl_data.log <- log(fl_data/fl_data[1])
 
-  if(x_type == "density"){
-    bad.values <- (is.na(density)) | (is.na(fl_data)) |
-      (!is.numeric(density)) | (!is.numeric(fl_data) )
+  if(x_type == "growth"){
+    bad.values <- (is.na(growth)) | (is.na(fl_data)) |
+      (!is.numeric(growth)) | (!is.numeric(fl_data) )
     if (TRUE %in% bad.values) {
-      density <- density[!bad.values]
+      growth <- growth[!bad.values]
       fl_data <- fl_data[!bad.values]
     }
     if (control$log.x.lin == TRUE) {
-      bad.values <- (density < 0)
+      bad.values <- (growth < 0)
       if (TRUE %in% bad.values) {
-        density <- density[!bad.values]
+        growth <- growth[!bad.values]
         fl_data <- fl_data[!bad.values]
       }
-      density.log <- log(density/density[1])
+      growth.log <- log(growth/growth[1])
     }
 
-    if(max(density) < control$growth.thresh * density[1]){
+    if(max(growth) < control$growth.thresh * growth[1]){
       if(control$suppress.messages==F) message(paste0("flFitLinear: No significant growth detected (with all values below ", control$growth.thresh, " * start_value)."))
-      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                          filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+      flFitLinear <- list(x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                          filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1078,44 +1078,44 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       class(flFitLinear) <- "flFitLinear"
       return(flFitLinear)
     }
-    # Implement min.density into dataset
-    # if(!is.null(control$min.density)) {
-    #   if (!is.na(control$min.density) && control$min.density != 0) {
-    #     min.density <- control$min.density
+    # Implement min.growth into dataset
+    # if(!is.null(control$min.growth)) {
+    #   if (!is.na(control$min.growth) && control$min.growth != 0) {
+    #     min.growth <- control$min.growth
     #     if (control$log.y.lin == TRUE) {
-    #       # perfom log transformation on min.density (Ln(y/y0))
-    #       min.density <- log(min.density / density[1])
-    #       fl_data.log <- fl_data.log[density.log >= min.density]
-    #       density.log <- density.log[density.log >= min.density]
+    #       # perfom log transformation on min.growth (Ln(y/y0))
+    #       min.growth <- log(min.growth / growth[1])
+    #       fl_data.log <- fl_data.log[growth.log >= min.growth]
+    #       growth.log <- growth.log[growth.log >= min.growth]
     #     } else {
-    #       fl_data <- fl_data[density >= min.density]
-    #       density <- density[density >= min.density]
+    #       fl_data <- fl_data[growth >= min.growth]
+    #       growth <- growth[growth >= min.growth]
     #     }
     #   }
     # }
 
 
     # Remove data points where y values stack on top of each other
-    fl_data <- fl_data[density >= cummax(density)]
-    fl_data.log <- fl_data.log[density >= cummax(density)]
-    density <- density[density >= cummax(density)]
+    fl_data <- fl_data[growth >= cummax(growth)]
+    fl_data.log <- fl_data.log[growth >= cummax(growth)]
+    growth <- growth[growth >= cummax(growth)]
     if (control$log.x.lin == FALSE) {
-      x <- density
+      x <- growth
     } else {
-      x <- density.log
+      x <- growth.log
     }
-    if(!is.null(control$max.density) && !is.na(control$max.density)){
+    if(!is.null(control$max.growth) && !is.na(control$max.growth)){
       if(control$log.x.lin == TRUE){
-        max.density <- log(max.density / density[1])
+        max.growth <- log(max.growth / growth[1])
       }
     } else {
-      max.density <- NA
+      max.growth <- NA
     }
     if(length(x)<4){
-      message("flFitLinear: Not enough data points above the chosen min.density.")
-      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                          filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+      message("flFitLinear: Not enough data points above the chosen min.growth.")
+      flFitLinear <- list(x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                          filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1123,7 +1123,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
       class(flFitLinear) <- "flFitLinear"
       return(flFitLinear)
     }
-  } # if(x_type == "density")
+  } # if(x_type == "growth")
   if(x_type == "time"){
     bad.values <- (is.na(time)) | (is.na(fl_data)) |
       (!is.numeric(time)) | (!is.numeric(fl_data) )
@@ -1151,9 +1151,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
     if(max(time) < control$t0){
       if(control$suppress.messages==F) message(paste0("flFitLinear: All time values are below the chosen 't0'."))
-      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                          filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+      flFitLinear <- list(x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                          filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1182,9 +1182,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
     if(length(x)<4){
       message("flFitLinear: Not enough data points above the chosen t0.")
-      flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                          filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+      flFitLinear <- list(x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")), fl.in = fl_data.in,
+                          raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                          filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1194,7 +1194,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     }
   } # if(x_type == "time")
   # extract period of fluorescence increase
-  x.in = get(ifelse(x_type == "density", "density.in", "time.in"))
+  x.in = get(ifelse(x_type == "growth", "growth.in", "time.in"))
   end <- FALSE
   step <- 0
   while(end==FALSE){
@@ -1292,12 +1292,12 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     ret <- ret[!bad,]
 
 
-    if(x_type == "density"){
-      if(!is.na(min.density)){
-        ret <- ret[which.min(abs(ret$fl_data-min.density)) : nrow(ret),] # consider only slopes from defined min.density
+    if(x_type == "growth"){
+      if(!is.na(min.growth)){
+        ret <- ret[which.min(abs(ret$fl_data-min.growth)) : nrow(ret),] # consider only slopes from defined min.growth
       }
-      if(!is.na(max.density)){
-        ret <- ret[(ret[,"x"]+(h*x[2]-x[1])) <= max.density, ] # consider only slopes up to defined max.density
+      if(!is.na(max.growth)){
+        ret <- ret[(ret[,"x"]+(h*x[2]-x[1])) <= max.growth, ] # consider only slopes up to defined max.growth
       }
     } else{
       ret <- ret[which.min(abs(x-t0)):nrow(ret),] # consider only slopes from defined t0
@@ -1309,8 +1309,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
     if(nrow(ret)<2){
       flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
-                          raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                          filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+                          raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                          filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                           ID = ID, FUN = grow_exponential, fit = NA, par = c(
                             y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                             x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1328,8 +1328,8 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
       if(nrow(ret.check)<2){
         flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
-                            raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                            filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+                            raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                            filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                             ID = ID, FUN = grow_exponential, fit = NA, par = c(
                               y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                               x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1352,12 +1352,12 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
           }
           index.max.ret <- ret.check[which(ret.check[,3]==slope.max),1] # index of maximum slope in fit table
           slope.quota <- quota * slope.max
-          if(x_type == "density"){
-            if(exists("min.density")){
+          if(x_type == "growth"){
+            if(exists("min.growth")){
               candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
                                     ret[, 5] >= 0.98*R2 & # R2 criterion for candidates
                                     abs(ret[, 6]) <= 1.02 * RSD & # RSD criterion for candidates
-                                    ret[, 7] >= min.density  # consider only slopes at densities higher than "min.density"
+                                    ret[, 7] >= min.growth  # consider only slopes at densities higher than "min.growth"
               )
             } else{
               candidates <- which(ret[, 3] >= slope.quota & # indices of slopes greater than slope.quota
@@ -1417,9 +1417,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               }
             } else {
               if(control$log.y.lin == TRUE){
-                y0_data  <- obs$ylog[obs$x>=min.density][1] # y0 in dataset
+                y0_data  <- obs$ylog[obs$x>=min.growth][1] # y0 in dataset
               } else {
-                y0_data  <- obs$fl_data[obs$x>=min.density][1] # y0 in dataset
+                y0_data  <- obs$fl_data[obs$x>=min.growth][1] # y0 in dataset
               }
             }
 
@@ -1445,14 +1445,14 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
           }
           else { # of if(length(candidates) > 0)
             flFitLinear <- list(x.in = x.in, fl.in = fl_data.in,
-                                raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                                filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+                                raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                                filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                                 ID = ID, FUN = grow_exponential, fit = NA, par = c(
                                   y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                                   x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
                                   x.max2_end = NA), ndx = NA, ndx.in = NA, ndx2 = NA, ndx2.in = NA, quota = quota, rsquared = NA, rsquared2 = NA, control = control, fitFlag = FALSE, fitFlag2 = FALSE)
             class(flFitLinear) <- "flFitLinear"
-            if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", R2, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.density = ", control$min.density, "."))
+            if(!control$suppress.messages) message(paste0("No linear fit in accordance with the chosen parameters identified with: R2 >= ", R2, ", RSD <= ", RSD, ", t0 = ", t0, ", and min.growth = ", control$min.growth, "."))
             return(flFitLinear)
           }
           if(control$biphasic) {
@@ -1473,12 +1473,12 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
             # expand max_slope window with more relaxed quota
             slope.quota.ext <- 0.8 * quota * slope.max
-            if(x_type == "density"){
-              if(exists("min.density")){
+            if(x_type == "growth"){
+              if(exists("min.growth")){
                 candidates.ext <- which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
                                           ret[, 5] >= 0.95*R2 & # R2 criterion for candidates
                                           abs(ret[, 6]) <= 1.1 * RSD & # RSD criterion for candidates
-                                          ret[, 7] >= min.density  # consider only slopes at densities higher than "min.density"
+                                          ret[, 7] >= min.growth  # consider only slopes at densities higher than "min.growth"
                 )
               } else{
                 candidates.ext <- which(ret[, 3] >= slope.quota.ext & # indices of slopes greater than slope.quota
@@ -1531,9 +1531,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
               ret.postmin <- ret.postmin[ret.postmin[, "slope"] > 0 & ret.postmin[, "slope"] >= 0.1*max_slope, ]
               ## Determine index of window with maximum slope, iterate until regression is found that meets R2 and RSD criterion
               success <- FALSE
-              # apply min.density to list of linear regressions
-              if(x_type == "density"){
-                ret.postmin.check <- ret.postmin[ret.postmin[, 7] >= min.density, ]
+              # apply min.growth to list of linear regressions
+              if(x_type == "growth"){
+                ret.postmin.check <- ret.postmin[ret.postmin[, 7] >= min.growth, ]
               } else {
                 ret.postmin.check <- ret.postmin
               }
@@ -1555,13 +1555,13 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 index.max.ret.postmin <- ret.postmin[which(ret.postmin[, 3] == slope.max.postmin), 1] # index of maximum slope in fit table
                 slope.quota <- quota * slope.max.postmin
 
-                if(x_type == "density"){
-                  if(exists("min.density")){
+                if(x_type == "growth"){
+                  if(exists("min.growth")){
                     candidates.postmin <- ret.postmin[which(
                       ret.postmin[, 3] >= slope.quota &
                         ret.postmin[, 5] >= 0.98 * R2 &
                         abs(ret.postmin[, 6]) <= 1.02 * RSD &
-                        ret.postmin[, 7] >= min.density), 1]
+                        ret.postmin[, 7] >= min.growth), 1]
                   } else{
                     candidates.postmin <- ret.postmin[which(
                       ret.postmin[, 3] >= slope.quota &
@@ -1693,9 +1693,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
                 ret.premin <- ret.premin[!(ret.premin[, 1] %in% tp.ext), ]
                 ## Determine index of window with maximum slope, iterate until regression is found that meets R2 and RSD criterion
                 success <- FALSE
-                # apply min.density to list of linear regressions
-                if(x_type == "density"){
-                  ret.premin.check <- ret.premin[ret.premin[, 8] >= min.density, ]
+                # apply min.growth to list of linear regressions
+                if(x_type == "growth"){
+                  ret.premin.check <- ret.premin[ret.premin[, 8] >= min.growth, ]
                 } else {
                   ret.premin.check <- ret.premin
                 }
@@ -1896,9 +1896,9 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
           }
         } # if(any(ret.check[,5] >= R2 & ret.check[,6] <= RSD))
         else{
-          flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                              raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                              filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+          flFitLinear <- list(x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")), fl.in = fl_data.in,
+                              raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                              filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                               ID = ID, FUN = grow_exponential, fit = NA, par = c(
                                 y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                                 x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1920,10 +1920,10 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
     } # else of if(nrow(ret)<2)
   } # if(N >= 3)
   else {
-    message("Not enough observations in the dataset to perform linear fit. flFitLinear requires at least 3 fl_data points within the given t0 and min.density thresholds.")
-    flFitLinear <- list(x.in = get(ifelse(x_type == "density", "density.in", "time.in")), fl.in = fl_data.in,
-                        raw.x = get(ifelse(x_type == "density", "density.in", "time.in")), raw.fl = fl_data.in,
-                        filt.x = get(ifelse(x_type == "density", "density", "time")), filt.fl = fl_data,
+    message("Not enough observations in the dataset to perform linear fit. flFitLinear requires at least 3 fl_data points within the given t0 and min.growth thresholds.")
+    flFitLinear <- list(x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")), fl.in = fl_data.in,
+                        raw.x = get(ifelse(x_type == "growth", "growth.in", "time.in")), raw.fl = fl_data.in,
+                        filt.x = get(ifelse(x_type == "growth", "growth", "time")), filt.fl = fl_data,
                         ID = ID, FUN = grow_exponential, fit = NA, par = c(
                           y0 = NA, dY= NA, A = NA, y0_lm = NA, max_slope = 0, tD = NA, slope.se = NA, lag = NA, x.max_start = NA, x.max_end = NA,
                           x.turn = NA, max_slope2 = NA, tD2 = NA, y0_lm2 = NA, lag2 = NA, x.max2_start = NA,
@@ -1935,7 +1935,7 @@ flFitLinear <- function(time = NULL, density = NULL, fl_data, ID = "undefined", 
 
 
   flFitLinear <- list(
-    x.in = get(ifelse(x_type == "density", "density.in", "time.in")),
+    x.in = get(ifelse(x_type == "growth", "growth.in", "time.in")),
     fl.in = fl_data.in,
     raw.x = x.in,
     raw.fl = fl_data.in,

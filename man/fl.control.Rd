@@ -6,12 +6,12 @@
 \usage{
 fl.control(
   fit.opt = c("l", "s"),
-  x_type = c("density", "time"),
+  x_type = c("growth", "time"),
   norm_fl = TRUE,
   t0 = 0,
   tmax = NA,
-  min.density = NA,
-  max.density = NA,
+  min.growth = NA,
+  max.growth = NA,
   log.x.lin = FALSE,
   log.x.spline = FALSE,
   log.y.lin = FALSE,
@@ -40,17 +40,17 @@ fl.control(
 \arguments{
 \item{fit.opt}{(Character or vector of strings) Indicates whether the program should perform a linear regression (\code{'l'}) and/or spline fit (\code{'s'}). Default:  \code{fit.opt = c('l', 's')}.}
 
-\item{x_type}{(Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.}
+\item{x_type}{(Character) Which data type shall be used as independent variable? Options are \code{'growth'} and \code{'time'}.}
 
-\item{norm_fl}{(Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}}
+\item{norm_fl}{(Logical) use normalized (to growth) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits (if \code{x_type = 'time'}).}
 
 \item{tmax}{(Numeric) Maximum time value considered for linear and spline fits (if \code{x_type = 'time'})..}
 
-\item{min.density}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).}
+\item{min.growth}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'growth'}).}
 
-\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).}
+\item{max.growth}{(Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'growth'}).}
 
 \item{log.x.lin}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the independent variable for \emph{linear} fits. Default: \code{FALSE}.}
 
@@ -66,7 +66,7 @@ fl.control(
 
 \item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{flFitLinear}}.}
 
-\item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
+\item{lin.dY}{(Numeric) Threshold for the minimum fraction of growth increase a linear regression window should cover. Default: 0.05 (5\%).}
 
 \item{dr.parameter}{(Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{'max_slope.spline'}, which represents the maximum slope of the spline fit Typical options include: \code{'max_slope.linfit'}, \code{'dY.linfit'}, \code{'max_slope.spline'}, and \code{'dY.spline'}.}
 
@@ -90,7 +90,7 @@ fl.control(
 
 \item{smooth.fl}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}}
 
-\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
+\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any growth value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start growth, further computations are performed. Else, a message is returned.}
 
 \item{suppress.messages}{(Logical) Indicates whether messages (information about current fluorescence curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.}
 

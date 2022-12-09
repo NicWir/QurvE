@@ -38,7 +38,7 @@
 
 \item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.}
 
-\item{raw}{(Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).}
+\item{raw}{(Logical) Display raw growth as circles (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{slope}{(Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).}
 

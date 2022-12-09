@@ -38,7 +38,7 @@
 
 \item{add}{(Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.flBootSpline}}.}
 
-\item{raw}{(Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).}
+\item{raw}{(Logical) Display raw growth as circles (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{slope}{(Logical) Show the slope at the maximum slope (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -94,9 +94,9 @@ A plot with the nonparametric fit.
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Extract time and normalized fluorescence data for single sample

@@ -2,11 +2,11 @@
 % Please edit documentation in R/growth_plots.R
 \name{plot.grodata}
 \alias{plot.grodata}
-\title{Generic plot function for \code{grodata} objects. Plots raw density, fluorescence, or normalized fluorescence data of multiple samples or conditions.}
+\title{Generic plot function for \code{grodata} objects. Plots raw growth, fluorescence, or normalized fluorescence data of multiple samples or conditions.}
 \usage{
 \method{plot}{grodata}(
   x,
-  data.type = c("dens", "fl", "norm.fl"),
+  data.type = c("growth", "fl", "norm.fl"),
   IDs = NULL,
   names = NULL,
   conc = NULL,
@@ -39,7 +39,7 @@
 \arguments{
 \item{x}{A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}.}
 
-\item{data.type}{(Character) Plot either raw density (\code{data.type = "dens"}), raw fluorescence (\code{data.type = "fl"}), or fluorescence normalized to density (\code{data.type = "norm.fl"}).}
+\item{data.type}{(Character) Plot either raw growth (\code{data.type = "growth"}), raw fluorescence (\code{data.type = "fl"}), or fluorescence normalized to growth (\code{data.type = "norm.fl"}).}
 
 \item{IDs}{(String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.}
 
@@ -112,7 +112,7 @@ data <- rbind(time, rnd.data1$data, rnd.data2$data)
 
 
 # Create a grodata object
-grodata <- read_data(data.density = data, data.format = "row")
+grodata <- read_data(data.growth = data, data.format = "row")
 
 plot(grodata, exclude.nm = "Test1", legend.ncol = 4)
 

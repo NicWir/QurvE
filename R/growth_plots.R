@@ -105,7 +105,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
                                    "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                                    "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
                                    "t0:", gcFittedLinear$control$t0,
-                                   "  min.density:", gcFittedLinear$control$min.density,
+                                   "  min.growth:", gcFittedLinear$control$min.growth,
                                    "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
                              cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
@@ -189,7 +189,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
                          "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
                          "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
                          "t0:", gcFittedLinear$control$t0,
-                         "  min.density:", gcFittedLinear$control$min.density,
+                         "  min.growth:", gcFittedLinear$control$min.growth,
                          "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
                    cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
@@ -249,7 +249,7 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
 
 #' Generic plot function for \code{gcFitModel} objects.
 #'
-#' Plot the results of a parametric model fit on density vs. time data
+#' Plot the results of a parametric model fit on growth vs. time data
 #'
 #' @param x A \code{gcFittedModel} object created with \code{\link{growth.gcFitModel}} or stored within a \code{grofit} or \code{gcFit} object created with \code{\link{growth.workflow}} or \code{\link{growth.gcFit}}, respectively.
 #' @param raw (Logical) Show the raw data within the plot (\code{TRUE}) or not (\code{FALSE}).
@@ -2196,7 +2196,7 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
 #'
 #' @param x object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.
-#' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
+#' @param raw (Logical) Display raw growth as circles (\code{TRUE}) or not (\code{FALSE}).
 #' @param slope (Logical) Show the slope at the maximum growth rate (\code{TRUE}) or not (\code{FALSE}).
 #' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
@@ -2392,14 +2392,14 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
       p <- p +
         # annotate(
         #   "text",
-        #   label = paste("t0:", gcFittedSpline$control$t0, "  min.density:", gcFittedSpline$control$min.density, "  smoothing:", gcFittedSpline$control$smooth.gc),
+        #   label = paste("t0:", gcFittedSpline$control$t0, "  min.growth:", gcFittedSpline$control$min.growth, "  smoothing:", gcFittedSpline$control$smooth.gc),
         #   x = 0.5*x_limit[2],
         #   y = ifelse(!is.null(y.lim) && !is.na(y.lim[2]), 1.05 * y.lim[2], 1.3 * y_limit[2]),
         #   angle = 0, parse = F, size = basesize*3.2/12) +
         labs(subtitle = paste("t0:", gcFittedSpline$control$t0,
                               " tmax:", gcFittedSpline$control$tmax,
-                              "  min.density:", gcFittedSpline$control$min.density,
-                              "  max.density:", gcFittedSpline$control$max.density,
+                              "  min.growth:", gcFittedSpline$control$min.growth,
+                              "  max.growth:", gcFittedSpline$control$max.growth,
                               "  smoothing:", gcFittedSpline$control$smooth.gc)
                ) +
         annotate(
@@ -2418,7 +2418,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 
       # annotate(
       #   "text",
-      #   label = paste("t0:", gcFittedSpline$control$t0, "  min.density:", gcFittedSpline$control$min.density, "  smoothing:", gcFittedSpline$control$smooth.gc),
+      #   label = paste("t0:", gcFittedSpline$control$t0, "  min.growth:", gcFittedSpline$control$min.growth, "  smoothing:", gcFittedSpline$control$smooth.gc),
       #   x = 19,
       #   y = 0.1 * y_limit[2],
       #   angle = 90, parse = FALSE, size = basesize*3.2/12) +
@@ -2740,7 +2740,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
       # /// add panel with growth rate over time
       if(deriv == TRUE){
         df.mu <- data.frame(spline(gcFittedSpline$spline.deriv1$x, gcFittedSpline$spline.deriv1$y))
-        #add missing time values due to min.density and t0
+        #add missing time values due to min.growth and t0
         df.mu <-
           dplyr::bind_rows(data.frame("x" = df$time[is.na(df$fit.data)], "y" = rep(NA, length(df$time[is.na(df$fit.data)]))),
                            df.mu)
@@ -2815,7 +2815,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
       p <- p +
         annotate(
           "text",
-          label = paste("t0:", gcFittedSpline$control$t0, "  min.density:", gcFittedSpline$control$min.density, "  smoothing:", gcFittedSpline$control$smooth.gc),
+          label = paste("t0:", gcFittedSpline$control$t0, "  min.growth:", gcFittedSpline$control$min.growth, "  smoothing:", gcFittedSpline$control$smooth.gc),
           x = 0.5*x_limit[2],
           y = 1.3 * y_limit[2],
           angle = 0, parse = FALSE, size = basesize*3.2/12) +
@@ -3006,7 +3006,7 @@ plot.grofit <- function(x, ...,
   }
   data.type <- match.arg(data.type)
   if(data.type == "raw" && deriv ==TRUE){
-    warning("Derivatives cannot be calculated for 'raw' data. Only the density values will be shown.")
+    warning("Derivatives cannot be calculated for 'raw' data. Only the growth values will be shown.")
     deriv = FALSE
   }
 
@@ -3114,7 +3114,7 @@ plot.grofit <- function(x, ...,
     conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
     conditions_unique <- unique(conditions)
 
-    # Create lists for each selected condition, with density values and derivatives, respectively. Each list item represents one condition with their average and SD
+    # Create lists for each selected condition, with growth values and derivatives, respectively. Each list item represents one condition with their average and SD
     plotdata.ls <- list()
     deriv.ls <- list()
     for(n in 1:length(conditions_unique)){
@@ -3126,7 +3126,7 @@ plot.grofit <- function(x, ...,
                                              "$"), sample.nm))
 
       name <- conditions_unique[n]
-      # Create lists for density and time values for each sample
+      # Create lists for growth and time values for each sample
       if(data.type == "spline"){
         time <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)))
         data <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.data)))
@@ -3135,7 +3135,7 @@ plot.grofit <- function(x, ...,
         if(methods::is(grofit) == "grofit"){
           data <- grofit$data[ndx, 4:ncol(grofit$data)]
         } else {
-          data <- grofit$density[ndx, 4:ncol(grofit$density)]
+          data <- grofit$growth[ndx, 4:ncol(grofit$growth)]
         }
         data <- split(as.matrix(data), 1:nrow(as.matrix(data)))
         data <- lapply(1:length(data), function(i) as.numeric(data[[i]]))
@@ -3152,7 +3152,7 @@ plot.grofit <- function(x, ...,
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
           for(j in 1:length(get(paste0("time.missing_", i)))){
-            # extract density values into a separate list
+            # extract growth values into a separate list
             data[[i]] <- append(data[[i]],
                                 values = NA,
                                 after = match(get(paste0("time.missing_", i))[j],
@@ -3583,13 +3583,13 @@ base_breaks <- function(n = 10){
   }
 }
 
-#' Generic plot function for \code{grodata} objects. Plots raw density, fluorescence, or normalized fluorescence data of multiple samples or conditions.
+#' Generic plot function for \code{grodata} objects. Plots raw growth, fluorescence, or normalized fluorescence data of multiple samples or conditions.
 #'
 #' \code{plot.grodata} calls \code{\link{plot.grofit}} or \code{\link{plot.flFitRes}} based on the chosen \code{data.type}, respectively.
 #'
 #'
 #' @param x A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}.
-#' @param data.type (Character) Plot either raw density (\code{data.type = "growth"}), raw fluorescence (\code{data.type = "fl"}), or fluorescence normalized to density (\code{data.type = "norm.fl"}).
+#' @param data.type (Character) Plot either raw growth (\code{data.type = "growth"}), raw fluorescence (\code{data.type = "fl"}), or fluorescence normalized to growth (\code{data.type = "norm.fl"}).
 #' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}.
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
 #' @param conc (Numeric or numeric vector) Define concentrations to combine into a single plot. If \code{NULL}, all concentrations are considered. Note: Ensure to use unique concentration values to extract groups of interest. If the concentration value of one condition is included in its entirety within the name of other conditions (e.g., the dataset contains '1', '10', and '100', \code{code = 10} will select both '10 and '100'), it cannot be extracted individually.
@@ -3635,7 +3635,7 @@ base_breaks <- function(n = 10){
 #'
 #'
 #' # Create a grodata object
-#' grodata <- read_data(data.density = data, data.format = "row")
+#' grodata <- read_data(data.growth = data, data.format = "row")
 #'
 #' plot(grodata, exclude.nm = "Test1", legend.ncol = 4)
 #'
@@ -3670,9 +3670,9 @@ plot.grodata <- function(x,
 {
   data.type <- match.arg(data.type)
   if(!(is(x) %in% "grodata")) stop("x needs to be a grodata object created with read_data() or parse_data().")
-  if(!(any(data.type %in% c("growth", "fl", "norm.fl")))) stop("data.type needs to be either a 'dens' (density), 'fl' (fluorescence), or 'norm.fl' (fluorescence normalized by density).")
+  if(!(any(data.type %in% c("growth", "fl", "norm.fl")))) stop("data.type needs to be either a 'dens' (growth), 'fl' (fluorescence), or 'norm.fl' (fluorescence normalized by growth).")
   if(data.type == "fl" && length(x$fluorescence)<2) stop("x does not contain fluorescence data.")
-  if(data.type == "norm.fl" && length(x$fluorescence)<2) stop("x does not contain norm. fluorescence data. Did you read both density and fluorescence data when calling read_data() or parse_data()?")
+  if(data.type == "norm.fl" && length(x$fluorescence)<2) stop("x does not contain norm. fluorescence data. Did you read both growth and fluorescence data when calling read_data() or parse_data()?")
 
   if(data.type == "fl" || data.type == "norm.fl")
     plot.flFitRes(x,
@@ -4565,7 +4565,7 @@ plot.grid <- function(x,
     }
   }
 
-  xlab.title <- if (data.type == "spline" && methods::is(object) == "flFitRes" && object$control$x_type == "density")
+  xlab.title <- if (data.type == "spline" && methods::is(object) == "flFitRes" && object$control$x_type == "growth")
   {
     "Growth"
   } else {
@@ -4580,7 +4580,7 @@ plot.grid <- function(x,
     "Normalized fluorescence"
   } else if(methods::is(object) == "flFitRes" && data.type == "spline" && object$control$x_type == "time" && !flFit$control$norm_fl){
     "Fluorescence"
-  } else if(methods::is(object) == "flFitRes" && data.type == "spline" && object$control$x_type == "density"){
+  } else if(methods::is(object) == "flFitRes" && data.type == "spline" && object$control$x_type == "growth"){
     "Fluorescence"
   } else {
     "Growth [y(t)]"
@@ -4591,7 +4591,7 @@ plot.grid <- function(x,
     conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
     conditions_unique <- unique(conditions)
 
-    # Create lists for each selected condition, with density values and derivatives, respectively. Each list item represents one condition with their average and SD
+    # Create lists for each selected condition, with growth values and derivatives, respectively. Each list item represents one condition with their average and SD
     plotdata.ls <- list()
     deriv.ls <- list()
     for(n in 1:length(conditions_unique)){
@@ -4603,7 +4603,7 @@ plot.grid <- function(x,
                                              "$"), sample.nm))
 
       name <- conditions_unique[n]
-      # Create lists for density, time, and param values for each sample
+      # Create lists for growth, time, and param values for each sample
       if(data.type == "spline"){
         if(methods::is(object) == "grofit"){
           time <- as.list(lapply(1:length(ndx), function(i) cbind(object$gcFit$gcFittedSplines[[ndx[[i]]]]$fit.time)))
@@ -4638,7 +4638,7 @@ plot.grid <- function(x,
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
           for(j in 1:length(get(paste0("time.missing_", i)))){
-            # extract density values into a separate list
+            # extract growth values into a separate list
             data[[i]] <- append(data[[i]],
                                 values = NA,
                                 after = match(get(paste0("time.missing_", i))[j],

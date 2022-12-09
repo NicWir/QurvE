@@ -159,13 +159,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                           style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
 
-                                                          fileInput(inputId = 'custom_file_density',
+                                                          fileInput(inputId = 'custom_file_growth',
                                                                     label = 'Choose growth data file',
                                                                     accept = c('.xlsx', '.xls', '.csv', '.txt', '.tsv')
                                                           ),
 
                                                           conditionalPanel(
-                                                            condition = "output.growthfileUploaded && output.custom_density_format == 'xlsx'",
+                                                            condition = "output.growthfileUploaded && output.custom_growth_format == 'xlsx'",
 
                                                             selectInput(inputId = "custom_growth_sheets",
                                                                         label = "Select Sheet",
@@ -173,24 +173,24 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                           ), # select sheet: conditional
                                                           conditionalPanel(
-                                                            condition = "output.growthfileUploaded && output.custom_density_format == 'csv'",
+                                                            condition = "output.growthfileUploaded && output.custom_growth_format == 'csv'",
 
-                                                            selectInput(inputId = "separator_custom_density",
+                                                            selectInput(inputId = "separator_custom_growth",
                                                                         label = "Select separator",
                                                                         choices = c("," = ",",
                                                                                     ";" = ";")
                                                             ),
 
-                                                            selectInput(inputId = "decimal_separator_custom_density",
+                                                            selectInput(inputId = "decimal_separator_custom_growth",
                                                                         label = "Select Decimal separator",
                                                                         choices = c("." = ".",
                                                                                     "," = ",")
                                                             )
                                                           ),
                                                           conditionalPanel(
-                                                            condition = "output.growthfileUploaded && (output.custom_density_format == 'tsv' || output.custom_density_format == 'txt')",
+                                                            condition = "output.growthfileUploaded && (output.custom_growth_format == 'tsv' || output.custom_growth_format == 'txt')",
 
-                                                            selectInput(inputId = "decimal_separator_custom_density",
+                                                            selectInput(inputId = "decimal_separator_custom_growth",
                                                                         label = "Select Decimal separator",
                                                                         choices = c("." = ".",
                                                                                     "," = ",")
@@ -244,7 +244,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      label = 'Use second fluorescence to normalize fluorescence.',
                                                                      value = FALSE),
                                                         bsPopover("load_fl2_data_custom", title = "Provide a table file with fluorescence 2 data",
-                                                                  content = "Table layout must mimic that of density data. Fluorescence 2 data is only used to normalize of fluorescence!"),
+                                                                  content = "Table layout must mimic that of growth data. Fluorescence 2 data is only used to normalize of fluorescence!"),
                                                         # #_____Fluorescence 2___________
                                                         conditionalPanel(
                                                           condition = "input.load_fl2_data_custom",
@@ -320,7 +320,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           )
                                                         ),
 
-                                                        tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
+                                                        tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
                                                                  checkboxInput(inputId = 'calibration_custom',
                                                                                label = 'Apply calibration')
                                                         ),
@@ -432,8 +432,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             h3(strong("3. Assign data type"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
                                                             conditionalPanel(
                                                               condition = "input.platereader_software != 'GrowthProfiler'",
-                                                              selectInput(inputId = "parsed_reads_density",
-                                                                          label = "Density data",
+                                                              selectInput(inputId = "parsed_reads_growth",
+                                                                          label = "Growth data",
                                                                           choices = ""
                                                               ),
 
@@ -527,14 +527,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           )
                                                         ),
 
-                                                        tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
+                                                        tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
                                                                  checkboxInput(inputId = 'calibration_plate_reader',
                                                                                label = 'Apply calibration')
                                                         ),
 
                                                         conditionalPanel(
                                                           condition = 'input.calibration_plate_reader',
-                                                          tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
+                                                          tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
                                                                    textInput(inputId = "calibration_equation_plate_reader",
                                                                              label = "Type equation in the form 'y = function(x)'",
                                                                              placeholder = 'y = x * 0.5 - 1')
@@ -615,9 +615,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    div(id = 'Custom_Data_Tables',
                                        h1("Your Data"),
                                        tabsetPanel(type = "tabs", id = "tabsetPanel_custom_tables",
-                                                   tabPanel(title = "Growth plot", value = "tabPanel_custom_plots_density",
+                                                   tabPanel(title = "Growth plot", value = "tabPanel_custom_plots_growth",
                                                             withSpinner(
-                                                              plotOutput("custom_raw_density_plot",
+                                                              plotOutput("custom_raw_growth_plot",
                                                                          width = "100%", height = "1000px"),
 
                                                             )
@@ -636,7 +636,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                             )
                                                    ),
-                                                   tabPanel(title = "Density", value = "tabPanel_custom_tables_density_processed",
+                                                   tabPanel(title = "Growth", value = "tabPanel_custom_tables_growth_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("growth_data_custom_processed")
                                                             )
@@ -670,9 +670,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    div(id = 'Parsed_Data_Tables',
                                        h1("Parsed Data"),
                                        tabsetPanel(type = "tabs", id = "tabsetPanel_parsed_tables",
-                                                   tabPanel(title = "Growth plot", value = "tabPanel_parsed_plots_density",
+                                                   tabPanel(title = "Growth plot", value = "tabPanel_parsed_plots_growth",
                                                             withSpinner(
-                                                              plotOutput("parsed_raw_density_plot",
+                                                              plotOutput("parsed_raw_growth_plot",
                                                                          width = "100%", height = "1000px"),
 
                                                             )
@@ -684,8 +684,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                             )
                                                    ),
-                                                   tabPanel(title = "Density", value = "tabPanel_parsed_tables_density",
-                                                            DT::dataTableOutput('parsed_data_table_density')
+                                                   tabPanel(title = "Growth", value = "tabPanel_parsed_tables_growth",
+                                                            DT::dataTableOutput('parsed_data_table_growth')
                                                    ),
                                                    tabPanel(title = "Fluorescence", value = "tabPanel_parsed_tables_fluorescence",
                                                             DT::dataTableOutput('parsed_data_table_fluorescence')
@@ -718,7 +718,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        style='padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
                                                                        h2(strong('Growth fit')),
                                                                        h4('Global fit options'),
-                                                                       tags$div(title="Perform linear regression on (log-transformed) density data.",
+                                                                       tags$div(title="Perform linear regression on (log-transformed) growth data.",
                                                                                 checkboxInput(inputId = 'linear_regression_growth',
                                                                                               label = 'Linear regression',
                                                                                               value = TRUE)
@@ -754,26 +754,26 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          max = NA,
                                                                          placeholder = 1.5
                                                                        ),
-                                                                       bsPopover(id = "growth_threshold_growth", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no density value is greater than [growth threshold] \\* start density."),
+                                                                       bsPopover(id = "growth_threshold_growth", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no growth value is greater than [growth threshold] \\* start growth."),
 
                                                                        numberInput(
-                                                                         inputId = 'minimum_density_growth',
-                                                                         label = 'Minimum density',
+                                                                         inputId = 'minimum_growth_growth',
+                                                                         label = 'Minimum growth meas.',
                                                                          value = 0,
                                                                          min = NA,
                                                                          max = NA,
                                                                          placeholder = 0
                                                                        ),
-                                                                       bsPopover(id = "minimum_density_growth", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
+                                                                       bsPopover(id = "minimum_growth_growth", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth] for the fits."),
 
                                                                        numberInput(
-                                                                         inputId = 'maximum_density_growth',
-                                                                         label = 'Maximum density',
+                                                                         inputId = 'maximum_growth_growth',
+                                                                         label = 'Maximum growth meas.',
                                                                          value = NULL,
                                                                          min = NA,
                                                                          max = NA
                                                                        ),
-                                                                       bsPopover(id = "maximum_density_growth", title = HTML("<em>max.density</em>"), content = "Consider only density values below and including [Maximum density] for linear and spline fits."),
+                                                                       bsPopover(id = "maximum_growth_growth", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth meas.] for linear and spline fits."),
 
 
                                                                        numberInput(
@@ -884,7 +884,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Linear fit')),
 
-                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on growth values.",
                                                                     checkboxInput(inputId = 'log_transform_data_linear_growth',
                                                                                   label = 'Log-transform data',
                                                                                   value = TRUE)
@@ -911,7 +911,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              value = 0.05,
                                                              placeholder = 0.05
                                                            ),
-                                                           bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of density increase a linear regression window should cover to be considered."),
+                                                           bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of growth increase a linear regression window should cover to be considered."),
 
                                                            checkboxInput(inputId = 'custom_sliding_window_size_growth',
                                                                          label = 'Custom sliding window size',
@@ -926,7 +926,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                min = NA,
                                                                max = NA,
                                                              ),
-                                                             bsPopover(id = "custom_sliding_window_size_value_growth", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum density)."),
+                                                             bsPopover(id = "custom_sliding_window_size_value_growth", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum growth meas.)."),
                                                            ),
                                                            fluidRow(
                                                              column(12,
@@ -946,7 +946,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Parametric fit')),
 
-                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on growth values.",
                                                                     checkboxInput(inputId = 'log_transform_data_parametric_growth',
                                                                                   label = 'Log-transform data',
                                                                                   value = TRUE)
@@ -1012,7 +1012,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            width = 4,
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Nonparametric fit')),
-                                                           tags$div(title="Perform a Ln(y/y0) transformation on density values.",
+                                                           tags$div(title="Perform a Ln(y/y0) transformation on growth values.",
                                                                     checkboxInput(inputId = 'log_transform_data_nonparametric_growth',
                                                                                   label = 'Log-transform data',
                                                                                   value = TRUE)
@@ -1068,7 +1068,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        style = 'padding: 1; border-color: #ADADAD; padding-top: 0; padding-bottom: 0',
                                                                        h2(strong('Fluorescence fit')),
                                                                        h4('Options'),
-                                                                       tags$div(title="Perform linear regression on log-transformed density data.",
+                                                                       tags$div(title="Perform linear regression on log-transformed growth data.",
                                                                                 checkboxInput(
                                                                                   inputId = 'linear_regression_fluorescence',
                                                                                   label = 'linear regression',
@@ -1097,17 +1097,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        bsPopover(id = "data_type_x_fluorescence", title = HTML("<em>x_type</em>"), content = "Select the data type that is used as the independent variable for all fits."),
 
                                                                        conditionalPanel(
-                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present && input.norm_type_parse == 'density'",
-                                                                         tags$div(title="Use normalized fluorescence (divided by density values) for all fits.",
+                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present && input.norm_type_parse == 'growth'",
+                                                                         tags$div(title="Use normalized fluorescence (divided by growth values) for all fits.",
                                                                                   checkboxInput(inputId = 'normalize_fluorescence',
-                                                                                                label = 'Normalize fluorescence to density'
+                                                                                                label = 'Normalize fluorescence to growth'
                                                                                   )
                                                                          )
                                                                        ),
 
                                                                        conditionalPanel(
                                                                          condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present && input.norm_type_parse == 'fluorescence 2'",
-                                                                         tags$div(title="Use normalized fluorescence (divided by density values) for all fits.",
+                                                                         tags$div(title="Use normalized fluorescence (divided by growth values) for all fits.",
                                                                                   checkboxInput(inputId = 'normalize_fluorescence',
                                                                                                 label = 'Normalize fluorescence to fluorescence 2'
                                                                                   )
@@ -1115,7 +1115,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        ),
 
                                                                        conditionalPanel(
-                                                                         condition = 'input.data_type_x_fluorescence.includes("density")',
+                                                                         condition = 'input.data_type_x_fluorescence.includes("growth")',
                                                                          numberInput(
                                                                            inputId = 'growth_threshold_in_percent_fluorescence',
                                                                            label = 'Growth threshold (in %)',
@@ -1124,32 +1124,32 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            max = NA,
                                                                            placeholder = 1.5
                                                                          ),
-                                                                         bsPopover(id = "growth_threshold_in_percent_fluorescence", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no density value is greater than [growth threshold] \\* start density."),
+                                                                         bsPopover(id = "growth_threshold_in_percent_fluorescence", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no growth value is greater than [growth threshold] \\* start growth."),
                                                                        ),
 
                                                                        conditionalPanel(
-                                                                         condition = 'input.data_type_x_fluorescence.includes("density")',
+                                                                         condition = 'input.data_type_x_fluorescence.includes("growth")',
                                                                          numberInput(
-                                                                           inputId = 'minimum_density_fluorescence',
-                                                                           label = 'Minimum density',
+                                                                           inputId = 'minimum_growth_fluorescence',
+                                                                           label = 'Minimum growth meas.',
                                                                            value = 0,
                                                                            min = NA,
                                                                            max = NA,
                                                                            placeholder = 0
                                                                          ),
-                                                                         bsPopover(id = "minimum_density_fluorescence", title = HTML("<em>min.density</em>"), content = "Consider only density values above [Minimum density] for the fits."),
+                                                                         bsPopover(id = "minimum_growth_fluorescence", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth meas.] for the fits."),
                                                                        ),
 
                                                                        conditionalPanel(
-                                                                         condition = 'input.data_type_x_fluorescence.includes("density")',
+                                                                         condition = 'input.data_type_x_fluorescence.includes("growth")',
                                                                          numberInput(
-                                                                           inputId = 'maximum_density_fluorescence',
-                                                                           label = 'Maximum density',
+                                                                           inputId = 'maximum_growth_fluorescence',
+                                                                           label = 'Maximum growth meas.',
                                                                            value = NULL,
                                                                            min = NA,
                                                                            max = NA
                                                                          ),
-                                                                         bsPopover(id = "maximum_density_fluorescence", title = HTML("<em>max.density</em>"), content = "Consider only density values below and including [Maximum density] for linear and spline fits."),
+                                                                         bsPopover(id = "maximum_growth_fluorescence", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth] for linear and spline fits."),
                                                                        ),
 
                                                                        conditionalPanel(
@@ -1326,7 +1326,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                min = NA,
                                                                max = NA,
                                                              ),
-                                                             bsPopover(id = "custom_sliding_window_size_value_fluorescence", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the phase of fluorescence increase (until maximum fluorescence or density)."),
+                                                             bsPopover(id = "custom_sliding_window_size_value_fluorescence", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the phase of fluorescence increase (until maximum fluorescence or growth)."),
                                                            ),
                                                            fluidRow(
                                                              column(12,
@@ -2630,7 +2630,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    selectInput(inputId = "data_type_growth_group_plot",
                                                                                label = "Data type",
-                                                                               choices = c("Raw density" = "raw",
+                                                                               choices = c("Raw growth" = "raw",
                                                                                            "Spline fits" = "spline")
                                                                    ),
 
@@ -3049,7 +3049,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    selectInput(inputId = "data_type_growth_grid_plot",
                                                                                label = "Data type",
-                                                                               choices = c("Raw density" = "raw",
+                                                                               choices = c("Raw growth" = "raw",
                                                                                            "Spline fits" = "spline")
                                                                    ),
 
@@ -4210,8 +4210,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    h3("Customize plot appearance"),
 
-                                                                   checkboxInput(inputId = "log_transform_y_axis_density_dual_plot",
-                                                                                 label = "Log-transform y-axis (Density)",
+                                                                   checkboxInput(inputId = "log_transform_y_axis_growth_dual_plot",
+                                                                                 label = "Log-transform y-axis (growth)",
                                                                                  value = FALSE),
 
                                                                    checkboxInput(inputId = "log_transform_y_axis_fluorescence_dual_plot",
@@ -4235,17 +4235,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      )
                                                                    ),
 
-                                                                   strong("y-Range (Density)"),
+                                                                   strong("y-Range (growth)"),
                                                                    fluidRow(
                                                                      column(5,
-                                                                            textInput(inputId = "y_range_min_density_dual_plot",
+                                                                            textInput(inputId = "y_range_min_growth_dual_plot",
                                                                                       label = NULL,
                                                                                       value = "", placeholder = "min"
                                                                             )
                                                                      ),
 
                                                                      column(5,
-                                                                            textInput(inputId = "y_range_max_density_dual_plot",
+                                                                            textInput(inputId = "y_range_max_growth_dual_plot",
                                                                                       label = NULL,
                                                                                       value = "", placeholder = "max"
                                                                             )
@@ -4269,8 +4269,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      )
                                                                    ),
 
-                                                                   textInput(inputId = "y_axis_title_density_dual_plot",
-                                                                             label = "y-axis title (Density)",
+                                                                   textInput(inputId = "y_axis_title_growth_dual_plot",
+                                                                             label = "y-axis title (growth)",
                                                                              value = ""
                                                                    ),
 
@@ -4548,6 +4548,237 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    ) # fluidRow
                                                                  ) # mainPanel
                                                         ), #  tabPanel(title = "Parameter plots"
+                                                        ### Growth Grid Plots ####
+
+                                                        tabPanel(title = "Plot Grid",
+                                                                 sidebarPanel(
+
+                                                                   selectInput(inputId = "data_type_fluorescence_grid_plot",
+                                                                               label = "Data type",
+                                                                               choices = c("Raw growth" = "raw",
+                                                                                           "Spline fits" = "spline")
+                                                                   ),
+
+                                                                   selectInput(inputId = "parameter_parameter_grid_plot_fluorescence",
+                                                                               label = "Parameter",
+                                                                               choices = ""
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "select_string_visualize_fluorescence_grid",
+                                                                                 label = "(De-)select samples based on string",
+                                                                                 value = FALSE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_fluorescence_grid && !input.plot_group_averages_fluorescence_grid_plot",
+                                                                     selectizeInput(inputId = "samples_visualize_fluorescence_grid",
+                                                                                    label = "Samples:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     ),
+                                                                     checkboxInput(inputId = "order_matters_visualize_fluorescence_grid",
+                                                                                   label = "Select order matters",
+                                                                                   value = FALSE
+                                                                     ),
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.select_string_visualize_fluorescence_grid && input.plot_group_averages_fluorescence_grid_plot",
+                                                                     selectizeInput(inputId = "groups_visualize_fluorescence_grid",
+                                                                                    label = "Conditions:",
+                                                                                    width = "100%",
+                                                                                    choices = "",
+                                                                                    multiple = TRUE,
+                                                                                    options = list(closeAfterSelect = FALSE,
+                                                                                                   plugins= list('remove_button'))
+                                                                     )
+                                                                   ),
+
+                                                                   conditionalPanel(
+                                                                     condition = "input.select_string_visualize_fluorescence_grid",
+                                                                     textInput(inputId = "select_samples_based_on_string_fluorescence_grid_plot",
+                                                                               label = "Select sample based on string (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_samples_based_on_string_fluorescence_grid_plot",
+                                                                               label = "Exclude sample based on string (separate by ;)"
+                                                                     ),
+
+                                                                   ),
+                                                                   conditionalPanel(
+                                                                     condition = "input.plot_group_averages_fluorescence_grid_plot || input.select_string_visualize_fluorescence_grid",
+                                                                     textInput(inputId = "select_samples_based_on_concentration_fluorescence_grid_plot",
+                                                                               label = "Select sample based on concentration (separate by ;)"
+                                                                     ),
+
+                                                                     textInput(inputId = "exclude_samples_based_on_concentration_fluorescence_grid_plot",
+                                                                               label = "Exclude sample based on concentration (separate by ;)"
+                                                                     )
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "plot_group_averages_fluorescence_grid_plot",
+                                                                                 label = "Plot group averages",
+                                                                                 value = TRUE),
+
+                                                                   conditionalPanel(
+                                                                     condition = "output.more_than_two_conc",
+                                                                     checkboxInput(inputId = "sort_by_conc_fluorescence_grid_plot",
+                                                                                   label = "Sort by concentration",
+                                                                                   value = TRUE)
+                                                                   ),
+
+                                                                   h3("Customize plot appearance"),
+
+                                                                   checkboxInput(inputId = "log_transform_y_axis_fluorescence_grid_plot",
+                                                                                 label = "Log-transform y-axis",
+                                                                                 value = TRUE),
+
+                                                                   strong("x-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_min_fluorescence_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "x_range_max_fluorescence_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("y-Range"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_min_fluorescence_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "y_range_max_fluorescence_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+                                                                   strong("Color scale limits"),
+                                                                   fluidRow(
+                                                                     column(5,
+                                                                            textInput(inputId = "legend_lim_min_fluorescence_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "min"
+                                                                            )
+                                                                     ),
+
+                                                                     column(5,
+                                                                            textInput(inputId = "legend_lim_max_fluorescence_grid_plot",
+                                                                                      label = NULL,
+                                                                                      value = "", placeholder = "max"
+                                                                            )
+                                                                     )
+                                                                   ),
+
+
+                                                                   textInput(inputId = "y_axis_title_fluorescence_grid_plot",
+                                                                             label = "y-axis title",
+                                                                             value = ""
+                                                                   ),
+
+                                                                   textInput(inputId = "x_axis_title_fluorescence_grid_plot",
+                                                                             label = "x-axis title",
+                                                                             value = "Time"
+                                                                   ),
+
+                                                                   sliderInput(inputId = "nbreaks_fluorescence_grid_plot",
+                                                                               label = "Number of breaks on y-axis",
+                                                                               min = 1,
+                                                                               max = 20,
+                                                                               value = 6),
+
+                                                                   sliderInput(inputId = "line_width_fluorescence_grid_plot",
+                                                                               label = "Line width",
+                                                                               min = 0.01,
+                                                                               max = 10,
+                                                                               value = 1.1),
+
+                                                                   sliderInput(inputId = 'base_size_fluorescence_grid_plot',
+                                                                               label = 'Base font size',
+                                                                               min = 10,
+                                                                               max = 35,
+                                                                               value = 23,
+                                                                               step = 0.5),
+
+
+                                                                   conditionalPanel(
+                                                                     condition = "!input.sort_by_conc_fluorescence_grid_plot",
+                                                                     sliderInput(inputId = "nrows_fluorescence_grid_plot",
+                                                                                 label = "Number of rows in grid",
+                                                                                 min = 1,
+                                                                                 max = 20,
+                                                                                 value = 2)
+                                                                   ),
+
+
+                                                                   selectInput(inputId = "color_palettes_grid_plot_fluorescence",
+                                                                               label = "Change color palette",
+                                                                               width = "100%",
+                                                                               choices = names(QurvE:::single_hue_palettes),
+                                                                               selected = names(QurvE:::single_hue_palettes),
+                                                                               multiple = FALSE
+                                                                   ),
+                                                                   bsPopover(id = "color_palettes_grid_plot_fluorescence",
+                                                                             title = HTML("<em>Define the colors used to visualize the value of the chosen parameter</em>"), placement = "top",
+                                                                             content = ""
+                                                                   ),
+
+                                                                 ), # Side panel fluorescence group plots
+
+                                                                 mainPanel(
+                                                                   withSpinner(
+                                                                     plotOutput("fluorescence_grid_plot",
+                                                                                width = "100%", height = "1000px"),
+
+                                                                   ),
+
+                                                                   h3(strong("Export plot")),
+
+                                                                   fluidRow(
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "width_download_fluorescence_grid_plot",
+                                                                                         label = "Width (in inches)",
+                                                                                         value = 10)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "height_download_fluorescence_grid_plot",
+                                                                                         label = "Height (in inches)",
+                                                                                         value = 9)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            numericInput(inputId = "dpi_download_fluorescence_grid_plot",
+                                                                                         label = "DPI",
+                                                                                         value = 300)
+                                                                     ), # column
+                                                                     column(width = 4,
+                                                                            downloadButton('download_fluorescence_grid_plot',"Download Plot"),
+
+                                                                            radioButtons("format_download_fluorescence_grid_plot",
+                                                                                         label = NULL,
+                                                                                         choices = c("PNG" = ".png",
+                                                                                                     "PDF" = ".pdf"),
+                                                                                         selected = ".png",
+                                                                                         inline = TRUE)
+                                                                     ) # column
+                                                                   ) # fluidRow
+                                                                 ) #  mainPanel
+                                                        ),
                                                         ### Fluorescence DR Plots Spline ####
 
                                                         tabPanel(title = "Dose-response analysis", value = "tabPanel_Visualize_Fluorescence_DoseResponse_spline",
@@ -5374,7 +5605,7 @@ server <- function(input, output, session){
       } else {
         shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Computation_Fluorescence]")
       }
-      if(length(grodata$density) < 2){
+      if(length(grodata$growth) < 2){
         shinyjs::disable(selector = "#navbar li a[data-value=tabPanel_Computation_Growth]")
       } else {
         shinyjs::enable(selector = "#navbar li a[data-value=tabPanel_Computation_Growth]")
@@ -5558,9 +5789,9 @@ server <- function(input, output, session){
     ##___Custom____####
 
   hide("Custom_Data_Tables")
-  ### Test if custom_file_density was loaded
+  ### Test if custom_file_growth was loaded
   output$growthfileUploaded <- reactive({
-    if(is.null(input$custom_file_density)) return(FALSE)
+    if(is.null(input$custom_file_growth)) return(FALSE)
     else return(TRUE)
   })
   outputOptions(output, 'growthfileUploaded', suspendWhenHidden=FALSE)
@@ -5582,27 +5813,27 @@ server <- function(input, output, session){
   # Read data upon click on [Read data]
   observeEvent(input$read_custom,{
     showModal(modalDialog("Reading data input...", footer=NULL))
-    density.file <- input$custom_file_density
+    growth.file <- input$custom_file_growth
     fl.file <- input$custom_file_fluorescence
     fl2.file <- input$custom_file_fluorescence2
 
-    if(is.null(density.file) && is.null(fl.file) ) return(NULL)
+    if(is.null(growth.file) && is.null(fl.file) ) return(NULL)
 
     if(input$convert_time_equation_custom == "" || is.na(input$convert_time_equation_custom)) convert.time <- NULL
     else convert.time <- input$convert_time_equation_custom
 
-    fl.normtype <- ifelse(input$load_fl2_data_custom, "fl2", "density")
+    fl.normtype <- ifelse(input$load_fl2_data_custom, "fl2", "growth")
     ## Read data
     try(
-      results$custom_data <- read_data(data.density = density.file$datapath,
+      results$custom_data <- read_data(data.growth = growth.file$datapath,
                                        data.fl = fl.file$datapath,
                                        data.fl2 = fl2.file$datapath,
                                        data.format = "col",
-                                       sheet.density = input$custom_growth_sheets,
+                                       sheet.growth = input$custom_growth_sheets,
                                        sheet.fl = input$custom_fluorescence_sheets,
                                        sheet.fl2 = input$custom_fluorescence2_sheets,
-                                       csvsep = input$separator_custom_density,
-                                       dec = input$decimal_separator_custom_density,
+                                       csvsep = input$separator_custom_growth,
+                                       dec = input$decimal_separator_custom_growth,
                                        csvsep.fl = input$separator_custom_fluorescence,
                                        dec.fl = input$decimal_separator_custom_fluorescence,
                                        csvsep.fl2 = input$separator_custom_fluorescence2,
@@ -5620,21 +5851,21 @@ server <- function(input, output, session){
       hide("data_instruction")
       show("Custom_Data_Tables")
       hide("Parsed_Data_Tables")
-      if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
+      if("growth" %in% names(results$custom_data) && length(results$custom_data$growth)>1){
         # show [Run Computation] button in Computation-Growth
         show("run_growth")
       }
-      # if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+      # if("growth" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
       #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
       # }
 
       # Remove eventually pre-loaded parsed data
       results$parsed_data <- NULL
-      hide("parsed_reads_density")
+      hide("parsed_reads_growth")
       hide("parsed_reads_fluorescence")
       hide("parsed_reads_fluorescence2")
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth")
 
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
@@ -5650,16 +5881,16 @@ server <- function(input, output, session){
     }
   })
 
-  ### Render custom density table
+  ### Render custom growth table
   # growth_data_custom <- reactive({
-  #   inFile <- input$custom_file_density
+  #   inFile <- input$custom_file_growth
   #
   #   if(is.null(inFile))
   #     return(NULL)
   #
   #   filename <- inFile$datapath
-  #   dec <- input$decimal_separator_custom_density
-  #   csvsep <- input$separator_custom_density
+  #   dec <- input$decimal_separator_custom_growth
+  #   csvsep <- input$separator_custom_growth
   #   if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "csv") {
   #     dat <-
   #       utils::read.csv(
@@ -5757,9 +5988,9 @@ server <- function(input, output, session){
 
   observe({
     # if(exists("growth_data_custom") && !is.null(growth_data_custom()) && is.null(growth_data_custom_processed()) ){
-    #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+    #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_growth")
     # } else {
-    #   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density")
+    #   hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_growth")
     # }
     # if(exists("custom_table_fluorescence") && !is.null(custom_table_fluorescence()) && is.null(custom_table_fluorescence_processed()) ){
     #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence", select = TRUE)
@@ -5772,11 +6003,11 @@ server <- function(input, output, session){
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_expdesign")
     }
     if(exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed())){
-      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed", select = TRUE)
-      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_density", select = FALSE)
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_growth_processed", select = TRUE)
+      showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_growth", select = FALSE)
     } else {
-      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed")
-      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_density")
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_growth_processed")
+      hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_growth")
     }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) ){
       showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed", select = TRUE)
@@ -5794,8 +6025,8 @@ server <- function(input, output, session){
     }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) &&
        exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed()) &&
-       all(results$custom_data$density == results$custom_data$fluorescence, na.rm = T)){
-      showModal(modalDialog("Density and Fluorescence data are identical. Did you assign the correct files and/or sheets?", easyClose = T))
+       all(results$custom_data$growth == results$custom_data$fluorescence, na.rm = T)){
+      showModal(modalDialog("growth and Fluorescence data are identical. Did you assign the correct files and/or sheets?", easyClose = T))
     }
   })
 
@@ -5878,25 +6109,25 @@ server <- function(input, output, session){
               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f1)-3)))
   })
 
-  # Render processed density table
+  # Render processed growth table
   growth_data_custom_processed <- reactive({
 
-    if(is.null(results$custom_data) || length(results$custom_data$density) < 2) return(NULL)
+    if(is.null(results$custom_data) || length(results$custom_data$growth) < 2) return(NULL)
 
-    table_density <- t(results$custom_data$density)
-    table_density[-(1:3), ] <- apply(apply(table_density[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
-    rownames(table_density)[-(1:3)] <- ""
-    table_density <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
-                           table_density)
+    table_growth <- t(results$custom_data$growth)
+    table_growth[-(1:3), ] <- apply(apply(table_growth[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
+    rownames(table_growth)[-(1:3)] <- ""
+    table_growth <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$custom_data$time[1,]), digits = 2))),
+                           table_growth)
 
-    table_density
+    table_growth
   })
 
   output$growth_data_custom_processed <- DT::renderDT({
-    table_density <- growth_data_custom_processed()
-    DT::datatable(table_density,
+    table_growth <- growth_data_custom_processed()
+    DT::datatable(table_growth,
               options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_density)-3)))
+              escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_growth)-3)))
   })
 
   # render processed fluorescence table
@@ -6024,8 +6255,8 @@ server <- function(input, output, session){
   #             escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(f2)-3)))
   # })
 
-  custom_raw_density_plot <- reactive({
-    if(is.null(results$custom_data) || length(results$custom_data$density) < 2) return(NULL)
+  custom_raw_growth_plot <- reactive({
+    if(is.null(results$custom_data) || length(results$custom_data$growth) < 2) return(NULL)
 
     try(
       suppressWarnings(
@@ -6037,8 +6268,8 @@ server <- function(input, output, session){
     )
   })
 
-  output$custom_raw_density_plot <- renderPlot({
-    custom_raw_density_plot()
+  output$custom_raw_growth_plot <- renderPlot({
+    custom_raw_growth_plot()
   })
 
   custom_raw_fluorescence_plot <- reactive({
@@ -6077,15 +6308,15 @@ server <- function(input, output, session){
 
 
 
-  output$custom_density_format <- reactive({
-    if(is.null(input$custom_file_density)) return(NULL)
+  output$custom_growth_format <- reactive({
+    if(is.null(input$custom_file_growth)) return(NULL)
 
-    filename <- input$custom_file_density$name
+    filename <- input$custom_file_growth$name
 
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     format
   })
-  outputOptions(output, 'custom_density_format', suspendWhenHidden=FALSE)
+  outputOptions(output, 'custom_growth_format', suspendWhenHidden=FALSE)
 
   output$custom_fluorescence_format <- reactive({
     if(is.null(input$custom_file_fluorescence)) return(NULL)
@@ -6108,11 +6339,11 @@ server <- function(input, output, session){
   outputOptions(output, 'custom_fluorescence2_format', suspendWhenHidden=FALSE)
 
   growth_excel_sheets <- reactive({
-    filename <- input$custom_file_density$datapath
-    if(is.null(input$custom_file_density)) return("")
+    filename <- input$custom_file_growth$datapath
+    if(is.null(input$custom_file_growth)) return("")
     format <- stringr::str_replace_all(filename, ".{1,}\\.", "")
     if(format != "xlsx" && format != "xls") return("")
-    sheets <- readxl::excel_sheets(input$custom_file_density$datapath)
+    sheets <- readxl::excel_sheets(input$custom_file_growth$datapath)
     sheets
   })
 
@@ -6155,11 +6386,11 @@ server <- function(input, output, session){
       modalDialog(
         tags$h2('Please enter parameters to simulate growth curves'),
         textInput('d.random.growth', 'Number of samples', placeholder = "35"),
-        textInput('y0.random.growth', 'Start density', placeholder = "0.05"),
+        textInput('y0.random.growth', 'Start growth', placeholder = "0.05"),
         textInput('tmax.random.growth', 'Maximum time value', placeholder = "24"),
         textInput('mu.random.growth', 'Maximum growth rate', placeholder = "0.6"),
         textInput('lambda.random.growth', 'Minimum lag time', placeholder = "5"),
-        textInput('A.random.growth', 'Maximum density', placeholder = "3"),
+        textInput('A.random.growth', 'Maximum growth', placeholder = "3"),
 
         footer=tagList(
           fluidRow(
@@ -6198,22 +6429,22 @@ server <- function(input, output, session){
     hide("data_instruction")
     show("Custom_Data_Tables")
     hide("Parsed_Data_Tables")
-    if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
+    if("growth" %in% names(results$custom_data) && length(results$custom_data$growth)>1){
       # show [Run Computation] button in Computation-Growth
       show("run_growth")
     }
-    # if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+    # if("growth" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
     #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
     # }
 
     # Remove eventually pre-loaded parsed data
     results$parsed_data <- NULL
-    hide("parsed_reads_density")
+    hide("parsed_reads_growth")
     hide("parsed_reads_fluorescence")
     hide("parsed_reads_fluorescence2")
     hide("norm_type_parse")
-    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth")
+    hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth")
 
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
@@ -6229,14 +6460,14 @@ server <- function(input, output, session){
                      "data" = t(results$custom_data$data))
     colnames(results$df_random_data ) <- results$df_random_data [1,]
     write.csv(results$df_random_data[-1,], file = paste0(tempdir(), "/random_data.csv"))
-    results$random_data_density <- paste0(tempdir(), "/random_data.csv")
+    results$random_data_growth <- paste0(tempdir(), "/random_data.csv")
     removeModal()
   })
 
   observe({
-    density.file <- results$random_data_density
+    growth.file <- results$random_data_growth
 
-    if(is.null(density.file)) return(NULL)
+    if(is.null(growth.file)) return(NULL)
     ## Read data
     try(
       results$custom_data <- read_data(results$df_random_data,
@@ -6252,21 +6483,21 @@ server <- function(input, output, session){
       hide("data_instruction")
       show("Custom_Data_Tables")
       hide("Parsed_Data_Tables")
-      if("density" %in% names(results$custom_data) && length(results$custom_data$density)>1){
+      if("growth" %in% names(results$custom_data) && length(results$custom_data$growth)>1){
         # show [Run Computation] button in Computation-Growth
         show("run_growth")
       }
-      # if("density" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
+      # if("growth" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
       #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
       # }
 
       # Remove eventually pre-loaded parsed data
       results$parsed_data <- NULL
-      hide("parsed_reads_density")
+      hide("parsed_reads_growth")
       hide("parsed_reads_fluorescence")
       hide("parsed_reads_norm_fluorescence2")
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth")
 
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
@@ -6285,13 +6516,13 @@ server <- function(input, output, session){
     ##__Parse data____####
   ### Hide elements to guide user
   hide("Parsed_Data_Tables")
-  hide("parsed_reads_density")
+  hide("parsed_reads_growth")
   hide("parsed_reads_fluorescence")
   hide("parsed_reads_fluorescence2")
   hide("parse_data")
   hide("norm_type_parse")
-  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth")
+  hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth")
 
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
   hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
@@ -6304,12 +6535,12 @@ server <- function(input, output, session){
     } else {
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
     }
-    if(exists("parsed_data_table_density") && !is.null(parsed_data_table_density())){
-      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density", select = TRUE)
-      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density", select = FALSE)
+    if(exists("parsed_data_table_growth") && !is.null(parsed_data_table_growth())){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth", select = TRUE)
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth", select = FALSE)
     } else {
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth")
     }
     if(exists("parsed_data_table_fluorescence") && !is.null(parsed_data_table_fluorescence()) ){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence", select = TRUE)
@@ -6468,7 +6699,7 @@ server <- function(input, output, session){
       )
     }
     if(exists("reads") && length(reads) > 0){
-      show("parsed_reads_density")
+      show("parsed_reads_growth")
       if(length(reads)>1){
         show("parsed_reads_fluorescence")
       } else {
@@ -6506,8 +6737,8 @@ server <- function(input, output, session){
       hide("parsed_reads_fluorescence2")
     }
     norm.types <- c()
-    if(input$parsed_reads_density != "Ignore"){
-      norm.types <- c(norm.types, "density")
+    if(input$parsed_reads_growth != "Ignore"){
+      norm.types <- c(norm.types, "growth")
     }
     if(length(reads) > 2 && input$parsed_reads_fluorescence != "Ignore"){
       if(input$parsed_reads_fluorescence2 != "Ignore")
@@ -6522,7 +6753,7 @@ server <- function(input, output, session){
   })
 
   observe({
-    updateSelectInput(inputId = "parsed_reads_density",
+    updateSelectInput(inputId = "parsed_reads_growth",
                       choices = selected_inputs_parsed_reads()
     )
   })
@@ -6547,7 +6778,7 @@ server <- function(input, output, session){
     if(input$norm_type_parse == "fluorescence 2"){
       fl.normtype <- "fl2"
     } else {
-      fl.normtype <- "density"
+      fl.normtype <- "growth"
     }
     showModal(modalDialog("Parsing data input...", footer=NULL))
     if(input$convert_time_equation_plate_reader == "" || is.na(input$convert_time_equation_plate_reader)) convert.time <- NULL
@@ -6570,15 +6801,15 @@ server <- function(input, output, session){
           csvsep.map =  input$separator_map,
           dec.map = input$decimal_separator_map,
           subtract.blank = input$subtract_blank_plate_reader,
-          density.nm = input$parsed_reads_density,
+          growth.nm = input$parsed_reads_growth,
           fl.nm = ifelse(
-            input$parsed_reads_fluorescence == input$parsed_reads_density,
+            input$parsed_reads_fluorescence == input$parsed_reads_growth,
             NA,
             input$parsed_reads_fluorescence
           ),
           calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, ""),
           fl2.nm = ifelse(
-            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+            input$parsed_reads_fluorescence2 == input$parsed_reads_growth |
               input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
             NA,
             input$parsed_reads_fluorescence2
@@ -6615,15 +6846,15 @@ server <- function(input, output, session){
           csvsep.map =  input$separator_map,
           dec.map = input$decimal_separator_map,
           subtract.blank = input$subtract_blank_plate_reader,
-          density.nm = input$parsed_reads_density,
+          growth.nm = input$parsed_reads_growth,
           fl.nm = ifelse(
-            input$parsed_reads_fluorescence == input$parsed_reads_density,
+            input$parsed_reads_fluorescence == input$parsed_reads_growth,
             NA,
             input$parsed_reads_fluorescence
           ),
           calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, ""),
           fl2.nm = ifelse(
-            input$parsed_reads_fluorescence2 == input$parsed_reads_density |
+            input$parsed_reads_fluorescence2 == input$parsed_reads_growth |
               input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
             NA,
             input$parsed_reads_fluorescence
@@ -6636,9 +6867,9 @@ server <- function(input, output, session){
     hide("mapping_layout")
     hide("Custom_Data_Tables")
     show("Parsed_Data_Tables")
-    if("density" %in% names(results$parsed_data) && length(results$parsed_data$density)>1){
-      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_density")
-      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_density")
+    if("growth" %in% names(results$parsed_data) && length(results$parsed_data$growth)>1){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth")
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth")
 
       # show [Run Computation] button in Computation-Growth
       show("run_growth")
@@ -6649,13 +6880,13 @@ server <- function(input, output, session){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
-    # if("density" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
+    # if("growth" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
     #   showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
     # }
     # Remove eventually pre-loaded custom data
     results$custom_data <- NULL
-    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_density_processed")
-    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_density")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_growth_processed")
+    hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_growth")
 
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence_processed")
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_fluorescence")
@@ -6671,25 +6902,25 @@ server <- function(input, output, session){
     removeModal()
   })
   #### Generate parsed tables to display in [DATA] tab
-  parsed_data_table_density <- reactive({
-    if(is.null(results$parsed_data) || length(results$parsed_data$density) < 2) return(NULL)
+  parsed_data_table_growth <- reactive({
+    if(is.null(results$parsed_data) || length(results$parsed_data$growth) < 2) return(NULL)
 
-    table_density <- t(results$parsed_data$density)
-    if(dim(table_density)[2]<2){
-      table_density[-(1:3), ] <- round(as.numeric(table_density[-(1:3), ]), digits = 3)
+    table_growth <- t(results$parsed_data$growth)
+    if(dim(table_growth)[2]<2){
+      table_growth[-(1:3), ] <- round(as.numeric(table_growth[-(1:3), ]), digits = 3)
     }else{
-      table_density[-(1:3), ] <- apply(apply(table_density[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
+      table_growth[-(1:3), ] <- apply(apply(table_growth[-(1:3), ], 2, as.numeric), 2, round, digits = 3)
     }
-    rownames(table_density)[-(1:3)] <- ""
-    table_density <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
-                           table_density)
-    table_density
+    rownames(table_growth)[-(1:3)] <- ""
+    table_growth <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
+                           table_growth)
+    table_growth
   })
 
-  output$parsed_data_table_density <- DT::renderDT({
-    DT::datatable(parsed_data_table_density(),
+  output$parsed_data_table_growth <- DT::renderDT({
+    DT::datatable(parsed_data_table_growth(),
                                options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_density())-3)))
+                               escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_growth())-3)))
 
   })
 
@@ -6739,8 +6970,8 @@ server <- function(input, output, session){
     expdesign
   })
 
-  parsed_raw_density_plot <- reactive({
-    if(is.null(results$parsed_data) || length(results$parsed_data$density) < 2) return(NULL)
+  parsed_raw_growth_plot <- reactive({
+    if(is.null(results$parsed_data) || length(results$parsed_data$growth) < 2) return(NULL)
 
     try(
       suppressWarnings(
@@ -6752,8 +6983,8 @@ server <- function(input, output, session){
     )
   })
 
-  output$parsed_raw_density_plot <- renderPlot({
-    parsed_raw_density_plot()
+  output$parsed_raw_growth_plot <- renderPlot({
+    parsed_raw_growth_plot()
   })
 
   parsed_raw_fluorescence_plot <- reactive({
@@ -6813,7 +7044,7 @@ server <- function(input, output, session){
 
   observeEvent(input$run_growth,{
     ## Read data
-    # grodata <- read_data(inFile$datapath, sheet.density = input$custom_growth_sheets, csvsep = input$separator_custom_density, dec = input$decimal_separator_custom_density)
+    # grodata <- read_data(inFile$datapath, sheet.growth = input$custom_growth_sheets, csvsep = input$separator_custom_growth, dec = input$decimal_separator_custom_growth)
     # Choose data input
     if(!is.null(results$custom_data)){
       grodata <- results$custom_data
@@ -6863,16 +7094,16 @@ server <- function(input, output, session){
       lin.dY <- as.numeric(input$dY_threshold_growth)
     }
 
-    if (is.null(input$minimum_density_growth) || is.na(input$minimum_density_growth) || input$minimum_density_growth == "NULL" || input$minimum_density_growth == "") {
-      min.density <- 0
+    if (is.null(input$minimum_growth_growth) || is.na(input$minimum_growth_growth) || input$minimum_growth_growth == "NULL" || input$minimum_growth_growth == "") {
+      min.growth <- 0
     } else {
-      min.density <- as.numeric(input$minimum_density_growth)
+      min.growth <- as.numeric(input$minimum_growth_growth)
     }
 
-    if (is.null(input$maximum_density_growth) || is.na(input$maximum_density_growth) || input$maximum_density_growth == "NULL" || input$maximum_density_growth == "") {
-      max.density <- NA
+    if (is.null(input$maximum_growth_growth) || is.na(input$maximum_growth_growth) || input$maximum_growth_growth == "NULL" || input$maximum_growth_growth == "") {
+      max.growth <- NA
     } else {
-      max.density <- as.numeric(input$maximum_density_growth)
+      max.growth <- as.numeric(input$maximum_growth_growth)
     }
 
     if (is.null(input$t0_growth) || is.na(input$t0_growth) || input$t0_growth == "NULL" || input$t0_growth == "") {
@@ -6927,8 +7158,8 @@ server <- function(input, output, session){
                                               fit.opt = fit.opt,
                                               t0 = t0,
                                               tmax = tmax,
-                                              min.density = min.density,
-                                              max.density = max.density,
+                                              min.growth = min.growth,
+                                              max.growth = max.growth,
                                               log.x.gc = input$log_transform_time_growth,
                                               log.y.lin = input$log_transform_data_linear_growth,
                                               log.y.model = input$log_transform_data_parametric_growth,
@@ -6979,8 +7210,8 @@ server <- function(input, output, session){
       grodata <- results$custom_data
     } else if(!is.null(results$parsed_data)){
       grodata <- results$parsed_data
-      if(input$parsed_reads_density == input$parsed_reads_fluorescence)
-        showModal(modalDialog("Identical values for density and fluorescence data. Did you choose the correct data identifiers?"))
+      if(input$parsed_reads_growth == input$parsed_reads_fluorescence)
+        showModal(modalDialog("Identical values for growth and fluorescence data. Did you choose the correct data identifiers?"))
 
     } else return(FALSE)
 
@@ -6999,7 +7230,7 @@ server <- function(input, output, session){
     if(!is.null(results$parsed_data)) data <- results$parsed_data
 
     x_types <- c()
-    if(length(data$density) > 1) x_types <- c(x_types, 'density')
+    if(length(data$growth) > 1) x_types <- c(x_types, 'growth')
     if(length(data$time) > 1) x_types <- c(x_types, 'time')
 
     x_types
@@ -7090,16 +7321,16 @@ server <- function(input, output, session){
       t0 <- as.numeric(input$t0_fluorescence)
     }
 
-    if (is.null(input$minimum_density_fluorescence) || is.na(input$minimum_density_fluorescence) || input$minimum_density_fluorescence == "NULL" || input$minimum_density_fluorescence == "") {
-      min.density <- 0
+    if (is.null(input$minimum_growth_fluorescence) || is.na(input$minimum_growth_fluorescence) || input$minimum_growth_fluorescence == "NULL" || input$minimum_growth_fluorescence == "") {
+      min.growth <- 0
     } else {
-      min.density <- as.numeric(input$minimum_density_fluorescence)
+      min.growth <- as.numeric(input$minimum_growth_fluorescence)
     }
 
-    if (is.null(input$maximum_density_fluorescence) || is.na(input$maximum_density_fluorescence) || input$maximum_density_fluorescence == "NULL" || input$maximum_density_fluorescence == "") {
-      max.density <- NA
+    if (is.null(input$maximum_growth_fluorescence) || is.na(input$maximum_growth_fluorescence) || input$maximum_growth_fluorescence == "NULL" || input$maximum_growth_fluorescence == "") {
+      max.growth <- NA
     } else {
-      max.density <- as.numeric(input$maximum_density_fluorescence)
+      max.growth <- as.numeric(input$maximum_growth_fluorescence)
     }
 
 
@@ -7133,7 +7364,7 @@ server <- function(input, output, session){
                                           x_type = input$data_type_x_fluorescence,
                                           norm_fl = input$normalize_fluorescence,
                                           t0 = t0,
-                                          min.density = min.density,
+                                          min.growth = min.growth,
                                           log.x.lin = input$log_transform_x_linear_fluorescence,
                                           log.x.spline = input$log_transform_x_nonparametric_fluorescence,
                                           log.y.lin = input$log_transform_data_linear_fluorescence,
@@ -7162,7 +7393,7 @@ server <- function(input, output, session){
                                           export.fig = FALSE,
                                           shiny = TRUE,
                                           tmax = tmax,
-                                          max.density = max.density
+                                          max.growth = max.growth
                               )
                             )
       )
@@ -8027,11 +8258,11 @@ server <- function(input, output, session){
     showModal(
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
-        checkboxInput('log.y.lin.rerun', 'log-transform density values', value = results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$log.y.lin),
+        checkboxInput('log.y.lin.rerun', 'log-transform growth values', value = results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$log.y.lin),
         textInput('t0.lin.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$t0)),
         textInput('tmax.lin.rerun', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$tmax)),
-        textInput('min.density.lin.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.density)),
-        textInput('max.density.lin.rerun', 'Maximum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$max.density)),
+        textInput('min.growth.lin.rerun', 'Minimum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.growth)),
+        textInput('max.growth.lin.rerun', 'Maximum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$max.growth)),
         textAreaInput('quota.rerun', 'Quota', placeholder = HTML(paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$quota,
                                                                         "\n",
                                                                         "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
@@ -8086,16 +8317,16 @@ server <- function(input, output, session){
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.lin.rerun)), as.numeric(input$t0.lin.rerun), control$t0)
       control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.lin.rerun)), as.numeric(input$tmax.lin.rerun), control$tmax)
       control_new$log.y.lin <- input$log.y.lin.rerun
-      min.density.lin.new <- ifelse(!is.na(as.numeric(input$min.density.lin.rerun)), as.numeric(input$min.density.lin.rerun), control$min.density)
-      if(is.numeric(min.density.lin.new)){
-        if(!is.na(min.density.lin.new) && all(as.vector(actwell) < min.density.lin.new)){
-          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
-        } else if(!is.na(min.density.lin.new)){
-          control_new$min.density <- min.density.lin.new
+      min.growth.lin.new <- ifelse(!is.na(as.numeric(input$min.growth.lin.rerun)), as.numeric(input$min.growth.lin.rerun), control$min.growth)
+      if(is.numeric(min.growth.lin.new)){
+        if(!is.na(min.growth.lin.new) && all(as.vector(actwell) < min.growth.lin.new)){
+          message(paste0("Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.growth' was not adjusted."), call. = FALSE)
+        } else if(!is.na(min.growth.lin.new)){
+          control_new$min.growth <- min.growth.lin.new
         }
       }
-      control_new$max.density <- ifelse(!is.na(as.numeric(input$max.density.lin.rerun)), as.numeric(input$max.density.lin.rerun), control$max.density)
+      control_new$max.growth <- ifelse(!is.na(as.numeric(input$max.growth.lin.rerun)), as.numeric(input$max.growth.lin.rerun), control$max.growth)
 
       quota_new <- ifelse(!is.na(as.numeric(input$quota.rerun)), as.numeric(input$quota.rerun), 0.95)
       try(
@@ -8346,8 +8577,8 @@ server <- function(input, output, session){
         tags$h2('Please enter adjusted parameters'),
         textInput('t0.spline.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$t0)),
         textInput('tmax.spline.rerun', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$tmax)),
-        textInput('min.density.spline.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$min.density)),
-        textInput('max.density.spline.rerun', 'Maximum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$max.density)),
+        textInput('min.growth.spline.rerun', 'Minimum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$min.growth)),
+        textInput('max.growth.spline.rerun', 'Maximum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$max.growth)),
         textInput('smooth.gc.rerun', 'Smoothing factor', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$smooth.gc)),
         footer=tagList(
           fluidRow(
@@ -8388,16 +8619,16 @@ server <- function(input, output, session){
       control_new$smooth.gc <- ifelse(!is.na(as.numeric(input$smooth.gc.rerun)), as.numeric(input$smooth.gc.rerun), control$smooth.gc)
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.spline.rerun)), as.numeric(input$t0.spline.rerun), control$t0)
       control_new$tmax <- ifelse(!is.na(as.numeric(input$tmax.spline.rerun)), as.numeric(input$tmax.spline.rerun), control$tmax)
-      min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun)), as.numeric(input$min.density.spline.rerun), control$min.density)
-      if(is.numeric(min.density.spline.new)){
-        if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
-          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
-        } else if(!is.na(min.density.spline.new)){
-          control_new$min.density <- min.density.spline.new
+      min.growth.spline.new <- ifelse(!is.na(as.numeric(input$min.growth.spline.rerun)), as.numeric(input$min.growth.spline.rerun), control$min.growth)
+      if(is.numeric(min.growth.spline.new)){
+        if(!is.na(min.growth.spline.new) && all(as.vector(actwell) < min.growth.spline.new)){
+          message(paste0("Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.growth' was not adjusted."), call. = FALSE)
+        } else if(!is.na(min.growth.spline.new)){
+          control_new$min.growth <- min.growth.spline.new
         }
       }
-      control_new$max.density <- ifelse(!is.na(as.numeric(input$max.density.spline.rerun)), as.numeric(input$max.density.spline.rerun), control$max.density)
+      control_new$max.growth <- ifelse(!is.na(as.numeric(input$max.growth.spline.rerun)), as.numeric(input$max.growth.spline.rerun), control$max.growth)
 
       showModal(modalDialog("Fitting sample data...", footer = NULL))
 
@@ -8552,7 +8783,7 @@ server <- function(input, output, session){
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
         textInput('t0.model.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$t0)),
-        textInput('min.density.model.rerun', 'Minimum density', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$min.density)),
+        textInput('min.growth.model.rerun', 'Minimum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$min.growth)),
         wellPanel(
           h4(strong('Models:')),
           style='padding: 1; padding-top: 0; padding-bottom: 0',
@@ -8617,13 +8848,13 @@ server <- function(input, output, session){
       gcID <- results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$gcID
 
       control_new$t0 <- ifelse(!is.na(as.numeric(input$t0.model.rerun)), as.numeric(input$t0.model.rerun), control$t0)
-      min.density.model.new <- ifelse(!is.na(as.numeric(input$min.density.model.rerun)), as.numeric(input$min.density.model.rerun), control$min.density)
-      if(is.numeric(min.density.model.new)){
-        if(!is.na(min.density.model.new) && all(as.vector(actwell) < min.density.model.new)){
-          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
-        } else if(!is.na(min.density.model.new)){
-          control_new$min.density <- min.density.model.new
+      min.growth.model.new <- ifelse(!is.na(as.numeric(input$min.growth.model.rerun)), as.numeric(input$min.growth.model.rerun), control$min.growth)
+      if(is.numeric(min.growth.model.new)){
+        if(!is.na(min.growth.model.new) && all(as.vector(actwell) < min.growth.model.new)){
+          message(paste0("Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.growth' was not adjusted."), call. = FALSE)
+        } else if(!is.na(min.growth.model.new)){
+          control_new$min.growth <- min.growth.model.new
         }
       }
       # combine selected models into vector
@@ -9093,8 +9324,8 @@ server <- function(input, output, session){
       showModal(
         modalDialog(
           tags$h2('Please enter adjusted parameters'),
-          textInput('min.density.lin.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.density)),
-          textInput('max.density.lin.rerun.fluorescence', 'Maximum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$max.density)),
+          textInput('min.growth.lin.rerun.fluorescence', 'Minimum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.growth)),
+          textInput('max.growth.lin.rerun.fluorescence', 'Maximum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$max.growth)),
           textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
                                                                                        "\n",
                                                                                        "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
@@ -9156,20 +9387,20 @@ server <- function(input, output, session){
                                  as.numeric(input$tmax.lin.rerun.fluorescence),
                                  control$tmax)
 
-      min.density.lin.new <- ifelse(!is.na(input$min.density.lin.rerun.fluorescence) && !is.null(input$min.density.lin.rerun.fluorescence) && input$min.density.lin.rerun.fluorescence != "",
-                                    as.numeric(input$min.density.lin.rerun.fluorescence),
-                                    control$min.density)
-      if(is.numeric(min.density.lin.new)){
-        if(!is.na(min.density.lin.new) && all(as.vector(actwell) < min.density.lin.new)){
+      min.growth.lin.new <- ifelse(!is.na(input$min.growth.lin.rerun.fluorescence) && !is.null(input$min.growth.lin.rerun.fluorescence) && input$min.growth.lin.rerun.fluorescence != "",
+                                    as.numeric(input$min.growth.lin.rerun.fluorescence),
+                                    control$min.growth)
+      if(is.numeric(min.growth.lin.new)){
+        if(!is.na(min.growth.lin.new) && all(as.vector(actwell) < min.growth.lin.new)){
           showModal(
-            modalDialog(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                         min(as.vector(actwell)),". 'min.density' was not adjusted."), easyClose = T)
+            modalDialog(paste0("Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.growth' was not adjusted."), easyClose = T)
           )
-        } else if(!is.na(min.density.lin.new)){
-          control_new$min.density <- min.density.lin.new
+        } else if(!is.na(min.growth.lin.new)){
+          control_new$min.growth <- min.growth.lin.new
         }
       }
-      control_new$max.density <-  ifelse(!is.na(as.numeric(input$max.density.lin.rerun.fluorescence)), as.numeric(input$max.density.lin.rerun.fluorescence), control$max.density)
+      control_new$max.growth <-  ifelse(!is.na(as.numeric(input$max.growth.lin.rerun.fluorescence)), as.numeric(input$max.growth.lin.rerun.fluorescence), control$max.growth)
       quota_new <- ifelse(!is.na(as.numeric(input$quota.rerun.fluorescence)), as.numeric(input$quota.rerun.fluorescence), 0.95)
 
       if(control$x_type == "time"){
@@ -9183,7 +9414,7 @@ server <- function(input, output, session){
       } else {
         try(
           results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]] <-
-            flFitLinear(density = acttime, fl_data = actwell,
+            flFitLinear(growth = acttime, fl_data = actwell,
                         ID = ID,
                         control = control_new,
                         quota = quota_new)
@@ -9435,8 +9666,8 @@ server <- function(input, output, session){
       showModal(
         modalDialog(
           tags$h2('Please enter adjusted parameters'),
-          textInput('min.density.spline.rerun.fluorescence', 'Minimum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.density)),
-          textInput('max.density.spline.rerun.fluorescence', 'Maximum density', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$max.density)),
+          textInput('min.growth.spline.rerun.fluorescence', 'Minimum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.growth)),
+          textInput('max.growth.spline.rerun.fluorescence', 'Maximum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$max.growth)),
           textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
           footer=tagList(
             fluidRow(
@@ -9484,18 +9715,18 @@ server <- function(input, output, session){
       control_new$tmax <- ifelse(!is.na(input$tmax.spline.rerun.fluorescence) && !is.null(input$tmax.spline.rerun.fluorescence) && input$tmax.spline.rerun.fluorescence != "",
                                  as.numeric(input$tmax.spline.rerun.fluorescence),
                                  control$tmax)
-      min.density.spline.new <- ifelse(!is.na(as.numeric(input$min.density.spline.rerun.fluorescence)) && !is.null(input$min.density.spline.rerun.fluorescence),
-                                       as.numeric(input$min.density.spline.rerun.fluorescence),
-                                       control$min.density)
-      control_new$max.density <-  ifelse(!is.na(as.numeric(input$max.density.spline.rerun.fluorescence)) && !is.null(input$max.density.spline.rerun.fluorescence),
-                                         as.numeric(input$max.density.spline.rerun.fluorescence),
-                                         control$max.density)
-      if(is.numeric(min.density.spline.new)){
-        if(!is.na(min.density.spline.new) && all(as.vector(actwell) < min.density.spline.new)){
-          message(paste0("Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
-                         min(as.vector(actwell)),". 'min.density' was not adjusted."), call. = FALSE)
-        } else if(!is.na(min.density.spline.new)){
-          control_new$min.density <- min.density.spline.new
+      min.growth.spline.new <- ifelse(!is.na(as.numeric(input$min.growth.spline.rerun.fluorescence)) && !is.null(input$min.growth.spline.rerun.fluorescence),
+                                       as.numeric(input$min.growth.spline.rerun.fluorescence),
+                                       control$min.growth)
+      control_new$max.growth <-  ifelse(!is.na(as.numeric(input$max.growth.spline.rerun.fluorescence)) && !is.null(input$max.growth.spline.rerun.fluorescence),
+                                         as.numeric(input$max.growth.spline.rerun.fluorescence),
+                                         control$max.growth)
+      if(is.numeric(min.growth.spline.new)){
+        if(!is.na(min.growth.spline.new) && all(as.vector(actwell) < min.growth.spline.new)){
+          message(paste0("Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
+                         min(as.vector(actwell)),". 'min.growth' was not adjusted."), call. = FALSE)
+        } else if(!is.na(min.growth.spline.new)){
+          control_new$min.growth <- min.growth.spline.new
         }
       }
       if(control$x_type == "time"){
@@ -9508,7 +9739,7 @@ server <- function(input, output, session){
       } else {
         try(
           results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]] <-
-            flFitSpline(density = acttime, fl_data = actwell,
+            flFitSpline(growth = acttime, fl_data = actwell,
                         ID = ID,
                         control = control_new)
         )
@@ -10726,16 +10957,16 @@ server <- function(input, output, session){
                            "Doubling time (Spline)" = "tD.spline",
                            "Doubling time phase 2 (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum density (Spline)' = 'A.spline',
-                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Maximum growth meas. (Spline)' = 'A.spline',
+                           'ΔGrowth meas. (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (Spline)' = 'mu.spline',
                            "Doubling time (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum density (Spline)' = 'A.spline',
-                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Maximum growth meas. (Spline)' = 'A.spline',
+                           'ΔGrowth meas. (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       }
     }
@@ -10747,15 +10978,15 @@ server <- function(input, output, session){
                            "Doubling time (linear fit)" = "tD.linfit",
                            "Doubling time phase 2 (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum density (linear fit)' = 'A.linfit',
-                           'ΔDensity (linear fit)' = 'dY.linfit')
+                           'Maximum growth meas. (linear fit)' = 'A.linfit',
+                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (linear fit)' = 'mu.linfit',
                            "Doubling time (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum density (linear fit)' = 'A.linfit',
-                           'ΔDensity (linear fit)' = 'dY.linfit')
+                           'Maximum growth meas. (linear fit)' = 'A.linfit',
+                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
       }
     }
     if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
@@ -10763,7 +10994,7 @@ server <- function(input, output, session){
                          'Growth rate (model)' = 'mu.model',
                          'Doubling time (model)' = 'tD.model',
                          'Lag time (model)' = 'lambda.model',
-                         'Maximum density (model)' = 'A.model')
+                         'Maximum growth meas. (model)' = 'A.model')
     }
     gc_parameters
   })
@@ -10838,16 +11069,16 @@ server <- function(input, output, session){
                            "Doubling time (Spline)" = "tD.spline",
                            "Doubling time phase 2 (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum density (Spline)' = 'A.spline',
-                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Maximum growth meas. (Spline)' = 'A.spline',
+                           'ΔGrowth meas. (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (Spline)' = 'mu.spline',
                            "Doubling time (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum density (Spline)' = 'A.spline',
-                           'ΔDensity (Spline)' = 'dY.spline',
+                           'Maximum growth meas. (Spline)' = 'A.spline',
+                           'ΔGrowth meas. (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       }
     }
@@ -10859,15 +11090,15 @@ server <- function(input, output, session){
                            "Doubling time (linear fit)" = "tD.linfit",
                            "Doubling time phase 2 (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum density (linear fit)' = 'A.linfit',
-                           'ΔDensity (linear fit)' = 'dY.linfit')
+                           'Maximum growth meas. (linear fit)' = 'A.linfit',
+                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (linear fit)' = 'mu.linfit',
                            "Doubling time (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum density (linear fit)' = 'A.linfit',
-                           'ΔDensity (linear fit)' = 'dY.linfit')
+                           'Maximum growth meas. (linear fit)' = 'A.linfit',
+                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
       }
     }
     if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
@@ -10875,7 +11106,7 @@ server <- function(input, output, session){
                          'Growth rate (model)' = 'mu.model',
                          'Doubling time (model)' = 'tD.model',
                          'Lag time (model)' = 'lambda.model',
-                         'Maximum density (model)' = 'A.model')
+                         'Maximum growth meas. (model)' = 'A.model')
     }
     gc_parameters
   })
@@ -11161,8 +11392,8 @@ server <- function(input, output, session){
     if (length(results$fluorescence$flFit)>1){
       if(input$data_type_fluorescence_group_plot == "norm.fl"  || input$data_type_fluorescence_group_plot == "raw" ){ # || data.type == "raw2" || data.type == "norm.fl2"
         x_axis <- "Time"
-      } else if (results$fluorescence$control$x_type == "density"){
-        x_axis <- "Density"
+      } else if (results$fluorescence$control$x_type == "growth"){
+        x_axis <- "growth"
       } else {
         x_axis <- "Time"
       }
@@ -11177,7 +11408,7 @@ server <- function(input, output, session){
 
   observe({
     if (length(results$fluorescence$flFit)>1){
-      if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$x_type == "density"){
+      if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$x_type == "growth"){
         shinyjs::hide(id = "plot_group_averages_fluorescence_group_plot")
       } else {
         shinyjs::show(id = "plot_group_averages_fluorescence_group_plot")
@@ -11221,7 +11452,7 @@ server <- function(input, output, session){
     } else {
       cols <- unlist(str_split(input$custom_colors_fluorescence_group_plot, ",|;"))
     }
-    if(input$data_type_fluorescence_group_plot == "spline" && results$control$x_type == "density"){
+    if(input$data_type_fluorescence_group_plot == "spline" && results$control$x_type == "growth"){
       plot_mean <-  FALSE
     } else {
       plot_mean <- input$plot_group_averages_fluorescence_group_plot
@@ -11905,7 +12136,7 @@ server <- function(input, output, session){
             gc_parameters <- c(gc_parameters,
                                'Increase rate (linear fit)' = 'max_slope.linfit',
                                'Maximum fluorescence (linear fit)' = 'A.linfit',
-                               'ΔDensity (linear fit)' = 'dY.linfit')
+                               'ΔFluorescence (linear fit)' = 'dY.linfit')
           }
         }
         gc_parameters
@@ -11960,6 +12191,191 @@ server <- function(input, output, session){
         updateSelectInput(inputId = "reference_concentration_fluorescence_parameter_plot",
                           choices = select_inputs_reference_concentration_fluorescence_parameter_plot()
         )})
+
+      ### Grid Plot ####
+      observe({
+        if(!exists("output$more_than_two_conc") || is.null(output$more_than_two_conc))
+          return(NULL)
+        if(!output$more_than_two_conc){
+          updateSelectInput(session = session,
+                            inputId = "sort_by_conc_fluorescence_grid_plot",
+                            selected = FALSE)
+        }
+      })
+
+      observe({
+        if(input$select_string_visualize_fluorescence_grid)
+          updateSelectInput(session = session,
+                            inputId = "order_matters_visualize_fluorescence_grid",
+                            selected = FALSE)
+      })
+
+      selected_inputs_parameter_fluorescence_grid_plot <- reactive({
+        results <- results$fluorescence
+        gc_parameters <- c()
+        if("s" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+          if(results$control$biphasic){
+            gc_parameters <- c(gc_parameters,
+                               'Increase rate (Spline)' = 'max_slope.spline',
+                               'Increase rate phase 2 (Spline)' = 'max_slope.spline',
+                               'Maximum fluorescence (Spline)' = 'A.spline',
+                               'ΔFluorescence (Spline)' = 'dY.spline',
+                               'Area under the curve (Spline)' = 'integral.spline')
+          } else {
+            gc_parameters <- c(gc_parameters,
+                               'Increase rate (Spline)' = 'max_slope.spline',
+                               'Maximum fluorescence (Spline)' = 'A.spline',
+                               'ΔFluorescence (Spline)' = 'dY.spline',
+                               'Area under the curve (Spline)' = 'integral.spline')
+          }
+        }
+        if("l" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
+          if(results$control$biphasic){
+            gc_parameters <- c(gc_parameters,
+                               'Increase rate (linear fit)' = 'max_slope.linfit',
+                               'Increase rate phase 2 (linear fit)' = 'max_slope.linfit',
+                               'Maximum fluorescence (linear fit)' = 'A.linfit',
+                               'ΔFluorescence (linear fit)' = 'dY.linfit')
+          } else {
+            gc_parameters <- c(gc_parameters,
+                               'Increase rate (linear fit)' = 'max_slope.linfit',
+                               'Maximum fluorescence (linear fit)' = 'A.linfit',
+                               'ΔFluorescence (linear fit)' = 'dY.linfit')
+          }
+        }
+        gc_parameters
+      })
+
+      observe({
+        updateSelectInput(inputId = "parameter_parameter_grid_plot_fluorescence",
+                          choices = selected_inputs_parameter_fluorescence_grid_plot()
+        )})
+
+      selected_inputs_visualize_fluorescence_grid <- reactive({
+        results <- results$fluorescence
+        if(is.null(results)) return("")
+        if(input$plot_group_averages_fluorescence_grid_plot){
+          select_samples <- results$expdesign$condition
+        } else {
+          select_samples <- results$expdesign$label
+        }
+        select_samples
+      })
+
+      observe({
+        updateSelectInput(session,
+                          inputId = "samples_visualize_fluorescence_grid",
+                          choices = selected_inputs_visualize_fluorescence_grid()
+        )
+      })
+
+      observe({
+        updateSelectInput(session,
+                          inputId = "groups_visualize_fluorescence_grid",
+                          choices = selected_inputs_visualize_fluorescence_grid()
+        )
+      })
+
+      fluorescence_grid_plot <- reactive({
+        results <- results$fluorescence
+        if(input$y_axis_title_fluorescence_grid_plot == "" || )
+          y_axis_title <- NULL
+        else
+          y_axis_title <- input$y_axis_title_fluorescence_grid_plot
+        if(input$select_string_visualize_fluorescence_grid){
+          suppressWarnings(
+            plot.grid(results,
+                      data.type = input$data_type_fluorescence_grid_plot,
+                      IDs = NULL,
+                      sort_by_ID = FALSE,
+                      names = input$select_samples_based_on_string_fluorescence_grid_plot,
+                      conc = input$select_samples_based_on_concentration_fluorescence_grid_plot,
+                      exclude.nm = input$exclude_samples_based_on_string_fluorescence_grid_plot,
+                      exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_grid_plot,
+                      mean = input$plot_group_averages_fluorescence_grid_plot,
+                      log.y = input$log_transform_y_axis_fluorescence_grid_plot,
+                      x.lim = c(input$x_range_min_fluorescence_grid_plot, input$x_range_max_fluorescence_grid_plot),
+                      y.lim = c(input$y_range_min_fluorescence_grid_plot,input$y_range_max_fluorescence_grid_plot),
+                      y.title = y_axis_title,
+                      x.title = input$x_axis_title_fluorescence_grid_plot,
+                      n.ybreaks = input$nbreaks_fluorescence_grid_plot,
+                      lwd = input$line_width_fluorescence_grid_plot,
+                      basesize = input$base_size_fluorescence_grid_plot,
+                      pal = input$color_palettes_grid_plot_fluorescence,
+                      sort_by_conc = input$sort_by_conc_fluorescence_grid_plot,
+                      legend.lim = c(input$legend_lim_min_fluorescence_grid_plot, input$legend_lim_max_fluorescence_grid_plot),
+                      nrow = input$nrows_fluorescence_grid_plot,
+                      param = input$parameter_parameter_grid_plot_fluorescence
+            )
+          )
+        }
+        else{
+          suppressWarnings(
+            plot.grid(results,
+                      data.type = input$data_type_fluorescence_grid_plot,
+                      IDs = if(input$plot_group_averages_fluorescence_grid_plot){
+                        input$groups_visualize_fluorescence_grid
+                      }else{
+                        input$samples_visualize_fluorescence_grid
+                      },
+                      sort_by_ID = input$order_matters_visualize_fluorescence_grid,
+                      names = NULL,
+                      conc = input$select_samples_based_on_concentration_fluorescence_grid_plot,
+                      exclude.nm = NULL,
+                      exclude.conc = input$exclude_samples_based_on_concentration_fluorescence_grid_plot,
+                      mean = input$plot_group_averages_fluorescence_grid_plot,
+                      log.y = input$log_transform_y_axis_fluorescence_grid_plot,
+                      x.lim = c(input$x_range_min_fluorescence_grid_plot, input$x_range_max_fluorescence_grid_plot),
+                      y.lim = c(input$y_range_min_fluorescence_grid_plot,input$y_range_max_fluorescence_grid_plot),
+                      y.title = y_axis_title,
+                      x.title = input$x_axis_title_fluorescence_grid_plot,
+                      n.ybreaks = input$nbreaks_fluorescence_grid_plot,
+                      lwd = input$line_width_fluorescence_grid_plot,
+                      basesize = input$base_size_fluorescence_grid_plot,
+                      pal = input$color_palettes_grid_plot_fluorescence,
+                      sort_by_conc = input$sort_by_conc_fluorescence_grid_plot,
+                      legend.lim = c(input$legend_lim_min_fluorescence_grid_plot, input$legend_lim_max_fluorescence_grid_plot),
+                      nrow = input$nrows_fluorescence_grid_plot,
+                      param = input$parameter_parameter_grid_plot_fluorescence
+            )
+          )
+        }
+      })
+
+      output$fluorescence_grid_plot <- renderPlot({
+        fluorescence_grid_plot()
+      })
+
+
+      output$download_fluorescence_grid_plot <- downloadHandler(
+        filename = function() {
+          paste("fluorescence_grid_plot",  input$format_download_fluorescence_grid_plot, sep="")
+        },
+        content = function(file) {
+          if(input$format_download_fluorescence_grid_plot == ".pdf"){
+            if (requireNamespace("Cairo", quietly = TRUE)) {
+              ggsave(filename = file, width = input$width_download_fluorescence_grid_plot,
+                     height = input$height_download_fluorescence_grid_plot,
+                     dpi = input$dpi_download_fluorescence_grid_plot,
+                     device = cairo_pdf)
+            } else {
+              showModal(modalDialog("Package 'Cairo' must be installed to preserve special characters in the exported PDF image", easyClose = T))
+              ggsave(filename = file, width = input$width_download_fluorescence_grid_plot,
+                     height = input$height_download_fluorescence_grid_plot,
+                     dpi = input$dpi_download_fluorescence_grid_plot,
+                     device = pdf)
+            }
+
+          } else {
+            ggsave(filename = file, width = input$width_download_fluorescence_grid_plot,
+                   height = input$height_download_fluorescence_grid_plot,
+                   dpi = input$dpi_download_fluorescence_grid_plot,
+                   device = png)
+          }
+
+        },
+        contentType = ifelse(input$format_download_fluorescence_grid_plot == ".pdf", "image/pdf", "image/png")
+      )
 
       ### DR Plots (Bootstrap) ####
       observe({
@@ -12049,7 +12465,7 @@ server <- function(input, output, session){
       })
 
       observe({
-        if(length(results$fluorescence$data$density) > 1 && length(results$fluorescence$data$fluorescence) > 1){
+        if(length(results$fluorescence$data$growth) > 1 && length(results$fluorescence$data$fluorescence) > 1){
           showTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
         } else {
           hideTab(inputId = "tabsetPanel_Visualize_Fluorescence", target = "tabPabel_Visualize_Dual")
@@ -12073,13 +12489,13 @@ server <- function(input, output, session){
                     exclude.nm = input$exclude_samples_based_on_string_dual_plot,
                     exclude.conc = input$exclude_samples_based_on_concentration_dual_plot,
                     mean = input$plot_group_averages_dual_plot,
-                    log.y.density = input$log_transform_y_axis_density_dual_plot,
+                    log.y.growth = input$log_transform_y_axis_growth_dual_plot,
                     log.y.fl = input$log_transform_y_axis_fluorescence_dual_plot,
                     x.lim = c(input$x_range_min_dual_plot, input$x_range_max_dual_plot),
-                    y.lim.density = c(input$y_range_min_density_dual_plot,input$y_range_max_density_dual_plot),
+                    y.lim.growth = c(input$y_range_min_growth_dual_plot,input$y_range_max_growth_dual_plot),
                     y.lim.fl = c(input$y_range_min_fluorescence_dual_plot,input$y_range_max_fluorescence_dual_plot),
                     y.title.fl = input$y_axis_title_fluorescence_dual_plot,
-                    y.title.density = input$y_axis_title_density_dual_plot,
+                    y.title.growth = input$y_axis_title_growth_dual_plot,
                     x.title = input$x_axis_title_dual_plot,
                     n.ybreaks = input$nbreaks_dual_plot,
                     lwd = input$line_width_dual_plot,
@@ -12101,13 +12517,13 @@ server <- function(input, output, session){
                       exclude.nm = NULL,
                       exclude.conc = input$exclude_samples_based_on_concentration_dual_plot,
                       mean = input$plot_group_averages_dual_plot,
-                      log.y.density = input$log_transform_y_axis_density_dual_plot,
+                      log.y.growth = input$log_transform_y_axis_growth_dual_plot,
                       log.y.fl = input$log_transform_y_axis_fluorescence_dual_plot,
                       x.lim = c(input$x_range_min_dual_plot, input$x_range_max_dual_plot),
-                      y.lim.density = c(input$y_range_min_density_dual_plot,input$y_range_max_density_dual_plot),
+                      y.lim.growth = c(input$y_range_min_growth_dual_plot,input$y_range_max_growth_dual_plot),
                       y.lim.fl = c(input$y_range_min_fluorescence_dual_plot,input$y_range_max_fluorescence_dual_plot),
                       y.title.fl = input$y_axis_title_fluorescence_dual_plot,
-                      y.title.density = input$y_axis_title_density_dual_plot,
+                      y.title.growth = input$y_axis_title_growth_dual_plot,
                       x.title = input$x_axis_title_dual_plot,
                       n.ybreaks = input$nbreaks_dual_plot,
                       lwd = input$line_width_dual_plot,

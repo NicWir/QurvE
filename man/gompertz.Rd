@@ -9,7 +9,7 @@ gompertz(time, A, mu, lambda, addpar = NULL)
 \arguments{
 \item{time}{A vector of time values}
 
-\item{A}{Maximum density value}
+\item{A}{Maximum growth value}
 
 \item{mu}{Growth rate}
 
@@ -18,14 +18,14 @@ gompertz(time, A, mu, lambda, addpar = NULL)
 \item{addpar}{Additional parameters have no effect in this type of model. They belong to the standard model description in \code{grofit} and are initialized as \code{addpar=NULL} in the function header.}
 }
 \value{
-A vector of density values
+A vector of growth values
 }
 \description{
 Calculate the values of the Gompertz growth model for given time points and growth parameters.
 }
 \examples{
 time <- seq(from = 0, to = 24, by = 0.25)
-density <- gompertz(time, A = 3, mu=0.6, lambda = 3)
+growth <- gompertz(time, A = 3, mu=0.6, lambda = 3)
 
-plot(time, density)
+plot(time, growth)
 }

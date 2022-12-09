@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{grid}(
   x,
-  data.type = c("spline", "raw"),
+  data.type = c("spline", "raw", "norm.fl"),
   param = c("mu.linfit", "lambda.linfit", "dY.linfit", "A.linfit", "mu2.linfit",
     "lambda2.linfit", "mu.model", "lambda.model", "A.model", "A.orig.model", "dY.model",
     "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline", "mu.spline",
@@ -16,6 +16,7 @@
   pal = c("Green", "Orange", "Purple", "Magenta", "Grey", "Blue", "Grey", "Red", "Cyan",
     "Brown", "Mint"),
   IDs = NULL,
+  sort_by_ID = FALSE,
   names = NULL,
   conc = NULL,
   exclude.nm = NULL,
@@ -55,6 +56,8 @@
 \item{pal}{(Character string) Choose one of 'Green',   'Orange',  'Purple',  'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', or 'Mint' to visualize the value of the parameter chosen as \code{param} for each sample or condition.}
 
 \item{IDs}{(String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}. The order of strings within the vector defines the order of samples within the grid.}
+
+\item{sort_by_ID}{(Logical) Shall samples/conditions be ordered as entered in \code{IDs} (\code{TRUE}) or alphabetically (\code{FALSE})?}
 
 \item{names}{(String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.}
 

@@ -9,7 +9,7 @@ gompertz.exp(time, A, mu, lambda, addpar)
 \arguments{
 \item{time}{A vector of time values}
 
-\item{A}{Maximum density value}
+\item{A}{Maximum growth value}
 
 \item{mu}{Growth rate}
 
@@ -18,14 +18,14 @@ gompertz.exp(time, A, mu, lambda, addpar)
 \item{addpar}{Numeric vector of size two, addpar\code{[}1\verb{]} corresponds to scaling parameter \eqn{\alpha} and addpar\code{[}2\verb{]} corresponds to shifting parameter \eqn{t_{shift}}.}
 }
 \value{
-A vector of density values
+A vector of growth values
 }
 \description{
 Calculate the values of the modified Gompertz growth model for given time points and growth parameters.
 }
 \examples{
 time <- seq(from = 0, to = 24, by = 0.25)
-density <- gompertz.exp(time, A = 3, mu=0.6, lambda = 3, addpar = c(0.1, 12))
+growth <- gompertz.exp(time, A = 3, mu=0.6, lambda = 3, addpar = c(0.1, 12))
 
-plot(time, density)
+plot(time, growth)
 }

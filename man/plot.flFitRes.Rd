@@ -148,9 +148,9 @@ Visualize fluorescence, normalized fluorescence, or spline fits of multiple samp
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Run workflow
@@ -164,9 +164,9 @@ plot(res, legend.ncol = 3, basesize = 15)
 
 
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Run curve fitting workflow

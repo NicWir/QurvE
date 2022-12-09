@@ -19,7 +19,7 @@ parse_data(
   dec.map = ".",
   subtract.blank = T,
   calibration = NULL,
-  fl.normtype = c("density", "fl2")
+  fl.normtype = c("growth", "fl2")
 )
 
 parse_data_shiny(
@@ -34,11 +34,11 @@ parse_data_shiny(
   csvsep.map = ";",
   dec.map = ".",
   subtract.blank = T,
-  density.nm = NULL,
+  growth.nm = NULL,
   fl.nm = NULL,
   fl2.nm = NULL,
   calibration = NULL,
-  fl.normtype = c("density", "fl2")
+  fl.normtype = c("growth", "fl2")
 )
 }
 \arguments{
@@ -65,11 +65,11 @@ For example: \code{convert.time = 'y = 24 * x'}}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 
-\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.}
+\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.}
 
-\item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'density'} or by fluorescence2 values (\code{'fl2'}).}
+\item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).}
 
-\item{density.nm}{Name of read corresponding to growth rate}
+\item{growth.nm}{Name of read corresponding to growth rate}
 
 \item{fl.nm}{Name of read corresponding to fluorescence2 data}
 }
@@ -79,7 +79,7 @@ A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code
 A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.
 }
 \description{
-\code{parse_data} takes a raw export file from a plate reader experiment (or similar device), extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}. If more than one read type is found the user is prompted to assign the correct reads to \code{density} or \code{fluorescence}.
+\code{parse_data} takes a raw export file from a plate reader experiment (or similar device), extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}. If more than one read type is found the user is prompted to assign the correct reads to \code{growth} or \code{fluorescence}.
 }
 \examples{
 if(interactive()){
@@ -95,7 +95,7 @@ grodata <- parse_data(data.file = system.file("fluorescence_test_Gen5.xlsx", pac
 grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx",
                                                     package = "QurvE"),
                       sheet.data = 1,
-                      density.nm = "Read 3:630",
+                      growth.nm = "Read 3:630",
                       fl.nm = "GFP:485,528",
                       map.file = system.file("fluorescence_test_Gen5.xlsx",
                                              package = "QurvE"),

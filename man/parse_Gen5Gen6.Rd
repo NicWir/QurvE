@@ -10,7 +10,7 @@ parse_Gen5Gen6(input)
 \item{input}{A dataframe created by reading a table file with \code{\link{read_file}}}
 }
 \value{
-a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 }
 \description{
 Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.

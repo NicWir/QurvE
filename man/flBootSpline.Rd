@@ -6,7 +6,7 @@
 \usage{
 flBootSpline(
   time = NULL,
-  density = NULL,
+  growth = NULL,
   fl_data,
   ID = "undefined",
   control = fl.control()
@@ -15,7 +15,7 @@ flBootSpline(
 \arguments{
 \item{time}{Vector of the independent variable: time (if \code{x_type = 'time'} in \code{fl.control} object.}
 
-\item{density}{Vector of the independent variable: density (if \code{x_type = 'density'} in \code{fl.control} object.}
+\item{growth}{Vector of the independent variable: growth (if \code{x_type = 'growth'} in \code{fl.control} object.}
 
 \item{fl_data}{Vector of dependent variable: fluorescence.}
 
@@ -29,10 +29,10 @@ a \code{flFitSpline} object for each bootstrap sample. Use \code{\link{plot.gcBo
 to visualize all bootstrapping splines as well as the distribution of
 physiological parameters.
 \item{raw.x}{Raw time values provided to the function as \code{time}.}
-\item{raw.fl}{Raw density data provided to the function as \code{data}.}
+\item{raw.fl}{Raw growth data provided to the function as \code{data}.}
 \item{ID}{(Character) Identifies the tested sample.}
 \item{boot.x}{Table of time values per column, resulting from each spline fit of the bootstrap.}
-\item{boot.fl}{Table of density values per column, resulting from each spline fit of the bootstrap.}
+\item{boot.fl}{Table of growth values per column, resulting from each spline fit of the bootstrap.}
 \item{boot.flSpline}{List of \code{flFitSpline} object, created by \code{\link{flFitSpline}} for each resample of the bootstrap.}
 \item{lambda}{Vector of estimated lambda (lag time) values from each bootstrap entry.}
 \item{max_slope}{Vector of estimated max_slope (maximum slope) values from each bootstrap entry.}
@@ -46,9 +46,9 @@ physiological parameters.
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file('lac_promoters.xlsx', package = 'QurvE'),
+input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Extract time and normalized fluorescence data for single sample

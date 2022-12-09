@@ -9,7 +9,7 @@ logistic(time, A, mu, lambda, addpar = NULL)
 \arguments{
 \item{time}{A vector of time values}
 
-\item{A}{Maximum density value}
+\item{A}{Maximum growth value}
 
 \item{mu}{Growth rate}
 
@@ -18,7 +18,7 @@ logistic(time, A, mu, lambda, addpar = NULL)
 \item{addpar}{Additional parameters have no effect in this type of model. They belong to the standard model description in \code{QurvE} and are initialized as \code{addpar=NULL} in the function header.}
 }
 \value{
-A vector of density values
+A vector of growth values
 }
 \description{
 Calculate the values of the logistic growth model for given time points and growth parameters.
@@ -26,7 +26,7 @@ Calculate the values of the logistic growth model for given time points and grow
 \examples{
 time <- seq(from = 0, to = 24, by = 0.25)
 # Simulate logistic growth curve
-density <- logistic(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+growth <- logistic(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 
-plot(time, density)
+plot(time, growth)
 }

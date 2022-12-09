@@ -82,9 +82,9 @@ code{drFitfl} calls \code{\link{plot.drFitFLModel}} for each group used in a dos
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Define fit controls

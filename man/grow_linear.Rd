@@ -9,10 +9,10 @@ grow_linear(time, parms)
 \arguments{
 \item{time}{A vector of time values}
 
-\item{parms}{A vector of length 2 with parameters: 1. start density value (y0), 2. growth rate as slope of the linear model (mumax)}
+\item{parms}{A vector of length 2 with parameters: 1. start growth value (y0), 2. growth rate as slope of the linear model (mumax)}
 }
 \value{
-A dataframe with time and calculated density columns
+A dataframe with time and calculated growth columns
 }
 \description{
 Calculate the values of the linear growth model for given time points and growth parameters.

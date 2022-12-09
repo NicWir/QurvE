@@ -2,7 +2,7 @@
 #'
 #' \code{growth.workflow} runs \code{\link{growth.control}} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF or HTML format that summarizes all results obtained.
 #'
-#' @param grodata A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, or a list containing a \code{'time'} matrix as well as a \code{'density'} dataframe.
+#' @param grodata A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, or a list containing a \code{'time'} matrix as well as a \code{'growth'} dataframe.
 #' @param time (optional) A matrix containing time values for each sample.
 #' @param data (optional) A dataframe containing growth data (if a \code{time} matrix is provided as separate argument).
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
@@ -14,8 +14,8 @@
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
 #' @param suppress.messages (Logical) Indicates whether grofit messages (information about current growth curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
 #' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{'l'}), model fit (\code{'m'}), spline fit (\code{'s'}), or all (\code{'a'}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c('l', 's')} Default:  \code{fit.opt = c('l', 's')}.
-#' @param min.density (Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions or spline fits.
-#' @param max.density (Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits.
+#' @param min.growth (Numeric) Indicate whether only growth values above a certain threshold should be considered for linear regressions or spline fits.
+#' @param max.growth (Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{TRUE}
 #' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{TRUE}
@@ -24,14 +24,14 @@
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
 #' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}
-#' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
+#' @param lin.dY (Numeric) Threshold for the minimum fraction of growth increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option NULL might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{smooth.spline} or lead to an overestimation. The usage of a fixed value is recommended for reproducible results across samples. See \code{?smooth.spline} for further details. Default: \code{0.55}
 #' @param model.type (Character) Vector providing the names of the parametric models which should be fitted to the data. Default: \code{c('logistic', 'richards', 'gompertz', 'gompertz.exp', 'huang', 'baranyi')}.
 #' @param dr.method (Character) Define the method used to perform a dose-responde analysis: smooth spline fit (\code{'spline'}) or model fitting (\code{'model'}).
 #' @param dr.model (Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = 'model'}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.
-#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
+#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any growth value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start growth, further computations are performed. Else, a message is returned.
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{growth.drFit}} for further details. Default: \code{'mu.linfit'}, which represents the maximum slope of the linear regression. Typical options include: \code{'mu.linfit'}, \code{'lambda.linfit'}, \code{'dY.linfit'}, \code{'mu.spline'}, \code{'dY.spline'}, \code{'mu.model'}, and \code{'A.model'}.
 #' @param smooth.dr (Numeric) Smoothing parameter used in the spline fit by smooth.spline during dose response curve estimation. Usually (not necessesary) in (0; 1]. See documentation of smooth.spline for further details. Default: \code{NULL}.
@@ -52,7 +52,7 @@
 #'
 #' @return A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.
 #' \item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided).}
-#' \item{data}{Raw density dataframe passed to the function as \code{data} (if no \code{grofit} object is provided).}
+#' \item{data}{Raw growth dataframe passed to the function as \code{data} (if no \code{grofit} object is provided).}
 #' \item{gcFit}{\code{gcFit} object created with the call of \code{\link{growth.gcFit}}.}
 #' \item{drFit}{\code{drFit} object created with the call of \code{\link{growth.drFit}}.}
 #' \item{expdesign}{Experimental design table inherited from \code{grodata} or created from the identifier columns (columns 1-3) in \code{data}.}
@@ -83,7 +83,7 @@
 #'                          parallelize = FALSE)
 #'
 #' # Load custom dataset
-#'   input <- read_data(data.density = system.file('2-FMA_toxicity.csv', package = 'QurvE'))
+#'   input <- read_data(data.growth = system.file('2-FMA_toxicity.csv', package = 'QurvE'))
 #'
 #'   res <- growth.workflow(grodata = input,
 #'                          fit.opt = c('s', 'l'),
@@ -99,7 +99,7 @@ growth.workflow <- function(
     mean.grp = NA, mean.conc = NA, neg.nan.act = FALSE,
     clean.bootstrap = TRUE, suppress.messages = FALSE,
     fit.opt = c("a"),
-    t0 = 0, tmax = NA, min.density = NA, max.density = NA,
+    t0 = 0, tmax = NA, min.growth = NA, max.growth = NA,
     log.x.gc = FALSE, log.y.lin = TRUE, log.y.spline = TRUE,
     log.y.model = TRUE, biphasic = FALSE, lin.h = NULL,
     lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, interactive = FALSE,
@@ -150,7 +150,7 @@ growth.workflow <- function(
     call <- match.call()
 
     ## remove strictly defined arguments
-    call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <- call$fit.opt <- call$t0 <- call$min.density <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <- call$tmax <- call$max.density <- call$parallelize <- call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <- call$dr.method <- call$dr.model <- call$dr.have.atleast <- call$dr.parameter <- call$smooth.dr <- call$log.x.dr <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
+    call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <- call$fit.opt <- call$t0 <- call$min.growth <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <- call$tmax <- call$max.growth <- call$parallelize <- call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <- call$dr.method <- call$dr.model <- call$dr.have.atleast <- call$dr.parameter <- call$smooth.dr <- call$log.x.dr <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
 
 
     arglist <- sapply(call, function(x) x)
@@ -194,7 +194,7 @@ growth.workflow <- function(
         time <- grodata$time
         if (!is.null(grodata$expdesign))
             expdesign <- grodata$expdesign
-        data <- grodata$density
+        data <- grodata$growth
     } else
     {
         dat.mat <- as.matrix(data)
@@ -226,8 +226,8 @@ growth.workflow <- function(
     control <- growth.control(
         neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
         suppress.messages = suppress.messages, fit.opt = fit.opt,
-        t0 = t0, min.density = min.density, tmax = tmax,
-        max.density = max.density, log.x.gc = log.x.gc,
+        t0 = t0, min.growth = min.growth, tmax = tmax,
+        max.growth = max.growth, log.x.gc = log.x.gc,
         log.y.lin = log.y.lin, log.y.spline = log.y.spline,
         log.y.model = log.y.model, biphasic = biphasic,
         lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD,
@@ -486,8 +486,8 @@ growth.workflow <- function(
 #'
 #' @param time (optional) A matrix containing time values for each sample.
 #' @param data  Either... \enumerate{ \item a \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}},
-#'   \item a list containing a \code{'time'} matrix as well as \code{'density'} and, if appropriate, a \code{'fluorescence'} dataframes,
-#'   or \item a dataframe containing density values (if a \code{time} matrix is provided as separate argument).}
+#'   \item a list containing a \code{'time'} matrix as well as \code{'growth'} and, if appropriate, a \code{'fluorescence'} dataframes,
+#'   or \item a dataframe containing growth values (if a \code{time} matrix is provided as separate argument).}
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
 #' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
 #' @param ... Further arguments passed to the shiny app.
@@ -495,7 +495,7 @@ growth.workflow <- function(
 #' @return A \code{gcFit} object that contains all growth fitting results, compatible with
 #'   various plotting functions of the QurvE package.
 #' \item{raw.time}{Raw time matrix passed to the function as \code{time}.}
-#' \item{raw.data}{Raw density dataframe passed to the function as \code{data}.}
+#' \item{raw.data}{Raw growth dataframe passed to the function as \code{data}.}
 #' \item{gcTable}{Table with growth parameters and related statistics for each growth curve evaluation performed by the function. This table, which is also returned by the generic \code{summary.gcFit} method applied to a \code{gcFit} object, is used as an input for \code{\link{growth.drFit}}.}
 #' \item{gcFittedLinear}{List of all \code{gcFitLinear} objects, generated by the call of \code{\link{growth.gcFitLinear}}. Note: access to each object in the list via double brace: gcFittedLinear\[\[#n\]\].}
 #' \item{gcFittedModels}{List of all \code{gcFitModel} objects, generated by the call of \code{\link{growth.gcFitModel}}. Note: access to each object in the list via double brace: gcFittedModels\[\[#n\]\].}
@@ -582,11 +582,11 @@ growth.gcFit <- function(
     } else if (!is.null(data))
         {
         time <- data$time
-        data <- data$density
+        data <- data$growth
     }
-    # /// check if start density values are above
-    # min.density in all samples
-    max.density <- unlist(
+    # /// check if start growth values are above
+    # min.growth in all samples
+    max.growth <- unlist(
         lapply(
             1:nrow(data),
             function(x) max(
@@ -594,19 +594,19 @@ growth.gcFit <- function(
             )
         )
     )
-    if (is.numeric(control$min.density) &&
-        control$min.density != 0)
+    if (is.numeric(control$min.growth) &&
+        control$min.growth != 0)
         {
-        if (!is.na(control$min.density) &&
+        if (!is.na(control$min.growth) &&
             all(
-                as.numeric(max.density) <
-                  control$min.density
+                as.numeric(max.growth) <
+                  control$min.growth
             ))
                 {
             stop(
                 paste0(
-                  "The chosen global start density value (min.density) is larger than every value in your dataset.\nThe maximum value in your dataset is: ",
-                  max(as.numeric(max.density))
+                  "The chosen global start growth value (min.growth) is larger than every value in your dataset.\nThe maximum value in your dataset is: ",
+                  max(as.numeric(max.growth))
               )
             )
         }
@@ -914,7 +914,7 @@ growth.gcFit <- function(
                           if ("n" %in% answer_satisfied)
                             {
                               test_answer <- readline(
-                                "Enter: t0, h, quota, min.density, R2, RSD, tmax, max.density                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n"
+                                "Enter: t0, h, quota, min.growth, R2, RSD, tmax, max.growth                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n"
                             )
                               if ("n" %in% test_answer)
                                 {
@@ -944,10 +944,10 @@ growth.gcFit <- function(
                                   as.numeric(new_params[3]),
                                   0.95
                               )
-                                min.density_new <- ifelse(
+                                min.growth_new <- ifelse(
                                   !is.na(as.numeric(new_params[4])),
                                   as.numeric(new_params[4]),
-                                  control$min.density
+                                  control$min.growth
                               )
                                 R2_new <- ifelse(
                                   !is.na(as.numeric(new_params[5])),
@@ -964,10 +964,10 @@ growth.gcFit <- function(
                                   as.numeric(new_params[7]),
                                   control$tmax
                               )
-                                max.density_new <- ifelse(
+                                max.growth_new <- ifelse(
                                   !is.na(as.numeric(new_params[8])),
                                   as.numeric(new_params[8]),
-                                  control$max.density
+                                  control$max.growth
                               )
 
                                 control_new <- control
@@ -977,27 +977,27 @@ growth.gcFit <- function(
                                 control_new$lin.R2 <- R2_new
                                 control_new$lin.RSD <- RSD_new
                                 control_new$tmax <- tmax_new
-                                control_new$max.density <- max.density_new
+                                control_new$max.growth <- max.growth_new
 
-                                if (is.numeric(min.density_new))
+                                if (is.numeric(min.growth_new))
                                   {
-                                  if (!is.na(min.density_new) &&
+                                  if (!is.na(min.growth_new) &&
                                     all(
                                       as.vector(actwell) <
-                                        min.density_new
+                                        min.growth_new
                                   ))
                                       {
                                     message(
                                       paste0(
-                                        "Start density values need to be greater than 'min.density'.\nThe minimum start value in your dataset is: ",
+                                        "Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
                                         min(as.vector(actwell)),
-                                        ". 'min.density' was not adjusted."
+                                        ". 'min.growth' was not adjusted."
                                     ),
                                       call. = FALSE
                                   )
-                                  } else if (!is.na(min.density_new))
+                                  } else if (!is.na(min.growth_new))
                                     {
-                                    control_new$min.density <- min.density_new
+                                    control_new$min.growth <- min.growth_new
                                   }
                                 }
                                 fitlinear <- growth.gcFitLinear(
@@ -1159,7 +1159,7 @@ growth.gcFit <- function(
                           if ("n" %in% answer_satisfied)
                             {
                               test_answer <- readline(
-                                "Enter: smooth.gc, t0, min.density, tmax, max.density                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.density (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n "
+                                "Enter: smooth.gc, t0, min.growth, tmax, max.growth                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.growth (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n "
                             )
                               if ("n" %in% test_answer)
                                 {
@@ -1194,32 +1194,32 @@ growth.gcFit <- function(
                                   control_new$smooth.gc <- smooth.gc_new
                                 }
                                 control_new$t0 <- t0_new
-                                min.density_new <- as.numeric(new_params[3])
-                                if (!is.na(min.density_new))
+                                min.growth_new <- as.numeric(new_params[3])
+                                if (!is.na(min.growth_new))
                                   {
-                                  if (is.numeric(min.density_new) &&
-                                    min.density_new !=
+                                  if (is.numeric(min.growth_new) &&
+                                    min.growth_new !=
                                       0 && all(
                                     as.vector(actwell) <
-                                      min.density_new
+                                      min.growth_new
                                 ))
                                     {
                                     message(
                                       paste0(
-                                        "Start density values need to be below 'min.density'.\nThe minimum start value in your dataset is: ",
+                                        "Start growth values need to be below 'min.growth'.\nThe minimum start value in your dataset is: ",
                                         min(
                                           as.vector(
                                             data[,
                                               4]
                                         )
                                       ),
-                                        ". 'min.density' was not adjusted."
+                                        ". 'min.growth' was not adjusted."
                                     ),
                                       call. = FALSE
                                   )
-                                  } else if (!is.na(min.density_new))
+                                  } else if (!is.na(min.growth_new))
                                     {
-                                    control_new$min.density <- min.density_new
+                                    control_new$min.growth <- min.growth_new
                                   }
                                 }
 
@@ -1229,12 +1229,12 @@ growth.gcFit <- function(
                                   {
                                   control_new$tmax <- tmax_new
                                 }
-                                max.density_new <- as.numeric(new_params[5])
-                                if (!is.na(max.density_new) &&
-                                  max.density_new !=
+                                max.growth_new <- as.numeric(new_params[5])
+                                if (!is.na(max.growth_new) &&
+                                  max.growth_new !=
                                     "")
                                     {
-                                  control_new$max.density <- max.density_new
+                                  control_new$max.growth <- max.growth_new
                                 }
 
                                 nonpara <- growth.gcFitSpline(

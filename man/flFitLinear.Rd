@@ -6,19 +6,19 @@
 \usage{
 flFitLinear(
   time = NULL,
-  density = NULL,
+  growth = NULL,
   fl_data,
   ID = "undefined",
   quota = 0.95,
-  control = fl.control(x_type = c("density", "time"), log.x.lin = FALSE, log.y.lin =
-    FALSE, t0 = 0, min.density = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY
-    = 0.05, biphasic = FALSE)
+  control = fl.control(x_type = c("growth", "time"), log.x.lin = FALSE, log.y.lin =
+    FALSE, t0 = 0, min.growth = NA, lin.h = NULL, lin.R2 = 0.98, lin.RSD = 0.05, lin.dY =
+    0.05, biphasic = FALSE)
 )
 }
 \arguments{
 \item{time}{Vector of the independent time variable (if x_type = "time" in control object).}
 
-\item{density}{Vector of the independent time density (if x_type = "density" in control object).}
+\item{growth}{Vector of the independent time growth (if x_type = "growth" in control object).}
 
 \item{fl_data}{Vector of the dependent fluorescence variable.}
 
@@ -75,9 +75,9 @@ Hall et al. (2013).
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Extract time and normalized fluorescence data for single sample

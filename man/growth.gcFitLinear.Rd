@@ -10,14 +10,14 @@ growth.gcFitLinear(
   gcID = "undefined",
   quota = 0.95,
   control = growth.control(t0 = 0, tmax = NA, log.x.gc = FALSE, log.y.lin = TRUE,
-    min.density = NA, max.density = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1,
-    lin.dY = 0.05, biphasic = FALSE)
+    min.growth = NA, max.growth = NA, lin.h = NULL, lin.R2 = 0.97, lin.RSD = 0.1, lin.dY
+    = 0.05, biphasic = FALSE)
 )
 }
 \arguments{
 \item{time}{Vector of the independent variable (usually: time).}
 
-\item{data}{Vector of dependent variable (usually: density values).}
+\item{data}{Vector of dependent variable (usually: growth values).}
 
 \item{gcID}{(Character) The name of the analyzed sample.}
 
@@ -29,9 +29,9 @@ growth.gcFitLinear(
 
 \item{log.y.lin}{(Logical) Indicates whether \emph{ln(y/y0)} should be applied to the growth data for \emph{linear} fits. Default: \code{TRUE}}
 
-\item{min.density}{(Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions.}
+\item{min.growth}{(Numeric) Indicate whether only growth values above a certain threshold should be considered for linear regressions.}
 
-\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions.}
+\item{max.growth}{(Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions.}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits.}
 
@@ -43,7 +43,7 @@ growth.gcFitLinear(
 
 \item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}}
 
-\item{lin.dY}{(Numeric) Enter the minimum percentage of density increase that a linear regression should cover.}
+\item{lin.dY}{(Numeric) Enter the minimum percentage of growth increase that a linear regression should cover.}
 
 \item{biphasic}{(Logical) Shall \code{\link{growth.gcFitLinear}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
 }
@@ -53,18 +53,18 @@ estimated as the intersection between the fit and the horizontal line with
 \eqn{y=y_0}, where \code{y0} is the first value of the dependent variable.
 Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
 \item{raw.time}{Raw time values provided to the function as \code{time}.}
-\item{raw.data}{Raw density data provided to the function as \code{data}.}
+\item{raw.data}{Raw growth data provided to the function as \code{data}.}
 \item{filt.time}{Filtered time values used for the heuristic linear method.}
-\item{filt.data}{Filtered density values.}
-\item{log.data}{Log-transformed, filtered density values used for the heuristic linear method.}
+\item{filt.data}{Filtered growth values.}
+\item{log.data}{Log-transformed, filtered growth values used for the heuristic linear method.}
 \item{gcID}{(Character) Identifies the tested sample.}
 \item{FUN}{Linear \emph{function} used for plotting the tangent at mumax.}
 \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
 \item{par}{List of determined growth parameters.}
 \itemize{
-\item \code{y0}: {Minimum density value considered for the heuristic linear method.}
-\item \code{dY}: {Difference in maximum density and minimum density.}
-\item \code{A}: {Maximum density.}
+\item \code{y0}: {Minimum growth value considered for the heuristic linear method.}
+\item \code{dY}: {Difference in maximum growth and minimum growth.}
+\item \code{A}: {Maximum growth.}
 \item \code{y0_lm}: {Intersection of the linear fit with the abscissa.}
 \item \code{mumax}: {Maximum growth rate (i.e., slope of the linear fit).}
 \item \code{tD}: {Doubling time.}
@@ -100,7 +100,7 @@ The algorithm works as follows:
 \item Fit linear regressions (Theil-Sen estimator) to all subsets of \code{h} consecutive, log-transformed data
 points (sliding window of size \code{h}). If for example \eqn{h=5}, fit a linear regression to points
 1 \dots 5, 2 \dots 6, 3 \dots 7 and so on.
-\item Find the subset with the highest slope \eqn{mu_{max}}. Do the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} and relative standard deviation (RSD) values of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total density increase? If not, evaluate the subset with the second highest slope, and so on.
+\item Find the subset with the highest slope \eqn{mu_{max}}. Do the \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} and relative standard deviation (RSD) values of the regression meet the in \code{lin.R2} and \code{lin.RSD} defined thresholds and do the data points within the regression window account for a fraction of at least \code{lin.dY} of the total growth increase? If not, evaluate the subset with the second highest slope, and so on.
 \item Include also the data points of adjacent subsets that have a slope of at least \eqn{quota \cdot mu{max}}, e.g., all regression windows that have at least 95\% of the maximum slope.
 \item Fit a new linear model to the extended data window identified in step 3.
 }

@@ -5,7 +5,7 @@
 \title{Read growth and fluorescence data in table format}
 \usage{
 read_data(
-  data.density = NA,
+  data.growth = NA,
   data.fl = NA,
   data.fl2 = NA,
   data.format = "col",
@@ -15,17 +15,17 @@ read_data(
   dec.fl = ".",
   csvsep.fl2 = ";",
   dec.fl2 = ".",
-  sheet.density = 1,
+  sheet.growth = 1,
   sheet.fl = 1,
   sheet.fl2 = 1,
-  fl.normtype = c("density", "fl2"),
+  fl.normtype = c("growth", "fl2"),
   subtract.blank = T,
   convert.time = NULL,
   calibration = NULL
 )
 }
 \arguments{
-\item{data.density}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing density data.
+\item{data.growth}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data.
 In column format, the first three table rows contain
 \enumerate{
 \item sample description
@@ -33,15 +33,15 @@ In column format, the first three table rows contain
 \item concentration value (\emph{optional})
 }}
 
-\item{data.fl}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.}
+\item{data.fl}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.growth}.}
 
-\item{data.fl2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence2 data (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.density}.}
+\item{data.fl2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence2 data (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.growth}.}
 
 \item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}}
 
-\item{csvsep}{(Character) separator used in CSV file storing density data (ignored for other file types). Default: \code{";"}}
+\item{csvsep}{(Character) separator used in CSV file storing growth data (ignored for other file types). Default: \code{";"}}
 
-\item{dec}{(Character) decimal separator used in CSV, TSV or TXT file storing density data. Default: \code{"."}}
+\item{dec}{(Character) decimal separator used in CSV, TSV or TXT file storing growth data. Default: \code{"."}}
 
 \item{csvsep.fl}{(Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}}
 
@@ -51,32 +51,32 @@ In column format, the first three table rows contain
 
 \item{dec.fl2}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}}
 
-\item{sheet.density}{(Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (\emph{optional}).}
+\item{sheet.growth}{(Numeric or Character) Number or name of the sheet with growth data in XLS or XLSX files (\emph{optional}).}
 
 \item{sheet.fl}{(Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (\emph{optional}).}
 
 \item{sheet.fl2}{(Numeric or Character) Number or name of the sheet with fluorescence2 data (used for normalization of fluorescence data) in XLS or XLSX files (\emph{optional}).}
 
-\item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'density'} or by fluorescence2 values (\code{'fl2'}).}
+\item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}). If \code{calibration = TRUE}, blanks are subtracted after value conversion.}
 
 \item{convert.time}{(\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 For example: \code{convert.time = 'y = 24 * x'}}
 
-\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.}
 }
 \value{
-An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with density and fluorescence data (if applicable),
+An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with growth and fluorescence data (if applicable),
 and an experimental design table. The \code{grodata} object can be directly
 used to run \code{\link{growth.workflow}}/\code{\link{fl.workflow}} or, together with a \code{growth.control}/\code{fl.control}
 object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
-\item{time}{Matrix with raw time values extracted from \code{data.density}.}
-\item{density}{Dataframe with raw density values and sample identifiers extracted from \code{data.density}.}
+\item{time}{Matrix with raw time values extracted from \code{data.growth}.}
+\item{growth}{Dataframe with raw growth values and sample identifiers extracted from \code{data.growth}.}
 \item{fluorescence}{Dataframe with raw fluorescence values and sample identifiers extracted from \code{data.fl}. \code{NA}, if no fluorescence data is provided.}
-\item{norm.fluorescence}{fluorescence data divided by density values. \code{NA}, if no fluorescence data is provided.}
-\item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.density}.}
+\item{norm.fluorescence}{fluorescence data divided by growth values. \code{NA}, if no fluorescence data is provided.}
+\item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.growth}.}
 }
 \description{
 \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction, applies data transformation (calibration), and combines technical replicates.
@@ -86,12 +86,12 @@ object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
 }
 \examples{
 # Load CSV file containing only growth data
-data_growth <- read_data(data.density = system.file("2-FMA_toxicity.csv",
+data_growth <- read_data(data.growth = system.file("2-FMA_toxicity.csv",
                          package = "QurvE"), csvsep = ";" )
 
-# Load XLSX file containing both density and fluorescence data
-data_growth_fl <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-                            sheet.density = "OD",
+# Load XLSX file containing both growth and fluorescence data
+data_growth_fl <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
+                            sheet.growth = "OD",
                             data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
                             sheet.fl = 2)
 }

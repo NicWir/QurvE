@@ -9,7 +9,7 @@ rdm.data(d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label = "Test1")
 \arguments{
 \item{d}{Numeric value, number of data sets. If \code{d} is a vector, only the first entry is used.}
 
-\item{y0}{Numeric value, start density. If \code{t} is a vector, only the first entry is used.}
+\item{y0}{Numeric value, start growth. If \code{t} is a vector, only the first entry is used.}
 
 \item{tmax}{Numeric value, number of time points per data set. If \code{t} is a vector, only the first entry is used.}
 
@@ -17,7 +17,7 @@ rdm.data(d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label = "Test1")
 
 \item{lambda}{Numeric value, lag-phase. If \code{lambda} is a vector, only the first entry is used.}
 
-\item{A}{Numeric value, maximum density. If \code{A} is a vector, only the first entry is used.}
+\item{A}{Numeric value, maximum growth. If \code{A} is a vector, only the first entry is used.}
 
 \item{label}{Character string, condition label  If \code{label} is a vector, only the first entry is used.}
 }

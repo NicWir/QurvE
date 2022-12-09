@@ -9,23 +9,23 @@ huang(time, A, mu, lambda, addpar)
 \arguments{
 \item{time}{A vector of time values}
 
-\item{A}{Maximum density value}
+\item{A}{Maximum growth value}
 
 \item{mu}{Growth rate}
 
 \item{lambda}{Lag time}
 
-\item{addpar}{additional parameters (here: minimum density)}
+\item{addpar}{additional parameters (here: minimum growth)}
 }
 \value{
-A vector of density values
+A vector of growth values
 }
 \description{
 Calculate the values of the Huang growth model for given time points and growth parameters.
 }
 \examples{
 time <- seq(from = 0, to = 24, by = 0.25)
-density <- huang(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+growth <- huang(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 
-plot(time, density)
+plot(time, growth)
 }

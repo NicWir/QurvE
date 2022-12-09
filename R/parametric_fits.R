@@ -1,22 +1,22 @@
-#' Fit nonlinear growth models to density data
+#' Fit nonlinear growth models to growth data
 #'
 #' \code{growth.gcFitModel} determines a parametric growth model that best describes the data.
 #'
 #' @param time Vector of the independent variable (usually time).
-#' @param data Vector of dependent variable (usually density values).
+#' @param data Vector of dependent variable (usually growth values).
 #' @param gcID (Character) The name of the analyzed sample.
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
 #'
 #' @return A \code{gcFitModel} object that contains physiological parameters and information about the best fit. Use \code{\link{plot.gcFitModel}} to visualize the parametric fit and growth equation.
 #' \item{raw.time}{Raw time values provided to the function as \code{time}.}
-#' \item{raw.data}{Raw density data provided to the function as \code{data}.}
+#' \item{raw.data}{Raw growth data provided to the function as \code{data}.}
 #' \item{gcID}{(Character) Identifies the tested sample.}
 #' \item{fit.time}{Fitted time values.}
-#' \item{fit.data}{Fitted density values.}
+#' \item{fit.data}{Fitted growth values.}
 #' \item{parameters}{List of determined growth parameters.}
 #' \itemize{
-#' \item \code{A}: {Maximum density.}
-#' \item \code{dY}: {Difference in maximum density and minimum density of the fitted model.}
+#' \item \code{A}: {Maximum growth.}
+#' \item \code{dY}: {Difference in maximum growth and minimum growth of the fitted model.}
 #' \item \code{mu}: {Maximum growth rate (i.e., maximum in first derivative of the spline).}
 #' \item \code{lambda}: {Lag time.}
 #' \item \code{b.tangent}: {Intersection of the tangent at the maximum growth rate with the abscissa.}
@@ -74,7 +74,7 @@ growth.gcFitModel <- function(
         0)
         {
         data <- data + abs(min(data[data < 0])) +
-            0.01  # add the absolute value of the minimum negative density (+ 0.01) to the data
+            0.01  # add the absolute value of the minimum negative growth (+ 0.01) to the data
     }
 
     # /// check length of input data
@@ -127,7 +127,7 @@ growth.gcFitModel <- function(
         class(gcFitModel) <- "gcFitModel"
         return(gcFitModel)
     }
-    # /// check if there are enough density
+    # /// check if there are enough growth
     # values above the start value
     data.growth <- data[data > data[1]]
     if (length(data.growth) <
@@ -135,7 +135,7 @@ growth.gcFitModel <- function(
         {
         if (control$suppress.messages == F)
             message(
-                "gcFitModel: No significant amount of density values above the start value!"
+                "gcFitModel: No significant amount of growth values above the start value!"
             )
         gcFitModel <- list(
             time.in = time, data.in = data, raw.time = time,
@@ -159,20 +159,20 @@ growth.gcFitModel <- function(
 #' Internal function called within \code{\link{growth.gcFitModel}} to perform growth model fitting.
 #'
 #' @param time Vector of the independent variable (usually time).
-#' @param data Vector of dependent variable (usually density values).
+#' @param data Vector of dependent variable (usually growth values).
 #' @param gcID (Character) The name of the analyzed sample.
 #' @param control A \code{grofit.control} object created with \code{\link{growth.control}}, defining relevant fitting options.
 #'
 #' @return A \code{gcFitModel} object that contains physiological parameters and information about the best fit. Use \code{\link{plot.gcFitModel}} to visualize the parametric fit and growth equation.
 #' \item{raw.time}{Raw time values provided to the function as \code{time}.}
-#' \item{raw.data}{Raw density data provided to the function as \code{data}.}
+#' \item{raw.data}{Raw growth data provided to the function as \code{data}.}
 #' \item{gcID}{(Character) Identifies the tested sample.}
 #' \item{fit.time}{Fitted time values.}
-#' \item{fit.data}{Fitted density values.}
+#' \item{fit.data}{Fitted growth values.}
 #' \item{parameters}{List of determined growth parameters.}
 #' \itemize{
-#' \item \code{A}: {Maximum density.}
-#' \item \code{dY}: {Difference in maximum density and minimum density of the fitted model.}
+#' \item \code{A}: {Maximum growth.}
+#' \item \code{dY}: {Difference in maximum growth and minimum growth of the fitted model.}
 #' \item \code{mu}: {Maximum growth rate (i.e., maximum in first derivative of the spline).}
 #' \item \code{lambda}: {Lag time.}
 #' \item \code{b.tangent}: {Intersection of the tangent at the maximum growth rate with the abscissa.}
@@ -219,20 +219,20 @@ growth.param <- function(time, data, gcID = "undefined", control)
         t0 <- 0
     }
 
-    # Implement min.density into dataset
-    if (!is.null(control$min.density))
+    # Implement min.growth into dataset
+    if (!is.null(control$min.growth))
         {
-        if (!is.na(control$min.density) &&
-            control$min.density != 0)
+        if (!is.na(control$min.growth) &&
+            control$min.growth != 0)
             {
-            min.density <- control$min.density
+            min.growth <- control$min.growth
             time <- time[max(
                 which.min(abs(time.in - t0)),
-                which.min(abs(data - min.density))
+                which.min(abs(data - min.growth))
             ):length(time)]
             data <- data[max(
                 which.min(abs(time.in - t0)),
-                which.min(abs(data - min.density))
+                which.min(abs(data - min.growth))
             ):length(data)]
         }
     }
@@ -545,9 +545,9 @@ growth.param <- function(time, data, gcID = "undefined", control)
 #' Calculate the values of the exponential growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param parms A vector of length 2 with parameters: 1. start density value (y0), 2. exponential growth rate (mumax)
+#' @param parms A vector of length 2 with parameters: 1. start growth value (y0), 2. exponential growth rate (mumax)
 #'
-#' @return A dataframe with time and calculated density columns
+#' @return A dataframe with time and calculated growth columns
 #' @export
 #'
 #' @examples
@@ -575,9 +575,9 @@ grow_exponential <- function(time, parms)
 #' Calculate the values of the linear growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param parms A vector of length 2 with parameters: 1. start density value (y0), 2. growth rate as slope of the linear model (mumax)
+#' @param parms A vector of length 2 with parameters: 1. start growth value (y0), 2. growth rate as slope of the linear model (mumax)
 #'
-#' @return A dataframe with time and calculated density columns
+#' @return A dataframe with time and calculated growth columns
 #' @export
 #'
 #' @examples
@@ -666,20 +666,20 @@ low.integrate <- function(x, y)
 #' Calculate the values of the logistic growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param A Maximum density value
+#' @param A Maximum growth value
 #' @param mu Growth rate
 #' @param lambda Lag time
 #' @param addpar Additional parameters have no effect in this type of model. They belong to the standard model description in \code{QurvE} and are initialized as \code{addpar=NULL} in the function header.
 #'
-#' @return A vector of density values
+#' @return A vector of growth values
 #' @export
 #'
 #' @examples
 #' time <- seq(from = 0, to = 24, by = 0.25)
 #' # Simulate logistic growth curve
-#' density <- logistic(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+#' growth <- logistic(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 #'
-#' plot(time, density)
+#' plot(time, growth)
 logistic <- function(time, A, mu, lambda, addpar = NULL)
     {
     A <- A[1]
@@ -706,7 +706,7 @@ logistic <- function(time, A, mu, lambda, addpar = NULL)
 #'\code{initlogistic} receives time points, growth data, values for \eqn{A}, \eqn{\mu} and \eqn{\lambda} and returns a list object which entries are used as initial values in the nonlinear fit procedure \code{\link{nls}} with the logistic growth model.
 #'
 #' @param time A vector of time values.
-#' @param y A vector with growth values (e.g., density).
+#' @param y A vector with growth values (e.g., growth).
 #' @param A Maximum of the curve. If a vector is provided only the first entry is used.
 #' @param mu Maximum slope. If a vector is provided only the first entry is used.
 #' @param lambda Lag time. If a vector is provided only the first entry is used.
@@ -754,7 +754,7 @@ initlogistic <- function(time, y, A, mu, lambda)
 #'\code{initlogistic} receives time points, growth data, values for \eqn{A}, \eqn{\mu} and \eqn{\lambda} and returns a list object which entries are used as initial values in the nonlinear fit procedure \code{\link{nls}} with the Richard's growth model.
 #'
 #' @param time A vector of time values.
-#' @param y A vector with growth values (e.g., density).
+#' @param y A vector with growth values (e.g., growth).
 #' @param A Maximum of the curve. If a vector is provided only the first entry is used.
 #' @param mu Maximum slope. If a vector is provided only the first entry is used.
 #' @param lambda Lag time. If a vector is provided only the first entry is used.
@@ -803,7 +803,7 @@ initrichards <- function(time, y, A, mu, lambda)
 #'\code{initlogistic} receives time points, growth data, values for \eqn{A}, \eqn{\mu} and \eqn{\lambda} and returns a list object which entries are used as initial values in the nonlinear fit procedure \code{\link{nls}} with the Huang's growth model.
 #'
 #' @param time A vector of time values.
-#' @param y A vector with growth values (e.g., density).
+#' @param y A vector with growth values (e.g., growth).
 #' @param A Maximum of the curve. If a vector is provided only the first entry is used.
 #' @param mu Maximum slope. If a vector is provided only the first entry is used.
 #' @param lambda Lag time. If a vector is provided only the first entry is used.
@@ -850,19 +850,19 @@ inithuang <- function(time, y, A, mu, lambda)
 #' Calculate the values of the Huang growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param A Maximum density value
+#' @param A Maximum growth value
 #' @param mu Growth rate
 #' @param lambda Lag time
-#' @param addpar additional parameters (here: minimum density)
+#' @param addpar additional parameters (here: minimum growth)
 #'
-#' @return A vector of density values
+#' @return A vector of growth values
 #' @export
 #'
 #' @examples
 #' time <- seq(from = 0, to = 24, by = 0.25)
-#' density <- huang(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+#' growth <- huang(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 #'
-#' plot(time, density)
+#' plot(time, growth)
 huang <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]
@@ -900,19 +900,19 @@ huang <- function(time, A, mu, lambda, addpar)
 #' Calculate the values of the Baranyi growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param A Maximum density value
+#' @param A Maximum growth value
 #' @param mu Growth rate
 #' @param lambda Lag time
-#' @param addpar additional parameters (here: minimum density)
+#' @param addpar additional parameters (here: minimum growth)
 #'
-#' @return A vector of density values
+#' @return A vector of growth values
 #' @export
 #'
 #' @examples
 #' time <- seq(from = 0, to = 24, by = 0.25)
-#' density <- baranyi(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+#' growth <- baranyi(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 #'
-#' plot(time, density)
+#' plot(time, growth)
 baranyi <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]
@@ -952,7 +952,7 @@ baranyi <- function(time, A, mu, lambda, addpar)
 #'\code{initlogistic} receives time points, growth data, values for \eqn{A}, \eqn{\mu} and \eqn{\lambda} and returns a list object which entries are used as initial values in the nonlinear fit procedure \code{\link{nls}} with the Baranyi's growth model.
 #'
 #' @param time A vector of time values.
-#' @param y A vector with growth values (e.g., density).
+#' @param y A vector with growth values (e.g., growth).
 #' @param A Maximum of the curve. If a vector is provided only the first entry is used.
 #' @param mu Maximum slope. If a vector is provided only the first entry is used.
 #' @param lambda Lag time. If a vector is provided only the first entry is used.
@@ -1022,19 +1022,19 @@ initbaranyi <- function(time, y, A, mu, lambda)
 #' Calculate the values of the Richards growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param A Maximum density value
+#' @param A Maximum growth value
 #' @param mu Growth rate
 #' @param lambda Lag time
 #' @param addpar additional parameters (here: Shape exponent \eqn{\nu}.)
 #'
-#' @return A vector of density values
+#' @return A vector of growth values
 #' @export
 #'
 #' @examples
 #' time <- seq(from = 0, to = 24, by = 0.25)
-#' density <- richards(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+#' growth <- richards(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 #'
-#' plot(time, density)
+#' plot(time, growth)
 richards <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]
@@ -1064,19 +1064,19 @@ richards <- function(time, A, mu, lambda, addpar)
 #' Calculate the values of the Gompertz growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param A Maximum density value
+#' @param A Maximum growth value
 #' @param mu Growth rate
 #' @param lambda Lag time
 #' @param addpar Additional parameters have no effect in this type of model. They belong to the standard model description in \code{grofit} and are initialized as \code{addpar=NULL} in the function header.
 #'
-#' @return A vector of density values
+#' @return A vector of growth values
 #' @export
 #'
 #' @examples
 #' time <- seq(from = 0, to = 24, by = 0.25)
-#' density <- gompertz(time, A = 3, mu=0.6, lambda = 3)
+#' growth <- gompertz(time, A = 3, mu=0.6, lambda = 3)
 #'
-#' plot(time, density)
+#' plot(time, growth)
 gompertz <- function(time, A, mu, lambda, addpar = NULL)
     {
     A <- A[1]
@@ -1104,7 +1104,7 @@ gompertz <- function(time, A, mu, lambda, addpar = NULL)
 #'\code{initlogistic} receives time points, growth data, values for \eqn{A}, \eqn{\mu} and \eqn{\lambda} and returns a list object which entries are used as initial values in the nonlinear fit procedure \code{\link{nls}} with the Gompertz's growth model.
 #'
 #' @param time A vector of time values.
-#' @param y A vector with growth values (e.g., density).
+#' @param y A vector with growth values (e.g., growth).
 #' @param A Maximum of the curve. If a vector is provided only the first entry is used.
 #' @param mu Maximum slope. If a vector is provided only the first entry is used.
 #' @param lambda Lag time. If a vector is provided only the first entry is used.
@@ -1152,7 +1152,7 @@ initgompertz <- function(time, y, A, mu, lambda)
 #'\code{initlogistic} receives time points, growth data, values for \eqn{A}, \eqn{\mu} and \eqn{\lambda} and returns a list object which entries are used as initial values in the nonlinear fit procedure \code{\link{nls}} with the Gompertz's growth model.
 #'
 #' @param time A vector of time values.
-#' @param y A vector with growth values (e.g., density).
+#' @param y A vector with growth values (e.g., growth).
 #' @param A Maximum of the curve. If a vector is provided only the first entry is used.
 #' @param mu Maximum slope. If a vector is provided only the first entry is used.
 #' @param lambda Lag time. If a vector is provided only the first entry is used.
@@ -1202,19 +1202,19 @@ initgompertz.exp <- function(time, y, A, mu, lambda)
 #' Calculate the values of the modified Gompertz growth model for given time points and growth parameters.
 #'
 #' @param time A vector of time values
-#' @param A Maximum density value
+#' @param A Maximum growth value
 #' @param mu Growth rate
 #' @param lambda Lag time
 #' @param addpar Numeric vector of size two, addpar`[`1`]` corresponds to scaling parameter \eqn{\alpha} and addpar`[`2`]` corresponds to shifting parameter \eqn{t_{shift}}.
 #'
-#' @return A vector of density values
+#' @return A vector of growth values
 #' @export
 #'
 #' @examples
 #' time <- seq(from = 0, to = 24, by = 0.25)
-#' density <- gompertz.exp(time, A = 3, mu=0.6, lambda = 3, addpar = c(0.1, 12))
+#' growth <- gompertz.exp(time, A = 3, mu=0.6, lambda = 3, addpar = c(0.1, 12))
 #'
-#' plot(time, density)
+#' plot(time, growth)
 gompertz.exp <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]

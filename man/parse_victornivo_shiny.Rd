@@ -4,19 +4,19 @@
 \alias{parse_victornivo_shiny}
 \title{Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.}
 \usage{
-parse_victornivo_shiny(input, density.nm, fl.nm, fl2.nm)
+parse_victornivo_shiny(input, growth.nm, fl.nm, fl2.nm)
 }
 \arguments{
 \item{input}{A dataframe created by reading a table file with \code{\link{read_file}}}
 
-\item{density.nm}{Name of read corresponding to growth rate}
+\item{growth.nm}{Name of read corresponding to growth rate}
 
 \item{fl.nm}{Name of read corresponding to fluorescence 1 data}
 
 \item{fl2.nm}{Name of read corresponding to fluorescence 2 data}
 }
 \value{
-a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 }
 \description{
 Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.

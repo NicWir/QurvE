@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluorescence_plots.R
 \name{plot.dual}
 \alias{plot.dual}
-\title{Compare fluorescence and density over time}
+\title{Compare fluorescence and growth over time}
 \usage{
 \method{plot}{dual}(
   x,
@@ -13,7 +13,7 @@
   mean = TRUE,
   exclude.nm = NULL,
   exclude.conc = NULL,
-  log.y.density = F,
+  log.y.growth = F,
   log.y.fl = F,
   n.ybreaks = 6,
   colors = NULL,
@@ -21,11 +21,11 @@
   group_pals = c("Green", "Orange", "Purple", "Magenta", "Grey", "Blue", "Grey", "Red",
     "Cyan", "Brown", "Mint"),
   basesize = 20,
-  y.lim.density = NULL,
+  y.lim.growth = NULL,
   y.lim.fl = NULL,
   x.lim = NULL,
   x.title = NULL,
-  y.title.density = NULL,
+  y.title.growth = NULL,
   y.title.fl = NULL,
   lwd = 1.1,
   legend.position = "bottom",
@@ -56,7 +56,7 @@
 
 \item{exclude.conc}{(Numeric or numeric vector) Define concentrations to exclude from the plot.}
 
-\item{log.y.density}{(Logical) Log-transform the y-axis of the density plot (\code{TRUE}) or not (\code{FALSE})?}
+\item{log.y.growth}{(Logical) Log-transform the y-axis of the growth plot (\code{TRUE}) or not (\code{FALSE})?}
 
 \item{log.y.fl}{(Logical) Log-transform the y-axis of the fluorescence plot (\code{TRUE}) or not (\code{FALSE})?}
 
@@ -70,15 +70,15 @@
 
 \item{basesize}{(Numeric) Base font size.}
 
-\item{y.lim.density}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the density plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+\item{y.lim.growth}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
 \item{y.lim.fl}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence plot as a vector in the form \code{c(l, u)}.}
 
-\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence and density plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
+\item{x.lim}{(Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence and growth plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.}
 
 \item{x.title}{(Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.}
 
-\item{y.title.density}{(Character) Optional: Provide a title for the y-axis of the density plot.}
+\item{y.title.growth}{(Character) Optional: Provide a title for the y-axis of the growth plot.}
 
 \item{y.title.fl}{(Character) Optional: Provide a title for the y-axis of the fluorescence plot.}
 
@@ -103,16 +103,16 @@
 \item{...}{Additional arguments. This has currently no effect and is only meant to fulfill the requirements of a generic function.}
 }
 \value{
-A two-panel plot, showing raw fluorescence (\code{fluorescence = "fl"}) or normalized fluorescence (\code{fluorescence = "norm.fl"}) over time in the top panel, and density over time in the bottom panel.
+A two-panel plot, showing raw fluorescence (\code{fluorescence = "fl"}) or normalized fluorescence (\code{fluorescence = "norm.fl"}) over time in the top panel, and growth over time in the bottom panel.
 }
 \description{
-\code{plot.dual} creates a two-panel plot in which fluorescence or density values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
+\code{plot.dual} creates a two-panel plot in which fluorescence or growth values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Run workflow

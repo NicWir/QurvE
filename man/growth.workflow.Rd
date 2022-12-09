@@ -17,8 +17,8 @@ growth.workflow(
   fit.opt = c("a"),
   t0 = 0,
   tmax = NA,
-  min.density = NA,
-  max.density = NA,
+  min.growth = NA,
+  max.growth = NA,
   log.x.gc = FALSE,
   log.y.lin = TRUE,
   log.y.spline = TRUE,
@@ -55,7 +55,7 @@ growth.workflow(
 )
 }
 \arguments{
-\item{grodata}{A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, or a list containing a \code{'time'} matrix as well as a \code{'density'} dataframe.}
+\item{grodata}{A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, or a list containing a \code{'time'} matrix as well as a \code{'growth'} dataframe.}
 
 \item{time}{(optional) A matrix containing time values for each sample.}
 
@@ -79,9 +79,9 @@ growth.workflow(
 
 \item{tmax}{(Numeric) Maximum time value considered for linear and spline fits.}
 
-\item{min.density}{(Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions or spline fits.}
+\item{min.growth}{(Numeric) Indicate whether only growth values above a certain threshold should be considered for linear regressions or spline fits.}
 
-\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits.}
+\item{max.growth}{(Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions or spline fits.}
 
 \item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
 
@@ -99,7 +99,7 @@ growth.workflow(
 
 \item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for calculated slope in \code{\link{growth.gcFitLinear}}}
 
-\item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
+\item{lin.dY}{(Numeric) Threshold for the minimum fraction of growth increase a linear regression window should cover. Default: 0.05 (5\%).}
 
 \item{interactive}{(Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the \emph{Plots} pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.}
 
@@ -113,7 +113,7 @@ growth.workflow(
 
 \item{dr.model}{(Character) Provide a list of models from the R package 'drc' to include in the dose-response analysis (if \code{dr.method = 'model'}). If more than one model is provided, the best-fitting model will be chosen based on the Akaike Information Criterion.}
 
-\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
+\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any growth value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start growth, further computations are performed. Else, a message is returned.}
 
 \item{dr.have.atleast}{(Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.}
 
@@ -144,7 +144,7 @@ growth.workflow(
 \value{
 A \code{grofit} object that contains all computation results, compatible with various plotting functions of the QurvE package and with \code{\link{growth.report}}.
 \item{time}{Raw time matrix passed to the function as \code{time} (if no \code{grofit} object is provided).}
-\item{data}{Raw density dataframe passed to the function as \code{data} (if no \code{grofit} object is provided).}
+\item{data}{Raw growth dataframe passed to the function as \code{data} (if no \code{grofit} object is provided).}
 \item{gcFit}{\code{gcFit} object created with the call of \code{\link{growth.gcFit}}.}
 \item{drFit}{\code{drFit} object created with the call of \code{\link{growth.drFit}}.}
 \item{expdesign}{Experimental design table inherited from \code{grodata} or created from the identifier columns (columns 1-3) in \code{data}.}
@@ -172,7 +172,7 @@ A \code{grofit} object that contains all computation results, compatible with va
                          parallelize = FALSE)
 
 # Load custom dataset
-  input <- read_data(data.density = system.file('2-FMA_toxicity.csv', package = 'QurvE'))
+  input <- read_data(data.growth = system.file('2-FMA_toxicity.csv', package = 'QurvE'))
 
   res <- growth.workflow(grodata = input,
                          fit.opt = c('s', 'l'),

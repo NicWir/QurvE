@@ -2,44 +2,44 @@
 #'
 #' \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction, applies data transformation (calibration), and combines technical replicates.
 #'
-#' @param data.density An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing density data.
+#' @param data.growth An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data.
 #' In column format, the first three table rows contain
 #' \enumerate{
 #'    \item sample description
 #'    \item replicate number (_optional_: followed by a letter to indicate technical replicates)
 #'    \item concentration value (_optional_)
 #' }
-#' @param data.fl (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.density}.
-#' @param data.fl2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence2 data (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.density}.
+#' @param data.fl (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.growth}.
+#' @param data.fl2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence2 data (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.growth}.
 #' @param data.format (Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}
-#' @param csvsep (Character) separator used in CSV file storing density data (ignored for other file types). Default: \code{";"}
-#' @param dec (Character) decimal separator used in CSV, TSV or TXT file storing density data. Default: \code{"."}
+#' @param csvsep (Character) separator used in CSV file storing growth data (ignored for other file types). Default: \code{";"}
+#' @param dec (Character) decimal separator used in CSV, TSV or TXT file storing growth data. Default: \code{"."}
 #' @param csvsep.fl (Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}
 #' @param dec.fl (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}
 #' @param csvsep.fl2 (Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}
 #' @param dec.fl2 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]). If \code{calibration = TRUE}, blanks are subtracted after value conversion.
-#' @param sheet.density (Numeric or Character) Number or name of the sheet with density data in XLS or XLSX files (_optional_).
+#' @param sheet.growth (Numeric or Character) Number or name of the sheet with growth data in XLS or XLSX files (_optional_).
 #' @param sheet.fl (Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (_optional_).
 #' @param sheet.fl2 (Numeric or Character) Number or name of the sheet with fluorescence2 data (used for normalization of fluorescence data) in XLS or XLSX files (_optional_).
-#' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'density'} or by fluorescence2 values (\code{'fl2'}).
+#' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 #' For example: \code{convert.time = 'y = 24 * x'}
-#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
 #' @details
 #' \figure{Data_layout.jpg}
 #'
-#' @return An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with density and fluorescence data (if applicable),
+#' @return An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with growth and fluorescence data (if applicable),
 #' and an experimental design table. The \code{grodata} object can be directly
 #'   used to run \code{\link{growth.workflow}}/\code{\link{fl.workflow}} or, together with a \code{growth.control}/\code{fl.control}
 #'   object, in \code{\link{growth.gcFit}}/\code{\link{flFit}}.
-#' \item{time}{Matrix with raw time values extracted from \code{data.density}.}
-#' \item{density}{Dataframe with raw density values and sample identifiers extracted from \code{data.density}.}
+#' \item{time}{Matrix with raw time values extracted from \code{data.growth}.}
+#' \item{growth}{Dataframe with raw growth values and sample identifiers extracted from \code{data.growth}.}
 #' \item{fluorescence}{Dataframe with raw fluorescence values and sample identifiers extracted from \code{data.fl}. \code{NA}, if no fluorescence data is provided.}
-#' \item{norm.fluorescence}{fluorescence data divided by density values. \code{NA}, if no fluorescence data is provided.}
-#' \item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.density}.}
+#' \item{norm.fluorescence}{fluorescence data divided by growth values. \code{NA}, if no fluorescence data is provided.}
+#' \item{expdesign}{Experimental design table created from the first three identifier rows/columns (see argument \code{data.format}) (\code{data.growth}.}
 #'
 #' @export
 #' @importFrom methods is
@@ -47,16 +47,16 @@
 #' @md
 #' @examples
 #' # Load CSV file containing only growth data
-#' data_growth <- read_data(data.density = system.file("2-FMA_toxicity.csv",
+#' data_growth <- read_data(data.growth = system.file("2-FMA_toxicity.csv",
 #'                          package = "QurvE"), csvsep = ";" )
 #'
-#' # Load XLSX file containing both density and fluorescence data
-#' data_growth_fl <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                             sheet.density = "OD",
+#' # Load XLSX file containing both growth and fluorescence data
+#' data_growth_fl <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                             sheet.growth = "OD",
 #'                             data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                             sheet.fl = 2)
 read_data <-
-  function(data.density = NA,
+  function(data.growth = NA,
            data.fl = NA,
            data.fl2 = NA,
            data.format = "col",
@@ -66,15 +66,15 @@ read_data <-
            dec.fl = ".",
            csvsep.fl2 = ";",
            dec.fl2 = ".",
-           sheet.density = 1,
+           sheet.growth = 1,
            sheet.fl = 1,
            sheet.fl2 = 1,
-           fl.normtype = c("density", "fl2"),
+           fl.normtype = c("growth", "fl2"),
            subtract.blank  = T,
            convert.time = NULL,
            calibration = NULL)
   {
-    if(is.null(data.density)) data.density <- NA
+    if(is.null(data.growth)) data.growth <- NA
     if(is.null(data.fl)) data.fl <- NA
     if(is.null(data.fl2)) data.fl2 <- NA
     if(is.null(data.fl2)) data.fl2 <- NA
@@ -82,12 +82,12 @@ read_data <-
 
     fl.normtype <- match.arg(fl.normtype)
 
-    # Load density data
-    if (any(is(data.density) %in% c("matrix", "list", "array")) || !is.character(data.density)) {
-      dat <- data.density
+    # Load growth data
+    if (any(is(data.growth) %in% c("matrix", "list", "array")) || !is.character(data.growth)) {
+      dat <- data.growth
     } else {
       # Read table file
-      dat <- read_file(data.density, csvsep=csvsep, dec=dec, sheet=sheet.density)
+      dat <- read_file(data.growth, csvsep=csvsep, dec=dec, sheet=sheet.growth)
     }
     if(data.format == "col"){
       dat <- t(dat)
@@ -180,9 +180,9 @@ read_data <-
     if((length(dat) > 1 && !(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))) &&
        (length(fl) > 1 && !(any(grepl("time", unlist(fl[,1]), ignore.case = TRUE)))) ){ #&& (length(fl2) > 1 && !(any(grepl("time", unlist(fl2[,1]), ignore.case = TRUE))))
       if(data.format == "col"){
-        stop("Could not find 'time' in column 1 of any provided 'data.density' or 'data.fl'.")
+        stop("Could not find 'time' in column 1 of any provided 'data.growth' or 'data.fl'.")
       } else {
-        stop("Could not find 'time' in row 1 of any provided 'data.density' or 'data.fl'.")
+        stop("Could not find 'time' in row 1 of any provided 'data.growth' or 'data.fl'.")
       }
     }
 
@@ -378,7 +378,7 @@ read_data <-
     }
 
     # normalize fluorescence
-    if(fl.normtype == "density"){
+    if(fl.normtype == "growth"){
       if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){
         fl.norm <- fl
         time.ndx <- grep("time", unlist(fl.norm[,1]), ignore.case = TRUE)
@@ -451,7 +451,7 @@ read_data <-
       } # end of for (i in 2:(length(time.ndx)))
     } # end of else {}
 
-    # Create data matrices for density and fluorescence values
+    # Create data matrices for growth and fluorescence values
     create_datmat <- function(df, time.ndx){
       if(length(time.ndx)==1){
         df.mat <- data.frame(df[(time.ndx[1]+1):nrow(df),])
@@ -631,7 +631,7 @@ read_data <-
     } # if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1))
 
     dataset <- list("time" = t.mat,
-                    "density" = dat.mat,
+                    "growth" = dat.mat,
                     "fluorescence" = fl.mat,
                     # "fluorescence2" = fl2.mat,
                     "norm.fluorescence" = fl.norm.mat,
@@ -644,7 +644,7 @@ read_data <-
 
 #'  (Experimental) Parse raw plate reader data and convert it to a format compatible with QurvE
 #'
-#' \code{parse_data} takes a raw export file from a plate reader experiment (or similar device), extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}. If more than one read type is found the user is prompted to assign the correct reads to \code{density} or \code{fluorescence}.
+#' \code{parse_data} takes a raw export file from a plate reader experiment (or similar device), extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}. If more than one read type is found the user is prompted to assign the correct reads to \code{growth} or \code{fluorescence}.
 #'
 #' @param data.file (Character) A table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing raw plate reader (or similar device) data.
 #' @param map.file (Character) A table file in column format with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt'  with 'well', 'ID', 'replicate', and 'concentration' in the first row. Used to assign sample information to wells in a plate.
@@ -658,9 +658,9 @@ read_data <-
 #' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
 #' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
-#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
-#' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'density'} or by fluorescence2 values (\code{'fl2'}).
+#' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #'
 #' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.
 #'
@@ -689,7 +689,7 @@ parse_data <-
            dec.map = ".",
            subtract.blank  = T,
            calibration = NULL,
-           fl.normtype = c("density", "fl2")
+           fl.normtype = c("growth", "fl2")
   ) {
     software <- match_arg(software)
     if(is.null(data.file)) stop("Please provide the name or path to a table file containing plate reader data in the 'data.file' argument.")
@@ -787,15 +787,15 @@ parse_data <-
       }
     }
     if(length(data.ls)==1){
-      names(data.ls) <- "density"
-      grodata <- read_data(data.density = data.ls[[1]], data.fl = NA, subtract.blank = subtract.blank, calibration = calibration)
+      names(data.ls) <- "growth"
+      grodata <- read_data(data.growth = data.ls[[1]], data.fl = NA, subtract.blank = subtract.blank, calibration = calibration)
     } else if(length(data.ls)==2){
-      names(data.ls) <- c("density", "fluorescence")
-      grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
+      names(data.ls) <- c("growth", "fluorescence")
+      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
     }
     else {
-      names(data.ls) <- c("density", "fluorescence", "fluorescence2")
-      grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], data.fl2 = data.ls[[3]],
+      names(data.ls) <- c("growth", "fluorescence", "fluorescence2")
+      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]], data.fl2 = data.ls[[3]],
                            subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
     }
     invisible(grodata)
@@ -887,7 +887,7 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
@@ -947,14 +947,14 @@ parse_Gen5Gen6 <- function(input)
   data.ls <- list()
   if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the density data is stored?\n",
+    answer <- readline(paste0("Indicate where the growth data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
     if(as.numeric(answer) == length(reads)+1){
-      density <- NA
+      growth <- NA
     } else {
-      density <- read.data[[as.numeric(answer)]]
+      growth <- read.data[[as.numeric(answer)]]
     }
 
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
@@ -967,7 +967,7 @@ parse_Gen5Gen6 <- function(input)
       fluorescence <- read.data[[as.numeric(answer)]]
       fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
     }
-    data.ls[[1]] <- density
+    data.ls[[1]] <- growth
     data.ls[[2]] <- fluorescence
 
     if(length(reads)>2){
@@ -984,8 +984,8 @@ parse_Gen5Gen6 <- function(input)
      data.ls[[3]] <- fluorescence2
     }
   } else {
-    density <- read.data[[1]]
-    data.ls[[1]] <- density
+    growth <- read.data[[1]]
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
   }
   return(list(data.ls))
@@ -995,7 +995,7 @@ parse_Gen5Gen6 <- function(input)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
@@ -1011,16 +1011,16 @@ parse_chibio <- function(input)
   data.ls <- list()
   if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the density data is stored?\n",
+    answer <- readline(paste0("Indicate where the growth data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
     if(as.numeric(answer) == length(reads)+1){
-      density <- NA
+      growth <- NA
     } else {
-      density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
-      if(all(as.numeric(density[-1,2]) == 0) | all(is.na(density[-1,2]))){
-        density <- NA
+      growth <- data.frame("time" = input[, time.ndx], "growth" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+      if(all(as.numeric(growth[-1,2]) == 0) | all(is.na(growth[-1,2]))){
+        growth <- NA
       }
     }
 
@@ -1037,7 +1037,7 @@ parse_chibio <- function(input)
         fluorescence <- NA
       }
     }
-    data.ls[[1]] <- density
+    data.ls[[1]] <- growth
     data.ls[[2]] <- fluorescence
 
     if(length(reads)>2){
@@ -1057,8 +1057,8 @@ parse_chibio <- function(input)
       data.ls[[3]] <- fluorescence2
     }
   } else {
-    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
-    data.ls[[1]] <- density
+    growth <- data.frame("time" = input[, time.ndx], "growth" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }
@@ -1070,7 +1070,7 @@ parse_chibio <- function(input)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #'
-#' @return a list of length two containing a density dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
+#' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
 #' @examples
 #' \dontrun{
@@ -1084,10 +1084,10 @@ parse_growthprofiler <- function(input)
   # get index of empty column at the and of the data series
   na.ndx <- which(is.na(input[time.ndx,]))
 
-  density <- input[time.ndx:nrow(input), 1:(na.ndx-1)]
+  growth <- input[time.ndx:nrow(input), 1:(na.ndx-1)]
 
   data.ls <- list()
-  data.ls[[1]] <- density
+  data.ls[[1]] <- growth
   data.ls[[2]] <- NA
   # data.ls[[3]] <- NA
 
@@ -1098,7 +1098,7 @@ parse_growthprofiler <- function(input)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
@@ -1145,14 +1145,14 @@ parse_tecan <- function(input)
   data.ls <- list()
   if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the density data is stored?\n",
+    answer <- readline(paste0("Indicate where the growth data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
     if(as.numeric(answer) == length(reads)+1){
-      density <- NA
+      growth <- NA
     } else {
-      density <- read.data[[as.numeric(answer)]]
+      growth <- read.data[[as.numeric(answer)]]
     }
 
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
@@ -1165,7 +1165,7 @@ parse_tecan <- function(input)
       fluorescence <- read.data[[as.numeric(answer)]]
       fluorescence[which(fluorescence == "OVER", arr.ind = TRUE)] <- NA
     }
-    data.ls[[1]] <- density
+    data.ls[[1]] <- growth
     data.ls[[2]] <- fluorescence
 
     if(length(reads)>2){
@@ -1182,8 +1182,8 @@ parse_tecan <- function(input)
       data.ls[[3]] <- fluorescence2
     }
   } else {
-    density <- read.data[[1]]
-    data.ls[[1]] <- density
+    growth <- read.data[[1]]
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }
@@ -1194,7 +1194,7 @@ parse_tecan <- function(input)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #'
-#' @return a list of length two containing a density dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
+#' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
 #' @examples
 #' \dontrun{
@@ -1251,23 +1251,23 @@ parse_biolector <- function(input)
   data.ls <- list()
   if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the density data is stored?\n",
+    answer <- readline(paste0("Indicate where the growth data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
     if(as.numeric(answer) == length(reads)+1){
-      density <- NA
+      growth <- NA
     } else {
-      density <- read.data[[as.numeric(answer)]]
+      growth <- read.data[[as.numeric(answer)]]
     }
 
-    data.ls[[1]] <- density
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
 
   } else {
-    density <- read.data[[1]]
-    data.ls[[1]] <- density
+    growth <- read.data[[1]]
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }
@@ -1278,7 +1278,7 @@ parse_biolector <- function(input)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
@@ -1324,14 +1324,14 @@ parse_victornivo <- function(input)
   data.ls <- list()
   if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the density data is stored?\n",
+    answer <- readline(paste0("Indicate where the growth data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
     if(as.numeric(answer) == length(reads)+1){
-      density <- NA
+      growth <- NA
     } else {
-      density <- read.data[[as.numeric(answer)]]
+      growth <- read.data[[as.numeric(answer)]]
     }
 
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
@@ -1344,7 +1344,7 @@ parse_victornivo <- function(input)
       fluorescence <- read.data[[as.numeric(answer)]]
       fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
     }
-    data.ls[[1]] <- density
+    data.ls[[1]] <- growth
     data.ls[[2]] <- fluorescence
 
     if(length(reads)>2){
@@ -1361,8 +1361,8 @@ parse_victornivo <- function(input)
       data.ls[[3]] <- fluorescence2
     }
   } else {
-    density <- read.data[[1]]
-    data.ls[[1]] <- density
+    growth <- read.data[[1]]
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }
@@ -1373,7 +1373,7 @@ parse_victornivo <- function(input)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
@@ -1467,14 +1467,14 @@ parse_victorx3 <- function(input)
   data.ls <- list()
   if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the density data is stored?\n",
+    answer <- readline(paste0("Indicate where the growth data is stored?\n",
                               paste(unlist(lapply(1:length(reads), function (i)
                                 paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard density data\n"))
+                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
     if(as.numeric(answer) == length(reads)+1){
-      density <- NA
+      growth <- NA
     } else {
-      density <- read.data[[as.numeric(answer)]]
+      growth <- read.data[[as.numeric(answer)]]
     }
 
     answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
@@ -1487,7 +1487,7 @@ parse_victorx3 <- function(input)
       fluorescence <- read.data[[as.numeric(answer)]]
       fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
     }
-    data.ls[[1]] <- density
+    data.ls[[1]] <- growth
     data.ls[[2]] <- fluorescence
 
     if(length(reads)>2){
@@ -1504,8 +1504,8 @@ parse_victorx3 <- function(input)
       data.ls[[3]] <- fluorescence2
     }
   } else {
-    density <- read.data[[1]]
-    data.ls[[1]] <- density
+    growth <- read.data[[1]]
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }

@@ -69,7 +69,7 @@
 A plot with the parametric fit.
 }
 \description{
-Plot the results of a parametric model fit on density vs. time data
+Plot the results of a parametric model fit on growth vs. time data
 }
 \examples{
 # Create random growth dataset

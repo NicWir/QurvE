@@ -10,7 +10,7 @@ parse_biolector(input)
 \item{input}{A dataframe created by reading a table file with \code{\link{read_file}}}
 }
 \value{
-a list of length two containing a density dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
+a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 }
 \description{
 Extract relevant data from a raw data export file generated from the software of "Biolector" plate readers.

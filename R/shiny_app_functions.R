@@ -202,11 +202,11 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
 #' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
-#' @param density.nm Name of read corresponding to growth rate
+#' @param growth.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence data
 #' @param fl.nm Name of read corresponding to fluorescence2 data
-#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert density and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
-#' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'density'} or by fluorescence2 values (\code{'fl2'}).
+#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #'
 #' @rdname parse_data
 #'
@@ -217,7 +217,7 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #' grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx",
 #'                                                     package = "QurvE"),
 #'                       sheet.data = 1,
-#'                       density.nm = "Read 3:630",
+#'                       growth.nm = "Read 3:630",
 #'                       fl.nm = "GFP:485,528",
 #'                       map.file = system.file("fluorescence_test_Gen5.xlsx",
 #'                                              package = "QurvE"),
@@ -238,11 +238,11 @@ parse_data_shiny <-
            csvsep.map = ";",
            dec.map = ".",
            subtract.blank  = T,
-           density.nm = NULL,
+           growth.nm = NULL,
            fl.nm = NULL,
            fl2.nm = NULL,
            calibration = NULL,
-           fl.normtype = c("density", "fl2")
+           fl.normtype = c("growth", "fl2")
   ) {
     if(!is.null(fl.nm) && is.na(fl.nm)) fl.nm <- NULL
     if(!is.null(fl2.nm) && is.na(fl2.nm)) fl2.nm <- NULL
@@ -265,11 +265,11 @@ parse_data_shiny <-
       mapping <- NULL
     }
     if(any(grep("Gen5|Gen6", software, ignore.case = T))){
-      parsed.ls <- parse_Gen5Gen6_shiny(data = input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_Gen5Gen6_shiny(data = input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     } # if("Gen5" %in% software)
     if(any(grep("Chi.Bio", software, ignore.case = T))){
-      parsed.ls <- parse_chibio_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_chibio_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
     if(any(grep("GrowthProfiler", software, ignore.case = T))){
@@ -277,22 +277,22 @@ parse_data_shiny <-
       data.ls <- parsed.ls[[1]]
     }
     if(any(grep("Tecan", software, ignore.case = T))){
-      parsed.ls <- parse_tecan_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_tecan_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
     if(any(grep("Biolector", software, ignore.case = T))){
-      parsed.ls <- parse_biolector_shiny(input, density.nm = density.nm)
+      parsed.ls <- parse_biolector_shiny(input, growth.nm = growth.nm)
       data.ls <- parsed.ls[[1]]
     }
 
     if(any(grep("VictorNivo", software, ignore.case = T))){
-      parsed.ls <- parse_victornivo_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_victornivo_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
     if(any(grep("VictorX3", software, ignore.case = T))){
-      parsed.ls <- parse_victorx3_shiny(input, density.nm = density.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
+      parsed.ls <- parse_victorx3_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -355,17 +355,17 @@ parse_data_shiny <-
       }
     }
     if(length(data.ls)==1){
-      names(data.ls) <- "density"
-      grodata <- read_data(data.density = data.ls[[1]], data.fl = NA,
+      names(data.ls) <- "growth"
+      grodata <- read_data(data.growth = data.ls[[1]], data.fl = NA,
                            subtract.blank = subtract.blank, calibration = calibration)
     } else if(length(data.ls)==2){
-      names(data.ls) <- c("density", "fluorescence")
-      grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]],
+      names(data.ls) <- c("growth", "fluorescence")
+      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]],
                            subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
     }
     else {
-      names(data.ls) <- c("density", "fluorescence", "fluorescence2")
-      grodata <- read_data(data.density = data.ls[[1]], data.fl = data.ls[[2]], data.fl2 = data.ls[[3]],
+      names(data.ls) <- c("growth", "fluorescence", "fluorescence2")
+      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]], data.fl2 = data.ls[[3]],
                            subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
     }
 
@@ -375,17 +375,17 @@ parse_data_shiny <-
 #' Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.
 #'
 #' @param data A dataframe created by reading a table file with \code{\link{read_file}}
-#' @param density.nm Name of read corresponding to growth rate
+#' @param growth.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence data
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
 #'
 #' @examples
 #' \dontrun{
 #' input <- read_file(filename = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE") )
 #' parsed <- parse_Gen5Gen6_shiny(input, "Read 3:630", "GFP:485,528")
 #' }
-parse_Gen5Gen6_shiny <- function(data, density.nm, fl.nm, fl2.nm)
+parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
   time.ndx <- grep("\\btime\\b", data[[2]], ignore.case = T)
@@ -435,10 +435,10 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl.nm, fl2.nm)
     read.data <- read.data.combined
   }
   data.ls <- list()
-  if (!is.null(density.nm) && density.nm != "Ignore")
-    density <- read.data[[match(density.nm, reads)]]
+  if (!is.null(growth.nm) && growth.nm != "Ignore")
+    growth <- read.data[[match(growth.nm, reads)]]
   else
-    density  <- NA
+    growth  <- NA
 
   if(!is.null(fl.nm) && fl.nm != "Ignore"){
     fluorescence <-  read.data[[match(fl.nm, reads)]]
@@ -455,8 +455,8 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl.nm, fl2.nm)
     fluorescence2 <- NA
 
 
-  # density <- read.data[[1]]
-  data.ls[[1]] <- density
+  # growth <- read.data[[1]]
+  data.ls[[1]] <- growth
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
@@ -466,18 +466,18 @@ parse_Gen5Gen6_shiny <- function(data, density.nm, fl.nm, fl2.nm)
 #' Extract relevant data from a raw data export file generated from the software of "Chi.Bio" bioreactors.
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
-#' @param density.nm Name of read corresponding to growth rate
+#' @param growth.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence data
 #' @param fl2.nm Name of read corresponding to fluorescence 2 data
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
 #' input <- read_file(filename = system.file("ChiBio.csv", package = "QurvE"), csvsep = "," )
 #' parsed <- parse_chibio(input, "od_measured", "FP1_emit1")
 #' }
-parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
+parse_chibio_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   time.ndx <- grep("time", input[1,], ignore.case = T)
   read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
@@ -485,17 +485,17 @@ parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 
   data.ls <- list()
   if(length(reads)>1){
-    if (!is.null(density.nm) && density.nm != "Ignore"){
-      density <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(density.nm, reads)]], as.numeric(input[-1, read.ndx[match(density.nm, reads)]])))
-      if(all(as.numeric(density[-1,2]) == 0) || all(is.na(density[-1,2]))){
-        density <- NA
+    if (!is.null(growth.nm) && growth.nm != "Ignore"){
+      growth <- data.frame("time" = input[, time.ndx], "growth" = c(input[1,read.ndx[match(growth.nm, reads)]], as.numeric(input[-1, read.ndx[match(growth.nm, reads)]])))
+      if(all(as.numeric(growth[-1,2]) == 0) || all(is.na(growth[-1,2]))){
+        growth <- NA
       }
     }
     else
-      density  <- NA
+      growth  <- NA
 
     if (!is.null(fl.nm) && fl.nm != "Ignore"){
-      fluorescence <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl.nm, reads)]])))
+      fluorescence <- data.frame("time" = input[, time.ndx], "growth" = c(input[1,read.ndx[match(fl.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl.nm, reads)]])))
       if(all(as.numeric(fluorescence[-1,2]) == 0) || all(is.na(fluorescence[-1,2]))){
         fluorescence <- NA
       }
@@ -504,7 +504,7 @@ parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
       fluorescence  <- NA
 
     if (!is.null(fl2.nm) && fl2.nm != "Ignore"){
-      fluorescence2 <- data.frame("time" = input[, time.ndx], "density" = c(input[1,read.ndx[match(fl2.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl2.nm, reads)]])))
+      fluorescence2 <- data.frame("time" = input[, time.ndx], "growth" = c(input[1,read.ndx[match(fl2.nm, reads)]], as.numeric(input[-1, read.ndx[match(fl2.nm, reads)]])))
       if(all(as.numeric(fluorescence2[-1,2]) == 0) || all(is.na(fluorescence2[-1,2]))){
         fluorescence2 <- NA
       }
@@ -512,12 +512,12 @@ parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
     else
       fluorescence2  <- NA
   } else {
-    density <- data.frame("time" = input[, time.ndx], "density" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
+    growth <- data.frame("time" = input[, time.ndx], "growth" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
     fluorescence <- NA
     fluorescence2 <- NA
   }
 
-  data.ls[[1]] <- density
+  data.ls[[1]] <- growth
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
@@ -527,18 +527,18 @@ parse_chibio_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 #' Extract relevant data from a raw data export file generated from the software of "Tecan" plate readers.
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
-#' @param density.nm Name of read corresponding to growth rate
+#' @param growth.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence 1 data
 #' @param fl2.nm Name of read corresponding to fluorescence 2 data
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
 #' input <- read_file(filename = system.file("Tecan.csv", package = "QurvE"), csvsep = "," )
 #' parsed <- parse_tecan(input, "Label1_Copy1", "sfGFP", "mRFP1")
 #' }
-parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
+parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
   time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
@@ -578,10 +578,10 @@ parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 
   data.ls <- list()
 
-  if (!is.null(density.nm) && density.nm != "Ignore")
-    density <- read.data[[match(density.nm, reads)]]
+  if (!is.null(growth.nm) && growth.nm != "Ignore")
+    growth <- read.data[[match(growth.nm, reads)]]
   else
-    density  <- NA
+    growth  <- NA
 
   if(!is.null(fl.nm) && fl.nm != "Ignore"){
     fluorescence <-  read.data[[match(fl.nm, reads)]]
@@ -597,7 +597,7 @@ parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
   else
     fluorescence2 <- NA
 
-  data.ls[[1]] <- density
+  data.ls[[1]] <- growth
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
@@ -607,16 +607,16 @@ parse_tecan_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 #' Extract relevant data from a raw data export file generated from the software of "Biolector" plate readers.
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
-#' @param density.nm Name of read corresponding to growth rate
+#' @param growth.nm Name of read corresponding to growth rate
 #'
-#' @return a list of length two containing a density dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
+#' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
 #' @examples
 #' \dontrun{
 #' input <- read_file(filename = system.file("biolector", package = "QurvE"), csvsep = "," )
 #' parsed <- parse_biolector_shiny(input, "[1] Biomass Gain=3")
 #' }
-parse_biolector_shiny <- function(input, density.nm)
+parse_biolector_shiny <- function(input, growth.nm)
 {
   # get index (row,column) for "Time:"
   time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = T)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = T),], ignore.case = T))
@@ -666,15 +666,15 @@ parse_biolector_shiny <- function(input, density.nm)
   data.ls <- list()
   if(length(reads)>1){
 
-    density <- read.data[[match(density.nm, reads)]]
+    growth <- read.data[[match(growth.nm, reads)]]
 
-    data.ls[[1]] <- density
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
 
   } else {
-    density <- read.data[[1]]
-    data.ls[[1]] <- density
+    growth <- read.data[[1]]
+    data.ls[[1]] <- growth
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }
@@ -684,18 +684,18 @@ parse_biolector_shiny <- function(input, density.nm)
 #' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
-#' @param density.nm Name of read corresponding to growth rate
+#' @param growth.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence 1 data
 #' @param fl2.nm Name of read corresponding to fluorescence 2 data
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
 #' input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
 #' parsed <- parse_victornivo_shiny(input, "ABS (F) - Kinetics")
 #' }
-parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
+parse_victornivo_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
   time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
@@ -733,10 +733,10 @@ parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
   names(read.data) <- reads
 
   data.ls <- list()
-  if (!is.null(density.nm) && density.nm != "Ignore")
-    density <- read.data[[match(density.nm, reads)]]
+  if (!is.null(growth.nm) && growth.nm != "Ignore")
+    growth <- read.data[[match(growth.nm, reads)]]
   else
-    density  <- NA
+    growth  <- NA
 
   if(!is.null(fl.nm) && fl.nm != "Ignore"){
     fluorescence <-  read.data[[match(fl.nm, reads)]]
@@ -753,8 +753,8 @@ parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
     fluorescence2 <- NA
 
 
-  # density <- read.data[[1]]
-  data.ls[[1]] <- density
+  # growth <- read.data[[1]]
+  data.ls[[1]] <- growth
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
@@ -764,18 +764,18 @@ parse_victornivo_shiny <- function(input, density.nm, fl.nm, fl2.nm)
 #' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor X3" plate readers.
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
-#' @param density.nm Name of read corresponding to growth rate
+#' @param growth.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence 1 data
 #' @param fl2.nm Name of read corresponding to fluorescence 2 data
 #'
-#' @return a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
+#' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
 #' @examples
 #' \dontrun{
 #' input <- read_file(filename = system.file("victorx3_output.txt", package = "QurvE") )
 #' parsed <- parse_victorx3_shiny(input, "Absorbance @ 600 (A)", "GFP (Counts)")
 #' }
-parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
+parse_victorx3_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
   time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = T)
@@ -861,10 +861,10 @@ parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
   names(read.data) <- reads
 
   data.ls <- list()
-  if (!is.null(density.nm) && density.nm != "Ignore")
-    density <- read.data[[match(density.nm, reads)]]
+  if (!is.null(growth.nm) && growth.nm != "Ignore")
+    growth <- read.data[[match(growth.nm, reads)]]
   else
-    density  <- NA
+    growth  <- NA
 
   if(!is.null(fl.nm) && fl.nm != "Ignore"){
     fluorescence <-  read.data[[match(fl.nm, reads)]]
@@ -881,8 +881,8 @@ parse_victorx3_shiny <- function(input, density.nm, fl.nm, fl2.nm)
     fluorescence2 <- NA
 
 
-  # density <- read.data[[1]]
-  data.ls[[1]] <- density
+  # growth <- read.data[[1]]
+  data.ls[[1]] <- growth
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 

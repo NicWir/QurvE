@@ -11,8 +11,8 @@ growth.control(
   fit.opt = c("a"),
   t0 = 0,
   tmax = NA,
-  min.density = NA,
-  max.density = NA,
+  min.growth = NA,
+  max.growth = NA,
   log.x.gc = FALSE,
   log.y.lin = TRUE,
   log.y.spline = TRUE,
@@ -54,9 +54,9 @@ growth.control(
 
 \item{tmax}{(Numeric) Maximum time value considered for linear and spline fits.}
 
-\item{min.density}{(Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions or spline fits.}
+\item{min.growth}{(Numeric) Indicate whether only growth values above a certain threshold should be considered for linear regressions or spline fits.}
 
-\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits.}
+\item{max.growth}{(Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions or spline fits.}
 
 \item{log.x.gc}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the time data for \emph{linear} and \emph{spline} fits. Default: \code{FALSE}.}
 
@@ -72,7 +72,7 @@ growth.control(
 
 \item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{growth.gcFitLinear}}}
 
-\item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
+\item{lin.dY}{(Numeric) Threshold for the minimum fraction of growth increase a linear regression window should cover. Default: 0.05 (5\%).}
 
 \item{biphasic}{(Logical) Shall \code{\link{growth.gcFitLinear}} and \code{\link{growth.gcFitSpline}} try to extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts) (\code{TRUE}) or not (\code{FALSE})?}
 
@@ -100,7 +100,7 @@ growth.control(
 
 \item{nboot.dr}{(Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.}
 
-\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
+\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any growth value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start growth, further computations are performed. Else, a message is returned.}
 }
 \value{
 Generates a list with all arguments described above as entries.

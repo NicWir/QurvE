@@ -531,7 +531,7 @@ match_arg <- function(
 #' \item simplicity - how early in the Q order are you
 #' \item coverage - labelings that don't extend outside the data:
 #' range(data) / range(labels)
-#' \item density (previously granularity) - how close to the number of
+#' \item growth (previously granularity) - how close to the number of
 #' ticks do you get (default is 5)
 #' \item legibility - has to do with fontsize and formatting to prevent
 #' label overlap
@@ -653,11 +653,11 @@ xgx_minor_breaks_log10 <- function(data_range)
 #' The function calls the \code{\link{baranyi}} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
 #'
 #' @param d  Numeric value, number of data sets. If \code{d} is a vector, only the first entry is used.
-#' @param y0  Numeric value, start density. If \code{t} is a vector, only the first entry is used.
+#' @param y0  Numeric value, start growth. If \code{t} is a vector, only the first entry is used.
 #' @param tmax  Numeric value, number of time points per data set. If \code{t} is a vector, only the first entry is used.
 #' @param mu Numeric value, maximum slope. If \code{mu} is a vector, only the first entry is used.
 #' @param lambda Numeric value, lag-phase. If \code{lambda} is a vector, only the first entry is used.
-#' @param A Numeric value, maximum density. If \code{A} is a vector, only the first entry is used.
+#' @param A Numeric value, maximum growth. If \code{A} is a vector, only the first entry is used.
 #' @param label Character string, condition label  If \code{label} is a vector, only the first entry is used.
 #'
 #' @return A list containing simulated data for three tests (e.g., 'organisms'):

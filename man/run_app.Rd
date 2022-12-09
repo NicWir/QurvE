@@ -4,7 +4,7 @@
 \alias{run_app}
 \title{Run Shiny QurvE App}
 \usage{
-run_app(options = list())
+run_app()
 }
 \value{
 Launches a browser with the shiny app

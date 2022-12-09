@@ -9,7 +9,7 @@ initgompertz.exp(time, y, A, mu, lambda)
 \arguments{
 \item{time}{A vector of time values.}
 
-\item{y}{A vector with growth values (e.g., density).}
+\item{y}{A vector with growth values (e.g., growth).}
 
 \item{A}{Maximum of the curve. If a vector is provided only the first entry is used.}
 

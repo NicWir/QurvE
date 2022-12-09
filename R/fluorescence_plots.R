@@ -27,9 +27,9 @@
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Extract time and normalized fluorescence data for single sample
@@ -84,7 +84,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
     }
   } else {
     if(control$log.x.lin){
-      xlab <- "Ln(density + 1)"
+      xlab <- "Ln(growth + 1)"
     } else {
       xlab <- "Density"
     }
@@ -146,7 +146,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
                                    "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                                    "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
                                    "t0:", flFittedLinear$control$t0,
-                                   "  min.density:", flFittedLinear$control$min.density,
+                                   "  min.growth:", flFittedLinear$control$min.growth,
                                    "   dY-thresh.:",  flFittedLinear$control$lin.dY),
                              cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
            },
@@ -231,7 +231,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
                                    "   R2-thresh.:",  flFittedLinear$control$lin.R2,
                                    "   RSD-thresh.:",  flFittedLinear$control$lin.RSD,
                                    "t0:", flFittedLinear$control$t0,
-                                   "  min.density:", flFittedLinear$control$min.density,
+                                   "  min.growth:", flFittedLinear$control$min.growth,
                                    "   dY-thresh.:",  flFittedLinear$control$lin.dY),
                              cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
@@ -285,7 +285,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #'
 #' @param x Object of class \code{flFitSpline}, created with \code{\link{flFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.flBootSpline}}.
-#' @param raw (Logical) Display raw density as circles (\code{TRUE}) or not (\code{FALSE}).
+#' @param raw (Logical) Display raw growth as circles (\code{TRUE}) or not (\code{FALSE}).
 #' @param slope (Logical) Show the slope at the maximum slope (\code{TRUE}) or not (\code{FALSE}).
 #' @param deriv (Logical) Show the derivative (i.e., slope) over time in a secondary plot (\code{TRUE}) or not (\code{FALSE}).
 #' @param spline (Logical) Only for \code{add = TRUE}: add the current spline to the existing plot (\code{FALSE}).
@@ -321,9 +321,9 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Extract time and normalized fluorescence data for single sample
@@ -430,7 +430,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                          "fit.fl" = fit.fl)
       }
 
-      x.label = if(flFitSpline$control$x_type == "density"){
+      x.label = if(flFitSpline$control$x_type == "growth"){
         "Density"
       } else {
         "Time"
@@ -495,14 +495,14 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       p <- p +
         # annotate(
         #   "text",
-        #   label = paste("t0:", flFitSpline$control$t0, "  min.density:", flFitSpline$control$min.density, "  smoothing:", flFitSpline$control$smooth.fl),
+        #   label = paste("t0:", flFitSpline$control$t0, "  min.growth:", flFitSpline$control$min.growth, "  smoothing:", flFitSpline$control$smooth.fl),
         #   x = 0.5*x_limit[2],
         #   y = ifelse(!is.null(y.lim) && !is.na(y.lim[2]), 1.05 * y.lim[2], 1.3 * y_limit[2]),
         #   angle = 0, parse = F, size = basesize*3.2/12) +
         labs(subtitle = paste("t0:", flFitSpline$control$t0,
                               " tmax:", flFitSpline$control$tmax,
-                              "  min.density:", flFitSpline$control$min.density,
-                              "  max.density:", flFitSpline$control$max.density,
+                              "  min.growth:", flFitSpline$control$min.growth,
+                              "  max.growth:", flFitSpline$control$max.growth,
                               "  smoothing:", flFitSpline$control$smooth.fl)
         ) +
         annotate(
@@ -521,7 +521,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
       # annotate(
       #   "text",
-      #   label = paste("t0:", flFitSpline$control$t0, "  min.density:", flFitSpline$control$min.density, "  smoothing:", flFitSpline$control$smooth.fl),
+      #   label = paste("t0:", flFitSpline$control$t0, "  min.growth:", flFitSpline$control$min.growth, "  smoothing:", flFitSpline$control$smooth.fl),
       #   x = 19,
       #   y = 0.1 * y_limit[2],
       #   angle = 90, parse = FALSE, size = basesize*3.2/12) +
@@ -843,7 +843,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       # /// add panel with growth rate over time
       if(deriv == TRUE){
         df.max_slope <- data.frame(spline(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y))
-        #add missing time values due to min.density and t0
+        #add missing time values due to min.growth and t0
         df.max_slope <-
           dplyr::bind_rows(data.frame("x" = df$time[is.na(df$fit.fl)], "y" = rep(NA, length(df$time[is.na(df$fit.fl)]))),
                            df.max_slope)
@@ -918,7 +918,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       p <- p +
         annotate(
           "text",
-          label = paste("t0:", flFitSpline$control$t0, "  min.density:", flFitSpline$control$min.density, "  smoothing:", flFitSpline$control$smooth.fl),
+          label = paste("t0:", flFitSpline$control$t0, "  min.growth:", flFitSpline$control$min.growth, "  smoothing:", flFitSpline$control$smooth.fl),
           x = 0.5*x_limit[2],
           y = 1.3 * y_limit[2],
           angle = 0, parse = FALSE, size = basesize*3.2/12) +
@@ -1000,9 +1000,9 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Extract time and normalized fluorescence data for single sample
@@ -1109,7 +1109,7 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
         }
         title(ylab = "First derivative", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
-      if(flBootSpline$control$x_type == "density"){
+      if(flBootSpline$control$x_type == "growth"){
         if (fit.log.x==TRUE){
           title(xlab = "Density [Ln(x(t)/x0)]", line = 1+0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
         }
@@ -1229,7 +1229,7 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
         }
         title(ylab = "First derivative", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
-      if(flBootSpline$control$x_type == "density"){
+      if(flBootSpline$control$x_type == "growth"){
         if (fit.log.x==TRUE){
           title(xlab = "Density [Ln(x(t)/x0)]", line = 1+0.7*cex.lab+0.7*cex.axis, cex.lab = cex.lab)
         }
@@ -1719,9 +1719,9 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Run workflow
@@ -1913,9 +1913,9 @@ plot.flFitRes <-  function(x,
       }
     }
   }
-  if((data.type == "spline") && flFit$control$x_type == "density" && mean == TRUE){ # || data.type == "spline2"
-    message("Grouping of replicates is not supported for spline fits with x_type = 'density'. Argument changed to mean = FALSE.")
-    try(showModal(modalDialog("Grouping of replicates is not supported for spline fits with x_type = 'density'.", easyClose = T, footer=NULL)), silent = TRUE)
+  if((data.type == "spline") && flFit$control$x_type == "growth" && mean == TRUE){ # || data.type == "spline2"
+    message("Grouping of replicates is not supported for spline fits with x_type = 'growth'. Argument changed to mean = FALSE.")
+    try(showModal(modalDialog("Grouping of replicates is not supported for spline fits with x_type = 'growth'.", easyClose = T, footer=NULL)), silent = TRUE)
     mean <- FALSE
   }
   if(mean == TRUE){
@@ -1923,7 +1923,7 @@ plot.flFitRes <-  function(x,
     conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
     conditions_unique <- unique(conditions)
 
-    # Create lists for each selected condition, with density values and derivatives, respectively. Each list item represents one condition with their average and SD
+    # Create lists for each selected condition, with growth values and derivatives, respectively. Each list item represents one condition with their average and SD
     plotdata.ls <- list()
     deriv.ls <- list()
     for(n in 1:length(conditions_unique)){
@@ -1934,7 +1934,7 @@ plot.flFitRes <-  function(x,
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
       name <- conditions_unique[n]
-      # Create lists for density and time values for each sample
+      # Create lists for growth and time values for each sample
       if(data.type == "spline" ){ # || data.type == "spline2"
         time <- as.list(lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.x)))
         data <- as.list(lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$fit.fl)))
@@ -1961,7 +1961,7 @@ plot.flFitRes <-  function(x,
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
           for(j in 1:length(get(paste0("time.missing_", i)))){
-            # extract density values into a separate list
+            # extract growth values into a separate list
             data[[i]] <- append(data[[i]],
                                 values = NA,
                                 after = match(get(paste0("time.missing_", i))[j],
@@ -2042,7 +2042,7 @@ plot.flFitRes <-  function(x,
     }
     xlab.title <- if(data.type == "norm.fl"  || data.type == "raw" ){ # || data.type == "raw2" || data.type == "norm.fl2"
       "Time"
-    } else if (flFit$control$x_type == "density"){
+    } else if (flFit$control$x_type == "growth"){
       "Density"
     } else {
       "Time"
@@ -2251,7 +2251,7 @@ plot.flFitRes <-  function(x,
     if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
     xlab.title <- if(data.type == "norm.fl" || data.type == "raw" ){ # || data.type == "raw2" || data.type == "norm.fl2"
       "Time"
-    } else if (object$control$x_type == "density"){
+    } else if (object$control$x_type == "growth"){
       "Density"
     } else {
       "Time"
@@ -2457,9 +2457,9 @@ plot.flFitRes <-  function(x,
 #' @return A plot with all curves (raw fluorescence measurements or raw normalized fluorescence over time) in a \code{flFit} object with \code{\link{flFit}}, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Run curve fitting workflow
@@ -2474,9 +2474,9 @@ plot.flFitRes <-  function(x,
 #'
 plot.flFit <- plot.flFitRes
 
-#' Compare fluorescence and density over time
+#' Compare fluorescence and growth over time
 #'
-#' \code{plot.dual} creates a two-panel plot in which fluorescence or density values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
+#' \code{plot.dual} creates a two-panel plot in which fluorescence or growth values are shown over time, allowing for the identification of, e.g., expression patterns in different growth stages.
 #'
 #' @param x A \code{flFit}, \code{flFitRes}, or \code{grodata} object created with \code{\link{flFit}}, \code{\link{fl.workflow}} or \code{\link{read_data}}
 #' @param fluorescence (Character) Indicate, which type of fluorescence data should be displayed.
@@ -2486,18 +2486,18 @@ plot.flFit <- plot.flFitRes
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
 #' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
 #' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
-#' @param log.y.density (Logical) Log-transform the y-axis of the density plot (\code{TRUE}) or not (\code{FALSE})?
+#' @param log.y.growth (Logical) Log-transform the y-axis of the growth plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param log.y.fl (Logical) Log-transform the y-axis of the fluorescence plot (\code{TRUE}) or not (\code{FALSE})?
 #' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param colors (vector of strings) Define a color palette used to draw the plots. If \code{NULL}, default palettes are chosen based on the number of groups/samples within the plot. Note: The number of provided colors should at least match the number of groups/samples.
 #' @param color_groups (Logical) Shall samples within the same group but with different concentrations be shown in different shades of the same color?
 #' @param group_pals (String vector) Define the colors used to display sample groups with identical concentrations. The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend. Available options: "Green", "Oranges", "Purple", "Cyan", "Grey", "Red", "Blue", and "Magenta".
 #' @param basesize (Numeric) Base font size.
-#' @param y.lim.density (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the density plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param y.lim.growth (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the growth plot as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param y.lim.fl (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the y-axis of the fluorescence plot as a vector in the form \code{c(l, u)}.
-#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence and density plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
+#' @param x.lim (Numeric vector with two elements) Optional: Provide the lower (\code{l}) and upper (\code{u}) bounds of the x-axis of both fluorescence and growth plots as a vector in the form \code{c(l, u)}. If only the lower or upper bound should be fixed, provide \code{c(l, NA)} or \code{c(NA, u)}, respectively.
 #' @param x.title (Character) Optional: Provide a title for the x-axis of both growth curve and derivative plots.
-#' @param y.title.density (Character) Optional: Provide a title for the y-axis of the density plot.
+#' @param y.title.growth (Character) Optional: Provide a title for the y-axis of the growth plot.
 #' @param y.title.fl (Character) Optional: Provide a title for the y-axis of the fluorescence plot.
 #' @param lwd (Numeric) Line width of the individual plots.
 #' @param legend.position (Character) Position of the legend. One of "bottom", "top", "left", "right".
@@ -2513,13 +2513,13 @@ plot.flFit <- plot.flFitRes
 #' @export plot.dual
 #' @export
 #'
-#' @return A two-panel plot, showing raw fluorescence (\code{fluorescence = "fl"}) or normalized fluorescence (\code{fluorescence = "norm.fl"}) over time in the top panel, and density over time in the bottom panel.
+#' @return A two-panel plot, showing raw fluorescence (\code{fluorescence = "fl"}) or normalized fluorescence (\code{fluorescence = "norm.fl"}) over time in the top panel, and growth over time in the bottom panel.
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Run workflow
@@ -2540,18 +2540,18 @@ plot.dual <-  function(x,
                        mean = TRUE,
                        exclude.nm = NULL,
                        exclude.conc = NULL,
-                       log.y.density = F,
+                       log.y.growth = F,
                        log.y.fl = F,
                        n.ybreaks = 6,
                        colors = NULL,
                        color_groups = T,
                        group_pals = c('Green', 'Orange', 'Purple', 'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', 'Mint'),
                        basesize = 20,
-                       y.lim.density = NULL,
+                       y.lim.growth = NULL,
                        y.lim.fl = NULL,
                        x.lim = NULL,
                        x.title = NULL,
-                       y.title.density = NULL,
+                       y.title.growth = NULL,
                        y.title.fl = NULL,
                        lwd = 1.1,
                        legend.position = "bottom",
@@ -2569,16 +2569,16 @@ plot.dual <-  function(x,
   # Convert range  and selecting arguments
   x.lim <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", x.lim)), pattern = ";|,"))
   y.lim.fl <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.fl)), pattern = ";|,"))
-  y.lim.density <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.density)), pattern = ";|,"))
+  y.lim.growth <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", y.lim.growth)), pattern = ";|,"))
   suppressWarnings(assign("x.lim" ,as.numeric(x.lim)))
   if(all(is.na(x.lim))) x.lim <- NULL
   suppressWarnings(assign("y.lim.fl" ,as.numeric(y.lim.fl)))
   if(all(is.na(y.lim.fl))) y.lim.fl <- NULL
-  suppressWarnings(assign("y.lim.density" ,as.numeric(y.lim.density)))
-  if(all(is.na(y.lim.density))) y.lim.density <- NULL
+  suppressWarnings(assign("y.lim.growth" ,as.numeric(y.lim.growth)))
+  if(all(is.na(y.lim.growth))) y.lim.growth <- NULL
 
   if(!any(methods::is(object) %in% c("flFit","flFitRes", "grodata"))) stop("'x' needs to be an object created with fl.workflow(), flFit(), parse_data(), or read_data().")
-  density <- density.nm <- "density"
+  growth <- growth.nm <- "growth"
   fluorescence <- match.arg(fluorescence)
 
   if(methods::is(object) == "grodata"){
@@ -2672,7 +2672,7 @@ plot.dual <-  function(x,
     conditions <- str_replace_all(nm, "\\| .+ \\| ", "| ")
     conditions_unique <- unique(conditions)
 
-    # Create lists for each selected condition, with density values and (normalized) fluorescence, respectively. Each list item represents one condition with their average and SD
+    # Create lists for each selected condition, with growth values and (normalized) fluorescence, respectively. Each list item represents one condition with their average and SD
     plotdata.ls <- list()
     for(n in 1:length(conditions_unique)){
       # find indexes of replicates
@@ -2682,15 +2682,15 @@ plot.dual <-  function(x,
                                              unlist(str_split(conditions_unique[n], " \\| "))[2],
                                              "$"), sample.nm))
       name <- conditions_unique[n]
-      # Create lists for density and time values for each sample
+      # Create lists for growth and time values for each sample
 
       if(methods::is(object) %in% "flFitRes"){
         time <- lapply(1:length(ndx), function(i) raw_data$time[ndx[i], ])
-        dens.data <- raw_data[[density.nm]][ndx, 4:ncol(raw_data[[density.nm]])]
+        dens.data <- raw_data[[growth.nm]][ndx, 4:ncol(raw_data[[growth.nm]])]
         fl.data <- raw_data[[fl.nm]][ndx, 4:ncol(raw_data[[fl.nm]])]
       } else {
         time <- as.list(lapply(1:length(ndx), function(i) cbind(raw_data$time[ndx[[i]], ])))
-        dens.data <- raw_data[[density.nm]][ndx, 4:ncol(raw_data[[density.nm]])]
+        dens.data <- raw_data[[growth.nm]][ndx, 4:ncol(raw_data[[growth.nm]])]
         fl.data <- raw_data[[fl.nm]][ndx, 4:ncol(raw_data[[fl.nm]])]
       }
       dens.data <- split(as.matrix(dens.data), 1:nrow(as.matrix(dens.data)))
@@ -2704,7 +2704,7 @@ plot.dual <-  function(x,
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
           for(j in 1:length(get(paste0("time.missing_", i)))){
-            # extract density values into a separate list
+            # extract growth values into a separate list
             dens.data[[i]] <- append(dens.data[[i]],
                                      values = NA,
                                      after = match(get(paste0("time.missing_", i))[j],
@@ -2752,7 +2752,7 @@ plot.dual <-  function(x,
     if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
 
     # replace negative lower ribbon boundaries with 0 for log10 transformation
-    if(log.y.density==TRUE){
+    if(log.y.growth==TRUE){
       df$dens.lower[df$dens.lower<0] <- 0
     }
     if(log.y.fl==TRUE){
@@ -2767,21 +2767,21 @@ plot.dual <-  function(x,
       geom_ribbon(aes(ymin=.data$dens.lower,ymax=.data$dens.upper, fill=.data$name), alpha = 0.3, colour = NA) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
-      ylab(ifelse(is.null(y.title.density) || y.title.density == "", ylab.title.dens, y.title.density)) +
+      ylab(ifelse(is.null(y.title.growth) || y.title.growth == "", ylab.title.dens, y.title.growth)) +
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()) +
       ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
-    if(log.y.density == TRUE){
-      if(!is.null(y.lim.density)){
-        p <- p + scale_y_log10(limits = y.lim.density, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+    if(log.y.growth == TRUE){
+      if(!is.null(y.lim.growth)){
+        p <- p + scale_y_log10(limits = y.lim.growth, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
         p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
     } else {
-      if(!is.null(y.lim.density)){
-        p <- p + scale_y_continuous(limits = y.lim.density, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      if(!is.null(y.lim.growth)){
+        p <- p + scale_y_continuous(limits = y.lim.growth, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
         p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
@@ -2928,22 +2928,22 @@ plot.dual <-  function(x,
     for(i in 1:length(ndx.keep)){
       df <- plyr::rbind.fill(df, data.frame("name" = sample.nm[ndx.keep[i]],
                                             "time" = as.vector(raw_data$time[ndx.keep[i], ]),
-                                            "density" = unlist(unname(utils::type.convert(raw_data[[density.nm]][ndx.keep[i], 4:ncol(raw_data[[density.nm]])], as.is=T))),
+                                            "growth" = unlist(unname(utils::type.convert(raw_data[[growth.nm]][ndx.keep[i], 4:ncol(raw_data[[growth.nm]])], as.is=T))),
                                             "fl" = unlist(unname(utils::type.convert(raw_data[[fl.nm]][ndx.keep[i], 4:ncol(raw_data[[fl.nm]])], as.is=T)))))
 
     }
-    df <- df[df[["density"]]>0, ]
+    df <- df[df[["growth"]]>0, ]
     df <- df[df[["fl"]]>0, ]
 
     if(!is.null(x.lim)) df <- df[df[["time"]]>x.lim[1], ]
     xlab.title <- "Time"
 
     ylab.title <- "Density"
-    p <- ggplot(df, aes(x=.data$time, y=.data$density, col = .data$name)) +
+    p <- ggplot(df, aes(x=.data$time, y=.data$growth, col = .data$name)) +
       geom_line(linewidth=lwd) +
       theme_classic(base_size = basesize) +
       xlab(ifelse(is.null(x.title) || x.title == "", xlab.title, x.title)) +
-      ylab(ifelse(is.null(y.title.density) || y.title.density == "", ylab.title, y.title.density)) +
+      ylab(ifelse(is.null(y.title.growth) || y.title.growth == "", ylab.title, y.title.growth)) +
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()) +
@@ -2955,15 +2955,15 @@ plot.dual <-  function(x,
       p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
     }
 
-    if(log.y.density == TRUE){
-      if(!is.null(y.lim.density)){
-        p <- p + scale_y_log10(limits = y.lim.density, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+    if(log.y.growth == TRUE){
+      if(!is.null(y.lim.growth)){
+        p <- p + scale_y_log10(limits = y.lim.growth, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
         p <- p + scale_y_log10(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
     } else {
-      if(!is.null(y.lim.density)){
-        p <- p + scale_y_continuous(limits = y.lim.density, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
+      if(!is.null(y.lim.growth)){
+        p <- p + scale_y_continuous(limits = y.lim.growth, breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       } else {
         p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks, bounds = FALSE))
       }
@@ -3147,9 +3147,9 @@ plot.dual <-  function(x,
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    sheet.density = 1,
+#'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
 #' # Define fit controls

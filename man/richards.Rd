@@ -9,7 +9,7 @@ richards(time, A, mu, lambda, addpar)
 \arguments{
 \item{time}{A vector of time values}
 
-\item{A}{Maximum density value}
+\item{A}{Maximum growth value}
 
 \item{mu}{Growth rate}
 
@@ -18,14 +18,14 @@ richards(time, A, mu, lambda, addpar)
 \item{addpar}{additional parameters (here: Shape exponent \eqn{\nu}.)}
 }
 \value{
-A vector of density values
+A vector of growth values
 }
 \description{
 Calculate the values of the Richards growth model for given time points and growth parameters.
 }
 \examples{
 time <- seq(from = 0, to = 24, by = 0.25)
-density <- richards(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+growth <- richards(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
 
-plot(time, density)
+plot(time, growth)
 }

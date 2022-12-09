@@ -8,8 +8,8 @@
 #' @param fit.opt (Character or character vector) Indicates whether the program should perform a linear regression (\code{'l'}), model fit (\code{'m'}), spline fit (\code{'s'}), or all (\code{'a'}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c('l', 's')} Default:  \code{fit.opt = c('l', 's')}.
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits.
 #' @param tmax (Numeric) Maximum time value considered for linear and spline fits.
-#' @param min.density (Numeric) Indicate whether only density values above a certain threshold should be considered for linear regressions or spline fits.
-#' @param max.density (Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits.
+#' @param min.growth (Numeric) Indicate whether only growth values above a certain threshold should be considered for linear regressions or spline fits.
+#' @param max.growth (Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions or spline fits.
 #' @param log.x.gc (Logical) Indicates whether _ln(x+1)_ should be applied to the time data for _linear_ and _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _linear_ fits. Default: \code{TRUE}
 #' @param log.y.spline (Logical) Indicates whether _ln(y/y0)_ should be applied to the growth data for _spline_ fits. Default: \code{TRUE}
@@ -18,7 +18,7 @@
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{growth.gcFitLinear}} If \code{NULL}, h is calculated for each samples based on the number of measurements in the growth phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{growth.gcFitLinear}}
 #' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{growth.gcFitLinear}}
-#' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
+#' @param lin.dY (Numeric) Threshold for the minimum fraction of growth increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param interactive (Logical) Controls whether the fit of each growth curve and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
 #' @param nboot.gc (Numeric) Number of bootstrap samples used for nonparametric growth curve fitting with \code{\link{growth.gcBootSpline}}. Use \code{nboot.gc = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.gc (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating growth rates) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
@@ -31,7 +31,7 @@
 #' @param log.x.dr (Logical) Indicates whether \code{ln(x+1)} should be applied to the concentration data of the dose response curves. Default: \code{FALSE}.
 #' @param log.y.dr (Logical) Indicates whether \code{ln(y+1)} should be applied to the response data of the dose response curves. Default: \code{FALSE}.
 #' @param nboot.dr (Numeric) Defines the number of bootstrap samples for EC50 estimation. Use \code{nboot.dr = 0} to disable bootstrapping. Default: \code{0}.
-#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
+#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any growth value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start growth, further computations are performed. Else, a message is returned.
 #'
 #' @return Generates a list with all arguments described above as entries.
 #'
@@ -49,7 +49,7 @@
 growth.control <- function(
     neg.nan.act = FALSE, clean.bootstrap = TRUE, suppress.messages = FALSE,
     fit.opt = c("a"),
-    t0 = 0, tmax = NA, min.density = NA, max.density = NA,
+    t0 = 0, tmax = NA, min.growth = NA, max.growth = NA,
     log.x.gc = FALSE, log.y.lin = TRUE, log.y.spline = TRUE,
     log.y.model = TRUE, lin.h = NULL, lin.R2 = 0.97,
     lin.RSD = 0.1, lin.dY = 0.05, biphasic = FALSE,
@@ -272,8 +272,8 @@ growth.control <- function(
     grofit.control <- list(
         neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
         suppress.messages = suppress.messages, fit.opt = fit.opt,
-        t0 = t0, tmax = tmax, min.density = min.density,
-        max.density = max.density, log.x.gc = log.x.gc,
+        t0 = t0, tmax = tmax, min.growth = min.growth,
+        max.growth = max.growth, log.x.gc = log.x.gc,
         log.y.lin = log.y.lin, log.y.spline = log.y.spline,
         log.y.model = log.y.model, biphasic = biphasic,
         lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD,
@@ -294,13 +294,13 @@ growth.control <- function(
 #'
 #' A \code{fl.control} object is required to perform various computations on fluorescence data stored within \code{grodata} objects (created with \code{\link{read_data}} or \code{\link{parse_data}}). A \code{fl.control} object is created automatically as part of \code{\link{fl.workflow}}.
 #'
-#' @param x_type (Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.
+#' @param x_type (Character) Which data type shall be used as independent variable? Options are \code{'growth'} and \code{'time'}.
 #' @param fit.opt (Character or vector of strings) Indicates whether the program should perform a linear regression (\code{'l'}) and/or spline fit (\code{'s'}). Default:  \code{fit.opt = c('l', 's')}.
-#' @param norm_fl (Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}
+#' @param norm_fl (Logical) use normalized (to growth) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}
 #' @param t0 (Numeric) Minimum time value considered for linear and spline fits (if \code{x_type = 'time'}).
 #' @param tmax (Numeric) Maximum time value considered for linear and spline fits (if \code{x_type = 'time'})..
-#' @param min.density (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).
-#' @param max.density (Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).
+#' @param min.growth (Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'growth'}).
+#' @param max.growth (Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'growth'}).
 #' @param log.x.lin (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _linear_ fits. Default: \code{FALSE}.
 #' @param log.x.spline (Logical) Indicates whether _ln(x+1)_ should be applied to the independent variable for _spline_ fits. Default: \code{FALSE}.
 #' @param log.y.lin (Logical) Indicates whether _ln(y/y0)_ should be applied to the fluorescence data for _linear_ fits. Default: \code{FALSE}
@@ -308,7 +308,7 @@ growth.control <- function(
 #' @param lin.h (Numeric) Manually define the size of the sliding window used in \code{\link{flFitLinear}}. If \code{NULL}, h is calculated for each samples based on the number of measurements in the fluorescence increase phase of the plot.
 #' @param lin.R2 (Numeric) \ifelse{html}{\out{R<sup>2</sup>}}{\eqn{R^2}} threshold for \code{\link{flFitLinear}}.
 #' @param lin.RSD (Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{flFitLinear}}.
-#' @param lin.dY (Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5%).
+#' @param lin.dY (Numeric) Threshold for the minimum fraction of growth increase a linear regression window should cover. Default: 0.05 (5%).
 #' @param dr.parameter (Character or numeric) The response parameter in the output table to be used for creating a dose response curve. See \code{\link{fl.drFit}} for further details. Default: \code{'max_slope.spline'}, which represents the maximum slope of the spline fit Typical options include: \code{'max_slope.linfit'}, \code{'dY.linfit'}, \code{'max_slope.spline'}, and \code{'dY.spline'}.
 #' @param dr.method (Character) Perform either a smooth spline fit on response parameter vs. concentration data (\code{'spline'}) or fit a biosensor response model with \code{'model'} (proposed by Meyer et al., 2019).
 #' @param dr.have.atleast (Numeric) Minimum number of different values for the response parameter one should have for estimating a dose response curve. Note: All fit procedures require at least six unique values. Default: \code{6}.
@@ -320,7 +320,7 @@ growth.control <- function(
 #' @param interactive (Logical) Controls whether the fit for each sample and method is controlled manually by the user. If \code{TRUE}, each fit is visualized in the _Plots_ pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample. Default: \code{TRUE}.
 #' @param nboot.fl (Numeric) Number of bootstrap samples used for nonparametric curve fitting with \code{\link{flBootSpline}}. Use \code{nboot.fl = 0} to disable the bootstrap. Default: \code{0}
 #' @param smooth.fl (Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}
-#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.
+#' @param growth.thresh (Numeric) Define a threshold for growth. Only if any growth value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start growth, further computations are performed. Else, a message is returned.
 #' @param suppress.messages (Logical) Indicates whether messages (information about current fluorescence curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.
 #' @param neg.nan.act (Logical) Indicates whether the program should stop when negative fluorescence values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (\code{TRUE}) or kept (\code{FALSE}). Note: Infinite values are always removed. Default: \code{TRUE}.
@@ -341,9 +341,9 @@ growth.control <- function(
 #'                              t0 = 2)
 fl.control <- function(
     fit.opt = c("l", "s"),
-    x_type = c("density", "time"),
-    norm_fl = TRUE, t0 = 0, tmax = NA, min.density = NA,
-    max.density = NA, log.x.lin = FALSE, log.x.spline = FALSE,
+    x_type = c("growth", "time"),
+    norm_fl = TRUE, t0 = 0, tmax = NA, min.growth = NA,
+    max.growth = NA, log.x.lin = FALSE, log.x.spline = FALSE,
     log.y.lin = FALSE, log.y.spline = FALSE, lin.h = NULL,
     lin.R2 = 0.97, lin.RSD = 0.05, lin.dY = 0.05, dr.parameter = "max_slope.spline",
     dr.method = c("model", "spline"),
@@ -369,9 +369,9 @@ fl.control <- function(
             "value of fit.opt must be character and contain one of or both 'l' and 's'."
         )
     if ((is.character(x_type) ==
-        FALSE | !any(x_type %in% c("density", "time"))))
+        FALSE | !any(x_type %in% c("growth", "time"))))
         stop(
-            "value of x_type must be character and contain one of 'density' or 'time'."
+            "value of x_type must be character and contain one of 'growth' or 'time'."
         )
     if ((is.character(dr.method) ==
         FALSE | !any(dr.method %in% c("model", "spline"))))
@@ -506,8 +506,8 @@ fl.control <- function(
 
     fl.control <- list(
         fit.opt = fit.opt, x_type = x_type, norm_fl = norm_fl,
-        t0 = t0, tmax = tmax, min.density = min.density,
-        max.density = max.density, min.density = min.density,
+        t0 = t0, tmax = tmax, min.growth = min.growth,
+        max.growth = max.growth, min.growth = min.growth,
         log.x.lin = log.x.lin, log.x.spline = log.x.spline,
         log.y.lin = log.y.lin, log.y.spline = log.y.spline,
         lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD,

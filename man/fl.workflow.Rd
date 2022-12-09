@@ -7,18 +7,18 @@
 fl.workflow(
   grodata = NULL,
   time = NULL,
-  density = NULL,
+  growth = NULL,
   fl_data = NULL,
   ec50 = TRUE,
   mean.grp = NA,
   mean.conc = NA,
   fit.opt = c("l", "s"),
-  x_type = c("density", "time"),
+  x_type = c("growth", "time"),
   norm_fl = TRUE,
   t0 = 0,
   tmax = NA,
-  min.density = 0,
-  max.density = NA,
+  min.growth = 0,
+  max.growth = NA,
   log.x.lin = FALSE,
   log.x.spline = FALSE,
   log.y.lin = FALSE,
@@ -52,13 +52,13 @@ fl.workflow(
 )
 }
 \arguments{
-\item{grodata}{A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, containing fluorescence data and data for the independent variable (i.e., time or density).}
+\item{grodata}{A \code{grodata} object created with \code{\link{read_data}} or \code{\link{parse_data}}, containing fluorescence data and data for the independent variable (i.e., time or growth).}
 
 \item{time}{(optional) A matrix containing time values for each sample (if a \code{fl_data} dataframe is provided as separate argument).}
 
-\item{density}{(optional) A dataframe containing growth data (if a \code{fl_data} matrix is provided as separate argument).}
+\item{growth}{(optional) A dataframe containing growth data (if a \code{fl_data} matrix is provided as separate argument).}
 
-\item{fl_data}{(optional) A dataframe containing fluorescence data (if a \code{time} matrix or \code{density} dataframe is provided as separate argument).}
+\item{fl_data}{(optional) A dataframe containing fluorescence data (if a \code{time} matrix or \code{growth} dataframe is provided as separate argument).}
 
 \item{ec50}{(Logical) Perform dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
@@ -68,17 +68,17 @@ fl.workflow(
 
 \item{fit.opt}{(Character or character vector) Indicates whether the program should perform a linear regression (\code{"l"}), model fit (\code{"m"}), spline fit (\code{"s"}), or all (\code{"a"}). Combinations can be freely chosen by providing a character vector, e.g. \code{fit.opt = c("l", "s")} Default:  \code{fit.opt = c("l", "s")}.}
 
-\item{x_type}{(Character) Which data type shall be used as independent variable? Options are \code{'density'} and \code{'time'}.}
+\item{x_type}{(Character) Which data type shall be used as independent variable? Options are \code{'growth'} and \code{'time'}.}
 
-\item{norm_fl}{(Logical) use normalized (to density) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}}
+\item{norm_fl}{(Logical) use normalized (to growth) fluorescence data in fits. Has an effect only when \code{x_type = 'time'}}
 
 \item{t0}{(Numeric) Minimum time value considered for linear and spline fits (if \code{x_type = 'time'}).}
 
 \item{tmax}{(Numeric) Maximum time value considered for linear and spline fits (if \code{x_type = 'time'})..}
 
-\item{min.density}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).}
+\item{min.growth}{(Numeric) Indicate whether only values above a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'growth'}).}
 
-\item{max.density}{(Numeric) Indicate whether only density values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'density'}).}
+\item{max.growth}{(Numeric) Indicate whether only growth values below a certain threshold should be considered for linear regressions or spline fits (if \code{x_type = 'growth'}).}
 
 \item{log.x.lin}{(Logical) Indicates whether \emph{ln(x+1)} should be applied to the independent variable for \emph{linear} fits. Default: \code{FALSE}.}
 
@@ -94,7 +94,7 @@ fl.workflow(
 
 \item{lin.RSD}{(Numeric) Relative standard deviation (RSD) threshold for the calculated slope in \code{\link{flFitLinear}}.}
 
-\item{lin.dY}{(Numeric) Threshold for the minimum fraction of density increase a linear regression window should cover. Default: 0.05 (5\%).}
+\item{lin.dY}{(Numeric) Threshold for the minimum fraction of growth increase a linear regression window should cover. Default: 0.05 (5\%).}
 
 \item{biphasic}{(Logical) Shall \code{\link{flFitLinear}} and \code{\link{flFitSpline}} try to extract fluorescence parameters for two different phases (as observed with, e.g., regulator-promoter systems with varying response in different growth stages) (\code{TRUE}) or not (\code{FALSE})?}
 
@@ -118,7 +118,7 @@ fl.workflow(
 
 \item{smooth.fl}{(Numeric) Parameter describing the smoothness of the spline fit; usually (not necessary) within (0;1]. \code{smooth.gc=NULL} causes the program to query an optimal value via cross validation techniques. Especially for datasets with few data points the option \code{NULL} might cause a too small smoothing parameter. This can result a too tight fit that is susceptible to measurement errors (thus overestimating slopes) or produce an error in \code{\link{smooth.spline}} or lead to overfitting. The usage of a fixed value is recommended for reproducible results across samples. See \code{\link{smooth.spline}} for further details. Default: \code{0.55}}
 
-\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any density value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start density, further computations are performed. Else, a message is returned.}
+\item{growth.thresh}{(Numeric) Define a threshold for growth. Only if any growth value in a sample is greater than \code{growth.thresh} (default: 1.5) times the start growth, further computations are performed. Else, a message is returned.}
 
 \item{suppress.messages}{(Logical) Indicates whether messages (information about current fluorescence curve, EC50 values etc.) should be displayed (\code{FALSE}) or not (\code{TRUE}). This option is meant to speed up the high-throughput processing data. Note: warnings are still displayed. Default: \code{FALSE}.}
 
@@ -154,9 +154,9 @@ A \code{flFitRes} object that contains all computation results, compatible with 
 }
 \examples{
 # load example dataset
-input <- read_data(data.density = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   sheet.density = 1,
+                   sheet.growth = 1,
                    sheet.fl = 2 )
 
 # Run workflow

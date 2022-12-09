@@ -4,17 +4,17 @@
 \alias{parse_Gen5Gen6_shiny}
 \title{Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.}
 \usage{
-parse_Gen5Gen6_shiny(data, density.nm, fl.nm, fl2.nm)
+parse_Gen5Gen6_shiny(data, growth.nm, fl.nm, fl2.nm)
 }
 \arguments{
 \item{data}{A dataframe created by reading a table file with \code{\link{read_file}}}
 
-\item{density.nm}{Name of read corresponding to growth rate}
+\item{growth.nm}{Name of read corresponding to growth rate}
 
 \item{fl.nm}{Name of read corresponding to fluorescence data}
 }
 \value{
-a list of length two containing density and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
+a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
 }
 \description{
 Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.
