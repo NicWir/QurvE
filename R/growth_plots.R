@@ -4437,15 +4437,12 @@ plot.grid <- function(x,
   exclude.conc <- as.numeric(exclude.conc)
 
   # Get name of conditions with multiple replicates; apply selecting arguments
-  sample.nm <- nm <- if (methods::is(object) == "object") {
-    if(methods::is(object) == "grofit"){
+  sample.nm <- nm <- if(methods::is(object) == "grofit"){
       as.character(names(object$gcFit$gcFittedSplines))
     } else {
       as.character(names(object$flFit$flFittedSplines))
     }
-  } else {
-    as.character(object$expdesign$label)
-  }
+
   if(!is.null(IDs)){
     # Check if IDs refer to samples or conditions
 

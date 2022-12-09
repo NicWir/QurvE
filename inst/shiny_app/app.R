@@ -4549,7 +4549,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    ) # fluidRow
                                                                  ) # mainPanel
                                                         ), #  tabPanel(title = "Parameter plots"
-                                                        ### Growth Grid Plots ####
+                                                        ### Fluorescence Grid Plots ####
 
                                                         tabPanel(title = "Plot Grid",
                                                                  sidebarPanel(
@@ -4695,7 +4695,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    textInput(inputId = "x_axis_title_fluorescence_grid_plot",
                                                                              label = "x-axis title",
-                                                                             value = "Time"
+                                                                             value = ""
                                                                    ),
 
                                                                    sliderInput(inputId = "nbreaks_fluorescence_grid_plot",
@@ -12211,6 +12211,26 @@ server <- function(input, output, session){
                             selected = FALSE)
       })
 
+      selected_inputs_fluorescence_grid_plot_data_type <- reactive({
+        results <- results$fluorescence
+        selection <- c()
+        if(length(results$data$fluorescence) > 1){
+          selection <- c(selection, "Raw fluorescence" = "raw")
+        }
+        if(length(results$data$norm.fluorescence) > 1){
+          selection <- c(selection, "Normalized FL" = "norm.fl")
+        }
+        if(length(results$data$fluorescence) > 1 && "s" %in% results$control$fit.opt){
+          selection <- c(selection, "Spline fits FL" = "spline")
+        }
+        selection
+      })
+
+      observe({
+        updateSelectInput(inputId = "data_type_fluorescence_grid_plot",
+                          choices = selected_inputs_fluorescence_grid_plot_data_type())
+      })
+
       selected_inputs_parameter_fluorescence_grid_plot <- reactive({
         results <- results$fluorescence
         gc_parameters <- c()
@@ -12278,11 +12298,21 @@ server <- function(input, output, session){
       })
 
       fluorescence_grid_plot <- reactive({
+
         results <- results$fluorescence
+
         if(input$y_axis_title_fluorescence_grid_plot == "")
           y_axis_title <- NULL
         else
           y_axis_title <- input$y_axis_title_fluorescence_grid_plot
+
+        if(input$x_axis_title_fluorescence_grid_plot == "")
+          x_axis_title <- NULL
+        else
+          x_axis_title <- input$x_axis_title_fluorescence_grid_plot
+
+        browser()
+
         if(input$select_string_visualize_fluorescence_grid){
           suppressWarnings(
             plot.grid(results,
@@ -12298,7 +12328,7 @@ server <- function(input, output, session){
                       x.lim = c(input$x_range_min_fluorescence_grid_plot, input$x_range_max_fluorescence_grid_plot),
                       y.lim = c(input$y_range_min_fluorescence_grid_plot,input$y_range_max_fluorescence_grid_plot),
                       y.title = y_axis_title,
-                      x.title = input$x_axis_title_fluorescence_grid_plot,
+                      x.title = x_axis_title,
                       n.ybreaks = input$nbreaks_fluorescence_grid_plot,
                       lwd = input$line_width_fluorescence_grid_plot,
                       basesize = input$base_size_fluorescence_grid_plot,
@@ -12329,7 +12359,7 @@ server <- function(input, output, session){
                       x.lim = c(input$x_range_min_fluorescence_grid_plot, input$x_range_max_fluorescence_grid_plot),
                       y.lim = c(input$y_range_min_fluorescence_grid_plot,input$y_range_max_fluorescence_grid_plot),
                       y.title = y_axis_title,
-                      x.title = input$x_axis_title_fluorescence_grid_plot,
+                      x.title = x_axis_title,
                       n.ybreaks = input$nbreaks_fluorescence_grid_plot,
                       lwd = input$line_width_fluorescence_grid_plot,
                       basesize = input$base_size_fluorescence_grid_plot,
