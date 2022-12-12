@@ -335,7 +335,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         ),
 
                                                         conditionalPanel(
-                                                          condition = 'output.growthfileUploaded || output.fluorescencefileUploaded || output.fluorescencefileUploaded',
+                                                          condition = 'output.growthfileUploaded || output.fluorescencefileUploaded',
                                                           fluidRow(
                                                             column(12,
                                                                    div(
@@ -639,7 +639,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                    tabPanel(title = "Growth", value = "tabPanel_custom_tables_growth_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("growth_data_custom_processed")
-                                                            )
+                                                            ),
+                                                            downloadButton('download_custom_tables_growth_processed',"Download table")
                                                    ),
                                                    # tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence",
                                                    #          withSpinner(
@@ -649,12 +650,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                    tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("custom_table_fluorescence_processed")
-                                                            )
+                                                            ),
+                                                            downloadButton('download_custom_tables_fluorescence_processed',"Download table")
                                                    ),
-                                                   tabPanel(title = "normalized Fluorescence", value = "tabPanel_custom_tables_norm_fluorescence_processed",
+                                                   tabPanel(title = "Normalized fluorescence", value = "tabPanel_custom_tables_norm_fluorescence_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("custom_table_norm_fluorescence_processed")
-                                                            )
+                                                            ),
+                                                            downloadButton('download_custom_table_norm_fluorescence_processed',"Download table")
                                                    ),
                                                    # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
                                                    #          withSpinner(
@@ -662,8 +665,9 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                    #          )
                                                    # ),
                                                    tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
-                                                            DT::dataTableOutput('custom_data_table_expdesign')
-                                                   )
+                                                            DT::dataTableOutput('custom_data_table_expdesign'),
+                                                            downloadButton('download_custom_tables_expdesign',"Download table")
+                                                   ),
 
                                        )
                                    ),
@@ -684,17 +688,33 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                             )
                                                    ),
+                                                   tabPanel(title = "norm. Fluorescence plot", value = "tabPanel_parsed_plots_norm_fluorescence",
+                                                            withSpinner(
+                                                              plotOutput("parsed_raw_norm_fluorescence_plot",
+                                                                         width = "100%", height = "1000px"),
+
+                                                            )
+                                                   ),
                                                    tabPanel(title = "Growth", value = "tabPanel_parsed_tables_growth",
-                                                            DT::dataTableOutput('parsed_data_table_growth')
+                                                            DT::dataTableOutput('parsed_data_table_growth'),
+                                                            downloadButton('download_parsed_tables_growth',"Download table")
                                                    ),
                                                    tabPanel(title = "Fluorescence", value = "tabPanel_parsed_tables_fluorescence",
-                                                            DT::dataTableOutput('parsed_data_table_fluorescence')
+                                                            DT::dataTableOutput('parsed_data_table_fluorescence'),
+                                                            downloadButton('download_parsed_tables_fluorescence',"Download table")
+                                                   ),
+                                                   tabPanel(title = "Normalized fluorescence", value = "tabPanel_parsed_tables_norm_fluorescence",
+                                                            withSpinner(
+                                                              DT::dataTableOutput("parsed_data_table_norm_fluorescence")
+                                                            ),
+                                                            downloadButton('download_tabPanel_parsed_tables_norm_fluorescence',"Download table")
                                                    ),
                                                    # tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
                                                    #          DT::dataTableOutput('parsed_data_table_fluorescence2')
                                                    # ),
                                                    tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
-                                                            DT::dataTableOutput('parsed_data_table_expdesign')
+                                                            DT::dataTableOutput('parsed_data_table_expdesign'),
+                                                            downloadButton('download_parsed_tables_expdesign',"Download table")
                                                    )
                                        )
                                    )
@@ -6455,6 +6475,7 @@ server <- function(input, output, session){
 
     hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_expdesign")
 
+
     shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
 
     results$df_random_data <- data.frame("time" = c("time", "","", results$custom_data$time[1,]),
@@ -6496,7 +6517,7 @@ server <- function(input, output, session){
       results$parsed_data <- NULL
       hide("parsed_reads_growth")
       hide("parsed_reads_fluorescence")
-      hide("parsed_reads_norm_fluorescence2")
+      hide("parsed_reads_norm_fluorescence")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_growth")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_growth")
 
@@ -6549,6 +6570,13 @@ server <- function(input, output, session){
     } else {
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
+    }
+    if(exists("parsed_data_table_norm_fluorescence") && !is.null(parsed_data_table_norm_fluorescence()) ){
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_custom_tables_norm_fluorescence_processed", select = TRUE)
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_norm_fluorescence", select = FALSE)
+    } else {
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_custom_tables_norm_fluorescence_processed")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_norm_fluorescence")
     }
   })
 
@@ -6942,6 +6970,25 @@ server <- function(input, output, session){
                            escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_fluorescence())-3)))
 
   })
+
+  # render processed normalized fluorescence table
+  parsed_data_table_norm_fluorescence <- reactive({
+    if(is.null(results$parsed_data) || length(results$parsed_data$norm.fluorescence)<2) return(NULL)
+
+    table_fl <- t(results$parsed_data$norm.fluorescence)
+    table_fl[-(1:3), ] <- apply(apply(table_fl[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
+    rownames(table_fl)[-(1:3)] <- ""
+    table_fl <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
+                      table_fl)
+    table_fl
+  })
+
+  output$parsed_data_table_norm_fluorescence <- DT::renderDT({
+    DT::datatable(parsed_data_table_norm_fluorescence(),
+                  options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
+                  escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_norm_fluorescence()())-3)))
+
+  })
   # output$parsed_data_table_fluorescence2 <- DT::renderDT({
   #
   #   if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence2)<2) return(NULL)
@@ -7022,6 +7069,112 @@ server <- function(input, output, session){
     }
   })
 
+  parsed_raw_norm_fluorescence_plot <- reactive({
+    if(is.null(results$parsed_data) || length(results$parsed_data$norm.fluorescence) < 2) return(NULL)
+
+    try(
+      suppressWarnings(
+        plot.grodata(x = results$parsed_data,
+                     data.type = "norm.fl",
+                     IDs = NULL
+        )
+      )
+    )
+  })
+
+  output$parsed_raw_norm_fluorescence_plot <- renderPlot({
+    custom_raw_norm_fluorescence_plot()
+  })
+
+    ##__Table_download____####
+  output$download_custom_tables_growth_processed <- downloadHandler(
+    filename = function() {
+      paste("custom_growth_data", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- growth_data_custom_processed()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_custom_table_fluorescence_processed <- downloadHandler(
+    filename = function() {
+      paste("custom_fluorescence_data", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- custom_table_fluorescence_processed()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_custom_tables_fluorescence_processed <- downloadHandler(
+    filename = function() {
+      paste("custom_fluorescence_data", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- custom_table_norm_fluorescence_processed()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_custom_tables_expdesign <- downloadHandler(
+    filename = function() {
+      paste("custom_expdesign", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- custom_data_table_expdesign()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_parsed_tables_growth <- downloadHandler(
+    filename = function() {
+      paste("parsed_growth_data", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- parsed_data_table_growth()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_parsed_tables_fluorescence <- downloadHandler(
+    filename = function() {
+      paste("parsed_fluorescence_data", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- parsed_data_table_fluorescence()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_parsed_tables_norm_fluorescence <- downloadHandler(
+    filename = function() {
+      paste("parsed_norm_fluorescence_data", ".csv", sep="")
+    },
+    content = function(file) {
+      table <- parsed_data_table_norm_fluorescence()
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
+
+  output$download_parsed_tables_expdesign <- downloadHandler(
+    filename = function() {
+      paste("parsed_expdesign", ".csv", sep="")
+    },
+    content = function(file) {
+      if(is.null(results$parsed_data) || length(results$parsed_data$expdesign)<2) return(NULL)
+      table <- results$parsed_data$expdesign
+      colnames(table) <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table))))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    }
+  )
   # Computation ####
     ##____Growth____#####
   hide("run_growth")

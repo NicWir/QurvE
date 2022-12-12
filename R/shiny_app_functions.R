@@ -896,7 +896,7 @@ write.csv.utf8.BOM <- function(df, filename)
     for (i in 1:ncol(df))
       df[,i] = iconv(df[,i], to = "UTF-8")
     writeChar(iconv("\ufeff", to = "UTF-8"), con, eos = NULL)
-    utils::write.csv(df, file = con)
+    utils::write.csv(df, file = con, na = "", row.names = FALSE)
   },finally = {close(con)})
 }
 
