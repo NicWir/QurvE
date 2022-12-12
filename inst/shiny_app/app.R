@@ -657,7 +657,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             withSpinner(
                                                               DT::dataTableOutput("custom_table_norm_fluorescence_processed")
                                                             ),
-                                                            downloadButton('download_custom_table_norm_fluorescence_processed',"Download table")
+                                                            downloadButton('download_custom_tables_norm_fluorescence_processed',"Download table")
                                                    ),
                                                    # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
                                                    #          withSpinner(
@@ -707,7 +707,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             withSpinner(
                                                               DT::dataTableOutput("parsed_data_table_norm_fluorescence")
                                                             ),
-                                                            downloadButton('download_tabPanel_parsed_tables_norm_fluorescence',"Download table")
+                                                            downloadButton('download_parsed_data_table_norm_fluorescence',"Download table")
                                                    ),
                                                    # tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
                                                    #          DT::dataTableOutput('parsed_data_table_fluorescence2')
@@ -778,7 +778,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        numberInput(
                                                                          inputId = 'minimum_growth_growth',
-                                                                         label = 'Minimum growth meas.',
+                                                                         label = 'Minimum growth measurement',
                                                                          value = 0,
                                                                          min = NA,
                                                                          max = NA,
@@ -788,12 +788,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        numberInput(
                                                                          inputId = 'maximum_growth_growth',
-                                                                         label = 'Maximum growth meas.',
+                                                                         label = 'Maximum growth measurement',
                                                                          value = NULL,
                                                                          min = NA,
                                                                          max = NA
                                                                        ),
-                                                                       bsPopover(id = "maximum_growth_growth", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth meas.] for linear and spline fits."),
+                                                                       bsPopover(id = "maximum_growth_growth", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth measurement] for linear and spline fits."),
 
 
                                                                        numberInput(
@@ -946,7 +946,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                min = NA,
                                                                max = NA,
                                                              ),
-                                                             bsPopover(id = "custom_sliding_window_size_value_growth", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum growth meas.)."),
+                                                             bsPopover(id = "custom_sliding_window_size_value_growth", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum growth measurement)."),
                                                            ),
                                                            fluidRow(
                                                              column(12,
@@ -1151,20 +1151,20 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          condition = 'input.data_type_x_fluorescence.includes("growth")',
                                                                          numberInput(
                                                                            inputId = 'minimum_growth_fluorescence',
-                                                                           label = 'Minimum growth meas.',
+                                                                           label = 'Minimum growth measurement',
                                                                            value = 0,
                                                                            min = NA,
                                                                            max = NA,
                                                                            placeholder = 0
                                                                          ),
-                                                                         bsPopover(id = "minimum_growth_fluorescence", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth meas.] for the fits."),
+                                                                         bsPopover(id = "minimum_growth_fluorescence", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth measurement] for the fits."),
                                                                        ),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("growth")',
                                                                          numberInput(
                                                                            inputId = 'maximum_growth_fluorescence',
-                                                                           label = 'Maximum growth meas.',
+                                                                           label = 'Maximum growth measurement',
                                                                            value = NULL,
                                                                            min = NA,
                                                                            max = NA
@@ -1737,7 +1737,18 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                  selected = ".png",
                                                                                                  inline = TRUE)
                                                                              ) # column
-                                                                           ) # fluidRow
+                                                                           ), # fluidRow
+
+                                                                           h3(strong("Export spline values")),
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_growth_validate_spline_values',"Download value table (x-y)")
+                                                                             ),
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_growth_validate_spline_deriv_values',"Download derivative value table (x-y)")
+                                                                             ),
+                                                                           )
+
                                                                  ) # mainPanel
 
                                                         ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Growth_splineFits",
@@ -2324,7 +2335,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                  selected = ".png",
                                                                                                  inline = TRUE)
                                                                              ) # column
-                                                                           ) # fluidRow
+                                                                           ), # fluidRow
+                                                                           h3(strong("Export spline values")),
+                                                                           fluidRow(
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_fluorescence_validate_spline_values',"Download value table (x-y)")
+                                                                             ),
+                                                                             column(width = 4,
+                                                                                    downloadButton('download_fluorescence_validate_spline_deriv_values',"Download derivative value table (x-y)")
+                                                                             ),
+                                                                           )
                                                                  ) # mainPanel
                                                         ), # tabPanel(title = "Nonparametric fits", value = "tabPanel_Validate_Fluorescence_splineFits",
 
@@ -5557,8 +5577,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                       ) #  navbarPage
                     ) # div(
                   ) # hidden(
-                ), # tagList(
-                verbatimTextOutput("debug")
+                ) # tagList(
 )
 
 #____SERVER____####
@@ -6572,10 +6591,10 @@ server <- function(input, output, session){
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
     }
     if(exists("parsed_data_table_norm_fluorescence") && !is.null(parsed_data_table_norm_fluorescence()) ){
-      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_custom_tables_norm_fluorescence_processed", select = TRUE)
+      showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_norm_fluorescence", select = TRUE)
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_norm_fluorescence", select = FALSE)
     } else {
-      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_custom_tables_norm_fluorescence_processed")
+      hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_norm_fluorescence")
       hideTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_norm_fluorescence")
     }
   })
@@ -6986,7 +7005,7 @@ server <- function(input, output, session){
   output$parsed_data_table_norm_fluorescence <- DT::renderDT({
     DT::datatable(parsed_data_table_norm_fluorescence(),
                   options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-                  escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_norm_fluorescence()())-3)))
+                  escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_norm_fluorescence())-3)))
 
   })
   # output$parsed_data_table_fluorescence2 <- DT::renderDT({
@@ -7005,17 +7024,17 @@ server <- function(input, output, session){
   #
   #   table_fl2
   # })
-  output$parsed_data_table_expdesign <- DT::renderDT({
-
+  parsed_data_table_expdesign <- reactive({
     if(is.null(results$parsed_data) || length(results$parsed_data$expdesign)<2) return(NULL)
-
     expdesign <- results$parsed_data$expdesign
+    expdesign
+  })
 
-    expdesign <- DT::datatable(expdesign,
+  output$parsed_data_table_expdesign <- DT::renderDT({
+    expdesign <- parsed_data_table_expdesign()
+    DT::datatable(expdesign,
                            options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
                            escape = FALSE, rownames = T)
-
-    expdesign
   })
 
   parsed_raw_growth_plot <- reactive({
@@ -7071,7 +7090,6 @@ server <- function(input, output, session){
 
   parsed_raw_norm_fluorescence_plot <- reactive({
     if(is.null(results$parsed_data) || length(results$parsed_data$norm.fluorescence) < 2) return(NULL)
-
     try(
       suppressWarnings(
         plot.grodata(x = results$parsed_data,
@@ -7083,7 +7101,7 @@ server <- function(input, output, session){
   })
 
   output$parsed_raw_norm_fluorescence_plot <- renderPlot({
-    custom_raw_norm_fluorescence_plot()
+    parsed_raw_norm_fluorescence_plot()
   })
 
     ##__Table_download____####
@@ -7098,7 +7116,7 @@ server <- function(input, output, session){
     }
   )
 
-  output$download_custom_table_fluorescence_processed <- downloadHandler(
+  output$download_custom_tables_fluorescence_processed <- downloadHandler(
     filename = function() {
       paste("custom_fluorescence_data", ".csv", sep="")
     },
@@ -7109,9 +7127,9 @@ server <- function(input, output, session){
     }
   )
 
-  output$download_custom_tables_fluorescence_processed <- downloadHandler(
+  output$download_custom_tables_norm_fluorescence_processed <- downloadHandler(
     filename = function() {
-      paste("custom_fluorescence_data", ".csv", sep="")
+      paste("custom_norm_fluorescence_data", ".csv", sep="")
     },
     content = function(file) {
       table <- custom_table_norm_fluorescence_processed()
@@ -7153,7 +7171,7 @@ server <- function(input, output, session){
     }
   )
 
-  output$download_parsed_tables_norm_fluorescence <- downloadHandler(
+  output$download_parsed_data_table_norm_fluorescence <- downloadHandler(
     filename = function() {
       paste("parsed_norm_fluorescence_data", ".csv", sep="")
     },
@@ -8415,8 +8433,8 @@ server <- function(input, output, session){
         checkboxInput('log.y.lin.rerun', 'log-transform growth values', value = results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$log.y.lin),
         textInput('t0.lin.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$t0)),
         textInput('tmax.lin.rerun', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$tmax)),
-        textInput('min.growth.lin.rerun', 'Minimum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.growth)),
-        textInput('max.growth.lin.rerun', 'Maximum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$max.growth)),
+        textInput('min.growth.lin.rerun', 'Minimum growth measurement', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$min.growth)),
+        textInput('max.growth.lin.rerun', 'Maximum growth measurement', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$control$max.growth)),
         textAreaInput('quota.rerun', 'Quota', placeholder = HTML(paste0("previously: ", results$growth$gcFit$gcFittedLinear[[selected_vals_validate_growth$sample_validate_growth_linear]]$quota,
                                                                         "\n",
                                                                         "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
@@ -8731,8 +8749,8 @@ server <- function(input, output, session){
         tags$h2('Please enter adjusted parameters'),
         textInput('t0.spline.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$t0)),
         textInput('tmax.spline.rerun', 'Maximum time (tmax)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$tmax)),
-        textInput('min.growth.spline.rerun', 'Minimum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$min.growth)),
-        textInput('max.growth.spline.rerun', 'Maximum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$max.growth)),
+        textInput('min.growth.spline.rerun', 'Minimum growth measurement', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$min.growth)),
+        textInput('max.growth.spline.rerun', 'Maximum growth measurement', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$max.growth)),
         textInput('smooth.gc.rerun', 'Smoothing factor', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedSplines[[selected_vals_validate_growth$sample_validate_growth_spline]]$control$smooth.gc)),
         footer=tagList(
           fluidRow(
@@ -8886,6 +8904,72 @@ server <- function(input, output, session){
 
   )
 
+  output$download_growth_validate_spline_values <- downloadHandler(
+    filename = function() {
+      paste("values_spline_fit_",  gsub(" \\| ", "_", selected_vals_validate_growth$sample_validate_growth_spline), ".csv", sep="")
+    },
+    content = function(file) {
+      results <- results$growth
+      if(length(results$gcFit$gcFittedSplines[[ifelse(
+        selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
+        selected_vals_validate_growth$sample_validate_growth_spline == "" ||
+        is.null(selected_vals_validate_growth$sample_validate_growth_spline),
+        1,
+        selected_vals_validate_growth$sample_validate_growth_spline
+      )]]) > 1) {
+        try(p <-
+              suppressWarnings(
+                plot.gcFitSpline(
+                  results$gcFit$gcFittedSplines[[ifelse(
+                    selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
+                      is.null(
+                        selected_vals_validate_growth$sample_validate_growth_spline
+                      ),
+                    1,
+                    selected_vals_validate_growth$sample_validate_growth_spline
+                  )]],
+                  export = FALSE,
+                  plot = FALSE,
+                  log.y = F,
+                  deriv = F
+                )
+              ))
+      }
+      table <- data.frame("x" = as.numeric(p$data$fit.time), "y" = as.numeric(p$data$fit.data))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    },
+    contentType = ".csv"
+  )
+
+  output$download_growth_validate_spline_deriv_values <- downloadHandler(
+    filename = function() {
+      paste("values_spline_fit_derivative_",  gsub(" \\| ", "_", selected_vals_validate_growth$sample_validate_growth_spline), ".csv", sep="")
+    },
+    content = function(file) {
+      results <- results$growth
+      if (length(results$gcFit$gcFittedSplines[[ifelse(
+        selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
+        selected_vals_validate_growth$sample_validate_growth_spline == "" ||
+        is.null(
+          selected_vals_validate_growth$sample_validate_growth_spline
+        ),
+        1,
+        selected_vals_validate_growth$sample_validate_growth_spline
+      )]]) > 1) {
+        table <-  as.data.frame(results$gcFit$gcFittedSplines[[ifelse(
+          selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
+            is.null(
+              selected_vals_validate_growth$sample_validate_growth_spline
+            ),
+          1,
+          selected_vals_validate_growth$sample_validate_growth_spline
+        )]]$spline.deriv1)
+      }
+      QurvE:::write.csv.utf8.BOM(table, file)
+    },
+    contentType = ".csv"
+  )
+
       ### Model Fits ####
   selected_inputs_validate_growth_model_sample <- reactive({
     results <- results$growth
@@ -8937,7 +9021,7 @@ server <- function(input, output, session){
       modalDialog(
         tags$h2('Please enter adjusted parameters'),
         textInput('t0.model.rerun', 'Minimum time (t0)', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$t0)),
-        textInput('min.growth.model.rerun', 'Minimum growth meas.', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$min.growth)),
+        textInput('min.growth.model.rerun', 'Minimum growth measurement', placeholder = paste0("previously: ", results$growth$gcFit$gcFittedModels[[selected_vals_validate_growth$sample_validate_growth_model]]$control$min.growth)),
         wellPanel(
           h4(strong('Models:')),
           style='padding: 1; padding-top: 0; padding-bottom: 0',
@@ -9478,8 +9562,8 @@ server <- function(input, output, session){
       showModal(
         modalDialog(
           tags$h2('Please enter adjusted parameters'),
-          textInput('min.growth.lin.rerun.fluorescence', 'Minimum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.growth)),
-          textInput('max.growth.lin.rerun.fluorescence', 'Maximum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$max.growth)),
+          textInput('min.growth.lin.rerun.fluorescence', 'Minimum growth measurement', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$min.growth)),
+          textInput('max.growth.lin.rerun.fluorescence', 'Maximum growth measurement', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$control$max.growth)),
           textAreaInput('quota.rerun.fluorescence', 'Quota', placeholder = HTML(paste0("previously: ", results$fluorescence$flFit$flFittedLinear[[selected_vals_validate_fluorescence$sample_validate_fluorescence_linear]]$quota,
                                                                                        "\n",
                                                                                        "include regression windows with slope = ", expression(µ[max]), " * quota into the final linear fit."))),
@@ -9820,8 +9904,8 @@ server <- function(input, output, session){
       showModal(
         modalDialog(
           tags$h2('Please enter adjusted parameters'),
-          textInput('min.growth.spline.rerun.fluorescence', 'Minimum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.growth)),
-          textInput('max.growth.spline.rerun.fluorescence', 'Maximum growth meas.', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$max.growth)),
+          textInput('min.growth.spline.rerun.fluorescence', 'Minimum growth measurement', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$min.growth)),
+          textInput('max.growth.spline.rerun.fluorescence', 'Maximum growth measurement', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$max.growth)),
           textInput('smooth.fl.rerun.fluorescence', 'Smoothing factor', placeholder = paste0("previously: ", results$fluorescence$flFit$flFittedSplines[[selected_vals_validate_fluorescence$sample_validate_fluorescence_spline]]$control$smooth.fl)),
           footer=tagList(
             fluidRow(
@@ -9990,6 +10074,56 @@ server <- function(input, output, session){
     },
     contentType = ifelse(input$format_download_fluorescence_validate_spline == ".pdf", "image/pdf", "image/png")
 
+  )
+
+  output$download_fluorescence_validate_spline_values <- downloadHandler(
+    filename = function() {
+      paste("values_spline_fit_",  gsub(" \\| ", "_", selected_vals_validate_fluorescence$sample_validate_fluorescence_spline), ".csv", sep="")
+    },
+    content = function(file) {
+      results <- results$fluorescence
+      if(length(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+                                                      is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                      1,
+                                                      input$sample_validate_fluorescence_spline)]]) > 1) {
+        try(p <-
+              suppressWarnings(
+                plot.flFitSpline(
+                  results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+                                                          is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                        1,
+                                                        input$sample_validate_fluorescence_spline)]],
+                  export = FALSE,
+                  plot = FALSE,
+                  log.y = F,
+                  deriv = F
+                )
+              ))
+      }
+      table <- data.frame("x" = as.numeric(p$data$fit.x), "y" = as.numeric(p$data$fit.fl))
+      QurvE:::write.csv.utf8.BOM(table, file)
+    },
+    contentType = ".csv"
+  )
+
+  output$download_fluorescence_validate_spline_deriv_values <- downloadHandler(
+    filename = function() {
+      paste("values_spline_fit_derivative_",  gsub(" \\| ", "_", selected_vals_validate_fluorescence$sample_validate_fluorescence_spline), ".csv", sep="")
+    },
+    content = function(file) {
+      results <- results$fluorescence
+      if (length(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+                                                       is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                       1,
+                                                       input$sample_validate_fluorescence_spline)]]) > 1) {
+        table <-  as.data.frame(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
+                                                                        is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline),
+                                                                      1,
+                                                                      input$sample_validate_fluorescence_spline)]]$spline.deriv1)
+      }
+      QurvE:::write.csv.utf8.BOM(table, file)
+    },
+    contentType = ".csv"
   )
 
       ### Spline Fits BT ####
@@ -11111,16 +11245,16 @@ server <- function(input, output, session){
                            "Doubling time (Spline)" = "tD.spline",
                            "Doubling time phase 2 (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum growth meas. (Spline)' = 'A.spline',
-                           'ΔGrowth meas. (Spline)' = 'dY.spline',
+                           'Maximum growth measurement (Spline)' = 'A.spline',
+                           'ΔGrowth measurement (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (Spline)' = 'mu.spline',
                            "Doubling time (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum growth meas. (Spline)' = 'A.spline',
-                           'ΔGrowth meas. (Spline)' = 'dY.spline',
+                           'Maximum growth measurement (Spline)' = 'A.spline',
+                           'ΔGrowth measurement (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       }
     }
@@ -11132,15 +11266,15 @@ server <- function(input, output, session){
                            "Doubling time (linear fit)" = "tD.linfit",
                            "Doubling time phase 2 (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum growth meas. (linear fit)' = 'A.linfit',
-                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
+                           'Maximum growth measurement (linear fit)' = 'A.linfit',
+                           'ΔGrowth measurement (linear fit)' = 'dY.linfit')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (linear fit)' = 'mu.linfit',
                            "Doubling time (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum growth meas. (linear fit)' = 'A.linfit',
-                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
+                           'Maximum growth measurement (linear fit)' = 'A.linfit',
+                           'ΔGrowth measurement (linear fit)' = 'dY.linfit')
       }
     }
     if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
@@ -11148,7 +11282,7 @@ server <- function(input, output, session){
                          'Growth rate (model)' = 'mu.model',
                          'Doubling time (model)' = 'tD.model',
                          'Lag time (model)' = 'lambda.model',
-                         'Maximum growth meas. (model)' = 'A.model')
+                         'Maximum growth measurement (model)' = 'A.model')
     }
     gc_parameters
   })
@@ -11223,16 +11357,16 @@ server <- function(input, output, session){
                            "Doubling time (Spline)" = "tD.spline",
                            "Doubling time phase 2 (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum growth meas. (Spline)' = 'A.spline',
-                           'ΔGrowth meas. (Spline)' = 'dY.spline',
+                           'Maximum growth measurement (Spline)' = 'A.spline',
+                           'ΔGrowth measurement (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (Spline)' = 'mu.spline',
                            "Doubling time (Spline)" = "tD.spline",
                            'Lag time (Spline)' = 'lambda.spline',
-                           'Maximum growth meas. (Spline)' = 'A.spline',
-                           'ΔGrowth meas. (Spline)' = 'dY.spline',
+                           'Maximum growth measurement (Spline)' = 'A.spline',
+                           'ΔGrowth measurement (Spline)' = 'dY.spline',
                            'Area under the curve (Spline)' = 'integral.spline')
       }
     }
@@ -11244,15 +11378,15 @@ server <- function(input, output, session){
                            "Doubling time (linear fit)" = "tD.linfit",
                            "Doubling time phase 2 (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum growth meas. (linear fit)' = 'A.linfit',
-                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
+                           'Maximum growth measurement (linear fit)' = 'A.linfit',
+                           'ΔGrowth measurement (linear fit)' = 'dY.linfit')
       } else {
         gc_parameters <- c(gc_parameters,
                            'Growth rate (linear fit)' = 'mu.linfit',
                            "Doubling time (linear fit)" = "tD.linfit",
                            'Lag time (linear fit)' = 'lambda.linfit',
-                           'Maximum growth meas. (linear fit)' = 'A.linfit',
-                           'ΔGrowth meas. (linear fit)' = 'dY.linfit')
+                           'Maximum growth measurement (linear fit)' = 'A.linfit',
+                           'ΔGrowth measurement (linear fit)' = 'dY.linfit')
       }
     }
     if("m" %in% results$control$fit.opt || "a" %in% results$control$fit.opt){
@@ -11260,7 +11394,7 @@ server <- function(input, output, session){
                          'Growth rate (model)' = 'mu.model',
                          'Doubling time (model)' = 'tD.model',
                          'Lag time (model)' = 'lambda.model',
-                         'Maximum growth meas. (model)' = 'A.model')
+                         'Maximum growth measurement (model)' = 'A.model')
     }
     gc_parameters
   })
