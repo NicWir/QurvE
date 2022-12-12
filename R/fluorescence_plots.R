@@ -671,8 +671,8 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
           if(flFitSpline$control$log.y.spline){
             p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
-                                      xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                      yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                      xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
+                                      yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
           }
           else {
@@ -730,13 +730,13 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
 
             if(flFitSpline$control$log.y.spline){
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
-                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
                                     data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
-                                        xend = .data$time[which.min(abs(.data$y - 1.1*p.yrange.end))],
-                                        yend = .data$y[which.min(abs(.data$y - 1.1*p.yrange.end))]),
+                                        xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
+                                        yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
                                     data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
             }
             else {
