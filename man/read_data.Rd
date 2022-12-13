@@ -21,12 +21,14 @@ read_data(
   fl.normtype = c("growth", "fl2"),
   subtract.blank = T,
   convert.time = NULL,
-  calibration = NULL
+  calib.growth = NULL,
+  calib.fl = NULL,
+  calib.fl2 = NULL
 )
 }
 \arguments{
 \item{data.growth}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data.
-In column format, the first three table rows contain
+The first three table rows contain
 \enumerate{
 \item sample description
 \item replicate number (\emph{optional}: followed by a letter to indicate technical replicates)
@@ -35,7 +37,7 @@ In column format, the first three table rows contain
 
 \item{data.fl}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.growth}.}
 
-\item{data.fl2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence2 data (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.growth}.}
+\item{data.fl2}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing measurements from a second fluorescence channel (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.growth}.}
 
 \item{data.format}{(Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}}
 
@@ -43,28 +45,20 @@ In column format, the first three table rows contain
 
 \item{dec}{(Character) decimal separator used in CSV, TSV or TXT file storing growth data. Default: \code{"."}}
 
-\item{csvsep.fl}{(Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}}
+\item{csvsep.fl, csvsep.fl2}{(Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}}
 
-\item{dec.fl}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}}
+\item{dec.fl, dec.fl2}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence data. Default: \code{"."}}
 
-\item{csvsep.fl2}{(Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}}
-
-\item{dec.fl2}{(Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}}
-
-\item{sheet.growth}{(Numeric or Character) Number or name of the sheet with growth data in XLS or XLSX files (\emph{optional}).}
-
-\item{sheet.fl}{(Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (\emph{optional}).}
-
-\item{sheet.fl2}{(Numeric or Character) Number or name of the sheet with fluorescence2 data (used for normalization of fluorescence data) in XLS or XLSX files (\emph{optional}).}
+\item{sheet.growth, sheet.fl, sheet.fl2}{(Numeric or Character) Number or name of the sheet with the respective data type in XLS or XLSX files (\emph{optional}).}
 
 \item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).}
 
-\item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}). If \code{calibration = TRUE}, blanks are subtracted after value conversion.}
+\item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 
 \item{convert.time}{(\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 For example: \code{convert.time = 'y = 24 * x'}}
 
-\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+\item{calib.growth, calib.fl, calib.fl2}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}} or fluorescence intensity into molecule concentrations.
 Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.}
 }
 \value{

@@ -53,6 +53,78 @@ suppress_warnings <- function(.expr, .f, ...)
     )
 }
 
+#' Apply data transformation/calibration to measurement values in a dataframe
+#'
+#' @param df An R dataframe object data in QurvE custom format.
+#' The first three table rows contain
+#' \enumerate{
+#'    \item sample description
+#'    \item replicate number (_optional_: followed by a letter to indicate technical replicates)
+#'    \item concentration value (_optional_)
+#' }
+#' @param equation An equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert values.
+#'
+#' @return Dataframe \code{df} with values adjusted based on the provided equation.
+#'
+#' @examples
+#' \dontrun{
+#' # Create random growth dataset
+#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
+#'
+#' # Convert dataset into QurvE custom format
+#' df <- cbind(
+#'   "time" = c("Time", NA, NA, rnd.data1$time[1,]),
+#'   t(rnd.data1$data))
+#'
+#' # Perform calibration
+#' df.calib <- calibrate(df, "y = 2 * x")
+#'
+#' # Inspect results
+#' head(df)
+#' head(df.calib)
+#' }
+calibrate <- function(df, equation)
+  {
+  #test if more than one time entity is present
+  time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
+  calib <- parse(text = equation)
+  if(length(time.ndx)==1){
+    if(!is.null(nrow(df[-time.ndx, -(1:3)]))){
+      x <- matrix(as.numeric(unlist(df[-time.ndx, -(1:3)])), nrow = nrow(df[-time.ndx, -(1:3)]))
+    } else {
+      x <- as.numeric(unlist(df[-time.ndx, -(1:3)]))
+    }
+    df[-time.ndx, -(1:3)] <- eval(calib)
+  } else { # identify different datasets based on the occurence of multiple 'time' entities
+    if(!is.null(nrow(df[-time.ndx, -(1:3)]))){
+      x <-  matrix(as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)])),
+                   nrow = nrow(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
+    } else {
+      x <- as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
+    }
+
+    df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)] <- eval(calib)
+    for (i in 2:(length(time.ndx))){
+      x <- matrix(as.numeric(unlist(df[if (is.na(time.ndx[i + 1])) {
+        (time.ndx[i] + 1):nrow(df)
+      } else {
+        (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+      }, -(1:3)])), nrow = nrow(df[if (is.na(time.ndx[i + 1])) {
+        (time.ndx[i] + 1):nrow(df)
+      } else {
+        (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+      }, -(1:3)]))
+
+      df[if (is.na(time.ndx[i + 1])) {
+        (time.ndx[i] + 1):nrow(df)
+      } else {
+        (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+      }, -(1:3)] <- eval(calib)
+    } # end of for (i in 2:(length(time.ndx)))
+  } # end of else of if(length(time.ndx)==1)
+  return(df)
+}
+
 
 #' Pretty ticks for log scale in ggplot
 #'

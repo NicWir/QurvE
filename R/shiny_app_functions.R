@@ -49,7 +49,7 @@ parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
   )
   reads <- reads[!is.na(reads)]
   reads <- unique(reads)
-  return(reads)
+  invisible(reads)
 }
 
 #' Extract names of reads from experimental data created with a Chi.Bio bioreactor setup
@@ -79,7 +79,7 @@ parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
   )
   reads <- reads[!is.na(reads)]
   reads <- unique(reads)
-  return(reads)
+  invisible(reads)
 }
 
 #' Extract names of reads from experimental data created with a Tecan plate reader
@@ -109,7 +109,7 @@ parse_properties_tecan <- function(file, csvsep=";", dec=".", sheet=1)
   )
   reads <- reads[!is.na(reads)]
   reads <- unique(reads)
-  return(reads)
+  invisible(reads)
 }
 
 #' Extract names of biomass reads from experimental data created with a Biolector plate reader
@@ -136,7 +136,7 @@ parse_properties_biolector <- function(file, csvsep=";", dec=".", sheet=1)
   # extract different read data in dataset
   reads <- unique(input[,time.ndx[2]][grep("Biomass", input[,time.ndx[2]])])
   reads <- reads[!is.na(reads)]
-  return(reads)
+  invisible(reads)
 }
 
 #' Extract names of reads from experimental data created with Pelkin Elmer's Victor Nivo plate readers
@@ -161,7 +161,7 @@ parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
   # extract different read data in dataset
   reads <- lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2])
   reads <- reads[!is.na(reads)]
-  return(reads)
+  invisible(reads)
 }
 
 #' Extract names of reads from experimental data created with Pelkin Elmer's Victor X3 plate readers
@@ -186,7 +186,7 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
   # extract different read data in dataset
   reads <- unlist(lapply(1:length(time.ndx), function(x) input[1, time.ndx[x]+1]))
   reads <- reads[!is.na(reads)]
-  return(reads)
+  invisible(reads)
 }
 
 
@@ -195,17 +195,14 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #' @param software (Character) The name of the software/device used to export the plate reader data.
 #' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 #' For example: \code{convert.time = 'y = 24 * x'}
-#' @param sheet.data (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
-#' @param sheet.map (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
-#' @param csvsep.data (Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}
-#' @param dec.data (Character) decimal separator used in CSV, TSV or TXT data file.
-#' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
-#' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
+#' @param sheet.data,sheet.map (Numeric or Character) Number or name of the sheets in XLS or XLSX files containing experimental data or mapping information, respectively (_optional_).
+#' @param csvsep.data,csvsep.map (Character) separator used in CSV data files (ignored for other file types).  Default: \code{";"}
+#' @param dec.data,dec.map (Character) decimal separator used in CSV, TSV or TXT files with measurements and mapping information, respectively.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #' @param growth.nm Name of read corresponding to growth rate
 #' @param fl.nm Name of read corresponding to fluorescence data
 #' @param fl.nm Name of read corresponding to fluorescence2 data
-#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' @param calib.growth,calib.fl,calib.fl2 (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}} or fluorescence intensity into molecule concentrations.
 #' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #'
 #' @rdname parse_data
@@ -224,7 +221,7 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #'                       sheet.map = "mapping",
 #'                       software = "Gen5",
 #'                       convert.time = "y = x * 24", # convert days to hours
-#'                       calibration = "y = x * 3.058") # convert absorbance to OD values
+#'                       calib.growth = "y = x * 3.058") # convert absorbance to OD values
 #' }
 parse_data_shiny <-
   function(data.file = NULL,
@@ -241,7 +238,9 @@ parse_data_shiny <-
            growth.nm = NULL,
            fl.nm = NULL,
            fl2.nm = NULL,
-           calibration = NULL,
+           calib.growth = NULL,
+           calib.fl = NULL,
+           calib.fl2 = NULL,
            fl.normtype = c("growth", "fl2")
   ) {
     if(!is.null(fl.nm) && is.na(fl.nm)) fl.nm <- NULL
@@ -354,22 +353,45 @@ parse_data_shiny <-
         data.ls[[i]] <- data.ls[[i]][,!is.na(data.ls[[i]][1,])]
       }
     }
-    if(length(data.ls)==1){
+    if(length(data.ls)==1) {
       names(data.ls) <- "growth"
-      grodata <- read_data(data.growth = data.ls[[1]], data.fl = NA,
-                           subtract.blank = subtract.blank, calibration = calibration)
-    } else if(length(data.ls)==2){
+      grodata <- read_data(
+        data.growth = data.ls[[1]],
+        data.fl = NA,
+        subtract.blank = subtract.blank,
+        calib.growth = calib.growth,
+        calib.fl = calib.fl,
+        calib.fl2 = calib.fl2
+      )
+    } else if (length(data.ls) == 2) {
       names(data.ls) <- c("growth", "fluorescence")
-      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]],
-                           subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
+      grodata <-
+        read_data(
+          data.growth = data.ls[[1]],
+          data.fl = data.ls[[2]],
+          subtract.blank = subtract.blank,
+          calib.growth = calib.growth,
+          calib.fl = calib.fl,
+          calib.fl2 = calib.fl2,
+          fl.normtype = fl.normtype
+        )
     }
     else {
       names(data.ls) <- c("growth", "fluorescence", "fluorescence2")
-      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]], data.fl2 = data.ls[[3]],
-                           subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
+      grodata <-
+        read_data(
+          data.growth = data.ls[[1]],
+          data.fl = data.ls[[2]],
+          data.fl2 = data.ls[[3]],
+          subtract.blank = subtract.blank,
+          calib.growth = calib.growth,
+          calib.fl = calib.fl,
+          calib.fl2 = calib.fl2,
+          fl.normtype = fl.normtype
+        )
     }
 
-    return(grodata)
+    invisible(grodata)
   }
 
 #' Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.
@@ -460,7 +482,7 @@ parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of "Chi.Bio" bioreactors.
@@ -521,7 +543,7 @@ parse_chibio_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of "Tecan" plate readers.
@@ -601,7 +623,7 @@ parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of "Biolector" plate readers.
@@ -678,7 +700,7 @@ parse_biolector_shiny <- function(input, growth.nm)
     data.ls[[2]] <- NA
     # data.ls[[3]] <- NA
   }
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.
@@ -758,7 +780,7 @@ parse_victornivo_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor X3" plate readers.
@@ -886,7 +908,7 @@ parse_victorx3_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
   data.ls[[2]] <- fluorescence
   data.ls[[3]] <- fluorescence2
 
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 write.csv.utf8.BOM <- function(df, filename)

@@ -155,6 +155,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                              tabPanel(value = "Custom", span("Custom", title="Upload manually formatted data. Data from different experiments can be added. In column format, the first three table rows contain (see figure):\n1. sample description\n2. replicate number (optional: followed by a letter to indicate technical replicates)\n3. concentration value (optional, for dose-response analysis)"),
                                                       sidebarPanel(
                                                         style='border-color: #ADADAD',
+                                                        # Growth data
                                                         wellPanel(
                                                           h4(strong("Growth data"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                           style='padding: 0.1; border-color: #ADADAD; padding: 1; padding-bottom: 0',
@@ -166,7 +167,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                           conditionalPanel(
                                                             condition = "output.growthfileUploaded && output.custom_growth_format == 'xlsx'",
-
+                                                            div(style = "margin-bottom: -20px"),
                                                             selectInput(inputId = "custom_growth_sheets",
                                                                         label = "Select Sheet",
                                                                         choices = "Sheet1")
@@ -195,7 +196,20 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                         choices = c("." = ".",
                                                                                     "," = ",")
                                                             )
-                                                          )
+                                                          ),
+                                                          div(style = "margin-bottom: -15px"),
+                                                          tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
+                                                                   checkboxInput(inputId = 'calibration_growth_custom',
+                                                                                 label = 'Apply calibration')
+                                                          ),
+                                                          conditionalPanel(
+                                                            condition = 'input.calibration_growth_custom',
+                                                            div(style = "margin-bottom: -10px"),
+                                                            textInput(inputId = "calibration_equation_growth_custom",
+                                                                      label = "Type equation in the form 'y = function(x)'",
+                                                                      placeholder = 'y = x * 0.5 - 1'
+                                                            )
+                                                          ),
                                                         ),
                                                         #____Fluorescence___________
                                                         wellPanel(
@@ -209,7 +223,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                           conditionalPanel(
                                                             condition = "output.fluorescencefileUploaded && output.custom_fluorescence_format == 'xlsx'",
-
+                                                            div(style = "margin-bottom: -20px"),
                                                             selectInput(inputId = "custom_fluorescence_sheets",
                                                                         label = "Select Sheet",
                                                                         choices = "Sheet1")
@@ -237,8 +251,21 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                         choices = c("." = ".",
                                                                                     "," = ",")
                                                             )
-                                                          )
-                                                        ),
+                                                          ),
+                                                          div(style = "margin-top: -15px"),
+                                                          tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert fluorescence values. This can be used to, e.g., convert fluorescence intensities into molecule concentrations.",
+                                                                   checkboxInput(inputId = 'calibration_fluorescence_custom',
+                                                                                 label = 'Apply calibration')
+                                                          ),
+                                                          conditionalPanel(
+                                                            condition = 'input.calibration_fluorescence_custom',
+                                                            div(style = "margin-bottom: -10px"),
+                                                            textInput(inputId = "calibration_equation_fluorescence_custom",
+                                                                      label = "Type equation in the form 'y = function(x)'",
+                                                                      placeholder = 'y = x * 0.5 - 1'
+                                                            )
+                                                          ),
+                                                        ), # wellpanel
 
                                                         checkboxInput(inputId = 'load_fl2_data_custom',
                                                                      label = 'Use second fluorescence to normalize fluorescence.',
@@ -263,6 +290,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                               condition = "output.fluorescence2fileUploaded && output.custom_fluorescence2_format == 'xlsx'",
                                                               wellPanel(
                                                                 style='padding: 1; border-color: #ADADAD; padding-bottom: 0',
+                                                                div(style = "margin-bottom: -20px"),
                                                                 selectInput(inputId = "custom_fluorescence2_sheets",
                                                                             label = "Select Sheet",
                                                                             choices = "Sheet1")
@@ -295,8 +323,21 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                         "," = ",")
                                                                 )
                                                               )
-                                                            )
-                                                          )
+                                                            ),
+                                                            div(style = "margin-top: -15px"),
+                                                            tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert fluorescence2 values. This can be used to, e.g., convert fluorescence intensities into molecule concentrations.",
+                                                                     checkboxInput(inputId = 'calibration_fluorescence2_custom',
+                                                                                   label = 'Apply calibration')
+                                                            ),
+                                                            conditionalPanel(
+                                                              condition = 'input.calibration_fluorescence2_custom',
+                                                              div(style = "margin-bottom: -10px"),
+                                                              textInput(inputId = "calibration_equation_fluorescence2_custom",
+                                                                        label = "Type equation in the form 'y = function(x)'",
+                                                                        placeholder = 'y = x * 0.5 - 1'
+                                                              )
+                                                            ),
+                                                          ) # wellPanel
                                                         ),
 
                                                         tags$div(title="Shall blank values (the mean of samples identified by 'Blank' IDs) be subtracted from values within the same experiment?",
@@ -314,23 +355,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                         conditionalPanel(
                                                           condition = 'input.convert_time_values_custom',
                                                           tags$div(title=HTML(paste("Provide an equation in the form 'y = function(x)' to convert time values. For example, type 'y = x / 60' to convert minutes to hours.\n", "Note: the time unit will affect calculated parameters (e.g., the growth rate in 1/h, 1/min, or 1/s) as well as the time displayed in all plots.")),
+                                                                   div(style = "margin-bottom: -10px"),
                                                                    textInput(inputId = "convert_time_equation_custom",
                                                                              label = "Type equation in the form 'y = function(x)'",
                                                                              placeholder = 'y = x / 24')
-                                                          )
-                                                        ),
-
-                                                        tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
-                                                                 checkboxInput(inputId = 'calibration_custom',
-                                                                               label = 'Apply calibration')
-                                                        ),
-
-
-                                                        conditionalPanel(
-                                                          condition = 'input.calibration_custom',
-                                                          textInput(inputId = "calibration_equation_custom",
-                                                                    label = "Type equation in the form 'y = function(x)'",
-                                                                    placeholder = 'y = x * 0.5 - 1'
                                                           )
                                                         ),
 
@@ -409,17 +437,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             div(style = "margin-top: -10px"),
                                                             h3(strong("2. Format"), style = "line-height: 0.4;font-size: 150%; margin-bottom: 15px;"),
                                                             selectizeInput(inputId = "platereader_software",
-                                                                        label = "Platereader software",
-                                                                        choices = c("Biotek - Gen5/Gen6" = "Gen5",
-                                                                                    "Biolector" = "Biolector",
-                                                                                    "Chi.Bio" = "Chi.Bio",
-                                                                                    "Growth Profiler 960" = "GrowthProfiler",
-                                                                                    "Tecan i-control" = "Tecan",
-                                                                                    "PerkinElmer - Victor Nivo" = "VictorNivo",
-                                                                                    "PerkinElmer - Victor X3" = "VictorX3"
-                                                                        ),
-                                                                        multiple = TRUE,
-                                                                        options = list(maxItems = 1)
+                                                                           label = "Platereader software",
+                                                                           choices = c("Biotek - Gen5/Gen6" = "Gen5",
+                                                                                       "Biolector" = "Biolector",
+                                                                                       "Chi.Bio" = "Chi.Bio",
+                                                                                       "Growth Profiler 960" = "GrowthProfiler",
+                                                                                       "Tecan i-control" = "Tecan",
+                                                                                       "PerkinElmer - Victor Nivo" = "VictorNivo",
+                                                                                       "PerkinElmer - Victor X3" = "VictorX3"
+                                                                           ),
+                                                                           multiple = TRUE,
+                                                                           options = list(maxItems = 1)
                                                             )
                                                           )
                                                         ),
@@ -432,22 +460,76 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             h3(strong("3. Assign data type"), style = "line-height: 0.4; font-size: 150%; margin-bottom: 15px;"),
                                                             conditionalPanel(
                                                               condition = "input.platereader_software != 'GrowthProfiler'",
+
+                                                              # Growth Read
                                                               selectInput(inputId = "parsed_reads_growth",
                                                                           label = "Growth data",
                                                                           choices = ""
                                                               ),
+                                                              conditionalPanel(
+                                                                condition = "input.parsed_reads_growth.length > 0 && input.parsed_reads_growth != 'Ignore'",
+                                                                div(style = "margin-top: -15px"),
+                                                                tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
+                                                                         checkboxInput(inputId = 'calibration_growth_plate_reader',
+                                                                                       label = 'Apply calibration'),
+                                                                ),
+                                                                conditionalPanel(
+                                                                  condition = "input.calibration_growth_plate_reader",
+                                                                  div(style = "margin-bottom: -10px"),
+                                                                  textInput(inputId = "calibration_equation_growth_plate_reader",
+                                                                            label = NULL,
+                                                                            placeholder = 'y = x * 0.5 - 1',
+                                                                            width = "85%")
 
+                                                                )
+                                                              ),
+
+                                                              # Fluorescence Read
                                                               selectInput(inputId = "parsed_reads_fluorescence",
                                                                           label = "Fluorescence data",
                                                                           choices = ""
-                                                              )
-                                                            ),
+                                                              ),
+                                                              conditionalPanel(
+                                                                condition = "input.parsed_reads_fluorescence.length > 0 && input.parsed_reads_fluorescence != 'Ignore'",
+                                                                div(style = "margin-top: -15px"),
+                                                                tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert fluorescence values. This can be used to, e.g., convert fluorescence intensities into molecule concentrations.",
+                                                                         checkboxInput(inputId = 'calibration_fluorescence_plate_reader',
+                                                                                       label = 'Apply calibration')
+                                                                ),
+                                                                conditionalPanel(
+                                                                  condition = "input.calibration_fluorescence_plate_reader",
+                                                                  div(style = "margin-bottom: -10px"),
+                                                                  textInput(inputId = "calibration_equation_fluorescence_plate_reader",
+                                                                            label = NULL,
+                                                                            placeholder = 'y = x * 0.5 - 1',
+                                                                            width = "85%"),
+                                                                )
+                                                              ),
 
-                                                            selectInput(inputId = "parsed_reads_fluorescence2",
-                                                                        label = "Fluorescence data 2 (used only for normalization)",
-                                                                        choices = ""
-                                                            )
-                                                          )
+                                                              # Fluorescence2 Read
+                                                              selectInput(inputId = "parsed_reads_fluorescence2",
+                                                                          label = "Fluorescence data 2 (used only for normalization)",
+                                                                          choices = ""
+                                                              ),
+                                                              conditionalPanel(
+                                                                condition = "input.parsed_reads_fluorescence2.length > 0 && input.parsed_reads_fluorescence2 != 'Ignore'",
+                                                                div(style = "margin-top: -15px"),
+                                                                tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert fluorescence values. This can be used to, e.g., convert fluorescence intensities into molecule concentrations.",
+                                                                         checkboxInput(inputId = 'calibration_fluorescence2_plate_reader',
+                                                                                       label = 'Apply calibration')
+                                                                ),
+                                                                conditionalPanel(
+                                                                  condition = "input.calibration_fluorescence2_plate_reader",
+                                                                  div(style = "margin-bottom: -10px"),
+                                                                  textInput(inputId = "calibration_equation_fluorescence2_plate_reader",
+                                                                            label = NULL,
+                                                                            placeholder = 'y = x * 0.5 - 1',
+                                                                            width = "85%")
+
+                                                                )
+                                                              ),
+                                                            ), # conditionalPanel
+                                                          ) # wellPanel
                                                         ),
                                                         div(style = "margin-top: -15px"),
                                                         conditionalPanel(
@@ -517,27 +599,13 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = 'Convert time values',
                                                                                value = TRUE)
                                                         ),
-
                                                         conditionalPanel(
                                                           condition = 'input.convert_time_values_plate_reader',
                                                           tags$div(title=HTML(paste("Provide an equation in the form 'y = function(x)' to convert time values. For example, type 'y = x / 60' to convert minutes to hours.\n", "Note: the time unit will affect calculated parameters (e.g., the growth rate in 1/h, 1/min, or 1/s) as well as the time displayed in all plots.")),
+                                                                   div(style = "margin-bottom: -10px"),
                                                                    textInput(inputId = "convert_time_equation_plate_reader",
                                                                              label = "Type equation in the form 'y = function(x)'",
                                                                              placeholder = 'y = x / 24')
-                                                          )
-                                                        ),
-
-                                                        tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
-                                                                 checkboxInput(inputId = 'calibration_plate_reader',
-                                                                               label = 'Apply calibration')
-                                                        ),
-
-                                                        conditionalPanel(
-                                                          condition = 'input.calibration_plate_reader',
-                                                          tags$div(title="Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into OD600.",
-                                                                   textInput(inputId = "calibration_equation_plate_reader",
-                                                                             label = "Type equation in the form 'y = function(x)'",
-                                                                             placeholder = 'y = x * 0.5 - 1')
                                                           )
                                                         ),
 
@@ -5880,7 +5948,9 @@ server <- function(input, output, session){
                                        dec.fl2 = input$decimal_separator_custom_fluorescence2,
                                        subtract.blank = input$subtract_blank_custom,
                                        convert.time = convert.time,
-                                       calibration = ifelse(input$calibration_custom, input$calibration_equation_custom, ""),
+                                       calib.growth = ifelse(input$calibration_growth_custom, input$calibration_equation_growth_custom, ""),
+                                       calib.fl = ifelse(input$calibration_fluorescence_custom, input$calibration_equation_fluorescence_custom, ""),
+                                       calib.fl2 = ifelse(input$calibration_fluorescence2_custom, input$calibration_equation_fluorescence2_custom, ""),
                                        fl.normtype = fl.normtype
       )
     )
@@ -6748,16 +6818,13 @@ server <- function(input, output, session){
     }
     if(exists("reads") && length(reads) > 0){
       show("parsed_reads_growth")
+      show("parsed_reads_fluorescence")
       if(length(reads)>1){
-        show("parsed_reads_fluorescence")
-      } else {
-        hide("parsed_reads_fluorescence")
-      }
-      if(length(reads)>2){
         show("parsed_reads_fluorescence2")
       } else {
         hide("parsed_reads_fluorescence2")
       }
+
       show("parse_data")
       removeModal()
       reads <- c(reads, "Ignore")
@@ -6779,7 +6846,7 @@ server <- function(input, output, session){
     reads <- selected_inputs_parsed_reads()
     if(length(reads) < 2)
       return(NULL)
-    if(length(reads) > 2 && input$parsed_reads_fluorescence != "Ignore"){
+    if(length(reads) > 1 && input$parsed_reads_fluorescence != "Ignore"){
       show("parsed_reads_fluorescence2")
     } else {
       hide("parsed_reads_fluorescence2")
@@ -6855,7 +6922,9 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence
           ),
-          calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, ""),
+          calib.growth = ifelse(input$calibration_growth_plate_reader, input$calibration_equation_growth_plate_reader, ""),
+          calib.fl = ifelse(input$calibration_fluorescence_plate_reader, input$calibration_equation_fluorescence_plate_reader, ""),
+          calib.fl2 = ifelse(input$calibration_fluorescence2_plate_reader, input$calibration_equation_fluorescence2_plate_reader, ""),
           fl2.nm = ifelse(
             input$parsed_reads_fluorescence2 == input$parsed_reads_growth |
               input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
@@ -6900,7 +6969,9 @@ server <- function(input, output, session){
             NA,
             input$parsed_reads_fluorescence
           ),
-          calibration = ifelse(input$calibration_plate_reader, input$calibration_equation_plate_reader, ""),
+          calib.growth = ifelse(input$calibration_growth_plate_reader, input$calibration_equation_growth_plate_reader, ""),
+          calib.fl = ifelse(input$calibration_fluorescence_plate_reader, input$calibration_equation_fluorescence_plate_reader, ""),
+          calib.fl2 = ifelse(input$calibration_fluorescence2_plate_reader, input$calibration_equation_fluorescence2_plate_reader, ""),
           fl2.nm = ifelse(
             input$parsed_reads_fluorescence2 == input$parsed_reads_growth |
               input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,

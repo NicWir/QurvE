@@ -17,7 +17,7 @@ Extract relevant data from a raw data export file generated from the software of
 }
 \examples{
 \dontrun{
-input <- read_file(filename = system.file("biolector", package = "QurvE"), csvsep = "," )
+input <- read_file(filename = system.file("biolector.csv", package = "QurvE"), csvsep = ";" )
 parsed <- parse_biolector(input)
 }
 }

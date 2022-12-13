@@ -18,7 +18,9 @@ parse_data(
   csvsep.map = ";",
   dec.map = ".",
   subtract.blank = T,
-  calibration = NULL,
+  calib.growth = NULL,
+  calib.fl = NULL,
+  calib.fl2 = NULL,
   fl.normtype = c("growth", "fl2")
 )
 
@@ -37,7 +39,9 @@ parse_data_shiny(
   growth.nm = NULL,
   fl.nm = NULL,
   fl2.nm = NULL,
-  calibration = NULL,
+  calib.growth = NULL,
+  calib.fl = NULL,
+  calib.fl2 = NULL,
   fl.normtype = c("growth", "fl2")
 )
 }
@@ -51,21 +55,15 @@ parse_data_shiny(
 \item{convert.time}{(\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 For example: \code{convert.time = 'y = 24 * x'}}
 
-\item{sheet.data}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
+\item{sheet.data, sheet.map}{(Numeric or Character) Number or name of the sheets in XLS or XLSX files containing experimental data or mapping information, respectively (\emph{optional}).}
 
-\item{sheet.map}{(Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (\emph{optional}).}
+\item{csvsep.data, csvsep.map}{(Character) separator used in CSV data files (ignored for other file types).  Default: \code{";"}}
 
-\item{csvsep.data}{(Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}}
-
-\item{dec.data}{(Character) decimal separator used in CSV, TSV or TXT data file.}
-
-\item{csvsep.map}{(Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}}
-
-\item{dec.map}{(Character) decimal separator used in CSV, TSV or TXT mapping file.}
+\item{dec.data, dec.map}{(Character) decimal separator used in CSV, TSV or TXT files with measurements and mapping information, respectively.}
 
 \item{subtract.blank}{(Logical) Shall blank values be subtracted from values within the same experiment (\link{TRUE}, the default) or not (\link{FALSE}).}
 
-\item{calibration}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.}
+\item{calib.growth, calib.fl, calib.fl2}{(Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}} or fluorescence intensity into molecule concentrations.}
 
 \item{fl.normtype}{(Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).}
 
@@ -89,7 +87,7 @@ grodata <- parse_data(data.file = system.file("fluorescence_test_Gen5.xlsx", pac
                       sheet.map = "mapping",
                       software = "Gen5",
                       convert.time = "y = x * 24", # convert days to hours
-                      calibration = "y = x * 3.058") # convert absorbance to OD values
+                      calib.growth = "y = x * 3.058") # convert absorbance to OD values
 }
 \dontrun{
 grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx",
@@ -102,6 +100,6 @@ grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx
                       sheet.map = "mapping",
                       software = "Gen5",
                       convert.time = "y = x * 24", # convert days to hours
-                      calibration = "y = x * 3.058") # convert absorbance to OD values
+                      calib.growth = "y = x * 3.058") # convert absorbance to OD values
 }
 }

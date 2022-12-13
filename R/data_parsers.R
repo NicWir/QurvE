@@ -3,29 +3,25 @@
 #' \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction, applies data transformation (calibration), and combines technical replicates.
 #'
 #' @param data.growth An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data.
-#' In column format, the first three table rows contain
+#' The first three table rows contain
 #' \enumerate{
 #'    \item sample description
 #'    \item replicate number (_optional_: followed by a letter to indicate technical replicates)
 #'    \item concentration value (_optional_)
 #' }
 #' @param data.fl (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.growth}.
-#' @param data.fl2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence2 data (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.growth}.
+#' @param data.fl2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing measurements from a second fluorescence channel (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.growth}.
 #' @param data.format (Character) "col" for samples in columns, or "row" for samples in rows. Default: \code{"col"}
 #' @param csvsep (Character) separator used in CSV file storing growth data (ignored for other file types). Default: \code{";"}
+#' @param csvsep.fl,csvsep.fl2 (Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}
 #' @param dec (Character) decimal separator used in CSV, TSV or TXT file storing growth data. Default: \code{"."}
-#' @param csvsep.fl (Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}
-#' @param dec.fl (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}
-#' @param csvsep.fl2 (Character) separator used in CSV file storing fluorescence data (ignored for other file types). Default: \code{";"}
-#' @param dec.fl2 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence2 data. Default: \code{"."}
-#' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]). If \code{calibration = TRUE}, blanks are subtracted after value conversion.
-#' @param sheet.growth (Numeric or Character) Number or name of the sheet with growth data in XLS or XLSX files (_optional_).
-#' @param sheet.fl (Numeric or Character) Number or name of the sheet with fluorescence data in XLS or XLSX files (_optional_).
-#' @param sheet.fl2 (Numeric or Character) Number or name of the sheet with fluorescence2 data (used for normalization of fluorescence data) in XLS or XLSX files (_optional_).
+#' @param dec.fl,dec.fl2 (Character) decimal separator used in CSV, TSV or TXT file storing fluorescence data. Default: \code{"."}
+#' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
+#' @param sheet.growth,sheet.fl,sheet.fl2 (Numeric or Character) Number or name of the sheet with the respective data type in XLS or XLSX files (_optional_).
 #' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 #' For example: \code{convert.time = 'y = 24 * x'}
-#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' @param calib.growth,calib.fl,calib.fl2 (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}} or fluorescence intensity into molecule concentrations.
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
 #' @details
@@ -72,13 +68,16 @@ read_data <-
            fl.normtype = c("growth", "fl2"),
            subtract.blank  = T,
            convert.time = NULL,
-           calibration = NULL)
+           calib.growth = NULL,
+           calib.fl = NULL,
+           calib.fl2 = NULL)
   {
     if(is.null(data.growth)) data.growth <- NA
     if(is.null(data.fl)) data.fl <- NA
     if(is.null(data.fl2)) data.fl2 <- NA
-    if(is.null(data.fl2)) data.fl2 <- NA
-    if(!is.null(calibration) && calibration == "") calibration <- NULL
+    if(!is.null(calib.growth) && calib.growth == "") calib.growth <- NULL
+    if(!is.null(calib.fl) && calib.fl == "") calib.fl <- NULL
+    if(!is.null(calib.fl2) && calib.fl2 == "") calib.fl2 <- NULL
 
     fl.normtype <- match.arg(fl.normtype)
 
@@ -186,51 +185,17 @@ read_data <-
       }
     }
 
-    if(!is.null(calibration)){
-      calibrate <- function(df){
-        #test if more than one time entity is present
-        time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
-        calib <- parse(text = calibration)
-        if(length(time.ndx)==1){
-          if(!is.null(nrow(df[-time.ndx, -(1:3)]))){
-            x <- matrix(as.numeric(unlist(df[-time.ndx, -(1:3)])), nrow = nrow(df[-time.ndx, -(1:3)]))
-          } else {
-            x <- as.numeric(unlist(df[-time.ndx, -(1:3)]))
-          }
-          df[-time.ndx, -(1:3)] <- eval(calib)
-        } else { # identify different datasets based on the occurence of multiple 'time' entities
-          if(!is.null(nrow(df[-time.ndx, -(1:3)]))){
-            x <-  matrix(as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)])),
-                         nrow = nrow(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
-          } else {
-            x <- as.numeric(unlist(df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)]))
-          }
-
-          df[(time.ndx[1]+1) : (time.ndx[2]-1), -(1:3)] <- eval(calib)
-          for (i in 2:(length(time.ndx))){
-            x <- matrix(as.numeric(unlist(df[if (is.na(time.ndx[i + 1])) {
-              (time.ndx[i] + 1):nrow(df)
-            } else {
-              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
-            }, -(1:3)])), nrow = nrow(df[if (is.na(time.ndx[i + 1])) {
-              (time.ndx[i] + 1):nrow(df)
-            } else {
-              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
-            }, -(1:3)]))
-
-            df[if (is.na(time.ndx[i + 1])) {
-              (time.ndx[i] + 1):nrow(df)
-            } else {
-              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
-            }, -(1:3)] <- eval(calib)
-          } # end of for (i in 2:(length(time.ndx)))
-        } # end of else of if(length(time.ndx)==1)
-        return(df)
-      }
-      if(length(dat)>1)             dat <- calibrate(df = dat)
-      if((length(fl) > 1 ) || !is.na(data.fl))    fl <- calibrate(df=fl)
-      if((length(fl2) > 1 ) || !is.na(data.fl2))    fl2 <- calibrate(df=fl2)
-
+    if(!is.null(calib.growth)){
+      if(length(dat)>1)
+        dat <- calibrate(dat, calib.growth)
+    }
+    if(!is.null(calib.fl)){
+      if((length(fl) > 1 ) || !is.na(data.fl))
+        fl <- calibrate(fl, calib.fl)
+    }
+    if(!is.null(calib.fl2)){
+      if((length(fl2) > 1 ) || !is.na(data.fl2))
+        fl2 <- calibrate(fl2, calib.fl2)
     }
 
     # subtract blank
@@ -651,14 +616,11 @@ read_data <-
 #' @param software (Character) The name of the software/device used to export the plate reader data.
 #' @param convert.time (\code{NULL} or string) Convert time values with a formula provided in the form \code{'y = function(x)'}.
 #' For example: \code{convert.time = 'y = 24 * x'}
-#' @param sheet.data (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
-#' @param sheet.map (Numeric or Character) Number or name of a sheet in XLS or XLSX files containing experimental data (_optional_).
-#' @param csvsep.data (Character) separator used in CSV data file (ignored for other file types).  Default: \code{";"}
-#' @param dec.data (Character) decimal separator used in CSV, TSV or TXT data file.
-#' @param csvsep.map (Character) separator used in CSV mapping file (ignored for other file types).  Default: \code{";"}
-#' @param dec.map (Character) decimal separator used in CSV, TSV or TXT mapping file.
+#' @param sheet.data,sheet.map (Numeric or Character) Number or name of the sheets in XLS or XLSX files containing experimental data or mapping information, respectively (_optional_).
+#' @param csvsep.data,csvsep.map (Character) separator used in CSV data files (ignored for other file types).  Default: \code{";"}
+#' @param dec.data,dec.map (Character) decimal separator used in CSV, TSV or TXT files with measurements and mapping information, respectively.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
-#' @param calibration (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}}.
+#' @param calib.growth,calib.fl,calib.fl2 (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}} or fluorescence intensity into molecule concentrations.
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #'
@@ -674,7 +636,7 @@ read_data <-
 #'                       sheet.map = "mapping",
 #'                       software = "Gen5",
 #'                       convert.time = "y = x * 24", # convert days to hours
-#'                       calibration = "y = x * 3.058") # convert absorbance to OD values
+#'                       calib.growth = "y = x * 3.058") # convert absorbance to OD values
 #' }
 parse_data <-
   function(data.file = NULL,
@@ -688,7 +650,9 @@ parse_data <-
            csvsep.map = ";",
            dec.map = ".",
            subtract.blank  = T,
-           calibration = NULL,
+           calib.growth = NULL,
+           calib.fl = NULL,
+           calib.fl2 = NULL,
            fl.normtype = c("growth", "fl2")
   ) {
     software <- match_arg(software)
@@ -786,19 +750,46 @@ parse_data <-
         data.ls[[i]] <- rbind(data.ls[[i]][1,], rep(NA, ncol(data.ls[[i]])), data.ls[[i]][-1,])
       }
     }
-    if(length(data.ls)==1){
+    if(length(data.ls)==1) {
       names(data.ls) <- "growth"
-      grodata <- read_data(data.growth = data.ls[[1]], data.fl = NA, subtract.blank = subtract.blank, calibration = calibration)
-    } else if(length(data.ls)==2){
+      grodata <-
+        read_data(
+          data.growth = data.ls[[1]],
+          data.fl = NA,
+          subtract.blank = subtract.blank,
+          calib.growth = calib.growth,
+          calib.fl = calib.fl,
+          calib.fl2 = calib.fl2
+        )
+    } else if (length(data.ls) == 2) {
       names(data.ls) <- c("growth", "fluorescence")
-      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]], subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
+      grodata <-
+        read_data(
+          data.growth = data.ls[[1]],
+          data.fl = data.ls[[2]],
+          subtract.blank = subtract.blank,
+          calib.growth = calib.growth,
+          calib.fl = calib.fl,
+          calib.fl2 = calib.fl2,
+          fl.normtype = fl.normtype
+        )
     }
     else {
       names(data.ls) <- c("growth", "fluorescence", "fluorescence2")
-      grodata <- read_data(data.growth = data.ls[[1]], data.fl = data.ls[[2]], data.fl2 = data.ls[[3]],
-                           subtract.blank = subtract.blank, calibration = calibration, fl.normtype = fl.normtype)
+      grodata <-
+        read_data(
+          data.growth = data.ls[[1]],
+          data.fl = data.ls[[2]],
+          data.fl2 = data.ls[[3]],
+          subtract.blank = subtract.blank,
+          calib.growth = calib.growth,
+          fl.normtype = fl.normtype,
+          calib.fl = calib.fl,
+          calib.fl2 = calib.fl2
+        )
     }
-    invisible(grodata)
+    invisible(grodata
+    )
   }
 
 #' Call the appropriate function required to read a table file and return the table as a dataframe object.
@@ -944,51 +935,47 @@ parse_Gen5Gen6 <- function(input)
     read.data <- read.data.combined
   }
 
-  data.ls <- list()
-  if(length(reads)>1){
+  data.ls <- list(NA, NA, NA)
 
-    answer <- readline(paste0("Indicate where the growth data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      growth <- NA
-    } else {
-      growth <- read.data[[as.numeric(answer)]]
-    }
+  for(i in 1:length(reads)){
+    if(length(reads) == 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              sep = "\n")
+      ))
 
-    answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      fluorescence <- NA
-    } else {
-      fluorescence <- read.data[[as.numeric(answer)]]
-      fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
+     if(as.numeric(answer) == 1)
+       data.ls[[1]] <-  read.data[[1]]
+     if(as.numeric(answer) == 2)
+       data.ls[[2]] <-  read.data[[1]]
     }
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- fluorescence
+    if(length(reads) > 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              "[3] Fluorescence 2 (to normalize Fluorescence)",
+              "[4] Ignore",
+              sep = "\n")
+      ))
 
-    if(length(reads)>2){
-     answer <- readline(paste0("Indicate where the fluorescence 2 data is stored (used only for normalization of fluorescence)?\n",
-                               paste(unlist(lapply(1:length(reads), function (i)
-                                 paste0("[", i, "] ", reads[i]))),
-                                 collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
-     if(as.numeric(answer) == length(reads)+1){
-       fluorescence2 <- NA
-     } else {
-       fluorescence2 <- read.data[[as.numeric(answer)]]
-       fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
-     }
-     data.ls[[3]] <- fluorescence2
+      if(as.numeric(answer) < 4){
+        data.ls[[as.numeric(answer)]] <-  read.data[[i]]
+
+        # replace "OVRFLW" with NA in fluorescence data
+        if(as.numeric(answer) %in% c(2,3))
+          data.ls[[as.numeric(answer)]][which(data.ls[[as.numeric(answer)]] == "OVRFLW", arr.ind = TRUE)] <- NA
+      }
     }
-  } else {
-    growth <- read.data[[1]]
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
   }
-  return(list(data.ls))
+
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of "Chi.Bio" bioreactors.
@@ -1008,62 +995,68 @@ parse_chibio <- function(input)
   read.ndx <- grep("measured|emit", input[1,], ignore.case = TRUE)
   reads <- input[1, read.ndx]
 
-  data.ls <- list()
-  if(length(reads)>1){
+  data.ls <- list(NA, NA, NA)
+  assigned <- c()
 
-    answer <- readline(paste0("Indicate where the growth data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      growth <- NA
-    } else {
-      growth <- data.frame("time" = input[, time.ndx], "growth" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
-      if(all(as.numeric(growth[-1,2]) == 0) | all(is.na(growth[-1,2]))){
-        growth <- NA
-      }
-    }
 
-    answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      fluorescence <- NA
-    } else {
-      fluorescence <- data.frame("time" = input[, time.ndx], "fluorescence" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
-      fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
-      if(all(as.numeric(fluorescence[-1,2]) == 0) || all(is.na(fluorescence[-1,2]))){
-        fluorescence <- NA
-      }
-    }
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- fluorescence
+    for(i in 1:length(reads)){
+      if(length(reads) == 1){
+        answer <- readline(paste0(
+          "Assign data type for read: ",
+          reads[i],
+          "?\n",
+          paste("[1] Growth",
+                "[2] Fluorescence",
+                sep = "\n")
+        ))
 
-    if(length(reads)>2){
-      answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
-                                paste(unlist(lapply(1:length(reads), function (i)
-                                  paste0("[", i, "] ", reads[i]))),
-                                  collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
-      if(as.numeric(answer) == length(reads)+1){
-        fluorescence2 <- NA
-      } else {
-        fluorescence2 <- data.frame("time" = input[, time.ndx], "fluorescence2" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
-        fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
-        if(all(as.numeric(fluorescence2[-1,2]) == 0) || all(is.na(fluorescence2[-1,2]))){
-          fluorescence2 <- NA
+        if(as.numeric(answer) == 1){
+          data.ls[[1]] <-  data.frame("time" = input[, time.ndx], "growth" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+          if(all(as.numeric(data.ls[[1]][-1,2]) == 0) | all(is.na(data.ls[[1]][-1,2]))){
+            data.ls[[1]] <- NA
+          }
         }
-      }
-      data.ls[[3]] <- fluorescence2
-    }
-  } else {
-    growth <- data.frame("time" = input[, time.ndx], "growth" = c(input[1, read.ndx], as.numeric(input[-1, read.ndx])))
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
+
+        if(as.numeric(answer) == 2){
+          data.ls[[2]] <-  data.frame("time" = input[, time.ndx], "fluorescence" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+          data.ls[[2]][which(data.ls[[2]] == "OVRFLW", arr.ind = TRUE)] <- NA
+          if(all(as.numeric(data.ls[[2]][-1,2]) == 0) || all(is.na(data.ls[[2]][-1,2]))){
+            fluorescence <- NA
+          }
+        }
+      } # if(length(reads) == 1)
+      if(length(reads) > 1){
+        answer <- readline(paste0(
+          "Assign data type for read: ",
+          reads[i],
+          "?\n",
+          paste("[1] Growth",
+                "[2] Fluorescence",
+                "[3] Fluorescence 2 (to normalize Fluorescence)",
+                "[4] Ignore",
+                sep = "\n")
+        ))
+
+        if(as.numeric(answer) < 4)
+          assigned <- c(assigned, TRUE)
+
+        if(as.numeric(answer) == 1){
+          data.ls[[1]] <-  data.frame("time" = input[, time.ndx], "growth" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+        }
+        if(as.numeric(answer) == 2){
+          data.ls[[2]] <-  data.frame("time" = input[, time.ndx], "fluorescence" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+          data.ls[[as.numeric(answer)]][which(data.ls[[as.numeric(answer)]] == "OVRFLW", arr.ind = TRUE)] <- NA
+        }
+        if(as.numeric(answer) == 3){
+          data.ls[[3]] <-  data.frame("time" = input[, time.ndx], "fluorescence" = c(input[1, read.ndx[as.numeric(answer)]], as.numeric(input[-1, read.ndx[as.numeric(answer)]])))
+          data.ls[[as.numeric(answer)]][which(data.ls[[as.numeric(answer)]] == "OVRFLW", arr.ind = TRUE)] <- NA
+        }
+        if(length(assigned) == 3)
+          break
+      } #if(length(reads) > 1)
   }
 
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of the "Growth Profiler".
@@ -1089,9 +1082,9 @@ parse_growthprofiler <- function(input)
   data.ls <- list()
   data.ls[[1]] <- growth
   data.ls[[2]] <- NA
-  # data.ls[[3]] <- NA
+  data.ls[[3]] <- NA
 
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of "Tecan" plate readers.
@@ -1102,7 +1095,7 @@ parse_growthprofiler <- function(input)
 #'
 #' @examples
 #' \dontrun{
-#' input <- read_file(filename = system.file("Tecan.csv", package = "QurvE"), csvsep = "," )
+#' input <- read_file(filename = system.file("Tecan.csv", package = "QurvE"), csvsep = ";" )
 #' parsed <- parse_tecan(input)
 #' }
 parse_tecan <- function(input)
@@ -1142,52 +1135,47 @@ parse_tecan <- function(input)
     }
   }
   names(read.data) <- reads
-  data.ls <- list()
-  if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the growth data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      growth <- NA
-    } else {
-      growth <- read.data[[as.numeric(answer)]]
+  data.ls <- list(NA, NA, NA)
+
+  for(i in 1:length(reads)){
+    if(length(reads) == 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              sep = "\n")
+      ))
+
+      if(as.numeric(answer) == 1)
+        data.ls[[1]] <-  read.data[[1]]
+      if(as.numeric(answer) == 2)
+        data.ls[[2]] <-  read.data[[1]]
     }
+    if(length(reads) > 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              "[3] Fluorescence 2 (to normalize Fluorescence)",
+              "[4] Ignore",
+              sep = "\n")
+      ))
 
-    answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      fluorescence <- NA
-    } else {
-      fluorescence <- read.data[[as.numeric(answer)]]
-      fluorescence[which(fluorescence == "OVER", arr.ind = TRUE)] <- NA
-    }
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- fluorescence
+      if(as.numeric(answer) < 4){
+        data.ls[[as.numeric(answer)]] <-  read.data[[i]]
 
-    if(length(reads)>2){
-      answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
-                                paste(unlist(lapply(1:length(reads), function (i)
-                                  paste0("[", i, "] ", reads[i]))),
-                                  collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
-      if(as.numeric(answer) == length(reads)+1){
-        fluorescence2 <- NA
-      } else {
-        fluorescence2 <- read.data[[as.numeric(answer)]]
-        fluorescence2[which(fluorescence2 == "OVER", arr.ind = TRUE)] <- NA
+        # replace "OVRFLW" with NA in fluorescence data
+        if(as.numeric(answer) %in% c(2,3))
+          data.ls[[as.numeric(answer)]][which(data.ls[[as.numeric(answer)]] == "OVER", arr.ind = TRUE)] <- NA
       }
-      data.ls[[3]] <- fluorescence2
     }
-  } else {
-    growth <- read.data[[1]]
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
   }
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of "Biolector" plate readers.
@@ -1198,7 +1186,7 @@ parse_tecan <- function(input)
 #'
 #' @examples
 #' \dontrun{
-#' input <- read_file(filename = system.file("biolector", package = "QurvE"), csvsep = "," )
+#' input <- read_file(filename = system.file("biolector.csv", package = "QurvE"), csvsep = ";" )
 #' parsed <- parse_biolector(input)
 #' }
 parse_biolector <- function(input)
@@ -1263,15 +1251,15 @@ parse_biolector <- function(input)
 
     data.ls[[1]] <- growth
     data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
+    data.ls[[3]] <- NA
 
   } else {
     growth <- read.data[[1]]
     data.ls[[1]] <- growth
     data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
+    data.ls[[3]] <- NA
   }
-  return(list(data.ls))
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.
@@ -1321,52 +1309,48 @@ parse_victornivo <- function(input)
     }
   }
   names(read.data) <- reads
-  data.ls <- list()
-  if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the growth data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      growth <- NA
-    } else {
-      growth <- read.data[[as.numeric(answer)]]
+  data.ls <- list(NA, NA, NA)
+
+  for(i in 1:length(reads)){
+    if(length(reads) == 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              sep = "\n")
+      ))
+
+      if(as.numeric(answer) == 1)
+        data.ls[[1]] <-  read.data[[1]]
+      if(as.numeric(answer) == 2)
+        data.ls[[2]] <-  read.data[[1]]
     }
+    if(length(reads) > 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              "[3] Fluorescence 2 (to normalize Fluorescence)",
+              "[4] Ignore",
+              sep = "\n")
+      ))
 
-    answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      fluorescence <- NA
-    } else {
-      fluorescence <- read.data[[as.numeric(answer)]]
-      fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
-    }
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- fluorescence
+      if(as.numeric(answer) < 4){
+        data.ls[[as.numeric(answer)]] <-  read.data[[i]]
 
-    if(length(reads)>2){
-      answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
-                                paste(unlist(lapply(1:length(reads), function (i)
-                                  paste0("[", i, "] ", reads[i]))),
-                                  collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
-      if(as.numeric(answer) == length(reads)+1){
-        fluorescence2 <- NA
-      } else {
-        fluorescence2 <- read.data[[as.numeric(answer)]]
-        fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+        # replace "OVRFLW" with NA in fluorescence data
+        if(as.numeric(answer) %in% c(2,3))
+          data.ls[[as.numeric(answer)]][which(data.ls[[as.numeric(answer)]] == "OVRFLW", arr.ind = TRUE)] <- NA
       }
-      data.ls[[3]] <- fluorescence2
     }
-  } else {
-    growth <- read.data[[1]]
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
   }
-  return(list(data.ls))
+
+  invisible(list(data.ls))
 }
 
 #' Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor X3" plate readers.
@@ -1464,50 +1448,46 @@ parse_victorx3 <- function(input)
     }
   }
   names(read.data) <- reads
-  data.ls <- list()
-  if(length(reads)>1){
 
-    answer <- readline(paste0("Indicate where the growth data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      growth <- NA
-    } else {
-      growth <- read.data[[as.numeric(answer)]]
+  data.ls <- list(NA, NA, NA)
+
+  for(i in 1:length(reads)){
+    if(length(reads) == 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              sep = "\n")
+      ))
+
+      if(as.numeric(answer) == 1)
+        data.ls[[1]] <-  read.data[[1]]
+      if(as.numeric(answer) == 2)
+        data.ls[[2]] <-  read.data[[1]]
     }
+    if(length(reads) > 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              "[3] Fluorescence 2 (to normalize Fluorescence)",
+              "[4] Ignore",
+              sep = "\n")
+      ))
 
-    answer <- readline(paste0("Indicate where the fluorescence data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      fluorescence <- NA
-    } else {
-      fluorescence <- read.data[[as.numeric(answer)]]
-      fluorescence[which(fluorescence == "OVRFLW", arr.ind = TRUE)] <- NA
-    }
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- fluorescence
+      if(as.numeric(answer) < 4){
+        data.ls[[as.numeric(answer)]] <-  read.data[[i]]
 
-    if(length(reads)>2){
-      answer <- readline(paste0("Indicate where the fluorescence 2 data is stored?\n",
-                                paste(unlist(lapply(1:length(reads), function (i)
-                                  paste0("[", i, "] ", reads[i]))),
-                                  collapse = "\n"), "\n[", length(reads)+1, "] Disregard fluorescence 2 data\n"))
-      if(as.numeric(answer) == length(reads)+1){
-        fluorescence2 <- NA
-      } else {
-        fluorescence2 <- read.data[[as.numeric(answer)]]
-        fluorescence2[which(fluorescence2 == "OVRFLW", arr.ind = TRUE)] <- NA
+        # replace "OVRFLW" with NA in fluorescence data
+        if(as.numeric(answer) %in% c(2,3))
+          data.ls[[as.numeric(answer)]][which(data.ls[[as.numeric(answer)]] == "OVRFLW", arr.ind = TRUE)] <- NA
       }
-      data.ls[[3]] <- fluorescence2
     }
-  } else {
-    growth <- read.data[[1]]
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
   }
-  return(list(data.ls))
+
+  invisible(list(data.ls))
 }
