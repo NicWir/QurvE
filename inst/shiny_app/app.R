@@ -267,11 +267,14 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           ),
                                                         ), # wellpanel
 
-                                                        checkboxInput(inputId = 'load_fl2_data_custom',
-                                                                     label = 'Use second fluorescence to normalize fluorescence.',
-                                                                     value = FALSE),
-                                                        bsPopover("load_fl2_data_custom", title = "Provide a table file with fluorescence 2 data",
-                                                                  content = "Table layout must mimic that of growth data. Fluorescence 2 data is only used to normalize of fluorescence!"),
+                                                        conditionalPanel(
+                                                          condition = "output.fluorescencefileUploaded",
+                                                          checkboxInput(inputId = 'load_fl2_data_custom',
+                                                                        label = 'Use second fluorescence to normalize fluorescence.',
+                                                                        value = FALSE),
+                                                          bsPopover("load_fl2_data_custom", title = "Provide a table file with fluorescence 2 data",
+                                                                    content = "Table layout must mimic that of growth data. Fluorescence 2 data is only used to normalize of fluorescence!")
+                                                        ),
                                                         # #_____Fluorescence 2___________
                                                         conditionalPanel(
                                                           condition = "input.load_fl2_data_custom",
@@ -339,6 +342,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             ),
                                                           ) # wellPanel
                                                         ),
+
+                                                        selectInput(inputId = 'norm_type_custom',
+                                                                    label = 'Select data type for fluorescence normalization',
+                                                                    choices = ""),
 
                                                         tags$div(title="Shall blank values (the mean of samples identified by 'Blank' IDs) be subtracted from values within the same experiment?",
                                                                  checkboxInput(inputId = 'subtract_blank_custom',
@@ -584,6 +591,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             )
                                                           )
                                                         ),
+
                                                         selectInput(inputId = 'norm_type_parse',
                                                                       label = 'Select Read for fluorescence normalization',
                                                                       choices = ""),
@@ -1185,19 +1193,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        bsPopover(id = "data_type_x_fluorescence", title = HTML("<em>x_type</em>"), content = "Select the data type that is used as the independent variable for all fits."),
 
                                                                        conditionalPanel(
-                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present && input.norm_type_parse == 'growth'",
+                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present",
                                                                          tags$div(title="Use normalized fluorescence (divided by growth values) for all fits.",
                                                                                   checkboxInput(inputId = 'normalize_fluorescence',
-                                                                                                label = 'Normalize fluorescence to growth'
-                                                                                  )
-                                                                         )
-                                                                       ),
-
-                                                                       conditionalPanel(
-                                                                         condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present && input.norm_type_parse == 'fluorescence 2'",
-                                                                         tags$div(title="Use normalized fluorescence (divided by growth values) for all fits.",
-                                                                                  checkboxInput(inputId = 'normalize_fluorescence',
-                                                                                                label = 'Normalize fluorescence to fluorescence 2'
+                                                                                                label = 'Use normalized fluorescence'
                                                                                   )
                                                                          )
                                                                        ),
@@ -3334,13 +3333,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                   label = "Change color palette",
                                                                                   width = "100%",
                                                                                   choices = names(QurvE:::single_hue_palettes),
-                                                                                  selected = names(QurvE:::single_hue_palettes),
+                                                                                  selected = names(QurvE:::single_hue_palettes)[1],
                                                                                   multiple = FALSE
                                                                    ),
                                                                    bsPopover(id = "color_palettes_grid_plot",
                                                                              title = HTML("<em>Define the colors used to visualize the value of the chosen parameter</em>"), placement = "top",
                                                                              content = ""
                                                                    ),
+
+                                                                   checkboxInput(inputId = "invert_color_palette_grid_plot",
+                                                                                 label = "Invert color palette",
+                                                                                 value = FALSE)
 
                                                                  ), # Side panel growth group plots
 
@@ -4840,13 +4843,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                label = "Change color palette",
                                                                                width = "100%",
                                                                                choices = names(QurvE:::single_hue_palettes),
-                                                                               selected = names(QurvE:::single_hue_palettes),
+                                                                               selected = names(QurvE:::single_hue_palettes)[1],
                                                                                multiple = FALSE
                                                                    ),
                                                                    bsPopover(id = "color_palettes_grid_plot_fluorescence",
                                                                              title = HTML("<em>Define the colors used to visualize the value of the chosen parameter</em>"), placement = "top",
                                                                              content = ""
                                                                    ),
+
+                                                                   checkboxInput(inputId = "invert_color_palette_grid_plot_fluorescence",
+                                                                                 label = "Invert color palette",
+                                                                                 value = FALSE)
 
                                                                  ), # Side panel fluorescence group plots
 
@@ -5897,6 +5904,7 @@ server <- function(input, output, session){
     ##___Custom____####
 
   hide("Custom_Data_Tables")
+  hide("norm_type_custom")
   ### Test if custom_file_growth was loaded
   output$growthfileUploaded <- reactive({
     if(is.null(input$custom_file_growth)) return(FALSE)
@@ -5917,6 +5925,30 @@ server <- function(input, output, session){
     else return(TRUE)
   })
   outputOptions(output, 'fluorescence2fileUploaded', suspendWhenHidden=FALSE)
+
+  observe({
+    if(!is.null(input$custom_file_fluorescence) && (!is.null(input$custom_file_growth) | !is.null(input$custom_file_fluorescence2))){
+      show("norm_type_custom")
+    } else {
+      hide("norm_type_custom")
+      return(NULL)
+    }
+    norm.types <- c()
+    if(!is.null(input$custom_file_growth)){
+      norm.types <- c(norm.types, "growth")
+    }
+    if(!is.null(input$custom_file_fluorescence2)){
+      norm.types <- c(norm.types, "fluorescence 2")
+    }
+    if(length(norm.types) > 0){
+      show("norm_type_custom")
+    } else {
+      hide("norm_type_custom")
+    }
+    updateSelectInput(inputId = "norm_type_custom",
+                      choices = norm.types
+    )
+  })
 
   # Read data upon click on [Read data]
   observeEvent(input$read_custom,{
@@ -6848,16 +6880,19 @@ server <- function(input, output, session){
       return(NULL)
     if(length(reads) > 1 && input$parsed_reads_fluorescence != "Ignore"){
       show("parsed_reads_fluorescence2")
+      show("norm_type_parse")
     } else {
       hide("parsed_reads_fluorescence2")
+      hide("norm_type_parse")
     }
     norm.types <- c()
     if(input$parsed_reads_growth != "Ignore"){
       norm.types <- c(norm.types, "growth")
     }
-    if(length(reads) > 2 && input$parsed_reads_fluorescence != "Ignore"){
-      if(input$parsed_reads_fluorescence2 != "Ignore")
-        norm.types <- c(norm.types, "fluorescence 2")
+    if(input$parsed_reads_fluorescence2 != "Ignore"){
+      norm.types <- c(norm.types, "fluorescence 2")
+    }
+    if(length(norm.types) > 0){
       show("norm_type_parse")
     } else {
       hide("norm_type_parse")
@@ -9915,6 +9950,7 @@ server <- function(input, output, session){
                                                     1,
                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
+      browser()
       try(
         suppressWarnings(
           plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
@@ -11522,6 +11558,7 @@ server <- function(input, output, session){
                   lwd = input$line_width_growth_grid_plot,
                   basesize = input$base_size_growth_grid_plot,
                   pal = input$color_palettes_grid_plot,
+                  invert.pal = input$invert_color_palette_grid_plot,
                   sort_by_conc = input$sort_by_conc_growth_grid_plot,
                   legend.lim = c(input$legend_lim_min_growth_grid_plot, input$legend_lim_max_growth_grid_plot),
                   nrow = input$nrows_growth_grid_plot,
@@ -11553,6 +11590,7 @@ server <- function(input, output, session){
                   lwd = input$line_width_growth_grid_plot,
                   basesize = input$base_size_growth_grid_plot,
                   pal = input$color_palettes_grid_plot,
+                  invert.pal = input$invert_color_palette_grid_plot,
                   sort_by_conc = input$sort_by_conc_growth_grid_plot,
                   legend.lim = c(input$legend_lim_min_growth_grid_plot, input$legend_lim_max_growth_grid_plot),
                   nrow = input$nrows_growth_grid_plot,
@@ -11614,9 +11652,10 @@ server <- function(input, output, session){
     } else {
       reference.nm <- NULL
     }
+    param <- input$parameter_dr_parameter_growth_plot
     suppressWarnings(
       plot.dr_parameter(results,
-                        param = input$parameter_dr_parameter_growth_plot,
+                        param = param,
                         names = input$select_sample_based_on_string_growth_dr_parameter_plot,
                         exclude.nm = input$exclude_sample_based_on_strings_growth_dr_parameter_plot,
                         reference.nm = reference.nm,
@@ -11668,6 +11707,12 @@ server <- function(input, output, session){
         dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50')
         if(!is.null(input$number_of_bootstrappings_dr_growth) && !is.na(input$number_of_bootstrappings_dr_growth) && input$number_of_bootstrappings_dr_growth != "" && as.numeric(input$number_of_bootstrappings_dr_growth) > 1){
           dr_parameters <- c(dr_parameters, 'Response(EC50) - Bootstrap' = 'drboot.meanEC50', 'EC50 - Bootstrap' = 'drboot.meanEC50y')
+        }
+        if(input$log_transform_response_growth){
+          dr_parameters <- c(dr_parameters, 'Original response(EC50)' = 'yEC50.orig')
+        }
+        if(input$log_transform_concentration_growth){
+          dr_parameters <- c(dr_parameters, 'Original EC50' = 'EC50.orig')
         }
       } else {
         dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50.Estimate')
@@ -12669,8 +12714,6 @@ server <- function(input, output, session){
         else
           x_axis_title <- input$x_axis_title_fluorescence_grid_plot
 
-        browser()
-
         if(input$select_string_visualize_fluorescence_grid){
           suppressWarnings(
             plot.grid(results,
@@ -12692,6 +12735,7 @@ server <- function(input, output, session){
                       basesize = input$base_size_fluorescence_grid_plot,
                       pal = input$color_palettes_grid_plot_fluorescence,
                       sort_by_conc = input$sort_by_conc_fluorescence_grid_plot,
+                      invert.pal = input$invert_color_palette_grid_plot_fluorescence,
                       legend.lim = c(input$legend_lim_min_fluorescence_grid_plot, input$legend_lim_max_fluorescence_grid_plot),
                       nrow = input$nrows_fluorescence_grid_plot,
                       param = input$parameter_parameter_grid_plot_fluorescence
@@ -12722,6 +12766,7 @@ server <- function(input, output, session){
                       lwd = input$line_width_fluorescence_grid_plot,
                       basesize = input$base_size_fluorescence_grid_plot,
                       pal = input$color_palettes_grid_plot_fluorescence,
+                      invert.pal = input$invert_color_palette_grid_plot_fluorescence,
                       sort_by_conc = input$sort_by_conc_fluorescence_grid_plot,
                       legend.lim = c(input$legend_lim_min_fluorescence_grid_plot, input$legend_lim_max_fluorescence_grid_plot),
                       nrow = input$nrows_fluorescence_grid_plot,
@@ -13053,6 +13098,12 @@ server <- function(input, output, session){
           dr_parameters <- c('Response(EC50)' = 'yEC50','EC50' = 'EC50')
           if(results$control$nboot.dr > 1){
             dr_parameters <- c(dr_parameters, 'Response(EC50) - Bootstrap' = 'drboot.meanEC50', 'EC50 - Bootstrap' = 'drboot.meanEC50y')
+          }
+          if(input$log_transform_response_fluorescence){
+            dr_parameters <- c(dr_parameters, 'Original response(EC50)' = 'yEC50.orig')
+          }
+          if(input$log_transform_concentration_fluorescence){
+            dr_parameters <- c(dr_parameters, 'Original EC50' = 'EC50.orig')
           }
         } else {
           dr_parameters <- c('Leakiness' = 'y.min','Sensitivity' = 'K', 'Fold change' = 'fc', 'Maximum response' = 'y.max')

@@ -15,6 +15,7 @@
     "max_slope.spline"),
   pal = c("Green", "Orange", "Purple", "Magenta", "Grey", "Blue", "Grey", "Red", "Cyan",
     "Brown", "Mint"),
+  invert.pal = FALSE,
   IDs = NULL,
   sort_by_ID = FALSE,
   names = NULL,
@@ -54,6 +55,8 @@
 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'}
 
 \item{pal}{(Character string) Choose one of 'Green',   'Orange',  'Purple',  'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', or 'Mint' to visualize the value of the parameter chosen as \code{param} for each sample or condition.}
+
+\item{invert.pal}{(Logical) Shall the colors in the chosen \code{pal} be inverted (\code{TRUE}) or not \code{FALSE}?}
 
 \item{IDs}{(String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}. The order of strings within the vector defines the order of samples within the grid.}
 

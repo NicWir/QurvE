@@ -4159,7 +4159,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
 #'
 #' plot.dr_parameter(drFit, param = 'EC50')
 #'
-plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.min', 'fc', 'K', 'n', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y'),
+plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.min', 'fc', 'K', 'n', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y', 'EC50.orig', 'yEC50.orig'),
                               names = NULL, exclude.nm = NULL, basesize = 12, reference.nm = NULL, label.size = NULL,
                               plot = TRUE, export = FALSE, height = 7, width = NULL, out.dir = NULL, out.nm = NULL, ...)
 {
@@ -4170,8 +4170,8 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
   exclude.nm <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", exclude.nm)), pattern = ";"))
   # check class of object
   if(!(any(methods::is(object) %in% c("drTable", "grofit", "drFit", "flFitRes")))) stop("object needs to be either a 'grofit', 'drTable', 'drFit', or 'flFitRes' object created with growth.workflow(), growth.drFit(), fl.workflow(), or growth.drFit().")
-  if(!is.character(param) || !(param %in% c('y.max', 'EC50.Estimate', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y', 'Km', 'Vmax', 'EC50.Estimate')))
-    stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', or 'yEC50' (for fluorescence fits), or \n 'yEC50', 'EC50', 'EC50.Estimate', 'drboot.meanEC50', or 'drboot.meanEC50y' (for growth fits).")
+  if(!is.character(param) || !(param %in% c('y.max', 'EC50.Estimate', 'y.min', 'fc', 'K', 'n', 'EC50', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y', 'Km', 'Vmax', 'EC50.Estimate', 'EC50.orig', 'yEC50.orig')))
+    stop("param needs to be a character string and one of:\n 'y.max', 'y.min', 'fc', 'K', 'n', 'yEC50', 'EC50.orig', or 'yEC50.orig' (for fluorescence fits), or \n 'yEC50', 'EC50', 'EC50.Estimate', 'drboot.meanEC50', 'drboot.meanEC50y', 'EC50.orig', or 'yEC50.orig' (for growth fits).")
   #extract drTable
   if(any(methods::is(object) %in% "drTable")){
     drTable <- as.data.frame(object)
@@ -4297,6 +4297,7 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
 #' 'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline',
 #' 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt'
 #' @param pal (Character string) Choose one of 'Green',   'Orange',  'Purple',  'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', or 'Mint' to visualize the value of the parameter chosen as \code{param} for each sample or condition.
+#' @param invert.pal (Logical) Shall the colors in the chosen \code{pal} be inverted (\code{TRUE}) or not \code{FALSE}?
 #' @param IDs (String or vector of strings) Define samples or groups (if \code{mean = TRUE}) to combine into a single plot based on exact matches with entries in the \code{label} or \code{condition} columns of \code{grofit$expdesign}. The order of strings within the vector defines the order of samples within the grid.
 #' @param sort_by_ID (Logical) Shall samples/conditions be ordered as entered in \code{IDs} (\code{TRUE}) or alphabetically (\code{FALSE})?
 #' @param names (String or vector of strings) Define groups to combine into a single plot. Partial matches with sample/group names are accepted. If \code{NULL}, all samples are considered. Note: Ensure to use unique substrings to extract groups of interest. If the name of one condition is included in its entirety within the name of other conditions, it cannot be extracted individually.
@@ -4356,6 +4357,7 @@ plot.grid <- function(x,
                                 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                 'max_slope.linfit', 'max_slope.spline'),
                       pal = c("Green",   "Orange",  "Purple",  "Magenta", "Grey", "Blue", "Grey", "Red", "Cyan", "Brown", "Mint"),
+                      invert.pal = FALSE,
                       IDs = NULL,
                       sort_by_ID = FALSE,
                       names = NULL,
@@ -4712,8 +4714,17 @@ plot.grid <- function(x,
 
 
     if(!is.null(legend.lim)){
-      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
-                                              high = "white", limits = legend.lim) +
+      if(!invert.pal){
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[1],
+                                                high = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))],
+                                                limits = legend.lim)
+      } else {
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))],
+                                                high = rev(single_hue_palettes[[pal]])[1],
+                                                limits = legend.lim)
+      }
+
+      p <- p +
         ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
                                                         frame.linewidth = basesize/22,
                                                         title.hjust = 0.5,
@@ -4726,9 +4737,15 @@ plot.grid <- function(x,
                                                         barwidth = basesize,
                                                         barheight = basesize/10))
     } else {
-      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
-                                              high = "white") +
-        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+      if(!invert.pal){
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[1],
+                                                high = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))])
+      } else {
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))],
+                                                high = rev(single_hue_palettes[[pal]])[1])
+      }
+
+      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
                                                         frame.linewidth = basesize/22,
                                                         title.hjust = 0.5,
                                                         title.vjust = 0.8,
@@ -4984,9 +5001,17 @@ plot.grid <- function(x,
                                             linewidth = basesize/22, linetype = "solid"))
 
     if(!is.null(legend.lim)){
-      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
-                                              high = "white", limits = legend.lim) +
-        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+      if(!invert.pal){
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[1],
+                                                high = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))],
+                                                limits = legend.lim)
+      } else {
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))],
+                                                high = rev(single_hue_palettes[[pal]])[1],
+                                                limits = legend.lim)
+      }
+
+      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
                                                         frame.linewidth = basesize/22,
                                                         title.hjust = 0.5,
                                                         title.vjust = 0.8,
@@ -4998,9 +5023,15 @@ plot.grid <- function(x,
                                                         barwidth = basesize,
                                                         barheight = basesize/10))
     } else {
-      p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[2],
-                                              high = "white") +
-        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+      if(!invert.pal){
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[1],
+                                                high = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))])
+      } else {
+        p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[length(rev(single_hue_palettes[[pal]]))],
+                                                high = rev(single_hue_palettes[[pal]])[1])
+      }
+
+      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
                                                         frame.linewidth = basesize/22,
                                                         title.hjust = 0.5,
                                                         title.vjust = 0.8,

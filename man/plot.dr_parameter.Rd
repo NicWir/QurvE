@@ -7,7 +7,7 @@
 \method{plot}{dr_parameter}(
   x,
   param = c("EC50", "EC50.Estimate", "y.max", "y.min", "fc", "K", "n", "yEC50",
-    "drboot.meanEC50", "drboot.meanEC50y"),
+    "drboot.meanEC50", "drboot.meanEC50y", "EC50.orig", "yEC50.orig"),
   names = NULL,
   exclude.nm = NULL,
   basesize = 12,
