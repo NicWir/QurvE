@@ -647,7 +647,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              paste0(
                                                                "<ul>",
                                                                "<li>The first row contains \\'Time\\' and \\'Blank\\', as well as sample identifiers \\(identical for replicates\\).</li>",
-                                                               "<li>The second row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
+                                                               "<li>The second row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates with the same replicate number. Samples with identical IDs, concentrations, and replicate <i>numbers</i> will be combined by their <i>average</i>.</li>",
                                                                "<li>The third row contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
                                                                "</ul>"
                                                              ),
@@ -676,7 +676,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                "<ul>",
                                                                "<li>The first column contains the <i>well</i> number in the plate.</li>",
                                                                "<li>The second column contains the <i>ID</i> \\(i.e., organism, condition, etc.\\) of each sample. The ID needs to be identical for replicates. .</li>",
-                                                               "<li>The third column row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates by <i>letters</i> following the <i>numbers</i> for biological replicates. Samples with identical IDs and replicate <i>numbers</i> but different <i>letters</i> will be combined as their <i>averages</i>.</li>",
+                                                               "<li>The third column row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates with the same replicate number. Samples with identical IDs, concentrations, and replicate <i>numbers</i> will be combined by their <i>average</i>.</li>",
                                                                "<li>The fourth column contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
                                                                "</ul>"
                                                              ),

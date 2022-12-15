@@ -279,11 +279,11 @@ read_data <-
         ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
         name <- df[ndx.cond[1]+1,1]
         conc <- df[ndx.cond[1]+1,3]
-        tech.rep <- suppressWarnings(as.numeric(unique(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
+        tech.rep <- suppressWarnings(as.numeric(unique(gsub("___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
         tech.rep <- tech.rep[!is.na(tech.rep)]
         if(length(tech.rep)>1){
           for(j in 1:length(tech.rep)){
-            ndx.rep <- ndx.cond[which(gsub("[[:alpha:]]___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j])]
+            ndx.rep <- ndx.cond[which(gsub("___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j])]
             if(length(ndx.rep)>1){
               values <- apply(df[ndx.rep+1, 4:ncol(df)], 1, as.numeric)
               means <- rowMeans(values)
@@ -294,9 +294,6 @@ read_data <-
               df[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
             }
           }
-        }
-        else{
-          df[1+ndx.cond, 2] <- gsub("[[:alpha:]]", "", df[1+ndx.cond, 2])
         }
       }
       if(length(remove)>1){
