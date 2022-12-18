@@ -71,7 +71,7 @@ library(QurvE)
 
 In virtually all disciplines of biology dealing with living organisms, from classical microbiology to applied biotechnology, it is routine to characterize the **growth** of the species under study. `QurvE` provides a suite of analysis tools to make such growth profiling quick, efficient, and reproducible. In addition, it allows the characterization of **fluorescence** data for, e.g., biosensor characterization in plate reader experiments (further discussed in the vignette *Quantitiative Fluorescence Curve Evaluation with Package `QurvE`*). All computational steps to obtain an in-depth characterization are combined into user-friendly *workflow* functions and a range of plotting functions allow the visualization of fits and the comparison of organism performances.
 
-Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, density increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
+Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, growth measurement increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
 
 The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. `QurvE` was designed to be usable with minimal prior knowledge of the R programming language or programming in general. You will need to be familiar with the idea of running commands from a console or writing basic scripts. For R beginners, [this](https://moderndive.netlify.app/1-getting-started.html) is a great starting point, there are some good resources [here](https://education.rstudio.com/learn/beginner/) and we suggest using the [RStudio application](https://rstudio.com/products/rstudio/). It provides an environment for writing and running R code.
 
@@ -103,12 +103,12 @@ Three methods are available to characterize growth curves:
 
 1.  Fit parametric growth models to (log-transformed) growth data
 
-2.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total density increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]\
+2.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total growth value increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]\
     The algorithm works as follows:
 
     i.  Fit linear regressions [with the Theil-Sen estimator [@sen1968; @theil1992]] to all subsets of `h` consecutive, log-transformed data points (sliding window of size `h`). If, for example, `h=5`, fit a linear regression to points 1 $\dots$ 5, 2 $\dots$ 6, 3 $\dots$ 7 and so forth.
 
-    ii. Find the subset with the highest slope $\mu_{max}$. Do the R^2^ and RSD values of the regression meet the defined thresholds and do the data points within the regression window account for at least a defined fraction of the total density increase? If not, evaluate the regression with the second highest slope, and so forth.
+    ii. Find the subset with the highest slope $\mu_{max}$. Do the R^2^ and RSD values of the regression meet the defined thresholds and do the data points within the regression window account for at least a defined fraction of the total growth measurement increase? If not, evaluate the regression with the second highest slope, and so forth.
 
     iii. Include also the data points of adjacent subsets that have a slope of at least a $defined \space quota \times \mu_{max}$, e.g., all regression windows that have at least 95% of the maximum slope.
 
@@ -163,7 +163,7 @@ The purpose of a dose-response analysis is to define the *sensitivity* of a give
 To ensure compatibility with any type of measurement and data type (e.g., optical density, cell count, measured dimensions), `QurvE` uses a custom data layout. Here the first column contains *time values* and **'Time'** in the top cell, cells #2 and #3 are ignored. The remaining columns contain *measurement values* and the following sample identifiers in the top three rows:
 
 1.  Sample name; usually a combination of organism and condition, or 'blank'.
-2.  Replicate number; replicates are identified by *identical* names and concentration values. If only one type of replicate (biological or technical) was performed, enter numerical values here. If **both** biological and technical replicates of these biological replicates have been performed, the biological replicates shall be indicated with numbers and the technical replicates with letters. The technical replicates are then combined with their average value.
+2.  Replicate number; replicates are identified by *identical* names and concentration values. If only one type of replicate (biological or technical) was performed, enter numerical values here. If **both** biological and technical replicates of these biological replicates have been performed, the technical replicates should have the same replicate number. The technical replicates are then combined by their average value.
 3.  (*optional*) Concentration values of an added compound; this information is used to perform a dose-response analysis.
 
 Several experiments (e.g., runs on different plate readers) can be combined into a single file and analyzed simultaneously. Therefore, different experiments are marked by the presence of separate time columns. Different lengths and values in these time columns are permitted.\
@@ -177,16 +177,16 @@ knitr::include_graphics("../man/figures/Data_layout.jpg", dpi = 100, error = F)
 To read data in custom format, run:
 
 ```{r read-custom, echo = TRUE, eval = FALSE}
-grodata <- read_data(data.density = 'path_to_data_file',
+grodata <- read_data(data.growth = 'path_to_data_file',
                    csvsep = ';', # or ','
                    dec = '.', # or ','
-                   sheet.density = 1, # number (or "name") of the EXCEL file sheet containing data
+                   sheet.growth = 1, # number (or "name") of the EXCEL file sheet containing data
                    subtract.blank = TRUE,
-                   calibration = NULL)
+                   calib.growth = NULL)
 ```
 
-The `r colorize_code("data.density", "red")` argument takes the path to the file containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.density", "red")` specifies the number or name (in quotes) of the sheet containing the data.\
-If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values.
+The `r colorize_code("data.growth", "red")` argument takes the path to the file or the name of an R dataframe object containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.growth", "red")` specifies the number or name (in quotes) of the sheet containing the data.\
+If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calib.growth", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calib.growth = 'y = x * 2 + 0.5'`) to transform growth measurement values.
 
 ## Data parser
 
@@ -210,11 +210,13 @@ grodata <- parse_data(data.file = 'path_to_data_file',
                     sheet.map = 1, # number (or "name") of the EXCEL file sheet containing
                                    # mapping information
                     subtract.blank = TRUE,
-                    calibration = NULL,
+                    calib.growth = NULL,
                     convert.time = NULL)
 ```
 
-The `r colorize_code("data.file", "red")` argument takes the path to the file containing experimental data exported from a culture device, `r colorize_code("map.file", "red")` the path to the file with mapping information. With `r colorize_code("software", "red")`, you can specify the device (or software) that was used to generate the data. `r colorize_code("csvsep.data", "red")` and `r colorize_code("csvsep.map", "red")` specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`). `r colorize_code("dec.data", "red")` and `r colorize_code("dec.map", "red")` are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file, `r colorize_code("sheet.data", "red")` and/or `r colorize_code("sheet.map", "red")` specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. Similarly, `r colorize_code("convert.time", "red")` accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours).
+The `r colorize_code("data.file", "red")` argument takes the path to the file containing experimental data exported from a culture device, `r colorize_code("map.file", "red")` the path to the file with mapping information. With `r colorize_code("software", "red")`, you can specify the device (or software) that was used to generate the data. `r colorize_code("csvsep.data", "red")` and `r colorize_code("csvsep.map", "red")` specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`). `r colorize_code("dec.data", "red")` and `r colorize_code("dec.map", "red")` are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file, `r colorize_code("sheet.data", "red")` and/or `r colorize_code("sheet.map", "red")` specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If the same Excel file contains both data and mapping information in different worksheets, the file path needs to be specified for both `data.file`and `map.file`.  If `r colorize_code("subtract.blank = TRUE", "red")`, samples with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. The argument `r colorize_code("convert.time", "red")` accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours).
+
+If more than one read type is identified in the provided data file, the user will be prompted to specify which measurements belong to **growth**, **fluorescence**, and **fluorescence2**, respectively.
 
 # Run a complete growth analysis workflow
 
@@ -231,14 +233,14 @@ we load experimental data from the publication @wirth2021 in which *Pseudomonas 
 ## Load data
 
 ```{r load-data, echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE}
-grodata <- read_data(data.density = system.file('2-FMA_toxicity.csv', package = 'QurvE'), csvsep = ";" )
+grodata <- read_data(data.growth = system.file('2-FMA_toxicity.csv', package = 'QurvE'), csvsep = ";" )
 ```
 
 The created object `grodata` can be inspected with `View(grodata)`. It is a list of class `grodata` containing:
 
 -   a `time` matrix with 66 rows, each corresponding to one sample in the dataset, and 161 columns, i.e., time values for each sample.
 
--   a `density` data frame with 66 rows and 161+3 columns. The three additional columns contain the sample identifiers `condition`, `replicate`, and `concentration`.
+-   a `growth` data frame with 66 rows and 161+3 columns. The three additional columns contain the sample identifiers `condition`, `replicate`, and `concentration`.
 
 -   `fluorescence1` (here: `NA`)
 
@@ -455,7 +457,7 @@ plot(grofit$drFit, cex.point = 1, basesize = 12)
 
 # Bootstrapping
 
-When growth experiments are performed on a larger scale with manual density measurements, technical deviations can result in outliers. Such outliers can lead to a distortion of the curve fits, especially if fewer data points are available than is usual in plate reading experiments. In this instance, bootstrapping can provide a more realistic estimation of growth parameters. Bootstrapping is a statistical procedure that resamples a single dataset to create many simulated samples. This is done by randomly drawing data points from a dataset with replacement until the original number of data points has been reached. The analysis (here: growth fitting) is then performed individually on each bootstrapped replicate. The variation in the resulting estimated parameters is a reasonable approximation of the variance in those parameters. To include bootstrapping into the `QurvE` workflow, we define the argument `r colorize_code("nboot.gc", "red")`.
+When growth experiments are performed on a larger scale with manual growth measurements, technical deviations can result in outliers. Such outliers can lead to a distortion of the curve fits, especially if fewer data points are available than is usual in plate reading experiments. In this instance, bootstrapping can provide a more realistic estimation of growth parameters. Bootstrapping is a statistical procedure that resamples a single dataset to create many simulated samples. This is done by randomly drawing data points from a dataset with replacement until the original number of data points has been reached. The analysis (here: growth fitting) is then performed individually on each bootstrapped replicate. The variation in the resulting estimated parameters is a reasonable approximation of the variance in those parameters. To include bootstrapping into the `QurvE` workflow, we define the argument `r colorize_code("nboot.gc", "red")`.
 
 Similarly, we can include bootstrapping in the dose-response analysis if done with `r colorize_code("dr.method = 'spline'", "red")` by defining argument `r colorize_code("nboot.dr", "red")`.
 

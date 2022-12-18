@@ -3238,7 +3238,8 @@ plot.grofit <- function(x, ...,
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()) +
-      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol)) +
+      ggplot2::guides(colour=ggplot2::guide_legend(ncol=legend.ncol))
 
 
     if(log.y == TRUE){
@@ -3414,7 +3415,8 @@ plot.grofit <- function(x, ...,
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()) +
-      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))+
+      ggplot2::guides(colour=ggplot2::guide_legend(ncol=legend.ncol))
 
 
     if(log.y == TRUE){

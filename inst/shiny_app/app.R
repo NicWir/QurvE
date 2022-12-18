@@ -656,6 +656,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                "<ul>",
                                                                "<li>Different experiments with differing time values and experiment-specific blanks are distinguished by an individual \\'Time\\' column to the left of each dataset.</li>",
                                                                "<li>Blank values \\(for each experiment\\) are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected.</li>",
+                                                               "<li>The metadata in the second and third rows are optional to perform the analysis and can be left empty.</li>",
                                                                "</ul>"
                                                              ),
                                                              sep = "<br>"),
@@ -674,15 +675,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                              content = paste("Please format a table providing sample information in the format shown in the figure:",
                                                              paste0(
                                                                "<ul>",
-                                                               "<li>The first column contains the <i>well</i> number in the plate.</li>",
-                                                               "<li>The second column contains the <i>ID</i> \\(i.e., organism, condition, etc.\\) of each sample. The ID needs to be identical for replicates. .</li>",
-                                                               "<li>The third column row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates with the same replicate number. Samples with identical IDs, concentrations, and replicate <i>numbers</i> will be combined by their <i>average</i>.</li>",
+                                                               "<li>The first column contains the <i>well</i> position/name in the plate.</li>",
+                                                               "<li>The second column contains the <i>ID</i> \\(i.e., organism, condition, etc.\\) of each sample. The ID needs to be identical for replicates.</li>",
+                                                               "<li>The third column row contains replicate numbers for the same conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates with the same replicate number. Samples with identical IDs, concentrations, and replicate <i>numbers</i> will be combined by their <i>average</i>.</li>",
                                                                "<li>The fourth column contains \\(optional\\) concentration values to perform a dose-response analysis, if different concentrations of a compound were used in the experiment.</li>",
                                                                "</ul>"
                                                              ),
                                                              "Details:",
                                                              paste0(
-                                                               "The values in \\'Blank\\' samples are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected."
+                                                               "The values in \\'Blank\\' samples are combined as their average and subtracted from all remaining values if option \\[Subtract blank\\] is selected. The metadata in the third and fourth columns are optional to perform the analysis and can be left empty."
                                                              ),
                                                              sep = "<br>"),
                                              trigger = "hover", options = list(container = "body", template = widePopover)

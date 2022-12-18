@@ -2075,7 +2075,8 @@ plot.flFitRes <-  function(x,
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()) +
-      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol)) +
+      ggplot2::guides(colour=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(!all(is.na(df$upper)))
       p <- suppressWarnings(p + geom_ribbon(data = df, aes(ymin=.data$lower,ymax=.data$upper, fill=.data$name), alpha = 0.3, colour = NA)
@@ -2225,7 +2226,7 @@ plot.flFitRes <-  function(x,
           scale_color_manual(name = "Condition",
                              values = colors)
       }
-      p <- suppressWarnings( ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p, position = "right")) )
+      p <- suppressWarnings( ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = TRUE, legend = legend.position, legend.grob = ggpubr::get_legend(p) ))
     }
   } # if(mean == TRUE)
   else {
@@ -2282,7 +2283,8 @@ plot.flFitRes <-  function(x,
       theme(legend.position=legend.position,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()) +
-      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol)) +
+      ggplot2::guides(colour=ggplot2::guide_legend(ncol=legend.ncol))
 
     if(!is.null(x.lim)){
       p <- p + scale_x_continuous(limits = x.lim, breaks = scales::pretty_breaks(n = 10))

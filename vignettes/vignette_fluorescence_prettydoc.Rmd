@@ -69,183 +69,69 @@ library(QurvE)
 
 # Introduction
 
-For a general introduction to the `QurvE` package, see the vignette *Quantitiative Fluorescence Curve Evaluation with Package `QurvE`*.
+For a general introduction to the package, see the vignette *Quantitiative Growth Curve Evaluation with Package `QurvE`*. This vignette will show you how to use `QurvE` to analyze datasets with fluorescence measurements taken over time, as well as how to extract the most important results.
 
-Fluorescent reporter proteins are widely used to study the mechanisms of gene regulation or to develop biosensors that allow the detection of chemical compounds and provide insights into the intracellular environment.
+Fluorescent reporter proteins are widely used to study the mechanisms of gene regulation or to develop biosensors that allow the detection of chemical compounds and provide insights into the intracellular environment. A workflow for analyzing fluorescence data works analogously to analyzing growth data by following the scheme *read data* and *execute workflow*. The package allows users to select either time or growth data (e.g. from the simultaneous measurement of cell density and fluorescence intensity in plate reader experiments) as the independent variable. Additionally, biosensors can be characterized via dose-response analysis.
 
-# Growth profiling methods
+# Fluorescence profiling methods
 
-Three methods are available to characterize growth curves:
-
-1.  Fit parametric growth models to (log-transformed) growth data
-
-2.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total density increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]\
-    The algorithm works as follows:
-
-    i.  Fit linear regressions [with the Theil-Sen estimator [@sen1968; @theil1992]] to all subsets of `h` consecutive, log-transformed data points (sliding window of size `h`). If, for example, `h=5`, fit a linear regression to points 1 $\dots$ 5, 2 $\dots$ 6, 3 $\dots$ 7 and so forth.
-
-    ii. Find the subset with the highest slope $\mu_{max}$. Do the R^2^ and RSD values of the regression meet the defined thresholds and do the data points within the regression window account for at least a defined fraction of the total density increase? If not, evaluate the regression with the second highest slope, and so forth.
-
-    iii. Include also the data points of adjacent subsets that have a slope of at least a $defined \space quota \times \mu_{max}$, e.g., all regression windows that have at least 95% of the maximum slope.
-
-    iv. Fit a new linear model to the extended data window identified in step iii.
-
-    If `biphasic = TRUE` (see section \@ref(run-workflow)), the following steps are performed to define a second growth phase:
-
-    i.  Perform a smooth spline fit on the data with a smoothing factor of 0.5.
-
-    ii. Calculate the second derivative of the spline fit and perform a smooth spline fit of the derivative with a smoothing factor of 0.4.
-
-    iii. Determine local maxima and minima in the second derivative.
-
-    iv. Find the local minimum following $\mu_{max}$ and repeat the heuristic linear method for later time values.
-
-    v.  Find the local maximum before $\mu_{max}$ and repeat the heuristic linear method for earlier time values.
-
-    vi. Choose the greater of the two independently determined slopes as $\mu_{max}2$.
-
-3.  Perform a smooth spline fit on (log-transformed) growth data and extract µ~max~ as the maximum value of the first derivative^1^.
-
-    If `biphasic = TRUE` (see section \@ref(run-workflow)), the following steps are performed to define a second growth phase:
-
-    i.  Determine local minima within the first derivative of the smooth spline fit.
-
-    ii. Remove the *'peak'* containing the highest value of the first derivative (i.e., $\mu_{max}$) that is flanked by two local minima.
-
-    iii. Repeat the smooth spline fit and identification of maximum slope for later time values than the local minimum after $\mu_{max}$.
-
-    iv. Repeat the smooth spline fit and identification of maximum slope for earlier time values than the local minimum before $\mu_{max}$.
-
-    v.  Choose the greater of the two independently determined slopes as $\mu_{max}2$.
-
-[^1]: For linear and nonparametric (i.e, smooth spline) fits, the lag time is calculated as the intersect of the tangent at µ~max~ and a horizontal line at the first data point (y~0~). For the analysis of bi-phasic growth curves, the lag time is extracted as the lower of the two obtained $\lambda$ values.
+`QurvE` offers the same curve evaluation methods for fluorescence data as for growth data, with the exception of fitting growth models. The calculation algorithms for *linear regression* and *nonparametric fits* (smoothing splines) as well as the default parameters have been empirically adjusted to account for the differences in curve shapes commonly seen with fluorescence data.
 
 # Dose-response analysis methods
 
-The purpose of a dose-response analysis is to define the *sensitivity* of a given organism to the effects of a compound or the *potency* of a substance, respectively. Such effects can be either beneficial (e.g., a nutrient compound) or detrimental (e.g., an antibiotic). The sensitivity is reflected in the half-maximal effective concentration (*EC~50~*), i.e., the concentration (dose) at which the half-maximal response (e.g., $\mu_{max}$ or $\Delta$Y) is observed. `QurvE` provides two methods to determine the *EC~50~*:
+Dose response analysis is a useful method for evaluating the performance of a biosensor. Biosensors are typically designed to respond to specific chemical compounds, and the strength of the response often depends on the concentration of the target compound. Dose-response analysis can be used to determine the concentration of a target compound that elicits a half-maximal response in the biosensor (variants), the half-maximal effective concentration (EC~50~). This allows evaluation of the *sensitivity* and *specificity* of a biosensor and can be used to optimize the design for a particular application. In addition to evaluating the performance of biosensors, dose-response analysis can also be used to study the mechanisms of gene regulation in biological systems. By measuring the response of a biological system to different concentrations of a chemical compound, researchers can gain insights into the genes and pathways involved in the response, and can identify potential targets for drug discovery. `QurvE` provides two methods to perform dose-response analyses on fluorescence data:
 
 1.  Perform a smooth spline fit on response vs. concentration data and extract the *EC~50~* as the concentration at the midpoint between the largest and smallest response value.
 
-2.  Apply up to 20 (parametric) dose-response models to response vs. concentration data and choose the best model based on the Akaike information criterion (AIC). This is done using the excellent package `drc` [@ritz2016].
+2.  Apply a biosensor response model to response vs. concentration data [@meyer2019].
 
-# Data formats
+# Run a complete fluorescence analysis workflow
 
-`QurvE` accepts files with the formats *.xls*, *.xlsx*, *.csv*, *.tsv*, and *.txt* (tab separated). The data in the files should be structured as shown in Figure \@ref(fig:data-layout). Alternatively, data parsers are available that allow direct import of raw data from different culture instruments. For a list of currently supported devices, please run `?parse_data`.
-
-*Please note: I recommend always converting .xls or .xlsx files to an alternate format first to speed up the parsing process. Reading Excel files may require orders of magnitude longer processing time.*
-
-## Custom format
-
-To ensure compatibility with any type of measurement and data type (e.g., optical density, cell count, measured dimensions), `QurvE` uses a custom data layout. Here the first column contains *time values* and **'Time'** in the top cell, cells #2 and #3 are ignored. The remaining columns contain *measurement values* and the following sample identifiers in the top three rows:
-
-1.  Sample name; usually a combination of organism and condition, or 'blank'.
-2.  Replicate number; replicates are identified by *identical* names and concentration values. If only one type of replicate (biological or technical) was performed, enter numerical values here. If **both** biological and technical replicates of these biological replicates have been performed, the biological replicates shall be indicated with numbers and the technical replicates with letters. The technical replicates are then combined with their average value.
-3.  (*optional*) Concentration values of an added compound; this information is used to perform a dose-response analysis.
-
-Several experiments (e.g., runs on different plate readers) can be combined into a single file and analyzed simultaneously. Therefore, different experiments are marked by the presence of separate time columns. Different lengths and values in these time columns are permitted.\
-\
-
-```{r data-layout, echo = FALSE, fig.width = 10, out.width = "100%", fig.cap = "\\label{fig:data-layout} Custom QurvE data layout", fig.align='center'}
-knitr::include_graphics("../man/figures/Data_layout.jpg", dpi = 100, error = F)
-```
-
-\
-To read data in custom format, run:
-
-```{r read-custom, echo = TRUE, eval = FALSE}
-grodata <- read_data(data.density = 'path_to_data_file',
-                   csvsep = ';', # or ','
-                   dec = '.', # or ','
-                   sheet.density = 1, # number (or "name") of the EXCEL file sheet containing data
-                   subtract.blank = TRUE,
-                   calibration = NULL)
-```
-
-The `r colorize_code("data.density", "red")` argument takes the path to the file containing experimental data in custom format. `r colorize_code("csvsep", "red")` specifies the separator symbol (only required for .csv files; default: `';'`). `r colorize_code("dec", "red")` is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used, `r colorize_code("sheet.density", "red")` specifies the number or name (in quotes) of the sheet containing the data.\
-If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values.
-
-## Data parser
-
-The data generated by culture devices (e.g., plate readers) from different manufacturers come in different formats. If these data are to be used directly, they must first be "parsed" from the plate reader into the `QurvE` standard format. In this scenario, sample information must be provided in a separate table that *maps* samples with their respective identifiers.The *mapping table* must have the following layout (Figure \@ref(fig:mapping-layout)):
-
-```{r mapping-layout, echo = FALSE, fig.pos = "H", out.width = "40%", fig.cap = "\\label{fig:mapping-layout} Data parser mapping layout", fig.align='center'}
-knitr::include_graphics("../man/figures/mapping_layout.png", dpi = 100, error = F)
-```
-
-To parse data, run:
-
-```{r parse-data, echo = TRUE, eval = FALSE, tidy.opts=list(width.cutoff=60)}
-grodata <- parse_data(data.file = 'path_to_data_file',
-                    map.file = 'path_to_mapping_file',
-                    software = 'used_software_or_device',
-                    csvsep.data = ';', # or ','
-                    dec.data = '.', # or ','
-                    csvsep.map = ';', # or ','
-                    dec.map = '.', # or ','
-                    sheet.data = 1, # number (or "name") of the EXCEL file sheet containing data
-                    sheet.map = 1, # number (or "name") of the EXCEL file sheet containing
-                                   # mapping information
-                    subtract.blank = TRUE,
-                    calibration = NULL,
-                    convert.time = NULL)
-```
-
-The `r colorize_code("data.file", "red")` argument takes the path to the file containing experimental data exported from a culture device, `r colorize_code("map.file", "red")` the path to the file with mapping information. With `r colorize_code("software", "red")`, you can specify the device (or software) that was used to generate the data. `r colorize_code("csvsep.data", "red")` and `r colorize_code("csvsep.map", "red")` specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`). `r colorize_code("dec.data", "red")` and `r colorize_code("dec.map", "red")` are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file, `r colorize_code("sheet.data", "red")` and/or `r colorize_code("sheet.map", "red")` specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If `r colorize_code("subtract.blank = TRUE", "red")`, columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the `r colorize_code("calibration", "red")` argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. Similarly, `r colorize_code("convert.time", "red")` accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours).
-
-# Run a complete growth analysis workflow
-
-`QurvE` reduces all computational steps required to create a complete growth profiling to two steps, **read data** and **run workflow**.
-
-After loading the package:
+Load the package:
 
 ```{r library-QurvE, echo = T, eval = TRUE, results='hide', message=FALSE, error=FALSE, warning=FALSE}
 library(QurvE)
 ```
 
-we load experimental data from the publication @wirth2021 in which *Pseudomonas putida* KT2440 and an engineered strain were tested for their sensitivity towards the product 2-fluoromuconic acid:
+Next, load your experimental data. In this example, the dataset being used is from a preliminary characterization of different versions of the SEVA (Standard European Vector Architecture) plasmid pSEVA634, as described in [@nikel2022]. The data contains both growth an fluorescence measurements that have been converted into the custom `QurvE` data format and are located in different work sheets of the same XLSX file:
 
 ## Load data
 
 ```{r load-data, echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE}
-grodata <- read_data(data.density = system.file('2-FMA_toxicity.csv', package = 'QurvE'), csvsep = ";" )
+input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'), sheet.growth = 1,
+                   data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'), sheet.fl = 2,
+                   fl.normtype = "growth") # normalize fluorescence to growth data
 ```
 
-The created object `grodata` can be inspected with `View(grodata)`. It is a list of class `grodata` containing:
+The two functions `read_data()` or `parse_data()` come with more arguments to give the user more control when loading fluorescence data. As for growth data, arguments `r colorize_code("data.fl", "red")` (file path), `r colorize_code("csvsep.fl", "red")` (separator symbol in CSV file), `r colorize_code("dec.fl", "red")` (decimal separator), and `r colorize_code("sheet.fl", "red")` (Excel file worksheet number or "name") provide details on how where an how the data is stored. `r colorize_code("calib.fl", "red")` allows defining an equation with which to transform fluorescence values. 
 
--   a `time` matrix with 66 rows, each corresponding to one sample in the dataset, and 161 columns, i.e., time values for each sample.
+Similarly, the functions accept the arguments `r colorize_code("data.fl2", "red")`, `r colorize_code("csvsep.fl2", "red")`, `r colorize_code("dec.fl2", "red")`, `r colorize_code("sheet.fl2", "red")`, and `r colorize_code("calib.fl2", "red")` to load data from a second fluorescence channel. This second fluorescence is currently only used to normalize the first fluorescence values, as applied in ...ADD CITATION... 
 
--   a `density` data frame with 66 rows and 161+3 columns. The three additional columns contain the sample identifiers `condition`, `replicate`, and `concentration`.
+Normalization of fluorescence, if any, can be controlled via `r colorize_code("fl.normtype", "red")` to be performed by either dividing by growth values (`r colorize_code("fl.normtype = 'growth'", "red")`) or fluorescence 2 `r colorize_code("fl.normtype = 'fl2'", "red")`.
 
--   `fluorescence1` (here: `NA`)
-
--   `fluorescence2` (here: `NA`)
-
--   `norm.fluorescence1` (here: `NA`)
-
--   `norm.fluorescence2` (here: `NA`)
-
--   `expdesign`, a data frame containing the `label`, `condition`, `replicate`, and `concentration` for each sample:
+We can inspect the `input` object of class `grodata`:
 
 ```{r head-grodata, echo = T, eval = T}
-head(grodata$expdesign)
+head(input)
 ```
 
-We can plot the raw data. Applying the generic `plot()` function to `grodata` objects calls the function `plot.grodata()`.:
+## Plot raw data
 
 ```{r raw-data-plot, dpi = 120, out.width="80%", fig.height=4.5, fig.pos = "H", echo = T, eval = T, results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.\nConditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
-plot(grodata, data.type = "dens", log.y = FALSE,
-     x.lim = c(NA, 32), legend.position = "right",
-     exclude.conc = c(50, 70, 90),
-     basesize = 10, legend.ncol = 1, lwd = 0.7)
+plot(input, data.type = "fl", 
+     exclude.conc = c(0.5, 0.1),
+     log.y = FALSE,
+     legend.position = "bottom",
+     basesize = 10, 
+     legend.ncol = 3, 
+     lwd = 0.7)
 ```
 
 ## Run Workflow
 
-To perform a complete growth profiling of all samples in the input dataset, we call the `growth.workflow()` function on the `grodata` object. With `r colorize_code("supress.messages = TRUE", "red")`, we avoid printing information about every sample's fit in the sample to the console. By default, the selected response parameter to perform a dose-response analysis is 'mu.linfit'. To choose a different parameter, provide the argument `r colorize_code("dr.parameter = 'choice'", "red")`. A list of appropriate parameters is provided within the function documentation (`?growth.workflow`).
-
 ```{r run-default-workflow, message=T, error=FALSE, warning=FALSE, tidy.opts=list(width.cutoff=60), tidy = TRUE, eval = T}
-grofit <- growth.workflow(grodata = grodata,
-                          fit.opt = "a",
+grofit <- fl.workflow(grodata = input,
+                          fit.opt = c("s", "l"),
                           ec50 = T,
                           suppress.messages = TRUE,
                           export.res = F) # Prevent creating TXT table and RData files with results
@@ -314,9 +200,7 @@ knitr::include_graphics("../man/figures/grofit_container.jpg", error = F)
 
 ## Tabular results
 
-A `grofit` object contains two tables summarizing the computational results:
--   `grofit$gcFit$gcTable` lists all calculated physiological parameters for every sample and fit
--   `grofit$drFit$drTable` contains the results of the dose-response analysis
+A `grofit` object contains two tables summarizing the computational results: - `grofit$gcFit$gcTable` lists all calculated physiological parameters for every sample and fit - `grofit$drFit$drTable` contains the results of the dose-response analysis
 
 ```{r echo = T, eval = T, results='asis', message=FALSE, error=FALSE, warning=FALSE, tidy = FALSE}
 # show the first three rows and first 14 columns of gcTable
@@ -380,7 +264,6 @@ plot(grofit$gcFit$gcFittedLinear$`KT2440 | 1 | 0`, cex.lab = 1.2, cex.axis = 1.2
 plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2, cex.axis = 1.2)
 ```
 
-
 Apparently, the algorithm to find the maximum slope in the growth curve with the standard threshold of `lin.R2 = 0.97` could not find an appropriate fit within the first stage of growth due to insufficient linearity. We can manually re-run the fit for this sample with adjusted parameters. Thereby, we lower the R2 threshold and increase the size of the sliding window to cover a larger fraction of the growth curve. Then, we update the respective entries in the `gcTable` object that summarizes all fitting results (and that plot.parameter() accesses to extract relevant data). The generic function `summary()`, when applied to a the fit object of a single sample within `grofit`, provides the required parameters to update the table. Lastly, we also have to re-run the dose-response analysis since 'mu.linfit' was used as response parameter (the default), including the erroneous value.
 
 *Note: This process of manually updating `grofit`elements with adjusted fits can be avoided by re-running `growth.workflow` with adjusted global parameters or my running the workflow in interactive mode (`interactive = TRUE`). In interactive mode, each individual fit is printed and the user can decide to re-run a single fit with adjusted parameters.*
@@ -425,6 +308,7 @@ plot.parameter(grofit, param = "mu.linfit", basesize = 8.5)
 ### Dose-response analysis
 
 The results of the dose-response analysis can be visualized by calling `plot()` on the `drFit` object that is stored within `grofit`. This action calls `plot.drFit()` which in turn runs `plot.drFitSpline()` or `plot.drFitModel()` (depending on the choice of `r colorize_code("dr.method", "red")` in the workflow) on every condition for which a dose-response analysis has been performed. Alternatively, you can call `plot()` on the list elements in `grofit$drFit$drFittedModels` or `grofit$drFit$drFittedSplines`, respectively.
+
 ```{r plot-drFit, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = T, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`."}
 plot(grofit$drFit, cex.point = 1, basesize = 12)
 ```
@@ -464,8 +348,10 @@ plot(grofit_bt$drFit$drBootSpline[[1]],
      combine = TRUE, # combine both dose-response curves and parameter plots in the same window
      lwd = 0.7)
 ```
+
 \pagebreak
 
 # References
 
-<div id="refs"></div>
+::: {#refs}
+:::
