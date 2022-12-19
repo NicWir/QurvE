@@ -91,7 +91,7 @@ GithubRepo: QurvE
 GithubUsername: NicWir
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Collate: 
     'control_functions.R'
     'data_parsers.R'

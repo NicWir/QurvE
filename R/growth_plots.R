@@ -5001,9 +5001,9 @@ plot.grid <- function(x,
             legend.position = "bottom",
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank(),
-            panel.background = element_rect(fill = "white", color = "black",
+            panel.background = ggplot2::element_rect(fill = "white", color = "black",
                                             linewidth = basesize/22, linetype = "solid"),
-            strip.background = element_rect(fill = "white", color = "black",
+            strip.background = ggplot2::element_rect(fill = "white", color = "black",
                                             linewidth = basesize/22, linetype = "solid"))
 
     if(!is.null(legend.lim)){
@@ -5207,7 +5207,7 @@ plot.grid <- function(x,
       w <- width
     }
     if(is.null(height)){
-      h <- ifelse(deriv==T, 9, 6)
+      h <- 6
     } else {
       h <- height
     }

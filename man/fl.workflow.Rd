@@ -132,9 +132,9 @@ fl.workflow(
 
 \item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "Fluorescenceeport_" and the current date and time.}
 
-\item{export.fig}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).}
+\item{export.fig}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}). Only effective if \code{report = TRUE}.}
 
-\item{export.res}{(Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting \code{flFitRes} object at the end of the workflow.}
+\item{export.res}{(Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting \code{flFitRes} object.}
 
 \item{parallelize}{Run linear fits and bootstrapping operations in parallel using all but one available processor cores}
 
