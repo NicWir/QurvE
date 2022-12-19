@@ -512,6 +512,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                 t[max]: ~ .(round(flFitSpline$parameters$x.max, digits = 2)))),
           x = 1.02*x_limit[2],
           y = 0.1 * ifelse(!is.null(y.lim) && !is.na(y.lim[2]), y.lim[2], y_limit[2]),
+          hjust = 0,
           angle = 90, parse = T, size = basesize*3.2/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
         p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y.lim[2]), clip = "off")

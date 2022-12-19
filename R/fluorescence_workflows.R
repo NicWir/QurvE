@@ -550,8 +550,8 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
 #' @param report (Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})
 #' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "Fluorescenceeport_" and the current date and time.
-#' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}).
-#' @param export.res (Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting `flFitRes` object at the end of the workflow.
+#' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}). Only effective if \code{report = TRUE}.
+#' @param export.res (Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting `flFitRes` object.
 #' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
 #' @param ... Further arguments passed to the shiny app.
 #'
