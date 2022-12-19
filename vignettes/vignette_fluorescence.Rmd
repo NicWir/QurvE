@@ -62,9 +62,11 @@ Next, load your experimental data. In this example, the dataset being used is fr
 
 
 ```r
-input <- read_data(data.growth = system.file("lac_promoters.xlsx",
-    package = "QurvE"), sheet.growth = 1, data.fl = system.file("lac_promoters.xlsx",
-    package = "QurvE"), sheet.fl = 2, fl.normtype = "growth")  # normalize fluorescence to growth data
+input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"), 
+                sheet.growth = 1, 
+                data.fl = system.file("lac_promoters.xlsx", package = "QurvE"), 
+                sheet.fl = 2, 
+                fl.normtype = "growth")  # normalize fluorescence to growth data
 ```
 
 The two functions `read_data()` or `parse_data()` come with more arguments to give the user more control when loading fluorescence data. As for growth data, arguments  (file path),  (separator symbol in CSV file),  (decimal separator), and  (Excel file worksheet number or "name") provide details on how where an how the data is stored.  allows defining an equation with which to transform fluorescence values.

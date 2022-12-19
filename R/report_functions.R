@@ -70,7 +70,7 @@ growth.report <- function(
     try(
         showModal(
             modalDialog(
-                "Rendering report...\n(This can take up to several minutes)",
+              HTML("Rendering report...<br><br>(This can take up to several minutes)"),
                 footer = NULL
             )
         ),
@@ -296,7 +296,7 @@ fl.report <- function(
     try(
         showModal(
             modalDialog(
-                "Rendering report...\n(This can take up to several minutes)",
+                HTML("Rendering report...<br><br>(This can take up to several minutes)"),
                 footer = NULL
             )
         ),

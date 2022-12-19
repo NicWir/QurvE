@@ -13169,7 +13169,27 @@ server <- function(input, output, session){
           modalDialog("Please install package 'tinytex' to render PDF reports.", easyClose = T)
         )
       } else if(!tinytex::is_tinytex()){
-        stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+        # stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+        showModal(
+          modalDialog(HTML("TinyTeX is required to render PDF reports but was not found on your system. Installing TinyTeX...<br><br>(This requires and active internet connection and will take several minutes)"), footer = NULL)
+        )
+        update.packages(ask = FALSE, checkBuilt = TRUE, repos='http://cran.us.r-project.org')
+        tinytex:::install_prebuilt()
+        tinytex::tlmgr_update()
+        removeModal()
+        try(
+          suppressWarnings(
+            suppressMessages(
+              growth.report(grofit = results$growth,
+                            out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                            out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
+                            ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                            format = input$report_filetype_growth,
+                            export = FALSE,
+                            mean.grp = "all")
+            )
+          )
+        )
       } else {
         try(
           suppressWarnings(
@@ -13225,7 +13245,27 @@ server <- function(input, output, session){
           modalDialog("Please install package 'tinytex' to render PDF reports.", easyClose = T)
         )
       } else if(!tinytex::is_tinytex()){
-        stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+        # stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
+        showModal(
+          modalDialog(HTML("TinyTeX is required to render PDF reports but was not found on your system. Installing TinyTeX...<br><br>(This requires and active internet connection and will take several minutes)"), footer = NULL)
+        )
+        update.packages(ask = FALSE, checkBuilt = TRUE, repos='http://cran.us.r-project.org')
+        tinytex:::install_prebuilt()
+        tinytex::tlmgr_update()
+        removeModal()
+        try(
+          suppressWarnings(
+            suppressMessages(
+              fl.report(flFitRes = results$fluorescence,
+                        out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                        out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
+                        ec50 = ifelse(length(results$fluorescence$drFit) > 1 && length(results$fluorescence$drFit$drTable) > 1, TRUE, FALSE),
+                        format = input$report_filetype_fluorescence,
+                        export = FALSE,
+                        mean.grp = "all")
+            )
+          )
+        )
       } else {
         try(
           suppressWarnings(
