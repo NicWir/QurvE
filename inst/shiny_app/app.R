@@ -9951,7 +9951,6 @@ server <- function(input, output, session){
                                                     1,
                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
       showModal(modalDialog("Creating plot...", footer=NULL))
-      browser()
       try(
         suppressWarnings(
           plot.flFitSpline(results$flFit$flFittedSplines[[ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" ||
