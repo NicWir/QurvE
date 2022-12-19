@@ -511,7 +511,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                 lambda: ~ .(round(flFitSpline$parameters$lambda, digits = 3))~~~~
                                 t[max]: ~ .(round(flFitSpline$parameters$x.max, digits = 2)))),
           x = 1.02*x_limit[2],
-          y = 0.1 * ifelse(!is.null(y.lim) && !is.na(y.lim[2]), y.lim[2], y_limit[2]),
+          y = ifelse(deriv==TRUE, -0.3, 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
           hjust = 0,
           angle = 90, parse = T, size = basesize*3.2/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
@@ -574,12 +574,12 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = 0.7*lwd)
             }
             else {
               p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
@@ -631,12 +631,12 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 2*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 2*y_limit[2]))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.9*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = 0.9*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 3.5*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 3.5*y_limit[2]))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.9*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = 0.9*lwd)
             }
             else {
               p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
@@ -674,7 +674,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                       xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                       yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = 0.7*lwd)
           }
           else {
             p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
@@ -733,12 +733,12 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = 0.7*lwd)
             }
             else {
               p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
@@ -788,12 +788,12 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = 0.7*lwd)
 
               p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla2))], y = .data$y[which.min(abs(bla2))],
                                         xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                         yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), size = 0.7*lwd)
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.7), linewidth = 0.7*lwd)
             }
             else {
               p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
@@ -829,7 +829,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
             p <- p + geom_segment(aes(x = .data$time[which.min(abs(bla))], y = .data$y[which.min(abs(bla))],
                                       xend = .data$time[which.min(abs(.data$y - 1.1*y_limit[2]))],
                                       yend = .data$y[which.min(abs(.data$y - 1.1*y_limit[2]))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), size = 0.7*lwd)
+                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = 0.7*lwd)
           }
           else {
             p <- p + geom_line(aes(x = .data$time, y = .data$y), data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.7), linewidth = lwd)
@@ -854,7 +854,11 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           theme_classic(base_size = basesize) +
           xlab(ifelse(is.null(x.title), x.label, x.title)) +
           ylab(ifelse(is.null(y.title.deriv), "Slope", y.title.deriv)) +
-          coord_cartesian(xlim = c(0, x_limit[2]*0.95), clip = "off")
+          coord_cartesian(xlim = c(0, x_limit[2]*0.95), clip = "off") +
+          theme(
+            panel.background = ggplot2::element_rect(fill='transparent'), #transparent panel bg
+            plot.background = ggplot2::element_rect(fill='transparent', color=NA)
+          )
 
         if(!is.null(y.lim.deriv)){
           p.max_slope <- p.max_slope + scale_y_continuous(limits = y.lim.deriv, breaks = scales::pretty_breaks(n = 6))
