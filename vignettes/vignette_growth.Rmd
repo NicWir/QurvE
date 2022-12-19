@@ -1,7 +1,7 @@
 ---
 title: "Quantitiative Growth Curve Evaluation with Package `QurvE`"
 author: "Nicolas T. Wirth"
-date: "2022-12-04"
+date: "2022-12-19"
 mainfont: Arial
 output:
   prettydoc::html_pretty:
@@ -33,7 +33,7 @@ bibliography: references.bib
 
 In virtually all disciplines of biology dealing with living organisms, from classical microbiology to applied biotechnology, it is routine to characterize the **growth** of the species under study. `QurvE` provides a suite of analysis tools to make such growth profiling quick, efficient, and reproducible. In addition, it allows the characterization of **fluorescence** data for, e.g., biosensor characterization in plate reader experiments (further discussed in the vignette *Quantitiative Fluorescence Curve Evaluation with Package `QurvE`*). All computational steps to obtain an in-depth characterization are combined into user-friendly *workflow* functions and a range of plotting functions allow the visualization of fits and the comparison of organism performances.
 
-Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, density increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
+Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, growth measurement increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
 
 The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. `QurvE` was designed to be usable with minimal prior knowledge of the R programming language or programming in general. You will need to be familiar with the idea of running commands from a console or writing basic scripts. For R beginners, [this](https://moderndive.netlify.app/1-getting-started.html) is a great starting point, there are some good resources [here](https://education.rstudio.com/learn/beginner/) and we suggest using the [RStudio application](https://rstudio.com/products/rstudio/). It provides an environment for writing and running R code.
 
@@ -66,12 +66,12 @@ Three methods are available to characterize growth curves:
 
 1.  Fit parametric growth models to (log-transformed) growth data
 
-2.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total density increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]\
+2.  Determine maximum growth rates (µ~max~) from the log-linear part of a growth curve using a heuristic approach proposed as the "growth rates made easy"-method by @hall2014. Do do so, `QurvE` uses code from the package @petzoldt2022, but adds user-defined thresholds for (i) R^2^ values of linear fits, (ii) relative standard deviations (RSD) of estimates slopes, and (iii) the minimum fraction of total growth value increase ($\Delta$Y) a regression window should cover to be considered for the analysis. These thresholds ensure a more robust and reproducible identification of the linear range that best describes the growth curve. Additionally, parameters for a *secondary growth phase* can be extracted for bi-linear growth curves.[^1]\
     The algorithm works as follows:
 
     i.  Fit linear regressions [with the Theil-Sen estimator [@sen1968; @theil1992]] to all subsets of `h` consecutive, log-transformed data points (sliding window of size `h`). If, for example, `h=5`, fit a linear regression to points 1 $\dots$ 5, 2 $\dots$ 6, 3 $\dots$ 7 and so forth.
 
-    ii. Find the subset with the highest slope $\mu_{max}$. Do the R^2^ and RSD values of the regression meet the defined thresholds and do the data points within the regression window account for at least a defined fraction of the total density increase? If not, evaluate the regression with the second highest slope, and so forth.
+    ii. Find the subset with the highest slope $\mu_{max}$. Do the R^2^ and RSD values of the regression meet the defined thresholds and do the data points within the regression window account for at least a defined fraction of the total growth measurement increase? If not, evaluate the regression with the second highest slope, and so forth.
 
     iii. Include also the data points of adjacent subsets that have a slope of at least a $defined \space quota \times \mu_{max}$, e.g., all regression windows that have at least 95% of the maximum slope.
 
@@ -139,16 +139,16 @@ To read data in custom format, run:
 
 
 ```r
-grodata <- read_data(data.density = 'path_to_data_file',
+grodata <- read_data(data.growth = 'path_to_data_file',
                    csvsep = ';', # or ','
                    dec = '.', # or ','
-                   sheet.density = 1, # number (or "name") of the EXCEL file sheet containing data
+                   sheet.growth = 1, # number (or "name") of the EXCEL file sheet containing data
                    subtract.blank = TRUE,
-                   calibration = NULL)
+                   calib.growth = NULL)
 ```
 
-The  argument takes the path to the file containing experimental data in custom format.  specifies the separator symbol (only required for .csv files; default: `';'`).  is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used,  specifies the number or name (in quotes) of the sheet containing the data.\
-If , columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the  argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values.
+The  argument takes the path to the file or the name of an R dataframe object containing experimental data in custom format.  specifies the separator symbol (only required for .csv files; default: `';'`).  is the decimal separator (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used,  specifies the number or name (in quotes) of the sheet containing the data.\
+If , columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the  argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calib.growth = 'y = x * 2 + 0.5'`) to transform growth measurement values.
 
 ## Data parser
 
@@ -171,11 +171,13 @@ grodata <- parse_data(data.file = 'path_to_data_file',
                     sheet.map = 1, # number (or "name") of the EXCEL file sheet containing
                                    # mapping information
                     subtract.blank = TRUE,
-                    calibration = NULL,
+                    calib.growth = NULL,
                     convert.time = NULL)
 ```
 
-The  argument takes the path to the file containing experimental data exported from a culture device,  the path to the file with mapping information. With , you can specify the device (or software) that was used to generate the data.  and  specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`).  and  are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file,  and/or  specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If , columns with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. For the  argument, a formula can be provided in the form *'y = function(x)'* (e.g., `calibration = 'y = x * 2 + 0.5'`) to transform all measurement values. Similarly,  accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours).
+The  argument takes the path to the file containing experimental data exported from a culture device,  the path to the file with mapping information. With , you can specify the device (or software) that was used to generate the data.  and  specify the separator symbol for data and mapping file, respectively (only required for .csv files; default: `';'`).  and  are the decimal separator used in data and mapping file, respectively (only required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format is used for both or one of data or mapping file,  and/or  specify the number or name (in quotes) of the sheet containing the data or mapping information, respectively. If the same Excel file contains both data and mapping information in different worksheets, the file path needs to be specified for both `data.file`and `map.file`.  If , samples with name 'blank' will be combined by their row-wise average, and the mean values will be subtracted from the measurements of all remaining samples. The argument  accepts a function *'y = function(x)'* to transform time values (e.g., `convert.time = 'y = x/3600'` to convert seconds to hours).
+
+If more than one read type is identified in the provided data file, the user will be prompted to specify which measurements belong to **growth**, **fluorescence**, and **fluorescence2**, respectively.
 
 # Run a complete growth analysis workflow
 
@@ -194,7 +196,7 @@ we load experimental data from the publication @wirth2021 in which *Pseudomonas 
 
 
 ```r
-grodata <- read_data(data.density = system.file("2-FMA_toxicity.csv",
+grodata <- read_data(data.growth = system.file("2-FMA_toxicity.csv",
     package = "QurvE"), csvsep = ";")
 ```
 
@@ -202,7 +204,7 @@ The created object `grodata` can be inspected with `View(grodata)`. It is a list
 
 -   a `time` matrix with 66 rows, each corresponding to one sample in the dataset, and 161 columns, i.e., time values for each sample.
 
--   a `density` data frame with 66 rows and 161+3 columns. The three additional columns contain the sample identifiers `condition`, `replicate`, and `concentration`.
+-   a `growth` data frame with 66 rows and 161+3 columns. The three additional columns contain the sample identifiers `condition`, `replicate`, and `concentration`.
 
 -   `fluorescence1` (here: `NA`)
 
@@ -230,14 +232,14 @@ We can plot the raw data. Applying the generic `plot()` function to `grodata` ob
 
 
 ```r
-plot(grodata, data.type = "dens", log.y = FALSE,
+plot(grodata, data.type = "growth", log.y = FALSE,
      x.lim = c(NA, 32), legend.position = "right",
      exclude.conc = c(50, 70, 90),
      basesize = 10, legend.ncol = 1, lwd = 0.7)
 ```
 
 <img src="vigfig-raw-data-plot-1.png" alt="\label{fig:raw-data-plot} Raw data plot.
-Conditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options." width="80%" />
+Conditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options." width="80%" style="display: block; margin: auto;" />
 
 ## Run Workflow
 
@@ -245,11 +247,11 @@ To perform a complete growth profiling of all samples in the input dataset, we c
 
 
 ```r
-grofit <- growth.workflow(grodata = grodata, fit.opt = "a", ec50 = T,
-    suppress.messages = TRUE, export.res = F)  # Prevent creating TXT table and RData files with results
+grofit <- growth.workflow(grodata = grodata, fit.opt = "a", ec50 = TRUE,
+    suppress.messages = TRUE, export.res = FALSE)  # Prevent creating TXT table and RData files with results
 ```
 
-Tab-delimited .txt files summarizing the computation results are created automatically, as well as the `grofit` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit`object. In RStudio, `View(grofit)` allows interactive inspection of the data container.
+If option  is set to , tab-delimited .txt files summarizing the computation results are created, as well as the `grofit` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit` object. In RStudio, `View(grofit)` allows interactive inspection of the data container.
 
 If you want to create a report summarizing all computational results including a graphical representation of every fit, provide the desired output format(s) as , , or . The advantage of having the report in HTML format is that every figure can be exported as (editable) PDF file.
 
@@ -317,14 +319,14 @@ gcTable <- grofit$gcFit$gcTable
 gcTable[1:3, 1:14]
 ```
 
-  TestId AddId concentration reliability_tag used.model log.x log.y.lin log.y.spline
-1 KT2440     1            90            TRUE       <NA> FALSE      TRUE         TRUE
-2 KT2440     1            70            TRUE       <NA> FALSE      TRUE         TRUE
-3 KT2440     1            50            TRUE       <NA> FALSE      TRUE         TRUE
-  log.y.model nboot.gc mu.linfit tD.linfit lambda.linfit dY.linfit
-1        TRUE        0         0      <NA>          <NA>         0
-2        TRUE        0         0      <NA>          <NA>         0
-3        TRUE        0         0      <NA>          <NA>         0
+  TestId AddId concentration reliability_tag used.model log.x log.y.lin
+1 KT2440     1            90            TRUE       <NA> FALSE      TRUE
+2 KT2440     1            70            TRUE       <NA> FALSE      TRUE
+3 KT2440     1            50            TRUE       <NA> FALSE      TRUE
+  log.y.spline log.y.model nboot.gc mu.linfit tD.linfit lambda.linfit dY.linfit
+1         TRUE        TRUE        0         0      <NA>          <NA>         0
+2         TRUE        TRUE        0         0      <NA>          <NA>         0
+3         TRUE        TRUE        0         0      <NA>          <NA>         0
 
 ```r
 
@@ -349,6 +351,7 @@ Applying `plot()` to the `grofit` object produces a figure of all spline fits pe
 plot(grofit,
      data.type = "spline",
      log.y = TRUE,
+     deriv = TRUE,
      conc = c(0,5,10,15,20),
      legend.position = "right",
      legend.ncol = 1,
@@ -360,7 +363,7 @@ plot(grofit,
 ```
 
 <img src="vigfig-group-spline-plot-1.png" alt="\label{fig:group-spline-plot} Combined plot of all spline fits performed.
-In addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options." width="80%" />
+In addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options." width="80%" style="display: block; margin: auto;" />
 
 \pagebreak
 
@@ -396,7 +399,7 @@ plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2,
     cex.axis = 1.2)
 ```
 
-<img src="vigfig-plot-linear-1.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto auto auto 0;" /><img src="vigfig-plot-linear-2.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto auto auto 0;" />
+<img src="vigfig-plot-linear-1.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" /><img src="vigfig-plot-linear-2.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" />
 
 
 Apparently, the algorithm to find the maximum slope in the growth curve with the standard threshold of `lin.R2 = 0.97` could not find an appropriate fit within the first stage of growth due to insufficient linearity. We can manually re-run the fit for this sample with adjusted parameters. Thereby, we lower the R2 threshold and increase the size of the sliding window to cover a larger fraction of the growth curve. Then, we update the respective entries in the `gcTable` object that summarizes all fitting results (and that plot.parameter() accesses to extract relevant data). The generic function `summary()`, when applied to a the fit object of a single sample within `grofit`, provides the required parameters to update the table. Lastly, we also have to re-run the dose-response analysis since 'mu.linfit' was used as response parameter (the default), including the erroneous value.
@@ -410,7 +413,7 @@ Apparently, the algorithm to find the maximum slope in the growth curve with the
 grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0` <-
   growth.gcFitLinear(time = grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`$raw.time,
                      data = grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`$raw.data,
-                     control = growth.control(lin.R2 = 0.90, lin.h = 12))
+                     control = growth.control(lin.R2 = 0.95, lin.h = 10))
 
 # extract row index of sample `KT2440 | 2 | 0`
 ndx.row <- grep("KT2440 \\| 2 \\| 0", grofit$expdesign$label)
@@ -442,10 +445,27 @@ That looks better!
 
 ```r
 # Parameters obtained from linear regression
-plot.parameter(grofit, param = "mu.linfit", basesize = 8.5)
+plot.parameter(grofit, param = "mu.linfit", basesize = 15)
 ```
 
 <img src="vigfig-plot-parameter-update-1.png" alt="\label{fig:plot-parameter-update} Parameter plot with updated fit." width="70%" style="display: block; margin: auto;" />
+
+### Plot grids
+
+By arranging the individual samples in a grid, we can create a visual representation similar to a heat map that illustrates the values of a chosen parameter. This can be a helpful way to gain insights and understand trends within the data.:
+
+
+```r
+plot.grid(grofit, 
+          param = "mu.linfit", 
+          pal = "Mint", 
+          log.y = FALSE,
+          sort_by_conc = FALSE,
+          basesize = 9)
+```
+
+<img src="vigfig-grid-plot-1.png" alt="\label{fig:plot} Plot grid of all spline fits performed . See `?plot.grid` for available options." width="90%" style="display: block; margin: auto;" />
+
 
 ### Dose-response analysis
 
@@ -459,7 +479,7 @@ plot(grofit$drFit, cex.point = 1, basesize = 12)
 
 # Bootstrapping
 
-When growth experiments are performed on a larger scale with manual density measurements, technical deviations can result in outliers. Such outliers can lead to a distortion of the curve fits, especially if fewer data points are available than is usual in plate reading experiments. In this instance, bootstrapping can provide a more realistic estimation of growth parameters. Bootstrapping is a statistical procedure that resamples a single dataset to create many simulated samples. This is done by randomly drawing data points from a dataset with replacement until the original number of data points has been reached. The analysis (here: growth fitting) is then performed individually on each bootstrapped replicate. The variation in the resulting estimated parameters is a reasonable approximation of the variance in those parameters. To include bootstrapping into the `QurvE` workflow, we define the argument .
+When growth experiments are performed on a larger scale with manual growth measurements, technical deviations can result in outliers. Such outliers can lead to a distortion of the curve fits, especially if fewer data points are available than is usual in plate reading experiments. In this instance, bootstrapping can provide a more realistic estimation of growth parameters. Bootstrapping is a statistical procedure that resamples a single dataset to create many simulated samples. This is done by randomly drawing data points from a dataset with replacement until the original number of data points has been reached. The analysis (here: growth fitting) is then performed individually on each bootstrapped replicate. The variation in the resulting estimated parameters is a reasonable approximation of the variance in those parameters. To include bootstrapping into the `QurvE` workflow, we define the argument .
 
 Similarly, we can include bootstrapping in the dose-response analysis if done with  by defining argument .
 

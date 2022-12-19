@@ -507,13 +507,13 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
         ) +
         annotate(
           "text",
-          label = list(bquote(slope[max]: ~ .(round(flFitSpline$parameters$max_slope, digits = 3))~~~~
-                                lambda: ~ .(round(flFitSpline$parameters$lambda, digits = 3))~~~~
-                                t[max]: ~ .(round(flFitSpline$parameters$x.max, digits = 2)))),
+          label = list(bquote(slope[max]: ~ .(round(flFitSpline$parameters$max_slope, digits = 0))~~~~
+                                lambda: ~ .(round(flFitSpline$parameters$lambda, digits = 2))~~~~
+                                x[max]: ~ .(round(flFitSpline$parameters$x.max, digits = 2)))),
           x = 1.02*x_limit[2],
           y = ifelse(deriv==TRUE, ifelse(log.y == TRUE, 0.5, -0.3), 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
           hjust = 0,
-          angle = 90, parse = T, size = basesize*3.2/12)
+          angle = 90, parse = T, size = basesize*3/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
         p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y.lim[2]), clip = "off")
       } else {
