@@ -117,7 +117,7 @@ summary(input)
 
 ## Plot raw data
 
-```{r raw-data-plot, dpi = 120, out.width="80%", fig.height=4.5, fig.pos = "H", echo = T, eval = T, fig.align='center', results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.\nConditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
+```{r raw-data-plot, dpi = 120, out.width="80%", fig.height=4.5, fig.pos = "H", echo = T, eval = T, fig.align='center', results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.<br>Conditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
 plot(input, data.type = "fl",
      exclude.conc = c(0.5, 0.1),
      log.y = FALSE,

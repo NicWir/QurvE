@@ -238,8 +238,10 @@ plot(grodata, data.type = "growth", log.y = FALSE,
      basesize = 10, legend.ncol = 1, lwd = 0.7)
 ```
 
-<img src="vigfig-raw-data-plot-1.png" alt="\label{fig:raw-data-plot} Raw data plot.
-Conditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options." width="80%" style="display: block; margin: auto;" />
+```{r raw-data-plot, dpi = 120, out.width="80%", fig.height=4.5, fig.pos = "H", fig.align="center", echo = F, eval = T, results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.\nConditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
+knitr::include_graphics("vigfig-raw-data-plot-1.png", error = F)
+
+```
 
 ## Run Workflow
 
@@ -362,8 +364,9 @@ plot(grofit,
      lwd = 0.7)
 ```
 
-<img src="vigfig-group-spline-plot-1.png" alt="\label{fig:group-spline-plot} Combined plot of all spline fits performed.
-In addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options." width="80%" style="display: block; margin: auto;" />
+```{r group-spline-plot, dpi = 120, out.width="80%", fig.height=6.5, fig.pos = "H", fig.align="center", echo = F, eval = T, results='asis', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:group-spline-plot} Combined plot of all spline fits performed.\nIn addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options.", tidy = FALSE}
+knitr::include_graphics("vigfig-group-spline-plot-1.png", error = F)
+```
 
 \pagebreak
 
@@ -387,7 +390,19 @@ plot.parameter(grofit, param = "dY.orig.model", basesize = 10,
     legend.position = "bottom")
 ```
 
-<img src="vigfig-plot-parameter-1.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-2.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-3.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-4.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-5.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-6.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" />
+```{r plot-parameter, dpi = 120, fig.show="hold", out.width="47%", fig.height = 5, fig.align="center", fig.pos = "H", echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean \u00B1 95\\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`."}
+# Parameters obtained from linear regression
+knitr::include_graphics("vigfig-plot-parameter-1.png", error = F)
+knitr::include_graphics("vigfig-plot-parameter-2.png", error = F)
+
+# Parameters obtained from nonparametric fits
+knitr::include_graphics("vigfig-plot-parameter-3.png", error = F)
+knitr::include_graphics("vigfig-plot-parameter-4.png", error = F)
+
+# Parameters obtained from model fits
+knitr::include_graphics("vigfig-plot-parameter-5.png", error = F)
+knitr::include_graphics("vigfig-plot-parameter-6.png", error = F)
+```
 
 From the parameter plot for ´mu.linfit´ (the growth rates determined with linear regression), we can see that there is an outlier for strain KT2440 at concentration 0. We can plot the individual fits for this condition to find out if this is due to the fit quality:
 
@@ -399,8 +414,10 @@ plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2,
     cex.axis = 1.2)
 ```
 
-<img src="vigfig-plot-linear-1.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" /><img src="vigfig-plot-linear-2.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" />
-
+```{r plot-linear, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`.", fig.subcap=c("Sample 'KT2440 | 1 | 0'", "Sample 'KT2440 | 2 | 0'")}
+knitr::include_graphics("vigfig-plot-linear-1.png", error = F)
+knitr::include_graphics("vigfig-plot-linear-2.png", error = F)
+```
 
 Apparently, the algorithm to find the maximum slope in the growth curve with the standard threshold of `lin.R2 = 0.97` could not find an appropriate fit within the first stage of growth due to insufficient linearity. We can manually re-run the fit for this sample with adjusted parameters. Thereby, we lower the R2 threshold and increase the size of the sliding window to cover a larger fraction of the growth curve. Then, we update the respective entries in the `gcTable` object that summarizes all fitting results (and that plot.parameter() accesses to extract relevant data). The generic function `summary()`, when applied to a the fit object of a single sample within `grofit`, provides the required parameters to update the table. Lastly, we also have to re-run the dose-response analysis since 'mu.linfit' was used as response parameter (the default), including the erroneous value.
 
@@ -438,7 +455,9 @@ And we can validate the quality of the updated fit:
 plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2)
 ```
 
-<img src="vigfig-plot-linear-update-1.png" alt="\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'." width="70%" style="display: block; margin: auto;" />
+```{r plot-linear-update, dpi = 120, fig.show="hold", out.width="70%", fig.height = 4.5, results='hold' ,fig.align="center", fig.pos = "H", echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'."}
+knitr::include_graphics("vigfig-plot-linear-update-1.png", error = F)
+```
 
 That looks better!
 
@@ -448,7 +467,11 @@ That looks better!
 plot.parameter(grofit, param = "mu.linfit", basesize = 15)
 ```
 
-<img src="vigfig-plot-parameter-update-1.png" alt="\label{fig:plot-parameter-update} Parameter plot with updated fit." width="70%" style="display: block; margin: auto;" />
+
+```{r plot-parameter-update, dpi = 120, out.width="70%", fig.height = 5, fig.align="center", fig.pos = "H", echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter-update} Parameter plot with updated fit."}
+# Parameters obtained from linear regression
+knitr::include_graphics("vigfig-plot-parameter-update-1.png", error = F)
+```
 
 ### Plot grids
 
@@ -464,7 +487,9 @@ plot.grid(grofit,
           basesize = 9)
 ```
 
-<img src="vigfig-grid-plot-1.png" alt="\label{fig:plot} Plot grid of all spline fits performed . See `?plot.grid` for available options." width="90%" style="display: block; margin: auto;" />
+```{r grid-plot, dpi = 120, out.width="90%", fig.height=3, fig.pos = "H", fig.align='center', echo = F, eval = T, results='asis', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:plot} Plot grid of all spline fits performed . See `?plot.grid` for available options.", tidy = FALSE}
+knitr::include_graphics("vigfig-grid-plot-1.png", error = F)
+```
 
 
 ### Dose-response analysis
@@ -475,7 +500,9 @@ The results of the dose-response analysis can be visualized by calling `plot()` 
 plot(grofit$drFit, cex.point = 1, basesize = 12)
 ```
 
-<img src="vigfig-plot-drFit-1.png" alt="\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`." width="70%" style="display: block; margin: auto;" />
+```{r plot-drFit, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`."}
+knitr::include_graphics("vigfig-plot-drFit-1.png", error = F)
+```
 
 # Bootstrapping
 
@@ -507,7 +534,10 @@ plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative 
      lwd = 0.7)
 ```
 
-<img src="vigfig-plot-gcBootSpline-1.png" alt="\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`." width="85%" style="display: block; margin: auto;" />
+```{r plot-gcBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 10, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = FALSE, fig.cap = "\\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`."}
+knitr::include_graphics("vigfig-plot-gcBootSpline-1.png", error = F)
+
+```
 
 And by applying `plot()` to a `drBootSpline` object, we can plot the dose-response bootstrap results:
 
@@ -518,7 +548,10 @@ plot(grofit_bt$drFit$drBootSpline[[1]],
      lwd = 0.7)
 ```
 
-<img src="vigfig-plot-drBootSpline-1.png" alt="\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`." width="85%" style="display: block; margin: auto;" />
+```{r plot-drBootSpline, dpi = 120, fig.show="hold", out.width="85%", fig.height = 6, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = FALSE, fig.cap = "\\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`."}
+knitr::include_graphics("vigfig-plot-drBootSpline-1.png", error = F)
+
+```
 \pagebreak
 
 # References
