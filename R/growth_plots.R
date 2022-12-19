@@ -2386,8 +2386,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
       }
 
       x_limit <- ggplot_build(p)$layout$panel_params[[1]]$x.range
-      y_limit <- ggplot_build(p)$layout$panel_params[[1]]$y.range
-      y_limit[2] <- max(df$data)
+      y_limit <- c(min(df$data), max(df$data))
 
       p <- p +
         # annotate(
@@ -2408,7 +2407,8 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                            lambda: ~ .(round(gcFittedSpline$parameters$lambda, digits = 3))~~~~
                            t[max]: ~ .(round(gcFittedSpline$parameters$t.max, digits = 2)))),
           x = 1.02*x_limit[2],
-          y = ifelse(deriv==TRUE, -0.3, 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
+          y = ifelse(deriv==TRUE, ifelse(log.y == TRUE, 0.5, -0.3), 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
+          hjust = 0,
           angle = 90, parse = T, size = basesize*3.2/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
         p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y.lim[2]), clip = "off")

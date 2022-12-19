@@ -489,8 +489,8 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
       }
 
       x_limit <- ggplot_build(p)$layout$panel_params[[1]]$x.range
-      y_limit <- ggplot_build(p)$layout$panel_params[[1]]$y.range
-      y_limit[2] <- max(df$data)
+      y_limit <- c(min(df$data), max(df$data))
+
 
       p <- p +
         # annotate(
@@ -511,7 +511,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
                                 lambda: ~ .(round(flFitSpline$parameters$lambda, digits = 3))~~~~
                                 t[max]: ~ .(round(flFitSpline$parameters$x.max, digits = 2)))),
           x = 1.02*x_limit[2],
-          y = ifelse(deriv==TRUE, -0.3, 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
+          y = ifelse(deriv==TRUE, ifelse(log.y == TRUE, 0.5, -0.3), 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
           hjust = 0,
           angle = 90, parse = T, size = basesize*3.2/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
@@ -658,8 +658,8 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           } else {
             bla <- coef["b.tangent"][[1]] + (max_slope*time)
           }
-          time <- time[bla <= 1.15 * max(df$fit.fl)]
-          bla <- bla[bla <= 1.15 * max(df$fit.fl)]
+          time <- time[bla <= 1.15 * max(df$fit.fl[!is.na(df$fit.fl)])]
+          bla <- bla[bla <= 1.15 * max(df$fit.fl[!is.na(df$fit.fl)])]
 
           tangent.df <- data.frame("time" = time,
                                    "y" = bla)
@@ -815,8 +815,8 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           } else {
             bla <- coef["b.tangent"][[1]] + (max_slope*time)
           }
-          time <- time[bla <= 1.15 * max(df$fit.fl)]
-          bla <- bla[bla <= 1.15 * max(df$fit.fl)]
+          time <- time[bla <= 1.15 * max(df$fit.fl[!is.na(df$fit.fl)])]
+          bla <- bla[bla <= 1.15 * max(df$fit.fl[!is.na(df$fit.fl)])]
           tangent.df <- data.frame("time" = time,
                                    "y" = bla)
           df.horizontal <- data.frame("time" = c(flFitSpline[["raw.x"]][1], lagtime),
