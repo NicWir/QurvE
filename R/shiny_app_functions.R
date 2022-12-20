@@ -200,8 +200,7 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #' @param dec.data,dec.map (Character) decimal separator used in CSV, TSV or TXT files with measurements and mapping information, respectively.
 #' @param subtract.blank (Logical) Shall blank values be subtracted from values within the same experiment ([TRUE], the default) or not ([FALSE]).
 #' @param growth.nm Name of read corresponding to growth rate
-#' @param fl.nm Name of read corresponding to fluorescence data
-#' @param fl.nm Name of read corresponding to fluorescence2 data
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #' @param calib.growth,calib.fl,calib.fl2 (Character or \code{NULL}) Provide an equation in the form 'y = function(x)' (for example: 'y = x^2 * 0.3 - 0.5') to convert growth and fluorescence values. This can be used to, e.g., convert plate reader absorbance values into \ifelse{html}{\out{OD<sub>600</sub>}}{\eqn{OD_{600}}} or fluorescence intensity into molecule concentrations.
 #' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #'
@@ -398,7 +397,7 @@ parse_data_shiny <-
 #'
 #' @param data A dataframe created by reading a table file with \code{\link{read_file}}
 #' @param growth.nm Name of read corresponding to growth rate
-#' @param fl.nm Name of read corresponding to fluorescence data
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
 #'
@@ -489,8 +488,7 @@ parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #' @param growth.nm Name of read corresponding to growth rate
-#' @param fl.nm Name of read corresponding to fluorescence data
-#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
@@ -550,8 +548,7 @@ parse_chibio_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #' @param growth.nm Name of read corresponding to growth rate
-#' @param fl.nm Name of read corresponding to fluorescence 1 data
-#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
@@ -707,8 +704,7 @@ parse_biolector_shiny <- function(input, growth.nm)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #' @param growth.nm Name of read corresponding to growth rate
-#' @param fl.nm Name of read corresponding to fluorescence 1 data
-#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
@@ -787,8 +783,7 @@ parse_victornivo_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #' @param growth.nm Name of read corresponding to growth rate
-#' @param fl.nm Name of read corresponding to fluorescence 1 data
-#' @param fl2.nm Name of read corresponding to fluorescence 2 data
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'

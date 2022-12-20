@@ -442,7 +442,7 @@ summary.drBootSpline <- function(object, ...)
 #' gcFit <- growth.gcFit(time = rnd.data$time,
 #'                        data = rnd.data$data,
 #'                        parallelize = FALSE,
-#'                        control = growth.control(fit.opt = 'a',
+#'                        control = growth.control(fit.opt = 's',
 #'                                                 suppress.messages = TRUE,
 #'                                                 nboot.gc = 20))
 #' summary(gcFit)

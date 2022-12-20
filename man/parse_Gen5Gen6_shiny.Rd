@@ -11,7 +11,7 @@ parse_Gen5Gen6_shiny(data, growth.nm, fl.nm, fl2.nm)
 
 \item{growth.nm}{Name of read corresponding to growth rate}
 
-\item{fl.nm}{Name of read corresponding to fluorescence data}
+\item{fl.nm, fl2.nm}{Name of read corresponding to fluorescence and fluorescence2 data}
 }
 \value{
 a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.

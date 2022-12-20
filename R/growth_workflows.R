@@ -86,7 +86,7 @@
 #'   input <- read_data(data.growth = system.file('2-FMA_toxicity.csv', package = 'QurvE'))
 #'
 #'   res <- growth.workflow(grodata = input,
-#'                          fit.opt = c('s', 'l'),
+#'                          fit.opt = 's',
 #'                          ec50 = TRUE,
 #'                          export.res = FALSE,
 #'                          suppress.messages = TRUE,

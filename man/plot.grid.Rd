@@ -72,7 +72,9 @@
 
 \item{mean}{(Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?}
 
-\item{log.y}{(Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?#' @param n.ybreaks}
+\item{log.y}{(Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?#'}
+
+\item{n.ybreaks}{(Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.}
 
 \item{sort_by_conc}{(Logical) Shall the samples/conditions be sorted with concentrations in rows and groups in columns?}
 

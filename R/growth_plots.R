@@ -4311,7 +4311,8 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
 #' @param exclude.nm (String or vector of strings) Define groups to exclude from the plot. Partial matches with sample/group names are accepted.
 #' @param exclude.conc (Numeric or numeric vector) Define concentrations to exclude from the plot.
 #' @param mean (Logical) Display the mean and standard deviation of groups with replicates (\code{TRUE}) or plot each sample individually (\code{FALSE})?
-#' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?#' @param n.ybreaks
+#' @param log.y (Logical) Log-transform the y-axis of the plot (\code{TRUE}) or not (\code{FALSE})?#'
+#' @param n.ybreaks (Numeric) Number of breaks on the y-axis. The breaks are generated using \code{scales::pretty_breaks}. Thus, the final number of breaks can deviate from the user input.
 #' @param sort_by_conc (Logical) Shall the samples/conditions be sorted with concentrations in rows and groups in columns?
 #' @param nrow (Numeric) Defines the number of rows in the grid if \code{sort_by_conc} is \code{FALSE}.
 #' @param basesize (Numeric) Base font size.

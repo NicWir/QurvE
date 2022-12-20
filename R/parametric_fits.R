@@ -910,7 +910,7 @@ huang <- function(time, A, mu, lambda, addpar)
 #'
 #' @examples
 #' time <- seq(from = 0, to = 24, by = 0.25)
-#' growth <- baranyi(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
+#' growth <- baranyi(time, A = 3, mu=  0.6, lambda = 3, addpar = 0.01)
 #'
 #' plot(time, growth)
 baranyi <- function(time, A, mu, lambda, addpar)

@@ -262,7 +262,7 @@ summary.flBootSpline <- function(object, ...)
 #' res <- flFit(fl_data = input$norm.fluorescence,
 #'              time = input$time,
 #'              parallelize = FALSE,
-#'              control = fl.control(fit.opt = c('s','l'), suppress.messages = TRUE,
+#'              control = fl.control(fit.opt = 's', suppress.messages = TRUE,
 #'              x_type = 'time', norm_fl = TRUE, nboot.fl = 20))
 #'
 #' summary(res)

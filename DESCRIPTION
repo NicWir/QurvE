@@ -84,8 +84,7 @@ Suggests:
     testthat (>= 3.0.0),
     tibble,
     tinytex
-VignetteBuilder: 
-    knitr
+VignetteBuilder: knitr
 Encoding: UTF-8
 GithubRepo: QurvE
 GithubUsername: NicWir

@@ -69,7 +69,7 @@ For example: \code{convert.time = 'y = 24 * x'}}
 
 \item{growth.nm}{Name of read corresponding to growth rate}
 
-\item{fl.nm}{Name of read corresponding to fluorescence2 data}
+\item{fl.nm, fl2.nm}{Name of read corresponding to fluorescence and fluorescence2 data}
 }
 \value{
 A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.

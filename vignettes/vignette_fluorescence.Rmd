@@ -1,7 +1,7 @@
 ---
 title: "Quantitiative Fluorescence Curve Evaluation with Package `QurvE`"
 author: "Nicolas T. Wirth"
-date: "2022-12-19"
+date: "2022-12-20"
 mainfont: Arial
 output:
   prettydoc::html_pretty:
