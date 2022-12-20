@@ -19,7 +19,7 @@ Generate a grouped results table for linear fits with average and standard devia
 }
 \examples{
 # Create random growth data set
-rnd.data <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
+rnd.data <- rdm.data(d = 30, mu = 0.6, A = 4.5, label = "Test2")
 
 
 # Run growth curve analysis workflow
