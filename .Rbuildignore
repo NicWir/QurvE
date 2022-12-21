@@ -21,3 +21,5 @@ cran-comments\.md$
 \.tex
 ^doc$
 ^cran-comments\.md$
+\.RData$
+^Meta$

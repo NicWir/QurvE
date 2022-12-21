@@ -10,7 +10,7 @@ Authors@R: c(
            comment = c(contribution = "Author of 'grofit' package, whose general data structure was adopted for QurvE.")),
     person("Maik", "Kschischo", role = "ctb",
            comment = c(contribution = "Author of 'grofit' package, whose general data structure was adopted for QurvE.")),
-    person("Thomas", "Petzoldt", , "thomas.petzoldt at tu-dresden.de", role = "ctb",
+    person("Thomas", "Petzoldt", , "thomas.petzoldt@tu-dresden.de", role = "ctb",
            comment = c(ORCID = "0000-0002-4951-6468", contribution = "Creator of the package 'growthrates', whose function for calculating linear regressions served as a template in QurvE.")),
     person("Andrew", "Stein", , "andy.stein@gmail.com", role = "ctb",
            comment = c(contribution = "Creator of 'xgxr' package from which QurvE adopted code to plot axis ticks on log10 scale.")),

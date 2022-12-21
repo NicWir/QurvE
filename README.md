@@ -1,9 +1,4 @@
 
-<strong>Please note:</strong> This vignette will be updated from time to
-time when new features are implemented. Please find the most recent
-version at the [QurvE GitHub
-repository](https://github.com/NicWir/QurvE).
-
 # Introduction
 
 In virtually all disciplines of biology dealing with living organisms,
