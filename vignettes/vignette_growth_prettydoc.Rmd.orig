@@ -52,7 +52,7 @@ colorize <- function(x, color) {
 colorize_code <- function(x, color) {
     if (knitr::is_latex_output()) {
          sprintf("\\texttt{\\textcolor{%s}{%s}}", color, x)
-    } else if (knitr::is_html_output()) {
+    } else {
         sprintf("<span style='color: %s;'>`%s`</span>", color,
                 x)
     }
@@ -86,6 +86,14 @@ All computational results of a workflow are stored in a data container (list) an
 \pagebreak
 
 # Installation
+
+## Release version
+
+The most recent release version can be found on CRAN:
+
+```r
+install.packages("QurvE")
+```
 
 ## Development version
 
@@ -180,7 +188,7 @@ Several experiments (e.g., runs on different plate readers) can be combined into
 \
 
 ```{r data-layout, echo = FALSE, fig.width = 10, out.width = "100%", fig.cap = "\\label{fig:data-layout} Custom QurvE data layout", fig.align='center'}
-knitr::include_graphics("../man/figures/Data_layout.jpg", dpi = 100, error = F)
+knitr::include_graphics("https://i.imgur.com/T7LkFDi.png", dpi = 100, error = F)
 ```
 
 \
@@ -296,7 +304,25 @@ If you want to create a report summarizing all computational results including a
 Arguments that are commonly modified:
 
 ```{r workflow-arguments, echo = F}
-if (knitr::is_html_output()) {
+if (knitr::is_latex_output()) {
+arguments <- data.frame(args = c("\\texttt{\\textcolor{red}{fit.opt}}",
+                                   "\\texttt{\\textcolor{red}{model.type}}",
+                                   "\\texttt{\\textcolor{red}{log.y.lin}}\n\\texttt{\\textcolor{red}{log.y.spline}}\n\\texttt{\\textcolor{red}{log.y.model}}",
+                                   "\\texttt{\\textcolor{red}{biphasic}}",
+                                   "\\texttt{\\textcolor{red}{interactive}}",
+                                   "\\texttt{\\textcolor{red}{nboot.gc}}",
+                                   "\\texttt{\\textcolor{red}{dr.method}}",
+                                   "\\texttt{\\textcolor{red}{dr.parameter}}"),
+                          descr = c("Which growth fitting methods to perform; a string containing \\texttt{\\textcolor{red}{'l'}} for linear fits, \\texttt{\\textcolor{red}{'s'}} for spline fits, \\texttt{\\textcolor{red}{'m'}} for model fits, or \\texttt{\\textcolor{red}{'a'}}(the default) for all three methods. Combinations can be also given as a vector of strings, e.g., \\texttt{\\textcolor{red}{c('l', 's').}}",
+                                    "Which growth models to apply; a string containing one of, or a vector of strings containing any combination of 'logistic', 'richards', 'gompertz', 'gompertz.exp', 'huang', and 'baranyi'.",
+                                    "Should Ln(y/y0) be applied to the growth data for the respective fits?",
+                                    "Extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts)",
+                                    "Controls interactive mode.  If \\texttt{\\textcolor{red}{TRUE}}, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample",
+                                    "Number of bootstrap samples used for nonparametric growth curve fitting. See \\texttt{?growth.gcBootSpline} for details.",
+                                    "Define the method used to perform a dose-responde analysis: smooth spline fit (\\texttt{\\textcolor{red}{'spline'}}) or model fitting (\\texttt{\\textcolor{red}{'model'}}, the default). See section 4",
+                                    "The response parameter in the output table to be used for creating a dose response curve. See \\texttt{?growth.drFit} for further details."
+                          ))
+} else {
   arguments <- data.frame(args = c("<span style='color: red;'>`fit.opt`</span>",
                                    "<span style='color: red;'>`model.type`</span>",
                                    "<span style='color: red;'>`log.y.lin`</span>\n<span style='color: red;'>`log.y.spline`</span>\n<span style='color: red;'>`log.y.model`</span>",
@@ -313,25 +339,6 @@ if (knitr::is_html_output()) {
                                     "Number of bootstrap samples used for nonparametric growth curve fitting. See `?growth.gcBootSpline` for details.",
                                     "Define the method used to perform a dose-responde analysis: smooth spline fit (`'spline'`) or model fitting (`'model'`, the default). See section 4",
                                     "The response parameter in the output table to be used for creating a dose response curve. See `?growth.drFit` for further details."
-                          ))
-
-} else {
-  arguments <- data.frame(args = c("\\texttt{\\textcolor{red}{fit.opt}}",
-                                   "\\texttt{\\textcolor{red}{model.type}}",
-                                   "\\texttt{\\textcolor{red}{log.y.lin}}\n\\texttt{\\textcolor{red}{log.y.spline}}\n\\texttt{\\textcolor{red}{log.y.model}}",
-                                   "\\texttt{\\textcolor{red}{biphasic}}",
-                                   "\\texttt{\\textcolor{red}{interactive}}",
-                                   "\\texttt{\\textcolor{red}{nboot.gc}}",
-                                   "\\texttt{\\textcolor{red}{dr.method}}",
-                                   "\\texttt{\\textcolor{red}{dr.parameter}}"),
-                          descr = c("Which growth fitting methods to perform; a string containing \\texttt{\\textcolor{red}{'l'}} for linear fits, \\texttt{\\textcolor{red}{'s'}} for spline fits, \\texttt{\\textcolor{red}{'m'}} for model fits, or \\texttt{\\textcolor{red}{'a'}}(the default) for all three methods. Combinations can be also given as a vector of strings, e.g., \\texttt{\\textcolor{red}{c('l', 's').}}",
-                                    "Which growth models to apply; a string containing one of, or a vector of strings containing any combination of 'logistic', 'richards', 'gompertz', 'gompertz.exp', 'huang', and 'baranyi'.",
-                                    "Should Ln(y/y0) be applied to the growth data for the respective fits?",
-                                    "Extract growth parameters for two different growth phases (as observed with, e.g., diauxic shifts)",
-                                    "Controls interactive mode.  If \\texttt{\\textcolor{red}{TRUE}}, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample",
-                                    "Number of bootstrap samples used for nonparametric growth curve fitting. See \\texttt{?growth.gcBootSpline} for details.",
-                                    "Define the method used to perform a dose-responde analysis: smooth spline fit (\\texttt{\\textcolor{red}{'spline'}}) or model fitting (\\texttt{\\textcolor{red}{'model'}}, the default). See section 4",
-                                    "The response parameter in the output table to be used for creating a dose response curve. See \\texttt{?growth.drFit} for further details."
                           ))
 }
 

@@ -5,6 +5,7 @@
 ^pkgdown$
 ^QurvE\.Rproj$
 ^/vignettes/\.orig$
+^/vignettes/\.png$
 ^/vignettes/precompile\.R$
 ^/vignettes/prettydoc\.Rmd$
 aux$
@@ -19,3 +20,4 @@ cran-comments\.md$
 ^/QurvE
 \.tex
 ^doc$
+^cran-comments\.md$

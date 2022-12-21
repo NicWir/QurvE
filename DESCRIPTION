@@ -2,7 +2,7 @@ Package: QurvE
 Title: Robust and User-Friendly Analysis of Growth Curves
 Version: 1.0
 Authors@R: c(
-    person("Nicolas T.", "Wirth", , "mail.nicowirth@gmail.com", role = c("aut", "cre"),
+    person("Nicolas T.", "Wirth", , "mail.nicowirth@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0003-0799-1321")),
     person("Jonathan", "Funk", , "funk.jonathan21@gmail.com", role = "aut",
            comment = c(contribution = "Co-developer of shiny app.")),
@@ -31,8 +31,9 @@ Authors@R: c(
   )
 Description: High-throughput analysis of growth curves and fluorescence
     data using three methods: linear regression, growth model fitting, and
-    smooth spline fit. Complete data analysis workflows can be executed in
-    a single step via user-friendly wrapper functions. The results
+    smooth spline fit. Analysis of dose-response relationships via smoothing 
+    splines or dose-response models. Complete data analysis workflows can be 
+    executed in a single step via user-friendly wrapper functions. The results
     of these workflows are summarized in detailed reports as well as
     intuitively navigable R data containers. A shiny application provides
     access to all of the package's features without requiring any

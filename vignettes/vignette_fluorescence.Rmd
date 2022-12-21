@@ -62,18 +62,16 @@ Next, load your experimental data. In this example, the dataset being used is fr
 
 
 ```r
-input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"), 
-                sheet.growth = 1, 
-                data.fl = system.file("lac_promoters.xlsx", package = "QurvE"), 
-                sheet.fl = 2, 
-                fl.normtype = "growth")  # normalize fluorescence to growth data
+input <- read_data(data.growth = system.file("lac_promoters.xlsx",
+    package = "QurvE"), sheet.growth = 1, data.fl = system.file("lac_promoters.xlsx",
+    package = "QurvE"), sheet.fl = 2, fl.normtype = "growth")  # normalize fluorescence to growth data
 ```
 
-The two functions `read_data()` or `parse_data()` come with more arguments to give the user more control when loading fluorescence data. As for growth data, arguments  (file path),  (separator symbol in CSV file),  (decimal separator), and  (Excel file worksheet number or "name") provide details on how where an how the data is stored.  allows defining an equation with which to transform fluorescence values.
+The two functions `read_data()` or `parse_data()` come with more arguments to give the user more control when loading fluorescence data. As for growth data, arguments <span style='color: red;'>`data.fl`</span> (file path), <span style='color: red;'>`csvsep.fl`</span> (separator symbol in CSV file), <span style='color: red;'>`dec.fl`</span> (decimal separator), and <span style='color: red;'>`sheet.fl`</span> (Excel file worksheet number or "name") provide details on how where an how the data is stored. <span style='color: red;'>`calib.fl`</span> allows defining an equation with which to transform fluorescence values.
 
-Similarly, the functions accept the arguments , , , , and  to load data from a second fluorescence channel. This second fluorescence is currently only used to normalize the first fluorescence values, as applied in ...ADD CITATION...
+Similarly, the functions accept the arguments <span style='color: red;'>`data.fl2`</span>, <span style='color: red;'>`csvsep.fl2`</span>, <span style='color: red;'>`dec.fl2`</span>, <span style='color: red;'>`sheet.fl2`</span>, and <span style='color: red;'>`calib.fl2`</span> to load data from a second fluorescence channel. This second fluorescence is currently only used to normalize the first fluorescence values, as applied in ...ADD CITATION...
 
-Normalization of fluorescence, if any, can be controlled via  to be performed by either dividing by growth values () or fluorescence 2 .
+Normalization of fluorescence, if any, can be controlled via <span style='color: red;'>`fl.normtype`</span> to be performed by either dividing by growth values (<span style='color: red;'>`fl.normtype = 'growth'`</span>) or fluorescence 2 <span style='color: red;'>`fl.normtype = 'fl2'`</span>.
 
 We can inspect the structure of the `input` object of class `grodata`:
 
@@ -114,9 +112,9 @@ flFitRes <- fl.workflow(grodata = input, fit.opt = c("s", "l"),
     suppress.messages = TRUE, export.res = FALSE)  # Prevent creating TXT table and RData files with results
 ```
 
-If option  is set to , tab-delimited .txt files summarizing the computation results are created automatically, as well as the `flFitRes` object (an object of class `flFitRes`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:flFitRes-container) shows the structure of the generated `flFitRes` object. In RStudio, `View(flFitRes)` allows interactive inspection of the data container.
+If option <span style='color: red;'>`export.res`</span> is set to <span style='color: red;'>`TRUE`</span>, tab-delimited .txt files summarizing the computation results are created automatically, as well as the `flFitRes` object (an object of class `flFitRes`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:flFitRes-container) shows the structure of the generated `flFitRes` object. In RStudio, `View(flFitRes)` allows interactive inspection of the data container.
 
-If you want to create a report summarizing all computational results including a graphical representation of every fit, provide the desired output format(s) as , , or . The advantage of having the report in HTML format is that every figure can be exported as (editable) PDF file.
+If you want to create a report summarizing all computational results including a graphical representation of every fit, provide the desired output format(s) as <span style='color: red;'>`report = 'pdf'`</span>, <span style='color: red;'>`report = 'html'`</span>, or <span style='color: red;'>`report = c('pdf', 'html')`</span>. The advantage of having the report in HTML format is that every figure can be exported as (editable) PDF file.
 
 *<span style='color: orange;'>In the spirit of good scientific practice (data transparency), I would encourage anyone using QurvE to attach the .RData file and generated reports to their publication.</span>*
 
@@ -125,41 +123,41 @@ Arguments that are commonly modified:
 <table>
 <tbody>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{fit.opt}} </td>
-   <td style="text-align:left;vertical-align: top !important; "> Which growth fitting methods to perform; a string containing \texttt{\textcolor{red}{'l'}} for linear fits or \texttt{\textcolor{red}{'s'}} for spline fits. Both fit types can be selected as a vector of strings:  \texttt{\textcolor{red}{c('l', 's').}} </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`fit.opt`</span> </td>
+   <td style="text-align:left;vertical-align: top !important; "> Which growth fitting methods to perform; a string containing `'l'` for linear fits or `'s'` for spline fits. Both fit types can be selected as a vector of strings: `c('l', 's').` </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{x_type}} </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`x_type`</span> </td>
    <td style="text-align:left;vertical-align: top !important; "> Data type used as independent variable. Either `'growth'` or `'time'`. </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{norm_fl}} </td>
-   <td style="text-align:left;vertical-align: top !important; "> Use normalized fluorescence values for curve fitting (if `x_type = 'time'). </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`norm_fl`</span> </td>
+   <td style="text-align:left;vertical-align: top !important; "> Use normalized fluorescence values for curve fitting (if `x_type = 'time'`). </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{log.y.lin}}
-\texttt{\textcolor{red}{log.y.spline}} </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`log.y.lin`</span>
+<span style="color: red;">`log.y.spline`</span> </td>
    <td style="text-align:left;vertical-align: top !important; "> Should Ln(y/y0) be applied to the fluorescence data for the respective fits? </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{biphasic}} </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`biphasic`</span> </td>
    <td style="text-align:left;vertical-align: top !important; "> Extract parameters for two different phases (as observed with, e.g., diauxic shifts) </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{interactive}} </td>
-   <td style="text-align:left;vertical-align: top !important; "> Controls interactive mode.  If \texttt{\textcolor{red}{TRUE}}, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`interactive`</span> </td>
+   <td style="text-align:left;vertical-align: top !important; "> Controls interactive mode.  If `TRUE`, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{nboot.fl}} </td>
-   <td style="text-align:left;vertical-align: top !important; "> Number of bootstrap samples used for nonparametric curve fitting. See \texttt{?flBootSpline} for details. </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`nboot.fl`</span> </td>
+   <td style="text-align:left;vertical-align: top !important; "> Number of bootstrap samples used for nonparametric curve fitting. See `?flBootSpline` for details. </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{dr.method}} </td>
-   <td style="text-align:left;vertical-align: top !important; "> Define the method used to perform a dose-responde analysis: smooth spline fit (\texttt{\textcolor{red}{'spline'}}) or model fitting (\texttt{\textcolor{red}{'model'}}, the default). See section 4 </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`dr.method`</span> </td>
+   <td style="text-align:left;vertical-align: top !important; "> Define the method used to perform a dose-responde analysis: smooth spline fit (`'spline'`) or model fitting (`'model'`, the default). See section 4 </td>
   </tr>
   <tr>
-   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> \texttt{\textcolor{red}{dr.parameter}} </td>
-   <td style="text-align:left;vertical-align: top !important; "> The response parameter in the output table to be used for creating a dose response curve. See \texttt{?fl.drFit} for further details. </td>
+   <td style="text-align:left;width: 3cm; vertical-align: top !important; "> <span style="color: red;">`dr.parameter`</span> </td>
+   <td style="text-align:left;vertical-align: top !important; "> The response parameter in the output table to be used for creating a dose response curve. See `?fl.drFit` for further details. </td>
   </tr>
 </tbody>
 </table>
@@ -169,7 +167,7 @@ Please consult `?fl.workflow` for further arguments to customize the workflow.\
 \
 
 ```{r flFitRes-container, echo = FALSE, fig.pos = "H", out.width = "90%", fig.cap = "\\label{fig:flFitRes-container} Internal structure of a `flFitRes`object generated by `growth.workflow()`.", fig.align='center'}
-knitr::include_graphics("../man/figures/flFitRes_container.jpg", error = F)
+knitr::include_graphics("https://i.imgur.com/QJ2KAT8.jpg", error = F)
 ```
 
 \pagebreak

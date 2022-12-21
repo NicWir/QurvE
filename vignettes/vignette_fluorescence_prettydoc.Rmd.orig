@@ -52,7 +52,7 @@ colorize <- function(x, color) {
 colorize_code <- function(x, color) {
     if (knitr::is_latex_output()) {
          sprintf("\\texttt{\\textcolor{%s}{%s}}", color, x)
-    } else if (knitr::is_html_output()) {
+    } else {
         sprintf("<span style='color: %s;'>`%s`</span>", color,
                 x)
     }
@@ -149,7 +149,28 @@ If you want to create a report summarizing all computational results including a
 Arguments that are commonly modified:
 
 ```{r workflow-arguments, echo = F}
-if (knitr::is_html_output()) {
+if (knitr::is_latex_output()) {
+arguments <- data.frame(args = c("\\texttt{\\textcolor{red}{fit.opt}}",
+                                   "\\texttt{\\textcolor{red}{x_type}}",
+                                   "\\texttt{\\textcolor{red}{norm_fl}}",
+                                   "\\texttt{\\textcolor{red}{log.y.lin}}\n\\texttt{\\textcolor{red}{log.y.spline}}",
+                                   "\\texttt{\\textcolor{red}{biphasic}}",
+                                   "\\texttt{\\textcolor{red}{interactive}}",
+                                   "\\texttt{\\textcolor{red}{nboot.fl}}",
+                                   "\\texttt{\\textcolor{red}{dr.method}}",
+                                   "\\texttt{\\textcolor{red}{dr.parameter}}"),
+                          descr = c("Which growth fitting methods to perform; a string containing \\texttt{\\textcolor{red}{'l'}} for linear fits or \\texttt{\\textcolor{red}{'s'}} for spline fits. Both fit types can be selected as a vector of strings:  \\texttt{\\textcolor{red}{c('l', 's').}}",
+                                    "Data type used as independent variable. Either `'growth'` or `'time'`.",
+                                    "Use normalized fluorescence values for curve fitting (if `x_type = 'time').",
+                                    "Should Ln(y/y0) be applied to the fluorescence data for the respective fits?",
+                                    "Extract parameters for two different phases (as observed with, e.g., diauxic shifts)",
+                                    "Controls interactive mode.  If \\texttt{\\textcolor{red}{TRUE}}, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample",
+                                    "Number of bootstrap samples used for nonparametric curve fitting. See \\texttt{?flBootSpline} for details.",
+                                    "Define the method used to perform a dose-responde analysis: smooth spline fit (\\texttt{\\textcolor{red}{'spline'}}) or model fitting (\\texttt{\\textcolor{red}{'model'}}, the default). See section 4",
+                                    "The response parameter in the output table to be used for creating a dose response curve. See \\texttt{?fl.drFit} for further details."
+                          ))
+
+} else {
   arguments <- data.frame(args = c("<span style='color: red;'>`fit.opt`</span>",
                                    "<span style='color: red;'>`x_type`</span>",
                                    "<span style='color: red;'>`norm_fl`</span>",
@@ -168,27 +189,6 @@ if (knitr::is_html_output()) {
                                     "Number of bootstrap samples used for nonparametric curve fitting. See `?flBootSpline` for details.",
                                     "Define the method used to perform a dose-responde analysis: smooth spline fit (`'spline'`) or model fitting (`'model'`, the default). See section 4",
                                     "The response parameter in the output table to be used for creating a dose response curve. See `?fl.drFit` for further details."
-                          ))
-
-} else {
-  arguments <- data.frame(args = c("\\texttt{\\textcolor{red}{fit.opt}}",
-                                   "\\texttt{\\textcolor{red}{x_type}}",
-                                   "\\texttt{\\textcolor{red}{norm_fl}}",
-                                   "\\texttt{\\textcolor{red}{log.y.lin}}\n\\texttt{\\textcolor{red}{log.y.spline}}",
-                                   "\\texttt{\\textcolor{red}{biphasic}}",
-                                   "\\texttt{\\textcolor{red}{interactive}}",
-                                   "\\texttt{\\textcolor{red}{nboot.fl}}",
-                                   "\\texttt{\\textcolor{red}{dr.method}}",
-                                   "\\texttt{\\textcolor{red}{dr.parameter}}"),
-                          descr = c("Which growth fitting methods to perform; a string containing \\texttt{\\textcolor{red}{'l'}} for linear fits or \\texttt{\\textcolor{red}{'s'}} for spline fits. Both fit types can be selected as a vector of strings:  \\texttt{\\textcolor{red}{c('l', 's').}}",
-                                    "Data type used as independent variable. Either `'growth'` or `'time'`.",
-                                    "Use normalized fluorescence values for curve fitting (if `x_type = 'time').",
-                                    "Should Ln(y/y0) be applied to the fluorescence data for the respective fits?",
-                                    "Extract parameters for two different phases (as observed with, e.g., diauxic shifts)",
-                                    "Controls interactive mode.  If \\texttt{\\textcolor{red}{TRUE}}, each fit is visualized in the Plots pane and the user can adjust fitting parameters and confirm the reliability of each fit per sample",
-                                    "Number of bootstrap samples used for nonparametric curve fitting. See \\texttt{?flBootSpline} for details.",
-                                    "Define the method used to perform a dose-responde analysis: smooth spline fit (\\texttt{\\textcolor{red}{'spline'}}) or model fitting (\\texttt{\\textcolor{red}{'model'}}, the default). See section 4",
-                                    "The response parameter in the output table to be used for creating a dose response curve. See \\texttt{?fl.drFit} for further details."
                           ))
 }
 
