@@ -28,7 +28,7 @@ Other contributors:
 \itemize{
   \item Matthias Kahm (Author of 'grofit' package, whose general data structure was adopted for QurvE.) [contributor]
   \item Maik Kschischo (Author of 'grofit' package, whose general data structure was adopted for QurvE.) [contributor]
-  \item Thomas Petzoldt \email{thomas.petzoldt at tu-dresden.de} (\href{https://orcid.org/0000-0002-4951-6468}{ORCID}) (Creator of the package 'growthrates', whose function for calculating linear regressions served as a template in QurvE.) [contributor]
+  \item Thomas Petzoldt \email{thomas.petzoldt@tu-dresden.de} (\href{https://orcid.org/0000-0002-4951-6468}{ORCID}) (Creator of the package 'growthrates', whose function for calculating linear regressions served as a template in QurvE.) [contributor]
   \item Andrew Stein \email{andy.stein@gmail.com} (Creator of 'xgxr' package from which QurvE adopted code to plot axis ticks on log10 scale.) [contributor]
   \item Michael W. Kearney \email{kearneymw@missouri.edu} (Creator of 'tfse' package from which QurvE adopted the match_arg function.) [contributor]
   \item Santiago I. Hurtado \email{santih@carina.fcaglp.unlp.edu.ar} (Creator of 'RobustLinearReg' package from which QurvE adopted the Theil Sehn Regression method.) [contributor]
