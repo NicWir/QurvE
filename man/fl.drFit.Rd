@@ -29,6 +29,7 @@ An object of class \code{drFit}.
 Fit a biosensor model (Meyer et al., 2019) to response vs. concentration data
 }
 \examples{
+\donttest{
 # Load example dataset
 input <- read_data(data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.fl = 2 )
@@ -48,7 +49,7 @@ drFit <- fl.drFit(flTable = fitres$flTable,
 # Inspect results
 summary(drFit)
 plot(drFit)
-
+}
 }
 \references{
 Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. \emph{Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors.} Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3

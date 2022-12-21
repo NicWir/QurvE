@@ -20,7 +20,7 @@ export_Table(table, out.dir = getwd(), out.nm = deparse(substitute(table)))
 Export a tabular object as tab-separated .txt file
 }
 \examples{
-\dontrun{
+if(interactive()){
 df <- data.frame('A' = seq(1:10), 'B' = rev(seq(1:10)))
 
 export_Table(df)

@@ -35,7 +35,7 @@ In virtually all disciplines of biology dealing with living organisms, from clas
 
 Any physiological parameter calculated (e.g., growth rate µ, doubling time t~D~, lag time $\lambda$, growth measurement increase $\Delta$Y, or equivalent fluorescence parameters) can be used to perform a dose-response analysis to determine the *half-maximal effective concentration* (EC~50~).
 
-The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. `QurvE` was designed to be usable with minimal prior knowledge of the R programming language or programming in general. You will need to be familiar with the idea of running commands from a console or writing basic scripts. For R beginners, [this](https://moderndive.netlify.app/1-getting-started.html) is a great starting point, there are some good resources [here](https://education.rstudio.com/learn/beginner/) and we suggest using the [RStudio application](https://posit.co/products/open-source/rstudio//). It provides an environment for writing and running R code.
+The package is build on the foundation of the two R packages from @kahm2010 and @petzoldt2022. `QurvE` was designed to be usable with minimal prior knowledge of the R programming language or programming in general. You will need to be familiar with the idea of running commands from a console or writing basic scripts. For R beginners, [this](https://moderndive.netlify.app/1-getting-started.html) is a great starting point, there are some good resources [here](https://education.rstudio.com/learn/beginner/) and we suggest using the [RStudio application](https://posit.co/products/open-source/rstudio/). It provides an environment for writing and running R code.
 
 With consideration for `R` novices, `QurvE` establishes a framework in which a complete, detailed growth curve analysis can be performed in two simple steps:
 
@@ -353,7 +353,6 @@ gcTable[1:3, 1:14]
 3        TRUE        0         0      <NA>          <NA>         0
 
 ```r
-
 # Show drTable. The function as.data.frame() ensures that it is shown in table format.
 drTable <- as.data.frame(grofit$drFit$drTable)
 ```

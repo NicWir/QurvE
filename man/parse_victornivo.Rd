@@ -16,7 +16,7 @@ a list of length two containing growth and/or fluorescence dataframes in the fir
 Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor Nivo" plate readers.
 }
 \examples{
-\dontrun{
+if(interactive()){
 input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
 parsed <- parse_victornivo(input)
 }

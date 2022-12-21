@@ -185,25 +185,9 @@ growth.gcFitModel <- function(
 #' \item{fitFlag}{(Logical) Indicates whether a parametric model was successfully fitted on the data.}
 #' \item{control}{Object of class \code{grofit.control} containing list of options passed to the function as \code{control}.}
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth dataset
-#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
+#' @keywords internal
+#' @noRd
 #'
-#' # Extract time and growth data for single sample
-#' time <- rnd.dataset$time[1,]
-#' data <- rnd.dataset$data[1,-(1:3)] # Remove identifier columns
-#'
-#' # /// conversion to handle even data.frame inputs
-#' time <- as.vector(as.numeric(as.matrix(time)))[!is.na(time)][!is.na(data)]
-#' data    <- as.vector(as.numeric(as.matrix(data)))[!is.na(time)][!is.na(data)]
-#'
-#' # Perform parametric fit
-#' TestFit <- growth.param(time, data, gcID = 'TestFit',
-#'                  control = growth.control(fit.opt = 'm'))
-#'
-#' plot(TestFit, basesize = 18, eq.size = 1.5)
-#' }
 growth.param <- function(time, data, gcID = "undefined", control)
     {
     time.in <- time
@@ -548,12 +532,9 @@ growth.param <- function(time, data, gcID = "undefined", control)
 #' @param parms A vector of length 2 with parameters: 1. start growth value (y0), 2. exponential growth rate (mumax)
 #'
 #' @return A dataframe with time and calculated growth columns
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' data.exp <- grow_exponential(time, parms = c(0.05, 0.6))
-#' plot(data.exp)
 grow_exponential <- function(time, parms)
     {
     if (is.null(names(parms)))
@@ -578,12 +559,9 @@ grow_exponential <- function(time, parms)
 #' @param parms A vector of length 2 with parameters: 1. start growth value (y0), 2. growth rate as slope of the linear model (mumax)
 #'
 #' @return A dataframe with time and calculated growth columns
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' data.lin <- grow_linear(time, parms = c(0.05, 0.6))
-#' plot(data.lin)
 grow_linear <- function(time, parms)
     {
     if (length(parms) >
@@ -672,14 +650,9 @@ low.integrate <- function(x, y)
 #' @param addpar Additional parameters have no effect in this type of model. They belong to the standard model description in \code{QurvE} and are initialized as \code{addpar=NULL} in the function header.
 #'
 #' @return A vector of growth values
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' # Simulate logistic growth curve
-#' growth <- logistic(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
-#'
-#' plot(time, growth)
 logistic <- function(time, A, mu, lambda, addpar = NULL)
     {
     A <- A[1]
@@ -717,14 +690,8 @@ logistic <- function(time, A, mu, lambda, addpar = NULL)
 #' \item{lambda}{Lag-phase.}
 #' \item{addpar}{additional parameters are not used in this type of model.}
 #'
-#' @export
-#'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' # Simulate baranyi growth curve
-#' y <- baranyi(time, A = 3, mu=0.6, lambda = 2, addpar = 0.01)
-#'
-#' init <- initlogistic(time, y, A = 3, mu = 0.6, lambda = 2)
+#' @keywords internal
+#' @noRd
 #'
 initlogistic <- function(time, y, A, mu, lambda)
     {
@@ -765,14 +732,8 @@ initlogistic <- function(time, y, A, mu, lambda)
 #' \item{lambda}{Lag time.}
 #' \item{addpar}{Shape exponent \eqn{\nu}.}
 #'
-#' @export
-#'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' # Simulate baranyi growth curve
-#' y <- baranyi(time, A = 3, mu=0.6, lambda = 2, addpar = 0.01)
-#'
-#' init <- initrichards(time, y, A = 3, mu = 0.6, lambda = 2)
+#' @keywords internal
+#' @noRd
 #'
 initrichards <- function(time, y, A, mu, lambda)
     {
@@ -814,14 +775,8 @@ initrichards <- function(time, y, A, mu, lambda)
 #' \item{lambda}{Lag time.}
 #' \item{addpar}{Minimum of the curve \eqn{y0}.}
 #'
-#' @export
-#'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' # Simulate baranyi growth curve
-#' y <- baranyi(time, A = 3, mu=0.6, lambda = 2, addpar = 0.01)
-#'
-#' init <- inithuang(time, y, A = 3, mu = 0.6, lambda = 2)
+#' @keywords internal
+#' @noRd
 #'
 inithuang <- function(time, y, A, mu, lambda)
     {
@@ -856,13 +811,9 @@ inithuang <- function(time, y, A, mu, lambda)
 #' @param addpar additional parameters (here: minimum growth)
 #'
 #' @return A vector of growth values
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' growth <- huang(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
-#'
-#' plot(time, growth)
 huang <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]
@@ -906,13 +857,9 @@ huang <- function(time, A, mu, lambda, addpar)
 #' @param addpar additional parameters (here: minimum growth)
 #'
 #' @return A vector of growth values
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' growth <- baranyi(time, A = 3, mu=  0.6, lambda = 3, addpar = 0.01)
-#'
-#' plot(time, growth)
 baranyi <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]
@@ -963,14 +910,8 @@ baranyi <- function(time, A, mu, lambda, addpar)
 #' \item{lambda}{Lag time.}
 #' \item{addpar}{Minimum of the curve \eqn{y0}.}
 #'
-#' @export
-#'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' # Simulate baranyi growth curve
-#' y <- baranyi(time, A = 3, mu=0.6, lambda = 2, addpar = 0.01)
-#'
-#' init <- initbaranyi(time, y, A = 3, mu = 0.6, lambda = 2)
+#' @keywords internal
+#' @noRd
 #'
 initbaranyi <- function(time, y, A, mu, lambda)
     {
@@ -1028,13 +969,9 @@ initbaranyi <- function(time, y, A, mu, lambda)
 #' @param addpar additional parameters (here: Shape exponent \eqn{\nu}.)
 #'
 #' @return A vector of growth values
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' growth <- richards(time, A = 3, mu=0.6, lambda = 3, addpar = 0.01)
-#'
-#' plot(time, growth)
 richards <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]
@@ -1070,13 +1007,9 @@ richards <- function(time, A, mu, lambda, addpar)
 #' @param addpar Additional parameters have no effect in this type of model. They belong to the standard model description in \code{grofit} and are initialized as \code{addpar=NULL} in the function header.
 #'
 #' @return A vector of growth values
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' growth <- gompertz(time, A = 3, mu=0.6, lambda = 3)
-#'
-#' plot(time, growth)
 gompertz <- function(time, A, mu, lambda, addpar = NULL)
     {
     A <- A[1]
@@ -1115,14 +1048,8 @@ gompertz <- function(time, A, mu, lambda, addpar = NULL)
 #' \item{lambda}{Lag time.}
 #' \item{addpar}{Additional parameters are not used in this type of model.}
 #'
-#' @export
-#'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' # Simulate baranyi growth curve
-#' y <- baranyi(time, A = 3, mu=0.6, lambda = 2, addpar = 0.01)
-#'
-#' init <- initgompertz(time, y, A = 3, mu = 0.6, lambda = 2)
+#' @keywords internal
+#' @noRd
 #'
 initgompertz <- function(time, y, A, mu, lambda)
     {
@@ -1163,14 +1090,8 @@ initgompertz <- function(time, y, A, mu, lambda)
 #' \item{lambda}{Lag time.}
 #' \item{addpar}{Two element vector defining scaling parameter \eqn{\alpha} and shifting parameter \eqn{t_{shift}}.}
 #'
-#' @export
-#'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' # Simulate baranyi growth curve
-#' y <- baranyi(time, A = 3, mu=0.6, lambda = 2, addpar = 0.01)
-#'
-#' init <- initgompertz(time, y, A = 3, mu = 0.6, lambda = 2)
+#' @keywords internal
+#' @noRd
 #'
 initgompertz.exp <- function(time, y, A, mu, lambda)
     {
@@ -1208,13 +1129,9 @@ initgompertz.exp <- function(time, y, A, mu, lambda)
 #' @param addpar Numeric vector of size two, addpar`[`1`]` corresponds to scaling parameter \eqn{\alpha} and addpar`[`2`]` corresponds to shifting parameter \eqn{t_{shift}}.
 #'
 #' @return A vector of growth values
-#' @export
+#' @keywords internal
+#' @noRd
 #'
-#' @examples
-#' time <- seq(from = 0, to = 24, by = 0.25)
-#' growth <- gompertz.exp(time, A = 3, mu=0.6, lambda = 3, addpar = c(0.1, 12))
-#'
-#' plot(time, growth)
 gompertz.exp <- function(time, A, mu, lambda, addpar)
     {
     A <- A[1]

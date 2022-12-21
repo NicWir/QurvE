@@ -1723,6 +1723,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab xlim ylim
 #'
 #' @examples
+#' \donttest{
 #' # load example dataset
 #' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -1737,7 +1738,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #'                    parallelize = FALSE)
 #'
 #' plot(res, legend.ncol = 3, basesize = 15)
-#'
+#' }
 #'
 plot.flFitRes <-  function(x,
                         data.type = c("spline", "raw", "norm.fl"),

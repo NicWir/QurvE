@@ -16,7 +16,7 @@ a list of length two containing growth and/or fluorescence dataframes in the fir
 Extract relevant data from a raw data export file generated with the "Gen5" or "Gen6" software.
 }
 \examples{
-\dontrun{
+if(interactive()){
 input <- read_file(filename = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE") )
 parsed <- parse_Gen5Gen6(input)
 }

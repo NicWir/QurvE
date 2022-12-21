@@ -31,6 +31,7 @@
 #'
 #' @export
 #' @examples
+#' \donttest{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = 'Test2')
@@ -53,7 +54,7 @@
 #' # Inspect results
 #' summary(drFit)
 #' plot(drFit)
-#'
+#' }
 growth.drFit <- function(
     gcTable, control = growth.control(
         dr.method = "model", dr.model = c(
@@ -1214,6 +1215,7 @@ growth.drFitModel <- function(
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'
 #' @examples
+#' \donttest{
 #' # Load example dataset
 #' input <- read_data(data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    sheet.fl = 2 )
@@ -1233,7 +1235,7 @@ growth.drFitModel <- function(
 #' # Inspect results
 #' summary(drFit)
 #' plot(drFit)
-#'
+#' }
 fl.drFit <- function(
     flTable, control = fl.control(
         dr.method = "model", dr.parameter = "max_slope.spline"

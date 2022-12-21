@@ -18,6 +18,7 @@ A data frame with grouped linear fit results. Empty cells indicate that no relia
 Generate a grouped results table for linear fits with average and standard deviations
 }
 \examples{
+\donttest{
 # load example dataset
 input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -36,5 +37,5 @@ table_group_fluorescence_linear(res$flFit$flTable)
 # with HTML formatting
 DT::datatable(table_group_fluorescence_linear(res$flFit$flTable, html = TRUE),
               escape = FALSE) # Do not escape HTML entities
-
+}
 }

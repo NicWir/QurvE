@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{rdm.data}
 \alias{rdm.data}
-\title{The function calls the \code{\link{baranyi}} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.}
+\title{The function calls the \code{baranyi} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.}
 \usage{
 rdm.data(d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5, A = 3, label = "Test1")
 }
@@ -27,7 +27,7 @@ A list containing simulated data for three tests (e.g., 'organisms'):
 \item{data}{data.frame of size \code{d}x(3+\code{t}), 1. column, character as an experiment identifier; 2. column: Replicate number; 3. column: concentration of substrate of a compound under which the experiment is obtained; 4.-(3+t). column: growth data corresponding to the time points in \code{time}.}
 }
 \description{
-The function calls the \code{\link{baranyi}} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
+The function calls the \code{baranyi} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
 }
 \examples{
 # Create random growth data set
@@ -45,6 +45,7 @@ gcFit <- growth.gcFit(time = rnd.data$time,
                        control = growth.control(fit.opt = 's',
                                                 suppress.messages = TRUE))
 
+\donttest{
 # Perform dose-response analysis
 drFit <- growth.drFit(gcTable = gcFit$gcTable,
              control = growth.control(dr.parameter = 'mu.spline'))
@@ -52,6 +53,7 @@ drFit <- growth.drFit(gcTable = gcFit$gcTable,
 # Inspect results
 summary(drFit)
 plot(drFit)
+}
 
 }
 \references{

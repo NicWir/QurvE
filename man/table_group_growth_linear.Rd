@@ -18,6 +18,7 @@ A data frame with grouped linear fit results. Empty cells indicate that no relia
 Generate a grouped results table for linear fits with average and standard deviations
 }
 \examples{
+\donttest{
 # Create random growth data set
 rnd.data <- rdm.data(d = 30, mu = 0.6, A = 4.5, label = "Test2")
 
@@ -36,4 +37,5 @@ table_group_growth_linear(res$gcFit$gcTable)
 # with HTML formatting
 DT::datatable(table_group_growth_linear(res$gcFit$gcTable, html = TRUE),
               escape = FALSE) # Do not escape HTML entities
+}
 }

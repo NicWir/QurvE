@@ -31,7 +31,7 @@
 #' @family reports
 #' @return \code{NULL}
 #' @examples
-#' \dontrun{
+#' if(interactive()){
 #' # Create random growth data set
 #'   rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
@@ -258,7 +258,7 @@ growth.report <- function(
 #' @return \code{NULL}
 #' @examples
 #' # load example dataset
-#' \dontrun{
+#' if(interactive()){
 #' input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    sheet.growth = 1,
@@ -485,11 +485,9 @@ fl.report <- function(
 #' @param x A character string. The text to be colored.
 #' @param color (Character) A color.
 #' @return A LaTeX- or HTML-formatted string to assign a color to text based on the output format.
-#' @examples
-#' \dontrun{
-#' # the example below is meaningless unless you put it in a markdown document
-#' colFmt('Test_text', 'Red')
-#' }
+#' @keywords internal
+#' @noRd
+#'
 colFmt <- function(x, color)
     {
     outputFormat <- knitr::opts_knit$get("rmarkdown.pandoc.to")

@@ -1048,6 +1048,7 @@ plot.drBootSpline <- function (x,
 #'   scale_y_continuous theme theme_classic theme_minimal xlab ylab
 #'
 #' @examples
+#' \donttest{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -1071,7 +1072,7 @@ plot.drBootSpline <- function (x,
 #' summary(drFit)
 #'
 #' plot(drFit)
-#'
+#' }
 plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch = 16, cex.point = 2, basesize = 15, colors = NULL, lwd = 0.7, ec50line = TRUE,
                        y.lim = NULL, x.lim = NULL, y.title = NULL, x.title = NULL, log.y = FALSE, log.x = FALSE,
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL, ...)
@@ -4144,6 +4145,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
 #' @return A column plot comparing a selected parameter of a dose-response analysis between tested conditions.
 #'
 #' @examples
+#' \donttest{
 #' # Create random growth data set
 #' rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 #' rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -4164,6 +4166,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
 #'             control = growth.control(dr.parameter = "mu.spline"))
 #'
 #' plot.dr_parameter(drFit, param = 'EC50')
+#' }
 #'
 plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.min', 'fc', 'K', 'n', 'yEC50', 'drboot.meanEC50', 'drboot.meanEC50y', 'EC50.orig', 'yEC50.orig'),
                               names = NULL, exclude.nm = NULL, basesize = 12, reference.nm = NULL, label.size = NULL,

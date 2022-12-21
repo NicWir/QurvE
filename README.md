@@ -34,8 +34,9 @@ from a console or writing basic scripts. For R beginners,
 [this](https://moderndive.netlify.app/1-getting-started.html) is a great
 starting point, there are some good resources
 [here](https://education.rstudio.com/learn/beginner/) and we suggest
-using the [RStudio application](https://rstudio.com/products/rstudio/).
-It provides an environment for writing and running R code.
+using the [RStudio
+application](https://posit.co/products/open-source/rstudio/). It
+provides an environment for writing and running R code.
 
 With consideration for `R` novices, `QurvE` establishes a framework in
 which a complete, detailed growth curve analysis can be performed in two
@@ -55,6 +56,14 @@ parsing of data from plate reader result files, and calculates
 parameters for an additional growth phase (bi-phasic growth).
 
 # Installation
+
+## Release version
+
+The most recent release version can be found on CRAN:
+
+``` r
+install.packages("QurvE")
+```
 
 ## Development version
 
@@ -384,7 +393,7 @@ plot(grodata, data.type = "growth", log.y = FALSE,
      basesize = 10, legend.ncol = 1, lwd = 0.7)
 ```
 
-<img src="vigfig-raw-data-plot-1.png" alt="\label{fig:raw-data-plot} Raw data plot.
+<img src="vignettes/vigfig-raw-data-plot-1.png" alt="\label{fig:raw-data-plot} Raw data plot.
 Conditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options." width="80%" style="display: block; margin: auto;" />
 
 ## Run Workflow
@@ -466,7 +475,6 @@ nboot.gc mu.linfit tD.linfit lambda.linfit dY.linfit 1 TRUE 0 0 <NA>
 <NA> 0 2 TRUE 0 0 <NA> <NA> 0 3 TRUE 0 0 <NA> <NA> 0
 
 ``` r
-
 # Show drTable. The function as.data.frame() ensures that it is shown in table format.
 drTable <- as.data.frame(grofit$drFit$drTable)
 ```
@@ -510,7 +518,7 @@ plot(grofit,
      lwd = 0.7)
 ```
 
-<img src="vigfig-group-spline-plot-1.png" alt="\label{fig:group-spline-plot} Combined plot of all spline fits performed.
+<img src="vignettes/vigfig-group-spline-plot-1.png" alt="\label{fig:group-spline-plot} Combined plot of all spline fits performed.
 In addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.grofit` for all options." width="80%" style="display: block; margin: auto;" />
 
 ### Compare growth parameters
@@ -534,7 +542,7 @@ plot.parameter(grofit, param = "dY.orig.model", basesize = 10,
     legend.position = "bottom")
 ```
 
-<img src="vigfig-plot-parameter-1.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-2.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-3.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-4.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-5.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vigfig-plot-parameter-6.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-plot-parameter-1.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vignettes/vigfig-plot-parameter-2.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vignettes/vigfig-plot-parameter-3.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vignettes/vigfig-plot-parameter-4.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vignettes/vigfig-plot-parameter-5.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" /><img src="vignettes/vigfig-plot-parameter-6.png" alt="\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean ± 95\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`." width="47%" style="display: block; margin: auto;" />
 
 From the parameter plot for ´mu.linfit´ (the growth rates determined
 with linear regression), we can see that there is an outlier for strain
@@ -548,7 +556,7 @@ plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2,
     cex.axis = 1.2)
 ```
 
-<img src="vigfig-plot-linear-1.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" /><img src="vigfig-plot-linear-2.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-plot-linear-1.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" /><img src="vignettes/vigfig-plot-linear-2.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" />
 
 Apparently, the algorithm to find the maximum slope in the growth curve
 with the standard threshold of `lin.R2 = 0.97` could not find an
@@ -601,7 +609,7 @@ And we can validate the quality of the updated fit:
 plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2)
 ```
 
-<img src="vigfig-plot-linear-update-1.png" alt="\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'." width="70%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-plot-linear-update-1.png" alt="\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'." width="70%" style="display: block; margin: auto;" />
 
 That looks better!
 
@@ -610,7 +618,7 @@ That looks better!
 plot.parameter(grofit, param = "mu.linfit", basesize = 15)
 ```
 
-<img src="vigfig-plot-parameter-update-1.png" alt="\label{fig:plot-parameter-update} Parameter plot with updated fit." width="70%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-plot-parameter-update-1.png" alt="\label{fig:plot-parameter-update} Parameter plot with updated fit." width="70%" style="display: block; margin: auto;" />
 
 ### Plot grids
 
@@ -628,7 +636,7 @@ plot.grid(grofit,
           basesize = 9)
 ```
 
-<img src="vigfig-grid-plot-1.png" alt="\label{fig:plot} Plot grid of all spline fits performed . See `?plot.grid` for available options." width="90%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-grid-plot-1.png" alt="\label{fig:plot} Plot grid of all spline fits performed . See `?plot.grid` for available options." width="90%" style="display: block; margin: auto;" />
 
 ### Dose-response analysis
 
@@ -646,7 +654,7 @@ respectively.
 plot(grofit$drFit, cex.point = 1, basesize = 12)
 ```
 
-<img src="vigfig-plot-drFit-1.png" alt="\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`." width="70%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-plot-drFit-1.png" alt="\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`." width="70%" style="display: block; margin: auto;" />
 
 # Bootstrapping
 
@@ -692,7 +700,7 @@ plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative 
      lwd = 0.7)
 ```
 
-<img src="vigfig-plot-gcBootSpline-1.png" alt="\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`." width="85%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-plot-gcBootSpline-1.png" alt="\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`." width="85%" style="display: block; margin: auto;" />
 
 And by applying `plot()` to a `drBootSpline` object, we can plot the
 dose-response bootstrap results:
@@ -703,7 +711,7 @@ plot(grofit_bt$drFit$drBootSpline[[1]],
      lwd = 0.7)
 ```
 
-<img src="vigfig-plot-drBootSpline-1.png" alt="\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`." width="85%" style="display: block; margin: auto;" />
+<img src="vignettes/vigfig-plot-drBootSpline-1.png" alt="\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`." width="85%" style="display: block; margin: auto;" />
 
 # References
 

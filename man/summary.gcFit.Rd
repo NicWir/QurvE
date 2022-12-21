@@ -18,6 +18,7 @@ A dataframe with parameters extracted from all fits of a workflow.
 Generic summary function for gcFit objects
 }
 \examples{
+\donttest{
 # Create random growth data set
 rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = 'Test2')
@@ -34,5 +35,6 @@ gcFit <- growth.gcFit(time = rnd.data$time,
                                                 suppress.messages = TRUE,
                                                 nboot.gc = 20))
 summary(gcFit)
+}
 
 }

@@ -10,7 +10,7 @@ output:
     theme: "cayman"
     highlight: vignette
 vignette: >
-  %\VignetteIndexEntry{Quantitiative Fluorescence Curve Evaluation with Package `QurvE`}
+  %\VignetteIndexEntry{QurvE User Manual v.1.0}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 lang: en-US

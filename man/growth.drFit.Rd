@@ -50,6 +50,7 @@ calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBo
 generate a table with estimates for EC50 and respecting statistics.
 }
 \examples{
+\donttest{
 # Create random growth data set
 rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = 'Test2')
@@ -72,7 +73,7 @@ drFit <- growth.drFit(gcTable = gcFit$gcTable,
 # Inspect results
 summary(drFit)
 plot(drFit)
-
+}
 }
 \references{
 Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). \emph{grofit: Fitting Biological Growth Curves with R}. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07

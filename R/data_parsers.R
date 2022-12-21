@@ -877,8 +877,10 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
+#' @export
+#'
 #' @examples
-#' \dontrun{
+#' if(interactive()){
 #' input <- read_file(filename = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE") )
 #' parsed <- parse_Gen5Gen6(input)
 #' }
@@ -981,11 +983,8 @@ parse_Gen5Gen6 <- function(input)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("ChiBio.csv", package = "QurvE"), csvsep = "," )
-#' parsed <- parse_chibio(input)
-#' }
+#' @keywords internal
+#' @noRd
 parse_chibio <- function(input)
 {
   time.ndx <- grep("time", input[1,], ignore.case = TRUE)
@@ -1062,11 +1061,8 @@ parse_chibio <- function(input)
 #'
 #' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("GrowthProfiler.csv", package = "QurvE"), csvsep = "," )
-#' parsed <- parse_growthprofiler(input)
-#' }
+#' @keywords internal
+#' @noRd
 parse_growthprofiler <- function(input)
 {
   # get row numbers for "time" in column 1
@@ -1090,11 +1086,8 @@ parse_growthprofiler <- function(input)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("Tecan.csv", package = "QurvE"), csvsep = ";" )
-#' parsed <- parse_tecan(input)
-#' }
+#' @keywords internal
+#' @noRd
 parse_tecan <- function(input)
 {
   # get row numbers for "time" in column 2
@@ -1181,11 +1174,8 @@ parse_tecan <- function(input)
 #'
 #' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("biolector.csv", package = "QurvE"), csvsep = ";" )
-#' parsed <- parse_biolector(input)
-#' }
+#' @keywords internal
+#' @noRd
 parse_biolector <- function(input)
 {
   # get index (row,column) for "Time:"
@@ -1265,8 +1255,10 @@ parse_biolector <- function(input)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
+#' @export
+#'
 #' @examples
-#' \dontrun{
+#' if(interactive()){
 #' input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
 #' parsed <- parse_victornivo(input)
 #' }
@@ -1356,8 +1348,10 @@ parse_victornivo <- function(input)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
+#' @export
+#'
 #' @examples
-#' \dontrun{
+#' if(interactive()){
 #' input <- read_file(filename = system.file("victorx3_output.txt", package = "QurvE") )
 #' parsed <- parse_victorx3(input)
 #' }

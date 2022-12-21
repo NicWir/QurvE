@@ -66,23 +66,9 @@ suppress_warnings <- function(.expr, .f, ...)
 #'
 #' @return Dataframe \code{df} with values adjusted based on the provided equation.
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth dataset
-#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
+#' @keywords internal
+#' @noRd
 #'
-#' # Convert dataset into QurvE custom format
-#' df <- cbind(
-#'   "time" = c("Time", NA, NA, rnd.data1$time[1,]),
-#'   t(rnd.data1$data))
-#'
-#' # Perform calibration
-#' df.calib <- calibrate(df, "y = 2 * x")
-#'
-#' # Inspect results
-#' head(df)
-#' head(df.calib)
-#' }
 calibrate <- function(df, equation)
   {
   #test if more than one time entity is present
@@ -132,21 +118,8 @@ calibrate <- function(df, equation)
 #'
 #' @return a call to\code{\link[grDevices]{axisTicks}} to create pretty axis ticks.
 #'
-#' @examples
-#' \dontrun{
-#' #Define values
-#' n <- seq(1:10)
-#' x <- 10*(1/2)^n
-#' y <- gompertz(time = x, A = 2, mu = 0.6, lambda = 3)
-#'
-#' df <- data.frame(x = x,
-#'                  y = y)
-#'
-#' ggplot(df, aes(x = x, y = y)) +
-#'        geom_point() +
-#'        scale_x_log10(breaks = base_breaks(n = 10)) +
-#'        scale_y_log10(breaks = base_breaks(n = 6))
-#' }
+#' @keywords internal
+#' @noRd
 #'
 base_breaks <- function(n = 10)
     {
@@ -384,16 +357,8 @@ biosensor.eq <- function(x, y.min, y.max, K, n)
 #' \item{n}{The initially defined cooperativity parameter.}
 #'
 #'
-#' @examples
-#' \dontrun{
-#' n <- seq(1:10)
-#' conc <- (10*(1/2)^n)
-#' response <- log10(y <- gompertz(conc, A = 2, mu = 0.6, lambda = 3))
-#'
-#' init <- initbiosensor(x = conc,
-#'                       y = response,
-#'                       n= 0.5)
-#' }
+#' @keywords internal
+#' @noRd
 #'
 initbiosensor <- function(x, y, n)
     {
@@ -437,7 +402,7 @@ initbiosensor <- function(x, y, n)
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' if(interactive()){
 #' df <- data.frame('A' = seq(1:10), 'B' = rev(seq(1:10)))
 #'
 #' export_Table(df)
@@ -467,7 +432,7 @@ export_Table <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' if(interactive()){
 #' df <- data.frame('A' = seq(1:10), 'B' = rev(seq(1:10)))
 #'
 #' export_RData(df)
@@ -514,25 +479,8 @@ export_RData <- function(
 #' @return Value(s) matched via partial matching.
 #'
 #' @author Alban Sagouis
-#' @examples
-#' \dontrun{
-#' require(stats)
-#' center <- function(x, type = c('mean', 'median', 'trimmed'))
-#' {
-#'   type <- match_arg(type)
-#'     switch(type,
-#'            mean = mean(x),
-#'            median = median(x),
-#'            trimmed = mean(x, trim = .1))
-#' }
-#' x <- rcauchy(10)
-#' center(x, 't')       # Works
-#' center(x, 'T')       # Works as well
-#' center(x, 'T')       # Works as well
-#' center(x, 'med')     # Works
-#' try(center(x, 'm'))  # Error
-#' }
-#'
+#' @keywords internal
+#' @noRd
 match_arg <- function(
     arg, choices, multiple = FALSE, ignore_case = TRUE,
     trim_ws = FALSE
@@ -621,21 +569,8 @@ match_arg <- function(
 #'
 #' @importFrom labeling extended
 #'
-#' @examples
-#' \dontrun{
-#' xgx_breaks_log10(c(1, 1000))
-#' xgx_breaks_log10(c(0.001, 100))
-#' xgx_breaks_log10(c(1e-4, 1e4))
-#' xgx_breaks_log10(c(1e-9, 1e9))
-#' xgx_breaks_log10(c(1, 2))
-#' xgx_breaks_log10(c(1, 5))
-#' xgx_breaks_log10(c(1, 10))
-#' xgx_breaks_log10(c(1, 100))
-#' xgx_breaks_log10(c(1, 1.01))
-#' xgx_breaks_log10(c(1, 1.0001))
-#' print(xgx_breaks_log10(c(1, 1.000001)), digits = 10)
-#' }
-#'
+#' @keywords internal
+#' @noRd
 xgx_breaks_log10 <- function(data_range)
     {
     data_min <- min(log10(data_range))
@@ -686,20 +621,8 @@ xgx_breaks_log10 <- function(data_range)
 #'
 #' @author Andrew Stein
 #'
-#' @examples
-#' \dontrun{
-#' xgx_minor_breaks_log10(c(1, 1000))
-#' xgx_minor_breaks_log10(c(0.001, 100))
-#' xgx_minor_breaks_log10(c(1e-4, 1e4))
-#' xgx_minor_breaks_log10(c(1e-9, 1e9))
-#' xgx_minor_breaks_log10(c(1, 2))
-#' xgx_minor_breaks_log10(c(1, 5))
-#' xgx_minor_breaks_log10(c(1, 10))
-#' xgx_minor_breaks_log10(c(1, 100))
-#' xgx_minor_breaks_log10(c(1, 1.01))
-#' xgx_minor_breaks_log10(c(1, 1.0001))
-#' print(xgx_minor_breaks_log10(c(1, 1.000001)), digits = 10)
-#' }
+#' @keywords internal
+#' @noRd
 xgx_minor_breaks_log10 <- function(data_range)
     {
     r1 <- range(log10(data_range))
@@ -722,7 +645,7 @@ xgx_minor_breaks_log10 <- function(data_range)
     return(minor_breaks)
 }
 
-#' The function calls the \code{\link{baranyi}} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
+#' The function calls the \code{baranyi} function to generate curves between time zero and \code{t} and adds some random noise to the x- and y-axes. The three growth parameters given as input values will be slightly changed to produce different growth curves. The resulting datasets can be used to test the \code{\link{growth.workflow}} function.
 #'
 #' @param d  Numeric value, number of data sets. If \code{d} is a vector, only the first entry is used.
 #' @param y0  Numeric value, start growth. If \code{t} is a vector, only the first entry is used.
@@ -756,6 +679,7 @@ xgx_minor_breaks_log10 <- function(data_range)
 #'                        control = growth.control(fit.opt = 's',
 #'                                                 suppress.messages = TRUE))
 #'
+#' \donttest{
 #' # Perform dose-response analysis
 #' drFit <- growth.drFit(gcTable = gcFit$gcTable,
 #'              control = growth.control(dr.parameter = 'mu.spline'))
@@ -763,6 +687,7 @@ xgx_minor_breaks_log10 <- function(data_range)
 #' # Inspect results
 #' summary(drFit)
 #' plot(drFit)
+#' }
 #'
 rdm.data <- function(
     d, y0 = 0.05, tmax = 24, mu = 0.6, lambda = 5,

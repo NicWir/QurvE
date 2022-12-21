@@ -60,6 +60,7 @@ A column plot comparing a selected parameter of a dose-response analysis between
 \code{plot.dr_parameter} gathers parameters from the results of a dose-response analysis and compares a chosen parameter between each condition in a column plot. Error bars represent the 95\% confidence interval (only shown for > 2 replicates).
 }
 \examples{
+\donttest{
 # Create random growth data set
 rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -80,5 +81,6 @@ drFit <- growth.drFit(gcTable = gcFit$gcTable,
             control = growth.control(dr.parameter = "mu.spline"))
 
 plot.dr_parameter(drFit, param = 'EC50')
+}
 
 }

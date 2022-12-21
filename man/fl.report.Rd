@@ -41,7 +41,7 @@ fl.report(
 }
 \examples{
 # load example dataset
-\dontrun{
+if(interactive()){
 input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.growth = 1,

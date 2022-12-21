@@ -7,7 +7,7 @@
 #' @import shiny doParallel knitr
 #' @return Launches a browser with the shiny app
 #' @examples
-#' \dontrun{
+#' if(interactive()){
 #' # Run the app
 #' run_app()
 #' }
@@ -32,10 +32,9 @@ run_app <- function() {
 #'
 #' @return A vector of read name strings
 #'
-#' @examples
-#' \dontrun{
-#' parse_properties_Gen5Gen6(file = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE"))
-#' }
+#' @keywords internal shiny_app
+#' @noRd
+#'
 parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -61,10 +60,8 @@ parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
 #'
 #' @return A vector of read name strings
 #'
-#' @examples
-#' \dontrun{
-#' parse_properties_chibio(file = system.file("ChiBio.csv", package = "QurvE"), csvsep = ",")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -91,10 +88,8 @@ parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
 #'
 #' @return A vector of read name strings
 #'
-#' @examples
-#' \dontrun{
-#' parse_properties_tecan(file = system.file("Tecan.csv", package = "QurvE"), csvsep = ";")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_properties_tecan <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -121,10 +116,8 @@ parse_properties_tecan <- function(file, csvsep=";", dec=".", sheet=1)
 #'
 #' @return A vector of read name strings
 #'
-#' @examples
-#' \dontrun{
-#' parse_properties_biolector(file = system.file("biolector.csv", package = "QurvE"), csvsep = ";")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_properties_biolector <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -148,10 +141,8 @@ parse_properties_biolector <- function(file, csvsep=";", dec=".", sheet=1)
 #'
 #' @return A vector of read name strings
 #'
-#' @examples
-#' \dontrun{
-#' parse_properties_victornivo(file = system.file("nivo_output.csv", package = "QurvE"), csvsep = ",")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -173,10 +164,8 @@ parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
 #'
 #' @return A vector of read name strings
 #'
-#' @examples
-#' \dontrun{
-#' parse_properties_victorx3(file = system.file("victorx3_output.txt", package = "QurvE"))
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 {
   # Read table file
@@ -208,20 +197,9 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
 #'
 #' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.
 #'
-#' @examples
-#' \dontrun{
-#' grodata <- parse_data_shiny(data.file = system.file("fluorescence_test_Gen5.xlsx",
-#'                                                     package = "QurvE"),
-#'                       sheet.data = 1,
-#'                       growth.nm = "Read 3:630",
-#'                       fl.nm = "GFP:485,528",
-#'                       map.file = system.file("fluorescence_test_Gen5.xlsx",
-#'                                              package = "QurvE"),
-#'                       sheet.map = "mapping",
-#'                       software = "Gen5",
-#'                       convert.time = "y = x * 24", # convert days to hours
-#'                       calib.growth = "y = x * 3.058") # convert absorbance to OD values
-#' }
+#' @keywords internal shiny_app
+#' @noRd
+#'
 parse_data_shiny <-
   function(data.file = NULL,
            map.file = NULL,
@@ -401,11 +379,8 @@ parse_data_shiny <-
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector, the remainder the measurements.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("fluorescence_test_Gen5.xlsx", package = "QurvE") )
-#' parsed <- parse_Gen5Gen6_shiny(input, "Read 3:630", "GFP:485,528")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
@@ -492,11 +467,8 @@ parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("ChiBio.csv", package = "QurvE"), csvsep = "," )
-#' parsed <- parse_chibio(input, "od_measured", "FP1_emit1")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_chibio_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   time.ndx <- grep("time", input[1,], ignore.case = T)
@@ -552,11 +524,8 @@ parse_chibio_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("Tecan.csv", package = "QurvE"), csvsep = "," )
-#' parsed <- parse_tecan(input, "Label1_Copy1", "sfGFP", "mRFP1")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
@@ -630,11 +599,8 @@ parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 #'
 #' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("biolector", package = "QurvE"), csvsep = "," )
-#' parsed <- parse_biolector_shiny(input, "[1] Biomass Gain=3")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_biolector_shiny <- function(input, growth.nm)
 {
   # get index (row,column) for "Time:"
@@ -708,11 +674,8 @@ parse_biolector_shiny <- function(input, growth.nm)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("nivo_output.csv", package = "QurvE"), csvsep = "," )
-#' parsed <- parse_victornivo_shiny(input, "ABS (F) - Kinetics")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_victornivo_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
@@ -787,11 +750,8 @@ parse_victornivo_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 #'
 #' @return a list of length two containing growth and/or fluorescence dataframes in the first and second element, respectively. The first column in these dataframes represents a time vector.
 #'
-#' @examples
-#' \dontrun{
-#' input <- read_file(filename = system.file("victorx3_output.txt", package = "QurvE") )
-#' parsed <- parse_victorx3_shiny(input, "Absorbance @ 600 (A)", "GFP (Counts)")
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 parse_victorx3_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
@@ -931,58 +891,9 @@ write.csv.utf8.BOM <- function(df, filename)
 #' @return \code{div} HTML tag for a modal dialog
 #'
 #' @author Stackoverflow user \code{mfindinge}
-#' @examples
-#' \dontrun{
-#' require(shiny)
 #'
-#' shinyApp(
-#'   ui = basicPage(
-#'     tags$style(
-#'       type = 'text/css',
-#'       '.modal-dialog.test{ width: fit-content !important; }'
-#'     ),
-#'     actionButton("show", "Show modal dialog"),
-#'     actionButton("shows", "Show modal dialog2")
-#'   ),
-#'
-#'   server = function(input, output) {
-#'
-#'     # Render DT
-#'     output$dt <- DT::renderDT(cbind(iris, iris))
-#'
-#'     # Modal management
-#'     observeEvent(input$show, {
-#'       showModal(
-#'         help_modal(easyClose = T,
-#'
-#'                 DT::DTOutput("dt"),
-#'
-#'                 footer = tagList(
-#'                   modalButton("Cancel"),
-#'                   actionButton("ok", "OK")
-#'                 ),
-#'                 idcss = "test"
-#'         )
-#'       )
-#'     })
-#'
-#'     observeEvent(input$shows, {
-#'       showModal(
-#'         help_modal(easyClose = T,
-#'
-#'                 DT::DTOutput("dt"),
-#'
-#'                 footer = tagList(
-#'                   modalButton("Cancel"),
-#'                   actionButton("ok", "OK")
-#'                 ),
-#'                 idcss = "tests"
-#'         )
-#'       )
-#'     })
-#'   }
-#' )
-#' }
+#' @keywords internal shiny_app
+#' @noRd
 #'
 help_modal <- function (..., title = NULL, footer = NULL,
                      size = c("m", "s", "l"), easyClose = TRUE, fade = TRUE, idcss = "")
@@ -1031,29 +942,8 @@ help_modal <- function (..., title = NULL, footer = NULL,
 #'
 #' @seealso \code{\link[shiny]{updateNumericInput}}
 #'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' if (interactive()) {
-#' library(shiny)
-#' library(shinysurveys)
-#'
-#' ui <- fluidPage(
-#'   numberInput("obs", "Observations:", placeholder = "How many do you see?", min = 1, max = 100),
-#'   verbatimTextOutput("value")
-#' )
-#' server <- function(input, output) {
-#'   output$value <- renderText({ input$obs })
-#' }
-#' shinyApp(ui, server)
-#' }
-#' }
-#'
-#' @section Server value: A numeric vector of length 1.
-#'
-#'
-#' @references Trattner, J. (2021) shinysurveys: Create and Deploy Surveys in 'Shiny' (R package version 0.2.0)
+#' @keywords internal shiny_app
+#' @noRd
 #'
 numberInput <- function(inputId, label, value = NULL, min = NA, max = NA, step = NA,
                         placeholder = NULL, width = NULL) {

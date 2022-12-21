@@ -20,7 +20,7 @@ export_RData(object, out.dir = getwd(), out.nm = class(object))
 Export an R object as .RData file
 }
 \examples{
-\dontrun{
+if(interactive()){
 df <- data.frame('A' = seq(1:10), 'B' = rev(seq(1:10)))
 
 export_RData(df)

@@ -147,6 +147,7 @@ A plot with all curves (raw fluorescence measurements or raw normalized fluoresc
 Visualize fluorescence, normalized fluorescence, or spline fits of multiple sample groups in a single plot.
 }
 \examples{
+\donttest{
 # load example dataset
 input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -161,7 +162,7 @@ res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
                    parallelize = FALSE)
 
 plot(res, legend.ncol = 3, basesize = 15)
-
+}
 
 # load example dataset
 input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),

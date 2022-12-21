@@ -1,5 +1,5 @@
 Package: QurvE
-Title: Robust and User-Friendly Analysis of Growth Curves
+Title: Robust and User-Friendly Analysis of Growth and Fluorescence Curves
 Version: 1.0
 Authors@R: c(
     person("Nicolas T.", "Wirth", , "mail.nicowirth@gmail.com", role = c("aut", "cre", "cph"),
@@ -19,7 +19,7 @@ Authors@R: c(
     person("Santiago I.", "Hurtado", , "santih@carina.fcaglp.unlp.edu.ar", role = "ctb",
            comment = c(contribution = "Creator of 'RobustLinearReg' package from which QurvE adopted the Theil Sehn Regression method.")),
     person("Mark", "Heckmann", role = "ctb",
-           comment = c(contribution = "Creator of the 'zipFastener' function.", source = "https://ryouready.wordpress.com/2009/03/27/r-zip-fastener-for-two-data-frames-combining-rows-or-columns-of-two-dataframes-in-an-alternating-manner/")),
+           comment = c(contribution = "Creator of the 'zipFastener' function; source: https://ryouready.wordpress.com/2009/03/27/r-zip-fastener-for-two-data-frames-combining-rows-or-columns-of-two-dataframes-in-an-alternating-manner/")),
     person("Nicholas", "Hamilton", role = "ctb",
            comment = c(contribution = "Creator of the 'colFmt' function.")),
     person("Evan", "Friedland", role = "ctb",
@@ -31,13 +31,13 @@ Authors@R: c(
   )
 Description: High-throughput analysis of growth curves and fluorescence
     data using three methods: linear regression, growth model fitting, and
-    smooth spline fit. Analysis of dose-response relationships via smoothing 
-    splines or dose-response models. Complete data analysis workflows can be 
-    executed in a single step via user-friendly wrapper functions. The results
-    of these workflows are summarized in detailed reports as well as
-    intuitively navigable R data containers. A shiny application provides
-    access to all of the package's features without requiring any
-    programming knowledge.
+    smooth spline fit. Analysis of dose-response relationships via
+    smoothing splines or dose-response models. Complete data analysis
+    workflows can be executed in a single step via user-friendly wrapper
+    functions. The results of these workflows are summarized in detailed
+    reports as well as intuitively navigable R data containers. A shiny
+    application provides access to all features without
+    requiring any programming knowledge. 
 License: GPL (>= 3)
 URL: https://github.com/NicWir/QurvE
 BugReports: https://github.com/NicWir/QurvE/issues
@@ -85,7 +85,8 @@ Suggests:
     testthat (>= 3.0.0),
     tibble,
     tinytex
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 GithubRepo: QurvE
 GithubUsername: NicWir
@@ -93,6 +94,7 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Collate: 
+    'QurvE-package.R'
     'control_functions.R'
     'data_parsers.R'
     'dose-response-analysis.R'

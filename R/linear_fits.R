@@ -2055,26 +2055,9 @@ lm_window <- function (x, y, i0, h = 5)
 #'
 #' @author Santiago I. Hurtado
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth dataset
-#' rnd.dataset <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
+#' @keywords internal
+#' @noRd
 #'
-#' # Extract time and growth data for single sample
-#' time <- rnd.dataset$time[1,]
-#' data <- as.numeric(rnd.dataset$data[1,-(1:3)]) # Remove identifier columns
-#' data.log <- log(data/data[1])
-#'
-#' # Perform theil-sen regression
-#' regression <- theil_sen_regression(data.log ~ time)
-#' summary(regression)
-#'
-#' df <- data.frame("x" = time, "y" = data.log)
-#' regression <- theil_sen_regression(y ~ x, df)
-#'
-#' summary(regression)
-#'
-#' }
 theil_sen_regression <- function (formula, data = NULL)
 {
   aux_data <- is.null(data)

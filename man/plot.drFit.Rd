@@ -84,6 +84,7 @@ One plot per condition tested in the dose-response analysis or a single plot sho
 code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis
 }
 \examples{
+\donttest{
 # Create random growth data set
 rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
 rnd.data2 <- rdm.data(d = 35, mu = 0.6, A = 4.5, label = "Test2")
@@ -107,5 +108,5 @@ drFit <- growth.drFit(gcTable = gcFit$gcTable,
 summary(drFit)
 
 plot(drFit)
-
+}
 }

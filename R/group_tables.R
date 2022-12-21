@@ -8,6 +8,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # load example dataset
 #' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
 #'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
@@ -26,7 +27,7 @@
 #' # with HTML formatting
 #' DT::datatable(table_group_fluorescence_linear(res$flFit$flTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
-#'
+#' }
 table_group_fluorescence_linear <- function(flTable, html = FALSE)
 {
   nm <- as.character(paste(flTable[,1], flTable[,2], flTable[,3], sep = " | "))
@@ -267,6 +268,7 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # Create random growth data set
 #' rnd.data <- rdm.data(d = 30, mu = 0.6, A = 4.5, label = "Test2")
 #'
@@ -285,6 +287,7 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
 #' # with HTML formatting
 #' DT::datatable(table_group_growth_linear(res$gcFit$gcTable, html = TRUE),
 #'               escape = FALSE) # Do not escape HTML entities
+#' }
 table_group_growth_linear <- function(gcTable, html = FALSE)
 {
   nm <- as.character(paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | "))
@@ -673,25 +676,8 @@ table_group_growth_model <- function(gcTable, html = FALSE)
 #'
 #' @return A vector of strings containing parameter averages.
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth data set
-#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#'
-#' # Run growth curve analysis workflow
-#' res <- growth.workflow(time = rnd.data$time,
-#'                        data = rnd.data$data,
-#'                        fit.opt = "s",
-#'                        ec50 = FALSE,
-#'                        export.res = FALSE,
-#'                        parallelize = FALSE,
-#'                        suppress.messages = TRUE)
-#'
-#' conc <- unique(res$expdesign$concentration)
-#' ndx.rep <- lapply(1:length(conc), function(x) grep(paste0("Test1.+", conc[x]), res$expdesign$label))
-#'
-#' get_avg_param(res$gcFit$gcTable, ndx.rep, "mu.spline")
-#' }
+#' @keywords internal
+#' @noRd
 #'
 get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
 {
@@ -723,26 +709,8 @@ get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2
 #'
 #' @return A vector of strings containing parameter standard deviations.
 #'
-#' @examples
-#' \dontrun{
-#' # Create random growth data set
-#' rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = "Test1")
-#'
-#'
-#' # Run growth curve analysis workflow
-#' res <- growth.workflow(time = rnd.data$time,
-#'                        data = rnd.data$data,
-#'                        fit.opt = "s",
-#'                        ec50 = FALSE,
-#'                        export.res = FALSE,
-#'                        parallelize = FALSE,
-#'                        suppress.messages = TRUE)
-#'
-#' conc <- unique(res$expdesign$concentration)
-#' ndx.rep <- lapply(1:length(conc), function(x) grep(paste0("Test1.+", conc[x]), res$expdesign$label))
-#'
-#' get_sd_param(res$gcFit$gcTable, ndx.rep, "mu.spline")
-#' }
+#' @keywords internal
+#' @noRd
 #'
 get_sd_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
 {

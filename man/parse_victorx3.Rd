@@ -16,7 +16,7 @@ a list of length two containing growth and/or fluorescence dataframes in the fir
 Extract relevant data from a raw data export file generated from the software of Perkin Elmer's "Victor X3" plate readers.
 }
 \examples{
-\dontrun{
+if(interactive()){
 input <- read_file(filename = system.file("victorx3_output.txt", package = "QurvE") )
 parsed <- parse_victorx3(input)
 }
