@@ -97,6 +97,16 @@ library(devtools)
 install_github("NicWir/QurvE")
 ```
 
+# Shiny app
+
+*QurvE* features a graphical user interface (GUI) developed as a Shiny app, which has been designed to be user-friendly and intuitive. You can start the app by running:
+
+```r
+QurvE::run_app()
+```
+
+See the *QurvE User Manual* for details on how to use the front-end application.
+
 # Growth profiling methods
 
 Three methods are available to characterize growth curves:
@@ -454,9 +464,9 @@ plot.parameter(grofit, param = "mu.linfit", basesize = 15)
 By arranging the individual samples in a grid, we can create a visual representation similar to a heat map that illustrates the values of a chosen parameter. This can be a helpful way to gain insights and understand trends within the data.:
 
 ```{r grid-plot, dpi = 120, out.width="90%", fig.height=3, fig.pos = "H", fig.align='center', echo = T, eval = T, results='hide', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:plot} Plot grid of all spline fits performed . See `?plot.grid` for available options.", tidy = FALSE}
-plot.grid(grofit, 
-          param = "mu.linfit", 
-          pal = "Mint", 
+plot.grid(grofit,
+          param = "mu.linfit",
+          pal = "Mint",
           log.y = FALSE,
           sort_by_conc = FALSE,
           basesize = 9)

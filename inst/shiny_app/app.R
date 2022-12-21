@@ -5542,7 +5542,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                    ),
                                                       ) # sidebarPanel
                                              ) # tabPanel(title = "fluorescence", value = "tabs_export_data_fluorescence",
-                                 ) # tabsetPanel(type = "tabs", id = "tabs_report",
+                                 ), # tabsetPanel(type = "tabs", id = "tabs_report",
+                                 checkboxInput(inputId = "report_issues",
+                                               label = "Creating reports does not work",
+                                               value = FALSE),
+                                 conditionalPanel(condition = "input.report_issues",
+                                                  actionButton(inputId = "run_report_fix",
+                                                               label = "Run Report Troubleshooting"),
+                                                  bsPopover(id = "run_report_fix", title = HTML("<em>Run Report Troubleshooting</em>"), content = HTML("This process will take several minutes!<br><br>Reinstalls TinyTeX, updates tlmgr and ensures that Pandoc is recognized correctly.")),
+                                 )
                         ), # tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
                         #___Export RData___####
                         tabPanel(span("Data Export", title = "Export all computation results as RData file."),
@@ -5583,7 +5591,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                              ),
                                  )
                         ),
-                        #Import RData___####
+                        #___Import RData___####
                         tabPanel(span("Data Import", title = "Import and RData file with results from a previous QurvE analysis."),
                                  icon = icon("upload"),
                                  value = "tabPanel_Import_RData",
@@ -5643,11 +5651,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                         tabPanel("About Us",
                                  mainPanel(
                                    h2("Creators"),
-                                   'Nicolas Wirth, Jonathan Funk',
+                                   'Nicolas Wirth', tags$a(icon("twitter"), href="https://twitter.com/JonathanFunk12"), br(),
+                                   'Jonathan Funk', tags$a(icon("twitter"), href="https://twitter.com/The_NiWi"),
                                    h2("Bug reports"),
                                    uiOutput("bug_report"),
-                                   h2("Publications"),
-                                   ''
+                                   # h2("Publications"),
+                                   # ''
                                  )
                         ),
                       ) #  navbarPage
@@ -13157,6 +13166,21 @@ server <- function(input, output, session){
     }
   })
 
+  observeEvent(input$run_report_fix, {
+    # check if pandoc is recognized
+    showModal(
+      modalDialog("Running report troubleshooting...", footer = NULL)
+    )
+    pandoc.path <- rmarkdown::find_pandoc()$dir
+    Sys.setenv(RSTUDIO_PANDOC = pandoc.path)
+    Sys.setenv(PANDOC_PATH = pandoc.path)
+
+    # reinstall tinytex
+    tinytex::tlmgr_update()
+    tinytex::reinstall_tinytex()
+    removeModal()
+  })
+
     ## Report Growth ####
 
   output$download_report_growth_pdf <- downloadHandler(
@@ -13174,8 +13198,9 @@ server <- function(input, output, session){
           modalDialog(HTML("TinyTeX is required to render PDF reports but was not found on your system. Installing TinyTeX...<br><br>(This requires and active internet connection and will take several minutes)"), footer = NULL)
         )
         update.packages(ask = FALSE, checkBuilt = TRUE, repos='http://cran.us.r-project.org')
-        tinytex:::install_prebuilt()
+        tinytex::install_tinytex()
         tinytex::tlmgr_update()
+        tinytex::reinstall_tinytex()
         removeModal()
         try(
           suppressWarnings(
@@ -13250,8 +13275,9 @@ server <- function(input, output, session){
           modalDialog(HTML("TinyTeX is required to render PDF reports but was not found on your system. Installing TinyTeX...<br><br>(This requires and active internet connection and will take several minutes)"), footer = NULL)
         )
         update.packages(ask = FALSE, checkBuilt = TRUE, repos='http://cran.us.r-project.org')
-        tinytex:::install_prebuilt()
+        tinytex::install_tinytex()
         tinytex::tlmgr_update()
+        tinytex::reinstall_tinytex()
         removeModal()
         try(
           suppressWarnings(

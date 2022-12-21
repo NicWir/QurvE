@@ -101,7 +101,7 @@ plot(input, data.type = "fl",
      lwd = 0.7)
 ```
 ```{r raw-data-plot, dpi = 120, out.width="80%", fig.height=4.5, fig.pos = "H", echo = F, eval = T, fig.align='center', results='hold', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:raw-data-plot} Raw data plot.\nConditions can be selected or deselected using the `names = c('grp1', 'grp2')` argument or `exclude.nm = c('grp3', 'grp4')` argument, respectively. Similarly, concentrations can be (de-selected) via the `conc` and `exclude.conc` arguments. To plot individual samples instead of grouping replicates, add `mean = FALSE`. See `?plot.grodata` for further options.", tidy = FALSE}
-knitr::include_graphics("vigfig_fl-raw-data-plot-1.png", error = F)
+knitr::include_graphics("https://i.imgur.com/wW5fj0X.png", error = F)
 
 ```
 
@@ -198,9 +198,9 @@ plot(flFitRes$flFit$flFittedLinear[[6]], cex.lab = 1.2, cex.axis = 1.2)
 ```
 
 ```{r plot-linear, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear} Linear fit plots to validate the applied fits. For details about this function, run `?plot.gcFitLinear`."}
-knitr::include_graphics("vigfig_fl-plot-linear-1.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-linear-2.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-linear-3.png", error = F)
+knitr::include_graphics("https://i.imgur.com/919wCo0.png", error = F)
+knitr::include_graphics("https://i.imgur.com/Q90TdEm.png", error = F)
+knitr::include_graphics("https://i.imgur.com/hRQoiOp.png", error = F)
 ```
 
 ```r
@@ -210,9 +210,9 @@ plot(flFitRes$flFit$flFittedSpline[[6]], basesize = 15)
 ```
 
 ```{r plot-spline, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 6, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-spline} Spline fit plots to validate the applied fits. For details about this function, run `?plot.gcFitLinear`."}
-knitr::include_graphics("vigfig_fl-plot-spline-1.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-spline-2.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-spline-3.png", error = F)
+knitr::include_graphics("https://i.imgur.com/B6bqitM.png", error = F)
+knitr::include_graphics("https://i.imgur.com/HbKpqp9.png", error = F)
+knitr::include_graphics("https://i.imgur.com/vsuSSrq.png", error = F)
 ```
 
 Normalization of fluorescence reads typically introduces additional noise. While the default smoothing parameter `smooth.fl` was suitable to produce good-quality representations of the curves via nonparametric fits, the linear fits either failed or produced regression windows that were too small. In order to obtain linear regression results that accurately represent the linear-increase section of the curves, we have to decrease the R2 threshold and manually increase the size of the sliding window (by default calculated automatically for each sample). These new settings need to be applied to all samples, so we re-run the entire workflow with adjusted parameters:
@@ -239,9 +239,9 @@ plot(flFitRes$flFit$flFittedLinear[[6]], cex.lab = 1.2, cex.axis = 1.2)
 ```
 
 ```{r plot-linear2, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-linear2} Linear fit plots to validate the linear regressions after re-running the workflow with adjusted parameters."}
-knitr::include_graphics("vigfig_fl-plot-linear2-1.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-linear2-2.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-linear2-3.png", error = F)
+knitr::include_graphics("https://i.imgur.com/b2eUR7y.png", error = F)
+knitr::include_graphics("https://i.imgur.com/jRNsTH1.png", error = F)
+knitr::include_graphics("https://i.imgur.com/lvz5Gyn.png", error = F)
 ```
 
 ### Grouped spline fits
@@ -261,7 +261,7 @@ plot(flFitRes,
 ```
 
 ```{r group-spline-plot, dpi = 120, out.width="80%", fig.height=6.5, fig.pos = "H", fig.align='center', echo = F, eval = T, results='asis', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:group-spline-plot} Combined plot of all spline fits performed.\nIn addition to the options available with `data.type = 'raw'`, further arguments can be defined that control the appearance of the secondary panel showing the slope over time. See `?plot.flFitRes` for all options.", tidy = FALSE}
-knitr::include_graphics("vigfig_fl-group-spline-plot-1.png", error = F)
+knitr::include_graphics("https://i.imgur.com/BptmI2k.png", error = F)
 
 ```
 
@@ -277,7 +277,7 @@ plot.grid(flFitRes,
 ```
 
 ```{r grid-plot, dpi = 120, out.width="90%", fig.pos = "H", fig.align='center', echo = F, eval = T, results='asis', message=FALSE, error=FALSE, warning=FALSE, fig.cap = "\\label{fig:plot} Plot grid of all spline fits performed with one concentration per row. See `?plot.grid` for available options.", tidy = FALSE}
-knitr::include_graphics("vigfig_fl-grid-plot-1.png", error = F)
+knitr::include_graphics("https://i.imgur.com/hx1RGzp.png", error = F)
 ```
 
 \pagebreak
@@ -303,12 +303,12 @@ plot.parameter(flFitRes, param = "dY.spline", basesize = 10,
 
 
 ```{r plot-parameter, fig.show="hold", out.width="47%", fig.height = 6, fig.align="center", fig.pos = "H", echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-parameter} Parameter plots. If `mean = TRUE`, the results of replicates are combined and shown as their mean \u00B1 95\\% confidence interval. As with the functions for combining different growth curves, the arguments `name`, `exclude.nm`, `conc` and `exclude.conc` allow (de)selection of specific samples or conditions. Since we applied growth models to log-transformed data, calling 'dY.orig.model' or 'A.orig.model' instead of 'dY.model' or 'A.model' provides the respective values on the original scale. For linear and spline fits, this is done automatically. For details about this function, run `?plot.parameter`."}
-knitr::include_graphics("vigfig_fl-plot-parameter-1.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-parameter-2.png", error = F)
+knitr::include_graphics("https://i.imgur.com/x8iAear.png", error = F)
+knitr::include_graphics("https://i.imgur.com/tm4rM4h.png", error = F)
 
 
-knitr::include_graphics("vigfig_fl-plot-parameter-3.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-parameter-4.png", error = F)
+knitr::include_graphics("https://i.imgur.com/DyukJ72.png", error = F)
+knitr::include_graphics("https://i.imgur.com/59Km0tg.png", error = F)
 
 ```
 
@@ -322,9 +322,9 @@ plot(flFitRes$drFit, cex.point = 1, cex.lab = 1.1, cex.axis = 1)
 ```
 
 ```{r plot-drFit, dpi = 120, fig.ncol = 1, fig.show="hold", out.width="70%", fig.height = 4.5, fig.pos = "H", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE, fig.cap = "\\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`."}
-knitr::include_graphics("vigfig_fl-plot-drFit-1.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-drFit-2.png", error = F)
-knitr::include_graphics("vigfig_fl-plot-drFit-3.png", error = F)
+knitr::include_graphics("https://i.imgur.com/Q5Onz3F.png", error = F)
+knitr::include_graphics("https://i.imgur.com/5mZDIPQ.png", error = F)
+knitr::include_graphics("https://i.imgur.com/LfQ7C5o.png", error = F)
 
 ```
 
