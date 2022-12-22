@@ -88,8 +88,6 @@ Suggests:
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
-GithubRepo: QurvE
-GithubUsername: NicWir
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

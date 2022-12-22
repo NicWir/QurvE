@@ -27,3 +27,7 @@ NOTE 2
 The package contains three detailed vignettes/manuals formatted in HTML. They are built quickly with images available online but require a certain file size. I hope that this is still acceptable.
 
 The accompanying 'shiny app' represents an extensive front-end solution that provides access to all the funtionalities of the `QurvE`package. The `app.R` alone has a size of 892 KB and two high-quality pictures have a combined file size of 483 KB
+
+## Resubmission changes
+
+Removed 'GithubRepo' and 'GithubUsername' fields from Description
