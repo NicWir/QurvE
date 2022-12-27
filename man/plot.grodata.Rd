@@ -16,7 +16,7 @@
   log.y = FALSE,
   n.ybreaks = 6,
   colors = NULL,
-  color_groups = T,
+  color_groups = TRUE,
   group_pals = c("Green", "Orange", "Purple", "Magenta", "Grey", "Blue", "Grey", "Red",
     "Cyan", "Brown", "Mint"),
   basesize = 20,
