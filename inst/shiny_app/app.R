@@ -843,7 +843,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                               label = 'Biphasic growth')
                                                                        ),
 
-                                                                       numberInput(
+                                                                       QurvE:::numberInput(
                                                                          inputId = 'growth_threshold_growth',
                                                                          label = 'Growth threshold',
                                                                          value = 1.5,
@@ -853,7 +853,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        ),
                                                                        bsPopover(id = "growth_threshold_growth", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no growth value is greater than [growth threshold] \\* start growth."),
 
-                                                                       numberInput(
+                                                                       QurvE:::numberInput(
                                                                          inputId = 'minimum_growth_growth',
                                                                          label = 'Minimum growth measurement',
                                                                          value = 0,
@@ -863,7 +863,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        ),
                                                                        bsPopover(id = "minimum_growth_growth", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth] for the fits."),
 
-                                                                       numberInput(
+                                                                       QurvE:::numberInput(
                                                                          inputId = 'maximum_growth_growth',
                                                                          label = 'Maximum growth measurement',
                                                                          value = NULL,
@@ -873,7 +873,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        bsPopover(id = "maximum_growth_growth", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth measurement] for linear and spline fits."),
 
 
-                                                                       numberInput(
+                                                                       QurvE:::numberInput(
                                                                          inputId = 't0_growth',
                                                                          label = 't0',
                                                                          value = 0,
@@ -883,7 +883,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                        ),
                                                                        bsPopover(id = "t0_growth", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
 
-                                                                       numberInput(
+                                                                       QurvE:::numberInput(
                                                                          inputId = 'tmax_growth',
                                                                          label = 'tmax',
                                                                          value = NULL,
@@ -941,7 +941,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           ),
                                                                                           bsPopover(id = "smoothing_factor_growth_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
-                                                                                          numberInput(
+                                                                                          QurvE:::numberInput(
                                                                                             inputId = 'number_of_bootstrappings_dr_growth',
                                                                                             label = 'Number of bootstrappings',
                                                                                             value = 0,
@@ -986,7 +986,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                   label = 'Log-transform data',
                                                                                   value = TRUE)
                                                            ),
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'R2_threshold_growth',
                                                              label = 'R2 threshold',
                                                              value = 0.95,
@@ -994,7 +994,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            ),
                                                            bsPopover(id = "R2_threshold_growth", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'RSD_threshold_growth',
                                                              label = 'RSD threshold',
                                                              value = 0.1,
@@ -1002,7 +1002,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            ),
                                                            bsPopover(id = "RSD_threshold_growth", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'dY_threshold_growth',
                                                              label = 'dY threshold',
                                                              value = 0.05,
@@ -1115,7 +1115,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                   value = TRUE)
                                                            ),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'smoothing_factor_nonparametric_growth',
                                                              label = 'Smoothing factor',
                                                              value = 0.55,
@@ -1126,7 +1126,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            bsPopover(id = "smoothing_factor_nonparametric_growth", title = HTML("<em>smooth.gc</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'number_of_bootstrappings_growth',
                                                              label = 'Number of bootstrappings',
                                                              value = 0,
@@ -1204,7 +1204,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("growth")',
-                                                                         numberInput(
+                                                                         QurvE:::numberInput(
                                                                            inputId = 'growth_threshold_in_percent_fluorescence',
                                                                            label = 'Growth threshold (in %)',
                                                                            value = 1.5,
@@ -1217,7 +1217,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("growth")',
-                                                                         numberInput(
+                                                                         QurvE:::numberInput(
                                                                            inputId = 'minimum_growth_fluorescence',
                                                                            label = 'Minimum growth measurement',
                                                                            value = 0,
@@ -1230,7 +1230,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("growth")',
-                                                                         numberInput(
+                                                                         QurvE:::numberInput(
                                                                            inputId = 'maximum_growth_fluorescence',
                                                                            label = 'Maximum growth measurement',
                                                                            value = NULL,
@@ -1242,7 +1242,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("time")',
-                                                                         numberInput(
+                                                                         QurvE:::numberInput(
                                                                            inputId = 't0_fluorescence',
                                                                            label = 't0',
                                                                            value = 0,
@@ -1255,7 +1255,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("time")',
-                                                                         numberInput(
+                                                                         QurvE:::numberInput(
                                                                            inputId = 'tmax_fluorescence',
                                                                            label = 'tmax',
                                                                            value = NULL,
@@ -1306,7 +1306,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                                                 conditionalPanel(
                                                                                                   condition = 'input.dr_method_fluorescence == "spline"',
-                                                                                                  numberInput(
+                                                                                                  QurvE:::numberInput(
                                                                                                     inputId = 'number_of_bootstrappings_dr_fluorescence',
                                                                                                     label = 'Number of bootstrappings',
                                                                                                     value = 0,
@@ -1361,7 +1361,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Linear fit')),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'R2_threshold_fluorescence',
                                                              label = 'R2 threshold',
                                                              value = 0.95,
@@ -1371,7 +1371,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            ),
                                                            bsPopover(id = "R2_threshold_fluorescence", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'RSD_threshold_fluorescence',
                                                              label = 'RSD threshold',
                                                              value = 0.1,
@@ -1381,7 +1381,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            ),
                                                            bsPopover(id = "RSD_threshold_fluorescence", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'dY_threshold_fluorescence',
                                                              label = 'dY threshold',
                                                              value = 0.05,
@@ -1436,7 +1436,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            style='border-color: #ADADAD; padding-top: 0',
                                                            h3(strong('Nonparametric fit')),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'smoothing_factor_nonparametric_fluorescence',
                                                              label = 'Smoothing factor',
                                                              value = 0.75,
@@ -1446,7 +1446,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                            ),
                                                            bsPopover(id = "smoothing_factor_nonparametric_fluorescence", title = HTML("<em>smooth.fl</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
-                                                           numberInput(
+                                                           QurvE:::numberInput(
                                                              inputId = 'number_of_bootstrappings_fluorescence',
                                                              label = 'Number of bootstrappings',
                                                              value = 0,
@@ -3713,7 +3713,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    conditionalPanel(
                                                                      condition = "input.show_break_dose_response_growth_plot_model && input.log_transform_x_axis_dose_response_growth_plot_model",
-                                                                     numberInput(inputId = 'bp_dose_response_growth_plot_model',
+                                                                     QurvE:::numberInput(inputId = 'bp_dose_response_growth_plot_model',
                                                                                  label = 'Break point position',
                                                                                  value = ""),
                                                                    ),
@@ -10628,7 +10628,7 @@ server <- function(input, output, session){
           ),
           bsPopover(id = "smoothing_factor_growth_dr_rerun", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
-          numberInput(
+          QurvE:::numberInput(
             inputId = 'number_of_bootstrappings_dr_growth_rerun',
             label = 'Number of bootstrappings',
             value = 0,
@@ -11091,7 +11091,7 @@ server <- function(input, output, session){
   #         ),
   #         bsPopover(id = "smoothing_factor_growth_dr_rerun_individual", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
   #
-  #         numberInput(
+  #         QurvE:::numberInput(
   #           inputId = 'number_of_bootstrappings_dr_growth_rerun_individual',
   #           label = 'Number of bootstrappings',
   #           value = 0,
@@ -12064,7 +12064,7 @@ server <- function(input, output, session){
           ),
           bsPopover(id = "smoothing_factor_fluorescence_dr_rerun", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
-          numberInput(
+          QurvE:::numberInput(
             inputId = 'number_of_bootstrappings_dr_fluorescence_rerun',
             label = 'Number of bootstrappings',
             value = 0,
