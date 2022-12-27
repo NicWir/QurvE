@@ -91,7 +91,15 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                 ),
                 tags$style(
                   type = 'text/css',
+                  '.modal-dialog.fldr { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
                   '.modal-dialog.growthworkflow { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
+                  '.modal-dialog.growthdr { width: fit-content !important; }'
                 ),
                 tagList(
                   # tags$style(type = 'text/css', '.navbar {
@@ -951,6 +959,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                           ),
                                                                                           bsPopover(id = "number_of_bootstrappings_dr_growth", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
                                                                                         ), #conditionalPanel(condition = 'input.dr_method_growth == "spline"')
+                                                                                        fluidRow(
+                                                                                          column(12,
+                                                                                                 div(
+                                                                                                   actionButton(inputId = "tooltip_growth_dr",
+                                                                                                                label = "",
+                                                                                                                icon=icon("question"),
+                                                                                                                style="padding:2px; font-size:100%"),
+                                                                                                   style="float:left")
+                                                                                          )
+                                                                                        ),
 
                                                                        ) # conditionalPanel(condition = "input.perform_ec50_growth"
                                                                      ), #  wellPanel
@@ -1326,6 +1344,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                     placeholder = "NULL (choose automatically)"
                                                                                                   ),
                                                                                                   bsPopover(id = "smoothing_factor_fluorescence_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+                                                                                                ),
+                                                                                                fluidRow(
+                                                                                                  column(12,
+                                                                                                         div(
+                                                                                                           actionButton(inputId = "tooltip_fl_dr",
+                                                                                                                        label = "",
+                                                                                                                        icon=icon("question"),
+                                                                                                                        style="padding:2px; font-size:100%"),
+                                                                                                           style="float:left")
+                                                                                                  )
                                                                                                 )
                                                                                ) # conditionalPanel(condition = "input.perform_ec50_fluorescence"
                                                                      ), # wellPanel
@@ -5825,9 +5853,23 @@ server <- function(input, output, session){
     content
   })
 
+
   observeEvent(input$tooltip_growth_workflow,{
     showModal(QurvE:::help_modal(size = "l", idcss = "growthworkflow",
                          htmlOutput("tooltip_growth_workflow"), easyClose = T )
+    )
+  })
+
+  output$tooltip_growth_dr <- renderText({
+    temp <- tools::Rd2HTML("../man/growth.drFit.Rd", out = paste0(tempfile("docs_growth_drFit"), ".txt"))
+    content <- readLines(temp)
+    file.remove(temp)
+    content
+  })
+
+  observeEvent(input$tooltip_growth_dr,{
+    showModal(QurvE:::help_modal(size = "l", idcss = "growthdr",
+                                 htmlOutput("tooltip_growth_dr"), easyClose = T )
     )
   })
 
@@ -5876,9 +5918,22 @@ server <- function(input, output, session){
     content
   })
 
+  output$tooltip_fl_dr <- renderText({
+    temp <- tools::Rd2HTML("../man/fl.drFit.Rd", out = paste0(tempfile("docs_fl_dr"), ".txt"))
+    content <- readLines(temp)
+    file.remove(temp)
+    content
+  })
+
   observeEvent(input$tooltip_fl_workflow,{
     showModal(QurvE:::help_modal(size = "l", idcss = "flworkflow",
                          htmlOutput("tooltip_fl_workflow"), easyClose = T )
+    )
+  })
+
+  observeEvent(input$tooltip_fl_dr,{
+    showModal(QurvE:::help_modal(size = "l", idcss = "fldr",
+                                 htmlOutput("tooltip_fl_dr"), easyClose = T )
     )
   })
 
