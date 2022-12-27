@@ -5749,8 +5749,8 @@ server <- function(input, output, session){
   ### Function help modals ####
 
   output$gcFitLinear_tooltip <- renderText({
-    temp = tools::Rd2HTML("../../man/growth.gcFitLinear.Rd", out = paste0(tempfile("docs_gcFitLinear"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/growth.gcFitLinear.Rd", out = paste0(tempfile("docs_gcFitLinear"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
@@ -5768,8 +5768,8 @@ server <- function(input, output, session){
   })
 
   output$rdm.data_tooltip <- renderText({
-    temp = tools::Rd2HTML("../../man/rdm.data.Rd", out = paste0(tempfile("docs_rdm.data"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/rdm.data.Rd", out = paste0(tempfile("docs_rdm.data"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
@@ -5781,8 +5781,8 @@ server <- function(input, output, session){
   })
 
   output$gcFitSpline_tooltip <- renderText({
-    temp = tools::Rd2HTML("../../man/growth.gcFitSpline.Rd", out = paste0(tempfile("docs_gcFitSpline"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/growth.gcFitSpline.Rd", out = paste0(tempfile("docs_gcFitSpline"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
@@ -5800,8 +5800,8 @@ server <- function(input, output, session){
   })
 
   output$gcFitModel_tooltip <- renderText({
-    temp = tools::Rd2HTML("../../man/growth.gcFitModel.Rd", out = paste0(tempfile("docs_gcFitModel"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/growth.gcFitModel.Rd", out = paste0(tempfile("docs_gcFitModel"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
@@ -5819,8 +5819,8 @@ server <- function(input, output, session){
   })
 
   output$tooltip_growth_workflow <- renderText({
-    temp = tools::Rd2HTML("../../man/growth.workflow.Rd", out = paste0(tempfile("docs_growth_workflow"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/growth.workflow.Rd", out = paste0(tempfile("docs_growth_workflow"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
@@ -5832,8 +5832,8 @@ server <- function(input, output, session){
   })
 
   output$flFitLinear_tooltip <- renderText({
-    temp = tools::Rd2HTML("../../man/flFitLinear.Rd", out = paste0(tempfile("docs_flFitLinear"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/flFitLinear.Rd", out = paste0(tempfile("docs_flFitLinear"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
@@ -5851,8 +5851,8 @@ server <- function(input, output, session){
   })
 
   output$flFitSpline_tooltip <- renderText({
-    temp = tools::Rd2HTML("../../man/flFitSpline.Rd", out = paste0(tempfile("docs_flFitSpline"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/flFitSpline.Rd", out = paste0(tempfile("docs_flFitSpline"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
@@ -5870,8 +5870,8 @@ server <- function(input, output, session){
   })
 
   output$tooltip_fl_workflow <- renderText({
-    temp = tools::Rd2HTML("../../man/fl.workflow.Rd", out = paste0(tempfile("docs_fl_workflow"), ".txt"))
-    content = readLines(temp)
+    temp <- tools::Rd2HTML("../man/fl.workflow.Rd", out = paste0(tempfile("docs_fl_workflow"), ".txt"))
+    content <- readLines(temp)
     file.remove(temp)
     content
   })
