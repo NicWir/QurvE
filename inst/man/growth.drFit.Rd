@@ -46,7 +46,7 @@ An object of class \code{drFit}.
 \code{growth.drFit} serves to determine dose-response curves on every condition in a
 dataset. The response parameter can be chosen from every physiological parameter in a
 \code{gcTable} table which is obtained via \code{\link{growth.gcFit}}. \code{\link{growth.drFit}}
-calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBootSpline}} to
+calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBootSpline}}, or \code{\link{growth.drFitModel}} to
 generate a table with estimates for EC50 and respecting statistics.
 }
 \examples{

@@ -71,6 +71,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                 ),
                 tags$style(
                   type = 'text/css',
+                  '.modal-dialog.rdm.data { width: fit-content !important; }'
+                ),
+                tags$style(
+                  type = 'text/css',
                   '.modal-dialog.gcFitSpline { width: fit-content !important; }'
                 ),
                 tags$style(
@@ -969,6 +973,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                    style="float:left")
                                                                                           )
                                                                                         ),
+                                                                                        HTML("<br>"),
 
                                                                        ) # conditionalPanel(condition = "input.perform_ec50_growth"
                                                                      ), #  wellPanel
@@ -1354,7 +1359,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                                         style="padding:2px; font-size:100%"),
                                                                                                            style="float:left")
                                                                                                   )
-                                                                                                )
+                                                                                                ),
+                                                                                                HTML("<br>"),
                                                                                ) # conditionalPanel(condition = "input.perform_ec50_fluorescence"
                                                                      ), # wellPanel
 

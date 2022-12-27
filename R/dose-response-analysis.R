@@ -3,7 +3,7 @@
 #' \code{growth.drFit} serves to determine dose-response curves on every condition in a
 #' dataset. The response parameter can be chosen from every physiological parameter in a
 #' \code{gcTable} table which is obtained via \code{\link{growth.gcFit}}. \code{\link{growth.drFit}}
-#' calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBootSpline}} to
+#' calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBootSpline}}, or \code{\link{growth.drFitModel}} to
 #' generate a table with estimates for EC50 and respecting statistics.
 #'
 #' @param gcTable A dataframe containing the data for the dose-response curve estimation. Such table of class \code{gcTable} can be obtained by running \code{\link{growth.gcFit}}.
@@ -317,6 +317,7 @@ growth.drFit <- function(
 #'   zero-response parameter values.
 #'
 #' @references Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). _grofit: Fitting Biological Growth Curves with R_. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07
+#' @references Christian Ritz, Florent Baty, Jens C. Streibig, Daniel Gerhard (2015). _Dose-Response Analysis Using R_. PLoS ONE 10(12): e0146021. DOI: 10.1371/journal.pone.0146021
 #'
 #' @export
 #' @examples
