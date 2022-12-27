@@ -279,7 +279,7 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
           while ("n" %in% answer_satisfied) {
             try(plot(fitlinear, log = ""))
             mtext(side = 3, line = 0, adj = 0,
-                  outer = F,
+                  outer = FALSE,
                   cex = 1,
                   wellname)
             answer_satisfied <- readline("Are you satisfied with the linear fit (y/n)?\n\n")
@@ -378,7 +378,7 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
           answer_satisfied <- "n"
           reliability_tag_nonpara <- NA
           while ("n" %in% answer_satisfied) {
-            plot(nonpara, add=FALSE, raw=TRUE,slope = T, colData=1, cex=1, plot=T, export=F)
+            plot(nonpara, add=FALSE, raw=TRUE,slope = TRUE, colData=1, cex=1, plot=T, export=F)
             answer_satisfied <- readline("Are you satisfied with the spline fit (y/n)?\n\n")
             if ("n" %in% answer_satisfied) {
               test_answer <- readline("Enter: smooth.fl, t0, min.growth, tmax, max.growth                        >>>> \n\n [Skip (enter 'n'), or smooth.fl, t0, and min.growth (see ?fl.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
@@ -788,7 +788,7 @@ fl.workflow <- function(grodata = NULL,
                                                            "%Y%m%d_%H%M%S"), sep = "")
     }
     if(export.res)
-      dir.create(wd, showWarnings = F)
+      dir.create(wd, showWarnings = FALSE)
 
     if (!is.null(fluorescence) && length(fluorescence) > 1 && !all(is.na(fluorescence))){
       flTable <- data.frame(apply(flFitRes[["flFit"]][["flTable"]],2,as.character))

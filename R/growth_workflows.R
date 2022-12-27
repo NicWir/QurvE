@@ -293,7 +293,7 @@ growth.workflow <- function(
               )
             }
             if (export.res)
-                dir.create(wd, showWarnings = F)
+                dir.create(wd, showWarnings = FALSE)
 
             gcTable <- data.frame(
                 apply(
@@ -906,7 +906,7 @@ growth.gcFit <- function(
                           }
                           graphics::mtext(
                             side = 3, line = 3, adj = 0,
-                            outer = F, cex = 1, wellname
+                            outer = FALSE, cex = 1, wellname
                         )
                           answer_satisfied <- readline(
                             "Are you satisfied with the linear fit (y/n)?\n\n"
@@ -1093,7 +1093,7 @@ growth.gcFit <- function(
                       # col='red', lty=1)
                       # title('Parametric fit')
                       # graphics::mtext(line =
-                      # 0.5, side=3, outer = F,
+                      # 0.5, side=3, outer = FALSE,
                       # cex=1, wellname)
                     }
                     # /// here a manual
@@ -1139,17 +1139,17 @@ growth.gcFit <- function(
                           {
                             plot.gcFitSpline(
                               nonpara, add = FALSE,
-                              raw = TRUE, slope = T,
+                              raw = TRUE, slope = TRUE,
                               colData = 1, cex.point = 2,
-                              plot = T, export = F
+                              plot = TRUE, export = F
                           )
                           } else
                           {
                             plot.gcFitSpline(
                               nonpara, add = FALSE,
-                              raw = TRUE, slope = T,
+                              raw = TRUE, slope = TRUE,
                               log.y = FALSE, colData = 1,
-                              cex.point = 2, plot = T,
+                              cex.point = 2, plot = TRUE,
                               export = F
                           )
                           }

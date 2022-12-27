@@ -6110,8 +6110,8 @@ server <- function(input, output, session){
   #         filename,
   #         dec = dec,
   #         sep = csvsep,
-  #         header = F,
-  #         stringsAsFactors = F,
+  #         header = FALSE,
+  #         stringsAsFactors = FALSE,
   #         fill = T,
   #         na.strings = "",
   #         quote = "",
@@ -6122,7 +6122,7 @@ server <- function(input, output, session){
   #              stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
   #     showModal(modalDialog("Reading data file...", footer=NULL))
   #     try(
-  #       dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_growth_sheets, progress = T)))
+  #       dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = FALSE, sheet = input$custom_growth_sheets, progress = T)))
   #       )
   #     removeModal()
   #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
@@ -6131,8 +6131,8 @@ server <- function(input, output, session){
   #         filename,
   #         dec = dec,
   #         sep = "\t",
-  #         header = F,
-  #         stringsAsFactors = F,
+  #         header = FALSE,
+  #         stringsAsFactors = FALSE,
   #         fill = T,
   #         na.strings = "",
   #         quote = "",
@@ -6145,8 +6145,8 @@ server <- function(input, output, session){
   #         filename,
   #         dec = dec,
   #         sep = "\t",
-  #         header = F,
-  #         stringsAsFactors = F,
+  #         header = FALSE,
+  #         stringsAsFactors = FALSE,
   #         fill = T,
   #         na.strings = "",
   #         quote = "",
@@ -6260,8 +6260,8 @@ server <- function(input, output, session){
           filename,
           dec = dec,
           sep = csvsep,
-          header = F,
-          stringsAsFactors = F,
+          header = FALSE,
+          stringsAsFactors = FALSE,
           fill = T,
           na.strings = "",
           quote = "",
@@ -6275,7 +6275,7 @@ server <- function(input, output, session){
           HTML("<strong>Reading data file...</strong><br><br><i>Note: Reading .xls/.xlsx files can take up to several minutes. Consider saving as .csv/.tsv/.txt before running QurvE.</i>"),
           footer=NULL))
       try(
-        f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence_sheets, progress = T)))
+        f1 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = FALSE, sheet = input$custom_fluorescence_sheets, progress = T)))
       )
       removeModal()
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
@@ -6284,8 +6284,8 @@ server <- function(input, output, session){
           filename,
           dec = dec,
           sep = "\t",
-          header = F,
-          stringsAsFactors = F,
+          header = FALSE,
+          stringsAsFactors = FALSE,
           fill = T,
           na.strings = "",
           quote = "",
@@ -6298,8 +6298,8 @@ server <- function(input, output, session){
           filename,
           dec = dec,
           sep = "\t",
-          header = F,
-          stringsAsFactors = F,
+          header = FALSE,
+          stringsAsFactors = FALSE,
           fill = T,
           na.strings = "",
           quote = "",
@@ -6401,8 +6401,8 @@ server <- function(input, output, session){
   #         filename,
   #         dec = dec,
   #         sep = csvsep,
-  #         header = F,
-  #         stringsAsFactors = F,
+  #         header = FALSE,
+  #         stringsAsFactors = FALSE,
   #         fill = T,
   #         na.strings = "",
   #         quote = "",
@@ -6412,7 +6412,7 @@ server <- function(input, output, session){
   #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
   #              stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
   #     showModal(modalDialog("Reading data file...", footer=NULL))
-  #     f2 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = input$custom_fluorescence2_sheets, progress = T)))
+  #     f2 <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = FALSE, sheet = input$custom_fluorescence2_sheets, progress = T)))
   #     removeModal()
   #   } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
   #     f2 <-
@@ -6420,8 +6420,8 @@ server <- function(input, output, session){
   #         filename,
   #         dec = dec,
   #         sep = "\t",
-  #         header = F,
-  #         stringsAsFactors = F,
+  #         header = FALSE,
+  #         stringsAsFactors = FALSE,
   #         fill = T,
   #         na.strings = "",
   #         quote = "",
@@ -6434,8 +6434,8 @@ server <- function(input, output, session){
   #         filename,
   #         dec = dec,
   #         sep = "\t",
-  #         header = F,
-  #         stringsAsFactors = F,
+  #         header = FALSE,
+  #         stringsAsFactors = FALSE,
   #         fill = T,
   #         na.strings = "",
   #         quote = "",
@@ -7518,7 +7518,7 @@ server <- function(input, output, session){
                                               lin.R2 = lin.R2,
                                               lin.RSD = lin.RSD,
                                               lin.dY = lin.dY,
-                                              interactive = F,
+                                              interactive = FALSE,
                                               nboot.gc = nboot.gc,
                                               smooth.gc = smooth.gc,
                                               model.type = models,
@@ -7806,7 +7806,7 @@ server <- function(input, output, session){
                                "t<sub>start</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.start.linfit), 2), ")")),
                                "t<sub>end</sub><br>(µ<sub>max</sub>)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$tmu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmu2.end.linfit), 2), ")")),
                                "R<sup>2</sup><br>(linear fit)" = ifelse(is.na(res.table.gc$mu2.linfit), round(as.numeric(res.table.gc$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.gc$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.gc$r2mu2.linfit), 3), ")")),
-                               stringsAsFactors = F, check.names = F)
+                               stringsAsFactors = FALSE, check.names = F)
     table_linear
 
   })
@@ -7928,19 +7928,19 @@ server <- function(input, output, session){
                                 "t<sub>D</sub>" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
                                 "λ" = ifelse(res.table.gc$lambda.model==0 | is.na(res.table.gc$lambda.model), "", paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3))),
                                 "A" = ifelse(res.table.gc$A.model==0 | is.na(res.table.gc$A.model), "", paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3))),
-                                stringsAsFactors = F, check.names = F)
+                                stringsAsFactors = FALSE, check.names = F)
       if(!is.null(res.table.gc)){
         if ( "richards" %in% res.table.gc$used.model  ){
-          table_model <- suppressWarnings(cbind(table_model, data.frame("ν" = round(as.numeric(res.table.gc$parameter_nu.model), 3), stringsAsFactors = F, check.names = F)))
+          table_model <- suppressWarnings(cbind(table_model, data.frame("ν" = round(as.numeric(res.table.gc$parameter_nu.model), 3), stringsAsFactors = FALSE, check.names = F)))
         }
         if ( "gompertz" %in% res.table.gc$used.model ){
-          table_model <- suppressWarnings(cbind(table_model, data.frame("α" = round(as.numeric(res.table.gc$parameter_alpha.model), 3), stringsAsFactors = F, check.names = F)))
+          table_model <- suppressWarnings(cbind(table_model, data.frame("α" = round(as.numeric(res.table.gc$parameter_alpha.model), 3), stringsAsFactors = FALSE, check.names = F)))
         }
         if ( "gompertz.exp" %in% res.table.gc$used.model ){
-          table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = F, check.names = F)))
+          table_model <- suppressWarnings(cbind(table_model, data.frame("t<sub>shift</sub>" = round(as.numeric(res.table.gc$parameter_t_shift.model), 3), stringsAsFactors = FALSE, check.names = F)))
         }
         if ("baranyi" %in% res.table.gc$used.model ||  "huang" %in% res.table.gc$used.model ){
-          table_model <- suppressWarnings(cbind(table_model, data.frame("y0" = round(as.numeric(res.table.gc$parameter_y0.model), 3), stringsAsFactors = F, check.names = F)))
+          table_model <- suppressWarnings(cbind(table_model, data.frame("y0" = round(as.numeric(res.table.gc$parameter_y0.model), 3), stringsAsFactors = FALSE, check.names = F)))
         }
       }
       table_model
@@ -7978,23 +7978,23 @@ server <- function(input, output, session){
                                "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
                                "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
                                "Test parameter" = res.table.dr[["test"]],
-                               stringsAsFactors = F, check.names = F)
+                               stringsAsFactors = FALSE, check.names = F)
         if(!is.null(res.table.dr)){
           if(results$growth$control$log.x.dr){
             table_dr <- suppressWarnings(cbind(table_dr,
                                                data.frame("EC50 (original)" = round(as.numeric(res.table.dr[["EC50.orig"]]), 3),
-                                                          stringsAsFactors = F, check.names = F)))
+                                                          stringsAsFactors = FALSE, check.names = F)))
           }
           if(results$growth$control$log.y.dr){
             table_dr <- suppressWarnings(cbind(table_dr,
                                                data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
-                                                          stringsAsFactors = F, check.names = F)))
+                                                          stringsAsFactors = FALSE, check.names = F)))
           }
           if ( results$growth$control$nboot.dr > 2 ){
             table_dr <- suppressWarnings(cbind(table_dr,
                                                data.frame("Mean EC50 (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50"]]), 3), sep = " \u00B1 "),
                                                           "Response(EC50) (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50y"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50y"]]), 3), sep = " \u00B1 "),
-                                                          stringsAsFactors = F, check.names = F)))
+                                                          stringsAsFactors = FALSE, check.names = F)))
           }
         }
         table_dr
@@ -8011,7 +8011,7 @@ server <- function(input, output, session){
                                "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
                                "Test parameter" = res.table.dr[["test"]],
                                "Model" = paste0(res.table.dr[["model"]], ": ", model.descr[match(res.table.dr[["model"]], model.names)]),
-                               stringsAsFactors = F, check.names = F)
+                               stringsAsFactors = FALSE, check.names = F)
 
         table_dr
       })
@@ -8156,7 +8156,7 @@ server <- function(input, output, session){
                                "x<sub>start</sub><br>(slope<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.start.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.start.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.start.linfit), 2), ")")),
                                "x<sub>end</sub><br>(slope<sub>max</sub>)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$x.mu.end.linfit), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.mu.end.linfit), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.mu2.end.linfit), 2), ")")),
                                "R<sup>2</sup><br>(linear fit)" = ifelse((is.na(res.table.fl$max_slope2.linfit)), round(as.numeric(res.table.fl$r2mu.linfit), 3), paste0("<strong>", round(as.numeric(res.table.fl$r2mu.linfit), 3), "</strong>", " (", round(as.numeric(res.table.fl$r2mu.linfit), 3), ")")),
-                               stringsAsFactors = F, check.names = F)
+                               stringsAsFactors = FALSE, check.names = F)
 
     table_linear
 
@@ -8270,23 +8270,23 @@ server <- function(input, output, session){
                              "EC50" = round(as.numeric(res.table.dr[["EC50"]]), 3),
                              "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
                              "Test parameter" = res.table.dr[["test"]],
-                             stringsAsFactors = F, check.names = F)
+                             stringsAsFactors = FALSE, check.names = F)
       if(!is.null(res.table.dr)){
         if(results$fluorescence$control$log.x.dr){
           table_dr <- suppressWarnings(cbind(table_dr,
                                              data.frame("EC50 (original)" = round(as.numeric(res.table.dr[["EC50.orig"]]), 3),
-                                                        stringsAsFactors = F, check.names = F)))
+                                                        stringsAsFactors = FALSE, check.names = F)))
         }
         if(results$fluorescence$control$log.y.dr){
           table_dr <- suppressWarnings(cbind(table_dr,
                                              data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
-                                                        stringsAsFactors = F, check.names = F)))
+                                                        stringsAsFactors = FALSE, check.names = F)))
         }
         if ( results$fluorescence$control$nboot.dr > 2 ){
           table_dr <- suppressWarnings(cbind(table_dr,
                                              data.frame("Mean EC50 (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50"]]), 3), sep = " \u00B1 "),
                                                         "Response(EC50) (bootstrap)" = paste(round(as.numeric(res.table.dr[["drboot.meanEC50y"]]), 3), round(as.numeric(res.table.dr[["drboot.sdEC50y"]]), 3), sep = " \u00B1 "),
-                                                        stringsAsFactors = F, check.names = F)))
+                                                        stringsAsFactors = FALSE, check.names = F)))
         }
       }
       table_dr
@@ -8311,17 +8311,17 @@ server <- function(input, output, session){
                              "Response(EC50)" = round(as.numeric(res.table.dr[["yEC50"]]), 3),
                              "Maximum FL" = round(as.numeric(res.table.dr[["y.max"]]), 3),
 
-                             stringsAsFactors = F, check.names = F)
+                             stringsAsFactors = FALSE, check.names = F)
       if(!is.null(res.table.dr)){
         if(results$fluorescence$control$log.x.dr){
           table_dr <- suppressWarnings(cbind(table_dr,
                                              data.frame("K (original)" = round(as.numeric(res.table.dr[["K.orig"]]), 3),
-                                                        stringsAsFactors = F, check.names = F)))
+                                                        stringsAsFactors = FALSE, check.names = F)))
         }
         if(results$fluorescence$control$log.y.dr){
           table_dr <- suppressWarnings(cbind(table_dr,
                                              data.frame("Response(EC50) (original)" = round(as.numeric(res.table.dr[["yEC50.orig"]]), 3),
-                                                        stringsAsFactors = F, check.names = F)))
+                                                        stringsAsFactors = FALSE, check.names = F)))
         }
       }
       table_dr
@@ -9107,7 +9107,7 @@ server <- function(input, output, session){
                   )]],
                   export = FALSE,
                   plot = FALSE,
-                  log.y = F,
+                  log.y = FALSE,
                   deriv = F
                 )
               ))
@@ -10272,7 +10272,7 @@ server <- function(input, output, session){
                                                         input$sample_validate_fluorescence_spline)]],
                   export = FALSE,
                   plot = FALSE,
-                  log.y = F,
+                  log.y = FALSE,
                   deriv = F
                 )
               ))

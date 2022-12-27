@@ -40,7 +40,7 @@ parse_properties_Gen5Gen6 <- function(file, csvsep=";", dec=".", sheet=1)
   # Read table file
   input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
   # get row numbers for "time" in column 2
-  time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = T)
+  time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
   suppressWarnings(
@@ -67,9 +67,9 @@ parse_properties_chibio <- function(file, csvsep=";", dec=".", sheet=1)
   # Read table file
   input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
 
-  time.ndx <- grep("time", input[1,], ignore.case = T)
+  time.ndx <- grep("time", input[1,], ignore.case = TRUE)
   # extract different read data in dataset
-  read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
+  read.ndx <- grep("measured|emit", input[1,], ignore.case = TRUE)
   reads <- input[1, read.ndx]
   suppressWarnings(
     reads[!is.na(as.numeric(reads))] <- gsub("\\.", ",", as.numeric(reads[!is.na(as.numeric(reads))]))
@@ -95,7 +95,7 @@ parse_properties_tecan <- function(file, csvsep=";", dec=".", sheet=1)
   # Read table file
   input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
   # get row numbers for "time" in column 2
-  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
+  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = TRUE)
   time.ndx <- time.ndx[-1]
   # extract different read data in dataset
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
@@ -123,9 +123,9 @@ parse_properties_biolector <- function(file, csvsep=";", dec=".", sheet=1)
   # Read table file
   input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
   # get row numbers for "time" in column 2
-  time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = T)
+  time.ndx <- grep("\\btime\\b", input[[2]], ignore.case = TRUE)
   # extract different read data in dataset
-  time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = T)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = T),], ignore.case = T))
+  time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = TRUE)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = TRUE),], ignore.case = TRUE))
   # extract different read data in dataset
   reads <- unique(input[,time.ndx[2]][grep("Biomass", input[,time.ndx[2]])])
   reads <- reads[!is.na(reads)]
@@ -148,7 +148,7 @@ parse_properties_victornivo <- function(file, csvsep=";", dec=".", sheet=1)
   # Read table file
   input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
   # get index (row,column) for "Time:"
-  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
+  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2])
   reads <- reads[!is.na(reads)]
@@ -171,7 +171,7 @@ parse_properties_victorx3 <- function(file, csvsep=";", dec=".", sheet=1)
   # Read table file
   input <- read_file(file, csvsep=csvsep, dec=dec, sheet=sheet)
   # get index (row,column) for "Time:"
-  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = T)
+  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- unlist(lapply(1:length(time.ndx), function(x) input[1, time.ndx[x]+1]))
   reads <- reads[!is.na(reads)]
@@ -211,7 +211,7 @@ parse_data_shiny <-
            dec.data = ".",
            csvsep.map = ";",
            dec.map = ".",
-           subtract.blank  = T,
+           subtract.blank  = TRUE,
            growth.nm = NULL,
            fl.nm = NULL,
            fl2.nm = NULL,
@@ -229,45 +229,45 @@ parse_data_shiny <-
       # Read table file
       input <- read_file(data.file, csvsep=csvsep.data, dec=dec.data, sheet=sheet.data)
     } else {
-      stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
+      stop(paste0("File \"", data.file, "\" does not exist."), call. = FALSE)
     }
     if(!is.null(map.file)){
       if (file.exists(map.file)) {
         mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=sheet.map)
       } else {
-        stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
+        stop(paste0("File \"", map.file, "\" does not exist."), call. = FALSE)
       }
     } else {
       mapping <- NULL
     }
-    if(any(grep("Gen5|Gen6", software, ignore.case = T))){
+    if(any(grep("Gen5|Gen6", software, ignore.case = TRUE))){
       parsed.ls <- parse_Gen5Gen6_shiny(data = input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     } # if("Gen5" %in% software)
-    if(any(grep("Chi.Bio", software, ignore.case = T))){
+    if(any(grep("Chi.Bio", software, ignore.case = TRUE))){
       parsed.ls <- parse_chibio_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
-    if(any(grep("GrowthProfiler", software, ignore.case = T))){
+    if(any(grep("GrowthProfiler", software, ignore.case = TRUE))){
       parsed.ls <- parse_growthprofiler(input)
       data.ls <- parsed.ls[[1]]
     }
-    if(any(grep("Tecan", software, ignore.case = T))){
+    if(any(grep("Tecan", software, ignore.case = TRUE))){
       parsed.ls <- parse_tecan_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
-    if(any(grep("Biolector", software, ignore.case = T))){
+    if(any(grep("Biolector", software, ignore.case = TRUE))){
       parsed.ls <- parse_biolector_shiny(input, growth.nm = growth.nm)
       data.ls <- parsed.ls[[1]]
     }
 
-    if(any(grep("VictorNivo", software, ignore.case = T))){
+    if(any(grep("VictorNivo", software, ignore.case = TRUE))){
       parsed.ls <- parse_victornivo_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
-    if(any(grep("VictorX3", software, ignore.case = T))){
+    if(any(grep("VictorX3", software, ignore.case = TRUE))){
       parsed.ls <- parse_victorx3_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
@@ -384,7 +384,7 @@ parse_data_shiny <-
 parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
-  time.ndx <- grep("\\btime\\b", data[[2]], ignore.case = T)
+  time.ndx <- grep("\\btime\\b", data[[2]], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) data[time.ndx[x]-2, 1])))
   read.ndx <- time.ndx[!is.na(reads)]
@@ -471,8 +471,8 @@ parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
 #' @noRd
 parse_chibio_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
-  time.ndx <- grep("time", input[1,], ignore.case = T)
-  read.ndx <- grep("measured|emit", input[1,], ignore.case = T)
+  time.ndx <- grep("time", input[1,], ignore.case = TRUE)
+  read.ndx <- grep("measured|emit", input[1,], ignore.case = TRUE)
   reads <- input[1, read.ndx]
 
   data.ls <- list()
@@ -529,7 +529,7 @@ parse_chibio_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get row numbers for "time" in column 2
-  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = T)
+  time.ndx <- grep("^\\btime\\b", input[[1]], ignore.case = TRUE)
   time.ndx <- time.ndx[-1]
   # extract different read data in dataset
   reads <- unname(unlist(lapply(1:length(time.ndx), function(x) input[time.ndx[x]-2, 1])))
@@ -604,7 +604,7 @@ parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 parse_biolector_shiny <- function(input, growth.nm)
 {
   # get index (row,column) for "Time:"
-  time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = T)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = T),], ignore.case = T))
+  time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = TRUE)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = TRUE),], ignore.case = TRUE))
   # extract different read data in dataset
   reads <- unique(input[,time.ndx[2]][grep("Biomass", input[,time.ndx[2]])])
   reads <- reads[!is.na(reads)]
@@ -679,7 +679,7 @@ parse_biolector_shiny <- function(input, growth.nm)
 parse_victornivo_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
-  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = T)
+  time.ndx <- grep("^\\bTime\\b", input[,2], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- lapply(1:length(time.ndx), function(x) input[time.ndx-6, 2])
   reads <- reads[!is.na(reads)]
@@ -755,7 +755,7 @@ parse_victornivo_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 parse_victorx3_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
-  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = T)
+  time.ndx <- grep("^\\bTime\\b", input[1,], ignore.case = TRUE)
   # extract different read data in dataset
   reads <- unlist(lapply(1:length(time.ndx), function(x) input[1, time.ndx[x]+1]))
   reads <- reads[!is.na(reads)]

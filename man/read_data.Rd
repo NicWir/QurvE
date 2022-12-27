@@ -19,7 +19,7 @@ read_data(
   sheet.fl = 1,
   sheet.fl2 = 1,
   fl.normtype = c("growth", "fl2"),
-  subtract.blank = T,
+  subtract.blank = TRUE,
   convert.time = NULL,
   calib.growth = NULL,
   calib.fl = NULL,

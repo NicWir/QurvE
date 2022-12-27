@@ -145,7 +145,7 @@ growth.gcFitSpline <- function(
     if (max(data) <
         control$growth.thresh * data[1])
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 paste0(
                   "gcFitSpline: No significant growth detected (with all values below ",
@@ -316,7 +316,7 @@ growth.gcFitSpline <- function(
             is.null(spline) ==
                 TRUE)
             {
-                if (control$suppress.messages == F)
+                if (control$suppress.messages == FALSE)
                   message(
                     "gcFitSpline: Spline could not be fitted to data!"
                 )
@@ -355,7 +355,7 @@ growth.gcFitSpline <- function(
             if (length(deriv1.growth$y) <
                 3)
                 {
-                if (control$suppress.messages == F)
+                if (control$suppress.messages == FALSE)
                   message(
                     "gcFitSpline: No significant amount of growth values above the start value!"
                 )
@@ -661,7 +661,7 @@ growth.gcBootSpline <- function(
     if (length(data) <
         6)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "gcBootSpline: There is not enough valid data. Must have at least 6 unique values!"
             )
@@ -769,7 +769,7 @@ growth.gcBootSpline <- function(
     }
     if (all(is.na(mu)))
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "gcBootSpline: No spline fit could be performed successfully!"
             )
@@ -1050,7 +1050,7 @@ flFitSpline <- function(
             if (max(growth) <
                 control$growth.thresh * growth[1])
                 {
-                if (control$suppress.messages == F)
+                if (control$suppress.messages == FALSE)
                   message(
                     paste0(
                       "flFitSpline: No significant growth detected (with all values below ",
@@ -1205,7 +1205,7 @@ flFitSpline <- function(
             if (max(time) <
                 control$t0)
                 {
-                if (control$suppress.messages == F)
+                if (control$suppress.messages == FALSE)
                   message(
                     paste0(
                       "flFitSpline: All time values are below the chosen 't0'."
@@ -1335,7 +1335,7 @@ flFitSpline <- function(
     if (!exists("spline") ||
         is.null(spline))
         {
-            if (control$suppress.messages == F)
+            if (control$suppress.messages == FALSE)
                 message(
                   "flFitSpline: Spline could not be fitted to data!"
               )
@@ -1690,7 +1690,7 @@ flBootSpline <- function(
     if (length(fl_data) <
         6)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "flBootSpline: There is not enough valid data. Must have at least 6 unique values!"
             )

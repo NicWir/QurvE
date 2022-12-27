@@ -384,7 +384,7 @@ growth.drFitSpline <- function(
     if (length(test) <
         6)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "drFitSpline: There is not enough valid data. Must have at least 6 unique values!"
             )
@@ -403,7 +403,7 @@ growth.drFitSpline <- function(
     if (length(test) <
         control$dr.have.atleast)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "drFitSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
             )
@@ -718,7 +718,7 @@ growth.drBootSpline <- function(
     if (length(unique(conc)) <
         4)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "drBootSpline: There are not enough concentration values. Must have at least 4 unique values!"
             )
@@ -752,7 +752,7 @@ growth.drBootSpline <- function(
     if (length(test) <
         6)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "drBootSpline: There is not enough valid data. Must have at least 6 unique values!"
             )
@@ -768,7 +768,7 @@ growth.drBootSpline <- function(
     if (length(test) <
         control$dr.have.atleast)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "drBootSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
             )
@@ -1025,7 +1025,7 @@ growth.drFitModel <- function(
     if (length(test) <
         6)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "growth.drFitModel: There is not enough valid data. Must have at least 6 unique values!"
             )
@@ -1044,7 +1044,7 @@ growth.drFitModel <- function(
     if (length(test) <
         control$dr.have.atleast)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "growth.drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
             )
@@ -1103,7 +1103,7 @@ growth.drFitModel <- function(
     if (length(model.fits) <
         1)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "growth.drFitModel: No DR model could be fit to the test and concentration data."
             )
@@ -1492,7 +1492,7 @@ fl.drFitModel <- function(
     if (length(test) <
         4)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "drFitModel: There is not enough valid data. Must have at least 4 unique values!"
             )
@@ -1511,7 +1511,7 @@ fl.drFitModel <- function(
     if (length(test) <
         control$dr.have.atleast)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See fl.control()."
             )

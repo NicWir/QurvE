@@ -430,7 +430,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) )),
                    x = (1 + 0.13+ log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = T, size = 2.5*eq.size) +
+                   angle = 90, parse = TRUE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model', breaks = "Logistic",
                              values=c("model" = colModel, "Logistic" = colModel)) +
           ggplot2::scale_color_discrete(labels="Logistic", type = colModel)
@@ -448,7 +448,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
                                          lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ~~~~ nu == .(round(as.numeric(gcFittedModel$parameters$fitpar$nu[1],3))))),
                    x = (1 + 0.22 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = T, size = 2.5*eq.size) +
+                   angle = 90, parse = TRUE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              values=c("model" = colModel, "Richards" = colModel)) +
           ggplot2::scale_color_discrete(labels="Richards", type = colModel)
@@ -469,7 +469,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) )),
                    x = (1 + 0.25 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = T, size = 2.5*eq.size) +
+                   angle = 90, parse = TRUE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              values=c("model" = colModel, "Baranyi" = colModel)) +
           ggplot2::scale_color_discrete(labels="Baranyi", type = colModel)
@@ -487,7 +487,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],3)) )),
                    x = (1 + 0.13 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = T, size = 2.5*eq.size) +
+                   angle = 90, parse = TRUE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              values=c("model" = colModel, "Gompertz" = colModel)) +
           ggplot2::scale_color_discrete(labels="Gompertz", type = colModel)
@@ -507,7 +507,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
                                     t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[1],2)) )),
                    x = (1 + 0.21 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = T, size = 2.5*eq.size) +
+                   angle = 90, parse = TRUE, size = 2.5*eq.size) +
           scale_color_manual(name='Growth Model',
                              values=c("model" = colModel, "Gompertz.exp" = colModel)) +
           ggplot2::scale_color_discrete(labels="Gompertz.exp", type = colModel)
@@ -527,7 +527,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
                                     lambda == .(round(gcFittedModel$parameters$lambda[1],2)))),
                    x = (1 + 0.21 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
-                   angle = 90, parse = T, size = 2.3*eq.size) +
+                   angle = 90, parse = TRUE, size = 2.3*eq.size) +
           scale_color_manual(name='Growth Model',
                              values=c("model" = colModel, "Huang" = colModel)) +
           ggplot2::scale_color_discrete(labels="Huang", type = colModel)
@@ -1695,7 +1695,7 @@ plot.drFitModel <- function(x,
             col = col,
             lwd = lwd,
             lty = lty,
-            axes = F,
+            axes = FALSE,
             xt = xt,
             yt = yt,
             log = log,
@@ -1877,7 +1877,7 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
   if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
   if (is.numeric(cex.point)==FALSE)   stop("Need numeric value for: cex")
   if (gcBootSpline$bootFlag==FALSE){
-    try(showModal(modalDialog("Could not find successful bootstrapping operations for the chosen sample.", easyClose = T)))
+    try(showModal(modalDialog("Could not find successful bootstrapping operations for the chosen sample.", easyClose = TRUE)))
     message("Could not find successful bootstrapping operations for the provided gcBootSpline object. Did you define 'nboot.gc' in the control object when running computations?")
     par(cex.lab = cex.lab, cex.axis = cex.axis)
     par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
@@ -2395,7 +2395,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
         #   label = paste("t0:", gcFittedSpline$control$t0, "  min.growth:", gcFittedSpline$control$min.growth, "  smoothing:", gcFittedSpline$control$smooth.gc),
         #   x = 0.5*x_limit[2],
         #   y = ifelse(!is.null(y.lim) && !is.na(y.lim[2]), 1.05 * y.lim[2], 1.3 * y_limit[2]),
-        #   angle = 0, parse = F, size = basesize*3.2/12) +
+        #   angle = 0, parse = FALSE, size = basesize*3.2/12) +
         labs(subtitle = paste("t0:", gcFittedSpline$control$t0,
                               " tmax:", gcFittedSpline$control$tmax,
                               "  min.growth:", gcFittedSpline$control$min.growth,
@@ -2410,7 +2410,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
           x = 1.02*x_limit[2],
           y = ifelse(deriv==TRUE, ifelse(log.y == TRUE, 0.5, -0.3), 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
           hjust = 0,
-          angle = 90, parse = T, size = basesize*3.2/12)
+          angle = 90, parse = TRUE, size = basesize*3.2/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
         p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y.lim[2]), clip = "off")
       } else {
@@ -2950,7 +2950,7 @@ plot.grofit <- function(x, ...,
                         deriv = TRUE,
                         n.ybreaks = 6,
                         colors = NULL,
-                        color_groups = T,
+                        color_groups = TRUE,
                         group_pals = c('Green', 'Orange', 'Purple', 'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', 'Mint'),
                         basesize = 20,
                         y.lim = NULL,
@@ -3274,7 +3274,7 @@ plot.grofit <- function(x, ...,
     groups_unique <- unique(groups)
     if(is.null(colors) && color_groups == TRUE && length(group_pals) < length(groups_unique)){
       message("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled (color_groups set to FALSE).")
-      try(showModal(modalDialog("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled.", easyClose = T, footer=NULL)), silent = TRUE)
+      try(showModal(modalDialog("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled.", easyClose = TRUE, footer=NULL)), silent = TRUE)
       color_groups <- FALSE
     }
     # apply color schemes
@@ -3657,7 +3657,7 @@ plot.grodata <- function(x,
                          log.y = FALSE,
                          n.ybreaks = 6,
                          colors = NULL,
-                         color_groups = T,
+                         color_groups = TRUE,
                          group_pals = c('Green', 'Orange', 'Purple', 'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', 'Mint'),
                          basesize = 20,
                          y.lim = NULL,

@@ -260,7 +260,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
     w <- width
     h <- height
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-    dir.create(out.dir, showWarnings = F)
+    dir.create(out.dir, showWarnings = FALSE)
     grDevices::png(paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.png"),
                    width = w, height = h, units = 'in', res = 300)
     p()
@@ -338,7 +338,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #'
 #' plot(TestFit)
 #
-plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = F, basesize = 16,
+plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE, spline = TRUE, log.y = FALSE, basesize = 16,
                              pch=1, colData=1, colSpline="dodgerblue3", cex.point=2, lwd = 0.7,
                              y.lim = NULL, x.lim = NULL, y.lim.deriv = NULL,  n.ybreaks = 6,
                              y.title = NULL, x.title = NULL, y.title.deriv = NULL,
@@ -498,7 +498,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
         #   label = paste("t0:", flFitSpline$control$t0, "  min.growth:", flFitSpline$control$min.growth, "  smoothing:", flFitSpline$control$smooth.fl),
         #   x = 0.5*x_limit[2],
         #   y = ifelse(!is.null(y.lim) && !is.na(y.lim[2]), 1.05 * y.lim[2], 1.3 * y_limit[2]),
-        #   angle = 0, parse = F, size = basesize*3.2/12) +
+        #   angle = 0, parse = FALSE, size = basesize*3.2/12) +
         labs(subtitle = paste("t0:", flFitSpline$control$t0,
                               " tmax:", flFitSpline$control$tmax,
                               "  min.growth:", flFitSpline$control$min.growth,
@@ -513,7 +513,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
           x = 1.02*x_limit[2],
           y = ifelse(deriv==TRUE, ifelse(log.y == TRUE, 0.5, -0.3), 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
           hjust = 0,
-          angle = 90, parse = T, size = basesize*3/12)
+          angle = 90, parse = TRUE, size = basesize*3/12)
       if(!is.null(y.lim) && !is.na(y.lim[2])){
         p <- p + coord_cartesian(xlim = c(0, x_limit[2]*0.96), ylim = c(y_limit[1], y.lim[2]), clip = "off")
       } else {
@@ -952,7 +952,7 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, sp
         w <- width
         h <- height
         out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-        dir.create(out.dir, showWarnings = F)
+        dir.create(out.dir, showWarnings = FALSE)
         grDevices::png(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.png"),
                        width = w, height = h, units = 'in', res = 300)
         print(p)
@@ -1080,8 +1080,8 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
 
       # /// plot all flFitSpline objects
       for(i in 1:flBootSpline$control$nboot.fl){
-        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd = lwd,
-                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline, cex.point = cex.point)
+        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = TRUE, lwd = lwd,
+                         deriv = FALSE, plot = FALSE, export = FALSE, pch=0, colSpline=colSpline, cex.point = cex.point)
       }
       # add plot title
       title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
@@ -1109,8 +1109,8 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
           try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, lwd = lwd, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
         }
         for(i in 2:flBootSpline$control$nboot.fl){
-          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
-                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline, cex.point = cex.point)
+          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = FALSE, lwd = lwd, xlim = x.lim,
+                           deriv = TRUE, plot = FALSE, export = FALSE, pch=0, colSpline=colSpline, cex.point = cex.point)
         }
         title(ylab = "First derivative", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
@@ -1200,8 +1200,8 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
 
       # /// plot all flFitSpline objects
       for(i in 1:flBootSpline$control$nboot.fl){
-        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = T, lwd = lwd,
-                         deriv = FALSE, plot = F, export = F, pch=0, colSpline=colSpline, cex.point = cex.point)
+        plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = TRUE, lwd = lwd,
+                         deriv = FALSE, plot = FALSE, export = FALSE, pch=0, colSpline=colSpline, cex.point = cex.point)
       }
       # add plot title
       title(paste(flBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
@@ -1229,8 +1229,8 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
           try( lines(flBootSpline$boot.flSpline[[1]]$x, flBootSpline$boot.flSpline[[1]]$spline.deriv1$y, lwd = lwd, xlab="Ln(1+time)", ylab="First derivative", type = "l") )
         }
         for(i in 2:flBootSpline$control$nboot.fl){
-          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = F, lwd = lwd, xlim = x.lim,
-                           deriv = T, plot = F, export = F, pch=0, colSpline=colSpline, cex.point = cex.point)
+          plot.flFitSpline(flBootSpline$boot.flSpline[[i]], add = TRUE, slope = FALSE, spline = FALSE, lwd = lwd, xlim = x.lim,
+                           deriv = TRUE, plot = FALSE, export = FALSE, pch=0, colSpline=colSpline, cex.point = cex.point)
         }
         title(ylab = "First derivative", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
       }
@@ -1290,7 +1290,7 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
   }
   if (export == TRUE && flBootSpline$bootFlag==TRUE){
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-    dir.create(out.dir, showWarnings = F)
+    dir.create(out.dir, showWarnings = FALSE)
     if(!combine){
       w1 <- width
       h1 <- height
@@ -1633,7 +1633,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
       },
       lwd = lwd,
       col = colSpline
-    ), silent = F)
+    ), silent = FALSE)
 
     if (ec50line == TRUE) {
       #vertical lines
@@ -1655,7 +1655,7 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
     w <- width
     h <- height
     out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-    dir.create(out.dir, showWarnings = F)
+    dir.create(out.dir, showWarnings = FALSE)
     grDevices::png(paste0(out.dir, "/", paste(drFittedFLModel$drID, collapse = "_"), "_drFitFLModel.png"),
                    width = w, height = h, units = 'in', res = 300)
     p()
@@ -1748,11 +1748,11 @@ plot.flFitRes <-  function(x,
                         mean = TRUE,
                         exclude.nm = NULL,
                         exclude.conc = NULL,
-                        log.y = F,
-                        deriv = F,
+                        log.y = FALSE,
+                        deriv = FALSE,
                         n.ybreaks = 6,
                         colors = NULL,
-                        color_groups = T,
+                        color_groups = TRUE,
                         group_pals = c('Green', 'Orange', 'Purple', 'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', 'Mint'),
                         basesize = 20,
                         y.lim = NULL,
@@ -1890,7 +1890,7 @@ plot.flFitRes <-  function(x,
                                                                                                            unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), sample.nm[ndx.filt.rep[[j]]])]))
   }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
   remove <- c()
   for(i in 1:length(ndx.filt)){
     if(length(ndx.filt[[i]]) == 0) remove <- c(remove, i)
@@ -1921,7 +1921,7 @@ plot.flFitRes <-  function(x,
   }
   if((data.type == "spline") && flFit$control$x_type == "growth" && mean == TRUE){ # || data.type == "spline2"
     message("Grouping of replicates is not supported for spline fits with x_type = 'growth'. Argument changed to mean = FALSE.")
-    try(showModal(modalDialog("Grouping of replicates is not supported for spline fits with x_type = 'growth'.", easyClose = T, footer=NULL)), silent = TRUE)
+    try(showModal(modalDialog("Grouping of replicates is not supported for spline fits with x_type = 'growth'.", easyClose = TRUE, footer=NULL)), silent = TRUE)
     mean <- FALSE
   }
   if(mean == TRUE){
@@ -2001,14 +2001,14 @@ plot.flFitRes <-  function(x,
       } # if(deriv)
       time <- time[[1]]
       data <- do.call("cbind", data)
-      avg <- rowMeans(data, na.rm = F)
-      sd <- apply(data, 1, sd, na.rm = F)
+      avg <- rowMeans(data, na.rm = FALSE)
+      sd <- apply(data, 1, sd, na.rm = FALSE)
       plotdata.ls[[n]] <- data.frame("name" = name, "time" = time, "mean" = avg, "upper" = avg+sd, "lower" = avg-sd)
       if(deriv){
         time.deriv <- time.deriv[[1]]
         data.deriv <- do.call("cbind", data.deriv)
-        avg.deriv <- rowMeans(data.deriv, na.rm = F)
-        sd.deriv <- apply(data.deriv, 1, sd, na.rm = F)
+        avg.deriv <- rowMeans(data.deriv, na.rm = FALSE)
+        sd.deriv <- apply(data.deriv, 1, sd, na.rm = FALSE)
        deriv.ls[[n]] <- data.frame("name" = name, "time" = time.deriv, "mean" = avg.deriv, "upper" = avg.deriv+sd.deriv, "lower" = avg.deriv-sd.deriv)
       }
     } # for(n in 1:length(conditions_unique))
@@ -2115,7 +2115,7 @@ plot.flFitRes <-  function(x,
     groups_unique <- unique(groups)
     if(is.null(colors) && color_groups == TRUE && length(group_pals) < length(groups_unique)){
       message("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled (color_groups set to FALSE).")
-      try(showModal(modalDialog("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled.", easyClose = T, footer=NULL)), silent = TRUE)
+      try(showModal(modalDialog("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled.", easyClose = TRUE, footer=NULL)), silent = TRUE)
       color_groups <- FALSE
     }
     if(is.null(colors)){
@@ -2419,7 +2419,7 @@ plot.flFitRes <-  function(x,
                              values = colors)
       }
       p <- suppressWarnings(
-        ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+        ggpubr::ggarrange(p, p.deriv, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1), common.legend = TRUE, legend = legend.position, legend.grob = ggpubr::get_legend(p))
       )
     } # if(deriv)
 
@@ -2440,7 +2440,7 @@ plot.flFitRes <-  function(x,
     } else {
       h <- height
     }
-    dir.create(out.dir, showWarnings = F)
+    dir.create(out.dir, showWarnings = FALSE)
     grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
     print(p)
@@ -2548,11 +2548,11 @@ plot.dual <-  function(x,
                        mean = TRUE,
                        exclude.nm = NULL,
                        exclude.conc = NULL,
-                       log.y.growth = F,
-                       log.y.fl = F,
+                       log.y.growth = FALSE,
+                       log.y.fl = FALSE,
                        n.ybreaks = 6,
                        colors = NULL,
-                       color_groups = T,
+                       color_groups = TRUE,
                        group_pals = c('Green', 'Orange', 'Purple', 'Magenta', 'Grey', 'Blue', 'Grey', 'Red', 'Cyan', 'Brown', 'Mint'),
                        basesize = 20,
                        y.lim.growth = NULL,
@@ -2669,7 +2669,7 @@ plot.dual <-  function(x,
                                                                                                            unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), sample.nm[ndx.filt.rep[[j]]])]))
   }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
 
   # get indices of samples with selected names
   ndx.keep <- grep(paste0(
@@ -2732,11 +2732,11 @@ plot.dual <-  function(x,
       }
       time <- time[[1]]
       dens.data <- do.call("cbind", dens.data)
-      dens.avg <- rowMeans(dens.data, na.rm = F)
-      dens.sd <- apply(dens.data, 1, sd, na.rm = F)
+      dens.avg <- rowMeans(dens.data, na.rm = FALSE)
+      dens.sd <- apply(dens.data, 1, sd, na.rm = FALSE)
       fl.data <- do.call("cbind", fl.data)
-      fl.avg <- rowMeans(fl.data, na.rm = F)
-      fl.sd <- apply(fl.data, 1, sd, na.rm = F)
+      fl.avg <- rowMeans(fl.data, na.rm = FALSE)
+      fl.sd <- apply(fl.data, 1, sd, na.rm = FALSE)
       plotdata.ls[[n]] <- data.frame("name" = name, "time" = time,
                                      "dens.mean" = dens.avg, "dens.upper" = dens.avg+dens.sd, "dens.lower" = dens.avg-dens.sd,
                                      "fl.mean" = fl.avg, "fl.upper" = fl.avg+fl.sd, "fl.lower" = fl.avg-fl.sd)
@@ -2807,7 +2807,7 @@ plot.dual <-  function(x,
     groups_unique <- unique(groups)
     if(is.null(colors) && color_groups == TRUE && length(group_pals) < length(groups_unique)){
       message("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled (color_groups set to FALSE).")
-      try(showModal(modalDialog("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled.", easyClose = T, footer=NULL)), silent = TRUE)
+      try(showModal(modalDialog("Fewer colors in 'group_pals' provided than the number of visualized groups. Grouped coloring was disabled.", easyClose = TRUE, footer=NULL)), silent = TRUE)
       color_groups <- FALSE
     }
     if(is.null(colors)){
@@ -2928,7 +2928,7 @@ plot.dual <-  function(x,
                            values = colors)
     }
     p <- suppressWarnings(
-      ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+      ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = TRUE, legend = legend.position, legend.grob = ggpubr::get_legend(p))
     )
   } # if(mean == TRUE)
   else {
@@ -3083,7 +3083,7 @@ plot.dual <-  function(x,
       }
     }
     p <- suppressWarnings(
-      ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = T, legend = legend.position, legend.grob = ggpubr::get_legend(p))
+      ggpubr::ggarrange(p, p.fl, ncol = 1, nrow = 2, align = "v", heights = c(2,2), common.legend = TRUE, legend = legend.position, legend.grob = ggpubr::get_legend(p))
     )
   }
   if(export == FALSE && plot == FALSE){
@@ -3102,7 +3102,7 @@ plot.dual <-  function(x,
     } else {
       h <- height
     }
-    dir.create(out.dir, showWarnings = F)
+    dir.create(out.dir, showWarnings = FALSE)
     grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
                    width = w, height = h, units = 'in', res = 300)
     print(p)

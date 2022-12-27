@@ -412,7 +412,7 @@ export_Table <- function(
 )
     {
     out.nm <- gsub("\\.txt$", "", out.nm)
-    dir.create(out.dir, showWarnings = F)
+    dir.create(out.dir, showWarnings = FALSE)
     utils::write.table(
         x = table, file = paste(
             out.dir, paste0(out.nm, ".txt"),
@@ -446,7 +446,7 @@ export_RData <- function(
     # 'flFitRes') stop('grofit needs to be an
     # object created with growth.workflow() or
     # fl.workflow().')
-    dir.create(out.dir, showWarnings = F)
+    dir.create(out.dir, showWarnings = FALSE)
     out.nm <- gsub("\\.RData$", "", out.nm)
     message(
         paste0(

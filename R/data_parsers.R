@@ -66,7 +66,7 @@ read_data <-
            sheet.fl = 1,
            sheet.fl2 = 1,
            fl.normtype = c("growth", "fl2"),
-           subtract.blank  = T,
+           subtract.blank  = TRUE,
            convert.time = NULL,
            calib.growth = NULL,
            calib.fl = NULL,
@@ -646,7 +646,7 @@ parse_data <-
            dec.data = ".",
            csvsep.map = ";",
            dec.map = ".",
-           subtract.blank  = T,
+           subtract.blank  = TRUE,
            calib.growth = NULL,
            calib.fl = NULL,
            calib.fl2 = NULL,
@@ -661,13 +661,13 @@ parse_data <-
       # Read table file
       input <- read_file(data.file, csvsep=csvsep.data, dec=dec.data, sheet=sheet.data)
     } else {
-      stop(paste0("File \"", data.file, "\" does not exist."), call. = F)
+      stop(paste0("File \"", data.file, "\" does not exist."), call. = FALSE)
     }
     if(!is.null(map.file)){
       if (file.exists(map.file)) {
         mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=sheet.map)
       } else {
-        stop(paste0("File \"", map.file, "\" does not exist."), call. = F)
+        stop(paste0("File \"", map.file, "\" does not exist."), call. = FALSE)
       }
     }
     if(any(grep("Gen5|Gen6", software, ignore.case = TRUE))){
@@ -814,18 +814,18 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
           dec = dec,
           sep = csvsep,
           blank.lines.skip = FALSE,
-          header = F,
-          stringsAsFactors = F,
-          fill = T,
+          header = FALSE,
+          stringsAsFactors = FALSE,
+          fill = TRUE,
           na.strings = "",
           quote = "",
           comment.char = "",
-          check.names = F,
+          check.names = FALSE,
           col.names = paste0("V", seq_len(ncols))
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "xls" |
                stringr::str_replace(filename, ".{1,}\\.", "") == "xlsx") {
-      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = F, sheet = sheet, progress = TRUE)))
+      dat <- data.frame(suppressMessages(readxl::read_excel(filename, col_names = FALSE, sheet = sheet, progress = TRUE)))
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "tsv") {
       ncols <- max(utils::count.fields(filename))
       dat <-
@@ -834,13 +834,13 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
           dec = dec,
           blank.lines.skip = FALSE,
           sep = "\t",
-          header = F,
-          stringsAsFactors = F,
-          fill = T,
+          header = FALSE,
+          stringsAsFactors = FALSE,
+          fill = TRUE,
           na.strings = "",
           quote = "",
           comment.char = "",
-          check.names = F,
+          check.names = FALSE,
           col.names = paste0("V", seq_len(ncols))
         )
     } else if (stringr::str_replace_all(filename, ".{1,}\\.", "") == "txt") {
@@ -850,13 +850,13 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
           filename,
           dec = dec,
           sep = "\t",
-          header = F,
-          stringsAsFactors = F,
-          fill = T,
+          header = FALSE,
+          stringsAsFactors = FALSE,
+          fill = TRUE,
           na.strings = "",
           quote = "",
           comment.char = "",
-          check.names = F,
+          check.names = FALSE,
           col.names = paste0("V", seq_len(ncols))
         )
     } else {
@@ -866,7 +866,7 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
       )
     }
   } else {
-    stop(paste0("File \"", filename, "\" does not exist."), call. = F)
+    stop(paste0("File \"", filename, "\" does not exist."), call. = FALSE)
   }
   return(dat)
 }

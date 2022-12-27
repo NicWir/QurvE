@@ -183,7 +183,7 @@ growth.report <- function(
             sep = ""
         )
     }
-    dir.create(wd, showWarnings = F)
+    dir.create(wd, showWarnings = FALSE)
     message("Render reports...")
     for (i in 1:length(.libPaths()))
         {
@@ -437,7 +437,7 @@ fl.report <- function(
             sep = ""
         )
     }
-    dir.create(wd, showWarnings = F)
+    dir.create(wd, showWarnings = FALSE)
     message("Render reports...")
     # for(i in 1:length(.libPaths())){ QurvE.ndx
     # <- grep('QurvE',

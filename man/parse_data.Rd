@@ -16,7 +16,7 @@ parse_data(
   dec.data = ".",
   csvsep.map = ";",
   dec.map = ".",
-  subtract.blank = T,
+  subtract.blank = TRUE,
   calib.growth = NULL,
   calib.fl = NULL,
   calib.fl2 = NULL,

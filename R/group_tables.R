@@ -42,7 +42,7 @@ table_group_fluorescence_linear <- function(flTable, html = FALSE)
                                                                                                            unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), nm[ndx.filt.rep[[j]]])]))
   }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
 
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
@@ -124,7 +124,7 @@ table_group_fluorescence_linear <- function(flTable, html = FALSE)
                                                              ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                       tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
                                                                     "", tmu.end.sd[x])))),
-                                   stringsAsFactors = F, check.names = F)
+                                   stringsAsFactors = FALSE, check.names = FALSE)
 
   if(html == TRUE){
     colnames(table_linear_group) <- c("Sample|Conc.", "slope<sub>max</sub>", "lagtime",
@@ -179,7 +179,7 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
                                                                                                            unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), nm[ndx.filt.rep[[j]]])]))
   }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
 
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
@@ -248,7 +248,7 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
                                                              ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                       tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                     "", tmax.sd[x])))),
-                                   check.names = F)
+                                   check.names = FALSE)
 
   if(html == TRUE){
     colnames(table_spline_group) <- c("Sample|Conc.", "slope<sub>max</sub>", "lagtime",
@@ -302,7 +302,7 @@ table_group_growth_linear <- function(gcTable, html = FALSE)
                                                                                                            unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), nm[ndx.filt.rep[[j]]])]))
   }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
 
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
@@ -400,7 +400,7 @@ table_group_growth_linear <- function(gcTable, html = FALSE)
                                                              ifelse(tmu.end.mean[x] == 0 || tmu.end.mean[x] == "" || tmu.end.mean[x] == "" ||
                                                                       tmu.end.sd[x] == 0 || tmu.end.sd[x] == "" || tmu.end.sd[x] == "",
                                                                     "", tmu.end.sd[x])))),
-                                   stringsAsFactors = F, check.names = F)
+                                   stringsAsFactors = FALSE, check.names = FALSE)
 
   if(html == TRUE){
     colnames(table_linear_group) <- c("Sample|Conc.", "mu<sub>max</sub>", "t<sub>D</sub>", "lagtime",
@@ -452,7 +452,7 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
                                                                                                            unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), nm[ndx.filt.rep[[j]]])]))
   }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
 
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
@@ -533,7 +533,7 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
                                                          ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                   tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                 "", tmax.sd[x])))),
-                                   check.names = F)
+                                   check.names = FALSE)
 
   if(html == TRUE){
     colnames(table_spline_group) <- c("Sample|Conc.", "mu<sub>max</sub>", "t<sub>D</sub>", "lagtime",
@@ -586,7 +586,7 @@ table_group_growth_model <- function(gcTable, html = FALSE)
                                                                                                            unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
                                                                                                            "$"), nm[ndx.filt.rep[[j]]])]))
   }
-  ndx.filt <- unlist(filter.ls, recursive = F)
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
 
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
@@ -655,7 +655,7 @@ table_group_growth_model <- function(gcTable, html = FALSE)
                                                   ifelse(dY.mean[x] == 0 || dY.mean[x] == "" || dY.mean[x] == "" ||
                                                            dY.sd[x] == 0 || dY.sd[x] == "" || dY.sd[x] == "",
                                                          "", dY.sd[x])))),
-                                  check.names = F)
+                                  check.names = FALSE)
 
   if(html == TRUE){
     colnames(table_model_group) <- c("Sample|Conc.", "mu<sub>max</sub>", "t<sub>D</sub>", "lagtime",
@@ -682,16 +682,16 @@ table_group_growth_model <- function(gcTable, html = FALSE)
 get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
 {
   if(!is.null(param2)){
-    avg <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
-                    is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
-                  "", ifelse(is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) )),
-                             round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
-                             paste0("<strong>", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
-                                    "</strong>", " (", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) ), 3), ")")))
+    avg <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ) == 0 |
+                    is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) )),
+                  "", ifelse(is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = TRUE)) )),
+                             round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ), 3),
+                             paste0("<strong>", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ), 3),
+                                    "</strong>", " (", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = TRUE)) ), 3), ")")))
   } else {
-    avg <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
-                    is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
-                  "", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3)
+    avg <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ) == 0 |
+                    is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) )),
+                  "", round(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ), 3)
     )
   }
   avg <- unlist(lapply(1:length(avg), function (x) ifelse(is.na(avg[x]), "", avg[x])) )
@@ -715,16 +715,16 @@ get_avg_param <- function(table = data.frame(), ndx.rep = list(), param1, param2
 get_sd_param <- function(table = data.frame(), ndx.rep = list(), param1, param2 = NULL)
 {
   if(!is.null(param2)){
-    sd <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
-                   is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
-                 "", ifelse(is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) )),
-                            round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
-                            paste0("<strong>", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3),
-                                   "</strong>", " (", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param2]), na.rm = T)) ), 3), ")")))
+    sd <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ) == 0 |
+                   is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) )),
+                 "", ifelse(is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param2]), na.rm = TRUE)) )),
+                            round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ), 3),
+                            paste0("<strong>", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ), 3),
+                                   "</strong>", " (", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param2]), na.rm = TRUE)) ), 3), ")")))
   } else {
-    sd <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ) == 0 |
-                   is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) )),
-                 "", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = T)) ), 3)
+    sd <- ifelse(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ) == 0 |
+                   is.na(unlist(lapply(1:length(ndx.rep), function (x) mean(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) )),
+                 "", round(unlist(lapply(1:length(ndx.rep), function (x) sd(as.numeric(table[ndx.rep[[x]], param1]), na.rm = TRUE)) ), 3)
     )
   }
   sd <- unlist(lapply(1:length(sd), function (x) ifelse(is.na(sd[x]), "", sd[x])) )

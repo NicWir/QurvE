@@ -35,7 +35,7 @@ Description: High-throughput analysis of growth curves and fluorescence
     smoothing splines or dose-response models. Complete data analysis
     workflows can be executed in a single step via user-friendly wrapper
     functions. The results of these workflows are summarized in detailed
-    reports as well as intuitively navigable R data containers. A shiny
+    reports as well as intuitively navigable 'R' data containers. A 'shiny'
     application provides access to all features without
     requiring any programming knowledge. 
 License: GPL (>= 3)

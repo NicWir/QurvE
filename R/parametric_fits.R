@@ -86,7 +86,7 @@ growth.gcFitModel <- function(
     if (max(data) <
         control$growth.thresh * data[1])
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 paste0(
                   "Parametric fit: No significant growth detected (with all values below ",
@@ -110,7 +110,7 @@ growth.gcFitModel <- function(
     if (length(data) <
         5)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "gcFitModel: There is not enough valid data. Must have at least 5 unique values!"
             )
@@ -133,7 +133,7 @@ growth.gcFitModel <- function(
     if (length(data.growth) <
         5)
         {
-        if (control$suppress.messages == F)
+        if (control$suppress.messages == FALSE)
             message(
                 "gcFitModel: No significant amount of growth values above the start value!"
             )
