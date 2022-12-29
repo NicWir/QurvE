@@ -11,6 +11,7 @@ fl.report(
   ec50 = FALSE,
   format = c("pdf", "html"),
   export = FALSE,
+  parallelize = TRUE,
   ...
 )
 }
@@ -26,6 +27,8 @@ fl.report(
 \item{format}{(Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})}
 
 \item{export}{(Logical) Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?}
+
+\item{parallelize}{(Logical) Create plots using all but one available processor cores (\code{TRUE}) or only a single core (\code{FALSE}).}
 
 \item{...}{Further arguments passed to create a report. Currently required:
 \itemize{
@@ -54,6 +57,6 @@ res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = 's',
                    suppress.messages = TRUE,
                    parallelize = FALSE)
 
-fl.report(res, out.dir = tempdir())
+fl.report(res, out.dir = tempdir(), parallelize = FALSE)
 }
 }

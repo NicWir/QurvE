@@ -22,5 +22,4 @@ cran-comments\.md$
 ^doc$
 ^cran-comments\.md$
 \.RData$
-^Meta$
 ^CRAN-SUBMISSION$

@@ -10,8 +10,26 @@ Unfortunately, there are no references to include regarding this package (yet).
 
 > Please write TRUE and FALSE instead of T and F. Please don't use "T" or "F" as vector names.
 
+Corrected!
 
+> You write information messages to the console that cannot be easily suppressed. -> R/fluorescence_workflows.R; R/dose-response-analysis.R; R/growth_workflows.R; R/linear_fits.R; R/nonparametric_fits.R; R/parametric_fits.R It is more R like to generate objects that can be used to extract the information a user is interested in, and then print() that object. 
+Instead of print()/cat() rather use message()/warning() or
+if(verbose)cat(..) (or maybe stop()) if you really have to write text to the console. (except for print, summary, interactive functions)
 
+Changed most instances of cat() to message(). Some calls to cat() remain if the argument 'suppress.messages' is set to FALSE or 'interactive' is set to TRUE by the user. The latter makes the functions in R/growth_workflows.R interactive.
+
+> Please make sure that you do not change the user's options, par or working directory. If you really have to do so within functions, please ensure with an *immediate* call of on.exit() that the settings are reset when the function is exited.
+
+Thanks a lot for the advice with 'on.exit()'! I implemented the suggested solution whenever par() settings are changed to create plots. 
+
+> Please ensure that you do not use more than 2 cores in your examples, vignettes, etc. -> R/fluorescence_workflows.R; R/growth_workflows.R
+
+Parallelization (using the packages ‘parallel’ and ‘doParallel’) is only used if the argument ‘parallelize’ is set to TRUE in the functions growth.workflow(), fl.workflow(), growth.report(), and fl.report(). I made sure that in the examples, this argument is set to FALSE.
+
+> Please ensure that your functions do not write by default or in your examples/vignettes/tests in the user's home filespace (including the package directory and getwd()). This is not allowed by CRAN policies. 
+Please omit any default path in writing functions. In your examples/vignettes/tests you can write to tempdir().
+
+Changed all default directories for functions writing files to tempdir().
 
 ## R CMD check results
 
@@ -43,6 +61,6 @@ The package contains three detailed vignettes/manuals formatted in HTML. They ar
 
 The accompanying 'shiny app' represents an extensive front-end solution that provides access to all the funtionalities of the `QurvE`package. The `app.R` alone has a size of 892 KB and two high-quality pictures have a combined file size of 483 KB
 
-## Resubmission changes
+### Resubmission changes
 
 Removed 'GithubRepo' and 'GithubUsername' fields from Description
