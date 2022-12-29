@@ -375,13 +375,13 @@ growth.param <- function(time, data, gcID = "undefined", control)
             }  # of if ( (exists((control$model.type)[i])) ...
  else
         {
-            cat((control$model.type)[i])
-            cat("\n")
-            cat(initmodel)
-            cat("\n")
-            stop(
-                "The model definition above does not exist! Spelling error?"
+          stop(
+            paste0(
+              "The model definition '",
+              (control$model.type)[i],
+              " does not exist! Spelling error?"
             )
+          )
         }
         y.model <- NULL
     }

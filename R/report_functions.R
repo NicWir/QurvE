@@ -14,6 +14,7 @@
 #' }
 #' @param ec50 (Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
 #' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
+#' @param parallelize (Logical) Create plots using all but one available processor cores (\code{TRUE}) or only a single core (\code{FALSE}).
 #'
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
@@ -31,7 +32,7 @@
 #' @family reports
 #' @return \code{NULL}
 #' @examples
-#' if(interactive()){
+#' \donttest{
 #' # Create random growth data set
 #'   rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
@@ -45,12 +46,12 @@
 #'                          suppress.messages = TRUE,
 #'                          parallelize = FALSE)
 #'
-#'   growth.report(res)
+#'   growth.report(res, out.dir = tempdir(), parallelize = FALSE)
 #' }
 growth.report <- function(
-    grofit, out.dir = NULL, out.nm = NULL, ec50 = FALSE,
+    grofit, out.dir = tempdir(), out.nm = NULL, ec50 = FALSE,
     format = c("pdf", "html"),
-    export = FALSE, ...
+    export = FALSE, parallelize = TRUE, ...
 )
     {
     if (any(format %in% "pdf"))
@@ -86,7 +87,7 @@ growth.report <- function(
     # calls
     call <- match.call()
     ## remove strictly defined arguments
-    call$grofit <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- NULL
+    call$grofit <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- call$parallelize <- NULL
     arglist <- sapply(call, function(x) x)
     arglist <- unlist(arglist)[-1]
     ## Assign additional arguments (...) as R
@@ -243,6 +244,7 @@ growth.report <- function(
 #' }
 #' @param ec50 (Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
 #' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
+#' @param parallelize (Logical) Create plots using all but one available processor cores (\code{TRUE}) or only a single core (\code{FALSE}).
 #'
 #' @export
 #'
@@ -258,7 +260,7 @@ growth.report <- function(
 #' @return \code{NULL}
 #' @examples
 #' # load example dataset
-#' if(interactive()){
+#' \donttest{
 #' input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    sheet.growth = 1,
@@ -271,12 +273,12 @@ growth.report <- function(
 #'                    suppress.messages = TRUE,
 #'                    parallelize = FALSE)
 #'
-#' fl.report(res)
+#' fl.report(res, out.dir = tempdir(), parallelize = FALSE)
 #' }
 fl.report <- function(
-    flFitRes, out.dir = NULL, out.nm = NULL, ec50 = FALSE,
+    flFitRes, out.dir = tempdir(), out.nm = NULL, ec50 = FALSE,
     format = c("pdf", "html"),
-    export = FALSE, ...
+    export = FALSE, parallelize = TRUE, ...
 )
     {
     if (any(format %in% "pdf"))
@@ -312,7 +314,7 @@ fl.report <- function(
     # calls
     call <- match.call()
     ## remove strictly defined arguments
-    call$flFitRes <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- NULL
+    call$flFitRes <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- call$parallelize <- NULL
     arglist <- sapply(call, function(x) x)
     arglist <- unlist(arglist)[-1]
     ## Assign additional arguments (...) as R

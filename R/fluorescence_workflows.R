@@ -53,6 +53,8 @@
 #'
 flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), parallelize = TRUE, ...)
 {
+  old.options <- options()
+  on.exit(options(old.options))
   # Define objects based on additional function calls
   call <- match.call()
 
@@ -241,7 +243,7 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
 
     ID    <- as.matrix(fl_data[i,1:3])
     wellname <- paste(as.character(fl_data[i,1]), as.character(fl_data[i,2]),as.character(fl_data[i,3]), sep=" | ")
-    if ((control$suppress.messages==FALSE)){
+    if(control$suppress.messages==FALSE){
       cat("\n\n")
       cat(paste("=== ", as.character(i), ". [", wellname, "] fluorescence curve =================================\n", sep=""))
       cat("----------------------------------------------------\n")
@@ -286,7 +288,9 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
             if ("n" %in% answer_satisfied) {
               test_answer <- readline("Enter: t0, h, quota, min.growth, R2, RSD, tmax, growth.max                >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?flFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n")
               if ("n" %in% test_answer) {
-                cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
+                if(control$suppress.messages==FALSE){
+                  cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
+                }
                 reliability_tag_linear              <- FALSE
                 fitlinear$reliable <- FALSE
                 fitlinear.all[[i]]$reliable    <- FALSE
@@ -337,7 +341,9 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
               reliability_tag_linear <- TRUE
               fitlinear$reliable <- TRUE
               fitlinear.all[[i]]$reliable <- TRUE
-              cat("Sample was (more or less) o.k.\n")
+              if(control$suppress.messages==FALSE){
+                cat("Sample was (more or less) o.k.\n")
+              }
             } # end else
           } # end while ("n" %in% answer_satisfied)
         } # end if (("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt))
@@ -383,7 +389,9 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
             if ("n" %in% answer_satisfied) {
               test_answer <- readline("Enter: smooth.fl, t0, min.growth, tmax, max.growth                        >>>> \n\n [Skip (enter 'n'), or smooth.fl, t0, and min.growth (see ?fl.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n ")
               if ("n" %in% test_answer) {
-                cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
+                if(control$suppress.messages==FALSE){
+                  cat("\n Tagged the linear fit of this sample as unreliable !\n\n")
+                }
                 reliability_tag_nonpara              <- FALSE
                 nonpara$reliable <- FALSE
                 fitnonpara.all[[i]]$reliable    <- FALSE
@@ -433,7 +441,9 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
               nonpara$reliable <- TRUE
               fitnonpara.all[[i]]$reliable <- TRUE
               fitnonpara.all[[i]]$FitFlag <- TRUE
-              cat("Sample was (more or less) o.k.\n")
+              if(control$suppress.messages==FALSE){
+                cat("Sample was (more or less) o.k.\n")
+              }
             } # end else
           } # end while ("n" %in% answer_satisfied)
         } # end if (nonpara$fitFlag == TRUE)
@@ -548,8 +558,8 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
 #' @param neg.nan.act (Logical) Indicates whether the program should stop when negative fluorescence values or NA values appear (\code{TRUE}). Otherwise, the program removes these values silently (\code{FALSE}). Improper values may be caused by incorrect data or input errors. Default: \code{FALSE}.
 #' @param clean.bootstrap (Logical) Determines if negative values which occur during bootstrap should be removed (\code{TRUE}) or kept (\code{FALSE}). Note: Infinite values are always removed. Default: \code{TRUE}.
 #' @param report (Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})
-#' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.
-#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "Fluorescenceeport_" and the current date and time.
+#' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files (tables and reports) are stored. If \code{NULL}, the folder will be named with a combination of "FluorescenceResults_" and the current date and time.
+#' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "FluorescenceReport_" and the current date and time.
 #' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}). Only effective if \code{report = TRUE}.
 #' @param export.res (Logical) Create tab-separated TXT files containing calculated parameters and dose-response analysis results as well as an .RData file for the resulting `flFitRes` object.
 #' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
@@ -796,7 +806,7 @@ fl.workflow <- function(grodata = NULL,
       if(export.res){
         export_Table(table = res.table.fl, out.dir = wd, out.nm = "results.fl1")
         message(paste0("\nResults of fluorescence analysis saved as tab-delimited text file in:\n",
-                     "...", gsub(".+/", "", wd), "/results.fl1.txt\n"))
+                       "...", gsub(".+/", "", wd), "/results.fl1.txt\n"))
       }
       # Export grouped results table
       if(("l" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
@@ -855,7 +865,7 @@ fl.workflow <- function(grodata = NULL,
           if(export.res){
             export_Table(table = res.table.dr_fl1, out.dir = wd, out.nm = "results.fl_dr1")
             message(paste0("\nResults of EC50 analysis for fluorescence saved as tab-delimited in:\n",
-                         "...", gsub(".+/", "", wd), "/results.fl_dr1.txt\n"))
+                           "...", gsub(".+/", "", wd), "/results.fl_dr1.txt\n"))
           }
         }
       }
@@ -881,7 +891,7 @@ fl.workflow <- function(grodata = NULL,
 
     if(any(report %in% c('pdf', 'html'))){
       try(fl.report(flFitRes, out.dir = gsub(paste0(getwd(), "/"), "", wd), mean.grp = mean.grp, mean.conc = mean.conc, ec50 = ec50,
-                    export = export.fig, format = report, out.nm = out.nm))
+                    export = export.fig, format = report, out.nm = out.nm, parallelize = parallelize))
     }
   }
 

@@ -7,7 +7,7 @@
 #' @import shiny doParallel knitr
 #' @return Launches a browser with the shiny app
 #' @examples
-#' if(interactive()){
+#' \donttest{
 #' # Run the app
 #' run_app()
 #' }

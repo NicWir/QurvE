@@ -51,6 +51,9 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
   if(methods::is(gcFittedLinear) != "gcFitLinear") stop("x needs to be an object created with growth.gcFitLinear().")
   which <- match.arg(which)
 
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
+
   p <- function(){
     switch(which,
            fit = {
@@ -111,8 +114,6 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
 
            },
            diagnostics = {
-             opar <- par(no.readonly = TRUE)
-             on.exit(par(opar))
              par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis, mfrow=c(1,2))
 
              ## residuals vs. fitted
@@ -135,8 +136,6 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
              axis(2, las=1, mgp = c(3,1,0))
            },
            fit_diagnostics = {
-             opar <- par(no.readonly = TRUE)
-             on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
              par(mar=c(2.1+cex.lab + 0.5*cex.axis, 2.6+1.3*cex.lab+1.2*cex.axis, 4.1+0.2*cex.lab, 3.1),
                  cex.lab = cex.lab, cex.axis = cex.axis)
@@ -242,9 +241,6 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
   if (plot == TRUE){
     p()
   }
-  # restore standard plot parameters
-  par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
-  par(mfrow = c(1, 1))
 }
 
 #' Generic plot function for \code{gcFitModel} objects.
@@ -680,10 +676,13 @@ plot.drBootSpline <- function (x,
 {
   drBootSpline <- x
   colSpline <- scales::alpha(colSpline, 0.15)
+
   # drBootSpline an object of class drBootSpline
   if(methods::is(drBootSpline) != "drBootSpline") stop("x needs to be an object created with growth.drBootSpline.")
   # /// initialize "Empty Plot" function
   empty.plot  <- function(text = "Empty plot", main = "") {
+    opar <- par(no.readonly = TRUE)
+    on.exit(par(opar))
     par(cex.lab = cex.lab, cex.axis = cex.axis)
     plot(c(0, 1, 0, 1, 0), c(0, 1, 1, 0, 0),
       type = "l", axes = FALSE, xlab = "", ylab = "", lwd = lwd,
@@ -708,7 +707,12 @@ plot.drBootSpline <- function (x,
   }
   else{
     p1 <- function(){
-      par(mar=c(2.1+cex.lab + 0.5*cex.axis, 2.1+1.3*cex.lab+1.2*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
+      opar <- par(no.readonly = TRUE)
+      on.exit(par(opar))
+
+      par(mar = c(2.1+cex.lab + 0.5*cex.axis, 2.1 + 1.3*cex.lab + 1.2*cex.axis, 4.1, 3.1),
+          cex.lab = cex.lab,
+          cex.axis = cex.axis)
 
       colSpline   <-
         rep(colSpline, (drBootSpline$control$nboot.dr %/% length(colSpline)) + 1)
@@ -796,6 +800,9 @@ plot.drBootSpline <- function (x,
       }
     }
     p2 <- function(){
+      opar <- par(no.readonly = TRUE)
+      on.exit(par(opar))
+
       layout(matrix(c(1,2), nrow = 1, ncol = 2))
       if (sum(!is.na(drBootSpline$ec50.boot)) > 5) {
         hist(
@@ -825,6 +832,10 @@ plot.drBootSpline <- function (x,
       }
     } # p2 <- function()
     p3 <- function(){
+      opar <- par(no.readonly = TRUE)
+      on.exit(par(opar))
+      on.exit(par(mfrow = c(1, 1)))
+
       layout(matrix(c(1,1,1,2,2, 1,1,1,3,3), nrow = 5, ncol = 2))
 
       par(cex.lab = cex.lab, cex.axis = cex.axis)
@@ -964,7 +975,6 @@ plot.drBootSpline <- function (x,
 
         w2 <- width
         h2 <- height
-        dir.create(paste0(getwd(), "/Plots"), showWarnings = FALSE)
         grDevices::png(paste0(out.dir, "/", paste(drBootSpline$drID, collapse = "_"), "_drBootSplinesEC50.png"),
                        width = w2, height = h2, units = 'in', res = 300)
         p2()
@@ -1004,10 +1014,6 @@ plot.drBootSpline <- function (x,
       }
     }
   } # /// else of if (drBootSpline$bootFlag==FALSE){
-
-  # restore standard plot parameters
-  par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
-  par(mfrow = c(1, 1))
 }
 
 #' Generic plot function for \code{drFit} objects.
@@ -1078,6 +1084,10 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL, ...)
 {
   drFit <- x
+
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
+
   # x an object of class drFit
   if(methods::is(drFit) != "drFit") stop("x needs to be an object of class 'drFit', created with growth.drFit() or fl.drFit(control=fl.control(dr.method='spline').")
   if(length(drFit) == 1) stop("drFit is NA. Please run growth.drFit() with valid data input or growth.workflow() with 'ec50 = T'.")
@@ -1286,7 +1296,7 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
         print(p)
         grDevices::dev.off()
 
-        cat(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
+        message(paste0("drFit plots exported to: ", out.dir, "/", out.nm))
       }
       if (plot == TRUE){
         print(p)
@@ -1372,6 +1382,7 @@ plot.drFitSpline <- function (x,
     stop("Need numeric value for: pch")
   if (is.numeric(cex.point) == FALSE)
     stop("Need numeric value for: cex.point")
+
   p <- function(){
     if(drFitSpline$control$log.x.dr == TRUE){
       x_data <- log(drFitSpline$raw.conc + 1)
@@ -1388,7 +1399,6 @@ plot.drFitSpline <- function (x,
     if (add == FALSE) {
       opar <- par(no.readonly = TRUE)
       on.exit(par(opar))
-
       par(mar=c(2.1+cex.lab + 0.5*cex.axis, 2.1+1.3*cex.lab+1.2*cex.axis, 4.1, 3.1), mgp=c(3, 1, 0), las=0)
       par(cex.lab = cex.lab, cex.axis = cex.axis)
 
@@ -1573,6 +1583,10 @@ plot.drFitModel <- function(x,
   conc <- drFitModel$raw.conc
   test <- drFitModel$raw.test
   bp <- ifelse(missing(bp)||!exists("bp")||bp == "", rlang::missing_arg(), bp)
+
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
+
   if(missing(bp)){
     log10cl <- round(log10(min(conc[conc > 0]))) - 1
     bp <- 10^(log10cl)
@@ -1806,9 +1820,6 @@ plot.drFitModel <- function(x,
       grDevices::dev.off()
     }
   }
-  # restore standard plot parameters
-  par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
-  par(mfrow = c(1, 1))
 }
 
 #' Generic plot function for \code{gcBootSpline} objects.
@@ -1863,6 +1874,8 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
 {
   gcBootSpline <- x
   colSpline <- ggplot2::alpha(colSpline, 0.2)
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
   # gcBootSpline an object of class gcBootSpline
   if(methods::is(gcBootSpline) != "gcBootSpline") stop("gcBootSpline needs to be an object created with growth.gcBootSpline.")
   # /// initialize "Empty Plot" function
@@ -2011,8 +2024,6 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
         axis(1, mgp=c(3,1+0.5*cex.axis,0))
       } else { empty.plot("Empty plot!", main=expression(Integral))}
       graphics::mtext(paste(gcBootSpline$gcID, collapse = "_"), side = 3, line = -1, outer = TRUE)
-      par(mfrow=c(1,1))
-      par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p2 <- function()
     p3 <- function()
     {
@@ -2119,8 +2130,6 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
         title(ylab = "Frequency", line = 1 + 0.5*cex.lab+0.5*cex.axis, cex.lab = cex.lab)
         axis(1, mgp=c(3,1+0.5*cex.axis,0))
       } else { empty.plot("Empty plot!", main=expression(Integral))}
-      par(mfrow=c(1,1))
-      par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
     } # p3 <- function()
   }
   if (export == TRUE && (gcBootSpline$bootFlag==TRUE)){
@@ -2186,9 +2195,6 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
     }
 
   }
-  # restore standard plot parameters
-  par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
-  par(mfrow = c(1, 1))
 }
 
 #' Generic plot function for \code{gcFitSpline} objects.

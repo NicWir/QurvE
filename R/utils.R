@@ -408,7 +408,7 @@ initbiosensor <- function(x, y, n)
 #' export_Table(df)
 #' }
 export_Table <- function(
-    table, out.dir = getwd(), out.nm = deparse(substitute(table))
+    table, out.dir = tempdir(), out.nm = deparse(substitute(table))
 )
     {
     out.nm <- gsub("\\.txt$", "", out.nm)
@@ -438,7 +438,7 @@ export_Table <- function(
 #' export_RData(df)
 #' }
 export_RData <- function(
-    object, out.dir = getwd(), out.nm = class(object)
+    object, out.dir = tempdir(), out.nm = class(object)
 )
     {
     # # an object of class grofit or flFitRes

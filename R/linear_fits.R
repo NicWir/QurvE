@@ -1010,7 +1010,7 @@ flFitLinear <- function(time = NULL, growth = NULL, fl_data, ID = "undefined",  
   if(x_type == "time" && length(time) != length(fl_data))
     stop("flFitLinear: length of input vectors (time and fl_data) differ!")
   if (length(fl_data) < 5) {
-    cat("flFitLinear: There is not enough valid data. Must have at least 5!")
+    warning("flFitLinear: There is not enough valid data. Must have at least 5!")
   }
 
   # Consider only data points up to max growth or time, respectively

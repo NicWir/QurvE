@@ -4,7 +4,7 @@
 \alias{export_RData}
 \title{Export an R object as .RData file}
 \usage{
-export_RData(object, out.dir = getwd(), out.nm = class(object))
+export_RData(object, out.dir = tempdir(), out.nm = class(object))
 }
 \arguments{
 \item{object}{An R object.}

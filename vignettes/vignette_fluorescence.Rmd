@@ -107,9 +107,15 @@ knitr::include_graphics("https://i.imgur.com/wW5fj0X.png", error = F)
 
 
 ```r
-flFitRes <- fl.workflow(grodata = input, fit.opt = c("s", "l"),
-    x_type = "time", norm_fl = TRUE, ec50 = TRUE, dr.parameter = "dY.spline",
-    suppress.messages = TRUE, export.res = FALSE)  # Prevent creating TXT table and RData files with results
+flFitRes <- fl.workflow(grodata = input, 
+    fit.opt = c("s", "l"),
+    x_type = "time", 
+    norm_fl = TRUE, 
+    ec50 = TRUE, 
+    dr.parameter = "dY.spline",
+    suppress.messages = TRUE, 
+    export.res = FALSE, # Prevent creating TXT table and RData files with results
+    parallelize = FALSE) # Use only one available CPU core
 ```
 
 If option <span style='color: red;'>`export.res`</span> is set to <span style='color: red;'>`TRUE`</span>, tab-delimited .txt files summarizing the computation results are created automatically, as well as the `flFitRes` object (an object of class `flFitRes`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:flFitRes-container) shows the structure of the generated `flFitRes` object. In RStudio, `View(flFitRes)` allows interactive inspection of the data container.
@@ -226,7 +232,8 @@ flFitRes <- fl.workflow(grodata = input,
                           ec50 = TRUE,
                           dr.parameter = "dY.spline",
                           suppress.messages = TRUE,
-                          export.res = FALSE)
+                          export.res = FALSE,
+                          parallelize = FALSE)
 ```
 
 

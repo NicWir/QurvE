@@ -4,7 +4,7 @@
 \alias{export_Table}
 \title{Export a tabular object as tab-separated .txt file}
 \usage{
-export_Table(table, out.dir = getwd(), out.nm = deparse(substitute(table)))
+export_Table(table, out.dir = tempdir(), out.nm = deparse(substitute(table)))
 }
 \arguments{
 \item{table}{A tabular R object (dataframe, matrix, array)}

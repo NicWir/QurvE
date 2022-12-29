@@ -13,7 +13,7 @@ Launches a browser with the shiny app
 Run Shiny QurvE App
 }
 \examples{
-if(interactive()){
+\donttest{
 # Run the app
 run_app()
 }

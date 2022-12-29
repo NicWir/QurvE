@@ -90,6 +90,9 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
     }
   }
 
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
+
   p <- function(){
     switch(which,
            fit = {
@@ -151,8 +154,7 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
                              cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
            },
            diagnostics = {
-             opar <- par(no.readonly = TRUE)
-             on.exit(par(opar))
+
              par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), cex.lab = cex.lab, cex.axis = cex.axis, mfrow=c(1,2))
 
              ## residuals vs. fitted
@@ -176,8 +178,6 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
            },
            fit_diagnostics = {
 
-             opar <- par(no.readonly = TRUE)
-             on.exit(par(opar))
              layout(matrix(c(1,1,2,3), nrow=2, byrow=TRUE))
              par(mar=c(5.1, 4.1+cex.lab, 4.1, 3.1), mai = c(0.7 + 0.05*cex.lab + 0.05*cex.axis, 0.7 + 0.2*cex.lab + 0.2*cex.axis, 0.5, 0.5), cex.lab = cex.lab, cex.axis = cex.axis)
 
@@ -1050,6 +1050,10 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
     empty.plot()
   }
   else{
+
+    opar <- par(no.readonly = TRUE)
+    on.exit(par(opar))
+
     p1 <- function()
     {
       par(cex.lab = cex.lab, cex.axis = cex.axis)
@@ -1350,9 +1354,6 @@ plot.flBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
       p3()
     }
   }
-  # restore standard plot parameters
-  par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
-  par(mfrow = c(1, 1))
 }
 
 #' Generic plot function for \code{drFitFLModel} objects.
@@ -1407,6 +1408,8 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
                               height = 7, width = 9, out.dir = NULL,
                               ...)
 {
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
   drFittedFLModel <- x
   # drFittedFLModel an object of class drFittedFLModel
   if(methods::is(drFittedFLModel) != "drFitFLModel") stop("x needs to be an object created with fl.drFitModel().")
@@ -1504,9 +1507,6 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
     y.lim
   }
   p <- function(){
-    opar <- par(no.readonly = TRUE)
-    on.exit(par(opar))
-
     par(mar=c(5.1+cex.lab, 4.1+cex.lab+0.5*cex.axis, 4.1, 3.1), cex.lab = cex.lab, cex.axis = cex.axis)
     if ((drFittedFLModel$control$log.x.dr == TRUE) && (drFittedFLModel$control$log.y.dr == TRUE)) {
       plot(

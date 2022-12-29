@@ -22,15 +22,18 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-library(doParallel, quietly =  TRUE)
-library(foreach, quietly =  TRUE)
 dir.create(paste0(tempdir(),"/Plots"), showWarnings = F)
 wd.plots <- paste0(wd,"/Plots")
 if(export == T){
  dir.create(wd.plots, showWarnings = F)
 }
-cl <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE)-1)
-doParallel::registerDoParallel(cl)
+if(parallelize){
+  library(doParallel, quietly =  TRUE)
+  library(foreach, quietly =  TRUE)
+  cl <- parallel::makeCluster(parallel::detectCores(all.tests = FALSE, logical = TRUE)-1)
+  doParallel::registerDoParallel(cl)
+}
+
 knitr::opts_chunk$set(dev = "pdf")
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
 knit_table <- function(df, caption){
@@ -719,6 +722,7 @@ if(any(c("s") %in% control$fit.opt)) {
     ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
   if(all(c('pdf', 'html') %in% format)){
     if (knitr::is_latex_output()) {
+      if(parallelize){
       foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
@@ -731,21 +735,47 @@ if(any(c("s") %in% control$fit.opt)) {
                 invisible(dev.off())
               }
             }
+      } else {
+        for(i in 1:length(flFitRes[["flFit"]][["flFittedSplines"]])){
+          if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
+                ))))), ".pdf")))
+                suppressWarnings(
+                  plot.ggSpline()
+                )
+                invisible(dev.off())
+              }
+        }
+      }
     }
   } else{
-    foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
+    if(parallelize){
+      foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
             .packages = "ggplot2") %dopar% {
               if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|>|<|\\(|\\)", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
                   "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
-                ))))),  ".pdf"))
-                )
+                ))))), ".pdf")))
                 suppressWarnings(
                   plot.ggSpline()
                 )
                 invisible(dev.off())
               }
             }
+      } else {
+        for(i in 1:length(flFitRes[["flFit"]][["flFittedSplines"]])){
+          if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
+                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
+                ))))), ".pdf")))
+                suppressWarnings(
+                  plot.ggSpline()
+                )
+                invisible(dev.off())
+              }
+        }
+      }
   }
   
   Files_list <- list.files(path = plotdir,

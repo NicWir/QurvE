@@ -57,226 +57,228 @@
 #' }
 growth.drFit <- function(
     gcTable, control = growth.control(
-        dr.method = "model", dr.model = c(
-            "gammadr", "multi2", "LL.2", "LL.3", "LL.4",
-            "LL.5", "W1.2", "W1.3", "W1.4", "W2.2",
-            "W2.3", "W2.4", "LL.3u", "LL2.2", "LL2.3",
-            "LL2.3u", "LL2.4", "LL2.5", "AR.2", "AR.3",
-            "MM.2"
-        ),
-        dr.have.atleast = 6, dr.parameter = "mu.linear",
-        nboot.dr = 0, smooth.dr = NULL, log.x.dr = FALSE,
-        log.y.dr = FALSE
+      dr.method = "model", dr.model = c(
+        "gammadr", "multi2", "LL.2", "LL.3", "LL.4",
+        "LL.5", "W1.2", "W1.3", "W1.4", "W2.2",
+        "W2.3", "W2.4", "LL.3u", "LL2.2", "LL2.3",
+        "LL2.3u", "LL2.4", "LL2.5", "AR.2", "AR.3",
+        "MM.2"
+      ),
+      dr.have.atleast = 6, dr.parameter = "mu.linear",
+      nboot.dr = 0, smooth.dr = NULL, log.x.dr = FALSE,
+      log.y.dr = FALSE
     )
 )
-    {
-    if (methods::is(control) !=
-        "grofit.control" && methods::is(control) !=
-        "fl.control")
-        stop(
-            "control must be of class grofit.control or fl.control!"
+{
+  if (methods::is(control) !=
+      "grofit.control" && methods::is(control) !=
+      "fl.control")
+    stop(
+      "control must be of class grofit.control or fl.control!"
+    )
+  EC50.table <- NULL
+  if (is.character(control$dr.parameter))
+  {
+    dr.parameter <- match(control$dr.parameter, colnames(gcTable))
+  }
+  FitData <- gcTable[!is.na(gcTable[, 1]),
+  ]
+  table.tests <- table(
+    (FitData[, 1])[which(
+      (FitData[, 4] == TRUE) & (is.na(FitData[, dr.parameter]) ==
+                                  FALSE)
+    )]
+  )
+  distinct <- names(table.tests)
+  EC50 <- list()
+  EC50.boot <- list()
+  validdata <- cbind(
+    as.character(distinct),
+    table.tests
+  )
+  colnames(validdata) <- c("TestID", "Number")
+  rownames(validdata) <- rep("     ", times = dim(validdata)[1])
+  if (control$suppress.messages == FALSE)
+  {
+    cat("\n")
+    cat(
+      "=== EC 50 Estimation ==============================\n"
+    )
+    cat(
+      "---------------------------------------------------\n"
+    )
+    cat("--> Checking data ...\n")
+    cat(
+      paste(
+        "--> Number of distinct tests found:",
+        as.character(length(distinct))
+      ),
+      "\n"
+    )
+    cat("--> Valid datasets per test: \n")
+    print(validdata, quote = FALSE)
+  }
+  if (TRUE %in% (table.tests < control$dr.have.atleast))
+  {
+    if (control$suppress.messages == FALSE){
+      cat(
+        paste(
+          "Warning: following tests have not enough ( <",
+          as.character(control$dr.have.atleast - 1),
+          ") datasets:\n"
         )
-    EC50.table <- NULL
-    if (is.character(control$dr.parameter))
+      )
+      cat(
+        distinct[(table.tests < control$dr.have.atleast)]
+      )
+      cat("These tests will not be regarded\n")
+      distinct <- distinct[table.tests >= control$dr.have.atleast]
+    }
+  }
+  if ((length(distinct)) ==
+      0)
+  {
+    warning(
+      paste(
+        "There are no tests having enough ( >",
+        as.character(control$dr.have.atleast - 1),
+        ") datasets!\n"
+      )
+    )
+  } else
+  {
+    skip <- c()
+
+    for (i in 1:length(distinct))
+    {
+      conc <- factor(
+        (FitData[, 3])[which(FitData[, 1] == distinct[i])]
+      )
+      test <- (as.numeric(FitData[, dr.parameter]))[FitData[,
+                                                            1] == distinct[i]]
+      conc <- as.factor(as.character(conc[!is.na(test)]))
+      test <- test[!is.na(test)]
+
+      if (length(levels(conc)) <
+          4)
+      {
+        message(
+          paste0(
+            distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."
+          )
+        )
+        skip <- c(skip, i)
+        next
+      }
+
+      names(test) <- rep(
+        names(FitData)[dr.parameter],
+        length(test)
+      )
+      drID <- distinct[i]
+      if (control$dr.method == "spline")
+      {
+        EC50[[i]] <- growth.drFitSpline(conc, test, drID, control)
+        if (control$nboot.dr > 0)
         {
-        dr.parameter <- match(control$dr.parameter, colnames(gcTable))
+          EC50.boot[[i]] <- growth.drBootSpline(conc, test, drID, control)
+        } else
+        {
+          EC50.boot[[i]] <- list(
+            raw.time = conc, raw.data = test,
+            drID = drID, boot.x = NA, boot.y = NA,
+            boot.drSpline = NA, ec50.boot = NA,
+            bootFlag = FALSE, control = control
+          )
+          class(EC50.boot[[i]]) <- "drBootSpline"
+        }
+      } else
+      {
+        EC50[[i]] <- growth.drFitModel(conc, test, drID, control)
+      }
+      description <- data.frame(
+        Test = distinct[i], log.x = control$log.x.dr,
+        log.y = control$log.y.dr, Samples = control$nboot.dr
+      )
+      if (control$dr.method == "spline")
+        out.row <- cbind(
+          description, summary.drFitSpline(EC50[[i]]),
+          summary.drBootSpline(EC50.boot[[i]])
+        ) else out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
+
+      if (!is.na(out.row[1, 5]) &&
+          out.row[1, 5] != "NA")
+        EC50.table <- rbind(
+          as.data.frame(EC50.table),
+          out.row
+        ) else
+        {
+          return(NA)
+        }
+
+      class(EC50.table) <- c("drTable", "list")
     }
-    FitData <- gcTable[!is.na(gcTable[, 1]),
-        ]
-    table.tests <- table(
-        (FitData[, 1])[which(
-            (FitData[, 4] == TRUE) & (is.na(FitData[, dr.parameter]) ==
-                FALSE)
-        )]
-    )
-    distinct <- names(table.tests)
-    EC50 <- list()
-    EC50.boot <- list()
-    validdata <- cbind(
-        as.character(distinct),
-        table.tests
-    )
-    colnames(validdata) <- c("TestID", "Number")
-    rownames(validdata) <- rep("     ", times = dim(validdata)[1])
-    if (control$suppress.messages == FALSE)
-    {
-        cat("\n")
-        cat(
-            "=== EC 50 Estimation ==============================\n"
-        )
-        cat(
-            "---------------------------------------------------\n"
-        )
-        cat("--> Checking data ...\n")
-        cat(
-            paste(
-                "--> Number of distinct tests found:",
-                as.character(length(distinct))
-            ),
-            "\n"
-        )
-        cat("--> Valid datasets per test: \n")
-        print(validdata, quote = FALSE)
-    }
-    if (TRUE %in% (table.tests < control$dr.have.atleast))
-    {
-        cat(
-            paste(
-                "Warning: following tests have not enough ( <",
-                as.character(control$dr.have.atleast - 1),
-                ") datasets:\n"
-            )
-        )
-        cat(
-            distinct[(table.tests < control$dr.have.atleast)]
-        )
-        cat("These tests will not be regarded\n")
-        distinct <- distinct[table.tests >= control$dr.have.atleast]
-    }
-    if ((length(distinct)) ==
+  }
+  if (exists("skip") &&
+      !is.null(skip))
+  {
+    distinct <- distinct[-skip]
+    EC50 <- EC50[-skip]
+    EC50.boot <- EC50.boot[-skip]
+  }
+  if (control$dr.method == "spline")
+  {
+    if (length(EC50) ==
         0)
-        {
-        cat(
-            paste(
-                "There are no tests having enough ( >",
-                as.character(control$dr.have.atleast - 1),
-                ") datasets!\n"
-            )
-        )
+    {
+      return(NA)
+    }
+    names(EC50) <- names(EC50.boot) <- distinct
+    fitflags <- unlist(
+      lapply(
+        1:length(EC50),
+        function(x) EC50[[x]]$fitFlag
+      )
+    )
+    if (all(isFALSE(fitflags)))
+    {
+      drFit <- NA
     } else
     {
-        skip <- c()
-
-        for (i in 1:length(distinct))
-            {
-            conc <- factor(
-                (FitData[, 3])[which(FitData[, 1] == distinct[i])]
-            )
-            test <- (as.numeric(FitData[, dr.parameter]))[FitData[,
-                1] == distinct[i]]
-            conc <- as.factor(as.character(conc[!is.na(test)]))
-            test <- test[!is.na(test)]
-
-            if (length(levels(conc)) <
-                4)
-                {
-                message(
-                  paste0(
-                    distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."
-                )
-              )
-                skip <- c(skip, i)
-                next
-            }
-
-            names(test) <- rep(
-                names(FitData)[dr.parameter],
-                length(test)
-            )
-            drID <- distinct[i]
-            if (control$dr.method == "spline")
-            {
-                EC50[[i]] <- growth.drFitSpline(conc, test, drID, control)
-                if (control$nboot.dr > 0)
-                {
-                  EC50.boot[[i]] <- growth.drBootSpline(conc, test, drID, control)
-                } else
-                {
-                  EC50.boot[[i]] <- list(
-                    raw.time = conc, raw.data = test,
-                    drID = drID, boot.x = NA, boot.y = NA,
-                    boot.drSpline = NA, ec50.boot = NA,
-                    bootFlag = FALSE, control = control
-                )
-                  class(EC50.boot[[i]]) <- "drBootSpline"
-                }
-            } else
-            {
-                EC50[[i]] <- growth.drFitModel(conc, test, drID, control)
-            }
-            description <- data.frame(
-                Test = distinct[i], log.x = control$log.x.dr,
-                log.y = control$log.y.dr, Samples = control$nboot.dr
-            )
-            if (control$dr.method == "spline")
-                out.row <- cbind(
-                  description, summary.drFitSpline(EC50[[i]]),
-                  summary.drBootSpline(EC50.boot[[i]])
-              ) else out.row <- cbind(description, summary.drFitModel(EC50[[i]]))
-
-            if (!is.na(out.row[1, 5]) &&
-                out.row[1, 5] != "NA")
-                EC50.table <- rbind(
-                  as.data.frame(EC50.table),
-                  out.row
-              ) else
-            {
-                return(NA)
-            }
-
-            class(EC50.table) <- c("drTable", "list")
-        }
+      drFit <- list(
+        raw.data = FitData, drTable = EC50.table,
+        drBootSplines = EC50.boot, drFittedSplines = EC50,
+        control = control
+      )
     }
-    if (exists("skip") &&
-        !is.null(skip))
-            {
-        distinct <- distinct[-skip]
-        EC50 <- EC50[-skip]
-        EC50.boot <- EC50.boot[-skip]
-    }
-    if (control$dr.method == "spline")
+  } else
+  {
+    if (length(EC50) ==
+        0)
     {
-        if (length(EC50) ==
-            0)
-            {
-            return(NA)
-        }
-        names(EC50) <- names(EC50.boot) <- distinct
-        fitflags <- unlist(
-            lapply(
-                1:length(EC50),
-                function(x) EC50[[x]]$fitFlag
-            )
-        )
-        if (all(isFALSE(fitflags)))
-            {
-            drFit <- NA
-        } else
-        {
-            drFit <- list(
-                raw.data = FitData, drTable = EC50.table,
-                drBootSplines = EC50.boot, drFittedSplines = EC50,
-                control = control
-            )
-        }
+      return(NA)
+    }
+    names(EC50) <- distinct
+    fitflags <- unlist(
+      lapply(
+        1:length(EC50),
+        function(x) EC50[[x]]$fitFlag
+      )
+    )
+    if (all(isFALSE(fitflags)))
+    {
+      drFit <- NA
     } else
     {
-        if (length(EC50) ==
-            0)
-            {
-            return(NA)
-        }
-        names(EC50) <- distinct
-        fitflags <- unlist(
-            lapply(
-                1:length(EC50),
-                function(x) EC50[[x]]$fitFlag
-            )
-        )
-        if (all(isFALSE(fitflags)))
-            {
-            drFit <- NA
-        } else
-        {
-            drFit <- list(
-                raw.data = FitData, drTable = EC50.table,
-                drFittedModels = EC50, control = control
-            )
-        }
+      drFit <- list(
+        raw.data = FitData, drTable = EC50.table,
+        drFittedModels = EC50, control = control
+      )
     }
+  }
 
-    class(drFit) <- "drFit"
-    invisible(drFit)
+  class(drFit) <- "drFit"
+  invisible(drFit)
 }
 
 #' Perform a smooth spline fit on response vs. concentration data of a single sample to determine the EC50.
@@ -333,312 +335,312 @@ growth.drFit <- function(
 growth.drFitSpline <- function(
     conc, test, drID = "undefined", control = growth.control()
 )
-    {
-    if (methods::is(control) !=
-        "grofit.control" && methods::is(control) !=
-        "fl.control")
-        stop(
-            "control must be of class grofit.control or fl.control!"
-        )
-    test.nm <- names(test)[1]
-    test <- as.vector(as.numeric(as.matrix(test)))
-    conc <- as.vector(as.numeric(as.matrix(conc)))
-    if (is.vector(conc) ==
-        FALSE || is.vector(test) ==
-        FALSE)
-        stop(
-            "growth.drFitSpline: dose or response data must be a vector !"
-        )
-    if (control$neg.nan.act == FALSE)
-    {
-        missings <- is.na(conc) |
-            is.na(test) |
-            !is.numeric(conc) |
-            !is.numeric(test)
-        conc <- conc[!missings]
-        test <- test[!missings]
-        negs <- (conc < 0) | (test < 0)
-        conc <- conc[!negs]
-        test <- test[!negs]
-    } else
-    {
-        if (sum(
-            is.na(conc) |
-                is.na(test)
-        ))
-            stop(
-                "growth.drFitSpline: NA values encountered. Program terminated"
-            )
-        if ((sum((conc < 0)) >
-            0) | (sum((test < 0)) >
-            0))
-            stop(
-                "growth.drFitSpline: Negative values encountered. Program terminated"
-            )
-        if ((FALSE %in% is.numeric(conc)) ||
-            (FALSE %in% is.numeric(test)))
-            stop(
-                "growth.drFitSpline: Non numeric values encountered. Program terminated"
-            )
-    }
-    if (length(test) <
-        6)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "drFitSpline: There is not enough valid data. Must have at least 6 unique values!"
-            )
-        drFitSpline <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                yEC50.orig = NA, test = test.nm
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitSpline) <- "drFitSpline"
-        return(drFitSpline)
-    }
-    if (length(test) <
-        control$dr.have.atleast)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "drFitSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
-            )
-        drFitSpline <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                yEC50.orig = NA, test = test.nm
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitSpline) <- "drFitSpline"
-        return(drFitSpline)
-    }
-    if (control$log.x.dr == TRUE)
-        conc.log <- log(conc + 1)
-    if (control$log.y.dr == TRUE)
-        test.log <- log(test + 1)
-    if (control$log.x.dr == TRUE)
-    {
-        conc.fit <- log(conc + 1)
-    } else
-    {
-        conc.fit <- conc
-    }
-    if (control$log.y.dr == TRUE)
-    {
-        test.fit <- log(test + 1)
-    } else
-    {
-        test.fit <- test
-    }
-    spltest <- NULL
-    fitFlag <- TRUE
-
-    # perform first lowess spline fit followed by
-    # smooth.spline onf lowess results
-    try(
-        spltest.low <- lowess(conc.fit, test.fit, f = 0.1),
-        silent = TRUE
+{
+  if (methods::is(control) !=
+      "grofit.control" && methods::is(control) !=
+      "fl.control")
+    stop(
+      "control must be of class grofit.control or fl.control!"
     )
-    try(
-        spltest.low$y <- spltest.low$y[!duplicated(spltest.low$x)],
-        silent = TRUE
+  test.nm <- names(test)[1]
+  test <- as.vector(as.numeric(as.matrix(test)))
+  conc <- as.vector(as.numeric(as.matrix(conc)))
+  if (is.vector(conc) ==
+      FALSE || is.vector(test) ==
+      FALSE)
+    stop(
+      "growth.drFitSpline: dose or response data must be a vector !"
     )
-    try(
-        spltest.low$x <- spltest.low$x[!duplicated(spltest.low$x)],
-        silent = TRUE
-    )
-
-    # assign high weights to concentration values
-    # of 0, response values of 0, and response
-    # values immediately before 0
-    weights <- sapply(
-        1:(length(spltest.low$x) -
-            1), function(i) ifelse(
-            spltest.low$x[[i]] == 0 | spltest.low$y[[i]] ==
-                0 | spltest.low$y[[i + 1]] == 0, 1,
-            0.05
-        )
-    )
-    weights <- c(
-        weights, ifelse(
-            spltest.low$x[length(spltest.low$x)] ==
-                0 | spltest.low$y[length(spltest.low$y)] ==
-                0, 1, 0.05
-        )
-    )
-
-    try(
-        spltest.smooth <- smooth.spline(
-            spltest.low$x, spltest.low$y, spar = control$smooth.dr,
-            keep.data = FALSE, w = weights
-        ),
-        silent = TRUE
-    )
-
-    if (!exists("spltest.smooth") ||
-        is.null(spltest.smooth) ==
-            TRUE)
-            {
-        cat(
-            "Spline could not be fitted in dose-response analysis!\n"
-        )
-        fitFlag <- FALSE
-        if (is.null(control$smooth.dr) ==
-            TRUE)
-            {
-            cat(
-                "This might be caused by usage of smoothing parameter 'smooth.dr = NULL'. Re-running the function might solve the problem. If not, please specify 'smooth.dr'.\n"
-            )
-        }
-        drFitSpline <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                yEC50.orig = NA, test = test.nm
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitSpline) <- "drFitSpline"
-        return(drFitSpline)
-    }
-    conc.min <- min(conc.fit)
-    conc.max <- max(conc.fit)
-    c.pred <- seq(conc.min, conc.max, length.out = 1000)
-    ytest <- stats::predict(spltest.smooth, c.pred)
-    yEC.test <- (max(ytest$y) -
-        min(ytest$y))/2 +
-        min(ytest$y)
-    last.test <- max(ytest$y)
-    kec.test <- 1
-    for (k in 1:(length(c.pred) -
-        1))
-        {
-        d1 <- (ytest$y[k] - yEC.test)
-        d2 <- (ytest$y[k + 1] - yEC.test)
-        if (((d1 <= 0) && (d2 >= 0)) | ((d1 >= 0) &&
-            (d2 <= 0)))
-            {
-            kec.test <- k
-            break
-        }
-    }
-    EC.test <- c.pred[kec.test]
+  if (control$neg.nan.act == FALSE)
+  {
+    missings <- is.na(conc) |
+      is.na(test) |
+      !is.numeric(conc) |
+      !is.numeric(test)
+    conc <- conc[!missings]
+    test <- test[!missings]
+    negs <- (conc < 0) | (test < 0)
+    conc <- conc[!negs]
+    test <- test[!negs]
+  } else
+  {
+    if (sum(
+      is.na(conc) |
+      is.na(test)
+    ))
+      stop(
+        "growth.drFitSpline: NA values encountered. Program terminated"
+      )
+    if ((sum((conc < 0)) >
+         0) | (sum((test < 0)) >
+               0))
+      stop(
+        "growth.drFitSpline: Negative values encountered. Program terminated"
+      )
+    if ((FALSE %in% is.numeric(conc)) ||
+        (FALSE %in% is.numeric(test)))
+      stop(
+        "growth.drFitSpline: Non numeric values encountered. Program terminated"
+      )
+  }
+  if (length(test) <
+      6)
+  {
     if (control$suppress.messages == FALSE)
-    {
-        cat(
-            "\n\n=== Dose response curve estimation ================\n"
-        )
-        cat(
-            "--- EC 50 -----------------------------------------\n"
-        )
-        cat(paste("-->", as.character(drID)))
-        cat("\n")
-        cat(
-            paste(
-                c("xEC50", "yEC50"),
-                c(EC.test, yEC.test)
-            )
-        )
-    }
-    if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
-        FALSE))
-        {
-        if (control$suppress.messages == FALSE)
-        {
-            cat("\n--> Original scale \n")
-            cat(
-                paste(
-                  c("xEC50", "yEC50"),
-                  c(
-                    exp(EC.test) -
-                      1, yEC.test
-                )
-              )
-            )
-        }
-        EC.orig <- c(
-            exp(EC.test) -
-                1, yEC.test
-        )
-    } else
-    {
-        if ((control$log.x.dr == FALSE) && (control$log.y.dr ==
-            TRUE))
-            {
-            if (control$suppress.messages == FALSE)
-            {
-                cat("\n--> Original scale \n")
-                cat(
-                  paste(
-                    c("xEC50", "yEC50"),
-                    c(
-                      EC.test, exp(yEC.test) -
-                        1
-                  )
-                )
-              )
-            }
-            EC.orig <- c(
-                EC.test, exp(yEC.test) -
-                  1
-            )
-        } else
-        {
-            if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
-                TRUE))
-                {
-                if (control$suppress.messages == FALSE)
-                {
-                  cat("\n--> Original scale \n")
-                  cat(
-                    paste(
-                      c("xEC50", "yEC50"),
-                      c(
-                        exp(EC.test) -
-                          1, exp(yEC.test) -
-                          1
-                    )
-                  )
-                )
-                }
-                EC.orig <- c(
-                  exp(EC.test) -
-                    1, exp(yEC.test) -
-                    1
-              )
-            } else
-            {
-                if ((control$log.x.dr == FALSE) &&
-                  (control$log.y.dr == FALSE))
-                  {
-                  EC.orig <- c(EC.test, yEC.test)
-                }
-            }
-        }
-    }
-    if (control$suppress.messages == FALSE)
-    {
-        cat("\n\n\n")
-    }
+      message(
+        "drFitSpline: There is not enough valid data. Must have at least 6 unique values!"
+      )
     drFitSpline <- list(
-        raw.conc = conc, raw.test = test, drID = drID,
-        fit.conc = ytest$x, fit.test = ytest$y, spline = spltest.smooth,
-        spline.low = spltest.low, parameters = list(
-            EC50 = EC.test[1], yEC50 = yEC.test, EC50.orig = EC.orig[1],
-            yEC50.orig = EC.orig[2], test = test.nm
-        ),
-        fitFlag = fitFlag, reliable = NULL, control = control
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, EC50.orig = NA,
+        yEC50.orig = NA, test = test.nm
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
     )
     class(drFitSpline) <- "drFitSpline"
-    invisible(drFitSpline)
+    return(drFitSpline)
+  }
+  if (length(test) <
+      control$dr.have.atleast)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "drFitSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
+      )
+    drFitSpline <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, EC50.orig = NA,
+        yEC50.orig = NA, test = test.nm
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
+    )
+    class(drFitSpline) <- "drFitSpline"
+    return(drFitSpline)
+  }
+  if (control$log.x.dr == TRUE)
+    conc.log <- log(conc + 1)
+  if (control$log.y.dr == TRUE)
+    test.log <- log(test + 1)
+  if (control$log.x.dr == TRUE)
+  {
+    conc.fit <- log(conc + 1)
+  } else
+  {
+    conc.fit <- conc
+  }
+  if (control$log.y.dr == TRUE)
+  {
+    test.fit <- log(test + 1)
+  } else
+  {
+    test.fit <- test
+  }
+  spltest <- NULL
+  fitFlag <- TRUE
+
+  # perform first lowess spline fit followed by
+  # smooth.spline onf lowess results
+  try(
+    spltest.low <- lowess(conc.fit, test.fit, f = 0.1),
+    silent = TRUE
+  )
+  try(
+    spltest.low$y <- spltest.low$y[!duplicated(spltest.low$x)],
+    silent = TRUE
+  )
+  try(
+    spltest.low$x <- spltest.low$x[!duplicated(spltest.low$x)],
+    silent = TRUE
+  )
+
+  # assign high weights to concentration values
+  # of 0, response values of 0, and response
+  # values immediately before 0
+  weights <- sapply(
+    1:(length(spltest.low$x) -
+         1), function(i) ifelse(
+           spltest.low$x[[i]] == 0 | spltest.low$y[[i]] ==
+             0 | spltest.low$y[[i + 1]] == 0, 1,
+           0.05
+         )
+  )
+  weights <- c(
+    weights, ifelse(
+      spltest.low$x[length(spltest.low$x)] ==
+        0 | spltest.low$y[length(spltest.low$y)] ==
+        0, 1, 0.05
+    )
+  )
+
+  try(
+    spltest.smooth <- smooth.spline(
+      spltest.low$x, spltest.low$y, spar = control$smooth.dr,
+      keep.data = FALSE, w = weights
+    ),
+    silent = TRUE
+  )
+
+  if (!exists("spltest.smooth") ||
+      is.null(spltest.smooth) ==
+      TRUE)
+  {
+    message(
+      "Spline could not be fitted in dose-response analysis!\n"
+    )
+    fitFlag <- FALSE
+    if (is.null(control$smooth.dr) ==
+        TRUE)
+    {
+      message(
+        "This might be caused by usage of smoothing parameter 'smooth.dr = NULL'. Re-running the function might solve the problem. If not, please specify 'smooth.dr'.\n"
+      )
+    }
+    drFitSpline <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, EC50.orig = NA,
+        yEC50.orig = NA, test = test.nm
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
+    )
+    class(drFitSpline) <- "drFitSpline"
+    return(drFitSpline)
+  }
+  conc.min <- min(conc.fit)
+  conc.max <- max(conc.fit)
+  c.pred <- seq(conc.min, conc.max, length.out = 1000)
+  ytest <- stats::predict(spltest.smooth, c.pred)
+  yEC.test <- (max(ytest$y) -
+                 min(ytest$y))/2 +
+    min(ytest$y)
+  last.test <- max(ytest$y)
+  kec.test <- 1
+  for (k in 1:(length(c.pred) -
+               1))
+  {
+    d1 <- (ytest$y[k] - yEC.test)
+    d2 <- (ytest$y[k + 1] - yEC.test)
+    if (((d1 <= 0) && (d2 >= 0)) | ((d1 >= 0) &&
+                                    (d2 <= 0)))
+    {
+      kec.test <- k
+      break
+    }
+  }
+  EC.test <- c.pred[kec.test]
+  if (control$suppress.messages == FALSE)
+  {
+    cat(
+      "\n\n=== Dose response curve estimation ================\n"
+    )
+    cat(
+      "--- EC 50 -----------------------------------------\n"
+    )
+    cat(paste("-->", as.character(drID)))
+    cat("\n")
+    cat(
+      paste(
+        c("xEC50", "yEC50"),
+        c(EC.test, yEC.test)
+      )
+    )
+  }
+  if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
+                                     FALSE))
+  {
+    if (control$suppress.messages == FALSE)
+    {
+      cat("\n--> Original scale \n")
+      cat(
+        paste(
+          c("xEC50", "yEC50"),
+          c(
+            exp(EC.test) -
+              1, yEC.test
+          )
+        )
+      )
+    }
+    EC.orig <- c(
+      exp(EC.test) -
+        1, yEC.test
+    )
+  } else
+  {
+    if ((control$log.x.dr == FALSE) && (control$log.y.dr ==
+                                        TRUE))
+    {
+      if (control$suppress.messages == FALSE)
+      {
+        cat("\n--> Original scale \n")
+        cat(
+          paste(
+            c("xEC50", "yEC50"),
+            c(
+              EC.test, exp(yEC.test) -
+                1
+            )
+          )
+        )
+      }
+      EC.orig <- c(
+        EC.test, exp(yEC.test) -
+          1
+      )
+    } else
+    {
+      if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
+                                         TRUE))
+      {
+        if (control$suppress.messages == FALSE)
+        {
+          cat("\n--> Original scale \n")
+          cat(
+            paste(
+              c("xEC50", "yEC50"),
+              c(
+                exp(EC.test) -
+                  1, exp(yEC.test) -
+                  1
+              )
+            )
+          )
+        }
+        EC.orig <- c(
+          exp(EC.test) -
+            1, exp(yEC.test) -
+            1
+        )
+      } else
+      {
+        if ((control$log.x.dr == FALSE) &&
+            (control$log.y.dr == FALSE))
+        {
+          EC.orig <- c(EC.test, yEC.test)
+        }
+      }
+    }
+  }
+  if (control$suppress.messages == FALSE)
+  {
+    cat("\n\n\n")
+  }
+  drFitSpline <- list(
+    raw.conc = conc, raw.test = test, drID = drID,
+    fit.conc = ytest$x, fit.test = ytest$y, spline = spltest.smooth,
+    spline.low = spltest.low, parameters = list(
+      EC50 = EC.test[1], yEC50 = yEC.test, EC50.orig = EC.orig[1],
+      yEC50.orig = EC.orig[2], test = test.nm
+    ),
+    fitFlag = fitFlag, reliable = NULL, control = control
+  )
+  class(drFitSpline) <- "drFitSpline"
+  invisible(drFitSpline)
 }
 
 #' Perform a smooth spline fit on response vs. concentration data of a single sample
@@ -684,265 +686,265 @@ growth.drFitSpline <- function(
 growth.drBootSpline <- function(
     conc, test, drID = "undefined", control = growth.control()
 )
-    {
-    test <- as.vector(as.numeric(as.matrix(test)))
-    conc <- as.vector(as.numeric(as.matrix(conc)))
-    if (is.vector(conc) ==
-        FALSE || is.vector(test) ==
-        FALSE)
-        stop("Need concentration and treatment !")
-    if (methods::is(control) !=
-        "grofit.control" && methods::is(control) !=
-        "fl.control")
-        stop(
-            "control must be of class grofit.control or fl.control!"
-        )
-    if (control$nboot.dr == 0)
-        stop(
-            "Number of bootstrap samples is zero! See ?growth.control or ?fl.control."
-        )
-    if (control$neg.nan.act == FALSE)
-    {
-        missings <- is.na(conc) |
-            is.na(test) |
-            !is.numeric(conc) |
-            !is.numeric(test)
-        conc <- conc[!missings]
-        test <- test[!missings]
-        negs <- (conc < 0) | (test < 0)
-        conc <- conc[!negs]
-        test <- test[!negs]
-    }
-    # Test if there are enough unique x-values
-    # (conc) to perform spline fit
-    if (length(unique(conc)) <
-        4)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "drBootSpline: There are not enough concentration values. Must have at least 4 unique values!"
-            )
-        drBootSpline <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            boot.conc = NA, boot.test = NA, boot.drSpline = NA,
-            ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE,
-            control = control
-        )
-        class(drBootSpline) <- "drBootSpline"
-        return(drBootSpline)
-    } else
-    {
-        if (sum(
-            is.na(conc) |
-                is.na(test)
-        ))
-            stop("NA values encountered. Program terminated")
-        if ((sum((conc < 0)) >
-            0) | (sum((test < 0)) >
-            0))
-            stop(
-                "growth.drFitSpline: Negative values encountered. Program terminated"
-            )
-        if ((FALSE %in% is.numeric(conc)) ||
-            (FALSE %in% is.numeric(test)))
-            stop(
-                "growth.drFitSpline: Non numeric values encountered. Program terminated"
-            )
-    }
-    if (length(test) <
-        6)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "drBootSpline: There is not enough valid data. Must have at least 6 unique values!"
-            )
-        drBootSpline <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            boot.conc = NA, boot.test = NA, boot.drSpline = NA,
-            ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE,
-            control = control
-        )
-        class(drBootSpline) <- "drBootSpline"
-        return(drBootSpline)
-    }
-    if (length(test) <
-        control$dr.have.atleast)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "drBootSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
-            )
-        drBootSpline <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            boot.conc = NA, boot.test = NA, boot.drSpline = NA,
-            ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE,
-            control = control
-        )
-        class(drBootSpline) <- "drBootSpline"
-        return(drBootSpline)
-    }
-
-    # /// transformation of data...
-    if (control$log.x.dr == TRUE)
-        conc.log <- log(conc + 1)
-    if (control$log.y.dr == TRUE)
-        test.log <- log(test + 1)
-    if (control$log.x.dr == TRUE)
-        conc.boot <- log(conc + 1) else conc.boot <- conc
-    if (control$log.y.dr == TRUE)
-        test.boot <- log(test + 1) else test.boot <- test
-
-    # /// Initialize some variables
-    boot.x <- array(NA, c(control$nboot.dr, 1000))
-    boot.y <- array(NA, c(control$nboot.dr, 1000))
-    ECtest.boot <- seq(0, 0, length.out = control$nboot.dr)
-    y.EC50.boot <- seq(0, 0, length.out = control$nboot.dr)
-    splinefit <- list()
-    sa <- seq(1, length(conc.boot))
-
-    # /// begin bootstrapping
-    for (b in 1:control$nboot.dr)
-    {
-        s <- sample(
-            sa, length(conc.boot),
-            replace = TRUE
-        )
-        s.conc <- conc.boot[s]
-        while (length(unique(s.conc)) <
-            4)
-            {
-            s <- sample(
-                sa, length(conc.boot),
-                replace = TRUE
-            )
-            s.conc <- conc.boot[s]
-        }
-        s.test <- test.boot[s]
-        spltest <- NULL
-        control.changed <- control
-        control.changed$suppress.messages <- TRUE
-        splinefit[[b]] <- growth.drFitSpline(s.conc, s.test, drID, control.changed)
-        spltest <- splinefit[[b]]$spline
-        boot.x[b, 1:length(splinefit[[b]]$fit.conc)] <- splinefit[[b]]$fit.conc
-        boot.y[b, 1:length(splinefit[[b]]$fit.test)] <- splinefit[[b]]$fit.test
-        if (is.null(spltest) ==
-            TRUE)
-            {
-            cat(
-                "Spline could not be fitted in dose-response analysis!!\n"
-            )
-            if (is.null(control$smooth.dr) ==
-                TRUE)
-                {
-                cat(
-                  "This might be caused by usage of smoothing parameter 'smooth.dr = NULL'.\n"
-              )
-            }
-            stop("Error in drBootSpline")
-        }
-        ECtest.boot[b] <- splinefit[[b]]$parameters$EC50
-        y.EC50.boot[b] <- splinefit[[b]]$parameters$yEC50
-    }
-    ECtest.boot[which(!is.finite(ECtest.boot))] <- NA
-    if (control$clean.bootstrap == TRUE)
-        ECtest.boot[which(ECtest.boot < 0)] <- NA
-    m.test <- mean(ECtest.boot, na.rm = TRUE)
-    s.test <- sd(ECtest.boot, na.rm = TRUE)
-    if (control$suppress.messages == FALSE)
-    {
-        cat(
-            "=== Bootstrapping of dose response curve ==========\n"
-        )
-        cat(
-            "--- EC 50 -----------------------------------------\n"
-        )
-        cat("\n")
-        cat(
-            paste(
-                "Mean  : ", as.character(m.test),
-                "StDev : ", as.character(s.test),
-                "\n"
-            )
-        )
-        cat(
-            paste(
-                "90% CI: ", as.character(
-                  c(
-                    m.test - 1.645 * s.test/control$nboot.dr,
-                    m.test + 1.645 * s.test/control$nboot.dr
-                )
-              )
-            )
-        )
-        cat("\n")
-        cat(
-            paste(
-                "95% CI: ", as.character(
-                  c(
-                    m.test - 1.96 * s.test/control$nboot.dr,
-                    m.test + 1.96 * s.test/control$nboot.dr
-                )
-              )
-            )
-        )
-        cat("\n\n")
-    }
-    EC50 <- data.frame(
-        EC50.boot = m.test, EC50.sd = s.test, CI.90.lo = m.test -
-            1.645 * s.test, CI.90.up = m.test + 1.645 *
-            s.test, CI.95.lo = m.test - 1.96 * s.test,
-        CI.95.up = m.test + 1.96 * s.test
+{
+  test <- as.vector(as.numeric(as.matrix(test)))
+  conc <- as.vector(as.numeric(as.matrix(conc)))
+  if (is.vector(conc) ==
+      FALSE || is.vector(test) ==
+      FALSE)
+    stop("Need concentration and treatment !")
+  if (methods::is(control) !=
+      "grofit.control" && methods::is(control) !=
+      "fl.control")
+    stop(
+      "control must be of class grofit.control or fl.control!"
     )
-    if (control$log.x.dr == TRUE && control$suppress.messages ==
-        FALSE)
-        {
-        cat("\n")
-        cat(
-            "--- EC 50 in original scale -----------------------\n"
-        )
-        cat("\n")
-        cat(
-            paste(
-                "Mean  : ", as.character(
-                  exp(m.test) -
-                    1
-              ),
-                "\n"
-            )
-        )
-        cat(
-            paste(
-                "90% CI: ", as.character(
-                  c(
-                    exp(m.test - 1.645 * s.test/control$nboot.dr) -
-                      1, exp(m.test + 1.645 * s.test/control$nboot.dr) -
-                      1
-                )
-              )
-            )
-        )
-        cat("\n")
-        cat(
-            paste(
-                "95% CI: ", as.character(
-                  c(
-                    exp(m.test - 1.96 * s.test/control$nboot.dr) -
-                      1, exp(m.test + 1.96 * s.test/control$nboot.dr) -
-                      1
-                )
-              )
-            )
-        )
-        cat("\n\n")
-    }
+  if (control$nboot.dr == 0)
+    stop(
+      "Number of bootstrap samples is zero! See ?growth.control or ?fl.control."
+    )
+  if (control$neg.nan.act == FALSE)
+  {
+    missings <- is.na(conc) |
+      is.na(test) |
+      !is.numeric(conc) |
+      !is.numeric(test)
+    conc <- conc[!missings]
+    test <- test[!missings]
+    negs <- (conc < 0) | (test < 0)
+    conc <- conc[!negs]
+    test <- test[!negs]
+  }
+  # Test if there are enough unique x-values
+  # (conc) to perform spline fit
+  if (length(unique(conc)) <
+      4)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "drBootSpline: There are not enough concentration values. Must have at least 4 unique values!"
+      )
     drBootSpline <- list(
-        raw.conc = conc, raw.test = test, drID = drID,
-        boot.conc = boot.x, boot.test = boot.y, boot.drSpline = splinefit,
-        ec50.boot = ECtest.boot, ec50y.boot = y.EC50.boot,
-        bootFlag = TRUE, control = control
+      raw.conc = conc, raw.test = test, drID = drID,
+      boot.conc = NA, boot.test = NA, boot.drSpline = NA,
+      ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE,
+      control = control
     )
     class(drBootSpline) <- "drBootSpline"
-    invisible(drBootSpline)
+    return(drBootSpline)
+  } else
+  {
+    if (sum(
+      is.na(conc) |
+      is.na(test)
+    ))
+      stop("NA values encountered. Program terminated")
+    if ((sum((conc < 0)) >
+         0) | (sum((test < 0)) >
+               0))
+      stop(
+        "growth.drFitSpline: Negative values encountered. Program terminated"
+      )
+    if ((FALSE %in% is.numeric(conc)) ||
+        (FALSE %in% is.numeric(test)))
+      stop(
+        "growth.drFitSpline: Non numeric values encountered. Program terminated"
+      )
+  }
+  if (length(test) <
+      6)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "drBootSpline: There is not enough valid data. Must have at least 6 unique values!"
+      )
+    drBootSpline <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      boot.conc = NA, boot.test = NA, boot.drSpline = NA,
+      ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE,
+      control = control
+    )
+    class(drBootSpline) <- "drBootSpline"
+    return(drBootSpline)
+  }
+  if (length(test) <
+      control$dr.have.atleast)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "drBootSpline: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
+      )
+    drBootSpline <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      boot.conc = NA, boot.test = NA, boot.drSpline = NA,
+      ec50.boot = NA, ec50y.boot = NA, bootFlag = FALSE,
+      control = control
+    )
+    class(drBootSpline) <- "drBootSpline"
+    return(drBootSpline)
+  }
+
+  # /// transformation of data...
+  if (control$log.x.dr == TRUE)
+    conc.log <- log(conc + 1)
+  if (control$log.y.dr == TRUE)
+    test.log <- log(test + 1)
+  if (control$log.x.dr == TRUE)
+    conc.boot <- log(conc + 1) else conc.boot <- conc
+  if (control$log.y.dr == TRUE)
+    test.boot <- log(test + 1) else test.boot <- test
+
+  # /// Initialize some variables
+  boot.x <- array(NA, c(control$nboot.dr, 1000))
+  boot.y <- array(NA, c(control$nboot.dr, 1000))
+  ECtest.boot <- seq(0, 0, length.out = control$nboot.dr)
+  y.EC50.boot <- seq(0, 0, length.out = control$nboot.dr)
+  splinefit <- list()
+  sa <- seq(1, length(conc.boot))
+
+  # /// begin bootstrapping
+  for (b in 1:control$nboot.dr)
+  {
+    s <- sample(
+      sa, length(conc.boot),
+      replace = TRUE
+    )
+    s.conc <- conc.boot[s]
+    while (length(unique(s.conc)) <
+           4)
+    {
+      s <- sample(
+        sa, length(conc.boot),
+        replace = TRUE
+      )
+      s.conc <- conc.boot[s]
+    }
+    s.test <- test.boot[s]
+    spltest <- NULL
+    control.changed <- control
+    control.changed$suppress.messages <- TRUE
+    splinefit[[b]] <- growth.drFitSpline(s.conc, s.test, drID, control.changed)
+    spltest <- splinefit[[b]]$spline
+    boot.x[b, 1:length(splinefit[[b]]$fit.conc)] <- splinefit[[b]]$fit.conc
+    boot.y[b, 1:length(splinefit[[b]]$fit.test)] <- splinefit[[b]]$fit.test
+    if (is.null(spltest) ==
+        TRUE)
+    {
+      message(
+        "Spline could not be fitted in dose-response analysis!!\n"
+      )
+      if (is.null(control$smooth.dr) ==
+          TRUE)
+      {
+        message(
+          "This might be caused by usage of smoothing parameter 'smooth.dr = NULL'.\n"
+        )
+      }
+      stop("Error in drBootSpline")
+    }
+    ECtest.boot[b] <- splinefit[[b]]$parameters$EC50
+    y.EC50.boot[b] <- splinefit[[b]]$parameters$yEC50
+  }
+  ECtest.boot[which(!is.finite(ECtest.boot))] <- NA
+  if (control$clean.bootstrap == TRUE)
+    ECtest.boot[which(ECtest.boot < 0)] <- NA
+  m.test <- mean(ECtest.boot, na.rm = TRUE)
+  s.test <- sd(ECtest.boot, na.rm = TRUE)
+  if (control$suppress.messages == FALSE)
+  {
+    cat(
+      "=== Bootstrapping of dose response curve ==========\n"
+    )
+    cat(
+      "--- EC 50 -----------------------------------------\n"
+    )
+    cat("\n")
+    cat(
+      paste(
+        "Mean  : ", as.character(m.test),
+        "StDev : ", as.character(s.test),
+        "\n"
+      )
+    )
+    cat(
+      paste(
+        "90% CI: ", as.character(
+          c(
+            m.test - 1.645 * s.test/control$nboot.dr,
+            m.test + 1.645 * s.test/control$nboot.dr
+          )
+        )
+      )
+    )
+    cat("\n")
+    cat(
+      paste(
+        "95% CI: ", as.character(
+          c(
+            m.test - 1.96 * s.test/control$nboot.dr,
+            m.test + 1.96 * s.test/control$nboot.dr
+          )
+        )
+      )
+    )
+    cat("\n\n")
+  }
+  EC50 <- data.frame(
+    EC50.boot = m.test, EC50.sd = s.test, CI.90.lo = m.test -
+      1.645 * s.test, CI.90.up = m.test + 1.645 *
+      s.test, CI.95.lo = m.test - 1.96 * s.test,
+    CI.95.up = m.test + 1.96 * s.test
+  )
+  if (control$log.x.dr == TRUE && control$suppress.messages ==
+      FALSE)
+  {
+    cat("\n")
+    cat(
+      "--- EC 50 in original scale -----------------------\n"
+    )
+    cat("\n")
+    cat(
+      paste(
+        "Mean  : ", as.character(
+          exp(m.test) -
+            1
+        ),
+        "\n"
+      )
+    )
+    cat(
+      paste(
+        "90% CI: ", as.character(
+          c(
+            exp(m.test - 1.645 * s.test/control$nboot.dr) -
+              1, exp(m.test + 1.645 * s.test/control$nboot.dr) -
+              1
+          )
+        )
+      )
+    )
+    cat("\n")
+    cat(
+      paste(
+        "95% CI: ", as.character(
+          c(
+            exp(m.test - 1.96 * s.test/control$nboot.dr) -
+              1, exp(m.test + 1.96 * s.test/control$nboot.dr) -
+              1
+          )
+        )
+      )
+    )
+    cat("\n\n")
+  } # if (control$log.x.dr == TRUE && control$suppress.messages == FALSE)
+  drBootSpline <- list(
+    raw.conc = conc, raw.test = test, drID = drID,
+    boot.conc = boot.x, boot.test = boot.y, boot.drSpline = splinefit,
+    ec50.boot = ECtest.boot, ec50y.boot = y.EC50.boot,
+    bootFlag = TRUE, control = control
+  )
+  class(drBootSpline) <- "drBootSpline"
+  invisible(drBootSpline)
 }
 
 
@@ -970,232 +972,232 @@ growth.drBootSpline <- function(
 growth.drFitModel <- function(
     conc, test, drID = "undefined", control = growth.control()
 )
-    {
-    if (methods::is(control) !=
-        "grofit.control" && methods::is(control) !=
-        "fl.control")
-        stop(
-            "growth.drFitModel: control must be of class grofit.control or fl.control!"
-        )
+{
+  if (methods::is(control) !=
+      "grofit.control" && methods::is(control) !=
+      "fl.control")
+    stop(
+      "growth.drFitModel: control must be of class grofit.control or fl.control!"
+    )
+  test.nm <- control$dr.parameter
+  if (test.nm != control$dr.parameter && control$dr.parameter !=
+      "mu.linfit")
     test.nm <- control$dr.parameter
-    if (test.nm != control$dr.parameter && control$dr.parameter !=
-        "mu.linfit")
-        test.nm <- control$dr.parameter
-    test <- as.vector(as.numeric(as.matrix(test)))
-    conc <- as.vector(as.numeric(as.matrix(conc)))
-    models <- control$dr.model
-    if (is.vector(conc) ==
-        FALSE || is.vector(test) ==
-        FALSE)
-        stop(
-            "growth.drFitModel: dose or response data must be a vector !"
-        )
-    if (control$neg.nan.act == FALSE)
-    {
-        missings <- is.na(conc) |
-            is.na(test) |
-            !is.numeric(conc) |
-            !is.numeric(test)
-        conc <- conc[!missings]
-        test <- test[!missings]
-        negs <- (conc < 0) | (test < 0)
-        conc <- conc[!negs]
-        test <- test[!negs]
-    } else
-    {
-        if (sum(
-            is.na(conc) |
-                is.na(test)
-        ))
-            stop(
-                "growth.drFitModel: NA values encountered. Program terminated"
-            )
-        if ((sum((conc < 0)) >
-            0) | (sum((test < 0)) >
-            0))
-            stop(
-                "growth.drFitModel: Negative values encountered. Program terminated"
-            )
-        if ((FALSE %in% is.numeric(conc)) ||
-            (FALSE %in% is.numeric(test)))
-            stop(
-                "growth.drFitModel: Non numeric values encountered. Program terminated"
-            )
-    }
-    if (length(test) <
-        6)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "growth.drFitModel: There is not enough valid data. Must have at least 6 unique values!"
-            )
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA,
-                EC50.orig = NA, yEC50.orig = NA, test = test.nm
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitModel) <- "drFitModel"
-        return(drFitModel)
-    }
-    if (length(test) <
-        control$dr.have.atleast)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "growth.drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
-            )
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA,
-                EC50.orig = NA, yEC50.orig = NA, test = test.nm
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitModel) <- "drFitModel"
-        return(drFitModel)
-    }
-    if (control$dr.method == "model.MM" && !all(models %in% c("MM.2", "MM.3")))
-        {
-        models <- c("MM.2", "MM.3")
-    }
-    # Perform model fits
-    model.fits <- list()
-    for (i in 1:length(models))
-        {
-        model.fits[[i]] <- try(
-            suppressWarnings(
-                invisible(
-                  drc::drm(
-                    test ~ as.numeric(as.character(conc)),
-                    fct = get(models[i])(),
-                    control = drc::drmc(
-                      errorm = FALSE, noMessage = TRUE,
-                      otrace = TRUE
-                  )
-                )
-              )
-            ),
-            silent = T
-        )
-    }
-    models <- models[!unlist(
-        lapply(
-            1:length(model.fits),
-            function(x) class(model.fits[[x]])
-        )
-    ) %in%
-        c("try-error", "list")]
-    model.fits <- model.fits[!unlist(
-        lapply(
-            1:length(model.fits),
-            function(x) class(model.fits[[x]])
-        )
-    ) %in%
-        c("try-error", "list")]
-    names(model.fits) <- models
-
-    if (length(model.fits) <
-        1)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "growth.drFitModel: No DR model could be fit to the test and concentration data."
-            )
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA,
-                EC50.orig = NA, yEC50.orig = NA, test = test.nm
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitModel) <- "drFitModel"
-        return(drFitModel)
-    }
-    # select best fitting model
-    model.AIC <- lapply(
-        1:length(model.fits),
-        function(x) AIC(model.fits[[x]])
+  test <- as.vector(as.numeric(as.matrix(test)))
+  conc <- as.vector(as.numeric(as.matrix(conc)))
+  models <- control$dr.model
+  if (is.vector(conc) ==
+      FALSE || is.vector(test) ==
+      FALSE)
+    stop(
+      "growth.drFitModel: dose or response data must be a vector !"
     )
-    names(model.AIC) <- models
-
-    best.model.ndx <- which.min(unlist(model.AIC))
-    best.model.nm <- models[best.model.ndx]
-    best.model <- model.fits[[best.model.ndx]]
-
-    # get EC50 value
-    if (any(grep("BC", best.model.nm)))
-        {
-        ec50 <- drc::ED(
-            best.model, 50, lower = 0.1, upper = 1000,
-            interval = "fls", display = FALSE
-        )
-    } else if (any(grep("NEC", best.model.nm)))
-        {
-        ec50 <- best.model$coefficients[4]
-    } else
-    {
-        ec50 <- drc::ED(
-            best.model, 50, interval = "delta", display = FALSE
-        )
-    }
-    # get response at ec50
-    dataList <- best.model[["dataList"]]
-    dose <- dataList[["dose"]]
-
-    concgrid <- seq(
-        min(dose),
-        max(dose),
-        length = 200
+  if (control$neg.nan.act == FALSE)
+  {
+    missings <- is.na(conc) |
+      is.na(test) |
+      !is.numeric(conc) |
+      !is.numeric(test)
+    conc <- conc[!missings]
+    test <- test[!missings]
+    negs <- (conc < 0) | (test < 0)
+    conc <- conc[!negs]
+    test <- test[!negs]
+  } else
+  {
+    if (sum(
+      is.na(conc) |
+      is.na(test)
+    ))
+      stop(
+        "growth.drFitModel: NA values encountered. Program terminated"
+      )
+    if ((sum((conc < 0)) >
+         0) | (sum((test < 0)) >
+               0))
+      stop(
+        "growth.drFitModel: Negative values encountered. Program terminated"
+      )
+    if ((FALSE %in% is.numeric(conc)) ||
+        (FALSE %in% is.numeric(test)))
+      stop(
+        "growth.drFitModel: Non numeric values encountered. Program terminated"
+      )
+  }
+  if (length(test) <
+      6)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "growth.drFitModel: There is not enough valid data. Must have at least 6 unique values!"
+      )
+    drFitModel <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA,
+        EC50.orig = NA, yEC50.orig = NA, test = test.nm
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
     )
-    respgrid <- best.model$curve[[1]](concgrid)
-
-    y.ec50 <- drc::PR(object = best.model, xVec = ec50[1])
-
-    # drc.models <- drc::getMeanFunctions(display
-    # = FALSE) drc.models.nm <-
-    # c(unlist(lapply(1:length(drc.models),
-    # function(x) drc.models[[x]][1])), 'NEC.4')
-    # drc.models.descr <-
-    # c(unlist(lapply(1:length(drc.models),
-    # function(x) drc.models[[x]][2])), 'model
-    # for estimation of\nno effect concentration
-    # (NEC)')
-    if (control$dr.method == "model.MM")
-    {
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = concgrid, fit.test = respgrid,
-            model = best.model, parameters = list(
-                EC50 = ec50, yEC50 = y.ec50, Vmax = coef(best.model)[grep("d:", names(coef(best.model)))],
-                Km = coef(best.model)[grep("e:", names(coef(best.model)))],
-                test = test.nm, model = best.model.nm
-            ),
-            fitFlag = TRUE, reliable = NULL, control = control
-        )
-
-    } else
-    {
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = concgrid, fit.test = respgrid,
-            model = best.model, parameters = list(
-                EC50 = ec50, yEC50 = y.ec50, Vmax = NA,
-                Km = NA, test = test.nm, model = best.model.nm
-            ),
-            fitFlag = TRUE, reliable = NULL, control = control
-        )
-    }
-
     class(drFitModel) <- "drFitModel"
-    invisible(drFitModel)
+    return(drFitModel)
+  }
+  if (length(test) <
+      control$dr.have.atleast)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "growth.drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See growth.control()."
+      )
+    drFitModel <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA,
+        EC50.orig = NA, yEC50.orig = NA, test = test.nm
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
+    )
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
+  }
+  if (control$dr.method == "model.MM" && !all(models %in% c("MM.2", "MM.3")))
+  {
+    models <- c("MM.2", "MM.3")
+  }
+  # Perform model fits
+  model.fits <- list()
+  for (i in 1:length(models))
+  {
+    model.fits[[i]] <- try(
+      suppressWarnings(
+        invisible(
+          drc::drm(
+            test ~ as.numeric(as.character(conc)),
+            fct = get(models[i])(),
+            control = drc::drmc(
+              errorm = FALSE, noMessage = TRUE,
+              otrace = TRUE
+            )
+          )
+        )
+      ),
+      silent = T
+    )
+  }
+  models <- models[!unlist(
+    lapply(
+      1:length(model.fits),
+      function(x) class(model.fits[[x]])
+    )
+  ) %in%
+    c("try-error", "list")]
+  model.fits <- model.fits[!unlist(
+    lapply(
+      1:length(model.fits),
+      function(x) class(model.fits[[x]])
+    )
+  ) %in%
+    c("try-error", "list")]
+  names(model.fits) <- models
+
+  if (length(model.fits) <
+      1)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "growth.drFitModel: No DR model could be fit to the test and concentration data."
+      )
+    drFitModel <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, Vmax = NA, Km = NA,
+        EC50.orig = NA, yEC50.orig = NA, test = test.nm
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
+    )
+    class(drFitModel) <- "drFitModel"
+    return(drFitModel)
+  }
+  # select best fitting model
+  model.AIC <- lapply(
+    1:length(model.fits),
+    function(x) AIC(model.fits[[x]])
+  )
+  names(model.AIC) <- models
+
+  best.model.ndx <- which.min(unlist(model.AIC))
+  best.model.nm <- models[best.model.ndx]
+  best.model <- model.fits[[best.model.ndx]]
+
+  # get EC50 value
+  if (any(grep("BC", best.model.nm)))
+  {
+    ec50 <- drc::ED(
+      best.model, 50, lower = 0.1, upper = 1000,
+      interval = "fls", display = FALSE
+    )
+  } else if (any(grep("NEC", best.model.nm)))
+  {
+    ec50 <- best.model$coefficients[4]
+  } else
+  {
+    ec50 <- drc::ED(
+      best.model, 50, interval = "delta", display = FALSE
+    )
+  }
+  # get response at ec50
+  dataList <- best.model[["dataList"]]
+  dose <- dataList[["dose"]]
+
+  concgrid <- seq(
+    min(dose),
+    max(dose),
+    length = 200
+  )
+  respgrid <- best.model$curve[[1]](concgrid)
+
+  y.ec50 <- drc::PR(object = best.model, xVec = ec50[1])
+
+  # drc.models <- drc::getMeanFunctions(display
+  # = FALSE) drc.models.nm <-
+  # c(unlist(lapply(1:length(drc.models),
+  # function(x) drc.models[[x]][1])), 'NEC.4')
+  # drc.models.descr <-
+  # c(unlist(lapply(1:length(drc.models),
+  # function(x) drc.models[[x]][2])), 'model
+  # for estimation of\nno effect concentration
+  # (NEC)')
+  if (control$dr.method == "model.MM")
+  {
+    drFitModel <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = concgrid, fit.test = respgrid,
+      model = best.model, parameters = list(
+        EC50 = ec50, yEC50 = y.ec50, Vmax = coef(best.model)[grep("d:", names(coef(best.model)))],
+        Km = coef(best.model)[grep("e:", names(coef(best.model)))],
+        test = test.nm, model = best.model.nm
+      ),
+      fitFlag = TRUE, reliable = NULL, control = control
+    )
+
+  } else
+  {
+    drFitModel <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = concgrid, fit.test = respgrid,
+      model = best.model, parameters = list(
+        EC50 = ec50, yEC50 = y.ec50, Vmax = NA,
+        Km = NA, test = test.nm, model = best.model.nm
+      ),
+      fitFlag = TRUE, reliable = NULL, control = control
+    )
+  }
+
+  class(drFitModel) <- "drFitModel"
+  invisible(drFitModel)
 }
 
 #' Fit a biosensor model (Meyer et al., 2019) to response vs. concentration data
@@ -1239,155 +1241,155 @@ growth.drFitModel <- function(
 #' }
 fl.drFit <- function(
     flTable, control = fl.control(
-        dr.method = "model", dr.parameter = "max_slope.spline"
+      dr.method = "model", dr.parameter = "max_slope.spline"
     )
 )
-    {
-    if (is(control) !=
-        "fl.control")
-        stop("control must be of class fl.control!")
-    EC50.table <- NULL
-    all.EC50 <- NA
-    if (is.character(control$dr.parameter))
-        {
-        dr.parameter <- match(control$dr.parameter, colnames(flTable))
-    }
-    flTable <- flTable[!is.na(flTable[, 1]),
-        ]
-    table.tests <- table(
-        (flTable[, 1])[which(
-            (flTable[, 4] == TRUE) & (is.na(flTable[, dr.parameter]) ==
-                FALSE)
-        )]
+{
+  if (is(control) !=
+      "fl.control")
+    stop("control must be of class fl.control!")
+  EC50.table <- NULL
+  all.EC50 <- NA
+  if (is.character(control$dr.parameter))
+  {
+    dr.parameter <- match(control$dr.parameter, colnames(flTable))
+  }
+  flTable <- flTable[!is.na(flTable[, 1]),
+  ]
+  table.tests <- table(
+    (flTable[, 1])[which(
+      (flTable[, 4] == TRUE) & (is.na(flTable[, dr.parameter]) ==
+                                  FALSE)
+    )]
+  )
+  distinct <- names(table.tests)
+  EC50 <- list()
+  validdata <- cbind(
+    as.character(distinct),
+    table.tests
+  )
+  colnames(validdata) <- c("TestID", "Number")
+  rownames(validdata) <- rep("     ", times = dim(validdata)[1])
+  if (control$suppress.messages == FALSE)
+  {
+    cat("\n")
+    cat(
+      "=== Dose-Response Estimation via Model Fit ==============================\n"
     )
-    distinct <- names(table.tests)
-    EC50 <- list()
-    validdata <- cbind(
-        as.character(distinct),
-        table.tests
+    cat(
+      "---------------------------------------------------\n"
     )
-    colnames(validdata) <- c("TestID", "Number")
-    rownames(validdata) <- rep("     ", times = dim(validdata)[1])
-    if (control$suppress.messages == FALSE)
-    {
-        cat("\n")
-        cat(
-            "=== Dose-Response Estimation via Model Fit ==============================\n"
-        )
-        cat(
-            "---------------------------------------------------\n"
-        )
-        cat("--> Checking data ...\n")
-        cat(
-            paste(
-                "--> Number of distinct tests found:",
-                as.character(length(distinct))
-            ),
-            "\n"
-        )
-        cat("--> Valid datasets per test: \n")
-        print(validdata, quote = FALSE)
-    }
-    if (TRUE %in% (table.tests < control$dr.have.atleast))
-    {
-        cat(
-            paste(
-                "Warning: following tests have not enough ( <",
-                as.character(control$dr.have.atleast - 1),
-                ") datasets:\n"
-            )
-        )
-        cat(
-            paste(
-                distinct[(table.tests < control$dr.have.atleast)],
-                sep = "\n"
-            )
-        )
-        cat("These tests will not be regarded\n")
-        distinct <- distinct[table.tests >= control$dr.have.atleast]
-    }
-    if ((length(distinct)) ==
-        0)
-        {
-        cat(
-            paste(
-                "There are no tests having enough ( >",
-                as.character(control$dr.have.atleast - 1),
-                ") datasets!\n"
-            )
-        )
-        drFitfl <- list(
-            raw.data = flTable, drTable = NA, drFittedModels = NA,
-            control = control
-        )
-        class(drFitfl) <- "drFitfl"
-        return(drFitfl)
-    } else
-    {
-        skip <- c()
-        for (i in 1:length(distinct))
-            {
-            conc <- factor(
-                (flTable[, 3])[which(flTable[, 1] == distinct[i])]
-            )
-            if (length(levels(conc)) <
-                4)
-                {
-                message(
-                  paste0(
-                    distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."
-                )
-              )
-                skip <- c(skip, i)
-                next
-            }
-            test <- (as.numeric(flTable[, dr.parameter]))[flTable[,
-                1] == distinct[i]]
-            names(test) <- rep(
-                names(flTable)[dr.parameter],
-                length(test)
-            )
-            drID <- distinct[i]
-            EC50[[i]] <- try(
-                fl.drFitModel(conc, test, drID, control),
-                silent = TRUE
-            )
-            description <- data.frame(
-                Test = distinct[i], log.x = control$log.x.dr,
-                log.y = control$log.y.dr
-            )
-            if (is(EC50[[i]]) !=
-                "try-error")
-                {
-                out.row <- cbind(description, summary.drFitFLModel(EC50[[i]]))
-            } else
-            {
-                out.row <- cbind(
-                  description, data.frame(
-                    yEC50 = NA, y.min = NA, y.max = NA,
-                    fc = NA, K = NA, n = NA, yEC50.orig = NA,
-                    K.orig = NA, test = NA
-                )
-              )
-            }
-            EC50.table <- rbind(EC50.table, out.row)
-
-        }
-    }
-    class(EC50.table) <- c("drTable", "list")
-    if (exists("skip") &&
-        !is.null(skip))
-            {
-        distinct <- distinct[-skip]
-        EC50 <- EC50[-skip]
-    }
-    names(EC50) <- distinct
+    cat("--> Checking data ...\n")
+    cat(
+      paste(
+        "--> Number of distinct tests found:",
+        as.character(length(distinct))
+      ),
+      "\n"
+    )
+    cat("--> Valid datasets per test: \n")
+    print(validdata, quote = FALSE)
+  }
+  if (TRUE %in% (table.tests < control$dr.have.atleast))
+  {
+    warning(
+      paste(
+        "Warning: following tests have not enough ( <",
+        as.character(control$dr.have.atleast - 1),
+        ") datasets:\n"
+      )
+    )
+    warning(
+      paste(
+        distinct[(table.tests < control$dr.have.atleast)],
+        sep = "\n"
+      )
+    )
+    warning("These tests will not be regarded\n")
+    distinct <- distinct[table.tests >= control$dr.have.atleast]
+  }
+  if ((length(distinct)) ==
+      0)
+  {
+    warning(
+      paste(
+        "There are no tests having enough ( >",
+        as.character(control$dr.have.atleast - 1),
+        ") datasets!\n"
+      )
+    )
     drFitfl <- list(
-        raw.data = flTable, drTable = EC50.table, drFittedModels = EC50,
-        control = control
+      raw.data = flTable, drTable = NA, drFittedModels = NA,
+      control = control
     )
     class(drFitfl) <- "drFitfl"
-    invisible(drFitfl)
+    return(drFitfl)
+  } else
+  {
+    skip <- c()
+    for (i in 1:length(distinct))
+    {
+      conc <- factor(
+        (flTable[, 3])[which(flTable[, 1] == distinct[i])]
+      )
+      if (length(levels(conc)) <
+          4)
+      {
+        message(
+          paste0(
+            distinct[i], " does not have enough unique concentrations. A condition must have at least 4 different concentrations to be considered for dose-response analysis."
+          )
+        )
+        skip <- c(skip, i)
+        next
+      }
+      test <- (as.numeric(flTable[, dr.parameter]))[flTable[,
+                                                            1] == distinct[i]]
+      names(test) <- rep(
+        names(flTable)[dr.parameter],
+        length(test)
+      )
+      drID <- distinct[i]
+      EC50[[i]] <- try(
+        fl.drFitModel(conc, test, drID, control),
+        silent = TRUE
+      )
+      description <- data.frame(
+        Test = distinct[i], log.x = control$log.x.dr,
+        log.y = control$log.y.dr
+      )
+      if (is(EC50[[i]]) !=
+          "try-error")
+      {
+        out.row <- cbind(description, summary.drFitFLModel(EC50[[i]]))
+      } else
+      {
+        out.row <- cbind(
+          description, data.frame(
+            yEC50 = NA, y.min = NA, y.max = NA,
+            fc = NA, K = NA, n = NA, yEC50.orig = NA,
+            K.orig = NA, test = NA
+          )
+        )
+      }
+      EC50.table <- rbind(EC50.table, out.row)
+
+    }
+  }
+  class(EC50.table) <- c("drTable", "list")
+  if (exists("skip") &&
+      !is.null(skip))
+  {
+    distinct <- distinct[-skip]
+    EC50 <- EC50[-skip]
+  }
+  names(EC50) <- distinct
+  drFitfl <- list(
+    raw.data = flTable, drTable = EC50.table, drFittedModels = EC50,
+    control = control
+  )
+  class(drFitfl) <- "drFitfl"
+  invisible(drFitfl)
 }
 
 #' Perform a biosensor model fit on response vs. concentration data of a single sample.
@@ -1444,305 +1446,305 @@ fl.drFit <- function(
 fl.drFitModel <- function(
     conc, test, drID = "undefined", control = fl.control()
 )
-    {
-    if (is(control) !=
-        "fl.control")
-        stop("control must be of class fl.control!")
-    test.nm <- names(test)[1]
-    test <- as.vector(as.numeric(as.matrix(test)))
-    conc <- as.vector(as.numeric(as.matrix(conc)))
-    if (is.vector(conc) ==
-        FALSE || is.vector(test) ==
-        FALSE)
-        stop(
-            "fl.drFitModel: dose or response data must be a vector !"
-        )
-    if (control$neg.nan.act == FALSE)
-    {
-        missings <- is.na(conc) |
-            is.na(test) |
-            !is.numeric(conc) |
-            !is.numeric(test)
-        conc <- conc[!missings]
-        test <- test[!missings]
-        negs <- (conc < 0) | (test < 0)
-        conc <- conc[!negs]
-        test <- test[!negs]
-    } else
-    {
-        if (sum(
-            is.na(conc) |
-                is.na(test)
-        ))
-            stop(
-                "fl.drFitModel: NA values encountered. Program terminated"
-            )
-        if ((sum((conc < 0)) >
-            0) | (sum((test < 0)) >
-            0))
-            stop(
-                "fl.drFitModel: Negative values encountered. Program terminated"
-            )
-        if ((FALSE %in% is.numeric(conc)) ||
-            (FALSE %in% is.numeric(test)))
-            stop(
-                "fl.drFitModel: Non numeric values encountered. Program terminated"
-            )
-    }
-    if (length(test) <
-        4)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "drFitModel: There is not enough valid data. Must have at least 4 unique values!"
-            )
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                yEC50.orig = NA
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitModel) <- "drFitFLModel"
-        return(drFitModel)
-    }
-    if (length(test) <
-        control$dr.have.atleast)
-        {
-        if (control$suppress.messages == FALSE)
-            message(
-                "drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See fl.control()."
-            )
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, spline = NA,
-            parameters = list(
-                EC50 = NA, yEC50 = NA, EC50.orig = NA,
-                yEC50.orig = NA
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitModel) <- "drFitFLModel"
-        return(drFitModel)
-    }
-    if (control$log.x.dr == TRUE)
-        conc.log <- log(conc + 1)
-    if (control$log.y.dr == TRUE)
-        test.log <- log(test + 1)
-    if (control$log.x.dr == TRUE)
-    {
-        conc.fit <- log(conc + 1)
-    } else
-    {
-        conc.fit <- conc
-    }
-    if (control$log.y.dr == TRUE)
-    {
-        test.fit <- log(test + 1)
-    } else
-    {
-        test.fit <- test
-    }
-    test.fit <- test.fit[order(conc.fit)]
-    conc.fit <- conc.fit[order(conc.fit)]
-    y.min <- mean(test.fit[which(conc.fit == conc.fit[1])])
-    fitFlag <- TRUE
-    n_candidates <- seq(0, 1, 0.01)
-    i <- 1
-    # plot(conc.fit, test.fit) title(drID)
-    df <- data.frame(x = conc.fit, test.fit = test.fit)
-    y.model <- list()
-    y.model[["convInfo"]] <- list()
-    y.model$convInfo[["isConv"]] <- FALSE
-    while (y.model$convInfo$isConv == FALSE && i <
-        100)
-        {
-        i <- i + 1
-        try(
-            suppressWarnings(
-                y.model <- minpack.lm::nlsLM(
-                  test.fit ~ biosensor.eq(
-                    x = conc.fit, y.min, y.max, K,
-                    n
-                ),
-                  start = initbiosensor(x = conc.fit, y = test.fit, n = n_candidates[i])
-              )
-            ),
-            silent = T
-        )
-        # try( suppressWarnings(y.model <-
-        # nls(test.fit ~ biosensor.eq(x=conc.fit,
-        # y.min, y.max, K, n), start =
-        # initbiosensor(x=conc.fit, y=test.fit, n
-        # = n_candidates[i]))), silent = F )
-    }
-    if (y.model$convInfo$isConv == FALSE)
-    {
-        if (control$suppress.messages == FALSE)
-        {
-            cat(
-                "Model could not be fitted in dose-response analysis!\n"
-            )
-        }
-        drFitModel <- list(
-            raw.conc = conc, raw.test = test, drID = drID,
-            fit.conc = NA, fit.test = NA, model = y.model,
-            parameters = list(
-                yEC50 = NA, y.min = NA, y.max = NA,
-                fc = NA, K = NA, n = NA, yEC50.orig = NA,
-                K.orig = NA, test = NA
-            ),
-            fitFlag = FALSE, reliable = NULL, control = control
-        )
-        class(drFitModel) <- "drFitFLModel"
-        return(drFitModel)
-    }
-    # lines(conc.fit, biosensor.eq(x=conc.fit,
-    # y.min=coef(y.model)[1],
-    # y.max=coef(y.model)[2], K=coef(y.model)[3],
-    # n=coef(y.model)[4]), col = 'red')
-    m <- summary(y.model)
-    par <- m$parameters
-    # y.min <- par[1,1]
-    y.max <- par[1, 1]
-    fc <- par[1, 1]/y.min  # fold-change
-    K <- par[2, 1]  # sensitivity
-    n <- par[3, 1]  # cooperativity
-
-    x_fit <- seq(
-        0, max(conc.fit),
-        length.out = 1000
+{
+  if (is(control) !=
+      "fl.control")
+    stop("control must be of class fl.control!")
+  test.nm <- names(test)[1]
+  test <- as.vector(as.numeric(as.matrix(test)))
+  conc <- as.vector(as.numeric(as.matrix(conc)))
+  if (is.vector(conc) ==
+      FALSE || is.vector(test) ==
+      FALSE)
+    stop(
+      "fl.drFitModel: dose or response data must be a vector !"
     )
-    y_fit <- biosensor.eq(
-        x_fit, y.min = y.min, y.max = par[1, 1], K = par[2,
-            1], n = par[3, 1]
-    )
-    # plot(conc.fit, test.fit) lines(xin,
-    # biosensor.eq(xin, y.min=par[1,1],
-    # y.max=par[2,1], K=par[3,1], n=par[4,1]))
-
-    # /// estimating EC 50 values
-    yEC.test <- y.min + (y.max - y.min) * (K^n/(K^n +
-        K^n))
-    EC.test <- K
+  if (control$neg.nan.act == FALSE)
+  {
+    missings <- is.na(conc) |
+      is.na(test) |
+      !is.numeric(conc) |
+      !is.numeric(test)
+    conc <- conc[!missings]
+    test <- test[!missings]
+    negs <- (conc < 0) | (test < 0)
+    conc <- conc[!negs]
+    test <- test[!negs]
+  } else
+  {
+    if (sum(
+      is.na(conc) |
+      is.na(test)
+    ))
+      stop(
+        "fl.drFitModel: NA values encountered. Program terminated"
+      )
+    if ((sum((conc < 0)) >
+         0) | (sum((test < 0)) >
+               0))
+      stop(
+        "fl.drFitModel: Negative values encountered. Program terminated"
+      )
+    if ((FALSE %in% is.numeric(conc)) ||
+        (FALSE %in% is.numeric(test)))
+      stop(
+        "fl.drFitModel: Non numeric values encountered. Program terminated"
+      )
+  }
+  if (length(test) <
+      4)
+  {
     if (control$suppress.messages == FALSE)
-    {
-        cat(
-            "\n\n=== Dose response curve estimation ================\n"
-        )
-        cat(
-            "--- EC 50 -----------------------------------------\n"
-        )
-        cat(paste("-->", as.character(drID)))
-        cat("\n")
-        cat(
-            paste(
-                c(
-                  "sensitivity:", "yEC50:", "fold change:",
-                  "leakiness:"
-              ),
-                c(
-                  signif(EC.test, digits = 3),
-                  round(yEC.test),
-                  round(fc, 2),
-                  round(y.min, 1)
-              ),
-                collapse = " | "
-            )
-        )
-    }
-    if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
-        FALSE))
-        {
-        if (control$suppress.messages == FALSE)
-        {
-            cat("\n--> Original scale \n")
-            cat(
-                paste(
-                  c("xEC50", "yEC50"),
-                  c(
-                    exp(EC.test) -
-                      1, yEC.test
-                )
-              )
-            )
-        }
-        EC.orig <- c(
-            exp(EC.test) -
-                1, yEC.test
-        )
-    } else
-    {
-        if ((control$log.x.dr == FALSE) && (control$log.y.dr ==
-            TRUE))
-            {
-            if (control$suppress.messages == FALSE)
-            {
-                cat("\n--> Original scale \n")
-                cat(
-                  paste(
-                    c("xEC50", "yEC50"),
-                    c(
-                      EC.test, exp(yEC.test) -
-                        1
-                  )
-                )
-              )
-            }
-            EC.orig <- c(
-                EC.test, exp(yEC.test) -
-                  1
-            )
-        } else
-        {
-            if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
-                TRUE))
-                {
-                if (control$suppress.messages == FALSE)
-                {
-                  cat("\n--> Original scale \n")
-                  cat(
-                    paste(
-                      c("xEC50", "yEC50"),
-                      c(
-                        exp(EC.test) -
-                          1, exp(yEC.test) -
-                          1
-                    )
-                  )
-                )
-                }
-                EC.orig <- c(
-                  exp(EC.test) -
-                    1, exp(yEC.test) -
-                    1
-              )
-            } else
-            {
-                if ((control$log.x.dr == FALSE) &&
-                  (control$log.y.dr == FALSE))
-                  {
-                  EC.orig <- c(EC.test, yEC.test)
-                }
-            }
-        }
-    }
-    if (control$suppress.messages == FALSE)
-    {
-        cat("\n\n\n")
-    }
+      message(
+        "drFitModel: There is not enough valid data. Must have at least 4 unique values!"
+      )
     drFitModel <- list(
-        raw.conc = conc, raw.test = test, drID = drID,
-        fit.conc = x_fit, fit.test = y_fit, model = y.model,
-        parameters = list(
-            yEC50 = yEC.test, y.min = y.min, y.max = y.max,
-            fc = fc, K = K, n = n, yEC50.orig = EC.orig[2],
-            K.orig = EC.orig[1], test = test.nm
-        ),
-        fitFlag = fitFlag, reliable = NULL, control = control
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, EC50.orig = NA,
+        yEC50.orig = NA
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
     )
     class(drFitModel) <- "drFitFLModel"
-    invisible(drFitModel)
+    return(drFitModel)
+  }
+  if (length(test) <
+      control$dr.have.atleast)
+  {
+    if (control$suppress.messages == FALSE)
+      message(
+        "drFitModel: number of valid data points is below the number specified in 'dr.have.atleast'. See fl.control()."
+      )
+    drFitModel <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, spline = NA,
+      parameters = list(
+        EC50 = NA, yEC50 = NA, EC50.orig = NA,
+        yEC50.orig = NA
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
+    )
+    class(drFitModel) <- "drFitFLModel"
+    return(drFitModel)
+  }
+  if (control$log.x.dr == TRUE)
+    conc.log <- log(conc + 1)
+  if (control$log.y.dr == TRUE)
+    test.log <- log(test + 1)
+  if (control$log.x.dr == TRUE)
+  {
+    conc.fit <- log(conc + 1)
+  } else
+  {
+    conc.fit <- conc
+  }
+  if (control$log.y.dr == TRUE)
+  {
+    test.fit <- log(test + 1)
+  } else
+  {
+    test.fit <- test
+  }
+  test.fit <- test.fit[order(conc.fit)]
+  conc.fit <- conc.fit[order(conc.fit)]
+  y.min <- mean(test.fit[which(conc.fit == conc.fit[1])])
+  fitFlag <- TRUE
+  n_candidates <- seq(0, 1, 0.01)
+  i <- 1
+  # plot(conc.fit, test.fit) title(drID)
+  df <- data.frame(x = conc.fit, test.fit = test.fit)
+  y.model <- list()
+  y.model[["convInfo"]] <- list()
+  y.model$convInfo[["isConv"]] <- FALSE
+  while (y.model$convInfo$isConv == FALSE && i <
+         100)
+  {
+    i <- i + 1
+    try(
+      suppressWarnings(
+        y.model <- minpack.lm::nlsLM(
+          test.fit ~ biosensor.eq(
+            x = conc.fit, y.min, y.max, K,
+            n
+          ),
+          start = initbiosensor(x = conc.fit, y = test.fit, n = n_candidates[i])
+        )
+      ),
+      silent = T
+    )
+    # try( suppressWarnings(y.model <-
+    # nls(test.fit ~ biosensor.eq(x=conc.fit,
+    # y.min, y.max, K, n), start =
+    # initbiosensor(x=conc.fit, y=test.fit, n
+    # = n_candidates[i]))), silent = F )
+  }
+  if (y.model$convInfo$isConv == FALSE)
+  {
+    if (control$suppress.messages == FALSE)
+    {
+      warning(
+        "Model could not be fitted in dose-response analysis!\n"
+      )
+    }
+    drFitModel <- list(
+      raw.conc = conc, raw.test = test, drID = drID,
+      fit.conc = NA, fit.test = NA, model = y.model,
+      parameters = list(
+        yEC50 = NA, y.min = NA, y.max = NA,
+        fc = NA, K = NA, n = NA, yEC50.orig = NA,
+        K.orig = NA, test = NA
+      ),
+      fitFlag = FALSE, reliable = NULL, control = control
+    )
+    class(drFitModel) <- "drFitFLModel"
+    return(drFitModel)
+  }
+  # lines(conc.fit, biosensor.eq(x=conc.fit,
+  # y.min=coef(y.model)[1],
+  # y.max=coef(y.model)[2], K=coef(y.model)[3],
+  # n=coef(y.model)[4]), col = 'red')
+  m <- summary(y.model)
+  par <- m$parameters
+  # y.min <- par[1,1]
+  y.max <- par[1, 1]
+  fc <- par[1, 1]/y.min  # fold-change
+  K <- par[2, 1]  # sensitivity
+  n <- par[3, 1]  # cooperativity
+
+  x_fit <- seq(
+    0, max(conc.fit),
+    length.out = 1000
+  )
+  y_fit <- biosensor.eq(
+    x_fit, y.min = y.min, y.max = par[1, 1], K = par[2,
+                                                     1], n = par[3, 1]
+  )
+  # plot(conc.fit, test.fit) lines(xin,
+  # biosensor.eq(xin, y.min=par[1,1],
+  # y.max=par[2,1], K=par[3,1], n=par[4,1]))
+
+  # /// estimating EC 50 values
+  yEC.test <- y.min + (y.max - y.min) * (K^n/(K^n +
+                                                K^n))
+  EC.test <- K
+  if (control$suppress.messages == FALSE)
+  {
+    cat(
+      "\n\n=== Dose response curve estimation ================\n"
+    )
+    cat(
+      "--- EC 50 -----------------------------------------\n"
+    )
+    cat(paste("-->", as.character(drID)))
+    cat("\n")
+    cat(
+      paste(
+        c(
+          "sensitivity:", "yEC50:", "fold change:",
+          "leakiness:"
+        ),
+        c(
+          signif(EC.test, digits = 3),
+          round(yEC.test),
+          round(fc, 2),
+          round(y.min, 1)
+        ),
+        collapse = " | "
+      )
+    )
+  }
+  if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
+                                     FALSE))
+  {
+    if (control$suppress.messages == FALSE)
+    {
+      cat("\n--> Original scale \n")
+      cat(
+        paste(
+          c("xEC50", "yEC50"),
+          c(
+            exp(EC.test) -
+              1, yEC.test
+          )
+        )
+      )
+    }
+    EC.orig <- c(
+      exp(EC.test) -
+        1, yEC.test
+    )
+  } else
+  {
+    if ((control$log.x.dr == FALSE) && (control$log.y.dr ==
+                                        TRUE))
+    {
+      if (control$suppress.messages == FALSE)
+      {
+        cat("\n--> Original scale \n")
+        cat(
+          paste(
+            c("xEC50", "yEC50"),
+            c(
+              EC.test, exp(yEC.test) -
+                1
+            )
+          )
+        )
+      }
+      EC.orig <- c(
+        EC.test, exp(yEC.test) -
+          1
+      )
+    } else
+    {
+      if ((control$log.x.dr == TRUE) && (control$log.y.dr ==
+                                         TRUE))
+      {
+        if (control$suppress.messages == FALSE)
+        {
+          cat("\n--> Original scale \n")
+          cat(
+            paste(
+              c("xEC50", "yEC50"),
+              c(
+                exp(EC.test) -
+                  1, exp(yEC.test) -
+                  1
+              )
+            )
+          )
+        }
+        EC.orig <- c(
+          exp(EC.test) -
+            1, exp(yEC.test) -
+            1
+        )
+      } else
+      {
+        if ((control$log.x.dr == FALSE) &&
+            (control$log.y.dr == FALSE))
+        {
+          EC.orig <- c(EC.test, yEC.test)
+        }
+      }
+    }
+  }
+  if (control$suppress.messages == FALSE)
+  {
+    cat("\n\n\n")
+  }
+  drFitModel <- list(
+    raw.conc = conc, raw.test = test, drID = drID,
+    fit.conc = x_fit, fit.test = y_fit, model = y.model,
+    parameters = list(
+      yEC50 = yEC.test, y.min = y.min, y.max = y.max,
+      fc = fc, K = K, n = n, yEC50.orig = EC.orig[2],
+      K.orig = EC.orig[1], test = test.nm
+    ),
+    fitFlag = fitFlag, reliable = NULL, control = control
+  )
+  class(drFitModel) <- "drFitFLModel"
+  invisible(drFitModel)
 }

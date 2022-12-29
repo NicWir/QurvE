@@ -171,7 +171,7 @@ growth.gcFitSpline <- function(
     if (length(data) <
         5)
         {
-        cat(
+        warning(
             "gcFitSpline: There is not enough valid data. Must have at least 5!"
         )
         gcFitSpline <- list(
@@ -974,7 +974,7 @@ flFitSpline <- function(
     if (length(fl_data) <
         5)
         {
-        cat(
+        warning(
             "flFitSpline: There is not enough valid data. Must have at least 5!"
         )
         flFitSpline <- list(

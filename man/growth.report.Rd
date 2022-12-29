@@ -6,7 +6,7 @@
 \usage{
 growth.report(
   grofit,
-  out.dir = NULL,
+  out.dir = tempdir(),
   out.nm = NULL,
   ec50 = FALSE,
   format = c("pdf", "html"),
@@ -40,7 +40,7 @@ growth.report(
 \code{growth.report} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results.
 }
 \examples{
-if(interactive()){
+\donttest{
 # Create random growth data set
   rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 
@@ -54,7 +54,7 @@ if(interactive()){
                          suppress.messages = TRUE,
                          parallelize = FALSE)
 
-  growth.report(res)
+  growth.report(res, out.dir = tempdir())
 }
 }
 \concept{reports}

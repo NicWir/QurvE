@@ -104,379 +104,379 @@ growth.workflow <- function(
     log.y.model = TRUE, biphasic = FALSE, lin.h = NULL,
     lin.R2 = 0.97, lin.RSD = 0.1, lin.dY = 0.05, interactive = FALSE,
     nboot.gc = 0, smooth.gc = 0.55, model.type = c(
-        "logistic", "richards", "gompertz", "gompertz.exp",
-        "huang", "baranyi"
+      "logistic", "richards", "gompertz", "gompertz.exp",
+      "huang", "baranyi"
     ),
     dr.method = c("model", "spline"),
     dr.model = c(
-        "gammadr", "multi2", "LL.2", "LL.3", "LL.4",
-        "LL.5", "W1.2", "W1.3", "W1.4", "W2.2", "W2.3",
-        "W2.4", "LL.3u", "LL2.2", "LL2.3", "LL2.3u",
-        "LL2.4", "LL2.5", "AR.2", "AR.3", "MM.2"
+      "gammadr", "multi2", "LL.2", "LL.3", "LL.4",
+      "LL.5", "W1.2", "W1.3", "W1.4", "W2.2", "W2.3",
+      "W2.4", "LL.3u", "LL2.2", "LL2.3", "LL2.3u",
+      "LL2.4", "LL2.5", "AR.2", "AR.3", "MM.2"
     ),
     growth.thresh = 1.5, dr.have.atleast = 6, dr.parameter = c(
-        "mu.linfit", "lambda.linfit", "dY.linfit",
-        "A.linfit", "mu.spline", "lambda.spline", "dY.spline",
-        "A.spline", "mu.model", "lambda.model", "dY.orig.model",
-        "A.orig.model"
+      "mu.linfit", "lambda.linfit", "dY.linfit",
+      "A.linfit", "mu.spline", "lambda.spline", "dY.spline",
+      "A.spline", "mu.model", "lambda.model", "dY.orig.model",
+      "A.orig.model"
     ),
     smooth.dr = 0.1, log.x.dr = FALSE, log.y.dr = FALSE,
     nboot.dr = 0, report = NULL, out.dir = NULL, out.nm = NULL,
     export.fig = FALSE, export.res = FALSE, parallelize = TRUE,
     ...
 )
+{
+  dr.parameter <- match.arg(dr.parameter)
+  if (ec50 == TRUE)
+  {
+    dr.parameter.fit.method <- gsub(".+\\.", "", dr.parameter)
+    if ((dr.parameter.fit.method == "spline" &&
+         !any(fit.opt %in% c("a", "s"))) ||
+        (dr.parameter.fit.method == "model" &&
+         !any(fit.opt %in% c("a", "m"))) ||
+        (dr.parameter.fit.method == "linfit" &&
+         !any(fit.opt %in% c("a", "l"))))
+      message(
+        "The chosen 'dr.parameter' is not compatible with the selected fitting options ('fit.opt'). Dose-response analysis will not be performed."
+      )
+  }
+  if (exists("lin.h") &&
+      !is.null(lin.h) &&
+      (is.na(lin.h) ||
+       lin.h == ""))
+    lin.h <- NULL
+  # Define objects based on additional function
+  # calls
+  call <- match.call()
+
+  ## remove strictly defined arguments
+  call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <- call$fit.opt <- call$t0 <- call$min.growth <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <- call$tmax <- call$max.growth <- call$parallelize <- call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <- call$dr.method <- call$dr.model <- call$dr.have.atleast <- call$dr.parameter <- call$smooth.dr <- call$log.x.dr <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
+
+
+  arglist <- sapply(call, function(x) x)
+  arglist <- unlist(arglist)[-1]
+  ## Assign additional arguments (...) as R
+  ## objects
+  if (length(arglist) >
+      0)
+  {
+    for (i in 1:length(arglist))
     {
-    dr.parameter <- match.arg(dr.parameter)
-    if (ec50 == TRUE)
+      assign(
+        names(arglist)[i],
+        arglist[[i]]
+      )
+    }
+  }
+
+  # Test input
+  if (is.null(grodata) ||
+      !(is(grodata) ==
+        "list") && !(is(grodata) ==
+                     "grodata"))
+  {
+    if (is.numeric(as.matrix(time)) ==
+        FALSE)
+      stop(
+        "Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data()."
+      )
+    if (is.numeric(as.matrix(data[-1:-3])) ==
+        FALSE)
+      stop(
+        "Need a numeric matrix for 'data' or a grodata object created with read_data() or parse_data()."
+      )
+    if (is.logical(ec50) ==
+        FALSE)
+      stop("Need a logical value for 'ec50'")
+  }
+  if (!is.null(grodata))
+  {
+    time <- grodata$time
+    if (!is.null(grodata$expdesign))
+      expdesign <- grodata$expdesign
+    data <- grodata$growth
+  } else
+  {
+    dat.mat <- as.matrix(data)
+    label <- unlist(
+      lapply(
+        1:nrow(dat.mat),
+        function(x) paste(
+          dat.mat[x, 1], dat.mat[x, 2], dat.mat[x,
+                                                3], sep = " | "
+        )
+      )
+    )
+    condition <- dat.mat[, 1]
+    replicate <- dat.mat[, 2]
+    concentration <- dat.mat[, 3]
+    expdesign <- data.frame(
+      label, condition, replicate, concentration,
+      check.names = FALSE
+    )
+  }
+  if (ec50 == TRUE)
+  {
+    if (length(unique(expdesign$concentration)) <
+        4)
+      message(
+        "No or not enough unique concentration information provided. Dose-Response analysis will be omitted."
+      )
+  }
+  control <- growth.control(
+    neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
+    suppress.messages = suppress.messages, fit.opt = fit.opt,
+    t0 = t0, min.growth = min.growth, tmax = tmax,
+    max.growth = max.growth, log.x.gc = log.x.gc,
+    log.y.lin = log.y.lin, log.y.spline = log.y.spline,
+    log.y.model = log.y.model, biphasic = biphasic,
+    lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD,
+    lin.dY = lin.dY, interactive = interactive,
+    nboot.gc = round(nboot.gc),
+    smooth.gc = smooth.gc, smooth.dr = smooth.dr,
+    dr.method = dr.method, dr.model = dr.model,
+    dr.have.atleast = round(dr.have.atleast),
+    dr.parameter = dr.parameter, log.x.dr = log.x.dr,
+    log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
+    model.type = model.type, growth.thresh = growth.thresh
+  )
+  nboot.gc <- control$nboot.gc
+  nboot.dr <- control$nboot.dr
+  out.gcFit <- NA
+  out.drFit <- NA
+  class(out.drFit) <- "drFit"
+
+  # /// fit of growth curves
+  # -----------------------------------
+  if (exists("shiny") &&
+      shiny == TRUE)
+    out.gcFit <- growth.gcFit(time, data, control, shiny = TRUE, parallelize = parallelize)
+  else
+    out.gcFit <- growth.gcFit(time, data, control, parallelize = parallelize)
+
+  # /// Estimate EC50 values
+  if (ec50 == TRUE && !((dr.parameter.fit.method ==
+                         "spline" && !any(fit.opt %in% c("a", "s"))) ||
+                        (dr.parameter.fit.method == "model" && !any(fit.opt %in% c("a", "m"))) ||
+                        (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("a", "l")))) &&
+      (length(unique(expdesign$concentration)) >=
+       4))
+  {
+    out.drFit <- growth.drFit(
+      summary.gcFit(out.gcFit),
+      control
+    )
+    if (length(out.drFit) >
+        1)
     {
-        dr.parameter.fit.method <- gsub(".+\\.", "", dr.parameter)
-        if ((dr.parameter.fit.method == "spline" &&
-            !any(fit.opt %in% c("a", "s"))) ||
-            (dr.parameter.fit.method == "model" &&
-                !any(fit.opt %in% c("a", "m"))) ||
-            (dr.parameter.fit.method == "linfit" &&
-                !any(fit.opt %in% c("a", "l"))))
-            message(
-                "The chosen 'dr.parameter' is not compatible with the selected fitting options ('fit.opt'). Dose-response analysis will not be performed."
-            )
+      EC50.table <- out.drFit$drTable
+      boot.ec <- out.drFit$boot.ec
     }
-    if (exists("lin.h") &&
-        !is.null(lin.h) &&
-        (is.na(lin.h) ||
-            lin.h == ""))
-        lin.h <- NULL
-    # Define objects based on additional function
-    # calls
-    call <- match.call()
-
-    ## remove strictly defined arguments
-    call$grodata <- call$time <- call$data <- call$ec50 <- call$mean.grp <- call$mean.conc <- call$neg.nan.act <- call$clean.bootstrap <- call$suppress.messages <- call$export.res <- call$fit.opt <- call$t0 <- call$min.growth <- call$log.x.gc <- call$log.y.spline <- call$log.y.lin <- call$log.y.model <- call$biphasic <- call$tmax <- call$max.growth <- call$parallelize <- call$lin.h <- call$lin.R2 <- call$lin.RSD <- call$lin.dY <- call$interactive <- call$nboot.gc <- call$smooth.gc <- call$model.type <- call$growth.thresh <- call$dr.method <- call$dr.model <- call$dr.have.atleast <- call$dr.parameter <- call$smooth.dr <- call$log.x.dr <- call$log.y.dr <- call$nboot.dr <- call$report <- call$out.dir <- call$out.nm <- call$export.fig <- NULL
-
-
-    arglist <- sapply(call, function(x) x)
-    arglist <- unlist(arglist)[-1]
-    ## Assign additional arguments (...) as R
-    ## objects
-    if (length(arglist) >
-        0)
-        {
-        for (i in 1:length(arglist))
-            {
-            assign(
-                names(arglist)[i],
-                arglist[[i]]
-            )
-        }
-    }
-
-    # Test input
-    if (is.null(grodata) ||
-        !(is(grodata) ==
-            "list") && !(is(grodata) ==
-            "grodata"))
-            {
-        if (is.numeric(as.matrix(time)) ==
-            FALSE)
-            stop(
-                "Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data()."
-            )
-        if (is.numeric(as.matrix(data[-1:-3])) ==
-            FALSE)
-            stop(
-                "Need a numeric matrix for 'data' or a grodata object created with read_data() or parse_data()."
-            )
-        if (is.logical(ec50) ==
-            FALSE)
-            stop("Need a logical value for 'ec50'")
-    }
-    if (!is.null(grodata))
-        {
-        time <- grodata$time
-        if (!is.null(grodata$expdesign))
-            expdesign <- grodata$expdesign
-        data <- grodata$growth
+  }
+  # ///
+  grofit <- list(
+    time = time, data = data, gcFit = out.gcFit,
+    drFit = out.drFit, expdesign = expdesign, control = control
+  )
+  class(grofit) <- "grofit"
+  if (!exists("shiny") ||
+      shiny != TRUE)
+  {
+    if (!is.null(out.dir))
+    {
+      wd <- paste0(out.dir)
     } else
     {
-        dat.mat <- as.matrix(data)
-        label <- unlist(
-            lapply(
-                1:nrow(dat.mat),
-                function(x) paste(
-                  dat.mat[x, 1], dat.mat[x, 2], dat.mat[x,
-                    3], sep = " | "
-              )
-            )
-        )
-        condition <- dat.mat[, 1]
-        replicate <- dat.mat[, 2]
-        concentration <- dat.mat[, 3]
-        expdesign <- data.frame(
-            label, condition, replicate, concentration,
-            check.names = FALSE
-        )
+      wd <- paste(
+        getwd(), "/GrowthResults_", format(Sys.time(), "%Y%m%d_%H%M%S"),
+        sep = ""
+      )
     }
-    if (ec50 == TRUE)
+    if (export.res)
+      dir.create(wd, showWarnings = FALSE)
+
+    gcTable <- data.frame(
+      apply(
+        grofit[["gcFit"]][["gcTable"]], 2,
+        as.character
+      )
+    )
+    res.table.gc <- cbind(
+      gcTable[, 1:3], Filter(
+        function(x) !all(is.na(x)),
+        gcTable[, -(1:3)]
+      )
+    )
+    if (export.res)
     {
-        if (length(unique(expdesign$concentration)) <
-            4)
-            message(
-                "No or not enough unique concentration information provided. Dose-Response analysis will be omitted."
-            )
-    }
-    control <- growth.control(
-        neg.nan.act = neg.nan.act, clean.bootstrap = clean.bootstrap,
-        suppress.messages = suppress.messages, fit.opt = fit.opt,
-        t0 = t0, min.growth = min.growth, tmax = tmax,
-        max.growth = max.growth, log.x.gc = log.x.gc,
-        log.y.lin = log.y.lin, log.y.spline = log.y.spline,
-        log.y.model = log.y.model, biphasic = biphasic,
-        lin.h = lin.h, lin.R2 = lin.R2, lin.RSD = lin.RSD,
-        lin.dY = lin.dY, interactive = interactive,
-        nboot.gc = round(nboot.gc),
-        smooth.gc = smooth.gc, smooth.dr = smooth.dr,
-        dr.method = dr.method, dr.model = dr.model,
-        dr.have.atleast = round(dr.have.atleast),
-        dr.parameter = dr.parameter, log.x.dr = log.x.dr,
-        log.y.dr = log.y.dr, nboot.dr = round(nboot.dr),
-        model.type = model.type, growth.thresh = growth.thresh
-    )
-    nboot.gc <- control$nboot.gc
-    nboot.dr <- control$nboot.dr
-    out.gcFit <- NA
-    out.drFit <- NA
-    class(out.drFit) <- "drFit"
-
-    # /// fit of growth curves
-    # -----------------------------------
-    if (exists("shiny") &&
-        shiny == TRUE)
-        out.gcFit <- growth.gcFit(
-            time, data, control, shiny = TRUE, parallelize = parallelize
-        ) else out.gcFit <- growth.gcFit(time, data, control, parallelize = parallelize)
-
-    # /// Estimate EC50 values
-    if (ec50 == TRUE && !((dr.parameter.fit.method ==
-        "spline" && !any(fit.opt %in% c("a", "s"))) ||
-        (dr.parameter.fit.method == "model" && !any(fit.opt %in% c("a", "m"))) ||
-        (dr.parameter.fit.method == "linfit" && !any(fit.opt %in% c("a", "l")))) &&
-        (length(unique(expdesign$concentration)) >=
-            4))
-            {
-        out.drFit <- growth.drFit(
-            summary.gcFit(out.gcFit),
-            control
+      export_Table(
+        table = res.table.gc, out.dir = wd,
+        out.nm = "results.gc"
+      )
+      # res.table.gc[, c(8:14, 20:27,
+      # 29:44)] <- apply(res.table.gc[,
+      # c(8:16, 20:27, 29:44)], 2,
+      # as.numeric)
+      message(
+        paste0(
+          "\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
+          "...", gsub(".+/", "", wd),
+          "/results.gc.txt'"
         )
-        if (length(out.drFit) >
-            1)
-            {
-            EC50.table <- out.drFit$drTable
-            boot.ec <- out.drFit$boot.ec
-        }
+      )
     }
-    # ///
-    grofit <- list(
-        time = time, data = data, gcFit = out.gcFit,
-        drFit = out.drFit, expdesign = expdesign, control = control
-    )
-    class(grofit) <- "grofit"
-    if (!exists("shiny") ||
-        shiny != TRUE)
-        {
-            if (!is.null(out.dir))
-                {
-                wd <- paste0(out.dir)
-            } else
-            {
-                wd <- paste(
-                  getwd(), "/GrowthResults_", format(Sys.time(), "%Y%m%d_%H%M%S"),
-                  sep = ""
-              )
-            }
-            if (export.res)
-                dir.create(wd, showWarnings = FALSE)
 
-            gcTable <- data.frame(
-                apply(
-                  grofit[["gcFit"]][["gcTable"]], 2,
-                  as.character
-              )
+    # Export grouped results table
+    if (("l" %in% control$fit.opt) || ("a" %in%
+                                       control$fit.opt))
+    {
+      table_linear_group <- table_group_growth_linear(res.table.gc)
+      names <- gsub(
+        "<sub>", "_", gsub(
+          "</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))
+        )
+      )
+      table_linear_group <- as.data.frame(
+        lapply(
+          1:ncol(table_linear_group),
+          function(x) gsub(
+            "<strong>", "", gsub(
+              "</strong>", "", table_linear_group[,
+                                                  x]
             )
-            res.table.gc <- cbind(
-                gcTable[, 1:3], Filter(
-                  function(x) !all(is.na(x)),
-                  gcTable[, -(1:3)]
-              )
+          )
+        )
+      )
+      colnames(table_linear_group) <- names
+      if (export.res)
+        export_Table(
+          table = table_linear_group, out.dir = wd,
+          out.nm = "grouped_results_linear"
+        )
+    }
+
+    if (("s" %in% control$fit.opt) || ("a" %in%
+                                       control$fit.opt))
+    {
+      table_spline_group <- table_group_growth_spline(res.table.gc)
+      names <- gsub(
+        "<sub>", "_", gsub(
+          "</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))
+        )
+      )
+      table_spline_group <- as.data.frame(
+        lapply(
+          1:ncol(table_spline_group),
+          function(x) gsub(
+            "<strong>", "", gsub(
+              "</strong>", "", table_spline_group[,
+                                                  x]
             )
-            if (export.res)
-            {
-                export_Table(
-                  table = res.table.gc, out.dir = wd,
-                  out.nm = "results.gc"
-              )
-                # res.table.gc[, c(8:14, 20:27,
-                # 29:44)] <- apply(res.table.gc[,
-                # c(8:16, 20:27, 29:44)], 2,
-                # as.numeric)
-                message(
-                  paste0(
-                    "\nResults of growth fit analysis saved as tab-delimited text file in:\n''",
-                    "...", gsub(".+/", "", wd),
-                    "/results.gc.txt'"
-                )
-              )
-            }
+          )
+        )
+      )
+      colnames(table_spline_group) <- names
+      if (export.res)
+        export_Table(
+          table = table_spline_group, out.dir = wd,
+          out.nm = "grouped_results_spline"
+        )
+    }
 
-            # Export grouped results table
-            if (("l" %in% control$fit.opt) || ("a" %in%
-                control$fit.opt))
-                {
-                table_linear_group <- table_group_growth_linear(res.table.gc)
-                names <- gsub(
-                  "<sub>", "_", gsub(
-                    "</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_linear_group))
-                )
-              )
-                table_linear_group <- as.data.frame(
-                  lapply(
-                    1:ncol(table_linear_group),
-                    function(x) gsub(
-                      "<strong>", "", gsub(
-                        "</strong>", "", table_linear_group[,
-                          x]
-                    )
-                  )
-                )
-              )
-                colnames(table_linear_group) <- names
-                if (export.res)
-                  export_Table(
-                    table = table_linear_group, out.dir = wd,
-                    out.nm = "grouped_results_linear"
-                )
-            }
+    if (("m" %in% control$fit.opt) || ("a" %in%
+                                       control$fit.opt))
+    {
+      table_model_group <- table_group_growth_model(res.table.gc)
+      names <- gsub(
+        "<sub>", "_", gsub(
+          "</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_model_group))
+        )
+      )
+      table_model_group <- as.data.frame(
+        lapply(
+          1:ncol(table_model_group),
+          function(x) gsub(
+            "<strong>", "", gsub(
+              "</strong>", "", table_model_group[,
+                                                 x]
+            )
+          )
+        )
+      )
+      colnames(table_model_group) <- names
+      if (export.res)
+        export_Table(
+          table = table_model_group, out.dir = wd,
+          out.nm = "grouped_results_model"
+        )
+    }
+    # # export table
+    # utils::write.table(combined.df,
+    # paste(wd, 'mean_results.gc.txt',
+    # sep = '/'), row.names = FALSE, sep
+    # = '\t') cat(paste0('Per-group
+    # average results of growth fit
+    # analysis saved as tab-delimited
+    # text file in:\n', wd,
+    # '/mean_results.gc.txt\n\n'))
 
-            if (("s" %in% control$fit.opt) || ("a" %in%
-                control$fit.opt))
-                {
-                table_spline_group <- table_group_growth_spline(res.table.gc)
-                names <- gsub(
-                  "<sub>", "_", gsub(
-                    "</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))
-                )
-              )
-                table_spline_group <- as.data.frame(
-                  lapply(
-                    1:ncol(table_spline_group),
-                    function(x) gsub(
-                      "<strong>", "", gsub(
-                        "</strong>", "", table_spline_group[,
-                          x]
-                    )
-                  )
-                )
-              )
-                colnames(table_spline_group) <- names
-                if (export.res)
-                  export_Table(
-                    table = table_spline_group, out.dir = wd,
-                    out.nm = "grouped_results_spline"
-                )
-            }
+    if (ec50 == TRUE && !((dr.parameter.fit.method ==
+                           "spline" && !any(fit.opt %in% c("a", "s"))) ||
+                          (dr.parameter.fit.method == "model" &&
+                           !any(fit.opt %in% c("a", "m"))) ||
+                          (dr.parameter.fit.method == "linfit" &&
+                           !any(fit.opt %in% c("a", "l")))) &&
+        (length(unique(expdesign$concentration)) >=
+         4) && length(out.drFit) >
+        1)
+    {
+      res.table.dr <- Filter(
+        function(x) !all(is.na(x)),
+        EC50.table
+      )
+      if (export.res)
+      {
+        export_Table(
+          table = res.table.dr, out.dir = wd,
+          out.nm = "results.dr"
+        )
+        message(
+          paste0(
+            "Results of EC50 analysis saved as tab-delimited text file in:\n'",
+            "...", gsub(".+/", "", wd),
+            "/results.dr.txt'"
+          )
+        )
+      }
+    } else
+    {
+      res.table.dr <- NULL
+    }
+    # Export RData object
+    if (export.res)
+      export_RData(grofit, out.dir = wd)
 
-            if (("m" %in% control$fit.opt) || ("a" %in%
-                control$fit.opt))
-                {
-                table_model_group <- table_group_growth_model(res.table.gc)
-                names <- gsub(
-                  "<sub>", "_", gsub(
-                    "</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_model_group))
-                )
-              )
-                table_model_group <- as.data.frame(
-                  lapply(
-                    1:ncol(table_model_group),
-                    function(x) gsub(
-                      "<strong>", "", gsub(
-                        "</strong>", "", table_model_group[,
-                          x]
-                    )
-                  )
-                )
-              )
-                colnames(table_model_group) <- names
-                if (export.res)
-                  export_Table(
-                    table = table_model_group, out.dir = wd,
-                    out.nm = "grouped_results_model"
-                )
-            }
-            # # export table
-            # utils::write.table(combined.df,
-            # paste(wd, 'mean_results.gc.txt',
-            # sep = '/'), row.names = FALSE, sep
-            # = '\t') cat(paste0('Per-group
-            # average results of growth fit
-            # analysis saved as tab-delimited
-            # text file in:\n', wd,
-            # '/mean_results.gc.txt\n\n'))
+    if (any(report %in% c("pdf", "html")))
+    {
+      try(
+        growth.report(
+          grofit, out.dir = gsub(
+            paste0(getwd(), "/"),
+            "", wd
+          ),
+          ec50 = ifelse(
+            length(out.drFit) >
+              1, ec50, FALSE
+          ),
+          mean.grp = mean.grp, mean.conc = mean.conc,
+          export = export.fig, format = report,
+          out.nm = out.nm, parallelize = parallelize
+        )
+      )
+    }
+  }  # if(!exists('shiny') || shiny != TRUE)
 
-            if (ec50 == TRUE && !((dr.parameter.fit.method ==
-                "spline" && !any(fit.opt %in% c("a", "s"))) ||
-                (dr.parameter.fit.method == "model" &&
-                  !any(fit.opt %in% c("a", "m"))) ||
-                (dr.parameter.fit.method == "linfit" &&
-                  !any(fit.opt %in% c("a", "l")))) &&
-                (length(unique(expdesign$concentration)) >=
-                  4) && length(out.drFit) >
-                1)
-                {
-                res.table.dr <- Filter(
-                  function(x) !all(is.na(x)),
-                  EC50.table
-              )
-                if (export.res)
-                {
-                  export_Table(
-                    table = res.table.dr, out.dir = wd,
-                    out.nm = "results.dr"
-                )
-                  message(
-                    paste0(
-                      "Results of EC50 analysis saved as tab-delimited text file in:\n'",
-                      "...", gsub(".+/", "", wd),
-                      "/results.dr.txt'"
-                  )
-                )
-                }
-            } else
-            {
-                res.table.dr <- NULL
-            }
-            # Export RData object
-            if (export.res)
-                export_RData(grofit, out.dir = wd)
-
-            if (any(report %in% c("pdf", "html")))
-                {
-                try(
-                  growth.report(
-                    grofit, out.dir = gsub(
-                      paste0(getwd(), "/"),
-                      "", wd
-                  ),
-                    ec50 = ifelse(
-                      length(out.drFit) >
-                        1, ec50, FALSE
-                  ),
-                    mean.grp = mean.grp, mean.conc = mean.conc,
-                    export = export.fig, format = report,
-                    out.nm = out.nm
-                )
-              )
-            }
-        }  # if(!exists('shiny') || shiny != TRUE)
-
-    invisible(grofit)
+  invisible(grofit)
 }
 
 #' Perform a growth curve analysis on all samples in the provided dataset.
@@ -539,830 +539,835 @@ growth.gcFit <- function(
     time, data, control = growth.control(), parallelize = TRUE,
     ...
 )
+{
+  # Define objects based on additional function
+  # calls
+  call <- match.call()
+
+  ## remove strictly defined arguments
+  call$time <- call$data <- call$control <- call$parallelize <- NULL
+
+
+  arglist <- sapply(call, function(x) x)
+  arglist <- unlist(arglist)[-1]
+  ## Assign additional arguments (...) as R
+  ## objects
+  if (length(arglist) >
+      0)
+  {
+    for (i in 1:length(arglist))
     {
-    # Define objects based on additional function
-    # calls
-    call <- match.call()
-
-    ## remove strictly defined arguments
-    call$time <- call$data <- call$control <- call$parallelize <- NULL
-
-
-    arglist <- sapply(call, function(x) x)
-    arglist <- unlist(arglist)[-1]
-    ## Assign additional arguments (...) as R
-    ## objects
-    if (length(arglist) >
-        0)
-        {
-        for (i in 1:length(arglist))
-            {
-            assign(
-                names(arglist)[i],
-                arglist[[i]]
-            )
-        }
+      assign(
+        names(arglist)[i],
+        arglist[[i]]
+      )
     }
+  }
 
-    if (!(any(
-        is(data) ==
-            "grodata"
-    )))
-        {
-        if (is.numeric(as.matrix(time)) ==
-            FALSE)
-            stop(
-                "Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data()."
-            )
-        if (is.numeric(as.matrix(data[-1:-3])) ==
-            FALSE)
-            stop(
-                "Need a numeric matrix for 'data' or a grodata object created with read_data() or parse_data()."
-            )
-    } else if (!is.null(data))
-        {
-        time <- data$time
-        data <- data$growth
-    }
-    # /// check if start growth values are above
-    # min.growth in all samples
-    max.growth <- unlist(
-        lapply(
-            1:nrow(data),
-            function(x) max(
-                as.numeric(as.matrix(data[x, -1:-3]))[!is.na(as.numeric(as.matrix(data[x, -1:-3])))]
-            )
-        )
+  if (!(any(
+    is(data) ==
+    "grodata"
+  )))
+  {
+    if (is.numeric(as.matrix(time)) ==
+        FALSE)
+      stop(
+        "Need a numeric matrix for 'time' or a grodata object created with read_data() or parse_data()."
+      )
+    if (is.numeric(as.matrix(data[-1:-3])) ==
+        FALSE)
+      stop(
+        "Need a numeric matrix for 'data' or a grodata object created with read_data() or parse_data()."
+      )
+  } else if (!is.null(data))
+  {
+    time <- data$time
+    data <- data$growth
+  }
+  # /// check if start growth values are above
+  # min.growth in all samples
+  max.growth <- unlist(
+    lapply(
+      1:nrow(data),
+      function(x) max(
+        as.numeric(as.matrix(data[x, -1:-3]))[!is.na(as.numeric(as.matrix(data[x, -1:-3])))]
+      )
     )
-    if (is.numeric(control$min.growth) &&
-        control$min.growth != 0)
+  )
+  if (is.numeric(control$min.growth) &&
+      control$min.growth != 0)
+  {
+    if (!is.na(control$min.growth) &&
+        all(
+          as.numeric(max.growth) <
+          control$min.growth
+        ))
+    {
+      stop(
+        paste0(
+          "The chosen global start growth value (min.growth) is larger than every value in your dataset.\nThe maximum value in your dataset is: ",
+          max(as.numeric(max.growth))
+        )
+      )
+    }
+  }
+  # /// check input parameters
+  if (methods::is(control) !=
+      "grofit.control")
+    stop("control must be of class grofit.control!")
+
+  # /// check number of datasets
+  if ((dim(time)[1]) !=
+      (dim(data)[1]))
+    stop(
+      "gcFit: Different number of datasets in data and time"
+    )
+
+  # /// check fitting options
+  old.options <- options()
+  on.exit(options(old.options))
+  if (!all(control$fit.opt %in% c("s", "m", "a", "l")))
+  {
+    options(warn = 1)
+    warning(
+      "fit.opt must contain 's', 'm', 'l', or 'a'. Changed to 'a' (all fit methods)!"
+    )
+    fit.opt = "a"
+    options(warn = 0)
+  }
+
+  # /// Initialize some parameters
+  out.table <- NULL
+  used.model <- NULL
+  fitpara.all <- list()
+  fitnonpara.all <- list()
+  fitlinear.all <- list()
+  boot.all <- list()
+  fitted.param <- NULL
+  fitted.nonparam <- NULL
+  bootstrap.param <- NULL
+  reliability_tag_linear <- NA
+  reliability_tag_param <- NA
+  reliability_tag_nonpara <- NA
+
+  if (control$interactive == FALSE && parallelize ==
+      TRUE && dim(data)[1] >
+      30 && (("l" %in% control$fit.opt) || ("a" %in%
+                                            control$fit.opt) || ("s" %in% control$fit.opt &&
+                                                                 control$nboot.gc > 0)))
+  {
+    times.ls <- lapply(
+      1:nrow(time),
+      function(x) time[x,
+      ][!is.na(time[x, ])][!is.na(data[x, -1:-3])]
+    )
+    wells.ls <- lapply(
+      1:nrow(data),
+      function(x) as.numeric(
+        data[x, -1:-3][!is.na(time[x, ])][!is.na(data[x, -1:-3])]
+      )
+    )
+    gcIDs.ls <- lapply(
+      1:nrow(data),
+      function(x) as.matrix(data[x, 1:3])
+    )
+    wellnames.ls <- lapply(
+      1:nrow(data),
+      function(x) paste(
+        as.character(data[x, 1]),
+        as.character(data[x, 2]),
+        as.character(data[x, 3]),
+        sep = " | "
+      )
+    )
+
+    # Set up computing clusters (all
+    # available processor cores - 1)
+    cl <- parallel::makeCluster(
+      parallel::detectCores(all.tests = FALSE, logical = TRUE) -
+        1
+    )
+    doParallel::registerDoParallel(cl)
+
+    # Perform linear fits in parallel
+    if (("l" %in% control$fit.opt) || ("a" %in%
+                                       control$fit.opt))
+    {
+      fitlinear.all <- foreach::foreach(i = 1:dim(data)[1]) %dopar%
         {
-        if (!is.na(control$min.growth) &&
-            all(
-                as.numeric(max.growth) <
+          QurvE::growth.gcFitLinear(
+            times.ls[[i]], wells.ls[[i]], gcID = gcIDs.ls[[i]],
+            control = control
+          )
+        }
+    } else
+    {
+      # /// generate list with empty
+      # objects
+      fitlinear.all <- lapply(
+        1:nrow(data),
+        function(x) list(
+          raw.time = times.ls[[x]], raw.data = wells.ls[[x]],
+          filt.time = NA, filt.data = NA, log.data = NA,
+          gcID = gcIDs.ls[[x]], FUN = NA, fit = NA,
+          par = c(
+            y0 = NA, y0_lm = NA, mumax = 0,
+            mu.se = NA, lag = NA, tmax_start = NA,
+            tmax_end = NA, t_turn = NA, mumax2 = NA,
+            y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
+            tmax2_end = NA
+          ),
+          ndx = NA, ndx2 = NA, quota = NA,
+          rsquared = NA, rsquared2 = NA, control = control,
+          fitFlag = FALSE, fitFlag2 = FALSE
+        )
+      )
+    }
+
+    # # Perform model fits in parallel if
+    # (('m' %in% control$fit.opt) || ('a'
+    # %in% control$fit.opt)){ fitpara.all <-
+    # foreach::foreach(i = 1:dim(data)[1] )
+    # %dopar% {
+    # QurvE::growth.gcFitModel(times.ls[[i]],
+    # wells.ls[[i]], gcID = gcIDs.ls[[i]],
+    # control = control) } } else { # ///
+    # generate list with empty objects
+    # fitpara.all <- lapply(1:nrow(data),
+    # function(x) list(time.in =
+    # times.ls[[x]], data.in = wells.ls[[x]],
+    # raw.time = times.ls[[x]], raw.data =
+    # wells.ls[[x]], gcID = gcIDs.ls[[x]],
+    # fit.time = NA, fit.data = NA,
+    # parameters = list(A=NA, mu=NA,
+    # lambda=NA, integral=NA), model = NA,
+    # nls = NA, reliable=NULL, fitFlag=FALSE,
+    # control = control) ) } # Perform spline
+    # fits in parallel if (('s' %in%
+    # control$fit.opt) || ('a' %in%
+    # control$fit.opt)){ fitnonpara.all <-
+    # foreach::foreach(i = 1:dim(data)[1] )
+    # %dopar% {
+    # QurvE::growth.gcFitSpline(times.ls[[i]],
+    # wells.ls[[i]], gcID = gcIDs.ls[[i]],
+    # control = control) } } else { # ///
+    # generate list with empty objects
+    # fitnonpara.all <- lapply(1:nrow(data),
+    # function(x) list(raw.time =
+    # times.ls[[x]], raw.data =
+    # wells.ls[[x]], gcID = gcIDs.ls[[x]],
+    # fit.time = NA, fit.data = NA,
+    # parameters = list(A = NA, dY = NA, mu =
+    # NA, t.max = NA, lambda = NA, b.tangent
+    # = NA, mu2 = NA, t.max2 = NA, lambda2 =
+    # NA, b.tangent2 = NA, integral = NA),
+    # spline = NA, parametersLowess = list(A
+    # = NA, mu = NA, lambda = NA), reliable =
+    # NULL, fitFlag = FALSE, fitFlag2 =
+    # FALSE, control = control) ) }
+
+    # Perform spline bootstrappings in
+    # parallel
+    if ((("s" %in% control$fit.opt) || ("a" %in%
+                                        control$fit.opt)) && (control$nboot.gc >
+                                                              10))
+    {
+      boot.all <- foreach::foreach(i = 1:dim(data)[1]) %dopar%
+        {
+          QurvE::growth.gcBootSpline(
+            times.ls[[i]], wells.ls[[i]], gcIDs.ls[[i]],
+            control
+          )
+        }
+    } else
+    {
+      # /// create empty gcBootSpline
+      # object
+      boot.all <- lapply(
+        1:nrow(data),
+        function(x) list(
+          raw.time = times.ls[[x]], raw.data = wells.ls[[x]],
+          gcID = gcIDs.ls[[x]], boot.x = NA,
+          boot.y = NA, boot.gcSpline = NA,
+          lambda = NA, mu = NA, A = NA, integral = NA,
+          bootFlag = FALSE, control = control
+        )
+      )
+    }
+    parallel::stopCluster(cl = cl)
+
+    # Assign classes to list elements
+    for (i in 1:length(fitlinear.all))
+    {
+      class(fitlinear.all[[i]]) <- "gcFitLinear"
+    }
+    # for(i in 1:length(fitpara.all)){
+    # class(fitpara.all[[i]]) <- 'gcFitModel'
+    # } for(i in 1:length(fitnonpara.all)){
+    # class(fitnonpara.all[[i]]) <-
+    # 'gcFitSpline' }
+    for (i in 1:length(boot.all))
+    {
+      class(boot.all[[i]]) <- "gcBootSpline"
+    }
+  }
+
+  reliability_tag <- c()
+  # /// loop over all wells
+  for (i in 1:dim(data)[1])
+  {
+    # Progress indicator for shiny app
+    if (exists("shiny") &&
+        shiny == TRUE)
+    {
+      shiny::incProgress(
+        amount = 1/(dim(data)[1]),
+        message = "Computations completed"
+      )
+    }
+    # /// conversion, to handle even
+    # data.frame inputs
+    acttime <- as.numeric(as.matrix(time[i, ]))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
+    actwell <- as.numeric(as.matrix((data[i, -1:-3])))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
+
+    gcID <- as.matrix(data[i, 1:3])
+    wellname <- paste(
+      as.character(data[i, 1]),
+      as.character(data[i, 2]),
+      as.character(data[i, 3]),
+      sep = " | "
+    )
+    if (control$suppress.messages == FALSE)
+    {
+      cat("\n\n")
+      cat(
+        paste(
+          "=== ", as.character(i),
+          ". [", wellname, "] growth curve =================================\n",
+          sep = ""
+        )
+      )
+      cat(
+        "----------------------------------------------------\n"
+      )
+    }
+    if (parallelize == FALSE || control$interactive ==
+        TRUE || dim(data)[1] <=
+        30 || !("l" %in% control$fit.opt || "a" %in%
+                control$fit.opt || ("s" %in% control$fit.opt &&
+                                    control$nboot.gc > 10)))
+    {
+      # /// Linear regression on
+      # log-transformed data
+      if (("l" %in% control$fit.opt) || ("a" %in%
+                                         control$fit.opt))
+      {
+        fitlinear <- growth.gcFitLinear(
+          acttime, actwell, gcID = gcID,
+          control = control
+        )
+        fitlinear.all[[i]] <- fitlinear
+      } else
+      {
+        # /// generate empty object
+        fitlinear <- list(
+          raw.time = acttime, raw.data = actwell,
+          filt.time = NA, filt.data = NA,
+          log.data = NA, gcID = gcID, FUN = NA,
+          fit = NA, par = c(
+            y0 = NA, y0_lm = NA, mumax = 0,
+            mu.se = NA, lag = NA, tmax_start = NA,
+            tmax_end = NA, t_turn = NA, mumax2 = NA,
+            y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
+            tmax2_end = NA
+          ),
+          ndx = NA, ndx2 = NA, quota = NA,
+          rsquared = NA, rsquared2 = NA,
+          control = control, fitFlag = FALSE,
+          fitFlag2 = FALSE
+        )
+        class(fitlinear) <- "gcFitLinear"
+        fitlinear.all[[i]] <- fitlinear
+      }
+      # /// plot linear fit
+      if ((control$interactive == TRUE))
+      {
+        if (("l" %in% control$fit.opt) ||
+            ("a" %in% control$fit.opt))
+        {
+          answer_satisfied <- "n"
+          reliability_tag_linear <- NA
+          while ("n" %in% answer_satisfied)
+          {
+            if (control$log.y.lin)
+            {
+              try(plot(fitlinear, log = "y"))
+            } else
+            {
+              try(plot(fitlinear, log = ""))
+            }
+            graphics::mtext(
+              side = 3, line = 3, adj = 0,
+              outer = FALSE, cex = 1, wellname
+            )
+            answer_satisfied <- readline(
+              "Are you satisfied with the linear fit (y/n)?\n\n"
+            )
+            if ("n" %in% answer_satisfied)
+            {
+              test_answer <- readline(
+                "Enter: t0, h, quota, min.growth, R2, RSD, tmax, max.growth                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n"
+              )
+              if ("n" %in% test_answer)
+              {
+                cat(
+                  "\n Tagged the linear fit of this sample as unreliable !\n\n"
+                )
+                reliability_tag_linear <- FALSE
+                fitlinear$reliable <- FALSE
+                fitlinear.all[[i]]$reliable <- FALSE
+                answer_satisfied <- "y"
+              }  # end if ('n' %in% test_answer)
+              else
+              {
+                new_params <- unlist(strsplit(test_answer, split = ","))
+                t0_new <- ifelse(
+                  !is.na(as.numeric(new_params[1])),
+                  as.numeric(new_params[1]),
+                  control$t0
+                )
+                h_new <- if_else(
+                  !is.na(as.numeric(new_params[2])),
+                  as.numeric(new_params[2]),
+                  control$lin.h
+                )
+                quota_new <- ifelse(
+                  !is.na(as.numeric(new_params[3])),
+                  as.numeric(new_params[3]),
+                  0.95
+                )
+                min.growth_new <- ifelse(
+                  !is.na(as.numeric(new_params[4])),
+                  as.numeric(new_params[4]),
                   control$min.growth
-            ))
-                {
-            stop(
-                paste0(
-                  "The chosen global start growth value (min.growth) is larger than every value in your dataset.\nThe maximum value in your dataset is: ",
-                  max(as.numeric(max.growth))
-              )
-            )
-        }
-    }
-    # /// check input parameters
-    if (methods::is(control) !=
-        "grofit.control")
-        stop("control must be of class grofit.control!")
-
-    # /// check number of datasets
-    if ((dim(time)[1]) !=
-        (dim(data)[1]))
-        stop(
-            "gcFit: Different number of datasets in data and time"
-        )
-
-    # /// check fitting options
-    if (!all(control$fit.opt %in% c("s", "m", "a", "l")))
-        {
-        options(warn = 1)
-        warning(
-            "fit.opt must contain 's', 'm', 'l', or 'a'. Changed to 'a' (all fit methods)!"
-        )
-        fit.opt = "a"
-        options(warn = 0)
-    }
-
-    # /// Initialize some parameters
-    out.table <- NULL
-    used.model <- NULL
-    fitpara.all <- list()
-    fitnonpara.all <- list()
-    fitlinear.all <- list()
-    boot.all <- list()
-    fitted.param <- NULL
-    fitted.nonparam <- NULL
-    bootstrap.param <- NULL
-    reliability_tag_linear <- NA
-    reliability_tag_param <- NA
-    reliability_tag_nonpara <- NA
-
-    if (control$interactive == FALSE && parallelize ==
-        TRUE && dim(data)[1] >
-        30 && (("l" %in% control$fit.opt) || ("a" %in%
-        control$fit.opt) || ("s" %in% control$fit.opt &&
-        control$nboot.gc > 0)))
-        {
-        times.ls <- lapply(
-            1:nrow(time),
-            function(x) time[x,
-                ][!is.na(time[x, ])][!is.na(data[x, -1:-3])]
-        )
-        wells.ls <- lapply(
-            1:nrow(data),
-            function(x) as.numeric(
-                data[x, -1:-3][!is.na(time[x, ])][!is.na(data[x, -1:-3])]
-            )
-        )
-        gcIDs.ls <- lapply(
-            1:nrow(data),
-            function(x) as.matrix(data[x, 1:3])
-        )
-        wellnames.ls <- lapply(
-            1:nrow(data),
-            function(x) paste(
-                as.character(data[x, 1]),
-                as.character(data[x, 2]),
-                as.character(data[x, 3]),
-                sep = " | "
-            )
-        )
-
-        # Set up computing clusters (all
-        # available processor cores - 1)
-        cl <- parallel::makeCluster(
-            parallel::detectCores(all.tests = FALSE, logical = TRUE) -
-                1
-        )
-        doParallel::registerDoParallel(cl)
-
-        # Perform linear fits in parallel
-        if (("l" %in% control$fit.opt) || ("a" %in%
-            control$fit.opt))
-            {
-            fitlinear.all <- foreach::foreach(i = 1:dim(data)[1]) %dopar%
-                {
-                  QurvE::growth.gcFitLinear(
-                    times.ls[[i]], wells.ls[[i]], gcID = gcIDs.ls[[i]],
-                    control = control
                 )
-                }
-        } else
-        {
-            # /// generate list with empty
-            # objects
-            fitlinear.all <- lapply(
-                1:nrow(data),
-                function(x) list(
-                  raw.time = times.ls[[x]], raw.data = wells.ls[[x]],
-                  filt.time = NA, filt.data = NA, log.data = NA,
-                  gcID = gcIDs.ls[[x]], FUN = NA, fit = NA,
-                  par = c(
-                    y0 = NA, y0_lm = NA, mumax = 0,
-                    mu.se = NA, lag = NA, tmax_start = NA,
-                    tmax_end = NA, t_turn = NA, mumax2 = NA,
-                    y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                    tmax2_end = NA
-                ),
-                  ndx = NA, ndx2 = NA, quota = NA,
-                  rsquared = NA, rsquared2 = NA, control = control,
-                  fitFlag = FALSE, fitFlag2 = FALSE
-              )
-            )
-        }
-
-        # # Perform model fits in parallel if
-        # (('m' %in% control$fit.opt) || ('a'
-        # %in% control$fit.opt)){ fitpara.all <-
-        # foreach::foreach(i = 1:dim(data)[1] )
-        # %dopar% {
-        # QurvE::growth.gcFitModel(times.ls[[i]],
-        # wells.ls[[i]], gcID = gcIDs.ls[[i]],
-        # control = control) } } else { # ///
-        # generate list with empty objects
-        # fitpara.all <- lapply(1:nrow(data),
-        # function(x) list(time.in =
-        # times.ls[[x]], data.in = wells.ls[[x]],
-        # raw.time = times.ls[[x]], raw.data =
-        # wells.ls[[x]], gcID = gcIDs.ls[[x]],
-        # fit.time = NA, fit.data = NA,
-        # parameters = list(A=NA, mu=NA,
-        # lambda=NA, integral=NA), model = NA,
-        # nls = NA, reliable=NULL, fitFlag=FALSE,
-        # control = control) ) } # Perform spline
-        # fits in parallel if (('s' %in%
-        # control$fit.opt) || ('a' %in%
-        # control$fit.opt)){ fitnonpara.all <-
-        # foreach::foreach(i = 1:dim(data)[1] )
-        # %dopar% {
-        # QurvE::growth.gcFitSpline(times.ls[[i]],
-        # wells.ls[[i]], gcID = gcIDs.ls[[i]],
-        # control = control) } } else { # ///
-        # generate list with empty objects
-        # fitnonpara.all <- lapply(1:nrow(data),
-        # function(x) list(raw.time =
-        # times.ls[[x]], raw.data =
-        # wells.ls[[x]], gcID = gcIDs.ls[[x]],
-        # fit.time = NA, fit.data = NA,
-        # parameters = list(A = NA, dY = NA, mu =
-        # NA, t.max = NA, lambda = NA, b.tangent
-        # = NA, mu2 = NA, t.max2 = NA, lambda2 =
-        # NA, b.tangent2 = NA, integral = NA),
-        # spline = NA, parametersLowess = list(A
-        # = NA, mu = NA, lambda = NA), reliable =
-        # NULL, fitFlag = FALSE, fitFlag2 =
-        # FALSE, control = control) ) }
-
-        # Perform spline bootstrappings in
-        # parallel
-        if ((("s" %in% control$fit.opt) || ("a" %in%
-            control$fit.opt)) && (control$nboot.gc >
-            10))
-            {
-            boot.all <- foreach::foreach(i = 1:dim(data)[1]) %dopar%
-                {
-                  QurvE::growth.gcBootSpline(
-                    times.ls[[i]], wells.ls[[i]], gcIDs.ls[[i]],
-                    control
+                R2_new <- ifelse(
+                  !is.na(as.numeric(new_params[5])),
+                  as.numeric(new_params[5]),
+                  control$lin.R2
                 )
-                }
-        } else
-        {
-            # /// create empty gcBootSpline
-            # object
-            boot.all <- lapply(
-                1:nrow(data),
-                function(x) list(
-                  raw.time = times.ls[[x]], raw.data = wells.ls[[x]],
-                  gcID = gcIDs.ls[[x]], boot.x = NA,
-                  boot.y = NA, boot.gcSpline = NA,
-                  lambda = NA, mu = NA, A = NA, integral = NA,
-                  bootFlag = FALSE, control = control
-              )
-            )
-        }
-        parallel::stopCluster(cl = cl)
+                RSD_new <- ifelse(
+                  !is.na(as.numeric(new_params[6])),
+                  as.numeric(new_params[6]),
+                  control$lin.RSD
+                )
+                tmax_new <- ifelse(
+                  !is.na(as.numeric(new_params[7])),
+                  as.numeric(new_params[7]),
+                  control$tmax
+                )
+                max.growth_new <- ifelse(
+                  !is.na(as.numeric(new_params[8])),
+                  as.numeric(new_params[8]),
+                  control$max.growth
+                )
 
-        # Assign classes to list elements
-        for (i in 1:length(fitlinear.all))
-            {
-            class(fitlinear.all[[i]]) <- "gcFitLinear"
-        }
-        # for(i in 1:length(fitpara.all)){
-        # class(fitpara.all[[i]]) <- 'gcFitModel'
-        # } for(i in 1:length(fitnonpara.all)){
-        # class(fitnonpara.all[[i]]) <-
-        # 'gcFitSpline' }
-        for (i in 1:length(boot.all))
-            {
-            class(boot.all[[i]]) <- "gcBootSpline"
-        }
-    }
+                control_new <- control
+                control_new$t0 <- t0_new
+                if (!is.na(h_new))
+                  control_new$lin.h <- h_new
+                control_new$lin.R2 <- R2_new
+                control_new$lin.RSD <- RSD_new
+                control_new$tmax <- tmax_new
+                control_new$max.growth <- max.growth_new
 
-    reliability_tag <- c()
-    # /// loop over all wells
-    for (i in 1:dim(data)[1])
-        {
-        # Progress indicator for shiny app
-        if (exists("shiny") &&
-            shiny == TRUE)
-            {
-            shiny::incProgress(
-                amount = 1/(dim(data)[1]),
-                message = "Computations completed"
-            )
-        }
-        # /// conversion, to handle even
-        # data.frame inputs
-        acttime <- as.numeric(as.matrix(time[i, ]))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
-        actwell <- as.numeric(as.matrix((data[i, -1:-3])))[!is.na(as.numeric(as.matrix(time[i, ])))][!is.na(as.numeric(as.matrix((data[i, -1:-3]))))]
-
-        gcID <- as.matrix(data[i, 1:3])
-        wellname <- paste(
-            as.character(data[i, 1]),
-            as.character(data[i, 2]),
-            as.character(data[i, 3]),
-            sep = " | "
-        )
-        if ((control$suppress.messages == FALSE))
-        {
-            cat("\n\n")
-            cat(
-                paste(
-                  "=== ", as.character(i),
-                  ". [", wellname, "] growth curve =================================\n",
-                  sep = ""
-              )
-            )
-            cat(
-                "----------------------------------------------------\n"
-            )
-        }
-        if (parallelize == FALSE || control$interactive ==
-            TRUE || dim(data)[1] <=
-            30 || !("l" %in% control$fit.opt || "a" %in%
-            control$fit.opt || ("s" %in% control$fit.opt &&
-            control$nboot.gc > 10)))
-            {
-                # /// Linear regression on
-                # log-transformed data
-                if (("l" %in% control$fit.opt) || ("a" %in%
-                  control$fit.opt))
+                if (is.numeric(min.growth_new))
+                {
+                  if (!is.na(min.growth_new) &&
+                      all(
+                        as.vector(actwell) <
+                        min.growth_new
+                      ))
                   {
-                  fitlinear <- growth.gcFitLinear(
-                    acttime, actwell, gcID = gcID,
-                    control = control
+                    message(
+                      paste0(
+                        "Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
+                        min(as.vector(actwell)),
+                        ". 'min.growth' was not adjusted."
+                      ),
+                      call. = FALSE
+                    )
+                  } else if (!is.na(min.growth_new))
+                  {
+                    control_new$min.growth <- min.growth_new
+                  }
+                }
+                fitlinear <- growth.gcFitLinear(
+                  acttime, actwell,
+                  gcID = gcID, control = control_new,
+                  quota = quota_new
                 )
-                  fitlinear.all[[i]] <- fitlinear
+                fitlinear.all[[i]] <- fitlinear
+              }  #end else
+            }  # end if ('n' %in% test_answer)
+            else
+            {
+              reliability_tag_linear <- TRUE
+              fitlinear$reliable <- TRUE
+              fitlinear.all[[i]]$reliable <- TRUE
+              if (control$suppress.messages == FALSE)
+                cat("Sample was (more or less) o.k.\n")
+            }  # end else
+          }  # end while ('n' %in% answer_satisfied)
+        }  # end if (('l' %in% control$fit.opt) || ('a'  %in% control$fit.opt))
+      }  # end if ((control$interactive == TRUE))
+      else
+      {
+        reliability_tag_linear <- TRUE
+        fitlinear$reliable <- TRUE
+        fitlinear.all[[i]]$reliable <- TRUE
+      }
+    }  # control$interactive == TRUE || dim(data)[1] <= 30
+    # /// Parametric fit
+    if (("m" %in% control$fit.opt) || ("a" %in%
+                                       control$fit.opt))
+    {
+      fitpara <- growth.gcFitModel(acttime, actwell, gcID, control)
+      fitpara.all[[i]] <- fitpara
+    } else
+    {
+      # /// generate empty object
+      fitpara <- list(
+        time.in = acttime, data.in = actwell,
+        raw.time = acttime, raw.data = actwell,
+        gcID = gcID, fit.time = NA, fit.data = NA,
+        parameters = list(
+          A = NA, mu = NA, tD = NA, lambda = NA,
+          integral = NA
+        ),
+        model = NA, nls = NA, reliable = NULL,
+        fitFlag = FALSE, control = control
+      )
+      class(fitpara) <- "gcFitModel"
+      fitpara.all[[i]] <- fitpara
+    }
+
+    # /// Non parametric fit
+    if (("s" %in% control$fit.opt) || ("a" %in%
+                                       control$fit.opt))
+    {
+      nonpara <- growth.gcFitSpline(acttime, actwell, gcID, control)
+      fitnonpara.all[[i]] <- nonpara
+    } else
+    {
+      # /// generate empty object
+      nonpara <- list(
+        raw.time = acttime, raw.data = actwell,
+        gcID = gcID, fit.time = NA, fit.data = NA,
+        parameters = list(
+          A = NA, dY = NA, mu = NA, t.max = NA,
+          lambda = NA, b.tangent = NA, mu2 = NA,
+          t.max2 = NA, lambda2 = NA, b.tangent2 = NA,
+          integral = NA
+        ),
+        parametersLowess = list(A = NA, mu = NA, lambda = NA),
+        spline = NA, spline.deriv1 = NA, reliable = NULL,
+        fitFlag = FALSE, fitFlag2 = FALSE,
+        control = control
+      )
+      class(nonpara) <- "gcFitSpline"
+      fitnonpara.all[[i]] <- nonpara
+    }
+    # /// plotting parametric fit
+    if ((control$interactive == TRUE))
+    {
+      if ((("m" %in% control$fit.opt) ||
+           ("a" %in% control$fit.opt)))
+      {
+        if (fitpara$fitFlag == TRUE)
+        {
+          plot.gcFitModel(
+            fitpara, colData = 1, colModel = 2,
+            colLag = 3, cex.point = 2,
+            raw = T
+          )
+          # legend(x='bottomright',
+          # legend=fitpara$model,
+          # col='red', lty=1)
+          # title('Parametric fit')
+          # graphics::mtext(line =
+          # 0.5, side=3, outer = FALSE,
+          # cex=1, wellname)
+        }
+        # /// here a manual
+        # reliability tag is set in
+        # the interactive mode
+        reliability_tag_param <- NA
+        answer <- readline(
+          "Are you satisfied with the model fit (y/n)?\n\n"
+        )
+        if ("n" %in% answer)
+        {
+          cat(
+            "\n Tagged the parametric fit of this sample as unreliable !\n\n"
+          )
+          reliability_tag_param <- FALSE
+          fitpara$reliable <- FALSE
+          fitpara.all[[i]]$reliable <- FALSE
+        } else
+        {
+          reliability_tag_param <- TRUE
+          fitpara$reliable <- TRUE
+          fitpara.all[[i]]$reliable <- TRUE
+          if (control$suppress.messages == FALSE)
+            cat("Sample was (more or less) o.k.\n")
+        }
+      }  # if ((('m' %in% control$fit.opt) || ('a'  %in% control$fit.opt) ) && fitpara$fitFlag == TRUE)
+      else
+      {
+        reliability_tag_param <- FALSE
+        fitpara$reliable <- FALSE
+        fitpara.all[[i]]$reliable <- FALSE
+      }
+      # /// plotting nonparametric fit
+      if (("s" %in% control$fit.opt) || ("a" %in%
+                                         control$fit.opt))
+      {
+        if (nonpara$fitFlag == TRUE)
+        {
+          answer_satisfied <- "n"
+          reliability_tag_nonpara <- NA
+          while ("n" %in% answer_satisfied)
+          {
+            if (control$log.y.spline)
+            {
+              plot.gcFitSpline(
+                nonpara, add = FALSE,
+                raw = TRUE, slope = TRUE,
+                colData = 1, cex.point = 2,
+                plot = TRUE, export = F
+              )
+            } else
+            {
+              plot.gcFitSpline(
+                nonpara, add = FALSE,
+                raw = TRUE, slope = TRUE,
+                log.y = FALSE, colData = 1,
+                cex.point = 2, plot = TRUE,
+                export = F
+              )
+            }
+            answer_satisfied <- readline(
+              "Are you satisfied with the spline fit (y/n)?\n\n"
+            )
+            if ("n" %in% answer_satisfied)
+            {
+              test_answer <- readline(
+                "Enter: smooth.gc, t0, min.growth, tmax, max.growth                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.growth (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n "
+              )
+              if ("n" %in% test_answer)
+              {
+                cat(
+                  "\n Tagged the linear fit of this sample as unreliable !\n\n"
+                )
+                reliability_tag_nonpara <- FALSE
+                nonpara$reliable <- FALSE
+                fitnonpara.all[[i]]$reliable <- FALSE
+                fitnonpara.all[[i]]$FitFlag <- FALSE
+                answer_satisfied <- "y"
+              }  # end if ('n' %in% test_answer)
+              else
+              {
+                new_params <- unlist(strsplit(test_answer, split = ","))
+                if (!is.na(as.numeric(new_params[2])) &&
+                    as.numeric(new_params[2]) !=
+                    "")
+                {
+                  t0_new <- as.numeric(new_params[2])
                 } else
                 {
-                  # /// generate empty object
-                  fitlinear <- list(
-                    raw.time = acttime, raw.data = actwell,
-                    filt.time = NA, filt.data = NA,
-                    log.data = NA, gcID = gcID, FUN = NA,
-                    fit = NA, par = c(
-                      y0 = NA, y0_lm = NA, mumax = 0,
-                      mu.se = NA, lag = NA, tmax_start = NA,
-                      tmax_end = NA, t_turn = NA, mumax2 = NA,
-                      y0_lm2 = NA, lag2 = NA, tmax2_start = NA,
-                      tmax2_end = NA
-                  ),
-                    ndx = NA, ndx2 = NA, quota = NA,
-                    rsquared = NA, rsquared2 = NA,
-                    control = control, fitFlag = FALSE,
-                    fitFlag2 = FALSE
-                )
-                  class(fitlinear) <- "gcFitLinear"
-                  fitlinear.all[[i]] <- fitlinear
+                  t0_new <- control$t0
                 }
-                # /// plot linear fit
-                if ((control$interactive == TRUE))
-                  {
-                    if (("l" %in% control$fit.opt) ||
-                      ("a" %in% control$fit.opt))
-                      {
-                        answer_satisfied <- "n"
-                        reliability_tag_linear <- NA
-                        while ("n" %in% answer_satisfied)
-                        {
-                          if (control$log.y.lin)
-                          {
-                            try(plot(fitlinear, log = "y"))
-                          } else
-                          {
-                            try(plot(fitlinear, log = ""))
-                          }
-                          graphics::mtext(
-                            side = 3, line = 3, adj = 0,
-                            outer = FALSE, cex = 1, wellname
-                        )
-                          answer_satisfied <- readline(
-                            "Are you satisfied with the linear fit (y/n)?\n\n"
-                        )
-                          if ("n" %in% answer_satisfied)
-                            {
-                              test_answer <- readline(
-                                "Enter: t0, h, quota, min.growth, R2, RSD, tmax, max.growth                         >>>>\n\n [Skip (enter 'n'), or adjust fit parameters (see ?growth.gcFitLinear).\n Leave {blank} at a given position if standard parameters are desired.]\n\n"
-                            )
-                              if ("n" %in% test_answer)
-                                {
-                                  cat(
-                                    "\n Tagged the linear fit of this sample as unreliable !\n\n"
-                                )
-                                  reliability_tag_linear <- FALSE
-                                  fitlinear$reliable <- FALSE
-                                  fitlinear.all[[i]]$reliable <- FALSE
-                                  answer_satisfied <- "y"
-                                }  # end if ('n' %in% test_answer)
- else
-                              {
-                                new_params <- unlist(strsplit(test_answer, split = ","))
-                                t0_new <- ifelse(
-                                  !is.na(as.numeric(new_params[1])),
-                                  as.numeric(new_params[1]),
-                                  control$t0
-                              )
-                                h_new <- if_else(
-                                  !is.na(as.numeric(new_params[2])),
-                                  as.numeric(new_params[2]),
-                                  control$lin.h
-                              )
-                                quota_new <- ifelse(
-                                  !is.na(as.numeric(new_params[3])),
-                                  as.numeric(new_params[3]),
-                                  0.95
-                              )
-                                min.growth_new <- ifelse(
-                                  !is.na(as.numeric(new_params[4])),
-                                  as.numeric(new_params[4]),
-                                  control$min.growth
-                              )
-                                R2_new <- ifelse(
-                                  !is.na(as.numeric(new_params[5])),
-                                  as.numeric(new_params[5]),
-                                  control$lin.R2
-                              )
-                                RSD_new <- ifelse(
-                                  !is.na(as.numeric(new_params[6])),
-                                  as.numeric(new_params[6]),
-                                  control$lin.RSD
-                              )
-                                tmax_new <- ifelse(
-                                  !is.na(as.numeric(new_params[7])),
-                                  as.numeric(new_params[7]),
-                                  control$tmax
-                              )
-                                max.growth_new <- ifelse(
-                                  !is.na(as.numeric(new_params[8])),
-                                  as.numeric(new_params[8]),
-                                  control$max.growth
-                              )
+                smooth.gc_new <- as.numeric(new_params[1])
 
-                                control_new <- control
-                                control_new$t0 <- t0_new
-                                if (!is.na(h_new))
-                                  control_new$lin.h <- h_new
-                                control_new$lin.R2 <- R2_new
-                                control_new$lin.RSD <- RSD_new
-                                control_new$tmax <- tmax_new
-                                control_new$max.growth <- max.growth_new
-
-                                if (is.numeric(min.growth_new))
-                                  {
-                                  if (!is.na(min.growth_new) &&
-                                    all(
-                                      as.vector(actwell) <
-                                        min.growth_new
-                                  ))
-                                      {
-                                    message(
-                                      paste0(
-                                        "Start growth values need to be greater than 'min.growth'.\nThe minimum start value in your dataset is: ",
-                                        min(as.vector(actwell)),
-                                        ". 'min.growth' was not adjusted."
-                                    ),
-                                      call. = FALSE
-                                  )
-                                  } else if (!is.na(min.growth_new))
-                                    {
-                                    control_new$min.growth <- min.growth_new
-                                  }
-                                }
-                                fitlinear <- growth.gcFitLinear(
-                                  acttime, actwell,
-                                  gcID = gcID, control = control_new,
-                                  quota = quota_new
-                              )
-                                fitlinear.all[[i]] <- fitlinear
-                              }  #end else
-                            }  # end if ('n' %in% test_answer)
- else
-                          {
-                            reliability_tag_linear <- TRUE
-                            fitlinear$reliable <- TRUE
-                            fitlinear.all[[i]]$reliable <- TRUE
-                            cat("Sample was (more or less) o.k.\n")
-                          }  # end else
-                        }  # end while ('n' %in% answer_satisfied)
-                      }  # end if (('l' %in% control$fit.opt) || ('a'  %in% control$fit.opt))
-                  }  # end if ((control$interactive == TRUE))
- else
+                control_new <- control
+                if (!is.na(smooth.gc_new) &&
+                    smooth.gc_new !=
+                    "")
                 {
-                  reliability_tag_linear <- TRUE
-                  fitlinear$reliable <- TRUE
-                  fitlinear.all[[i]]$reliable <- TRUE
+                  control_new$smooth.gc <- smooth.gc_new
                 }
-            }  # control$interactive == TRUE || dim(data)[1] <= 30
-        # /// Parametric fit
-        if (("m" %in% control$fit.opt) || ("a" %in%
-            control$fit.opt))
-            {
-            fitpara <- growth.gcFitModel(acttime, actwell, gcID, control)
-            fitpara.all[[i]] <- fitpara
-        } else
-        {
-            # /// generate empty object
-            fitpara <- list(
-                time.in = acttime, data.in = actwell,
-                raw.time = acttime, raw.data = actwell,
-                gcID = gcID, fit.time = NA, fit.data = NA,
-                parameters = list(
-                  A = NA, mu = NA, tD = NA, lambda = NA,
-                  integral = NA
-              ),
-                model = NA, nls = NA, reliable = NULL,
-                fitFlag = FALSE, control = control
-            )
-            class(fitpara) <- "gcFitModel"
-            fitpara.all[[i]] <- fitpara
-        }
-
-        # /// Non parametric fit
-        if (("s" %in% control$fit.opt) || ("a" %in%
-            control$fit.opt))
-            {
-            nonpara <- growth.gcFitSpline(acttime, actwell, gcID, control)
-            fitnonpara.all[[i]] <- nonpara
-        } else
-        {
-            # /// generate empty object
-            nonpara <- list(
-                raw.time = acttime, raw.data = actwell,
-                gcID = gcID, fit.time = NA, fit.data = NA,
-                parameters = list(
-                  A = NA, dY = NA, mu = NA, t.max = NA,
-                  lambda = NA, b.tangent = NA, mu2 = NA,
-                  t.max2 = NA, lambda2 = NA, b.tangent2 = NA,
-                  integral = NA
-              ),
-                parametersLowess = list(A = NA, mu = NA, lambda = NA),
-                spline = NA, spline.deriv1 = NA, reliable = NULL,
-                fitFlag = FALSE, fitFlag2 = FALSE,
-                control = control
-            )
-            class(nonpara) <- "gcFitSpline"
-            fitnonpara.all[[i]] <- nonpara
-        }
-        # /// plotting parametric fit
-        if ((control$interactive == TRUE))
-            {
-                if ((("m" %in% control$fit.opt) ||
-                  ("a" %in% control$fit.opt)))
-                  {
-                    if (fitpara$fitFlag == TRUE)
-                    {
-                      plot.gcFitModel(
-                        fitpara, colData = 1, colModel = 2,
-                        colLag = 3, cex.point = 2,
-                        raw = T
-                    )
-                      # legend(x='bottomright',
-                      # legend=fitpara$model,
-                      # col='red', lty=1)
-                      # title('Parametric fit')
-                      # graphics::mtext(line =
-                      # 0.5, side=3, outer = FALSE,
-                      # cex=1, wellname)
-                    }
-                    # /// here a manual
-                    # reliability tag is set in
-                    # the interactive mode
-                    reliability_tag_param <- NA
-                    answer <- readline(
-                      "Are you satisfied with the model fit (y/n)?\n\n"
-                  )
-                    if ("n" %in% answer)
-                    {
-                      cat(
-                        "\n Tagged the parametric fit of this sample as unreliable !\n\n"
-                    )
-                      reliability_tag_param <- FALSE
-                      fitpara$reliable <- FALSE
-                      fitpara.all[[i]]$reliable <- FALSE
-                    } else
-                    {
-                      reliability_tag_param <- TRUE
-                      fitpara$reliable <- TRUE
-                      fitpara.all[[i]]$reliable <- TRUE
-                      cat("Sample was (more or less) o.k.\n")
-                    }
-                  }  # if ((('m' %in% control$fit.opt) || ('a'  %in% control$fit.opt) ) && fitpara$fitFlag == TRUE)
- else
+                control_new$t0 <- t0_new
+                min.growth_new <- as.numeric(new_params[3])
+                if (!is.na(min.growth_new))
                 {
-                  reliability_tag_param <- FALSE
-                  fitpara$reliable <- FALSE
-                  fitpara.all[[i]]$reliable <- FALSE
-                }
-                # /// plotting nonparametric fit
-                if (("s" %in% control$fit.opt) || ("a" %in%
-                  control$fit.opt))
+                  if (is.numeric(min.growth_new) &&
+                      min.growth_new !=
+                      0 && all(
+                        as.vector(actwell) <
+                        min.growth_new
+                      ))
                   {
-                    if (nonpara$fitFlag == TRUE)
-                      {
-                        answer_satisfied <- "n"
-                        reliability_tag_nonpara <- NA
-                        while ("n" %in% answer_satisfied)
-                        {
-                          if (control$log.y.spline)
-                          {
-                            plot.gcFitSpline(
-                              nonpara, add = FALSE,
-                              raw = TRUE, slope = TRUE,
-                              colData = 1, cex.point = 2,
-                              plot = TRUE, export = F
+                    message(
+                      paste0(
+                        "Start growth values need to be below 'min.growth'.\nThe minimum start value in your dataset is: ",
+                        min(
+                          as.vector(
+                            data[,
+                                 4]
                           )
-                          } else
-                          {
-                            plot.gcFitSpline(
-                              nonpara, add = FALSE,
-                              raw = TRUE, slope = TRUE,
-                              log.y = FALSE, colData = 1,
-                              cex.point = 2, plot = TRUE,
-                              export = F
-                          )
-                          }
-                          answer_satisfied <- readline(
-                            "Are you satisfied with the spline fit (y/n)?\n\n"
-                        )
-                          if ("n" %in% answer_satisfied)
-                            {
-                              test_answer <- readline(
-                                "Enter: smooth.gc, t0, min.growth, tmax, max.growth                        >>>> \n\n [Skip (enter 'n'), or smooth.gc, t0, and min.growth (see ?growth.control).\n Leave {blank} at a given position if standard parameters are desired.]\n\n "
-                            )
-                              if ("n" %in% test_answer)
-                                {
-                                  cat(
-                                    "\n Tagged the linear fit of this sample as unreliable !\n\n"
-                                )
-                                  reliability_tag_nonpara <- FALSE
-                                  nonpara$reliable <- FALSE
-                                  fitnonpara.all[[i]]$reliable <- FALSE
-                                  fitnonpara.all[[i]]$FitFlag <- FALSE
-                                  answer_satisfied <- "y"
-                                }  # end if ('n' %in% test_answer)
- else
-                              {
-                                new_params <- unlist(strsplit(test_answer, split = ","))
-                                if (!is.na(as.numeric(new_params[2])) &&
-                                  as.numeric(new_params[2]) !=
-                                    "")
-                                    {
-                                  t0_new <- as.numeric(new_params[2])
-                                } else
-                                {
-                                  t0_new <- control$t0
-                                }
-                                smooth.gc_new <- as.numeric(new_params[1])
-
-                                control_new <- control
-                                if (!is.na(smooth.gc_new) &&
-                                  smooth.gc_new !=
-                                    "")
-                                    {
-                                  control_new$smooth.gc <- smooth.gc_new
-                                }
-                                control_new$t0 <- t0_new
-                                min.growth_new <- as.numeric(new_params[3])
-                                if (!is.na(min.growth_new))
-                                  {
-                                  if (is.numeric(min.growth_new) &&
-                                    min.growth_new !=
-                                      0 && all(
-                                    as.vector(actwell) <
-                                      min.growth_new
-                                ))
-                                    {
-                                    message(
-                                      paste0(
-                                        "Start growth values need to be below 'min.growth'.\nThe minimum start value in your dataset is: ",
-                                        min(
-                                          as.vector(
-                                            data[,
-                                              4]
-                                        )
-                                      ),
-                                        ". 'min.growth' was not adjusted."
-                                    ),
-                                      call. = FALSE
-                                  )
-                                  } else if (!is.na(min.growth_new))
-                                    {
-                                    control_new$min.growth <- min.growth_new
-                                  }
-                                }
-
-                                tmax_new <- as.numeric(new_params[4])
-                                if (!is.na(tmax_new) &&
-                                  tmax_new != "")
-                                  {
-                                  control_new$tmax <- tmax_new
-                                }
-                                max.growth_new <- as.numeric(new_params[5])
-                                if (!is.na(max.growth_new) &&
-                                  max.growth_new !=
-                                    "")
-                                    {
-                                  control_new$max.growth <- max.growth_new
-                                }
-
-                                nonpara <- growth.gcFitSpline(
-                                  acttime, actwell,
-                                  gcID, control_new
-                              )
-                                fitnonpara.all[[i]] <- nonpara
-                              }  #end else
-                            }  # end if ('n' %in% answer_satisfied)
- else
-                          {
-                            reliability_tag_nonpara <- TRUE
-                            nonpara$reliable <- TRUE
-                            fitnonpara.all[[i]]$reliable <- TRUE
-                            fitnonpara.all[[i]]$FitFlag <- TRUE
-                            cat("Sample was (more or less) o.k.\n")
-                          }  # end else
-                        }  # end while ('n' %in% answer_satisfied)
-                      }  # end if (nonpara$fitFlag == TRUE)
-                  }  # end if (('s' %in% control$fit.opt) || ('a'  %in% control$fit.opt) )
-            }  # end of if((control$interactive == TRUE))
- else
-        {
-            reliability_tag_param <- TRUE
-            reliability_tag_nonpara <- TRUE
-            nonpara$reliable <- TRUE
-            fitpara$reliable <- TRUE
-            fitnonpara.all[[i]]$reliable <- TRUE
-            fitpara.all[[i]]$reliable <- TRUE
-        }
-        if (parallelize == FALSE || control$interactive ==
-            TRUE || dim(data)[1] <=
-            30 || !("l" %in% control$fit.opt || "a" %in%
-            control$fit.opt || ("s" %in% control$fit.opt &&
-            control$nboot.gc > 10)))
-            {
-                # /// Beginn Bootstrap
-                if ((("s" %in% control$fit.opt) ||
-                  ("a" %in% control$fit.opt)) && (control$nboot.gc >
-                  0) && (reliability_tag_nonpara ==
-                  TRUE) && nonpara$fitFlag == TRUE)
+                        ),
+                        ". 'min.growth' was not adjusted."
+                      ),
+                      call. = FALSE
+                    )
+                  } else if (!is.na(min.growth_new))
                   {
-                    bt <- growth.gcBootSpline(acttime, actwell, gcID, control)
-                    boot.all[[i]] <- bt
-                  }  # /// end of if (control$nboot.gc ...)
- else
-                {
-                  # /// create empty gcBootSpline
-                  # object
-                  bt <- list(
-                    raw.time = acttime, raw.data = actwell,
-                    gcID = gcID, boot.x = NA, boot.y = NA,
-                    boot.gcSpline = NA, lambda = NA,
-                    mu = NA, A = NA, integral = NA,
-                    bootFlag = FALSE, control = control
-                )
-                  class(bt) <- "gcBootSpline"
-                  boot.all[[i]] <- bt
+                    control_new$min.growth <- min.growth_new
+                  }
                 }
-            }  # if(interactive == TRUE || 1:dim(data)[1] <= 30 ||
-        reliability_tag <- c(
-            reliability_tag, any(
-                reliability_tag_linear, reliability_tag_nonpara,
-                reliability_tag_param
-            )
+
+                tmax_new <- as.numeric(new_params[4])
+                if (!is.na(tmax_new) &&
+                    tmax_new != "")
+                {
+                  control_new$tmax <- tmax_new
+                }
+                max.growth_new <- as.numeric(new_params[5])
+                if (!is.na(max.growth_new) &&
+                    max.growth_new !=
+                    "")
+                {
+                  control_new$max.growth <- max.growth_new
+                }
+
+                nonpara <- growth.gcFitSpline(
+                  acttime, actwell,
+                  gcID, control_new
+                )
+                fitnonpara.all[[i]] <- nonpara
+              }  #end else
+            }  # end if ('n' %in% answer_satisfied)
+            else
+            {
+              reliability_tag_nonpara <- TRUE
+              nonpara$reliable <- TRUE
+              fitnonpara.all[[i]]$reliable <- TRUE
+              fitnonpara.all[[i]]$FitFlag <- TRUE
+              if (control$suppress.messages == FALSE)
+                cat("Sample was (more or less) o.k.\n")
+            }  # end else
+          }  # end while ('n' %in% answer_satisfied)
+        }  # end if (nonpara$fitFlag == TRUE)
+      }  # end if (('s' %in% control$fit.opt) || ('a'  %in% control$fit.opt) )
+    }  # end of if((control$interactive == TRUE))
+    else
+    {
+      reliability_tag_param <- TRUE
+      reliability_tag_nonpara <- TRUE
+      nonpara$reliable <- TRUE
+      fitpara$reliable <- TRUE
+      fitnonpara.all[[i]]$reliable <- TRUE
+      fitpara.all[[i]]$reliable <- TRUE
+    }
+    if (parallelize == FALSE || control$interactive ==
+        TRUE || dim(data)[1] <=
+        30 || !("l" %in% control$fit.opt || "a" %in%
+                control$fit.opt || ("s" %in% control$fit.opt &&
+                                    control$nboot.gc > 10)))
+    {
+      # /// Beginn Bootstrap
+      if ((("s" %in% control$fit.opt) ||
+           ("a" %in% control$fit.opt)) && (control$nboot.gc >
+                                           0) && (reliability_tag_nonpara ==
+                                                  TRUE) && nonpara$fitFlag == TRUE)
+      {
+        bt <- growth.gcBootSpline(acttime, actwell, gcID, control)
+        boot.all[[i]] <- bt
+      }  # /// end of if (control$nboot.gc ...)
+      else
+      {
+        # /// create empty gcBootSpline
+        # object
+        bt <- list(
+          raw.time = acttime, raw.data = actwell,
+          gcID = gcID, boot.x = NA, boot.y = NA,
+          boot.gcSpline = NA, lambda = NA,
+          mu = NA, A = NA, integral = NA,
+          bootFlag = FALSE, control = control
         )
-        # create output table description <-
-        # data.frame(TestId=data[i,1],
-        # AddId=data[i,2],concentration=data[i,3],
-        # reliability_tag=reliability_tag,
-        # used.model=fitpara$model,
-        # log.x=control$log.x.gc,
-        # log.y=control$log.y.spline,
-        # nboot.gc=control$nboot.gc)
-
-        # fitted <- cbind(description,
-        # summary.gcFitLinear(fitlinear),
-        # summary.gcFitModel(fitpara),
-        # summary.gcFitSpline(nonpara),
-        # summary.gcBootSpline(bt))
-
-        # out.table <- rbind(out.table, fitted)
-        # class(out.table) <- c('data.frame',
-        # 'gcTable')
-
-    }  # /// end of for (i in 1:dim(data)[1])
-    # Assign names to list elements
-    names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(
-        as.character(data[, 1]),
-        " | ", as.character(data[, 2]),
-        " | ", as.character(data[, 3])
+        class(bt) <- "gcBootSpline"
+        boot.all[[i]] <- bt
+      }
+    }  # if(interactive == TRUE || 1:dim(data)[1] <= 30 ||
+    reliability_tag <- c(
+      reliability_tag, any(
+        reliability_tag_linear, reliability_tag_nonpara,
+        reliability_tag_param
+      )
     )
+    # create output table description <-
+    # data.frame(TestId=data[i,1],
+    # AddId=data[i,2],concentration=data[i,3],
+    # reliability_tag=reliability_tag,
+    # used.model=fitpara$model,
+    # log.x=control$log.x.gc,
+    # log.y=control$log.y.spline,
+    # nboot.gc=control$nboot.gc)
 
-    # create output table
-    description <- lapply(
-        1:nrow(data),
-        function(x) data.frame(
-            TestId = data[x, 1], AddId = data[x, 2],
-            concentration = data[x, 3], reliability_tag = reliability_tag[x],
-            used.model = ifelse(
-                is.null(fitpara.all[[x]]$model),
-                NA, fitpara.all[[x]]$model
-            ),
-            log.x = control$log.x.gc, log.y.lin = control$log.y.lin,
-            log.y.spline = control$log.y.spline, log.y.model = control$log.y.model,
-            nboot.gc = control$nboot.gc
-        )
-    )
+    # fitted <- cbind(description,
+    # summary.gcFitLinear(fitlinear),
+    # summary.gcFitModel(fitpara),
+    # summary.gcFitSpline(nonpara),
+    # summary.gcBootSpline(bt))
 
-    fitted <- lapply(
-        1:length(fitlinear.all),
-        function(x) cbind(
-            description[[x]], summary.gcFitLinear(fitlinear.all[[x]]),
-            summary.gcFitModel(fitpara.all[[x]]),
-            summary.gcFitSpline(fitnonpara.all[[x]]),
-            summary.gcBootSpline(boot.all[[x]])
-        )
-    )
+    # out.table <- rbind(out.table, fitted)
+    # class(out.table) <- c('data.frame',
+    # 'gcTable')
 
-    out.table <- do.call(rbind, fitted)
-    class(out.table) <- c("data.frame", "gcTable")
-    # Combine results into list 'gcFit'
-    gcFit <- list(
-        raw.time = time, raw.data = data, gcTable = out.table,
-        gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all,
-        gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all,
-        control = control
+  }  # /// end of for (i in 1:dim(data)[1])
+  # Assign names to list elements
+  names(fitlinear.all) <- names(fitpara.all) <- names(fitnonpara.all) <- names(boot.all) <- paste0(
+    as.character(data[, 1]),
+    " | ", as.character(data[, 2]),
+    " | ", as.character(data[, 3])
+  )
+
+  # create output table
+  description <- lapply(
+    1:nrow(data),
+    function(x) data.frame(
+      TestId = data[x, 1], AddId = data[x, 2],
+      concentration = data[x, 3], reliability_tag = reliability_tag[x],
+      used.model = ifelse(
+        is.null(fitpara.all[[x]]$model),
+        NA, fitpara.all[[x]]$model
+      ),
+      log.x = control$log.x.gc, log.y.lin = control$log.y.lin,
+      log.y.spline = control$log.y.spline, log.y.model = control$log.y.model,
+      nboot.gc = control$nboot.gc
     )
-    class(gcFit) <- "gcFit"
-    invisible(gcFit)
+  )
+
+  fitted <- lapply(
+    1:length(fitlinear.all),
+    function(x) cbind(
+      description[[x]], summary.gcFitLinear(fitlinear.all[[x]]),
+      summary.gcFitModel(fitpara.all[[x]]),
+      summary.gcFitSpline(fitnonpara.all[[x]]),
+      summary.gcBootSpline(boot.all[[x]])
+    )
+  )
+
+  out.table <- do.call(rbind, fitted)
+  class(out.table) <- c("data.frame", "gcTable")
+  # Combine results into list 'gcFit'
+  gcFit <- list(
+    raw.time = time, raw.data = data, gcTable = out.table,
+    gcFittedLinear = fitlinear.all, gcFittedModels = fitpara.all,
+    gcFittedSplines = fitnonpara.all, gcBootSplines = boot.all,
+    control = control
+  )
+  class(gcFit) <- "gcFit"
+  invisible(gcFit)
 }

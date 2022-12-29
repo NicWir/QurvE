@@ -1,3 +1,18 @@
+## Second submission
+
+> Please always write package names, software names and API (application programming interface) names in single quotes in title and description.
+
+thanks, fixed!
+
+> If there are references describing the methods in your package, please add these in the description field of your DESCRIPTION file in the form authors (year) <doi:...> authors (year) <arXiv:...> authors (year, ISBN:...) or if those are not available: <https:...> with no space after 'doi:', 'arXiv:', 'https:' and angle brackets for auto-linking. (If you want to add a title as well please put it in quotes: "Title")
+
+Unfortunately, there are no references to include regarding this package (yet).
+
+> Please write TRUE and FALSE instead of T and F. Please don't use "T" or "F" as vector names.
+
+
+
+
 ## R CMD check results
 
 0 errors \| 0 warnings \| 2 notes

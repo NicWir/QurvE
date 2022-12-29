@@ -270,7 +270,9 @@ To perform a complete growth profiling of all samples in the input dataset, we c
 
 ```r
 grofit <- growth.workflow(grodata = grodata, fit.opt = "a", ec50 = TRUE,
-    suppress.messages = TRUE, export.res = FALSE)  # Prevent creating TXT table and RData files with results
+    suppress.messages = TRUE, 
+    export.res = FALSE, # Prevent creating TXT table and RData files with results
+    parallelize = FALSE) # Use only one available CPU core
 ```
 
 If option <span style='color: red;'>`export.res`</span> is set to <span style='color: red;'>`TRUE`</span>, tab-delimited .txt files summarizing the computation results are created, as well as the `grofit` object (an object of class `grofit`) as .RData file. This object (or the .RData file) contains all raw data, fitting options, and computational results. Figure \@ref(fig:grofit-container) shows the structure of the generated `grofit` object. In RStudio, `View(grofit)` allows interactive inspection of the data container.
@@ -542,7 +544,8 @@ grofit_bt <- growth.workflow(grodata = grodata,
                              nboot.dr = 50,
                              smooth.dr = 0.25,
                              suppress.messages = TRUE,
-                             export.res = F)
+                             export.res = F,
+                             parallelize = FALSE)
 ```
 
 To plot the results of a growth fit with bootstrapping, we call `plot()` on a `gcBootSpline` object:

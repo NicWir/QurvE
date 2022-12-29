@@ -6,7 +6,7 @@
 \usage{
 fl.report(
   flFitRes,
-  out.dir = NULL,
+  out.dir = tempdir(),
   out.nm = NULL,
   ec50 = FALSE,
   format = c("pdf", "html"),
@@ -41,7 +41,7 @@ fl.report(
 }
 \examples{
 # load example dataset
-if(interactive()){
+\donttest{
 input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.growth = 1,
@@ -54,6 +54,6 @@ res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = 's',
                    suppress.messages = TRUE,
                    parallelize = FALSE)
 
-fl.report(res)
+fl.report(res, out.dir = tempdir())
 }
 }
