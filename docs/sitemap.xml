@@ -10,9 +10,6 @@
     <loc>https://nicwir.github.io/QurvE/articles/shiny_app_manual.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/articles/vignette.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/articles/vignette_fluorescence.html</loc>
   </url>
   <url>
@@ -28,19 +25,7 @@
     <loc>https://nicwir.github.io/QurvE/news/index.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/baranyi.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/base_breaks.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/biosensor.eq.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/calibrate.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/colFmt.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/dot-onAttach.html</loc>
@@ -50,9 +35,6 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/export_Table.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/fast.write.csv.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/fl.control.html</loc>
@@ -80,21 +62,6 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/flFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/get_avg_param.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/get_sd_param.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/gompertz.exp.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/gompertz.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/grofit.param.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/growth.control.html</loc>
@@ -127,25 +94,10 @@
     <loc>https://nicwir.github.io/QurvE/reference/growth.gcFitSpline.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.param.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/growth.report.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/growth.workflow.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/grow_exponential.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/grow_linear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/help_modal.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/huang.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/index.html</loc>
@@ -154,52 +106,10 @@
     <loc>https://nicwir.github.io/QurvE/reference/inflect.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/initbaranyi.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/initbiosensor.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/initgompertz.exp.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/initgompertz.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/inithuang.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/initlogistic.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/initrichards.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/lm_window.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/logistic.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/low.integrate.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/match_arg.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/numberInput.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_biolector.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_biolector_shiny.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_chibio.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_chibio_shiny.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/parse_data.html</loc>
@@ -208,46 +118,10 @@
     <loc>https://nicwir.github.io/QurvE/reference/parse_Gen5Gen6.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_Gen5Gen6_shiny.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_growthprofiler.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_properties_biolector.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_properties_chibio.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_properties_Gen5Gen6.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_properties_tecan.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_properties_victornivo.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_properties_victorx3.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_tecan.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_tecan_shiny.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/parse_victornivo.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_victornivo_shiny.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/parse_victorx3.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_victorx3_shiny.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/plot.drBootSpline.html</loc>
@@ -322,9 +196,6 @@
     <loc>https://nicwir.github.io/QurvE/reference/read_file.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/richards.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/run_app.html</loc>
   </url>
   <url>
@@ -386,15 +257,6 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/table_group_growth_spline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/theil_sen_regression.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/xgx_breaks_log10.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/xgx_minor_breaks_log10.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/zipFastener.html</loc>
