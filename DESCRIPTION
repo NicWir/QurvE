@@ -39,7 +39,8 @@ Description: High-throughput analysis of growth curves and fluorescence
     application provides access to all features without
     requiring any programming knowledge. 
 License: GPL (>= 3)
-URL: https://github.com/NicWir/QurvE
+URL: https://github.com/NicWir/QurvE,
+    https://nicwir.github.io/QurvE/
 BugReports: https://github.com/NicWir/QurvE/issues
 Depends:
     dplyr,

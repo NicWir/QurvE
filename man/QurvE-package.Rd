@@ -12,6 +12,7 @@ High-throughput analysis of growth curves and fluorescence data using three meth
 Useful links:
 \itemize{
   \item \url{https://github.com/NicWir/QurvE}
+  \item \url{https://nicwir.github.io/QurvE/}
   \item Report bugs at \url{https://github.com/NicWir/QurvE/issues}
 }
 
