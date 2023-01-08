@@ -23,3 +23,4 @@ cran-comments\.md$
 ^cran-comments\.md$
 \.RData$
 ^CRAN-SUBMISSION$
+^/examples
