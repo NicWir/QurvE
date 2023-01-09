@@ -13395,7 +13395,7 @@ server <- function(input, output, session){
   )
 
   # Bug report message ####
-  github_url <- a("QurvE Github", href="https://github.com/NicWir/QurvE_issues/issues")
+  github_url <- a("QurvE Github", href="https://github.com/NicWir/QurvE/issues")
   output$bug_report <- renderUI({
     tagList("Please report bugs and user feedback at:", github_url)
   })
