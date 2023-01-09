@@ -5964,7 +5964,12 @@ server <- function(input, output, session){
       grodata <- results$custom_data
     } else if(!is.null(results$parsed_data)){
       grodata <- results$parsed_data
-    } else return(FALSE)
+    } else if(!is.null(results$growth)){
+      grodata <- results$growth
+    } else if(!is.null(results$fluorescence)){
+      grodata <- results$fluorescence
+    }
+    else return(FALSE)
 
     if(length(unique(grodata$expdesign$concentration)) > 2 )
       return(TRUE)
