@@ -5689,6 +5689,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                    'Jonathan Funk', tags$a(icon("twitter"), href="https://twitter.com/The_NiWi"),
                                    h2("Bug reports"),
                                    uiOutput("bug_report"),
+                                   h2("Cite QurvE"),
+                                   "Wirth, N. and Funk, J. (2023). QurvE: Robust and User-Friendly Analysis of Growth and Fluorescence Curves. R package version 1.0. https://CRAN.R-project.org/package=QurvE"
                                    # h2("Publications"),
                                    # ''
                                  )

@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_parsers.R
 \name{parse_data}
 \alias{parse_data}
-\title{(Experimental) Parse raw plate reader data and convert it to a format compatible with QurvE}
+\title{Parse raw plate reader data and convert it to a format compatible with QurvE}
 \usage{
 parse_data(
   data.file = NULL,
@@ -51,6 +51,10 @@ A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code
 }
 \description{
 \code{parse_data} takes a raw export file from a plate reader experiment (or similar device), extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}. If more than one read type is found the user is prompted to assign the correct reads to \code{growth} or \code{fluorescence}.
+}
+\details{
+Metadata provided as \code{map.file} needs to have the following layout:
+\figure{mapping-layout.png}
 }
 \examples{
 if(interactive()){

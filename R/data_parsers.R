@@ -25,7 +25,7 @@
 #' Caution!: When utilizing calibration, carefully consider whether or not blanks were subtracted to determine the calibration before selecting the input \code{subtract.blank = TRUE}.
 #'
 #' @details
-#' \figure{Data_layout.jpg}
+#' \figure{Data-layout.jpg}
 #'
 #' @return An R list object of class \code{grodata} containing a \code{time} matrix, dataframes with growth and fluorescence data (if applicable),
 #' and an experimental design table. The \code{grodata} object can be directly
@@ -604,7 +604,7 @@ read_data <-
     invisible(dataset)
   }
 
-#'  (Experimental) Parse raw plate reader data and convert it to a format compatible with QurvE
+#'  Parse raw plate reader data and convert it to a format compatible with QurvE
 #'
 #' \code{parse_data} takes a raw export file from a plate reader experiment (or similar device), extracts relevant information and parses it into the format required to run \code{\link{growth.workflow}}. If more than one read type is found the user is prompted to assign the correct reads to \code{growth} or \code{fluorescence}.
 #'
@@ -622,6 +622,9 @@ read_data <-
 #' @param fl.normtype (Character string) Normalize fluorescence values by either diving by \code{'growth'} or by fluorescence2 values (\code{'fl2'}).
 #'
 #' @return A \code{grodata} object suitable to run \code{\link{growth.workflow}}. See \code{\link{read_data}} for its structure.
+#'
+#' @details Metadata provided as \code{map.file} needs to have the following layout:
+#' \figure{mapping-layout.png}
 #'
 #' @export
 #'

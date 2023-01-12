@@ -17,11 +17,11 @@ README\.Rmd$
 QurvE\.pdf$
 cran-comments\.md$
 ^/inst/icons
-^/QurvE
+^/QurvE$
 \.tex
 ^doc$
 ^cran-comments\.md$
 \.RData$
 ^CRAN-SUBMISSION$
-^/examples
+^examples$
 ^\.github$

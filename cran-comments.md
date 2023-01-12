@@ -1,3 +1,25 @@
+## Publication LaTeX issue
+
+> Error is:
+$ R CMD Rd2pdf QurvE
+Hmm ... looks like a package
+Converting Rd files to LaTeX .......
+Creating pdf output from LaTeX ...
+Error in texi2dvi(file = file, pdf = TRUE, clean = clean, quiet = quiet,  :
+   Running 'texi2dvi' on 'Rd2.tex' failed.
+LaTeX errors:
+! Package pdftex.def Error: File `Data\T1\textunderscorelayout.jpg' not
+found:
+using draft setting.
+This is from
+$ grep -r layout.jpg QurvE
+QurvE/man/read_data.Rd:\figure{Data_layout.jpg}
+Can you please rename Data_layout.jpg to, e.g., Data.Layout.jpg or 
+Data-layout.jpg and resubmit?
+
+Done! renamed the file to Data-layout.jpg
+
+
 ## Second submission
 
 > Please always write package names, software names and API (application programming interface) names in single quotes in title and description.
