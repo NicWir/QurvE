@@ -144,27 +144,27 @@ a <code>drFitSpline</code> object for each bootstrap sample. Use <code><a href="
 <span class="r-out co"><span class="r-pr">#&gt;</span> === Bootstrapping of dose response curve ==========</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- EC 50 -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  0.920328419559173 StDev :  0.0681713486009854 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  0.9180855821902 90% CI:  0.922571256928145</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  0.917656102694014 95% CI:  0.923000736424331</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  0.904228488575653 StDev :  0.083532933470687 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  0.901480255064467 90% CI:  0.906976722086839</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  0.900953997583602 95% CI:  0.907502979567704</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- EC 50 in original scale -----------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  1.5101146253201 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  1.50449115505997 90% CI:  1.51575072226398</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  1.50341575840743 95% CI:  1.51683141766835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  1.47002553483333 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  1.46324664713482 90% CI:  1.47682307812141</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  1.46195068619402 95% CI:  1.4781268678295</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestRun</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.meanEC50 drboot.sdEC50 drboot.meanEC50y drboot.sdEC50y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.9203284    0.06817135        0.5262642      0.0947795</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.9042285    0.08353293         0.559557      0.1091799</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.ci90EC50.lo drboot.ci90EC50.up drboot.ci95EC50.lo drboot.ci95EC50.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          0.8081866            1.03247          0.7867126           1.053944</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          0.7668168            1.04164          0.7405039           1.067953</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.meanEC50.orig drboot.ci90EC50.orig.lo drboot.ci90EC50.orig.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1             1.510115                1.243835                1.807994</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1             1.470026                1.152902                1.833861</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.ci95EC50.orig.lo drboot.ci95EC50.orig.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                1.196165                1.868945</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                1.096992                1.909418</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">TestRun</span>, combine <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="growth.drBootSpline-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
