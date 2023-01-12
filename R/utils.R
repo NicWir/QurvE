@@ -5,6 +5,9 @@ utils::globalVariables(c("shiny"))
 #'
 #' @param libname library name
 #' @param pkgname package name
+#'
+#' @keywords internal
+#' @noRd
 .onAttach <- function(libname, pkgname)
     {
     k1 <- paste(
