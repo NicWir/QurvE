@@ -25,6 +25,11 @@ library(magrittr)
 \renewcommand{\texttt}[1]{\textttOrig{\colorbox{codegray}{#1}}}
 ```
 
+```{r logo, dpi = 300, out.width="70%", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE}
+knitr::include_graphics("https://i.imgur.com/aUqBv3S.png", error = F)
+```
+
+
 # Introduction
 
 In virtually all disciplines of biology dealing with living organisms, from classical microbiology to applied biotechnology, it is routine to characterize the **growth** of the species under study. `QurvE` provides a suite of analysis tools to make such growth profiling quick, efficient, and reproducible. In addition, it allows the characterization of **fluorescence** data for, e.g., biosensor characterization in plate reader experiments (further discussed in the vignette *Quantitiative Fluorescence Curve Evaluation with Package `QurvE`*). All computational steps to obtain an in-depth characterization are combined into user-friendly *workflow* functions and a range of plotting functions allow the visualization of fits and the comparison of organism performances.

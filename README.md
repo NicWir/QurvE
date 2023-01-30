@@ -1,4 +1,6 @@
 
+<img src="https://i.imgur.com/aUqBv3S.png" width="70%" style="display: block; margin: auto;" />
+
 # Introduction
 
 In virtually all disciplines of biology dealing with living organisms,
