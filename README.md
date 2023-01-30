@@ -566,7 +566,15 @@ plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2,
     cex.axis = 1.2)
 ```
 
-<img src="vignettes/vigfig-plot-linear-1.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" /><img src="vignettes/vigfig-plot-linear-2.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="https://i.imgur.com/V1Z1IGS.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" /><img src="https://i.imgur.com/gfxB1LY.png" alt="\label{fig:plot-linear} Linear fit plots to identify sample outliers. For details about this function, run `?plot.gcFitLinear`." width="70%" />
+<p class="caption">
+Linear fit plots to identify sample outliers. For details about this
+function, run `?plot.gcFitLinear`.
+</p>
+
+</div>
 
 Apparently, the algorithm to find the maximum slope in the growth curve
 with the standard threshold of `lin.R2 = 0.97` could not find an
@@ -619,7 +627,14 @@ And we can validate the quality of the updated fit:
 plot(grofit$gcFit$gcFittedLinear$`KT2440 | 2 | 0`, cex.lab = 1.2)
 ```
 
-<img src="vignettes/vigfig-plot-linear-update-1.png" alt="\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'." width="70%" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="https://i.imgur.com/tTh2BD1.png" alt="\label{fig:plot-linear-update} Updated linear fit for the outlier sample 'KT2440 | 2 | 0'." width="70%" />
+<p class="caption">
+Updated linear fit for the outlier sample ‘KT2440 \| 2 \| 0’.
+</p>
+
+</div>
 
 That looks better!
 
@@ -628,7 +643,14 @@ That looks better!
 plot.parameter(grofit, param = "mu.linfit", basesize = 15)
 ```
 
-<img src="vignettes/vigfig-plot-parameter-update-1.png" alt="\label{fig:plot-parameter-update} Parameter plot with updated fit." width="70%" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="https://i.imgur.com/AZIq9rW.png" alt="\label{fig:plot-parameter-update} Parameter plot with updated fit." width="70%" />
+<p class="caption">
+Parameter plot with updated fit.
+</p>
+
+</div>
 
 ### Plot grids
 
@@ -646,8 +668,6 @@ plot.grid(grofit,
           basesize = 9)
 ```
 
-<img src="vignettes/vigfig-grid-plot-1.png" alt="\label{fig:plot} Plot grid of all spline fits performed . See `?plot.grid` for available options." width="90%" style="display: block; margin: auto;" />
-
 ### Dose-response analysis
 
 The results of the dose-response analysis can be visualized by calling
@@ -664,7 +684,15 @@ respectively.
 plot(grofit$drFit, cex.point = 1, basesize = 12)
 ```
 
-<img src="vignettes/vigfig-plot-drFit-1.png" alt="\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`." width="70%" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="https://i.imgur.com/Wd4veyj.png" alt="\label{fig:plot-drFit} Dose response analysis - model fits. For details about this function, run `?plot.drFit`." width="70%" />
+<p class="caption">
+Dose response analysis - model fits. For details about this function,
+run `?plot.drFit`.
+</p>
+
+</div>
 
 # Bootstrapping
 
@@ -710,7 +738,15 @@ plot(grofit_bt$gcFit$gcBootSpline[[7]], # Double braces serve as an alternative 
      lwd = 0.7)
 ```
 
-<img src="vignettes/vigfig-plot-gcBootSpline-1.png" alt="\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`." width="85%" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="https://i.imgur.com/JUG2edR.png" alt="\label{fig:plot-gcBootSpline} Nonparametric growth fit with bootstrapping. For details about this function, run `?plot.gcBootSpline`." width="85%" />
+<p class="caption">
+Nonparametric growth fit with bootstrapping. For details about this
+function, run `?plot.gcBootSpline`.
+</p>
+
+</div>
 
 And by applying `plot()` to a `drBootSpline` object, we can plot the
 dose-response bootstrap results:
@@ -721,7 +757,15 @@ plot(grofit_bt$drFit$drBootSpline[[1]],
      lwd = 0.7)
 ```
 
-<img src="vignettes/vigfig-plot-drBootSpline-1.png" alt="\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`." width="85%" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="https://i.imgur.com/8J3taed.png" alt="\label{fig:plot-drBootSpline} Dose-response analysis with bootstrapping. For details about this function, run `?plot.drBootSpline`." width="85%" />
+<p class="caption">
+Dose-response analysis with bootstrapping. For details about this
+function, run `?plot.drBootSpline`.
+</p>
+
+</div>
 
 # References
 
