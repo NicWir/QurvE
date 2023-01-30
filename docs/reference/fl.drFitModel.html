@@ -24,7 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -147,15 +147,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> === Dose response curve estimation ================</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- EC 50 -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --&gt; test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sensitivity: 0.489 | yEC50: 3017 | fold change: 131.05 | leakiness: 45.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sensitivity: 0.498 | yEC50: 3043 | fold change: 74.09 | leakiness: 81.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestRun</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     yEC50    y.min    y.max       fc         K        n yEC50.orig    K.orig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 3016.62 45.68855 5987.551 131.0515 0.4885981 2.011308    3016.62 0.4885981</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      yEC50   y.min    y.max       fc        K        n yEC50.orig   K.orig test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 3043.217 81.0551 6005.379 74.09008 0.497777 1.919766   3043.217 0.497777   NA</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">TestRun</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="fl.drFitModel-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>

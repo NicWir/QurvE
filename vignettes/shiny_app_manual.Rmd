@@ -1,5 +1,5 @@
 ---
-title: QurvE User Manual v.1.0
+title: QurvE App User Manual v.1.0
 author: "Nicolas T. Wirth and Stefano Donati"
 date: "2022-12-20"
 mainfont: Arial
