@@ -41,9 +41,9 @@ allow the visualization of fits and the comparison of organism
 performances.
 
 Any physiological parameter calculated (e.g., growth rate µ, doubling
-time t<sub>D</sub>, lag time $\lambda$, growth measurement increase
-$\Delta$Y, or equivalent fluorescence parameters) can be used to perform
-a dose-response analysis to determine the *half-maximal effective
+time t<sub>D</sub>, lag time $\lambda$, growth measurement increase ΔY,
+or equivalent fluorescence parameters) can be used to perform a
+dose-response analysis to determine the *half-maximal effective
 concentration* (EC<sub>50</sub>).
 
 The package is build on the foundation of the two R packages from Kahm
@@ -122,7 +122,7 @@ Three methods are available to characterize growth curves:
     package Petzoldt ([2022](#ref-petzoldt2022)), but adds user-defined
     thresholds for (i) R<sup>2</sup> values of linear fits, (ii)
     relative standard deviations (RSD) of estimates slopes, and (iii)
-    the minimum fraction of total growth value increase ($\Delta$Y) a
+    the minimum fraction of total growth value increase (ΔY) a
     regression window should cover to be considered for the analysis.
     These thresholds ensure a more robust and reproducible
     identification of the linear range that best describes the growth
@@ -205,8 +205,8 @@ substance, respectively. Such effects can be either beneficial (e.g., a
 nutrient compound) or detrimental (e.g., an antibiotic). The sensitivity
 is reflected in the half-maximal effective concentration
 (*EC<sub>50</sub>*), i.e., the concentration (dose) at which the
-half-maximal response (e.g., $\mu_{max}$ or $\Delta$Y) is observed.
-`QurvE` provides two methods to determine the *EC<sub>50</sub>*:
+half-maximal response (e.g., $\mu_{max}$ or ΔY) is observed. `QurvE`
+provides two methods to determine the *EC<sub>50</sub>*:
 
 1.  Perform a smooth spline fit on response vs. concentration data and
     extract the *EC<sub>50</sub>* as the concentration at the midpoint
