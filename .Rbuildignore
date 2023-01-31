@@ -25,3 +25,5 @@ cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^examples$
 ^\.github$
+index\.md$
+index\.Rmd$
