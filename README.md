@@ -1,6 +1,30 @@
 
 <img src="https://i.imgur.com/aUqBv3S.png" width="70%" style="display: block; margin: auto;" />
 
+<br/> <font size="4">***QurvE* is an open-source, R package and software
+that provides a fully automated pipeline for fitting time-resolved
+biological data, including curve fitting, statistical evaluation, model
+selection, dose-response analysis, and built-in functions for data
+visualization.**</font>
+
+## Deployed application
+
+[Download the Windows
+setup](https://github.com/NicWir/QurvE/releases/download/v.1.0.0/QurvE_1.0.1_setup_windows.exe)
+
+[User manual for *QurvE*
+application](https://nicwir.github.io/QurvE/articles/shiny_app_manual.html)
+
+## R package
+
+[R package on CRAN](https://cran.r-project.org/web/packages/QurvE/)
+
+[User manual for growth curve
+analysis](https://nicwir.github.io/QurvE/articles/vignette_growth.html)
+
+[User manual for fluorescence curve
+analysis](https://nicwir.github.io/QurvE/articles/vignette_fluorescence.html)
+
 # Introduction
 
 In virtually all disciplines of biology dealing with living organisms,
