@@ -39,7 +39,7 @@ non-programmers is available. The app can be installed locally on
 Windows computers.
 
 <br/>
-<img src="https://i.imgur.com/qIPx0yX.png" width="100%" style="display: block; margin: auto;" />
+<a href="https://i.imgur.com/qIPx0yX.png"> <img src="https://i.imgur.com/qIPx0yX.png" width="100%"/> </a>
 
 <br/> **<font size="4">Figure:</font> *QurvE* enables robust,
 high-throughput analysis of growth and fluorescence data.**<br/> **(a)**

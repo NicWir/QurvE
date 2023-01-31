@@ -7,7 +7,14 @@ lang: en-US
 zotero: true
 bibliography: vignettes/references.bib
 ---
-
+```{r setup, include = FALSE}
+image_link <- function(image,url,...){
+  htmltools::a(
+    href=url,
+    htmltools::img(src=image,...)
+    )
+}
+```
 ```{r logo, dpi = 300, out.width="70%", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE}
 knitr::include_graphics("https://i.imgur.com/aUqBv3S.png", error = F)
 ```
@@ -36,9 +43,7 @@ The *shiny* application can be launched from within R via `QurvE::run_app()`.
 *QurvE* comes in the form of an R package that can be used to create custom workflows and application-specific downstream analyses and is published in the Comprehensive R Archive Network (CRAN) and on [GitHub](https://github.com/NicWir/QurvE). Alternatively, an intuitive graphical user interface (GUI) implemented as a shiny application for non-programmers is available. The app can be installed locally on Windows computers.
 
 <br/>
-```{r figure, dpi = 300, out.width="100%", fig.align='center', echo = F, eval = T, message=FALSE, error=FALSE, warning=FALSE, tidy = TRUE}
-knitr::include_graphics("https://i.imgur.com/qIPx0yX.png", error = F)
-```
+`r image_link("https://i.imgur.com/qIPx0yX.png","https://i.imgur.com/qIPx0yX.png", width="100%")`
 
 <br/>
 **<font size="4">Figure:</font> *QurvE* enables robust, high-throughput analysis of growth and fluorescence data.**<br/>
