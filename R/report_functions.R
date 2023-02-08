@@ -196,6 +196,11 @@ growth.report <- function(
         }
     }
     file <- paste0(Report.wd, "/Report_Growth.Rmd")
+
+    # Copy report files into temp directory
+    report_path <- tempfile(fileext = ".Rmd")
+    file.copy(file, report_path, overwrite = TRUE)
+
     if (all(
         c("pdf", "html") %in%
             format
@@ -215,7 +220,7 @@ growth.report <- function(
         )
     }
     rmarkdown::render(
-        file, output_format = format, output_dir = wd,
+      report_path, output_format = format, output_dir = wd,
         output_file = out.nm, quiet = TRUE
     )
     message(paste0("Report files saved in: '/", wd, "'"))
@@ -450,6 +455,11 @@ fl.report <- function(
         "C:/Users/nicwir/Documents/DTU_Biosustain/Scripts_and_Modelling/curvE package/QurvE/inst/"
     )
     file <- paste0(Report.wd, "/Report_Fluorescence.Rmd")
+
+    # Copy report files into temp directory
+    report_path <- tempfile(fileext = ".Rmd")
+    file.copy(file, report_path, overwrite = TRUE)
+
     if (all(
         c("pdf", "html") %in%
             format
@@ -469,7 +479,7 @@ fl.report <- function(
         )
     }
     rmarkdown::render(
-        file, output_format = format, output_dir = wd,
+      report_path, output_format = format, output_dir = wd,
         output_file = out.nm, quiet = TRUE
     )
     message(paste0("Files saved in: '", wd, "'"))
