@@ -7,6 +7,10 @@ biological data, including curve fitting, statistical evaluation, model
 selection, dose-response analysis, and built-in functions for data
 visualization.**</font>
 
+## Web application
+
+[Visit the QurvE online application](https:www.qurveanalysis.com)
+
 ## Deployed application
 
 [Download the Windows
