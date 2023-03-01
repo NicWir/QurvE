@@ -9,7 +9,7 @@ visualization.**</font>
 
 ## Web application
 
-[Visit the QurvE online application](https:www.qurveanalysis.com)
+[Visit the QurvE online application](https://www.qurveanalysis.com)
 
 ## Deployed application
 

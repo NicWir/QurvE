@@ -48,6 +48,8 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
                              width = ifelse(which=="fit", 9, 9), out.dir = NULL, ...)
 {
   gcFittedLinear <- x
+  if(!is.null(color))
+    color <- toupper(color)
   if(methods::is(gcFittedLinear) != "gcFitLinear") stop("x needs to be an object created with growth.gcFitLinear().")
   which <- match.arg(which)
 
@@ -309,6 +311,10 @@ plot.gcFitModel <- function(x, raw = TRUE,
                             out.dir = NULL,...)
 {
   gcFittedModel <- x
+  if(!is.null(colData))
+    colData <- toupper(colData)
+  if(!is.null(colModel))
+    colModel <- toupper(colModel)
   colModel <- ggplot2::alpha(colModel, 0.85)
   # /// check input parameters
   if (is.logical(raw)==FALSE)   stop("Need logical value for: raw")
@@ -417,13 +423,13 @@ plot.gcFitModel <- function(x, raw = TRUE,
       if(gcFittedModel$model == "logistic"){
         p <- p + annotate(
           "text",
-          label = "y(t) == frac(A , 1+exp(frac(4 %.% mu, A) %.% (lambda - t) + 2))",
+          label = "y(t) == frac(A , 1+exp(frac(4 %*% mu, A) %*% (lambda - t) + 2))",
           x = 1.08 * time[length(time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
-                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[1],3)) )),
+                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
                    x = (1 + 0.13+ log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -435,13 +441,13 @@ plot.gcFitModel <- function(x, raw = TRUE,
       if(gcFittedModel$model == "richards"){
         p <- p + annotate(
           "text",
-          label = "y(t) == A%.%(1.0+nu%.%italic(e)^{1+nu}%.%exp(frac(mu,A)%.%(1+nu)^(1+frac(1,nu))%.%( lambda - t )))^(-1/nu)",
+          label = "y(t) == A%*%(1.0+nu%*%italic(e)^{1+nu}%*%exp(frac(mu,A)%*%(1+nu)^(1+frac(1,nu))%*%( lambda - t )))^(-1/nu)",
           x = 1.17 * time[length(time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
-                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
-                                         lambda == .(round(gcFittedModel$parameters$lambda[1],3)) ~~~~ nu == .(round(as.numeric(gcFittedModel$parameters$fitpar$nu[1],3))))),
+                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                         lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) ~~~~ nu == .(round(as.numeric(gcFittedModel$parameters$fitpar$nu[[1]],3))))),
                    x = (1 + 0.22 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -453,16 +459,16 @@ plot.gcFitModel <- function(x, raw = TRUE,
       if(gcFittedModel$model == "baranyi"){
         p <- p + annotate(
           "text",
-          label = "atop(B == t + frac(1,mu) %.% log(symbol(e)^{-mu%.%time} + symbol(e)^{-mu%.%lambda} - symbol(e)^{-mu%.%(time + lambda)}),
-          y == y0 + mu%.%B - log(1 + (symbol(e)^{mu %.% B} - 1)/symbol(e)^{A - y0}))",
+          label = "atop(B == t + frac(1,mu) %*% log(symbol(e)^{-mu%*%time} + symbol(e)^{-mu%*%lambda} - symbol(e)^{-mu%*%(time + lambda)}),
+          y == y0 + mu%*%B - log(1 + (symbol(e)^{mu %*% B} - 1)/symbol(e)^{A - y0}))",
           x = 1.17 * time[length(time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
                    label = list(bquote(y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ~~~~
-                                    A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~
-                                    mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[1],3)) )),
+                                    A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~
+                                    mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
                    x = (1 + 0.25 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -474,13 +480,13 @@ plot.gcFitModel <- function(x, raw = TRUE,
       if(gcFittedModel$model == "gompertz"){
         p <- p + annotate(
           "text",
-          label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1))",
+          label = "y(t) == A%*%exp(-exp(frac(mu%*%italic(e),A)%*%(lambda-t) +1))",
           x = 1.08 * time[length(time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.4*eq.size) +
           annotate("text",
-                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[1],3)) )),
+                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
                    x = (1 + 0.13 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -493,14 +499,14 @@ plot.gcFitModel <- function(x, raw = TRUE,
         lagtime <- lagtime - gcFittedModel$parameters$A[1]*exp(gcFittedModel$parameters$fitpar$alpha[1]*(gcFittedModel$parameters$lambda[1]-gcFittedModel$parameters$fitpar$t_shift[1]))
         p <- p + annotate(
           "text",
-          label = "y(t) == A%.%exp(-exp(frac(mu%.%italic(e),A)%.%(lambda-t) +1)) + A%.%exp(alpha%.%(t-t[shift]))",
+          label = "y(t) == A%*%exp(-exp(frac(mu%*%italic(e),A)%*%(lambda-t) +1)) + A%*%exp(alpha%*%(t-t[shift]))",
           x = 1.16 * time[length(time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
-                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[1],2)) ~~~~ alpha == .(round(gcFittedModel$parameters$fitpar$alpha[1],3))  ~~~~
-                                    t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[1],2)) )),
+                   label = list(bquote(A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],2)) ~~~~ alpha == .(round(gcFittedModel$parameters$fitpar$alpha[1],3))  ~~~~
+                                    t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[[1]],2)) )),
                    x = (1 + 0.21 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -512,15 +518,15 @@ plot.gcFitModel <- function(x, raw = TRUE,
       if(gcFittedModel$model == "huang"){
         p <- p + annotate(
           "text",
-          label = "y(t) == y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu%.%(t+0.25%.%log(frac(1+exp(-4%.%(t-lambda)),1+exp(4%.%lambda))))) )",
+          label = "y(t) == y0 + A - log( exp(y0) + (exp(A) - exp(y0)) * exp(-mu%*%(t+0.25%*%log(frac(1+exp(-4%*%(t-lambda)),1+exp(4%*%lambda))))) )",
           x = 1.16 * time[length(time)],
           y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
           angle = 90, parse = TRUE, size = 3.0*eq.size) +
           annotate("text",
                    label = list(bquote(y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ~~~~
-                                    A == .(round(gcFittedModel$parameters$A[1],3)) ~~~~
-                                    mu == .(round(gcFittedModel$parameters$mu[1],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[1],2)))),
+                                    A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~
+                                    mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],2)))),
                    x = (1 + 0.21 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.3*eq.size) +
@@ -675,6 +681,10 @@ plot.drBootSpline <- function (x,
                                ...)
 {
   drBootSpline <- x
+  if(!is.null(colSpline))
+    colSpline <- toupper(colSpline)
+  if(!is.null(colData))
+    colData <- toupper(colData)
   colSpline <- scales::alpha(colSpline, 0.15)
 
   # drBootSpline an object of class drBootSpline
@@ -1084,6 +1094,8 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
                        plot = TRUE, export = FALSE, height = NULL, width = NULL, out.dir = NULL, out.nm = NULL, ...)
 {
   drFit <- x
+  if(!is.null(colors))
+    colSpline <- toupper(colors)
 
   opar <- par(no.readonly = TRUE)
   on.exit(par(opar))
@@ -1371,6 +1383,10 @@ plot.drFitSpline <- function (x,
                               ...)
 {
   drFitSpline <- x
+  if(!is.null(colSpline))
+    colSpline <- toupper(colSpline)
+  if(!is.null(colData))
+    colData <- toupper(colData)
   # drFitSpline an object of class drFitSpline
   if(methods::is(drFitSpline) != "drFitSpline") stop("x needs to be an object created with growth.drFitSpline.")
   # /// check input parameters
@@ -1873,6 +1889,10 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
                               height = 7, width = 9, out.dir = NULL, combine = FALSE, ...)
 {
   gcBootSpline <- x
+  if(!is.null(colSpline))
+    colSpline <- toupper(colSpline)
+  if(!is.null(colData))
+    colData <- toupper(colData)
   colSpline <- ggplot2::alpha(colSpline, 0.2)
   opar <- par(no.readonly = TRUE)
   on.exit(par(opar))
@@ -2260,6 +2280,10 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                              out.dir = NULL, ...)
 {
   gcFittedSpline <- x
+  if(!is.null(colSpline))
+    colSpline <- toupper(colSpline)
+  if(!is.null(colData))
+    colData <- toupper(colData)
   n.ybreaks <- as.numeric(n.ybreaks)
   # x an object of class gcFittedSpline
   if(methods::is(gcFittedSpline) != "gcFitSpline") stop("x needs to be an object created with growth.gcFitSpline().")
@@ -2977,6 +3001,8 @@ plot.grofit <- function(x, ...,
 )
 {
   grofit <- x
+  if(!is.null(colors))
+    colors <- toupper(colors)
   # Convert range  and selecting arguments
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
   conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
@@ -3057,12 +3083,12 @@ plot.grofit <- function(x, ...,
     if(!is.null(names)  && length(names) > 0){
       if(!is.na(names) && names != ""){
         names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-        nm <- nm[grep(paste(names, collapse="|"), gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm))]
+        nm <- nm[grep(paste(names, collapse="|"), nm)]
       }
     }
     if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
       if(!is.na(exclude.nm) && exclude.nm != ""){
-        names.excl <- gsub("\\.", "\\\\.",gsub("\\+", "\\\\+", exclude.nm))
+        names.excl <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", exclude.nm)
         nm <- nm[!grepl(paste(names.excl, collapse="|"), gsub(" \\|.+", "", nm))]
       }
     }
@@ -3850,6 +3876,8 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                            ...)
   {
   object <- x
+  if(!is.null(colors))
+    colSpline <- toupper(colors)
   # Convert range  and selecting arguments
   names <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", names)), pattern = ";"))
   conc <- unlist(str_split(gsub("[;,][[:space:]]+", ";", gsub("[[:space:]]+[;,]", ";", conc)), pattern = "[;,]"))
@@ -4033,6 +4061,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
     ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
   if(!is.null(colors)){
+    colors <- toupper(colors)
     if(length(unique(df$group)) > length(colors)){
       p <- p + scale_fill_manual(name = "Condition",
                                  values = c(colors, scales::hue_pal()(length(unique(df$group)))[-(1:length(colors))])

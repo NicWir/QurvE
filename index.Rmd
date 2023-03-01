@@ -24,7 +24,7 @@ knitr::include_graphics("https://i.imgur.com/aUqBv3S.png", error = F)
 
 ## Web application
 
-[Visit the QurvE online application](https:www.qurveanalysis.com)
+[Visit the QurvE online application](https://www.qurveanalysis.com)
 
 ## Deployed application
 

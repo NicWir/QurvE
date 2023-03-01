@@ -24,6 +24,7 @@ library(shinyFiles, quietly = T)
 library(shinyjs, quietly = T)
 library(shinythemes, quietly = T)
 library(ggplot2, quietly = T)
+library(magrittr)
 
 # Define icon set from custom SVG files
 # iconset <- icons::icon_set("icons/")
@@ -10493,7 +10494,7 @@ server <- function(input, output, session){
     if(is.null(input$custom_colors_group_plot) || is.na(input$custom_colors_group_plot) || input$custom_colors_group_plot == ""){
       cols <- NULL
     } else {
-      cols <- unlist(str_split(input$custom_colors_group_plot, ",|;"))
+      cols <- toupper(unlist(str_split(input$custom_colors_group_plot, ", |; |,|;")))
     }
     if(input$select_string_visualize_growth_group){
       suppressWarnings(
@@ -11337,7 +11338,7 @@ server <- function(input, output, session){
     if(is.null(input$custom_colors_growth_parameter_plot) || is.na(input$custom_colors_growth_parameter_plot) || input$custom_colors_growth_parameter_plot == ""){
       cols <- NULL
     } else {
-      cols <- unlist(str_split(input$custom_colors_growth_parameter_plot, ",|;"))
+      cols <- toupper(unlist(str_split(input$custom_colors_growth_parameter_plot, ", |; |,|;")))
     }
     if(input$select_string_visualize_parameter_growth_plot){
       suppressWarnings(
@@ -11931,7 +11932,7 @@ server <- function(input, output, session){
     if(is.null(input$custom_colors_fluorescence_group_plot) || is.na(input$custom_colors_fluorescence_group_plot) || input$custom_colors_fluorescence_group_plot == ""){
       cols <- NULL
     } else {
-      cols <- unlist(str_split(input$custom_colors_fluorescence_group_plot, ",|;"))
+      cols <- toupper(unlist(str_split(input$custom_colors_fluorescence_group_plot, ", |; |,|;")))
     }
     if(input$data_type_fluorescence_group_plot == "spline" && results$control$x_type == "growth"){
       plot_mean <-  FALSE
@@ -12507,7 +12508,7 @@ server <- function(input, output, session){
         if(is.null(input$custom_colors_fluorescence_parameter_plot) || is.na(input$custom_colors_fluorescence_parameter_plot) || input$custom_colors_fluorescence_parameter_plot == ""){
           cols <- NULL
         } else {
-          cols <- unlist(str_split(input$custom_colors_fluorescence_parameter_plot, ",|;"))
+          cols <- toupper(unlist(str_split(input$custom_colors_fluorescence_parameter_plot, ", |; |,|;")))
         }
         if(input$select_string_visualize_parameter_fluorescence_plot){
           suppressWarnings(
@@ -12988,7 +12989,7 @@ server <- function(input, output, session){
         if(is.null(input$custom_colors_dual_plot) || is.na(input$custom_colors_dual_plot) || input$custom_colors_dual_plot == ""){
           cols <- NULL
         } else {
-          cols <- unlist(str_split(input$custom_colors_dual_plot, ",|;"))
+          cols <- toupper(unlist(str_split(input$custom_colors_dual_plot, ", |; |,|;")))
         }
         if(input$select_string_visualize_dual_plot){
         suppressWarnings(
