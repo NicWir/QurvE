@@ -401,8 +401,18 @@ parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
     # Extract last read table
     read.data[[length(read.ndx)]] <- data.frame(data[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1),2:(ncol)])
     read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
+    for( i in 1:length(read.data) ){
+      if(any(is.na(read.data[[i]][,1]))){
+        read.data[[i]] <- read.data[[i]][1:which(is.na(read.data[[i]][,1]))[1]-1, ]
+      }
+    }
   } else {
-    read.data[[1]] <- data.frame(data[read.ndx:(read.ndx + match(NA, data[read.ndx:nrow(data),3])-2),2:(1+ncol)])
+    if(!any(is.na(input[read.ndx:nrow(input),3]))){
+      read.data[[1]] <- data.frame(input[read.ndx:nrow(input),2:(1+ncol)])
+    }
+    else {
+      read.data[[1]] <- data.frame(input[read.ndx:(read.ndx + match(NA, input[read.ndx:nrow(input),3])-2),2:(1+ncol)])
+    }
   }
   # Remove time points with NA in all samples
   for(i in 1:length(read.data))
@@ -545,8 +555,18 @@ parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
     # Extract last read table
     read.data[[length(read.ndx)]] <- t(data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1), 1:(ncol)]))
     read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
+    for( i in 1:length(read.data) ){
+      if(any(is.na(read.data[[i]][,1]))){
+        read.data[[i]] <- read.data[[i]][1:which(is.na(read.data[[i]][,1]))[1]-1, ]
+      }
+    }
   } else {
-    read.data[[1]] <- t(data.frame(input[read.ndx:(read.ndx + match(NA, input[read.ndx:nrow(input),3])-2), 1:(ncol)]))
+    if(!any(is.na(input[read.ndx:nrow(input),3]))){
+      read.data[[1]] <- t(data.frame(input[read.ndx:nrow(input),2:(1+ncol)]))
+    }
+    else {
+      read.data[[1]] <- t(data.frame(input[read.ndx:(read.ndx + match(NA, input[read.ndx:nrow(input),3])-2), 1:(ncol)]))
+    }
   }
   # Remove temperature columns
   for(i in 1:length(read.data))
