@@ -57,10 +57,12 @@
 <div class="section level3">
 <h3 id="enhancements-1-0-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-0-1"></a></h3>
 <ul><li>Report template .Rmd files are now copied into tempdir() before rendering to avoid bugs with restrictive write permissions.</li>
+<li>In shiny app: Don’t show “Select Read for fluorescence normalization” if Fluorescence is [Ignore].</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-0-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-1"></a></h3>
-<ul><li>Issue <a href="https://github.com/NicWir/QurvE/issues/4" class="external-link">#4</a>: In shiny app, checkbox ‘sort by concentration’ did not show after loading an old RData file</li>
+<ul><li>Issue <a href="https://github.com/NicWir/QurvE/issues/4" class="external-link">#4</a>: In shiny app, checkbox ‘sort by concentration’ did not show after loading an old RData file.</li>
+<li>Fixed bug in Gen5/Gen6 parser if only one read type was present.</li>
 </ul></div>
 </div>
     <div class="section level2">
