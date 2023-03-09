@@ -407,11 +407,11 @@ parse_Gen5Gen6_shiny <- function(data, growth.nm, fl.nm, fl2.nm)
       }
     }
   } else {
-    if(!any(is.na(input[read.ndx:nrow(input),3]))){
-      read.data[[1]] <- data.frame(input[read.ndx:nrow(input),2:(1+ncol)])
+    if(!any(is.na(data[read.ndx:nrow(data),3]))){
+      read.data[[1]] <- data.frame(data[read.ndx:nrow(data),2:(1+ncol)])
     }
     else {
-      read.data[[1]] <- data.frame(input[read.ndx:(read.ndx + match(NA, input[read.ndx:nrow(input),3])-2),2:(1+ncol)])
+      read.data[[1]] <- data.frame(data[read.ndx:(read.ndx + match(NA, data[read.ndx:nrow(data),3])-2),2:(1+ncol)])
     }
   }
   # Remove time points with NA in all samples
