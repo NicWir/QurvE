@@ -605,9 +605,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           )
                                                         ),
 
-                                                        selectInput(inputId = 'norm_type_parse',
+                                                        conditionalPanel(
+                                                          condition = "input.parsed_reads_fluorescence.length > 0 && input.parsed_reads_fluorescence != 'Ignore'",
+                                                          selectInput(inputId = 'norm_type_parse',
                                                                       label = 'Select Read for fluorescence normalization',
-                                                                      choices = ""),
+                                                                      choices = "")
+                                                        ),
 
                                                         tags$div(title="Shall blank values (the mean of samples identified by 'Blank' IDs) be subtracted from values within the same experiment?",
                                                                  checkboxInput(inputId = 'subtract_blank_plate_reader',
