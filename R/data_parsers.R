@@ -903,11 +903,11 @@ parse_Gen5Gen6 <- function(input)
     read.data <- lapply(1:(length(read.ndx)-1), function(x) input[read.ndx[x]:(read.ndx[x+1]-3),2:(ncol)])
     read.data <- lapply(1:length(read.data), function(x) as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]),])
     # Extract last read table
-    read.data[[length(read.ndx)]] <- data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1),2:(ncol)])
-    read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
+    read.data[[length(read.ndx)]] <- data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])),2:(ncol)])
+    #read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
     for( i in 1:length(read.data) ){
-      if(any(is.na(read.data[[i]][,1]))){
-        read.data[[i]] <- read.data[[i]][1:which(is.na(read.data[[i]][,1]))[1]-1, ]
+      if(any(is.na(suppressWarnings(as.numeric(read.data[[i]][-1,2]))))){
+        read.data[[i]] <- suppressWarnings(read.data[[i]][1:which(is.na(as.numeric(read.data[[i]][-1,2])))[1], ])
       }
     }
   } else {
@@ -1119,10 +1119,10 @@ parse_tecan <- function(input)
     read.data <- lapply(1:length(read.data), function(x) as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]), ])
     # Extract last read table
     read.data[[length(read.ndx)]] <- t(data.frame(input[read.ndx[length(read.ndx)]:(read.ndx[length(read.ndx)]+length(read.data[[1]][[1]])-1), 1:(ncol)]))
-    read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
+    #read.data[[length(read.ndx)]] <- as.data.frame(read.data[[length(read.ndx)]])[1:length(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0][!is.na(read.data[[length(read.ndx)]][,1][read.data[[length(read.ndx)]][,1]!=0])]),]
     for( i in 1:length(read.data) ){
-      if(any(is.na(read.data[[i]][,1]))){
-        read.data[[i]] <- read.data[[i]][1:which(is.na(read.data[[i]][,1]))[1]-1, ]
+      if(any(is.na(suppressWarnings(as.numeric(read.data[[i]][-1,2]))))){
+        read.data[[i]] <- suppressWarnings(read.data[[i]][1:which(is.na(as.numeric(read.data[[i]][-1,2])))[1], ])
       }
     }
   } else {
