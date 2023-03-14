@@ -5,7 +5,7 @@ articles:
   shiny_app_manual: shiny_app_manual.html
   vignette_fluorescence: vignette_fluorescence.html
   vignette_growth: vignette_growth.html
-last_built: 2023-03-14T11:50Z
+last_built: 2023-03-14T12:55Z
 urls:
   reference: https://nicwir.github.io/QurvE/reference
   article: https://nicwir.github.io/QurvE/articles

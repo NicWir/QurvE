@@ -229,10 +229,10 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create a grodata object</span></span></span>
 <span class="r-in"><span><span class="va">grodata</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_data.html">read_data</a></span><span class="op">(</span>data.growth <span class="op">=</span> <span class="va">data</span>, data.format <span class="op">=</span> <span class="st">"row"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sample data are stored in rows. If they are stored in column format, please run read_data() with data.format = 'col'.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in 1:nrow(dat):</span> argument of length 0</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">grodata</span>, exclude.nm <span class="op">=</span> <span class="st">"Test1"</span>, legend.ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot.grodata-1.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot(grodata, exclude.nm = "Test1", legend.ncol = 4):</span> object 'grodata' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
