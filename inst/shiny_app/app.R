@@ -8871,7 +8871,7 @@ server <- function(input, output, session){
       }
       dev.off()
     },
-    contentType = ifelse(input$format_download_growth_validate_linear == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
 
   )
 
@@ -9104,7 +9104,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_growth_validate_spline == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
 
   )
 
@@ -9408,7 +9408,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_growth_validate_model == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
 
   )
 
@@ -9564,7 +9564,7 @@ server <- function(input, output, session){
 
       dev.off()
     },
-    contentType = ifelse(input$format_download_growth_validate_spline_bt == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
     ## Fluorescence #####
   observe({
@@ -10016,7 +10016,7 @@ server <- function(input, output, session){
       }
       dev.off()
     },
-    contentType = ifelse(input$format_download_fluorescence_validate_linear == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
 
   )
 
@@ -10276,7 +10276,7 @@ server <- function(input, output, session){
              device = png)
       }
     },
-    contentType = ifelse(input$format_download_fluorescence_validate_spline == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
 
   )
 
@@ -10476,7 +10476,7 @@ server <- function(input, output, session){
       )
       dev.off()
     },
-    contentType = ifelse(input$format_download_fluorescence_validate_spline_bt == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
   # Visualize ####
     ## Growth Plots: #####
@@ -10610,7 +10610,6 @@ server <- function(input, output, session){
                  dpi = input$dpi_download_growth_group_plot,
                  device = pdf)
         }
-
       } else {
         ggsave(filename = file, width = input$width_download_growth_group_plot,
                height = input$height_download_growth_group_plot,
@@ -10619,8 +10618,9 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_growth_group_plot == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
+
 
       ### DR Plots Spline ####
   observe({
@@ -10829,7 +10829,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_dose_response_growth_plot_combined == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
 
       ### DR Plots Model ####
@@ -10998,7 +10998,7 @@ server <- function(input, output, session){
           )
           dev.off()
         },
-        contentType = ifelse(input$format_download_dose_response_growth_plot_model == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
       )
 
       ### DR Plots Spline Individual ####
@@ -11126,7 +11126,7 @@ server <- function(input, output, session){
       )
       dev.off()
     },
-    contentType = ifelse(input$format_download_dose_response_growth_plot_individual == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
 
   # observeEvent(input$rerun_dr_spline_individual, {
@@ -11326,7 +11326,7 @@ server <- function(input, output, session){
       )
       dev.off()
     },
-    contentType = ifelse(input$format_download_dose_response_growth_plot_individual_bt == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
 
       ### Parameter Plots ####
@@ -11434,7 +11434,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_growth_parameter_plot == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
 
   )
 
@@ -11729,7 +11729,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_growth_grid_plot == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
 
       ### DR Parameter Plots ####
@@ -11793,7 +11793,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_growth_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
 
   )
 
@@ -12058,7 +12058,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_fluorescence_group_plot == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
 
   observe({
@@ -12266,7 +12266,7 @@ server <- function(input, output, session){
       }
 
     },
-    contentType = ifelse(input$format_download_dose_response_plot_fluorescence_combined == ".pdf", "image/pdf", "image/png")
+    contentType = "application/octet-stream"
   )
 
       ### DR Plots Spline Individual ####
@@ -12387,7 +12387,7 @@ server <- function(input, output, session){
                            x.lim = x.lim)
           dev.off()
         },
-        contentType = ifelse(input$format_download_dose_response_fluorescence_plot_individual == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
       )
 
       select_inputs_individual_plots_dose_response_fluorescence_plot<- reactive({
@@ -12485,7 +12485,7 @@ server <- function(input, output, session){
           }
 
         },
-        contentType = ifelse(input$format_download_dose_response_model_fluorescence_plot_individual == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
       )
 
       select_inputs_individual_plots_dose_response_model_fluorescence_plot<- reactive({
@@ -12603,7 +12603,7 @@ server <- function(input, output, session){
           }
 
         },
-        contentType = ifelse(input$format_download_fluorescence_parameter_plot == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
 
       )
 
@@ -12905,7 +12905,7 @@ server <- function(input, output, session){
           }
 
         },
-        contentType = ifelse(input$format_download_fluorescence_grid_plot == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
       )
 
       ### DR Plots (Bootstrap) ####
@@ -12972,7 +12972,7 @@ server <- function(input, output, session){
           )
           dev.off()
         },
-        contentType = ifelse(input$format_download_dose_response_fluorescence_plot_individual_bt == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
       )
 
 
@@ -13100,7 +13100,7 @@ server <- function(input, output, session){
           }
 
         },
-        contentType = ifelse(input$format_download_dual_plot == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
       )
 
       selected_inputs_fluorescence_type_dual_plot <- reactive({
@@ -13184,7 +13184,7 @@ server <- function(input, output, session){
           }
 
         },
-        contentType = ifelse(input$format_download_fluorescence_dr_parameter_plot == ".pdf", "image/pdf", "image/png")
+        contentType = "application/octet-stream"
 
       )
 
