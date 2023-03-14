@@ -91,6 +91,9 @@ read_data <-
     if(data.format == "col"){
       dat <- t(dat)
     }
+    # Remove explicit quotes
+    dat <- gsub('\"', "", dat)
+
     # Convert time values
     if(!is.null(convert.time)){
 
