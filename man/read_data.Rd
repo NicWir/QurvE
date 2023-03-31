@@ -27,12 +27,20 @@ read_data(
 )
 }
 \arguments{
-\item{data.growth}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data.
-The first three table rows contain
+\item{data.growth}{An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data. The data must be either in the '\code{QurvE} custom layout' or in 'tidy' (long) format.
+The first three table rows in the 'custom \code{QurvE} layout' contain:
 \enumerate{
-\item sample description
-\item replicate number (\emph{optional}: followed by a letter to indicate technical replicates)
-\item concentration value (\emph{optional})
+\item Sample description
+\item Replicate number (\emph{optional}: followed by a letter to indicate technical replicates)
+\item Concentration value (\emph{optional})
+}
+Data in 'tidy' format requires the following column headers:
+\enumerate{
+\item "Time": time values
+\item "Description": sample description
+\item "Replicate": replicate number (\emph{optional})
+\item "Concentration": concentration value (\emph{optional})
+\item "Values": growth values (e.g., optical density)
 }}
 
 \item{data.fl}{(optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.growth}.}

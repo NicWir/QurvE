@@ -11871,8 +11871,11 @@ server <- function(input, output, session){
     if (length(results$fluorescence$flFit)>1){
       if(input$data_type_fluorescence_group_plot == "raw") y_axis <- "Fluorescence"
       # if(input$data_type_fluorescence_group_plot == "raw2") y_axis <- "Fluorescence 2"
-      if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$norm_fl){
+      if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$norm_fl && results$fluorescence$control$x_type != "growth"){
         y_axis <- "Normalized fluorescence"
+      }
+      if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$norm_fl && results$fluorescence$control$x_type == "growth"){
+        y_axis <- "Fluorescence"
       }
       if(input$data_type_fluorescence_group_plot == "spline" && !results$fluorescence$control$norm_fl){
         y_axis <- "Fluorescence"

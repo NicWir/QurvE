@@ -2,12 +2,20 @@
 #'
 #' \code{read_data} reads table files or R dataframe objects containing growth and fluorescence data and extracts datasets, sample and group information, performs blank correction, applies data transformation (calibration), and combines technical replicates.
 #'
-#' @param data.growth An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data.
-#' The first three table rows contain
+#' @param data.growth An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data. The data must be either in the '`QurvE` custom layout' or in 'tidy' (long) format.
+#' The first three table rows in the 'custom `QurvE` layout' contain:
 #' \enumerate{
-#'    \item sample description
-#'    \item replicate number (_optional_: followed by a letter to indicate technical replicates)
-#'    \item concentration value (_optional_)
+#'    \item Sample description
+#'    \item Replicate number (_optional_: followed by a letter to indicate technical replicates)
+#'    \item Concentration value (_optional_)
+#' }
+#' Data in 'tidy' format requires the following column headers:
+#' \enumerate{
+#'    \item "Time": time values
+#'    \item "Description": sample description
+#'    \item "Replicate": replicate number (_optional_)
+#'    \item "Concentration": concentration value (_optional_)
+#'    \item "Values": growth values (e.g., optical density)
 #' }
 #' @param data.fl (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing fluorescence data. Table layout must mimic that of \code{data.growth}.
 #' @param data.fl2 (optional) An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing measurements from a second fluorescence channel (used only to normalize \code{fluorescence} data). Table layout must mimic that of \code{data.growth}.
@@ -88,7 +96,169 @@ read_data <-
       # Read table file
       dat <- read_file(data.growth, csvsep=csvsep, dec=dec, sheet=sheet.growth)
     }
-    if(data.format == "col"){
+    # Check if data is in "tidy" format
+    # Check if data contains the required headers in colnames or the first row
+    if((any(grepl("Time", colnames(dat), ignore.case = T)) &&
+        any(grepl("Description", colnames(dat), ignore.case = T)) &&
+        any(grepl("Values|Value", colnames(dat), ignore.case = T))) ||
+       (any(grepl("Time", dat[1,], ignore.case = T)) &&
+        any(grepl("Description", dat[1,], ignore.case = T)) &&
+        any(grepl("Values|Value", dat[1,], ignore.case = T)))
+    ){
+      tidy <- TRUE
+      # If identifiers in first row, convert to colnames
+      if(any(grepl("Time", dat[1,], ignore.case = T)) ||
+         any(grepl("Description", dat[1,], ignore.case = T)) ||
+         any(grepl("Values|Value", dat[1,], ignore.case = T))){
+        colnames(dat) <- dat[1, ]
+        dat <- dat[-1, ]
+      }
+      colnames(dat)[ncol(dat)] <- "Values"
+      # If missing, add columns for "Replicate" and "Concentration"
+      if(!any(grepl("Replicate", colnames(dat), ignore.case = T))){
+        dat[, "Replicate"] <- rep(NA, nrow(dat))
+      }
+      if(!any(grepl("Concentration", colnames(dat), ignore.case = T))){
+        dat[, "Concentration"] <- rep(NA, nrow(dat))
+      }
+
+
+      # Convert tidy format to the custom QurvE format
+
+          # Create a unique identifier for each combination of Description, Concentration, and Replicate
+          dat$Group <- with(dat, paste(Description, Concentration, Replicate, sep = "_"))
+
+          # Split the 'Time' column based on the unique identifier
+          time_split <- split(dat$Time, dat$Group)
+
+          # Create a list of subsets of 'dat' based on the unique identifiers in 'time_split'
+          subsets_list <- lapply(unique(dat$Group), function(x) {
+            subset(dat, Group == x)
+          })
+
+          # Helper function to check if two data frames have identical 'Time' values
+          identical_time <- function(df1, df2) {
+            identical(df1$Time, df2$Time)
+          }
+
+          # Initialize an empty list to store combined data frames
+          combined_list <- list()
+
+          # Initialize a vector to track combined data frames
+          combined_flag <- rep(FALSE, length(subsets_list))
+
+          for (i in seq_along(subsets_list)) {
+            # Skip if the data frame is already combined
+            if (combined_flag[i]) {
+              next
+            }
+
+            df1 <- subsets_list[[i]]
+            matching_indices <- c(i)
+
+            # Check for matching 'Time' values in other data frames
+            for (j in (i+1):length(subsets_list)) {
+              if (!combined_flag[j] && identical_time(df1, subsets_list[[j]])) {
+                matching_indices <- c(matching_indices, j)
+                combined_flag[j] <- TRUE
+              }
+            }
+
+            # Combine the matching data frames
+            combined_df <- do.call(rbind, subsets_list[matching_indices])
+
+            # Add the combined data frame to the combined_list
+            combined_list[[length(combined_list) + 1]] <- combined_df
+
+            # Mark the current data frame as combined
+            combined_flag[i] <- TRUE
+          }
+
+          # Define helper function to convert into wide format
+          convert_to_wide <- function(df) {
+            df <- df[!is.na(df$Time), ]
+            # Find unique groups
+            unique_groups <- unique(df$Group)
+
+            # Create an empty data frame with the required structure
+            df_wide <- data.frame(matrix(ncol = length(unique_groups) + 1, nrow = nrow(df)/length(unique_groups) + 2))
+            colnames(df_wide) <- c("Time", unique_groups)
+
+            # Add Time, Replicate, and Concentration values
+            time <- unique(df$Time)
+            time <- time[!is.na(time)]
+            df_wide$Time <- c(NA, NA, time)
+
+            for (group in unique_groups) {
+              group_df <- df[df$Group == group, ]
+              description <- unique(group_df$Description)
+              replicate <- unique(group_df$Replicate)
+              concentration <- unique(group_df$Concentration)
+
+              # Add Description, Replicate, Concentration, and Values
+              df_wide[[group]] <- c(replicate, concentration, group_df$Values)
+              colnames(df_wide)[colnames(df_wide) == group] <- description
+            }
+
+            return(df_wide)
+          }
+
+
+          wide_list <- lapply(combined_list, convert_to_wide)
+
+          # Combine dataframes into a single dataframe in QurvE custom format
+            # Find the maximum number of rows among the data frames
+            max_rows <- max(sapply(wide_list, nrow))
+
+            # Add NA rows to each data frame to make them equal in length
+            equalize_rows <- function(df, max_rows) {
+              if (nrow(df) < max_rows) {
+                missing_rows <- max_rows - nrow(df)
+                na_rows <- data.frame(matrix(NA, ncol = ncol(df), nrow = missing_rows))
+                colnames(na_rows) <- colnames(df)
+                df <- rbind(df, na_rows)
+              }
+              return(df)
+            }
+
+            wide_list_equal_rows <- lapply(wide_list, equalize_rows, max_rows = max_rows)
+
+            # Combine data frames into a single data frame
+            # Custom function to merge two data frames with different column names
+            merge_data_frames <- function(df1, df2) {
+              common_rows <- min(nrow(df1), nrow(df2))
+              missing_rows_df1 <- nrow(df2) - nrow(df1)
+              missing_rows_df2 <- nrow(df1) - nrow(df2)
+
+              # Add NA rows to the shorter data frame
+              if (missing_rows_df1 > 0) {
+                na_rows_df1 <- data.frame(matrix(NA, ncol = ncol(df1), nrow = missing_rows_df1))
+                colnames(na_rows_df1) <- colnames(df1)
+                df1 <- rbind(df1, na_rows_df1)
+              } else if (missing_rows_df2 > 0) {
+                na_rows_df2 <- data.frame(matrix(NA, ncol = ncol(df2), nrow = missing_rows_df2))
+                colnames(na_rows_df2) <- colnames(df2)
+                df2 <- rbind(df2, na_rows_df2)
+              }
+
+              # Combine the data frames
+              combined_df <- cbind(df1, df2)
+
+              return(combined_df)
+            }
+
+            combined_wide_df <- Reduce(merge_data_frames, wide_list_equal_rows)
+
+            # Create a new data frame with the column headers as its first row
+            header_df <- data.frame(matrix(colnames(combined_wide_df), ncol = ncol(combined_wide_df), nrow = 1))
+            colnames(header_df) <- colnames(combined_wide_df)
+
+            # Bind the original data frame below the header data frame
+            dat <- rbind(header_df, combined_wide_df)
+
+            dat <- t(dat)
+    }
+    else if(data.format == "col"){
       dat <- t(dat)
     }
     # Remove explicit quotes
@@ -438,8 +608,7 @@ read_data <-
       dat.mat <- create_datmat(dat, time.ndx=time.ndx)
       if(ncol(dat.mat) == 1) dat.mat <- t(dat.mat)
       dat.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])
-    }
-    else{
+    } else{
       dat.mat <- NA
     }
     if((length(fl) > 1 ) || !is.na(data.fl)){fl.mat <- create_datmat(df=fl, time.ndx=time.ndx);  fl.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.mat[,1])}else{fl.mat <- NA}
