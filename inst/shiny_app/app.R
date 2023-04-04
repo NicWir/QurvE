@@ -1006,6 +1006,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                              style="padding:2px; font-size:100%"),
                                                                                 style="float:left")
                                                                        )
+                                                                     ),
+                                                                     HTML("<br>"),
+                                                                     fluidRow(
+                                                                       column(12,
+                                                                              div(
+                                                                                actionButton(inputId = "run_growth_code",
+                                                                                             label = "Inspect code",
+                                                                                             icon=icon("code"),
+                                                                                             style="padding:5px; font-size:90%"),
+                                                                                style="float:right")
+                                                                       )
                                                                      )
                                                        ) # sidebarPanel
 
@@ -1395,6 +1406,17 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                icon=icon("question"),
                                                                                                style="padding:2px; font-size:100%"),
                                                                                   style="float:left")
+                                                                         )
+                                                                       ),
+                                                                       HTML("<br>"),
+                                                                       fluidRow(
+                                                                         column(12,
+                                                                                div(
+                                                                                  actionButton(inputId = "run_fluorescence_code",
+                                                                                               label = "Inspect code",
+                                                                                               icon=icon("code"),
+                                                                                               style="padding:5px; font-size:90%"),
+                                                                                  style="float:right")
                                                                          )
                                                                        )
                                                                      )
@@ -5530,9 +5552,10 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
 
                                                                    selectInput(inputId = 'report_filetype_growth',
                                                                                label = 'Choose file type',
-                                                                               choices = c('PDF' = 'pdf', 'HTML' = 'html')),
+                                                                               choices = c('PDF' = 'pdf',
+                                                                                           'HTML' = 'html')),
 
-                                                                   conditionalPanel(condition = "input.report_filetype_growth == 'pdf'",
+                                                                   conditionalPanel(condition = "input.report_filetype_growth == 'pdf' && output.tinytex_installed",
                                                                                     fluidRow(
                                                                                       column(12,
                                                                                              div(
@@ -5556,21 +5579,47 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                       )
                                                                                     )
                                                                    ),
+                                                                   conditionalPanel(condition = "!output.tinytex_installed && input.report_filetype_growth == 'pdf'",
+                                                                                    fluidRow(
+                                                                                      column(12,
+                                                                                             div(
+                                                                                               actionButton("install_tinytex",
+                                                                                                            label ="Install TinyTeX",
+                                                                                                            icon = icon("cloud-arrow-down"),
+                                                                                                            style="padding:5px; font-size:120%"),
+                                                                                               style="float:right")
+                                                                                      )
+                                                                                    )
+                                                                   ),
                                                       ) # sidebarPanel
                                              ), # tabPanel(title = "Growth", value = "tabs_export_data_growth",
                                              tabPanel(title = "Fluorescence", value = "tabPanel_report_fluorescence",
                                                       sidebarPanel(width = 6,
                                                                    selectInput(inputId = 'report_filetype_fluorescence',
                                                                                label = 'Choose file type',
-                                                                               choices = c('PDF' = 'pdf', 'HTML' = 'html')),
+                                                                               choices = c('PDF' = 'pdf',
+                                                                                           'HTML' = 'html')),
 
-                                                                   conditionalPanel(condition = "input.report_filetype_fluorescence == 'pdf'",
+                                                                   conditionalPanel(condition = "input.report_filetype_fluorescence == 'pdf' && output.tinytex_installed",
                                                                                     fluidRow(
                                                                                       column(12,
                                                                                              div(
                                                                                                downloadButton(outputId = 'download_report_fluorescence_pdf',
                                                                                                               label = "Render Report",
                                                                                                               icon = icon("file-pdf"),
+                                                                                                              style="padding:5px; font-size:120%"),
+                                                                                               style="float:right")
+                                                                                      )
+                                                                                    )
+                                                                   ),
+
+                                                                   conditionalPanel(condition = "!output.tinytex_installed && input.report_filetype_fluorescence == 'pdf'",
+                                                                                    fluidRow(
+                                                                                      column(12,
+                                                                                             div(
+                                                                                               actionButton("install_tinytex",
+                                                                                                            label ="Install TinyTeX",
+                                                                                                              icon = icon("cloud-arrow-down"),
                                                                                                               style="padding:5px; font-size:120%"),
                                                                                                style="float:right")
                                                                                       )
@@ -7588,6 +7637,145 @@ server <- function(input, output, session){
       showModal(modalDialog(geterrmessage()) )
 
   })
+
+  observeEvent(input$run_growth_code,{
+    ## Read data
+    # grodata <- read_data(inFile$datapath, sheet.growth = input$custom_growth_sheets, csvsep = input$separator_custom_growth, dec = input$decimal_separator_custom_growth)
+    # Choose data input
+    if(!is.null(results$custom_data)){
+      grodata <- "custom_data"
+    } else if(!is.null(results$parsed_data)){
+      grodata <- "parsed_data"
+    } else return(NULL)
+
+    if (is.null(input$number_of_bootstrappings_growth) || is.na(input$number_of_bootstrappings_growth) || input$number_of_bootstrappings_growth == "NULL" || input$number_of_bootstrappings_growth == "") {
+      nboot.gc <- 0.55
+    } else {
+      nboot.gc <- as.numeric(input$number_of_bootstrappings_growth)
+    }
+
+    if (is.null(input$smoothing_factor_nonparametric_growth) || is.na(input$smoothing_factor_nonparametric_growth) || input$smoothing_factor_nonparametric_growth == "NULL" || input$smoothing_factor_nonparametric_growth == "") {
+      smooth.gc <- 0.55
+    } else {
+      smooth.gc <- as.numeric(input$smoothing_factor_nonparametric_growth)
+    }
+
+    if (is.null(input$smoothing_factor_growth_dr) || is.na(input$smoothing_factor_growth_dr) || input$smoothing_factor_growth_dr == "NULL" || input$smoothing_factor_growth_dr == "") {
+      smooth.dr = "NULL"
+    } else {
+      smooth.dr <- as.numeric(input$smoothing_factor_growth_dr)
+    }
+
+    if (is.null(input$number_of_bootstrappings_dr_growth) || is.na(input$number_of_bootstrappings_dr_growth) || input$number_of_bootstrappings_dr_growth == "NULL" || input$number_of_bootstrappings_dr_growth == "") {
+      nboot.dr <- 0
+    } else {
+      nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_growth)
+    }
+
+    if (is.null(input$R2_threshold_growth) || is.na(input$R2_threshold_growth) || input$R2_threshold_growth == "NULL" || input$R2_threshold_growth == "") {
+      lin.R2 <- 0.95
+    } else {
+      lin.R2 <- as.numeric(input$R2_threshold_growth)
+    }
+
+    if (is.null(input$RSD_threshold_growth) || is.na(input$RSD_threshold_growth) || input$RSD_threshold_growth == "NULL" || input$RSD_threshold_growth == "") {
+      lin.RSD <- 0.1
+    } else {
+      lin.RSD <- as.numeric(input$RSD_threshold_growth)
+    }
+
+    if (is.null(input$dY_threshold_growth) || is.na(input$dY_threshold_growth) || input$dY_threshold_growth == "NULL" || input$dY_threshold_growth == "") {
+      lin.dY <- 0.05
+    } else {
+      lin.dY <- as.numeric(input$dY_threshold_growth)
+    }
+
+    if (is.null(input$minimum_growth_growth) || is.na(input$minimum_growth_growth) || input$minimum_growth_growth == "NULL" || input$minimum_growth_growth == "") {
+      min.growth <- 0
+    } else {
+      min.growth <- as.numeric(input$minimum_growth_growth)
+    }
+
+    if (is.null(input$maximum_growth_growth) || is.na(input$maximum_growth_growth) || input$maximum_growth_growth == "NULL" || input$maximum_growth_growth == "") {
+      max.growth <- NA
+    } else {
+      max.growth <- as.numeric(input$maximum_growth_growth)
+    }
+
+    if (is.null(input$t0_growth) || is.na(input$t0_growth) || input$t0_growth == "NULL" || input$t0_growth == "") {
+      t0 <- 0
+    } else {
+      t0 <- as.numeric(input$t0_growth)
+    }
+
+    if (is.null(input$tmax_growth) || is.na(input$tmax_growth) || input$tmax_growth == "NULL" || input$tmax_growth == "") {
+      tmax <- NA
+    } else {
+      tmax <- as.numeric(input$tmax_growth)
+    }
+
+    if (is.null(input$growth_threshold_growth) || is.na(input$growth_threshold_growth) || input$growth_threshold_growth == "NULL" || input$growth_threshold_growth == "") {
+      growth.thresh <- 1.5
+    } else {
+      growth.thresh <- as.numeric(input$growth_threshold_growth)
+    }
+
+    fit.opt <- c()
+    if(input$linear_regression_growth){
+      fit.opt <- c(fit.opt,
+                   'l')
+    }
+    if(input$parametric_fit_growth){
+      fit.opt <- c(fit.opt,
+                   'm')
+      # combine selected models into vector
+      models <- c()
+      if(input$logistic_growth == TRUE) models <- c(models, "logistic")
+      if(input$richards_growth == TRUE) models <- c(models, "richards")
+      if(input$gompertz_growth == TRUE) models <- c(models, "gompertz")
+      if(input$extended_gompertz_growth == TRUE) models <- c(models, "gompertz.exp")
+      if(input$huang_growth == TRUE) models <- c(models, "huang")
+      if(input$baranyi_growth == TRUE) models <- c(models, "baranyi")
+    } else {
+      models <- c("logistic")
+    }
+    if(input$nonparametric_fit_growth){
+      fit.opt <- c(fit.opt,
+                   's')
+    }
+    code_string <- paste0("growth.workflow(grodata = ", grodata, ",<br>",
+                                          "&nbsp&nbsp&nbspec50 = ", input$perform_ec50_growth, ",<br>",
+                                          "&nbsp&nbsp&nbspfit.opt = ", paste0("c(", toString(sapply(fit.opt, function(x) paste0('"', x, '"'))), ")"), ",<br>",
+                                          "&nbsp&nbsp&nbspt0 = ", t0, ",<br>",
+                                          "&nbsp&nbsp&nbsptmax = ", tmax, ",<br>",
+                                          "&nbsp&nbsp&nbspmin.growth = ", min.growth, ",<br>",
+                                          "&nbsp&nbsp&nbspmax.growth = ", max.growth, ",<br>",
+                                          "&nbsp&nbsp&nbsplog.x.gc = ", input$log_transform_time_growth, ",<br>",
+                                          "&nbsp&nbsp&nbsplog.y.lin = ", input$log_transform_data_linear_growth, ",<br>",
+                                          "&nbsp&nbsp&nbsplog.y.model = ", input$log_transform_data_parametric_growth, ",<br>",
+                                          "&nbsp&nbsp&nbsplog.y.spline = ", input$log_transform_data_nonparametric_growth, ",<br>",
+                                          "&nbsp&nbsp&nbspbiphasic = ", input$biphasic_growth, ",<br>",
+                                          "&nbsp&nbsp&nbsplin.h = ", input$custom_sliding_window_size_value_growth, ",<br>",
+                                          "&nbsp&nbsp&nbsplin.R2 = ", lin.R2, ",<br>",
+                                          "&nbsp&nbsp&nbsplin.RSD = ", lin.RSD, ",<br>",
+                                          "&nbsp&nbsp&nbsplin.dY = ", lin.dY, ",<br>",
+                                          "&nbsp&nbsp&nbspinteractive = ", "TRUE", ",<br>",
+                                          "&nbsp&nbsp&nbspnboot.gc = ", nboot.gc, ",<br>",
+                                          "&nbsp&nbsp&nbspsmooth.gc = ", smooth.gc, ",<br>",
+                                          "&nbsp&nbsp&nbspmodel.type = ", paste0("c(", toString(sapply(models, function(x) paste0('"', x, '"'))), ")"), ",<br>",
+                                          "&nbsp&nbsp&nbspgrowth.thresh = ", growth.thresh, ",<br>",
+                                          "&nbsp&nbsp&nbspdr.method = '", input$dr_method_growth, "'", ",<br>",
+                                          "&nbsp&nbsp&nbspdr.parameter = '", input$response_parameter_growth, "'", ",<br>",
+                                          "&nbsp&nbsp&nbspsmooth.dr = ", smooth.dr, ",<br>",
+                                          "&nbsp&nbsp&nbsplog.x.dr = ", input$log_transform_concentration_growth, ",<br>",
+                                          "&nbsp&nbsp&nbsplog.y.dr = ", input$log_transform_response_growth, ",<br>",
+                                          "&nbsp&nbsp&nbspnboot.dr = ", nboot.dr, ",<br>",
+                                          "&nbsp&nbsp&nbspsuppress.messages = ", "TRUE", ",<br>",
+                                          "&nbsp&nbsp&nbspreport = ", "NULL", ",<br>",
+                                          "&nbsp&nbsp&nbspshiny = ", "TRUE)")
+    showModal(modalDialog(HTML(code_string), footer=NULL, easyClose = T))
+
+  })
     ##____Fluorescence____#####
 
   # Create vector of x_types based on presence of data types
@@ -7796,6 +7984,139 @@ server <- function(input, output, session){
     }
     if(exists("results$fluorescence") && !is.null("results$fluorescence"))
       showModal(modalDialog(geterrmessage()) )
+  })
+
+  observeEvent(input$run_fluorescence_code,{
+    # Choose data input
+    if(!is.null(results$custom_data)){
+      grodata <- "custom_data"
+    } else if(!is.null(results$parsed_data)){
+      grodata <- "parsed_data"
+    } else return(NULL)
+
+    if (is.null(input$smoothing_factor_nonparametric_fluorescence) || is.na(input$smoothing_factor_nonparametric_fluorescence) || input$smoothing_factor_nonparametric_fluorescence == "NULL" || input$smoothing_factor_nonparametric_fluorescence == "") {
+      smooth.fl = 0.75
+    } else {
+      smooth.fl <- as.numeric(input$smoothing_factor_nonparametric_fluorescence)
+    }
+
+    if (is.null(input$smoothing_factor_fluorescence_dr) || is.na(input$smoothing_factor_fluorescence_dr) || input$smoothing_factor_fluorescence_dr == "NULL" || input$smoothing_factor_fluorescence_dr == "") {
+      smooth.dr = "NULL"
+    } else {
+      smooth.dr <- as.numeric(input$smoothing_factor_fluorescence_dr)
+    }
+
+    if (is.null(input$number_of_bootstrappings_fluorescence) || is.na(input$number_of_bootstrappings_fluorescence) || input$number_of_bootstrappings_fluorescence == "NULL" || input$number_of_bootstrappings_fluorescence == "") {
+      nboot.fl <- 0
+    } else {
+      nboot.fl <- as.numeric(input$number_of_bootstrappings_fluorescence)
+    }
+
+    if (is.null(input$number_of_bootstrappings_dr_fluorescence) || is.na(input$number_of_bootstrappings_dr_fluorescence) || input$number_of_bootstrappings_dr_fluorescence == "NULL" || input$number_of_bootstrappings_dr_fluorescence == "") {
+      nboot.dr <- 0
+    } else {
+      nboot.dr <- as.numeric(input$number_of_bootstrappings_dr_fluorescence)
+    }
+
+    if (is.null(input$R2_threshold_fluorescence) || is.na(input$R2_threshold_fluorescence) || input$R2_threshold_fluorescence == "NULL" || input$R2_threshold_fluorescence == "") {
+      lin.R2 <- 0.95
+    } else {
+      lin.R2 <- as.numeric(input$R2_threshold_fluorescence)
+    }
+
+    if (is.null(input$RSD_threshold_fluorescence) || is.na(input$RSD_threshold_fluorescence) || input$RSD_threshold_fluorescence == "NULL" || input$RSD_threshold_fluorescence == "") {
+      lin.RSD <- 0.1
+    } else {
+      lin.RSD <- as.numeric(input$RSD_threshold_fluorescence)
+    }
+
+    if (is.null(input$dY_threshold_fluorescence) || is.na(input$dY_threshold_fluorescence) || input$dY_threshold_fluorescence == "NULL" || input$dY_threshold_fluorescence == "") {
+      lin.dY <- 0.05
+    } else {
+      lin.dY <- as.numeric(input$dY_threshold_fluorescence)
+    }
+
+    if (is.null(input$growth_threshold_in_percent_fluorescence) || is.na(input$growth_threshold_in_percent_fluorescence) || input$growth_threshold_in_percent_fluorescence == "NULL" || input$growth_threshold_in_percent_fluorescence == "") {
+      growth.thresh <- 1.5
+    } else {
+      growth.thresh <- as.numeric(input$growth_threshold_in_percent_fluorescence)
+    }
+
+    if (is.null(input$t0_fluorescence) || is.na(input$t0_fluorescence) || input$t0_fluorescence == "NULL" || input$t0_fluorescence == "") {
+      t0 <- 0
+    } else {
+      t0 <- as.numeric(input$t0_fluorescence)
+    }
+
+    if (is.null(input$minimum_growth_fluorescence) || is.na(input$minimum_growth_fluorescence) || input$minimum_growth_fluorescence == "NULL" || input$minimum_growth_fluorescence == "") {
+      min.growth <- 0
+    } else {
+      min.growth <- as.numeric(input$minimum_growth_fluorescence)
+    }
+
+    if (is.null(input$maximum_growth_fluorescence) || is.na(input$maximum_growth_fluorescence) || input$maximum_growth_fluorescence == "NULL" || input$maximum_growth_fluorescence == "") {
+      max.growth <- NA
+    } else {
+      max.growth <- as.numeric(input$maximum_growth_fluorescence)
+    }
+
+
+    if (is.null(input$tmax_fluorescence) || is.na(input$tmax_fluorescence) || input$tmax_fluorescence == "NULL" || input$tmax_fluorescence == "") {
+      tmax <- NA
+    } else {
+      tmax <- as.numeric(input$tmax_fluorescence)
+    }
+
+    fit.opt <- c()
+    if(input$linear_regression_fluorescence){
+      fit.opt <- c(fit.opt,
+                   'l')
+    }
+    if(input$nonparametric_fit_fluorescence){
+      fit.opt <- c(fit.opt,
+                   's')
+    }
+
+    code_string <- paste0("fl.workflow(grodata = ", grodata, ",<br>",
+                          "&nbsp&nbsp&nbspec50 = ", input$perform_ec50_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbspfit.opt = ", paste0("c(", toString(sapply(fit.opt, function(x) paste0("'", x, "'"))), ")"), ",<br>",
+                          "&nbsp&nbsp&nbspx_type = '", input$data_type_x_fluorescence, "'", ",<br>",
+                          "&nbsp&nbsp&nbspnorm_fl = ", input$normalize_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbspt0 = ", t0, ",<br>",
+                          "&nbsp&nbsp&nbspmin.growth = ", min.growth, ",<br>",
+                          "&nbsp&nbsp&nbsplog.x.lin = ", input$log_transform_x_linear_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbsplog.x.spline = ", input$log_transform_x_nonparametric_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbsplog.y.lin = ", input$log_transform_data_linear_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbsplog.y.spline = ", input$log_transform_data_nonparametric_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbsplin.h = ", as.numeric(input$custom_sliding_window_size_value_fluorescence), ",<br>",
+                          "&nbsp&nbsp&nbsplin.R2 = ", lin.R2, ",<br>",
+                          "&nbsp&nbsp&nbsplin.RSD = ", lin.RSD, ",<br>",
+                          "&nbsp&nbsp&nbsplin.dY = ", lin.dY, ",<br>",
+                          "&nbsp&nbsp&nbspbiphasic = ", input$biphasic_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbspinteractive = ", "FALSE", ",<br>",
+                          "&nbsp&nbsp&nbspdr.parameter = '", input$response_parameter_fluorescence, "'", ",<br>",
+                          "&nbsp&nbsp&nbspdr.method = '", input$dr_method_fluorescence, "'", ",<br>",
+                          "&nbsp&nbsp&nbspsmooth.dr = ", smooth.dr, ",<br>",
+                          "&nbsp&nbsp&nbsplog.x.dr = ", input$log_transform_concentration_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbsplog.y.dr = ", input$log_transform_response_fluorescence, ",<br>",
+                          "&nbsp&nbsp&nbspnboot.dr = ", nboot.dr, ",<br>",
+                          "&nbsp&nbsp&nbspnboot.fl = ", nboot.fl, ",<br>",
+                          "&nbsp&nbsp&nbspsmooth.fl = ", smooth.fl, ",<br>",
+                          "&nbsp&nbsp&nbspgrowth.thresh = ", growth.thresh, ",<br>",
+                          "&nbsp&nbsp&nbspsuppress.messages = ", "TRUE", ",<br>",
+                          "&nbsp&nbsp&nbspneg.nan.act = ", "FALSE", ",<br>",
+                          "&nbsp&nbsp&nbspclean.bootstrap = ", "TRUE", ",<br>",
+                          "&nbsp&nbsp&nbspreport = ", "NULL", ",<br>",
+                          "&nbsp&nbsp&nbspout.dir = ", "NULL", ",<br>",
+                          "&nbsp&nbsp&nbspout.nm = ", "NULL", ",<br>",
+                          "&nbsp&nbsp&nbspexport.fig = ", "FALSE", ",<br>",
+                          "&nbsp&nbsp&nbspshiny = ", "TRUE", ",<br>",
+                          "&nbsp&nbsp&nbsptmax = ", tmax, ",<br>",
+                          "&nbsp&nbsp&nbspmax.growth = ", max.growth, ")")
+
+    showModal(modalDialog(HTML(code_string), footer=NULL, easyClose = T))
+
+
   })
 
   # Results ####
@@ -13251,8 +13572,52 @@ server <- function(input, output, session){
                           choices = select_inputs_individual_plots_dose_response_fluorescence_plot_bt()
         )})
 
-  # Report ####
+  # Reports ####
   volumes <- getVolumes() # this makes the directory at the base of your computer.
+
+  tinytex_package_installed <- requireNamespace("tinytex", quietly = TRUE)
+
+  tinytex_install_status <- reactiveVal(FALSE)
+
+  if (!tinytex_package_installed) {
+    shinyjs::disable("install_tinytex")
+    shinyjs::addTooltip("install_tinytex", "Please install package 'tinytex' to render PDF reports.")
+  } else {
+    tinytex_install_status(tinytex::is_tinytex())
+  }
+
+
+  output$tinytex_installed <- reactive({
+    return(
+      tinytex_install_status()
+    )
+  })
+  outputOptions(output, "tinytex_installed", suspendWhenHidden = FALSE)
+
+  observeEvent(input$install_tinytex, {
+    showModal(
+      modalDialog(
+        title = "Install TinyTeX",
+        "TinyTeX is required to render PDF reports but was not found on your system. Would you like to install TinyTeX? This requires an active internet connection and can take several minutes.",
+        footer = tagList(
+          modalButton("Cancel"),
+          actionButton("proceed_install", "Install TinyTeX")
+        )
+      )
+    )
+  })
+
+  observeEvent(input$proceed_install, {
+    showModal(
+      modalDialog(HTML("Installing TinyTeX...<br><br>(This requires an active internet connection and will take several minutes)"), footer = NULL)
+    )
+    tinytex::install_tinytex(force = T)
+    tinytex::tlmgr_update()
+
+    tinytex_install_status(TRUE)
+
+    removeModal()
+  })
 
   observe({
     if(!is.null(results$growth)){
@@ -13284,53 +13649,27 @@ server <- function(input, output, session){
 
     ## Report Growth ####
 
+
   output$download_report_growth_pdf <- downloadHandler(
     filename = function() {
       paste0("GrowthReport.", input$report_filetype_growth)
     },
     content = function(file) {
-      if (!requireNamespace("tinytex", quietly = TRUE)) {
-        showModal(
-          modalDialog("Please install package 'tinytex' to render PDF reports.", easyClose = T)
-        )
-      } else if(!tinytex::is_tinytex()){
-        # stop("TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex().")
-        showModal(
-          modalDialog(HTML("TinyTeX is required to render PDF reports but was not found on your system. Installing TinyTeX...<br><br>(This requires and active internet connection and will take several minutes)"), footer = NULL)
-        )
-        update.packages(ask = FALSE, checkBuilt = TRUE, repos='http://cran.us.r-project.org')
-        tinytex::install_tinytex()
-        tinytex::tlmgr_update()
-        tinytex::reinstall_tinytex()
-        removeModal()
-        try(
-          suppressWarnings(
-            suppressMessages(
-              growth.report(grofit = results$growth,
-                            out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
-                            out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
-                            ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                            format = input$report_filetype_growth,
-                            export = FALSE,
-                            mean.grp = "all")
-            )
+
+      try(
+        suppressWarnings(
+          suppressMessages(
+            growth.report(grofit = results$growth,
+                          out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
+                          out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
+                          ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
+                          format = input$report_filetype_growth,
+                          export = FALSE,
+                          mean.grp = "all", parallelize = F)
           )
         )
-      } else {
-        try(
-          suppressWarnings(
-            suppressMessages(
-              growth.report(grofit = results$growth,
-                            out.dir = gsub(paste0("[\\\\|", .Platform$file.sep, "]file.+$"), "", file),
-                            out.nm = gsub(paste0("^.+[\\\\|", .Platform$file.sep, "]"), "", file),
-                            ec50 = ifelse(length(results$growth$drFit) > 1 && length(results$growth$drFit$drTable) > 1, TRUE, FALSE),
-                            format = input$report_filetype_growth,
-                            export = FALSE,
-                            mean.grp = "all")
-            )
-          )
-        )
-      }
+      )
+
     },
     contentType = paste0(".", input$report_filetype_growth)
   )

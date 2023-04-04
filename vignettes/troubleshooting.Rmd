@@ -1,0 +1,58 @@
+---
+title: Troubleshooting
+author: "Nicolas T. Wirth"
+date: "2023-04-04"
+mainfont: Arial
+output:
+  prettydoc::html_pretty:
+    fig_caption: yes
+    toc: true
+    theme: "cayman"
+    highlight: vignette
+vignette: >
+  %\VignetteIndexEntry{Troubleshooting}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+lang: en-US
+---
+
+```{r setup, include = FALSE}
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+     sprintf("\\textcolor{%s}{%s}", color, x)
+   } else {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+            x)
+   }
+}
+colorize_code <- function(x, color) {
+    if (knitr::is_latex_output()) {
+         sprintf("\\texttt{\\textcolor{%s}{%s}}", color, x)
+    } else if (knitr::is_html_output()) {
+        sprintf("<span style='color: %s;'>`%s`</span>", color,
+                x)
+    }
+}
+```
+
+<br> This Troubleshooting guide aims to provide assistance and solutions to common issues that users may encounter while working with the QurvE package or shiny app. As we gather more user feedback, we will continue to update this page with additional information and solutions for a smooth *QurvE* experience.
+
+# Dealing with Outliers
+
+Outliers can significantly affect the accuracy and reliability of growth curve analysis. Identifying and addressing outliers is an essential step when using QurvE for high-throughput growth curve experiments. In this section, we discuss some strategies to identify and handle outliers in your data.
+
+## Identifying Outliers
+
+1.  Visual Inspection: Use the "Validation" window in the Shiny app to visually inspect each growth or fluorescence curve and its corresponding fit. Look for any irregularities or deviations from the expected growth pattern.
+
+2.  Examine Growth Parameters: Plot the computed growth or fluorescence parameters (e.g., growth rate, lag time, and maximum OD, fluorescence increase rate) for each sample to identify any unusual values that may indicate an outlier sample.
+
+3.  Bootstrapping: QurvE offers bootstrapping for spline fitting, which can help estimate uncertainty, validate the model, and identify potential outliers. Use the bootstrapping results to assess the reliability of your curve fits.
+
+## Handling Outliers
+
+1.  Modify Fitting Parameters: Adjust the fitting parameters in the [Computation] section of the Shiny app to systematically exclude problematic sections of the measurements (e.g., outside the detection limit of the instrument). In R, this can be achieved by defining values for `t0`, `tmax`, `min.growth`, and `max.growth` in the `growth.workflow()` and `fl.workflow()` functions
+
+2.  Re-run outlier samples: After identifying outliers, re-run their analysis with modified parameters in the [Validation] panel of the shiny app. An example for how this can be achieved within R is provided in the [growth curve analysis documentation](https://nicwir.github.io/QurvE/articles/vignette_growth.html#visualize-results)
+
+3.  Data Preprocessing: Before importing your data into QurvE, preprocess it to remove or reduce the impact of outliers. This can be done using various data cleaning techniques, such as filtering, interpolation, or imputation. Please note that such preprocessing methods are outside the scope of QurvE.

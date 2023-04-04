@@ -97,9 +97,9 @@ read_data <-
       dat <- read_file(data.growth, csvsep=csvsep, dec=dec, sheet=sheet.growth)
     }
     # Test if growth data is in tidy format and convert into QurvE custom format
-    tidy_to_custom(df = dat, data.format = data.format)
+    dat <- tidy_to_custom(df = dat, data.format = data.format)
     # Remove explicit quotes
-    dat <- gsub('\"', "", dat)
+    #dat <- gsub('\"', "", dat)
 
     # Convert time values
     if(!is.null(convert.time)){
@@ -135,7 +135,7 @@ read_data <-
         fl <- read_file(data.fl, csvsep=csvsep.fl, dec=dec.fl, sheet=sheet.fl)
       }
       # Test if fluorescence data is in tidy format and convert into QurvE custom format
-      tidy_to_custom(df = fl, data.format = data.format)
+      fl <- tidy_to_custom(df = fl, data.format = data.format)
 
       if(!(any(grepl("time", unlist(fl[,1]), ignore.case = TRUE)))){
         if(data.format == "col"){
@@ -174,7 +174,7 @@ read_data <-
         fl2 <- read_file(data.fl2, csvsep=csvsep.fl2, dec=dec.fl2, sheet=sheet.fl2)
       }
       # Test if fluorescence data is in tidy format and convert into QurvE custom format
-      tidy_to_custom(df = fl2, data.format = data.format)
+      fl2 <- tidy_to_custom(df = fl2, data.format = data.format)
 
       if(!(any(grepl("time", unlist(fl2[,1]), ignore.case = TRUE)))){
         if(data.format == "col"){
@@ -1027,7 +1027,7 @@ read_file <- function(filename, csvsep = ";", dec = ".", sheet = 1){
           stringsAsFactors = FALSE,
           fill = TRUE,
           na.strings = "",
-          quote = "",
+          quote = '',
           comment.char = "",
           check.names = FALSE,
           col.names = paste0("V", seq_len(ncols))

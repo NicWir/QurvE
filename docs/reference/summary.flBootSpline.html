@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -101,20 +102,20 @@
 <span class="r-in"><span>                       nboot.fl <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestFit</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       max_slope.bt        lambda.bt             A.bt            dY.bt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 241.999571509117 14.9027931560499 7534.52854830729 6029.19500937603</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        integral.bt  stdmax_slope.bt      stdlambda.bt          stdA.bt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 147431.086322529 2.57585790938037 0.303599540484422 100.096837038153</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       max_slope.bt        lambda.bt             A.bt           dY.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 242.321086500678 14.9765854024019 7544.10905191108 6022.3682991374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        integral.bt  stdmax_slope.bt      stdlambda.bt         stdA.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 148262.105779341 2.41968470863214 0.316172150297802 90.668944906239</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           stddY.bt   stdintegral.bt reliable_fit.bt    ci90.mu.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 106.490333688091 4910.49435355143            TRUE 237.762285248186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 103.329463069426 4315.50332204013            TRUE 238.340705154978</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ci90.mu.bt.up ci90.lambda.bt.lo ci90.lambda.bt.up     ci90.A.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 246.236857770047  14.4033719119531  15.4022144001468 7369.86925137953</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 246.301467846378  14.4564822151621  15.4966885896418 7394.95863754031</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       ci90.A.bt.up ci90.integral.bt.lo ci90.integral.bt.up    ci95.mu.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7699.18784523506    139353.323110937    155508.849534121 236.950890006731</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7693.25946628184    141163.102814585    155361.108744097 237.578504471759</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ci95.mu.bt.up ci95.lambda.bt.lo ci95.lambda.bt.up     ci95.A.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 247.048253011502  14.3077380567005  15.4978482553994 7338.33874771251</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ci95.A.bt.up ci95.integral.bt.lo ci95.integral.bt.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7730.71834890207    137806.517389568     157055.65525549</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 247.063668529597  14.3568879878182  15.5962828169856 7366.39791989485</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      ci95.A.bt.up ci95.integral.bt.lo ci95.integral.bt.up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7721.8201839273    139803.719268142    156720.492290539</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

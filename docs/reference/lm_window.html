@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -118,24 +119,24 @@ Mol. Biol. Evol. 31: 232-238 <a href="https://doi.org/10.1093/molbev/mst197" cla
 <span class="r-out co"><span class="r-pr">#&gt;</span> theil_sen_regression(formula = y ~ x)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Residuals:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       Min        1Q    Median        3Q       Max </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -0.008107 -0.001681  0.000000  0.018619  0.065973 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        Min         1Q     Median         3Q        Max </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -0.0181894 -0.0013193  0.0000000  0.0008923  0.0231012 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error t value Pr(&gt;|t|)   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.08276    0.04909  -1.686   0.1428   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> x            0.08064    0.01827   4.413   0.0045 **</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              Estimate Std. Error t value Pr(&gt;|t|)    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -0.175505   0.020076  -8.742 0.000124 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> x            0.118788   0.007472  15.897 3.93e-06 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error: 0.0296 on 6 degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple R-squared:  0.7645,	Adjusted R-squared:  0.7252 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> F-statistic: 19.48 on 1 and 6 DF,  p-value: 0.004504</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error: 0.01211 on 6 degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple R-squared:  0.9768,	Adjusted R-squared:  0.9729 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> F-statistic: 252.7 on 1 and 6 DF,  p-value: 3.932e-06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">lm_parms</span><span class="op">(</span><span class="va">linreg</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           a           b        b.se          r2       b.rsd </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -0.08276127  0.08063796  0.01827223  0.76448262  0.22659590 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            a            b         b.se           r2        b.rsd </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -0.175505065  0.118788146  0.007472299  0.976808808  0.062904414 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

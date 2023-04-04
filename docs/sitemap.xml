@@ -10,6 +10,9 @@
     <loc>https://nicwir.github.io/QurvE/articles/shiny_app_manual.html</loc>
   </url>
   <url>
+    <loc>https://nicwir.github.io/QurvE/articles/troubleshooting.html</loc>
+  </url>
+  <url>
     <loc>https://nicwir.github.io/QurvE/articles/vignette_fluorescence.html</loc>
   </url>
   <url>
@@ -257,6 +260,9 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/table_group_growth_spline.html</loc>
+  </url>
+  <url>
+    <loc>https://nicwir.github.io/QurvE/reference/tidy_to_custom.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/zipFastener.html</loc>

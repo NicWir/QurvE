@@ -13,7 +13,7 @@
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 #' }
 #' @param ec50 (Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
-#' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
+#' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Alternatively, R Markdown code with the report content can be generated with \code{format = 'rmd'}. Default: (\code{c('pdf', 'html')})
 #' @param parallelize (Logical) Create plots using all but one available processor cores (\code{TRUE}) or only a single core (\code{FALSE}).
 #'
 #' @export
@@ -50,7 +50,7 @@
 #' }
 growth.report <- function(
     grofit, out.dir = tempdir(), out.nm = NULL, ec50 = FALSE,
-    format = c("pdf", "html"),
+    format = c("pdf", "html", "rmd"),
     export = FALSE, parallelize = TRUE, ...
 )
     {
@@ -201,28 +201,37 @@ growth.report <- function(
     report_path <- tempfile(fileext = ".Rmd")
     file.copy(file, report_path, overwrite = TRUE)
 
-    if (all(
-        c("pdf", "html") %in%
-            format
-    ))
-        {
-        format <- c("html_document", "pdf_document")
-    } else if ("pdf" %in% format)
-    {
-        format <- "pdf_document"
-    } else if ("html" %in% format)
-    {
-        format <- "html_document"
-    } else
-    {
-        stop(
-            "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
-        )
+    if (all( c("pdf", "html") %in% format )) {
+      format <- c("html_document", "pdf_document")
+    } else if ("pdf" %in% format){
+      format <- "pdf_document"
+    } else if ("html" %in% format){
+      format <- "html_document"
+    } else if ("rmd" %in% format) {
+      format <- "rmd_document"
+    } else {
+      stop(
+        "Please define a valid report format, either 'pdf', 'html', 'rmd', or c('pdf', 'html')."
+      )
     }
-    rmarkdown::render(
-      report_path, output_format = format, output_dir = wd,
+
+    if (format == "rmd_document") {
+      out_file <- paste0(wd, "/", out.nm, ".Rmd")
+
+      # Get the arguments as a named list
+      arg_list <- as.list(match.call()[-1])
+      # Remove the arguments that are not needed for rmarkdown::render()
+      arg_list$grofit <- arg_list$out.dir <- arg_list$out.nm <- arg_list$format <- NULL
+
+      create_custom_rmd(input_rmd_path = report_path, output_rmd_path = out_file, args = arg_list)
+
+      message(paste0("R Markdown report file saved in: '", out_file, "'"))
+    } else {
+      rmarkdown::render(
+        report_path, output_format = format, output_dir = wd,
         output_file = out.nm, quiet = TRUE
-    )
+      )
+    }
     message(paste0("Report files saved in: '/", wd, "'"))
     unlink(
         paste0(tempdir(), "/Plots"),
@@ -230,6 +239,31 @@ growth.report <- function(
     )
     try(removeModal(), silent = TRUE)
     invisible(NULL)
+}
+
+create_custom_rmd <- function(input_rmd_path, output_rmd_path, args) {
+  input_rmd <- readLines(input_rmd_path)
+  output_rmd <- character(length(input_rmd))
+
+  for (i in seq_along(input_rmd)) {
+    line <- input_rmd[i]
+    if (grepl("{{ARGUMENTS}}", line)) {
+      arg_lines <- c()
+      for (arg_name in names(args)) {
+        arg_value <- args[[arg_name]]
+        if (is.character(arg_value)) {
+          arg_value <- paste0("'", arg_value, "'")
+        }
+        arg_lines <- c(arg_lines, paste0(arg_name, " <- ", arg_value))
+      }
+      output_rmd <- append(output_rmd, arg_lines, after = i - 1)
+      i <- i + length(arg_lines)
+    } else {
+      output_rmd[i] <- line
+    }
+  }
+
+  writeLines(output_rmd, output_rmd_path)
 }
 
 #' Create a PDF and HTML report with results from a fluorescence analysis workflow

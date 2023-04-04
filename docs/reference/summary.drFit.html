@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -114,11 +115,11 @@
 <span class="r-in"><span><span class="co"># Inspect results</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Test log.x log.y Samples EC50.Estimate EC50.Std..Error EC50.Lower EC50.Upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1598982     0.002634840  0.1545171  0.1652792</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1177411     0.001398206  0.1148931  0.1205892</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1598081     0.003367393  0.1529309  0.1666852</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1148034     0.001497771  0.1117525  0.1178542</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       yEC50      test model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3277960 mu.spline  LL.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2314959 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3276919 mu.spline  LL.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2359829 mu.spline  W1.3</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

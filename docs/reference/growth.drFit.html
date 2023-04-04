@@ -18,7 +18,7 @@ generate a table with estimates for EC50 and respecting statistics."><!-- mathja
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,7 @@ generate a table with estimates for EC50 and respecting statistics."><!-- mathja
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -193,11 +194,11 @@ generate a table with estimates for EC50 and respecting statistics.</p>
 <span class="r-in"><span><span class="co"># Inspect results</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Test log.x log.y Samples EC50.Estimate EC50.Std..Error EC50.Lower EC50.Upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1619550     0.002170696  0.1575334  0.1663765</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1161087     0.002079036  0.1118738  0.1203435</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1622427     0.002798474  0.1565424  0.1679431</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1162512     0.002034694  0.1121066  0.1203957</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       yEC50      test model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3282029 mu.spline  W1.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2382547 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3283462 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2345473 mu.spline  W1.3</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="growth.drFit-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="growth.drFit-2.png" alt="" width="700" height="433"></span>

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -85,10 +86,15 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data.growth</dt>
-<dd><p>An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data.
-The first three table rows contain</p><ol><li><p>sample description</p></li>
-<li><p>replicate number (<em>optional</em>: followed by a letter to indicate technical replicates)</p></li>
-<li><p>concentration value (<em>optional</em>)</p></li>
+<dd><p>An R dataframe object or a table file with extension '.xlsx', '.xls', '.csv', '.tsv', or '.txt' containing growth data. The data must be either in the '<code>QurvE</code> custom layout' or in 'tidy' (long) format.
+The first three table rows in the 'custom <code>QurvE</code> layout' contain:</p><ol><li><p>Sample description</p></li>
+<li><p>Replicate number (<em>optional</em>: followed by a letter to indicate technical replicates)</p></li>
+<li><p>Concentration value (<em>optional</em>)</p></li>
+</ol><p>Data in 'tidy' format requires the following column headers:</p><ol><li><p>"Time": time values</p></li>
+<li><p>"Description": sample description</p></li>
+<li><p>"Replicate": replicate number (<em>optional</em>)</p></li>
+<li><p>"Concentration": concentration value (<em>optional</em>)</p></li>
+<li><p>"Values": growth values (e.g., optical density)</p></li>
 </ol></dd>
 
 
