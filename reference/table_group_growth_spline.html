@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -95,37 +96,37 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">table_group_growth_spline</span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">gcFit</span><span class="op">$</span><span class="va">gcTable</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Sample|Conc.         mumax             tD       lagtime         Y_max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      Test1 | 0 0.675 ± 0.003  1.027 ± 0.005 4.431 ± 0.044 6.722 ± 0.335</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Test1 | 0.017 0.626 ± 0.003  1.107 ± 0.005 4.474 ± 0.339    4.1 ± 0.09</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Test1 | 0.026   0.6 ± 0.002  1.154 ± 0.003 4.694 ± 0.083 3.256 ± 0.328</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Test1 | 0.039 0.577 ± 0.003  1.202 ± 0.007  4.36 ± 0.197  2.59 ± 0.117</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Test1 | 0.059 0.532 ± 0.002  1.303 ± 0.004  4.406 ± 0.04 2.005 ± 0.191</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Test1 | 0.088  0.47 ± 0.007  1.477 ± 0.023 4.608 ± 0.073 1.698 ± 0.146</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Test1 | 0.13  0.39 ± 0.006   1.78 ± 0.026 4.452 ± 0.229 1.401 ± 0.023</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8    Test1 | 0.2 0.266 ± 0.003  2.604 ± 0.033 3.918 ± 0.219  0.84 ± 0.054</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9    Test1 | 0.3 0.155 ± 0.003  4.476 ± 0.093 3.346 ± 0.248 0.473 ± 0.024</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  Test1 | 0.44 0.074 ± 0.003   9.383 ± 0.34 2.436 ± 0.342   0.2 ± 0.009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  Test1 | 0.67 0.038 ± 0.002 18.129 ± 0.736 1.882 ± 1.597 0.089 ± 0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      Test1 | 0 0.663 ± 0.006  1.046 ± 0.009  4.375 ± 0.21  6.46 ± 0.524</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Test1 | 0.017 0.626 ± 0.006   1.108 ± 0.01 4.213 ± 0.022  3.56 ± 0.153</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Test1 | 0.026 0.596 ± 0.003  1.162 ± 0.006 4.306 ± 0.158 3.026 ± 0.291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Test1 | 0.039 0.583 ± 0.012   1.19 ± 0.025 4.456 ± 0.122 3.007 ± 0.201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Test1 | 0.059 0.535 ± 0.006  1.297 ± 0.015 4.688 ± 0.098  2.19 ± 0.308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Test1 | 0.088 0.474 ± 0.006  1.461 ± 0.017 4.619 ± 0.291  1.689 ± 0.04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Test1 | 0.13 0.383 ± 0.008   1.81 ± 0.039 4.351 ± 0.209 1.215 ± 0.116</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    Test1 | 0.2 0.269 ± 0.012   2.578 ± 0.12 3.983 ± 0.303 0.799 ± 0.079</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    Test1 | 0.3  0.15 ± 0.005   4.64 ± 0.168 3.199 ± 0.409 0.465 ± 0.009</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  Test1 | 0.44 0.071 ± 0.002  9.812 ± 0.326 1.962 ± 0.152 0.192 ± 0.023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  Test1 | 0.67 0.034 ± 0.003 20.474 ± 1.868 1.804 ± 0.723  0.092 ± 0.01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12     Test1 | 1                                                         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               dY       t(mumax)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  6.671 ± 0.332  8.083 ± 0.144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  4.048 ± 0.085   7.875 ± 0.53</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  3.204 ± 0.325  8.083 ± 0.289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   2.54 ± 0.117  7.833 ± 0.144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1.954 ± 0.186  7.917 ± 0.144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  1.646 ± 0.145           8.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  1.344 ± 0.022  8.417 ± 0.382</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.788 ± 0.049       9 ± 0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   0.42 ± 0.023   9.75 ± 0.433</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.147 ± 0.005 11.917 ± 1.443</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  0.04 ± 0.001   6.75 ± 5.105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  6.408 ± 0.521       8 ± 0.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  3.511 ± 0.153            7.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  2.974 ± 0.286  7.667 ± 0.144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  2.953 ± 0.198  7.917 ± 0.144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  2.136 ± 0.304    8.25 ± 0.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   1.64 ± 0.038  8.417 ± 0.382</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   1.16 ± 0.115  8.333 ± 0.289</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.748 ± 0.076  9.417 ± 0.144</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    0.41 ± 0.01   10.5 ± 1.146</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.141 ± 0.019 10.333 ± 2.255</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.039 ± 0.006  6.333 ± 3.394</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12                             </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># with HTML formatting</span></span></span>
 <span class="r-in"><span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu">table_group_growth_spline</span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">gcFit</span><span class="op">$</span><span class="va">gcTable</span>, html <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>              escape <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># Do not escape HTML entities</span></span></span>
-<div id="htmlwidget-f6ab4b39f6b4ed0955de" style="width:700px;height:432.632880098888px;" class="datatables html-widget "></div>
-<script type="application/json" data-for="htmlwidget-f6ab4b39f6b4ed0955de">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["Test1 | 0","Test1 | 0.017","Test1 | 0.026","Test1 | 0.039","Test1 | 0.059","Test1 | 0.088","Test1 | 0.13","Test1 | 0.2","Test1 | 0.3","Test1 | 0.44","Test1 | 0.67","Test1 | 1"],["0.675 ± 0.003","0.626 ± 0.003","0.6 ± 0.002","0.577 ± 0.003","0.532 ± 0.002","0.47 ± 0.007","0.39 ± 0.006","0.266 ± 0.003","0.155 ± 0.003","0.074 ± 0.003","0.038 ± 0.002",""],["1.027 ± 0.005","1.107 ± 0.005","1.154 ± 0.003","1.202 ± 0.007","1.303 ± 0.004","1.477 ± 0.023","1.78 ± 0.026","2.604 ± 0.033","4.476 ± 0.093","9.383 ± 0.34","18.129 ± 0.736",""],["4.431 ± 0.044","4.474 ± 0.339","4.694 ± 0.083","4.36 ± 0.197","4.406 ± 0.04","4.608 ± 0.073","4.452 ± 0.229","3.918 ± 0.219","3.346 ± 0.248","2.436 ± 0.342","1.882 ± 1.597",""],["6.722 ± 0.335","4.1 ± 0.09","3.256 ± 0.328","2.59 ± 0.117","2.005 ± 0.191","1.698 ± 0.146","1.401 ± 0.023","0.84 ± 0.054","0.473 ± 0.024","0.2 ± 0.009","0.089 ± 0.002",""],["6.671 ± 0.332","4.048 ± 0.085","3.204 ± 0.325","2.54 ± 0.117","1.954 ± 0.186","1.646 ± 0.145","1.344 ± 0.022","0.788 ± 0.049","0.42 ± 0.023","0.147 ± 0.005","0.04 ± 0.001",""],["8.083 ± 0.144","7.875 ± 0.53","8.083 ± 0.289","7.833 ± 0.144","7.917 ± 0.144","8.25","8.417 ± 0.382","9 ± 0.25","9.75 ± 0.433","11.917 ± 1.443","6.75 ± 5.105",""]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sample|Conc.<\/th>\n      <th>mu<sub>max<\/sub><\/th>\n      <th>t<sub>D<\/sub><\/th>\n      <th>lagtime<\/th>\n      <th>dY<\/th>\n      <th>y<sub>max<\/sub><\/th>\n      <th>t(mu<sub>max<\/sub>)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script><span class="r-in"><span></span></span>
+<div id="htmlwidget-f5f0aaf082a20eea8d7f" style="width:700px;height:432.632880098888px;" class="datatables html-widget "></div>
+<script type="application/json" data-for="htmlwidget-f5f0aaf082a20eea8d7f">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["Test1 | 0","Test1 | 0.017","Test1 | 0.026","Test1 | 0.039","Test1 | 0.059","Test1 | 0.088","Test1 | 0.13","Test1 | 0.2","Test1 | 0.3","Test1 | 0.44","Test1 | 0.67","Test1 | 1"],["0.663 ± 0.006","0.626 ± 0.006","0.596 ± 0.003","0.583 ± 0.012","0.535 ± 0.006","0.474 ± 0.006","0.383 ± 0.008","0.269 ± 0.012","0.15 ± 0.005","0.071 ± 0.002","0.034 ± 0.003",""],["1.046 ± 0.009","1.108 ± 0.01","1.162 ± 0.006","1.19 ± 0.025","1.297 ± 0.015","1.461 ± 0.017","1.81 ± 0.039","2.578 ± 0.12","4.64 ± 0.168","9.812 ± 0.326","20.474 ± 1.868",""],["4.375 ± 0.21","4.213 ± 0.022","4.306 ± 0.158","4.456 ± 0.122","4.688 ± 0.098","4.619 ± 0.291","4.351 ± 0.209","3.983 ± 0.303","3.199 ± 0.409","1.962 ± 0.152","1.804 ± 0.723",""],["6.46 ± 0.524","3.56 ± 0.153","3.026 ± 0.291","3.007 ± 0.201","2.19 ± 0.308","1.689 ± 0.04","1.215 ± 0.116","0.799 ± 0.079","0.465 ± 0.009","0.192 ± 0.023","0.092 ± 0.01",""],["6.408 ± 0.521","3.511 ± 0.153","2.974 ± 0.286","2.953 ± 0.198","2.136 ± 0.304","1.64 ± 0.038","1.16 ± 0.115","0.748 ± 0.076","0.41 ± 0.01","0.141 ± 0.019","0.039 ± 0.006",""],["8 ± 0.25","7.5","7.667 ± 0.144","7.917 ± 0.144","8.25 ± 0.25","8.417 ± 0.382","8.333 ± 0.289","9.417 ± 0.144","10.5 ± 1.146","10.333 ± 2.255","6.333 ± 3.394",""]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sample|Conc.<\/th>\n      <th>mu<sub>max<\/sub><\/th>\n      <th>t<sub>D<\/sub><\/th>\n      <th>lagtime<\/th>\n      <th>dY<\/th>\n      <th>y<sub>max<\/sub><\/th>\n      <th>t(mu<sub>max<\/sub>)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script><span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

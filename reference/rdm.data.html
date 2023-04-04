@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -143,11 +144,11 @@
 <span class="r-in"><span><span class="co"># Inspect results</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Test log.x log.y Samples EC50.Estimate EC50.Std..Error EC50.Lower EC50.Upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1587270     0.002836239  0.1529346  0.1645194</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1168757     0.001637891  0.1135395  0.1202120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1619948     0.002072080  0.1577741  0.1662155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1167660     0.001445176  0.1138223  0.1197097</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       yEC50      test model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3301651 mu.spline  LL.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2360556 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3296421 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2365823 mu.spline  W1.3</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="rdm.data-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="rdm.data-2.png" alt="" width="700" height="433"></span>

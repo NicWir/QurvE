@@ -27,6 +27,7 @@ the greatest slope as the global maximum in the first derivative of the spline."
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -214,23 +215,20 @@ independently determined slopes as \(mu_{max}2\).</p></li>
 <span class="r-in"><span>                   data.fl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xlsx'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                   sheet.growth <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>                   sheet.fl <span class="op">=</span> <span class="fl">2</span> <span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in 1:nrow(dat):</span> argument of length 0</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract time and normalized fluorescence data for single sample</span></span></span>
 <span class="r-in"><span><span class="va">time</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="fl">4</span>,<span class="op">]</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'input' not found</span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">norm.fluorescence</span><span class="op">[</span><span class="fl">4</span>,<span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span> <span class="co"># Remove identifier columns</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'input' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Perform linear fit</span></span></span>
 <span class="r-in"><span><span class="va">TestFit</span> <span class="op">&lt;-</span> <span class="fu">flFitSpline</span><span class="op">(</span>time <span class="op">=</span> <span class="va">time</span>,</span></span>
 <span class="r-in"><span>                       fl_data <span class="op">=</span> <span class="va">data</span>,</span></span>
 <span class="r-in"><span>                       ID <span class="op">=</span> <span class="st">'TestFit'</span>,</span></span>
 <span class="r-in"><span>                       control <span class="op">=</span> <span class="fu"><a href="fl.control.html">fl.control</a></span><span class="op">(</span>fit.opt <span class="op">=</span> <span class="st">'s'</span>, x_type <span class="op">=</span> <span class="st">'time'</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in as.vector(x, mode):</span> cannot coerce type 'closure' to vector of type 'any'</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">TestFit</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot(TestFit):</span> object 'TestFit' not found</span>
+<span class="r-plt img"><img src="flFitSpline-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

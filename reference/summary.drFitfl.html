@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -87,7 +88,7 @@
 <span class="r-in"><span>                   data.fl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xlsx'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                   sheet.growth <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>                   sheet.fl <span class="op">=</span> <span class="fl">2</span> <span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in 1:nrow(dat):</span> argument of length 0</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Define fit controls</span></span></span>
 <span class="r-in"><span><span class="va">control</span> <span class="op">&lt;-</span> <span class="fu"><a href="fl.control.html">fl.control</a></span><span class="op">(</span>fit.opt <span class="op">=</span> <span class="st">'s'</span>,</span></span>
@@ -101,14 +102,19 @@
 <span class="r-in"><span>             time <span class="op">=</span> <span class="va">input</span><span class="op">$</span><span class="va">time</span>,</span></span>
 <span class="r-in"><span>             parallelize <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>             control <span class="op">=</span> <span class="va">control</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in class(fl_data) %in% c("list", "grodata"):</span> object 'input' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Perform dose-response analysis with biosensor model</span></span></span>
 <span class="r-in"><span><span class="va">drFitfl</span> <span class="op">&lt;-</span> <span class="fu"><a href="fl.drFit.html">fl.drFit</a></span><span class="op">(</span>flTable <span class="op">=</span> <span class="va">res</span><span class="op">$</span><span class="va">flTable</span>, control <span class="op">=</span> <span class="va">control</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is.data.frame(x):</span> object 'res' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">drFitfl</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(drFitfl):</span> object 'drFitfl' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Test log.x log.y    yEC50    y.min    y.max        fc          K</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 pSEVA634rκ∙GFP FALSE FALSE 205.9582 64.17578 347.7406  5.418565 0.01018009</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  pSEVA634r∙GFP FALSE FALSE 190.4524 30.77274 350.1321 11.377995 0.04563553</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   pSEVA634∙GFP FALSE FALSE 446.4529 92.26689 800.6389  8.677423 0.03285860</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           n yEC50.orig     K.orig             test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.9764871   205.9582 0.01018009 max_slope.spline</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2.7157088   190.4524 0.04563553 max_slope.spline</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 1.1757158   446.4529 0.03285860 max_slope.spline</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

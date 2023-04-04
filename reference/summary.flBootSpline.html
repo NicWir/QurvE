@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -87,13 +88,11 @@
 <span class="r-in"><span>                   data.fl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xlsx'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                   sheet.growth <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>                   sheet.fl <span class="op">=</span> <span class="fl">2</span> <span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in 1:nrow(dat):</span> argument of length 0</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract time and normalized fluorescence data for single sample</span></span></span>
 <span class="r-in"><span><span class="va">time</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="fl">4</span>,<span class="op">]</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'input' not found</span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">input</span><span class="op">$</span><span class="va">norm.fluorescence</span><span class="op">[</span><span class="fl">4</span>,<span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span> <span class="co"># Remove identifier columns</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'input' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Perform linear fit</span></span></span>
 <span class="r-in"><span><span class="va">TestFit</span> <span class="op">&lt;-</span> <span class="fu"><a href="flBootSpline.html">flBootSpline</a></span><span class="op">(</span>time <span class="op">=</span> <span class="va">time</span>,</span></span>
@@ -101,10 +100,22 @@
 <span class="r-in"><span>                       ID <span class="op">=</span> <span class="st">'TestFit'</span>,</span></span>
 <span class="r-in"><span>                       control <span class="op">=</span> <span class="fu"><a href="fl.control.html">fl.control</a></span><span class="op">(</span>fit.opt <span class="op">=</span> <span class="st">'s'</span>, x_type <span class="op">=</span> <span class="st">'time'</span>,</span></span>
 <span class="r-in"><span>                       nboot.fl <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in as.vector(x, mode):</span> cannot coerce type 'closure' to vector of type 'any'</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestFit</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary(TestFit):</span> object 'TestFit' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       max_slope.bt        lambda.bt             A.bt           dY.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 242.326538652406 14.8714079612342 7567.43153224461 6073.8646423585</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        integral.bt  stdmax_slope.bt      stdlambda.bt          stdA.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 148839.171495195 2.96049466826478 0.310017631293647 60.8356911650226</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           stddY.bt   stdintegral.bt reliable_fit.bt    ci90.mu.bt.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 87.5478102578233 3149.58453471899            TRUE 237.456524923111</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      ci90.mu.bt.up ci90.lambda.bt.lo ci90.lambda.bt.up     ci90.A.bt.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 247.196552381702  14.3614289577561  15.3813869647122 7467.35682027815</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ci90.A.bt.up ci90.integral.bt.lo ci90.integral.bt.up    ci95.mu.bt.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7667.50624421107    143658.104935582    154020.238054807 236.523969102607</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      ci95.mu.bt.up ci95.lambda.bt.lo ci95.lambda.bt.up     ci95.A.bt.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 248.129108202205  14.2637734038986  15.4790425185697 7448.19357756116</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ci95.A.bt.up ci95.integral.bt.lo ci95.integral.bt.up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7686.66948692805    142665.985807145    155012.357183244</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
