@@ -675,6 +675,16 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                "<li>The metadata in the second and third rows are optional to perform the analysis and can be left empty.</li>",
                                                                "</ul>"
                                                              ),
+                                                             "<br>",
+                                                             "Alternatively, data can be provided in \\'tidy\\', long format with the following column headers:",
+                                                             paste0(
+                                                               "<ul>",
+                                                               "<li>\\'Time\\': time values.</li>",
+                                                               "<li>\\'Description\\': sample description</li>",
+                                                               "<li>\\'Concentration\\': concentration value (_optional_)</li>",
+                                                               "<li>\\'Values\\': measurement values (e.g., optical density, fluorescence)",
+                                                               "</ul>"
+                                                             ),
                                                              sep = "<br>"),
                                              trigger = "hover", options = list(container = "body", template = widePopover)
                                    ),
