@@ -16,6 +16,10 @@
 #' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
 #' @param parallelize (Logical) Create plots using all but one available processor cores (\code{TRUE}) or only a single core (\code{FALSE}).
 #'
+#' @details
+#' The template .Rmd file used within this function can be found within the QurvE package installation directory.
+#'
+#'
 #' @export
 #' @importFrom ggplot2 aes aes_ annotate coord_cartesian element_blank unit element_text geom_bar geom_errorbar geom_line
 #'   geom_point geom_ribbon geom_segment ggplot ggplot_build ggplot ggtitle labs
@@ -259,6 +263,7 @@ growth.report <- function(
 #' @import knitr
 #' @include utils.R
 #' @return \code{NULL}
+#' @details The template .Rmd file used within this function can be found within the QurvE package installation directory.
 #' @examples
 #' # load example dataset
 #' \donttest{
