@@ -13,7 +13,7 @@
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
 #' }
 #' @param ec50 (Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).
-#' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Alternatively, R Markdown code with the report content can be generated with \code{format = 'md'}. Default: (\code{c('pdf', 'html')})
+#' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
 #' @param parallelize (Logical) Create plots using all but one available processor cores (\code{TRUE}) or only a single core (\code{FALSE}).
 #'
 #' @export
@@ -50,7 +50,7 @@
 #' }
 growth.report <- function(
     grofit, out.dir = tempdir(), out.nm = NULL, ec50 = FALSE,
-    format = c("pdf", "html", "md"),
+    format = c("pdf", "html"),
     export = FALSE, parallelize = TRUE, ...
 )
     {
@@ -207,11 +207,9 @@ growth.report <- function(
       format <- "pdf_document"
     } else if ("html" %in% format){
       format <- "html_document"
-    } else if ("md" %in% format) {
-      format <- "md_document"
     } else {
       stop(
-        "Please define a valid report format, either 'pdf', 'html', 'md', or c('pdf', 'html')."
+        "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
       )
     }
 
@@ -280,7 +278,7 @@ growth.report <- function(
 #' }
 fl.report <- function(
     flFitRes, out.dir = tempdir(), out.nm = NULL, ec50 = FALSE,
-    format = c("pdf", "html", "md"),
+    format = c("pdf", "html"),
     export = FALSE, parallelize = TRUE, ...
 )
     {
@@ -470,11 +468,9 @@ fl.report <- function(
     } else if ("html" %in% format)
     {
         format <- "html_document"
-    } else if ("md" %in% format) {
-      format <- "md_document"
     } else {
       stop(
-        "Please define a valid report format, either 'pdf', 'html', 'md', or c('pdf', 'html')."
+        "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
       )
     }
 
