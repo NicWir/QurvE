@@ -1387,6 +1387,11 @@ plot.drFitSpline <- function (x,
     colSpline <- toupper(colSpline)
   if(!is.null(colData))
     colData <- toupper(colData)
+
+  if(any(is.na(x.lim)))
+    x.lim <- NULL
+  if(any(is.na(y.lim)))
+    y.lim <- NULL
   # drFitSpline an object of class drFitSpline
   if(methods::is(drFitSpline) != "drFitSpline") stop("x needs to be an object created with growth.drFitSpline.")
   # /// check input parameters
@@ -4495,7 +4500,7 @@ plot.grid <- function(x,
 
     if(sort_by_ID){
       # preserve order of input IDs
-      nm <- nm[unlist(lapply(1:length(IDs), function(x) which(nm %in% IDs[[x]] ) ) )]
+      nm <- nm[unlist(lapply(1:length(IDs), function(x) which(gsub(" | .+", "", nm) %in% IDs[[x]] ) ) )]
     } else {
       # preserve order in expdesign
       if(any(grep(" \\| ", IDs))){

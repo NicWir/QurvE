@@ -94,10 +94,12 @@ read_data <-
       dat <- data.growth
     } else {
       # Read table file
-      dat <- read_file(data.growth, csvsep=csvsep, dec=dec, sheet=sheet.growth)
+      if(!is.na(data.growth))
+        dat <- read_file(data.growth, csvsep=csvsep, dec=dec, sheet=sheet.growth)
     }
     # Test if growth data is in tidy format and convert into QurvE custom format
-    dat <- tidy_to_custom(df = dat, data.format = data.format)
+    if(length(dat) > 1)
+      dat <- tidy_to_custom(df = dat, data.format = data.format)
     # Remove explicit quotes
     #dat <- gsub('\"', "", dat)
 
@@ -111,12 +113,14 @@ read_data <-
       dat[1, -(1:3)] <- time_converted
     }
     # Remove all-NA data series
-    allNA.ndx <- which(unlist(lapply(1:nrow(dat), function(x) all(is.na(dat[x, -(1:3)])))))
-    if(length(allNA.ndx) > 0)
-      dat <- dat[-allNA.ndx, ]
+    if(length(dat) > 1){
+      allNA.ndx <- which(unlist(lapply(1:nrow(dat), function(x) all(is.na(dat[x, -(1:3)])))))
+      if(length(allNA.ndx) > 0)
+        dat <- dat[-allNA.ndx, ]
+    }
 
     #remove leading and trailing zeros
-    if(length(dat)>0)
+    if(length(dat)>0 && !all(is.na(dat)))
       dat[,3] <- suppressWarnings(
         as.character(as.numeric(dat[,3]))
       )
