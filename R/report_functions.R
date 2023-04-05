@@ -77,7 +77,6 @@ growth.report <- function(
         ),
         silent = TRUE
     )
-  browser()
     # results an object of class grofit
     if (methods::is(grofit) !=
         "grofit")

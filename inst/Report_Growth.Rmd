@@ -4,6 +4,7 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 geometry: margin=0.8cm
 urlcolor: blue
 mainfont: Arial
+always_allow_html: true
 header-includes:
   - \usepackage{booktabs}
   - \usepackage{makecell}
