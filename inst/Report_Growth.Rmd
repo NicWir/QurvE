@@ -19,6 +19,7 @@ output:
     toc: true
     toc_float: true
     theme: united
+  rmd_document: default
 ---
 
 ```{r setup, include=FALSE}

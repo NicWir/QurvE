@@ -9152,7 +9152,7 @@ server <- function(input, output, session){
     )]]) > 1) {
       if(input$diagnostics_validate_growth_plot_linear){
 
-        code_string <- paste0("plot.gcFitLinear(results$gcFit$gcFittedLinear[[", ifelse(
+        code_string <- paste0("plot.gcFitLinear(grofit$gcFit$gcFittedLinear[[", ifelse(
           selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
             is.null(
               selected_vals_validate_growth$sample_validate_growth_linear
@@ -9172,7 +9172,7 @@ server <- function(input, output, session){
         "&nbsp&nbsp&nbspcolor = ", input$color_validate_growth_plot_linear, "')")
 
       } else {
-        code_string <- paste0("plot.gcFitLinear(results$gcFit$gcFittedLinear[[", ifelse(
+        code_string <- paste0("plot.gcFitLinear(grofit$gcFit$gcFittedLinear[[", ifelse(
                 selected_vals_validate_growth$sample_validate_growth_linear == "1" ||
                   is.null(
                     selected_vals_validate_growth$sample_validate_growth_linear
@@ -9523,7 +9523,7 @@ server <- function(input, output, session){
       selected_vals_validate_growth$sample_validate_growth_spline
     )]]) > 1) {
 
-      code_string <- paste0("plot.gcFitSpline(results$gcFit$gcFittedSplines[[", ifelse(
+      code_string <- paste0("plot.gcFitSpline(grofit$gcFit$gcFittedSplines[[", ifelse(
               selected_vals_validate_growth$sample_validate_growth_spline == "1" ||
                 is.null(
                   selected_vals_validate_growth$sample_validate_growth_spline
@@ -9830,7 +9830,7 @@ server <- function(input, output, session){
                                                    selected_vals_validate_growth$sample_validate_growth_model == "" ||
                                                    is.null(selected_vals_validate_growth$sample_validate_growth_model), 1, selected_vals_validate_growth$sample_validate_growth_model)]]) > 1){
 
-      code_string <- paste0("plot.gcFitModel(results$gcFit$gcFittedModels[[", ifelse(
+      code_string <- paste0("plot.gcFitModel(grofit$gcFit$gcFittedModels[[", ifelse(
         selected_vals_validate_growth$sample_validate_growth_model == "1" || is.null(selected_vals_validate_growth$sample_validate_growth_model),
         "1", paste0("'", selected_vals_validate_growth$sample_validate_growth_model, "'")), "]]",  ",<br>",
         "&nbsp&nbsp&nbspcolModel = ", "'", input$color_validate_growth_plot_model, "'", ",<br>",
@@ -10101,7 +10101,7 @@ server <- function(input, output, session){
                                                   selected_vals_validate_growth$sample_validate_growth_spline_bt == ""||
                                                   is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt), 1, selected_vals_validate_growth$sample_validate_growth_spline_bt)]]) > 1){
 
-      code_string <- paste0("plot.gcBootSpline(results$gcFit$gcBootSplines[[",
+      code_string <- paste0("plot.gcBootSpline(grofit$gcFit$gcBootSplines[[",
                             ifelse(selected_vals_validate_growth$sample_validate_growth_spline_bt == "1"||
                                      selected_vals_validate_growth$sample_validate_growth_spline_bt == "" ||
                                      is.null(selected_vals_validate_growth$sample_validate_growth_spline_bt),
@@ -10361,7 +10361,7 @@ server <- function(input, output, session){
 
       if(!input$diagnostics_validate_fluorescence_plot_linear){
 
-        code_string <- paste0("plot.flFitLinear(results$flFit$flFittedLinear[[", ifelse(
+        code_string <- paste0("plot.flFitLinear(flFitRes$flFit$flFittedLinear[[", ifelse(
           selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), "1",
           paste0("'", selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, "'")), "]]", ",<br>",
           "&nbsp&nbsp&nbsplog = ", "'", logy_validate_fluorescence_plot_linear(), "'", ",<br>",
@@ -10377,7 +10377,7 @@ server <- function(input, output, session){
         )
       } else {
         if(input$diagnostics_validate_fluorescence_plot_linear){
-          code_string <- paste0("plot.flFitLinear(results$flFit$flFittedLinear[[", ifelse(
+          code_string <- paste0("plot.flFitLinear(flFitRes$flFit$flFittedLinear[[", ifelse(
             selected_vals_validate_fluorescence$sample_validate_fluorescence_linear == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_linear), "1",
             paste0("'", selected_vals_validate_fluorescence$sample_validate_fluorescence_linear, "'")), "]]", ",<br>",
             "&nbsp&nbsp&nbspwhich = ", "'fit_diagnostics'", ",<br>",
@@ -10841,7 +10841,7 @@ server <- function(input, output, session){
                                                     selected_vals_validate_fluorescence$sample_validate_fluorescence_spline)]]) > 1){
 
 
-        code_string <- paste0("plot.flFitSpline(results$flFit$flFittedSplines[[", ifelse(
+        code_string <- paste0("plot.flFitSpline(flFitRes$flFit$flFittedSplines[[", ifelse(
           selected_vals_validate_fluorescence$sample_validate_fluorescence_spline == "1" || is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline), "1",
           paste0("'", selected_vals_validate_fluorescence$sample_validate_fluorescence_spline, "'")), "]]", ",<br>",
           "&nbsp&nbsp&nbsplog.y = ",  input$logy_validate_fluorescence_plot_spline, ",<br>",
@@ -11168,7 +11168,7 @@ server <- function(input, output, session){
                  as.numeric(input$x_range_max_validate_fluorescence_spline_bt), ")")
     }
 
-      code_string <- paste0("plot.flBootSpline(results$flFit$flBootSplines[[",
+      code_string <- paste0("plot.flBootSpline(flFitRes$flFit$flBootSplines[[",
                             ifelse(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == "1"||
                                      selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt == "" ||
                                      is.null(selected_vals_validate_fluorescence$sample_validate_fluorescence_spline_bt),
@@ -11362,7 +11362,7 @@ server <- function(input, output, session){
     }
     if(input$select_string_visualize_growth_group){
 
-      code_string <- paste0("plot.grofit(results, ", ",<br>",
+      code_string <- paste0("plot.grofit(grofit, ", ",<br>",
                             "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_growth_group_plot, '"',  ",<br>",
                             "&nbsp&nbsp&nbspIDs = ", "NULL", ",<br>",
                             "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_samples_based_on_string_growth_group_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -11396,7 +11396,7 @@ server <- function(input, output, session){
       )
     }
     else{
-      code_string <- paste0("plot.grofit(results, ", ",<br>",
+      code_string <- paste0("plot.grofit(grofit, ", ",<br>",
                             "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_growth_group_plot, '"',  ",<br>",
                             "&nbsp&nbsp&nbspIDs = ", "c(", toString(sapply(if(input$plot_group_averages_growth_group_plot){
                               input$groups_visualize_growth_group
@@ -11568,7 +11568,7 @@ server <- function(input, output, session){
 
   observeEvent(input$code_dose_response_growth_plot_combined,{
 
-    code_string <- paste0("plot.drFit(results, ", ",<br>",
+    code_string <- paste0("plot.drFit(grofit, ", ",<br>",
                           "&nbsp&nbsp&nbspcombine = ", "TRUE",  ",<br>",
                           "&nbsp&nbsp&nbsppch = ", input$shape_type_dose_response_growth_plot,
                           "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_samples_based_on_string_dose_response_growth_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -11846,7 +11846,7 @@ server <- function(input, output, session){
                           as.numeric(input$x_range_max_dose_response_growth_plot_model), ")")
         }
 
-        code_string <- paste0("plot.drFitModel(results$drFit$drFittedModels[[",
+        code_string <- paste0("plot.drFitModel(grofit$drFit$drFittedModels[[",
                               ifelse(input$individual_plots_dose_response_growth_plot_model == "1" || is.null(input$individual_plots_dose_response_growth_plot_model), "1",
                                      paste0('"', input$individual_plots_dose_response_growth_plot_model, '"')),
                               "]]", ",<br>",
@@ -12042,7 +12042,7 @@ server <- function(input, output, session){
                           as.numeric(input$x_range_max_dose_response_growth_plot), ")")
         }
 
-        code_string <- paste0("plot.drFitSpline(results$drFit$drFittedSplines[[",
+        code_string <- paste0("plot.drFitSpline(grofit$drFit$drFittedSplines[[",
                               ifelse(input$individual_plots_dose_response_growth_plot == "1" || is.null(input$individual_plots_dose_response_growth_plot), "1",
                                      paste0('"', input$individual_plots_dose_response_growth_plot, '"')),
                               "]]", ",<br>",
@@ -12333,7 +12333,7 @@ server <- function(input, output, session){
 
   observeEvent(input$code_dose_response_growth_plot_individual_bt,{
 
-    code_string <- paste0("plot.drBootSpline(results$drFit$drBootSplines[[",
+    code_string <- paste0("plot.drBootSpline(grofit$drFit$drBootSplines[[",
                           ifelse(input$individual_plots_dose_response_growth_plot_bt == "1" || is.null(input$individual_plots_dose_response_growth_plot_bt), "1",
                                  paste0('"', input$individual_plots_dose_response_growth_plot_bt, '"')),
                           "]]", ",<br>",
@@ -12437,7 +12437,7 @@ server <- function(input, output, session){
       cols <- toupper(unlist(str_split(input$custom_colors_growth_parameter_plot, ", |; |,|;")))
     }
     if(input$select_string_visualize_parameter_growth_plot){
-      code_string <- paste0("plot.parameter(results", ",<br>",
+      code_string <- paste0("plot.parameter(grofit", ",<br>",
                             "&nbsp&nbsp&nbspparam = ", '"', input$parameter_parameter_growth_plot, '"', ",<br>",
                             "&nbsp&nbsp&nbspIDs = ", "NULL", ",<br>",
                             "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_sample_based_on_string_growth_parameter_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -12459,7 +12459,7 @@ server <- function(input, output, session){
                             ")"
       )
     } else {
-      code_string <- paste0("plot.parameter(results", ",<br>",
+      code_string <- paste0("plot.parameter(grofit", ",<br>",
              "&nbsp&nbsp&nbspparam = ", '"', input$parameter_parameter_growth_plot, '"', ",<br>",
              "&nbsp&nbsp&nbspIDs = ", "c(", toString(sapply(input$samples_visualize_parameter_growth_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
              "&nbsp&nbsp&nbspnames = ", "NULL", ",<br>",
@@ -12775,7 +12775,7 @@ server <- function(input, output, session){
 
   observeEvent(input$code_growth_grid_plot,{
     if(input$select_string_visualize_growth_grid){
-      code_string <- paste0("plot.grid(results", ",<br>",
+      code_string <- paste0("plot.grid(grofit", ",<br>",
                             "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_growth_grid_plot, '"',  ",<br>",
                             "&nbsp&nbsp&nbspIDs = ", "NULL", ",<br>",
                             "&nbsp&nbsp&nbspsort_by_ID = ", "FALSE", ",<br>",
@@ -12801,7 +12801,7 @@ server <- function(input, output, session){
                             ")"
       )
     } else {
-      code_string <- paste0("plot.grid(results", ",<br>",
+      code_string <- paste0("plot.grid(grofit", ",<br>",
                             "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_growth_grid_plot, '"', ",<br>",
 
                             "&nbsp&nbsp&nbspIDs = ", "c(", toString(sapply(if(input$plot_group_averages_fluorescence_group_plot){
@@ -12952,7 +12952,7 @@ server <- function(input, output, session){
     }
     param <- paste0('"', input$parameter_dr_parameter_growth_plot, '"')
 
-    code_string <- paste0("plot.dr_parameter(results", ",<br>",
+    code_string <- paste0("plot.dr_parameter(grofit", ",<br>",
                           "&nbsp&nbsp&nbspparam = ", param, "<br>",
                           "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_sample_based_on_string_growth_dr_parameter_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
                           "&nbsp&nbsp&nbspexclude.nm = ", "c(", toString(sapply(input$exclude_sample_based_on_strings_growth_dr_parameter_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -13181,7 +13181,7 @@ server <- function(input, output, session){
     }
     if(input$select_string_visualize_fluorescence_group){
 
-      code_string <- paste0("plot.flFitRes(results, ", ",<br>",
+      code_string <- paste0("plot.flFitRes(flFitRes, ", ",<br>",
                             "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_fluorescence_group_plot, '"',  ",<br>",
                             "&nbsp&nbsp&nbspIDs = ", "NULL", ",<br>",
                             "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_samples_based_on_string_fluorescence_group_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -13215,7 +13215,7 @@ server <- function(input, output, session){
       )
     }
     else{
-      code_string <- paste0("plot.flFitRes(results, ", ",<br>",
+      code_string <- paste0("plot.flFitRes(flFitRes, ", ",<br>",
                             "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_fluorescence_group_plot, '"',  ",<br>",
                             "&nbsp&nbsp&nbspIDs = ", "c(", toString(sapply(if(input$plot_group_averages_fluorescence_group_plot){
                               input$groups_visualize_fluorescence_group
@@ -13391,7 +13391,7 @@ server <- function(input, output, session){
 
   observeEvent(input$code_dose_response_plot_fluorescence_combined,{
 
-    code_string <- paste0("plot.drFit(results", ",<br>",
+    code_string <- paste0("plot.drFit(flFitRes", ",<br>",
                           "&nbsp&nbsp&nbspcombine = ", "TRUE",",<br>",
                           "&nbsp&nbsp&nbsppch = ", input$shape_type_dose_response_fluorescence_plot, ",<br>",
                           "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_samples_based_on_string_dose_response_fluorescence_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -13633,7 +13633,7 @@ server <- function(input, output, session){
                       as.numeric(input$x_range_max_dose_response_fluorescence_plot), ")")
     }
 
-    code_string <- paste0("plot.drFitSpline(results$drFit$drFittedSplines[[",
+    code_string <- paste0("plot.drFitSpline(flFitRes$drFit$drFittedSplines[[",
                           ifelse(input$individual_plots_dose_response_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot), "1",
                                  paste0('"', input$individual_plots_dose_response_fluorescence_plot, '"')),
                           "]]", ",<br>",
@@ -13874,7 +13874,7 @@ server <- function(input, output, session){
                           as.numeric(input$x_range_max_dose_response_model_fluorescence_plot), ")")
         }
 
-        code_string <- paste0("plot.drFitFLModel(results$drFit$drFittedModels[[",
+        code_string <- paste0("plot.drFitFLModel(flFitRes$drFit$drFittedModels[[",
                               ifelse(input$individual_plots_dose_response_model_fluorescence_plot == "1" || is.null(input$individual_plots_dose_response_model_fluorescence_plot), "1",
                                      paste0('"', input$individual_plots_dose_response_model_fluorescence_plot, '"')),
                               "]]", ",<br>",
@@ -14011,7 +14011,7 @@ server <- function(input, output, session){
           cols <- toupper(unlist(str_split(input$custom_colors_fluorescence_parameter_plot, ", |; |,|;")))
         }
         if(input$select_string_visualize_parameter_fluorescence_plot){
-          code_string <- paste0("plot.parameter(results", ",<br>",
+          code_string <- paste0("plot.parameter(flFitRes", ",<br>",
                                 "&nbsp&nbsp&nbspparam = ", '"', input$parameter_fluorescence_parameter_fluorescence_plot, '"', ",<br>",
                                 "&nbsp&nbsp&nbspIDs = ", "NULL", ",<br>",
                                 "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_sample_based_on_string_fluorescence_parameter_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -14033,7 +14033,7 @@ server <- function(input, output, session){
                                 ")"
           )
         } else {
-          code_string <- paste0("plot.parameter(results", ",<br>",
+          code_string <- paste0("plot.parameter(flFitRes", ",<br>",
                                 "&nbsp&nbsp&nbspparam = ", '"', input$parameter_fluorescence_parameter_fluorescence_plot, '"', ",<br>",
                                 "&nbsp&nbsp&nbspIDs = ", "c(", toString(sapply(input$samples_visualize_parameter_fluorescence_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
                                 "&nbsp&nbsp&nbspnames = ", "NULL", ",<br>",
@@ -14344,7 +14344,7 @@ server <- function(input, output, session){
 
       observeEvent(input$code_fluorescence_grid_plot,{
         if(input$select_string_visualize_fluorescence_grid){
-          code_string <- paste0("plot.grid(results", ",<br>",
+          code_string <- paste0("plot.grid(flFitRes", ",<br>",
                                 "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_fluorescence_grid_plot, '"',  ",<br>",
                                 "&nbsp&nbsp&nbspIDs = ", "NULL", ",<br>",
                                 "&nbsp&nbsp&nbspsort_by_ID = ", "FALSE", ",<br>",
@@ -14370,7 +14370,7 @@ server <- function(input, output, session){
                                 ")"
           )
         } else {
-          code_string <- paste0("plot.grid(results", ",<br>",
+          code_string <- paste0("plot.grid(flFitRes", ",<br>",
                                 "&nbsp&nbsp&nbspdata.type = ", '"', input$data_type_fluorescence_grid_plot, '"', ",<br>",
 
                                 "&nbsp&nbsp&nbspIDs = ", "c(", toString(sapply(if(input$plot_group_averages_fluorescence_group_plot){
@@ -14526,7 +14526,7 @@ server <- function(input, output, session){
 
       observeEvent(input$code_dose_response_fluorescence_plot_individual_bt,{
 
-        code_string <- paste0("plot.drBootSpline(results$drFit$drBootSplines[[",
+        code_string <- paste0("plot.drBootSpline(flFitRes$drFit$drBootSplines[[",
                               ifelse(input$individual_plots_dose_response_fluorescence_plot_bt == "1" || is.null(input$individual_plots_dose_response_fluorescence_plot_bt), "1",
                                      paste0('"', input$individual_plots_dose_response_fluorescence_plot_bt, '"')),
                               "]]", ",<br>",
@@ -14636,7 +14636,7 @@ server <- function(input, output, session){
         }
         if(input$select_string_visualize_dual_plot){
 
-          code_string <- paste0("plot.dual(results, ", ",<br>",
+          code_string <- paste0("plot.dual(flFitRes, ", ",<br>",
                                 "&nbsp&nbsp&nbspfluorescence = ", '"', input$fluorescence_type_dual_plot, '"', ",<br>",
                                 "&nbsp&nbsp&nbspIDs = ", "NULL", ",<br>",
                                 "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_samples_based_on_string_dual_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
@@ -14670,7 +14670,7 @@ server <- function(input, output, session){
           )
         }
         else{
-          code_string <- paste0("plot.dual(results, ", ",<br>",
+          code_string <- paste0("plot.dual(flFitRes, ", ",<br>",
                                 "&nbsp&nbsp&nbspfluorescence = ", '"', input$fluorescence_type_dual_plot, '"', ",<br>",
                                 "&nbsp&nbsp&nbspIDs = ", "c(", toString(sapply(input$samples_visualize_dual_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
                                 "&nbsp&nbsp&nbspnames = ", "NULL", ",<br>",
@@ -14847,7 +14847,7 @@ server <- function(input, output, session){
         }
         param <- paste0('"', input$parameter_dr_parameter_fluorescence_plot, '"')
 
-        code_string <- paste0("plot.dr_parameter(results", ",<br>",
+        code_string <- paste0("plot.dr_parameter(flFitRes", ",<br>",
                               "&nbsp&nbsp&nbspparam = ", param, "<br>",
                               "&nbsp&nbsp&nbspnames = ", "c(", toString(sapply(input$select_sample_based_on_string_fluorescence_dr_parameter_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",
                               "&nbsp&nbsp&nbspexclude.nm = ", "c(", toString(sapply(input$exclude_sample_based_on_strings_fluorescence_dr_parameter_plot, function(x) paste0('"', x, '"'))), ")", ",<br>",

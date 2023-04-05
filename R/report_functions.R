@@ -77,6 +77,7 @@ growth.report <- function(
         ),
         silent = TRUE
     )
+  browser()
     # results an object of class grofit
     if (methods::is(grofit) !=
         "grofit")
@@ -215,23 +216,12 @@ growth.report <- function(
       )
     }
 
-    if (format == "rmd_document") {
-      out_file <- paste0(wd, "/", out.nm, ".Rmd")
 
-      # Get the arguments as a named list
-      arg_list <- as.list(match.call()[-1])
-      # Remove the arguments that are not needed for rmarkdown::render()
-      arg_list$grofit <- arg_list$out.dir <- arg_list$out.nm <- arg_list$format <- NULL
-
-      create_custom_rmd(input_rmd_path = report_path, output_rmd_path = out_file, args = arg_list)
-
-      message(paste0("R Markdown report file saved in: '", out_file, "'"))
-    } else {
       rmarkdown::render(
         report_path, output_format = format, output_dir = wd,
         output_file = out.nm, quiet = TRUE
       )
-    }
+
     message(paste0("Report files saved in: '/", wd, "'"))
     unlink(
         paste0(tempdir(), "/Plots"),
@@ -316,7 +306,7 @@ create_custom_rmd <- function(input_rmd_path, output_rmd_path, args) {
 #' }
 fl.report <- function(
     flFitRes, out.dir = tempdir(), out.nm = NULL, ec50 = FALSE,
-    format = c("pdf", "html"),
+    format = c("pdf", "html", "rmd"),
     export = FALSE, parallelize = TRUE, ...
 )
     {
@@ -506,16 +496,19 @@ fl.report <- function(
     } else if ("html" %in% format)
     {
         format <- "html_document"
-    } else
-    {
-        stop(
-            "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
-        )
+    } else if ("rmd" %in% format) {
+      format <- "rmd_document"
+    } else {
+      stop(
+        "Please define a valid report format, either 'pdf', 'html', 'rmd', or c('pdf', 'html')."
+      )
     }
-    rmarkdown::render(
-      report_path, output_format = format, output_dir = wd,
+
+      rmarkdown::render(
+        report_path, output_format = format, output_dir = wd,
         output_file = out.nm, quiet = TRUE
-    )
+      )
+
     message(paste0("Files saved in: '", wd, "'"))
     unlink(
         paste0(tempdir(), "/Plots"),
