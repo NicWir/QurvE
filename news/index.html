@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,23 @@
       <small>Source: <a href="https://github.com/NicWir/QurvE/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1" id="qurve-11">QurvE 1.1<a class="anchor" aria-label="anchor" href="#qurve-11"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-1-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-1"></a></h3>
+<ul><li>read_data() now accepts files or dataframe objects in tidy format</li>
+<li>the shiny app now allows inspection of code used to run workflows and generate plots</li>
+<li>Parametric fits have Root Mean Squared Error (RMSE) added to the calculated parameters. The RMSE for each model fit has been also added to <code>gcTable</code> and the respective table within the shiny app.</li>
+<li>TinyTeX is only installed from within the shiny app if the user explicitly approves.</li>
+<li>added a [Q&amp;A and Troubleshooting] vignette</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-1-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1"></a></h3>
+<ul><li>the [sort by concentration] button for parameter plots in the shiny app now also is shown for data parsed from raw inputs, not only data parsed in custom format.</li>
+<li>[Select read for fluorescence normalization] is not shown is Fluorescence is <em>ignored</em>.</li>
+<li>Data is parsed correctly from CSV files if values are framed by explicit quotes</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.1" id="qurve-101">QurvE 1.0.1<a class="anchor" aria-label="anchor" href="#qurve-101"></a></h2>
 <div class="section level3">
