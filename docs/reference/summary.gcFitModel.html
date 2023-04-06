@@ -25,7 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
-    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Q&amp;A and Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -109,22 +109,22 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Best fitting model: ~baranyi</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestFit</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            mu.model          tD.model     lambda.model         A.model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.803303490572463 0.862870868475853 4.85962913182661 4.8533687974543</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            mu.model          tD.model     lambda.model          A.model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.804579592828026 0.861502313430041 4.72596077248723 4.87732745020749</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           dY.model     A.orig.model    dY.orig.model   integral.model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.85426825421893 6.07403950967471 6.07950530335438 78.1014177895764</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.87545715418648 6.96145703518536 6.94844921781831 79.1101598165308</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   parameter_nu.model parameter_alpha.model parameter_t_shift.model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1               &lt;NA&gt;                  &lt;NA&gt;                    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      parameter_y0.model         stdmu.model    stdlambda.model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.000926204234525582 0.00221297882319625 0.0140957443232616</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            stdA.model reliable_fit.model  ci90.mu.model.lo  ci90.mu.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.00211430956685347               TRUE 0.799663140408305 0.806943840736621</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ci90.lambda.model.lo ci90.lambda.model.up  ci90.A.model.lo  ci90.A.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     4.83644163241484     4.88281663123837 4.84989075821682 4.85684683669177</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ci95.mu.model.lo  ci95.mu.model.up ci95.lambda.model.lo ci95.lambda.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.798966052078998 0.807640929065928     4.83200147295302      4.8872567907002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ci95.A.model.lo  ci95.A.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.84922475070327 4.85751284420533</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    parameter_y0.model         stdmu.model    stdlambda.model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.00184634956876486 0.00236630258589613 0.0149024209872318</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            stdA.model        RMSE.model reliable_fit.model  ci90.mu.model.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.00226849484692177 0.014458368238055               TRUE 0.800687025074227</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ci90.mu.model.up ci90.lambda.model.lo ci90.lambda.model.up ci90.A.model.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.808472160581825     4.70144628996324     4.75047525501123 4.8735957761843</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ci90.A.model.up ci95.mu.model.lo  ci95.mu.model.up ci95.lambda.model.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.88105912423068 0.79994163975967 0.809217545896383     4.69675202735226</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ci95.lambda.model.up  ci95.A.model.lo  ci95.A.model.up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     4.75516951762221 4.87288120030752 4.88177370010746</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

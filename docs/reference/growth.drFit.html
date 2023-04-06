@@ -33,7 +33,7 @@ generate a table with estimates for EC50 and respecting statistics."><!-- mathja
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
-    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Q&amp;A and Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -146,6 +146,10 @@ generate a table with estimates for EC50 and respecting statistics.</p>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Common response parameters used in dose-response analysis:<br><br><b>Linear fit:</b><br>- mu.linfit: Growth rate<br>- lambda.linfit: Lag time<br>- dY.linfit: Density increase<br>- A.linfit: Maximum measurement<br><br><b>Spline fit:</b><br>- mu.spline: Growth rate<br>- lambda.spline: Lag time<br>- A.spline: Maximum measurement<br>- dY.spline: Density increase<br>- integral.spline: Integral<br><br><b>Parametric fit:</b><br>- mu.model: Growth rate<br>- lambda.model: Lag time<br>- A.model: Maximum measurement<br>- integral.model: Integral'</p>
+    </div>
+    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Kschischo (2010). <em>grofit: Fitting Biological Growth Curves with R</em>. Journal of Statistical Software, 33(7), 1-21. DOI: 10.18637/jss.v033.i07</p>
     </div>
@@ -194,11 +198,11 @@ generate a table with estimates for EC50 and respecting statistics.</p>
 <span class="r-in"><span><span class="co"># Inspect results</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Test log.x log.y Samples EC50.Estimate EC50.Std..Error EC50.Lower EC50.Upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1622427     0.002798474  0.1565424  0.1679431</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1162512     0.002034694  0.1121066  0.1203957</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1590786     0.002284292  0.1544256  0.1637315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1142663     0.001480089  0.1112514  0.1172811</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       yEC50      test model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3283462 mu.spline  W1.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2345473 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3324131 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2372419 mu.spline  W1.3</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="growth.drFit-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="growth.drFit-2.png" alt="" width="700" height="433"></span>

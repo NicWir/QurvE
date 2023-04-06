@@ -28,7 +28,13 @@
     <loc>https://nicwir.github.io/QurvE/news/index.html</loc>
   </url>
   <url>
+    <loc>https://nicwir.github.io/QurvE/reference/QurvE-package.html</loc>
+  </url>
+  <url>
     <loc>https://nicwir.github.io/QurvE/reference/biosensor.eq.html</loc>
+  </url>
+  <url>
+    <loc>https://nicwir.github.io/QurvE/reference/buildTooltipOrPopoverOptionsList.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/dot-onAttach.html</loc>
@@ -115,10 +121,10 @@
     <loc>https://nicwir.github.io/QurvE/reference/low.integrate.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_data.html</loc>
+    <loc>https://nicwir.github.io/QurvE/reference/parse_Gen5Gen6.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_Gen5Gen6.html</loc>
+    <loc>https://nicwir.github.io/QurvE/reference/parse_data.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/parse_victornivo.html</loc>
@@ -133,9 +139,6 @@
     <loc>https://nicwir.github.io/QurvE/reference/plot.drFit.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.drFitfl.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/plot.drFitFLModel.html</loc>
   </url>
   <url>
@@ -143,6 +146,9 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/plot.drFitSpline.html</loc>
+  </url>
+  <url>
+    <loc>https://nicwir.github.io/QurvE/reference/plot.drFitfl.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/plot.dr_parameter.html</loc>
@@ -187,9 +193,6 @@
     <loc>https://nicwir.github.io/QurvE/reference/plot.parameter.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/QurvE-package.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/rdm.data.html</loc>
   </url>
   <url>
@@ -208,9 +211,6 @@
     <loc>https://nicwir.github.io/QurvE/reference/summary.drFit.html</loc>
   </url>
   <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.drFitfl.html</loc>
-  </url>
-  <url>
     <loc>https://nicwir.github.io/QurvE/reference/summary.drFitFLModel.html</loc>
   </url>
   <url>
@@ -218,6 +218,9 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/summary.drFitSpline.html</loc>
+  </url>
+  <url>
+    <loc>https://nicwir.github.io/QurvE/reference/summary.drFitfl.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/summary.flBootSpline.html</loc>
@@ -263,6 +266,9 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/tidy_to_custom.html</loc>
+  </url>
+  <url>
+    <loc>https://nicwir.github.io/QurvE/reference/updateResistantPopover.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/zipFastener.html</loc>

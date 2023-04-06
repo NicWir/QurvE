@@ -128,9 +128,9 @@ fl.workflow(
 
 \item{report}{(Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})}
 
-\item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of "Report.fluorescence_" and the current date and time.}
+\item{out.dir}{{Character or \code{NULL}} Define the name of a folder in which all result files (tables and reports) are stored. If \code{NULL}, the folder will be named with a combination of "FluorescenceResults_" and the current date and time.}
 
-\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "Fluorescenceeport_" and the current date and time.}
+\item{out.nm}{{Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of "FluorescenceReport_" and the current date and time.}
 
 \item{export.fig}{(Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}). Only effective if \code{report = TRUE}.}
 
