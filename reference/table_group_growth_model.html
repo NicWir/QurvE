@@ -25,7 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
-    <a class="dropdown-item" href="../articles/troubleshooting.html">Troubleshooting</a>
+    <a class="dropdown-item" href="../articles/troubleshooting.html">Q&amp;A and Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
   </div>
@@ -96,38 +96,38 @@
 <span class="r-in"><span>                       suppress.messages <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">table_group_growth_model</span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">gcFit</span><span class="op">$</span><span class="va">gcTable</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Sample|Conc.         mumax            tD       lagtime         Y_max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      Test1 | 0 0.804 ± 0.005 0.862 ± 0.005 5.016 ± 0.161 4.802 ± 0.049</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Test1 | 0.017 0.782 ± 0.001 0.886 ± 0.002 5.215 ± 0.275 4.321 ± 0.083</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Test1 | 0.026 0.772 ± 0.002 0.898 ± 0.002 5.386 ± 0.184  4.052 ± 0.05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Test1 | 0.039  0.76 ± 0.009 0.913 ± 0.011 5.368 ± 0.033 3.884 ± 0.013</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Test1 | 0.059  0.732 ± 0.01 0.947 ± 0.013 5.443 ± 0.164 3.666 ± 0.067</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Test1 | 0.088 0.682 ± 0.006 1.017 ± 0.009  5.62 ± 0.073 3.464 ± 0.077</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Test1 | 0.13 0.591 ± 0.007 1.174 ± 0.013 5.786 ± 0.279  3.172 ± 0.07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8    Test1 | 0.2 0.444 ± 0.008 1.561 ± 0.029 5.822 ± 0.219 2.697 ± 0.029</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9    Test1 | 0.3 0.277 ± 0.006 2.502 ± 0.052 6.587 ± 0.083 2.209 ± 0.046</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10  Test1 | 0.44 0.136 ± 0.007 5.096 ± 0.287  6.74 ± 0.154   1.7 ± 0.066</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  Test1 | 0.67 0.057 ± 0.025 14.39 ± 7.775 4.256 ± 3.877 0.935 ± 0.166</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12     Test1 | 1                                                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Sample|Conc.         mumax             tD       lagtime         Y_max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      Test1 | 0 0.801 ± 0.005  0.866 ± 0.005 5.053 ± 0.139 4.769 ± 0.026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Test1 | 0.017 0.785 ± 0.006  0.883 ± 0.007 5.261 ± 0.006 4.296 ± 0.073</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Test1 | 0.026 0.778 ± 0.002  0.891 ± 0.003 5.197 ± 0.255 4.132 ± 0.034</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Test1 | 0.039 0.761 ± 0.008  0.911 ± 0.009 5.332 ± 0.211  3.99 ± 0.047</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Test1 | 0.059 0.738 ± 0.003   0.94 ± 0.004  5.48 ± 0.235 3.718 ± 0.085</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Test1 | 0.088 0.681 ± 0.012  1.018 ± 0.018 5.471 ± 0.153 3.452 ± 0.053</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Test1 | 0.13 0.589 ± 0.006  1.176 ± 0.011 5.606 ± 0.181 3.162 ± 0.045</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    Test1 | 0.2 0.447 ± 0.005  1.549 ± 0.018 5.933 ± 0.164 2.729 ± 0.027</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    Test1 | 0.3 0.275 ± 0.009  2.524 ± 0.081 6.282 ± 0.298 2.239 ± 0.112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  Test1 | 0.44 0.147 ± 0.013  4.735 ± 0.414 7.128 ± 0.333 1.582 ± 0.121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  Test1 | 0.67  0.062 ± 0.02 11.778 ± 3.151 3.626 ± 3.432 0.936 ± 0.053</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12     Test1 | 1                                                         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               dY</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  4.794 ± 0.056</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   4.314 ± 0.07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  4.059 ± 0.026</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  3.894 ± 0.016</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  3.687 ± 0.049</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  3.457 ± 0.071</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   3.165 ± 0.07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  2.682 ± 0.045</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   2.14 ± 0.044</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 1.356 ± 0.049</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.565 ± 0.045</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   4.77 ± 0.019</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  4.297 ± 0.057</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    4.12 ± 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  3.982 ± 0.045</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  3.713 ± 0.099</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   3.45 ± 0.057</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  3.163 ± 0.042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  2.725 ± 0.013</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  2.177 ± 0.091</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  1.306 ± 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.557 ± 0.046</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12              </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># with HTML formatting</span></span></span>
 <span class="r-in"><span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu">table_group_growth_model</span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">gcFit</span><span class="op">$</span><span class="va">gcTable</span>, html <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>              escape <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># Do not escape HTML entities</span></span></span>
-<div id="htmlwidget-698663df25860e4ecb1f" style="width:700px;height:432.632880098888px;" class="datatables html-widget "></div>
-<script type="application/json" data-for="htmlwidget-698663df25860e4ecb1f">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["Test1 | 0","Test1 | 0.017","Test1 | 0.026","Test1 | 0.039","Test1 | 0.059","Test1 | 0.088","Test1 | 0.13","Test1 | 0.2","Test1 | 0.3","Test1 | 0.44","Test1 | 0.67","Test1 | 1"],["0.804 ± 0.005","0.782 ± 0.001","0.772 ± 0.002","0.76 ± 0.009","0.732 ± 0.01","0.682 ± 0.006","0.591 ± 0.007","0.444 ± 0.008","0.277 ± 0.006","0.136 ± 0.007","0.057 ± 0.025",""],["0.862 ± 0.005","0.886 ± 0.002","0.898 ± 0.002","0.913 ± 0.011","0.947 ± 0.013","1.017 ± 0.009","1.174 ± 0.013","1.561 ± 0.029","2.502 ± 0.052","5.096 ± 0.287","14.39 ± 7.775",""],["5.016 ± 0.161","5.215 ± 0.275","5.386 ± 0.184","5.368 ± 0.033","5.443 ± 0.164","5.62 ± 0.073","5.786 ± 0.279","5.822 ± 0.219","6.587 ± 0.083","6.74 ± 0.154","4.256 ± 3.877",""],["4.802 ± 0.049","4.321 ± 0.083","4.052 ± 0.05","3.884 ± 0.013","3.666 ± 0.067","3.464 ± 0.077","3.172 ± 0.07","2.697 ± 0.029","2.209 ± 0.046","1.7 ± 0.066","0.935 ± 0.166",""],["4.794 ± 0.056","4.314 ± 0.07","4.059 ± 0.026","3.894 ± 0.016","3.687 ± 0.049","3.457 ± 0.071","3.165 ± 0.07","2.682 ± 0.045","2.14 ± 0.044","1.356 ± 0.049","0.565 ± 0.045",""]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sample|Conc.<\/th>\n      <th>mu<sub>max<\/sub><\/th>\n      <th>t<sub>D<\/sub><\/th>\n      <th>lagtime<\/th>\n      <th>y<sub>max<\/sub><\/th>\n      <th>dY<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script><span class="r-in"><span></span></span>
+<div id="htmlwidget-51378431405732348905" style="width:700px;height:432.632880098888px;" class="datatables html-widget "></div>
+<script type="application/json" data-for="htmlwidget-51378431405732348905">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["Test1 | 0","Test1 | 0.017","Test1 | 0.026","Test1 | 0.039","Test1 | 0.059","Test1 | 0.088","Test1 | 0.13","Test1 | 0.2","Test1 | 0.3","Test1 | 0.44","Test1 | 0.67","Test1 | 1"],["0.801 ± 0.005","0.785 ± 0.006","0.778 ± 0.002","0.761 ± 0.008","0.738 ± 0.003","0.681 ± 0.012","0.589 ± 0.006","0.447 ± 0.005","0.275 ± 0.009","0.147 ± 0.013","0.062 ± 0.02",""],["0.866 ± 0.005","0.883 ± 0.007","0.891 ± 0.003","0.911 ± 0.009","0.94 ± 0.004","1.018 ± 0.018","1.176 ± 0.011","1.549 ± 0.018","2.524 ± 0.081","4.735 ± 0.414","11.778 ± 3.151",""],["5.053 ± 0.139","5.261 ± 0.006","5.197 ± 0.255","5.332 ± 0.211","5.48 ± 0.235","5.471 ± 0.153","5.606 ± 0.181","5.933 ± 0.164","6.282 ± 0.298","7.128 ± 0.333","3.626 ± 3.432",""],["4.769 ± 0.026","4.296 ± 0.073","4.132 ± 0.034","3.99 ± 0.047","3.718 ± 0.085","3.452 ± 0.053","3.162 ± 0.045","2.729 ± 0.027","2.239 ± 0.112","1.582 ± 0.121","0.936 ± 0.053",""],["4.77 ± 0.019","4.297 ± 0.057","4.12 ± 0.05","3.982 ± 0.045","3.713 ± 0.099","3.45 ± 0.057","3.163 ± 0.042","2.725 ± 0.013","2.177 ± 0.091","1.306 ± 0.05","0.557 ± 0.046",""]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sample|Conc.<\/th>\n      <th>mu<sub>max<\/sub><\/th>\n      <th>t<sub>D<\/sub><\/th>\n      <th>lagtime<\/th>\n      <th>y<sub>max<\/sub><\/th>\n      <th>dY<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script><span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

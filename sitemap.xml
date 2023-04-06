@@ -34,6 +34,9 @@
     <loc>https://nicwir.github.io/QurvE/reference/biosensor.eq.html</loc>
   </url>
   <url>
+    <loc>https://nicwir.github.io/QurvE/reference/buildTooltipOrPopoverOptionsList.html</loc>
+  </url>
+  <url>
     <loc>https://nicwir.github.io/QurvE/reference/export_RData.html</loc>
   </url>
   <url>
@@ -260,6 +263,9 @@
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/tidy_to_custom.html</loc>
+  </url>
+  <url>
+    <loc>https://nicwir.github.io/QurvE/reference/updateResistantPopover.html</loc>
   </url>
   <url>
     <loc>https://nicwir.github.io/QurvE/reference/zipFastener.html</loc>
