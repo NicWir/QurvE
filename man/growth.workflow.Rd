@@ -153,6 +153,9 @@ A \code{grofit} object that contains all computation results, compatible with va
 \description{
 \code{growth.workflow} runs \code{\link{growth.control}} to create a \code{grofit.control} object and then performs all computational fitting operations based on the user input. Finally, if desired, a final report is created in PDF or HTML format that summarizes all results obtained.
 }
+\details{
+Common response parameters used in dose-response analysis:\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Linear fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- mu.linfit: Growth rate\if{html}{\out{<br>}}- lambda.linfit: Lag time\if{html}{\out{<br>}}- dY.linfit: Density increase\if{html}{\out{<br>}}- A.linfit: Maximum measurement\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Spline fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- mu.spline: Growth rate\if{html}{\out{<br>}}- lambda.spline: Lag time\if{html}{\out{<br>}}- A.spline: Maximum measurement\if{html}{\out{<br>}}- dY.spline: Density increase\if{html}{\out{<br>}}- integral.spline: Integral\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Parametric fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- mu.model: Growth rate\if{html}{\out{<br>}}- lambda.model: Lag time\if{html}{\out{<br>}}- A.model: Maximum measurement\if{html}{\out{<br>}}- integral.model: Integral'
+}
 \examples{
 # Create random growth data set
   rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')

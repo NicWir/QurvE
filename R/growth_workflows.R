@@ -64,6 +64,10 @@
 #'   position_dodge scale_color_manual scale_fill_brewer scale_color_brewer scale_fill_manual scale_x_continuous
 #'   scale_y_continuous scale_y_log10 theme theme_classic theme_minimal xlab ylab
 #'
+#' @details
+#' Common response parameters used in dose-response analysis:<br><br><b>Linear fit:</b><br>- mu.linfit: Growth rate<br>- lambda.linfit: Lag time<br>- dY.linfit: Density increase<br>- A.linfit: Maximum measurement<br><br><b>Spline fit:</b><br>- mu.spline: Growth rate<br>- lambda.spline: Lag time<br>- A.spline: Maximum measurement<br>- dY.spline: Density increase<br>- integral.spline: Integral<br><br><b>Parametric fit:</b><br>- mu.model: Growth rate<br>- lambda.model: Lag time<br>- A.model: Maximum measurement<br>- integral.model: Integral'
+#'
+#'
 #' @examples
 #' # Create random growth data set
 #'   rnd.data1 <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')

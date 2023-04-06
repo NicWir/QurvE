@@ -98,7 +98,7 @@ growth.gcFitModel <- function(
             raw.data = data, gcID = gcID, fit.time = NA,
             fit.data = NA, parameters = list(
                 A = NA, mu = 0, tD = NA, lambda = NA,
-                integral = NA
+                integral = NA, RMSE = NA
             ),
             model = NA, nls = NA, reliable = NULL,
             fitFlag = FALSE, control = control
@@ -119,7 +119,7 @@ growth.gcFitModel <- function(
             raw.data = data, gcID = gcID, fit.time = NA,
             fit.data = NA, parameters = list(
                 A = NA, mu = NA, tD = NA, lambda = NA,
-                integral = NA
+                integral = NA, RMSE = NA
             ),
             model = NA, nls = NA, reliable = NULL,
             fitFlag = FALSE, control = control
@@ -142,7 +142,7 @@ growth.gcFitModel <- function(
             raw.data = data, gcID = gcID, fit.time = NA,
             fit.data = NA, parameters = list(
                 A = NA, mu = NA, tD = NA, lambda = NA,
-                integral = NA
+                integral = NA, RMSE = NA
             ),
             model = NA, nls = NA, reliable = NULL,
             fitFlag = FALSE, control = control
@@ -256,6 +256,7 @@ growth.param <- function(time, data, gcID = "undefined", control)
     # fitting parametric growth curves
     y.model <- NULL
     bestAIC <- NULL
+    bestRMSE <- NULL
     best <- NULL
     used <- NULL
 
@@ -329,6 +330,8 @@ growth.param <- function(time, data, gcID = "undefined", control)
                   "nls")
                   {
                   AIC <- stats::AIC(y.model)
+                  model_residuals <- stats::residuals(y.model)
+                  RMSE <- sqrt(mean(model_residuals^2))
                 }
 
                 if (control$suppress.messages == FALSE)
@@ -368,6 +371,7 @@ growth.param <- function(time, data, gcID = "undefined", control)
                     AIC < bestAIC)
                     {
                     bestAIC <- AIC
+                    bestRMSE <- RMSE
                     best <- y.model
                     used <- (control$model.type)[i]
                   }
@@ -476,6 +480,7 @@ growth.param <- function(time, data, gcID = "undefined", control)
         Integralbest <- NA
         fitFlag <- FALSE
         b.tangent <- NA
+        bestRMSE <- NA
     }
     dY <- ifelse(
         is.null(best),
@@ -509,6 +514,7 @@ growth.param <- function(time, data, gcID = "undefined", control)
                 dY
             }, mu = mubest, tD = log(2)/as.numeric(mubest),
             lambda = lambdabest, b.tangent = b.tangent,
+            RMSE = bestRMSE,
             fitpar = if (exists("fitparbest"))
                 {
                 fitparbest

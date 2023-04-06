@@ -15,10 +15,14 @@ tidy_to_custom(df, data.format = "col")
 A data frame in the custom format (row format) used by QurvE.
 }
 \description{
-This function converts a data frame in "tidy" format into the custom format used by QurvE (row format). The provided "tidy" data has columns for "Description", "Concentration", "Replicate", and "Values", with one row per time point and sample. Alternatively, the function converts data in custom QurvE column format into row format (if \code{data.format = "col"}).
+This function converts a data frame in "tidy" format into the custom format used by QurvE (row format).
+The provided "tidy" data has columns for "Description", "Concentration", "Replicate", and "Values", with one
+row per time point and sample. Alternatively, the function converts data in custom QurvE column format into
+row format (if \code{data.format = "col"}).
 }
 \examples{
-# # Create a tidy data frame with two samples, five concentrations, three replicates, and five time points
+# Create a tidy data frame with two samples, five concentrations, three
+# replicates, and five time points
 samples <- c("Sample 1", "Sample 2")
 concentrations <- c(0.1, 0.5, 1, 2, 5)
 time_points <- c(1, 2, 3, 4, 5)
@@ -32,7 +36,7 @@ df <- expand.grid(
 
 df$Value <- abs(rnorm(nrow(df)))
 
-
+df_formatted <- tidy_to_custom(df)
 
 }
 \keyword{internal}

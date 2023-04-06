@@ -285,7 +285,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                           checkboxInput(inputId = 'load_fl2_data_custom',
                                                                         label = 'Use second fluorescence to normalize fluorescence.',
                                                                         value = FALSE),
-                                                          bsPopover("load_fl2_data_custom", title = "Provide a table file with fluorescence 2 data",
+                                                          QurvE:::updateResistantPopover("load_fl2_data_custom", title = "Provide a table file with fluorescence 2 data",
                                                                     content = "Table layout must mimic that of growth data. Fluorescence 2 data is only used to normalize of fluorescence!")
                                                         ),
                                                         # #_____Fluorescence 2___________
@@ -658,7 +658,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                            width = '100%')
                                      )
                                    ),
-                                   bsPopover(id = "data_instruction", title = "Custom data layout",
+                                   QurvE:::updateResistantPopover(id = "data_instruction", title = "Custom data layout",
                                              content = paste("Please format your data in the format shown in the figure:",
                                                              paste0(
                                                                "<ul>",
@@ -697,7 +697,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                            width = '60%')
                                      )
                                    ),
-                                   bsPopover(id = "mapping_layout", title = "Mapping layout",
+                                   QurvE:::updateResistantPopover(id = "mapping_layout", title = "Mapping layout",
                                              content = paste("Please format a table providing sample information in the format shown in the figure:",
                                                              paste0(
                                                                "<ul>",
@@ -877,7 +877,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          max = NA,
                                                                          placeholder = 1.5
                                                                        ),
-                                                                       bsPopover(id = "growth_threshold_growth", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no growth value is greater than [growth threshold] \\* start growth."),
+                                                                       QurvE:::updateResistantPopover(id = "growth_threshold_growth", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no growth value is greater than [growth threshold] \\* start growth."),
 
                                                                        QurvE:::numberInput(
                                                                          inputId = 'minimum_growth_growth',
@@ -887,7 +887,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          max = NA,
                                                                          placeholder = 0
                                                                        ),
-                                                                       bsPopover(id = "minimum_growth_growth", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth] for the fits."),
+                                                                       QurvE:::updateResistantPopover(id = "minimum_growth_growth", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth] for the fits."),
 
                                                                        QurvE:::numberInput(
                                                                          inputId = 'maximum_growth_growth',
@@ -896,7 +896,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          min = NA,
                                                                          max = NA
                                                                        ),
-                                                                       bsPopover(id = "maximum_growth_growth", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth measurement] for linear and spline fits."),
+                                                                       QurvE:::updateResistantPopover(id = "maximum_growth_growth", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth measurement] for linear and spline fits."),
 
 
                                                                        QurvE:::numberInput(
@@ -907,7 +907,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          max = NA,
                                                                          placeholder = 0
                                                                        ),
-                                                                       bsPopover(id = "t0_growth", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
+                                                                       QurvE:::updateResistantPopover(id = "t0_growth", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
 
                                                                        QurvE:::numberInput(
                                                                          inputId = 'tmax_growth',
@@ -916,7 +916,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          min = NA,
                                                                          max = NA
                                                                        ),
-                                                                       bsPopover(id = "tmax_growth", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits."),
+                                                                       QurvE:::updateResistantPopover(id = "tmax_growth", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits."),
 
                                                                      ), # Growth fit
 
@@ -935,7 +935,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                     choices = c("Dose-response models" = "model",
                                                                                                                 "Response spline fit" = "spline")
                                                                                         ),
-                                                                                        bsPopover(id = "dr_method_growth",
+                                                                                        QurvE:::updateResistantPopover(id = "dr_method_growth",
                                                                                                   title = HTML("<em>dr.method</em>"),
                                                                                                   placement = "right",
                                                                                                   content = "Fit either various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit.",
@@ -945,8 +945,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                         selectInput(inputId = "response_parameter_growth",
                                                                                                     label = "Response Parameter",
                                                                                                     choices = ""),
-                                                                                        bsPopover(id = "response_parameter_growth", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
-
+                                                                                        QurvE:::updateResistantPopover(id = "response_parameter_growth",
+                                                                                                  title = HTML("<em>dr.parameter</em>"),
+                                                                                                  placement = "right",
+                                                                                                  content = HTML('Choose the response parameter to be used for creating a dose response curve.<br><br><b>Linear fit:</b><br>- mu.linfit: Growth rate<br>- lambda.linfit: Lag time<br>- dY.linfit: Density increase<br>- A.linfit: Maximum measurement<br><br><b>Spline fit:</b><br>- mu.spline: Growth rate<br>- lambda.spline: Lag time<br>- dY.spline: Density increase<br>- A.spline: Maximum measurement<br>- integral.spline: -<br><br><b>Parametric fit:</b><br>- mu.model: Growth rate<br>- lambda.model: Lag time<br>- A.model: Maximum measurement<br>- integral.model: -'),
+                                                                                                  trigger = "hover", options = list(container = "body", template = widePopover)
+                                                                                        ),
                                                                                         conditionalPanel(
                                                                                           condition = 'input.dr_method_growth == "spline"',
                                                                                           tags$div(title="Perform a log(x+1) transformation on concentration values.",
@@ -965,7 +969,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                             value = "",
                                                                                             placeholder = "NULL (choose automatically)"
                                                                                           ),
-                                                                                          bsPopover(id = "smoothing_factor_growth_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+                                                                                          QurvE:::updateResistantPopover(id = "smoothing_factor_growth_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
                                                                                           QurvE:::numberInput(
                                                                                             inputId = 'number_of_bootstrappings_dr_growth',
@@ -975,7 +979,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                             max = NA,
                                                                                             placeholder = 0
                                                                                           ),
-                                                                                          bsPopover(id = "number_of_bootstrappings_dr_growth", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+                                                                                          QurvE:::updateResistantPopover(id = "number_of_bootstrappings_dr_growth", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
                                                                                         ), #conditionalPanel(condition = 'input.dr_method_growth == "spline"')
                                                                                         fluidRow(
                                                                                           column(12,
@@ -1040,7 +1044,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              value = 0.95,
                                                              placeholder = 0.95
                                                            ),
-                                                           bsPopover(id = "R2_threshold_growth", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
+                                                           QurvE:::updateResistantPopover(id = "R2_threshold_growth", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
                                                            QurvE:::numberInput(
                                                              inputId = 'RSD_threshold_growth',
@@ -1048,7 +1052,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              value = 0.1,
                                                              placeholder = 0.1
                                                            ),
-                                                           bsPopover(id = "RSD_threshold_growth", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
+                                                           QurvE:::updateResistantPopover(id = "RSD_threshold_growth", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum growth rate."),
 
                                                            QurvE:::numberInput(
                                                              inputId = 'dY_threshold_growth',
@@ -1056,7 +1060,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              value = 0.05,
                                                              placeholder = 0.05
                                                            ),
-                                                           bsPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of growth increase a linear regression window should cover to be considered."),
+                                                           QurvE:::updateResistantPopover(id = "dY_threshold_growth", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of growth increase a linear regression window should cover to be considered."),
 
                                                            checkboxInput(inputId = 'custom_sliding_window_size_growth',
                                                                          label = 'Custom sliding window size',
@@ -1071,7 +1075,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                min = NA,
                                                                max = NA,
                                                              ),
-                                                             bsPopover(id = "custom_sliding_window_size_value_growth", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum growth measurement)."),
+                                                             QurvE:::updateResistantPopover(id = "custom_sliding_window_size_value_growth", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the growth phase (until maximum growth measurement)."),
                                                            ),
                                                            fluidRow(
                                                              column(12,
@@ -1171,7 +1175,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              max = NA,
                                                              placeholder = 0.55
                                                            ),
-                                                           bsPopover(id = "smoothing_factor_nonparametric_growth", title = HTML("<em>smooth.gc</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
+                                                           QurvE:::updateResistantPopover(id = "smoothing_factor_nonparametric_growth", title = HTML("<em>smooth.gc</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
 
                                                            QurvE:::numberInput(
@@ -1182,7 +1186,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              max = NA,
                                                              placeholder = 0
                                                            ),
-                                                           bsPopover(id = "number_of_bootstrappings_growth", title = HTML("<em>nboot.gc</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
+                                                           QurvE:::updateResistantPopover(id = "number_of_bootstrappings_growth", title = HTML("<em>nboot.gc</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
                                                            fluidRow(
                                                              column(12,
                                                                     div(
@@ -1239,7 +1243,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                          label = 'Independent variable (x)',
                                                                          choices = ""
                                                                        ),
-                                                                       bsPopover(id = "data_type_x_fluorescence", title = HTML("<em>x_type</em>"), content = "Select the data type that is used as the independent variable for all fits."),
+                                                                       QurvE:::updateResistantPopover(id = "data_type_x_fluorescence", title = HTML("<em>x_type</em>"), content = "Select the data type that is used as the independent variable for all fits."),
 
                                                                        conditionalPanel(
                                                                          condition = "input.data_type_x_fluorescence == 'time' && output.normalized_fl_present",
@@ -1260,7 +1264,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            max = NA,
                                                                            placeholder = 1.5
                                                                          ),
-                                                                         bsPopover(id = "growth_threshold_in_percent_fluorescence", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no growth value is greater than [growth threshold] \\* start growth."),
+                                                                         QurvE:::updateResistantPopover(id = "growth_threshold_in_percent_fluorescence", title = HTML("<em>growth.thresh</em>"), content = "A sample will be considered to have no growth if no growth value is greater than [growth threshold] \\* start growth."),
                                                                        ),
 
                                                                        conditionalPanel(
@@ -1273,7 +1277,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            max = NA,
                                                                            placeholder = 0
                                                                          ),
-                                                                         bsPopover(id = "minimum_growth_fluorescence", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth measurement] for the fits."),
+                                                                         QurvE:::updateResistantPopover(id = "minimum_growth_fluorescence", title = HTML("<em>min.growth</em>"), content = "Consider only growth values above [Minimum growth measurement] for the fits."),
                                                                        ),
 
                                                                        conditionalPanel(
@@ -1285,7 +1289,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            min = NA,
                                                                            max = NA
                                                                          ),
-                                                                         bsPopover(id = "maximum_growth_fluorescence", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth] for linear and spline fits."),
+                                                                         QurvE:::updateResistantPopover(id = "maximum_growth_fluorescence", title = HTML("<em>max.growth</em>"), content = "Consider only growth values below and including [Maximum growth] for linear and spline fits."),
                                                                        ),
 
                                                                        conditionalPanel(
@@ -1299,7 +1303,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            placeholder = 0
                                                                          )
                                                                        ),
-                                                                       bsPopover(id = "t0_fluorescence", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
+                                                                       QurvE:::updateResistantPopover(id = "t0_fluorescence", title = HTML("<em>t0</em>"), content = "Consider only time values above [t0] for the fits."),
 
                                                                        conditionalPanel(
                                                                          condition = 'input.data_type_x_fluorescence.includes("time")',
@@ -1310,7 +1314,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                            min = NA,
                                                                            max = NA
                                                                          ),
-                                                                         bsPopover(id = "tmax_fluorescence", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits."),
+                                                                         QurvE:::updateResistantPopover(id = "tmax_fluorescence", title = HTML("<em>tmax</em>"), content = "Consider only time values below and including [tmax] for linear and spline fits."),
                                                                        ),
                                                                      ), # wellPanel
 
@@ -1331,7 +1335,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                             choices = c("Biosensor response model" = "model",
                                                                                                                         "Response spline fit" = "spline")
                                                                                                 ),
-                                                                                                bsPopover(id = "dr_method_fluorescence",
+                                                                                                QurvE:::updateResistantPopover(id = "dr_method_fluorescence",
                                                                                                           placement = "right",
                                                                                                           title = HTML("<em>dr.method</em>"),
                                                                                                           content = "Fit either a biosensor response model (Meyer et al., 2019) to response-vs.-concentration data, or apply a nonparametric (spline) fit."
@@ -1340,7 +1344,12 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                 selectInput(inputId = "response_parameter_fluorescence",
                                                                                                             label = "Response Parameter",
                                                                                                             choices = ""),
-                                                                                                bsPopover(id = "response_parameter_fluorescence", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
+                                                                                                QurvE:::updateResistantPopover(id = "response_parameter_fluorescence",
+                                                                                                                       title = HTML("<em>dr.parameter</em>"),
+                                                                                                                       placement = "right",
+                                                                                                                       content = HTML('Choose the response parameter to be used for creating a dose response curve.<br><br><b>Linear fit:</b><br>- max_slope.linfit: Fluorescence increase rate<br>- lambda.linfit: Lag time<br>- dY.linfit: Maximum Fluorescence - Minimum Fluorescence<br>- A.linfit: Maximum fluorescence<br><br><b>Spline fit:</b><br>- max_slope.spline: Fluorescence increase rate<br>- lambda.spline: Lag time<br>- dY.spline: Maximum Fluorescence - Minimum Fluorescence<br>- A.spline: Maximum fluorescence<br>- integral.spline: Integral<br><br><b>Parametric fit:</b><br>- max_slope.model: Fluorescence increase rate<br>- lambda.model: Lag time<br>- dY.model: Maximum Fluorescence - Minimum Fluorescence<br>- A.model: Maximum fluorescence<br>- integral.model: Integral'),
+                                                                                                                       trigger = "hover", options = list(container = "body", template = widePopover)
+                                                                                                ),
 
                                                                                                 tags$div(title="Perform a log(x+1) transformation on concentration values.",
                                                                                                          checkboxInput(inputId = 'log_transform_concentration_fluorescence',
@@ -1362,7 +1371,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                     max = NA,
                                                                                                     placeholder = 0
                                                                                                   ),
-                                                                                                  bsPopover(id = "number_of_bootstrappings_dr_fluorescence", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
+                                                                                                  QurvE:::updateResistantPopover(id = "number_of_bootstrappings_dr_fluorescence", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50."),
                                                                                                 ),
 
                                                                                                 conditionalPanel(
@@ -1373,7 +1382,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                     value = "",
                                                                                                     placeholder = "NULL (choose automatically)"
                                                                                                   ),
-                                                                                                  bsPopover(id = "smoothing_factor_fluorescence_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+                                                                                                  QurvE:::updateResistantPopover(id = "smoothing_factor_fluorescence_dr", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
                                                                                                 ),
                                                                                                 fluidRow(
                                                                                                   column(12,
@@ -1439,7 +1448,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              max = NA,
                                                              placeholder = 0.95
                                                            ),
-                                                           bsPopover(id = "R2_threshold_fluorescence", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
+                                                           QurvE:::updateResistantPopover(id = "R2_threshold_fluorescence", title = HTML("<em>lin.R2</em>"), content = "R2 threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
                                                            QurvE:::numberInput(
                                                              inputId = 'RSD_threshold_fluorescence',
@@ -1449,7 +1458,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              max = NA,
                                                              placeholder = 0.1
                                                            ),
-                                                           bsPopover(id = "RSD_threshold_fluorescence", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
+                                                           QurvE:::updateResistantPopover(id = "RSD_threshold_fluorescence", title = HTML("<em>lin.RSD</em>"), content = "Relative standard deviation (RSD) threshold for calculated slopes of linear regression windows to be considered for the maximum slope."),
 
                                                            QurvE:::numberInput(
                                                              inputId = 'dY_threshold_fluorescence',
@@ -1459,7 +1468,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              max = NA,
                                                              placeholder = 0.05
                                                            ),
-                                                           bsPopover(id = "dY_threshold_fluorescence", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of fluorescence increase a linear regression window should cover to be considered."),
+                                                           QurvE:::updateResistantPopover(id = "dY_threshold_fluorescence", title = HTML("<em>lin.dY</em>"), content = "Threshold for the minimum fraction of fluorescence increase a linear regression window should cover to be considered."),
 
                                                            tags$div(title="Perform a Ln(y/y0) transformation on fluorescence values.",
                                                                     checkboxInput(inputId = 'log_transform_data_linear_fluorescence',
@@ -1484,7 +1493,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                min = NA,
                                                                max = NA,
                                                              ),
-                                                             bsPopover(id = "custom_sliding_window_size_value_fluorescence", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the phase of fluorescence increase (until maximum fluorescence or growth)."),
+                                                             QurvE:::updateResistantPopover(id = "custom_sliding_window_size_value_fluorescence", title = HTML("<em>lin.h</em>"), content = "If NULL, the sliding windows size (h) is chosen based on the number of data points within the phase of fluorescence increase (until maximum fluorescence or growth)."),
                                                            ),
                                                            fluidRow(
                                                              column(12,
@@ -1514,7 +1523,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              max = NA,
                                                              placeholder = 0.75
                                                            ),
-                                                           bsPopover(id = "smoothing_factor_nonparametric_fluorescence", title = HTML("<em>smooth.fl</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
+                                                           QurvE:::updateResistantPopover(id = "smoothing_factor_nonparametric_fluorescence", title = HTML("<em>smooth.fl</em>"), content = "\\'spar\\' argument within the R function smooth\\.spline\\(\\)."),
 
                                                            QurvE:::numberInput(
                                                              inputId = 'number_of_bootstrappings_fluorescence',
@@ -1524,7 +1533,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                              max = NA,
                                                              placeholder = 0
                                                            ),
-                                                           bsPopover(id = "number_of_bootstrappings_fluorescence", title = HTML("<em>nboot.fl</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
+                                                           QurvE:::updateResistantPopover(id = "number_of_bootstrappings_fluorescence", title = HTML("<em>nboot.fl</em>"), content = "Optional: Define the number of bootstrap samples. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to yield a statistic distribution of growth parameters."),
 
                                                            tags$div(title="Perform a Ln(y/y0) transformation on fluorescence values.",
                                                                     checkboxInput(inputId = 'log_transform_data_nonparametric_fluorescence',
@@ -1655,7 +1664,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 label = 'Change color',
                                                                                 value = "firebrick3"
                                                                               ),
-                                                                              bsPopover(id = "color_validate_growth_plot_linear",
+                                                                              QurvE:::updateResistantPopover(id = "color_validate_growth_plot_linear",
                                                                                         title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
                                                                                         content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
@@ -1830,7 +1839,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 label = 'Change color',
                                                                                 value = "dodgerblue3"
                                                                               ),
-                                                                              bsPopover(id = "color_validate_growth_plot_spline",
+                                                                              QurvE:::updateResistantPopover(id = "color_validate_growth_plot_spline",
                                                                                         title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
                                                                                         content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
@@ -1963,7 +1972,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 label = 'Change color',
                                                                                 value = "forestgreen"
                                                                               ),
-                                                                              bsPopover(id = "color_validate_growth_plot_model",
+                                                                              QurvE:::updateResistantPopover(id = "color_validate_growth_plot_model",
                                                                                         title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
                                                                                         content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
@@ -2136,7 +2145,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                   label = 'Change color',
                                                                                   value = "dodgerblue3"
                                                                                 ),
-                                                                                bsPopover(id = "color_validate_growth_plot_spline_bt",
+                                                                                QurvE:::updateResistantPopover(id = "color_validate_growth_plot_spline_bt",
                                                                                           title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
                                                                                           content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                                 ),
@@ -2289,7 +2298,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 label = 'Change color',
                                                                                 value = "firebrick3"
                                                                               ),
-                                                                              bsPopover(id = "color_validate_fluorescence_plot_linear",
+                                                                              QurvE:::updateResistantPopover(id = "color_validate_fluorescence_plot_linear",
                                                                                         title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
                                                                                         content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
@@ -2457,7 +2466,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 label = 'Change color',
                                                                                 value = "dodgerblue3"
                                                                               ),
-                                                                              bsPopover(id = "color_validate_fluorescence_plot_spline",
+                                                                              QurvE:::updateResistantPopover(id = "color_validate_fluorescence_plot_spline",
                                                                                         title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
                                                                                         content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
@@ -2642,7 +2651,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                 label = 'Change color',
                                                                                 value = "dodgerblue3"
                                                                               ),
-                                                                              bsPopover(id = "color_validate_fluorescence_spline_bt",
+                                                                              QurvE:::updateResistantPopover(id = "color_validate_fluorescence_spline_bt",
                                                                                         title = HTML("<em>Define the colors used to highlight data points used in linear regression and determined slope</em>"), placement = "top",
                                                                                         content = "Enter color either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                               ),
@@ -3051,7 +3060,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      inputId = 'custom_colors_group_plot',
                                                                      label = 'Custom colors'
                                                                    ),
-                                                                   bsPopover(id = "custom_colors_group_plot",
+                                                                   QurvE:::updateResistantPopover(id = "custom_colors_group_plot",
                                                                              title = HTML("<em>Provide custom colors</em>"), placement = "top",
                                                                              content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                    ),
@@ -3067,7 +3076,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      ),
-                                                                     bsPopover(id = "color_palettes_group_plot",
+                                                                     QurvE:::updateResistantPopover(id = "color_palettes_group_plot",
                                                                                title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
                                                                                content = "The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend."
                                                                      ),
@@ -3235,7 +3244,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      inputId = 'custom_colors_growth_parameter_plot',
                                                                      label = 'Custom colors'
                                                                    ),
-                                                                   bsPopover(id = "custom_colors_growth_parameter_plot",
+                                                                   QurvE:::updateResistantPopover(id = "custom_colors_growth_parameter_plot",
                                                                              title = HTML("<em>Provide custom colors</em>"), placement = "top",
                                                                              content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                    ),
@@ -3472,7 +3481,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                   selected = names(QurvE:::single_hue_palettes)[1],
                                                                                   multiple = FALSE
                                                                    ),
-                                                                   bsPopover(id = "color_palettes_grid_plot",
+                                                                   QurvE:::updateResistantPopover(id = "color_palettes_grid_plot",
                                                                              title = HTML("<em>Define the colors used to visualize the value of the chosen parameter</em>"), placement = "top",
                                                                              content = ""
                                                                    ),
@@ -4371,7 +4380,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      inputId = 'custom_colors_fluorescence_group_plot',
                                                                      label = 'Custom colors'
                                                                    ),
-                                                                   bsPopover(id = "custom_colors_fluorescence_group_plot",
+                                                                   QurvE:::updateResistantPopover(id = "custom_colors_fluorescence_group_plot",
                                                                              title = HTML("<em>Provide custom colors</em>"), placement = "top",
                                                                              content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                    ),
@@ -4387,7 +4396,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      ),
-                                                                     bsPopover(id = "color_palettes_fluorescence_group_plot",
+                                                                     QurvE:::updateResistantPopover(id = "color_palettes_fluorescence_group_plot",
                                                                                title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
                                                                                content = "The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend."
                                                                      ),
@@ -4621,7 +4630,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      inputId = 'custom_colors_dual_plot',
                                                                      label = 'Custom colors'
                                                                    ),
-                                                                   bsPopover(id = "custom_colors_dual_plot",
+                                                                   QurvE:::updateResistantPopover(id = "custom_colors_dual_plot",
                                                                              title = HTML("<em>Provide custom colors</em>"), placement = "top",
                                                                              content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                    ),
@@ -4637,7 +4646,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     options = list(closeAfterSelect = FALSE,
                                                                                                    plugins= list('remove_button'))
                                                                      ),
-                                                                     bsPopover(id = "color_palettes_dual_plot",
+                                                                     QurvE:::updateResistantPopover(id = "color_palettes_dual_plot",
                                                                                title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
                                                                                content = "The number of selected color palettes must be at least the number of displayed groups. The order of the chosen palettes corresponds to the oder of conditions in the legend."
                                                                      ),
@@ -4803,7 +4812,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                      inputId = 'custom_colors_fluorescence_parameter_plot',
                                                                      label = 'Custom colors'
                                                                    ),
-                                                                   bsPopover(id = "custom_colors_fluorescence_parameter_plot",
+                                                                   QurvE:::updateResistantPopover(id = "custom_colors_fluorescence_parameter_plot",
                                                                              title = HTML("<em>Provide custom colors</em>"), placement = "top",
                                                                              content = "Enter colors either by name (e.g., red, blue, coral3) or via their hexadecimal code (e.g., #AE4371, #CCFF00FF, #0066FFFF). Separate colors with a comma. A full list of colors available by name can be found at http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf"
                                                                    ),
@@ -5039,7 +5048,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                selected = names(QurvE:::single_hue_palettes)[1],
                                                                                multiple = FALSE
                                                                    ),
-                                                                   bsPopover(id = "color_palettes_grid_plot_fluorescence",
+                                                                   QurvE:::updateResistantPopover(id = "color_palettes_grid_plot_fluorescence",
                                                                              title = HTML("<em>Define the colors used to visualize the value of the chosen parameter</em>"), placement = "top",
                                                                              content = ""
                                                                    ),
@@ -5803,7 +5812,7 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                  conditionalPanel(condition = "input.report_issues",
                                                   actionButton(inputId = "run_report_fix",
                                                                label = "Run Report Troubleshooting"),
-                                                  bsPopover(id = "run_report_fix", title = HTML("<em>Run Report Troubleshooting</em>"), content = HTML("This process will take several minutes!<br><br>Reinstalls TinyTeX, updates tlmgr and ensures that Pandoc is recognized correctly.")),
+                                                  QurvE:::updateResistantPopover(id = "run_report_fix", title = HTML("<em>Run Report Troubleshooting</em>"), content = HTML("This process will take several minutes!<br><br>Reinstalls TinyTeX, updates tlmgr and ensures that Pandoc is recognized correctly.")),
                                  )
                         ), # tabPanel("Report",  value = "tabPanel_Report", icon=icon("file-contract"),
                         #___Export RData___####
@@ -8443,6 +8452,7 @@ server <- function(input, output, session){
                                 "t<sub>D</sub>" = paste(ifelse(res.table.gc$mu.model==0 | is.na(res.table.gc$mu.model), "", paste(round(log(2)/as.numeric(res.table.gc$mu.model), 2), "\u00B1", round(sqrt(((-log(2)*as.numeric(res.table.gc$stdmu.model))/(as.numeric(res.table.gc$mu.model))^2)^2), 2)))),
                                 "λ" = ifelse(res.table.gc$lambda.model==0 | is.na(res.table.gc$lambda.model), "", paste(round(as.numeric(res.table.gc$lambda.model), 2), "\u00B1", round(as.numeric(res.table.gc$stdlambda.model),3))),
                                 "A" = ifelse(res.table.gc$A.model==0 | is.na(res.table.gc$A.model), "", paste(round(as.numeric(res.table.gc$A.model), 3), "\u00B1", round(as.numeric(res.table.gc$stdA.model),3))),
+                                "RMSE" = ifelse(res.table.gc$RMSE.model==0 | is.na(res.table.gc$RMSE.model), "", paste(round(as.numeric(res.table.gc$RMSE.model), 3))),
                                 stringsAsFactors = FALSE, check.names = F)
       if(!is.null(res.table.gc)){
         if ( "richards" %in% res.table.gc$used.model  ){
@@ -11638,7 +11648,7 @@ server <- function(input, output, session){
                     choices = c("Dose-response models" = "model",
                                 "Response spline fit" = "spline")
         ),
-        bsPopover(id = "dr_method_growth_rerun",
+        QurvE:::updateResistantPopover(id = "dr_method_growth_rerun",
                   title = HTML("<em>dr.method</em>"),
                   placement = "right",
                   content = "Fit either a various dose-response models (Ritz et al., 2015) to response-vs.-concentration data and select the best model based on the lowest AIC, or apply a nonparametric (spline) fit."),
@@ -11646,7 +11656,7 @@ server <- function(input, output, session){
         selectInput(inputId = "response_parameter_growth_rerun",
                     label = "Response Parameter",
                     choices = select_options),
-        bsPopover(id = "response_parameter_growth_rerun", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
+        QurvE:::updateResistantPopover(id = "response_parameter_growth_rerun", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
 
         conditionalPanel(
           condition = 'input.dr_method_growth_rerun == "spline"',
@@ -11666,7 +11676,7 @@ server <- function(input, output, session){
             value = "",
             placeholder = "NULL (choose automatically)"
           ),
-          bsPopover(id = "smoothing_factor_growth_dr_rerun", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+          QurvE:::updateResistantPopover(id = "smoothing_factor_growth_dr_rerun", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
           QurvE:::numberInput(
             inputId = 'number_of_bootstrappings_dr_growth_rerun',
@@ -11676,7 +11686,7 @@ server <- function(input, output, session){
             max = NA,
             placeholder = 0
           ),
-          bsPopover(id = "number_of_bootstrappings_dr_growth_rerun", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+          QurvE:::updateResistantPopover(id = "number_of_bootstrappings_dr_growth_rerun", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
         ), #conditionalPanel(condition = 'input.dr_method_growth_rerun == "spline"')
         footer=tagList(
           fluidRow(
@@ -12206,7 +12216,7 @@ server <- function(input, output, session){
   #       textInput(inputId = "dr_method_growth_rerun_individual",
   #                   label = "Method", value = results$growth$drFit$control$dr.method),
   #
-  #       bsPopover(id = "dr_method_growth_rerun_individual",
+  #       QurvE:::updateResistantPopover(id = "dr_method_growth_rerun_individual",
   #                 title = HTML("<em>dr.method</em>"),
   #                 placement = "right",
   #                 content = "To change the method for the dose-response analysis, please re-run the Computation workflow or select [Combine conditions into a single plot] and click [Re-run]."),
@@ -12215,7 +12225,7 @@ server <- function(input, output, session){
   #                   label = "Response Parameter",
   #                   choices = select_options,
   #                   selected =  results$growth$drFit$control$dr.parameter),
-  #       bsPopover(id = "response_parameter_growth_rerun_individual", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
+  #       QurvE:::updateResistantPopover(id = "response_parameter_growth_rerun_individual", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
   #
   #       conditionalPanel(
   #         condition = 'input.dr_method_growth_rerun_individual == "spline"',
@@ -12237,7 +12247,7 @@ server <- function(input, output, session){
   #           value = "",
   #           placeholder = "NULL (choose automatically)"
   #         ),
-  #         bsPopover(id = "smoothing_factor_growth_dr_rerun_individual", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+  #         QurvE:::updateResistantPopover(id = "smoothing_factor_growth_dr_rerun_individual", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
   #
   #         QurvE:::numberInput(
   #           inputId = 'number_of_bootstrappings_dr_growth_rerun_individual',
@@ -12247,7 +12257,7 @@ server <- function(input, output, session){
   #           max = NA,
   #           placeholder = 0
   #         ),
-  #         bsPopover(id = "number_of_bootstrappings_dr_growth_rerun_individual", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+  #         QurvE:::updateResistantPopover(id = "number_of_bootstrappings_dr_growth_rerun_individual", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
   #       ), #conditionalPanel(condition = 'input.dr_method_growth_rerun == "spline"')
   #       footer=tagList(
   #         fluidRow(
@@ -13456,7 +13466,7 @@ server <- function(input, output, session){
                     choices = c("Biosensor response model" = "model",
                                 "Response spline fit" = "spline")
         ),
-        bsPopover(id = "dr_method_fluorescence_rerun",
+        QurvE:::updateResistantPopover(id = "dr_method_fluorescence_rerun",
                   placement = "right",
                   title = HTML("<em>dr.method</em>"),
                   content = "Fit either a biosensor response model (Meyer et al., 2019) to response-vs.-concentration data, or apply a nonparametric (spline) fit."
@@ -13472,7 +13482,7 @@ server <- function(input, output, session){
                  checkboxInput(inputId = 'log_transform_response_fluorescence_rerun',
                                label = 'Log transform response')
         ),
-        bsPopover(id = "response_parameter_fluorescence_rerun", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
+        QurvE:::updateResistantPopover(id = "response_parameter_fluorescence_rerun", title = HTML("<em>dr.parameter</em>"), content = "Choose the response parameter to be used for creating a dose response curve.", placement = "top"),
 
         conditionalPanel(
           condition = 'input.dr_method_fluorescence_rerun == "spline"',
@@ -13483,7 +13493,7 @@ server <- function(input, output, session){
             value = "",
             placeholder = "NULL (choose automatically)"
           ),
-          bsPopover(id = "smoothing_factor_fluorescence_dr_rerun", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
+          QurvE:::updateResistantPopover(id = "smoothing_factor_fluorescence_dr_rerun", title = HTML("<em>smooth.dr</em>"), content = "\\'spar\\' argument in the R function smooth.spline() used to create the dose response curve."),
 
           QurvE:::numberInput(
             inputId = 'number_of_bootstrappings_dr_fluorescence_rerun',
@@ -13493,7 +13503,7 @@ server <- function(input, output, session){
             max = NA,
             placeholder = 0
           ),
-          bsPopover(id = "number_of_bootstrappings_dr_fluorescence_rerun", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
+          QurvE:::updateResistantPopover(id = "number_of_bootstrappings_dr_fluorescence_rerun", title = HTML("<em>nboot.dr</em>"), content = "Optional: Define the number of bootstrap samples for EC50 estimation. Bootstrapping resamples the values in a dataset with replacement and performs a spline fit for each bootstrap sample to determine the EC50.")
         ), #conditionalPanel(condition = 'input.dr_method_fluorescence_rerun == "spline"')
         footer=tagList(
           fluidRow(

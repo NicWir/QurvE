@@ -27,3 +27,4 @@ cran-comments\.md$
 ^\.github$
 index\.md$
 index\.Rmd$
+^Meta$

@@ -40,7 +40,15 @@ published in the Comprehensive R Archive Network (CRAN) and on
 [GitHub](https://github.com/NicWir/QurvE). Alternatively, an intuitive
 graphical user interface (GUI) implemented as a shiny application for
 non-programmers is available. The app can be installed locally on
-Windows computers or accessed as [web-app](https://www.qurveanalysis.com).
+Windows computers.
+
+## Issues and Suggestions
+
+If you encounter bugs or any other issues while using QurvE, please
+create an `Issue` on the Github
+[Issues](https://github.com/NicWir/QurvE/issues) page or write us a
+message. We welcome any suggestions for new features and improvements to
+make QurvE more useful and user-friendly.
 
 <br/>
 <a href="https://i.imgur.com/qIPx0yX.png"> <img src="https://i.imgur.com/qIPx0yX.png" width="100%"/> </a>

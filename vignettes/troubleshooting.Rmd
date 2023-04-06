@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: Q&A and Troubleshooting
 author: "Nicolas T. Wirth"
 date: "2023-04-04"
 mainfont: Arial
@@ -10,7 +10,7 @@ output:
     theme: "cayman"
     highlight: vignette
 vignette: >
-  %\VignetteIndexEntry{Troubleshooting}
+  %\VignetteIndexEntry{Q&A and Troubleshooting}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 lang: en-US
@@ -56,3 +56,8 @@ Outliers can significantly affect the accuracy and reliability of growth curve a
 2.  Re-run outlier samples: After identifying outliers, re-run their analysis with modified parameters in the [Validation] panel of the shiny app. An example for how this can be achieved within R is provided in the [growth curve analysis documentation](https://nicwir.github.io/QurvE/articles/vignette_growth.html#visualize-results)
 
 3.  Data Preprocessing: Before importing your data into QurvE, preprocess it to remove or reduce the impact of outliers. This can be done using various data cleaning techniques, such as filtering, interpolation, or imputation. Please note that such preprocessing methods are outside the scope of QurvE.
+
+# Q: What is the recommended sampling interval for different fitting methods?
+
+**A:** The appropriate measurement interval depends on the organism and growth conditions being studied. For instance, fast-growing organisms like *Escherichia coli* require shorter sampling intervals of at least one hour while slow-growing organisms like plants can be measured up to every five days. It's also important to note that the appropriate sampling interval may vary depending on the specific research question being addressed. For example, if the goal is to study the effects of a particular treatment on growth rates or diauxic shifts, more frequent sampling may be necessary to capture the short-term changes in growth. Alternatively, if the goal is to assess overall growth patterns over a longer time frame, less frequent sampling may be sufficient.\
+For linear fits, we recommend having at least four measurements within the mid-log phase of the growth curves to reliably estimate growth rates. When using smoothing splines with a low measurement frequency, such as in bioreactor fermentations or shaken flask experiments, you can increase the smoothing factor to make the fit less susceptible to outliers.

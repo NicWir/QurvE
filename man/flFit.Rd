@@ -42,6 +42,9 @@ various plotting functions of the QurvE package.
 \description{
 \code{flFit} performs all computational fluorescence fitting operations based on the user input.
 }
+\details{
+Common response parameters used in dose-response analysis:\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Linear fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- max_slope.linfit: Fluorescence increase rate\if{html}{\out{<br>}}- lambda.linfit: Lag time\if{html}{\out{<br>}}- dY.linfit: Maximum Fluorescence - Minimum Fluorescence\if{html}{\out{<br>}}- A.linfit: Maximum fluorescence\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Spline fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- max_slope.spline: Fluorescence increase rate\if{html}{\out{<br>}}- lambda.spline: Lag time\if{html}{\out{<br>}}- dY.spline: Maximum Fluorescence - Minimum Fluorescence\if{html}{\out{<br>}}- A.spline: Maximum fluorescence\if{html}{\out{<br>}}- integral.spline: Integral\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Parametric fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- max_slope.model: Fluorescence increase rate\if{html}{\out{<br>}}- lambda.model: Lag time\if{html}{\out{<br>}}- dY.model: Maximum Fluorescence - Minimum Fluorescence\if{html}{\out{<br>}}- A.model: Maximum fluorescence\if{html}{\out{<br>}}- integral.model: Integral'
+}
 \examples{
 # load example dataset
 input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),

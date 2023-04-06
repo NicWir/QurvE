@@ -9,7 +9,7 @@ growth.report(
   out.dir = tempdir(),
   out.nm = NULL,
   ec50 = FALSE,
-  format = c("pdf", "html", "rmd"),
+  format = c("pdf", "html"),
   export = FALSE,
   parallelize = TRUE,
   ...
@@ -24,7 +24,7 @@ growth.report(
 
 \item{ec50}{(Logical) Display results of dose-response analysis (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{format}{(Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Alternatively, R Markdown code with the report content can be generated with \code{format = 'rmd'}. Default: (\code{c('pdf', 'html')})}
+\item{format}{(Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})}
 
 \item{export}{(Logical) Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?}
 
@@ -42,8 +42,11 @@ growth.report(
 \description{
 \code{growth.report} requires a \code{grofit} object and creates a report in PDF and HTML format that summarizes all results.
 }
+\details{
+The template .Rmd file used within this function can be found within the QurvE package installation directory.
+}
 \examples{
-\donttest{
+\dontrun{
 # Create random growth data set
   rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 

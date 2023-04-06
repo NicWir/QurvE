@@ -49,6 +49,9 @@ dataset. The response parameter can be chosen from every physiological parameter
 calls the functions \code{\link{growth.drFitSpline}} and \code{\link{growth.drBootSpline}}, or \code{\link{growth.drFitModel}} to
 generate a table with estimates for EC50 and respecting statistics.
 }
+\details{
+Common response parameters used in dose-response analysis:\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Linear fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- mu.linfit: Growth rate\if{html}{\out{<br>}}- lambda.linfit: Lag time\if{html}{\out{<br>}}- dY.linfit: Density increase\if{html}{\out{<br>}}- A.linfit: Maximum measurement\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Spline fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- mu.spline: Growth rate\if{html}{\out{<br>}}- lambda.spline: Lag time\if{html}{\out{<br>}}- A.spline: Maximum measurement\if{html}{\out{<br>}}- dY.spline: Density increase\if{html}{\out{<br>}}- integral.spline: Integral\if{html}{\out{<br>}}\if{html}{\out{<br>}}\if{html}{\out{<b>}}Parametric fit:\if{html}{\out{</b>}}\if{html}{\out{<br>}}- mu.model: Growth rate\if{html}{\out{<br>}}- lambda.model: Lag time\if{html}{\out{<br>}}- A.model: Maximum measurement\if{html}{\out{<br>}}- integral.model: Integral'
+}
 \examples{
 \donttest{
 # Create random growth data set

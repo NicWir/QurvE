@@ -619,7 +619,10 @@ read_data <-
 
 #' Convert a tidy data frame to a custom QurvE format
 #'
-#' This function converts a data frame in "tidy" format into the custom format used by QurvE (row format). The provided "tidy" data has columns for "Description", "Concentration", "Replicate", and "Values", with one row per time point and sample. Alternatively, the function converts data in custom QurvE column format into row format (if \code{data.format = "col"}).
+#' This function converts a data frame in "tidy" format into the custom format used by QurvE (row format).
+#' The provided "tidy" data has columns for "Description", "Concentration", "Replicate", and "Values", with one
+#' row per time point and sample. Alternatively, the function converts data in custom QurvE column format into
+#' row format (if \code{data.format = "col"}).
 #'
 #' @param df A data frame in tidy format, containing "Time", "Description", and either "Values" or "Value" columns. Optionally, meta information provided in columns "Replicate" and "Concentration" is used.
 #' @param data.format (Character string) \code{"col"} (the default) or \code{"row"}. Only relevant if data is not provided in "tidy" format but has been prepared into the custom QurvE data format.
@@ -627,7 +630,8 @@ read_data <-
 #' @return A data frame in the custom format (row format) used by QurvE.
 #'
 #' @examples
-#' # # Create a tidy data frame with two samples, five concentrations, three replicates, and five time points
+#' # Create a tidy data frame with two samples, five concentrations, three
+#' # replicates, and five time points
 #' samples <- c("Sample 1", "Sample 2")
 #' concentrations <- c(0.1, 0.5, 1, 2, 5)
 #' time_points <- c(1, 2, 3, 4, 5)
@@ -641,7 +645,7 @@ read_data <-
 #'
 #' df$Value <- abs(rnorm(nrow(df)))
 #'
-#'
+#' df_formatted <- tidy_to_custom(df)
 #'
 #' @keywords internal
 #' @export
@@ -676,14 +680,14 @@ tidy_to_custom <- function(df, data.format = "col"){
     # Convert tidy format to the custom QurvE format
 
     # Create a unique identifier for each combination of Description, Concentration, and Replicate
-    df$Group <- with(df, paste(Description, Concentration, Replicate, sep = "_"))
+    df[["Group"]] <- paste(df$Description, df$Concentration, df$Replicate, sep = "_")
 
     # Split the 'Time' column based on the unique identifier
-    time_split <- split(df$Time, df$Group)
+    time_split <- split(df[["Time"]], df[["Group"]])
 
     # Create a list of subsets of 'df' based on the unique identifiers in 'time_split'
-    subsets_list <- lapply(unique(df$Group), function(x) {
-      subset(df, Group == x)
+    subsets_list <- lapply(unique(df[["Group"]]), function(x) {
+      subset(df, df[["Group"]] == x)
     })
 
     # Helper function to check if two data frames have identical 'Time' values
@@ -728,7 +732,7 @@ tidy_to_custom <- function(df, data.format = "col"){
     convert_to_wide <- function(df) {
       df <- df[!is.na(df$Time), ]
       # Find unique groups
-      unique_groups <- unique(df$Group)
+      unique_groups <- unique(df[["Group"]])
 
       # Create an empty data frame with the required structure
       df_wide <- data.frame(matrix(ncol = length(unique_groups) + 1, nrow = nrow(df)/length(unique_groups) + 2))
@@ -740,7 +744,7 @@ tidy_to_custom <- function(df, data.format = "col"){
       df_wide$Time <- c(NA, NA, time)
 
       for (group in unique_groups) {
-        group_df <- df[df$Group == group, ]
+        group_df <- df[df[["Group"]] == group, ]
         description <- as.character(unique(group_df$Description))
         replicate <- as.integer(unique(group_df$Replicate))
         concentration <- unique(group_df$Concentration)

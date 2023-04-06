@@ -36,7 +36,7 @@
 #' @family reports
 #' @return \code{NULL}
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create random growth data set
 #'   rnd.data <- rdm.data(d = 35, mu = 0.8, A = 5, label = 'Test1')
 #'
@@ -266,7 +266,7 @@ growth.report <- function(
 #' @details The template .Rmd file used within this function can be found within the QurvE package installation directory.
 #' @examples
 #' # load example dataset
-#' \donttest{
+#' \dontrun{
 #' input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
 #'                    sheet.growth = 1,

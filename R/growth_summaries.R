@@ -157,7 +157,7 @@ summary.gcFitModel <- function(object, ...)
         "dY.model", "A.orig.model", "dY.orig.model",
         "integral.model", "parameter_nu.model", "parameter_alpha.model",
         "parameter_t_shift.model", "parameter_y0.model",
-        "stdmu.model", "stdlambda.model", "stdA.model",
+        "stdmu.model", "stdlambda.model", "stdA.model", "RMSE.model",
         "reliable_fit.model", "ci90.mu.model.lo", "ci90.mu.model.up",
         "ci90.lambda.model.lo", "ci90.lambda.model.up",
         "ci90.A.model.lo", "ci90.A.model.up", "ci95.mu.model.lo",
@@ -173,13 +173,13 @@ summary.gcFitModel <- function(object, ...)
         if (is.na(object$parameters$mu[1]))
             {
             table <- c(
-                rep(NA, 15),
+                rep(NA, 16),
                 "FALSE", rep(NA, 12)
             )
         } else
         {
             table <- c(
-                0, rep(NA, 14),
+                0, rep(NA, 15),
                 as.character(object$fitFlag),
                 rep(NA, 12)
             )
@@ -211,7 +211,7 @@ summary.gcFitModel <- function(object, ...)
                 NA
             ),
             object$parameters$mu[2], object$parameters$lambda[2],
-            object$parameters$A[2], as.character(object$fitFlag),
+            object$parameters$A[2], object$parameters$RMSE[1], as.character(object$fitFlag),
             object$parameters$mu[1] - 1.645 * object$parameters$mu[2],
             object$parameters$mu[1] + 1.645 * object$parameters$mu[2],
             object$parameters$lambda[1] - 1.645 * object$parameters$lambda[2],

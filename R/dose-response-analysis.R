@@ -19,6 +19,9 @@
 #'
 #' @family growth fitting functions
 #'
+#' @details
+#' Common response parameters used in dose-response analysis:<br><br><b>Linear fit:</b><br>- mu.linfit: Growth rate<br>- lambda.linfit: Lag time<br>- dY.linfit: Density increase<br>- A.linfit: Maximum measurement<br><br><b>Spline fit:</b><br>- mu.spline: Growth rate<br>- lambda.spline: Lag time<br>- A.spline: Maximum measurement<br>- dY.spline: Density increase<br>- integral.spline: Integral<br><br><b>Parametric fit:</b><br>- mu.model: Growth rate<br>- lambda.model: Lag time<br>- A.model: Maximum measurement<br>- integral.model: Integral'
+#'
 #' @return An object of class \code{drFit}.
 #' \item{raw.data}{Data that passed to the function as \code{gcTable}.}
 #' \item{drTable}{Dataframe containing condition identifiers, fit options, and results of the dose-response analysis.}
@@ -1214,6 +1217,9 @@ growth.drFitModel <- function(
 #' \item{control}{Object of class \code{fl.control} created with the call of \code{\link{fl.control}}.}
 #'
 #' @export
+#'
+#' @details
+#' Common response parameters used in dose-response analysis:<br><br><b>Linear fit:</b><br>- max_slope.linfit: Fluorescence increase rate<br>- lambda.linfit: Lag time<br>- dY.linfit: Maximum Fluorescence - Minimum Fluorescence<br>- A.linfit: Maximum fluorescence<br><br><b>Spline fit:</b><br>- max_slope.spline: Fluorescence increase rate<br>- lambda.spline: Lag time<br>- dY.spline: Maximum Fluorescence - Minimum Fluorescence<br>- A.spline: Maximum fluorescence<br>- integral.spline: Integral<br><br><b>Parametric fit:</b><br>- max_slope.model: Fluorescence increase rate<br>- lambda.model: Lag time<br>- dY.model: Maximum Fluorescence - Minimum Fluorescence<br>- A.model: Maximum fluorescence<br>- integral.model: Integral'
 #'
 #' @references Meyer, A.J., Segall-Shapiro, T.H., Glassey, E. et al. _Escherichia coli “Marionette” strains with 12 highly optimized small-molecule sensors._ Nat Chem Biol 15, 196–204 (2019). DOI: 10.1038/s41589-018-0168-3
 #'

@@ -989,4 +989,114 @@ numberInput <- function(inputId, label, value = NULL, min = NA, max = NA, step =
   )
 }
 
+#' Create an update-resistant popover for a Shiny element
+#'
+#' This function creates a popover that is resistant to updates in the associated Shiny element.
+#' It adds an event listener to the specified element, which reinstalls the popover whenever a child
+#' of the element changes.
+#'
+#' @param id The id of the Shiny element to which the popover is attached.
+#' @param title The title of the popover.
+#' @param content The content of the popover.
+#' @param placement The placement of the popover relative to the Shiny element (default: "bottom").
+#'                  Possible values are "top", "bottom", "left", and "right".
+#' @param trigger The event that triggers the display of the popover (default: "hover").
+#'                Possible values are "hover", "focus", and "click".
+#' @param options A list of additional options for the popover.
+#'
+#' @return A Shiny HTML tag that contains the JavaScript code for creating the update-resistant popover.
+#' @author K. Rohde (stack overflow)
+#' @keywords internal shiny_app
+#' @importFrom utils packageVersion
+#' @examples
+#' \dontrun{
+#' library(shiny)
+#' library(shinyBS)
+#'
+#' ui <- shinyUI(fluidPage(
+#'   selectInput("Main2_1","Label","abc",  selectize = TRUE, multiple = TRUE),
+#'   updateResistantPopover("Main2_1", "Label", "content", placement = "right", trigger = "focus"),
+#'   actionButton("destroy", "destroy!")
+#' ))
+#'
+#' server <- function(input, output, session){
+#'   observeEvent(input$destroy, {
+#'     updateSelectInput(session, "Main2_1", choices="foo")
+#'   })
+#' }
+#'
+#' shinyApp(ui, server)
+#' }
+updateResistantPopover <- function(id, title, content, placement = "bottom", trigger = "hover", options = NULL){
+  options = buildTooltipOrPopoverOptionsList(title, placement, trigger, options, content)
+  options = paste0("{'", paste(names(options), options, sep = "': '", collapse = "', '"), "'}")
+  bsTag <- shiny::tags$script(shiny::HTML(paste0("
+    $(document).ready(function() {
+      var target = document.querySelector('#", id, "');
+      var observer = new MutationObserver(function(mutations) {
+        setTimeout(function() {
+          shinyBS.addTooltip('", id, "', 'popover', ", options, ");
+        }, 200);
+      });
+      observer.observe(target, { childList: true });
+    });
+  ")))
+  htmltools::attachDependencies(bsTag, htmltools::htmlDependency("shinyBS", utils::packageVersion("shinyBS"), src = c("href" = "sbs"), script = "shinyBS.js", stylesheet = "shinyBS.css"))
+}
+
+#' Custom tooltip function
+#'
+#' This function creates a custom tooltip for a given element in a Shiny application.
+#' The implementation is based on the shinyBS package.
+#'
+#' @param title The text for the tooltip's title.
+#' @param placement Placement of the tooltip. One of 'top', 'bottom', 'left', or 'right'.
+#' @param trigger The events that trigger the tooltip. One or more of 'click', 'hover', 'focus', or 'manual'.
+#' @param options A list of additional options for the tooltip.
+#' @param content Optional HTML content for the tooltip.
+#' @keywords internal shiny_app
+#' @return A list of tooltip options to be used in the Shiny application.
+#'
+#' @seealso \url{https://CRAN.R-project.org/package=shinyBS}
+#' @importFrom shiny HTML
+#'
+#' @examples
+#' \dontrun{
+#' tooltip_options <- custom_tooltip(
+#'   title = "Sample tooltip",
+#'   placement = "top",
+#'   trigger = "hover",
+#'   options = list(delay = 100),
+#'   content = "This is a custom tooltip."
+#' )
+#'
+#' # In a Shiny app
+#' # shiny::tags$span("Hover me!", `data-toggle` = "tooltip",
+#'                    `data-placement` = "top", `data-trigger` = "hover",
+#'                    `title` = "Hello, tooltip!")
+#' }
+buildTooltipOrPopoverOptionsList <- function (title, placement, trigger, options, content)
+{
+  if (is.null(options)) {
+    options = list()
+  }
+  if (!missing(content)) {
+    if (is.null(options$content)) {
+      options$content = shiny::HTML(content)
+    }
+  }
+  if (is.null(options$placement)) {
+    options$placement = placement
+  }
+  if (is.null(options$trigger)) {
+    if (length(trigger) > 1)
+      trigger = paste(trigger, collapse = " ")
+    options$trigger = trigger
+  }
+  if (is.null(options$title)) {
+    options$title = title
+  }
+  return(options)
+}
+
 shinyInputLabel <- utils::getFromNamespace("shinyInputLabel", "shiny")

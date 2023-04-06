@@ -42,9 +42,12 @@ fl.report(
 \description{
 \code{fl.report} requires a \code{flFitRes} object and creates a report in PDF and HTML format that summarizes all results obtained.
 }
+\details{
+The template .Rmd file used within this function can be found within the QurvE package installation directory.
+}
 \examples{
 # load example dataset
-\donttest{
+\dontrun{
 input <- read_data(data.growth = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
                    sheet.growth = 1,
