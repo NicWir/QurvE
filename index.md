@@ -14,7 +14,7 @@ visualization.**</font>
 ## Deployed application
 
 [Download the Windows
-setup](https://github.com/NicWir/QurvE/releases/download/v.1.0.0/QurvE_1.0.1_setup_windows.exe)
+setup](https://github.com/NicWir/QurvE/releases/download/v.1.0.0/QurvE_1.1_setup_windows.exe)
 
 [User manual for *QurvE*
 application](https://nicwir.github.io/QurvE/articles/shiny_app_manual.html)
