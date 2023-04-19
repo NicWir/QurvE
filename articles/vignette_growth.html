@@ -125,8 +125,8 @@ code.</p>
 establishes a framework in which a complete, detailed growth curve
 analysis can be performed in two simple steps:</p>
 <ol style="list-style-type: decimal">
-<li><p><em>Read data</em> in custom format or parse data from a plate
-reader experiment.</p></li>
+<li><p><em>Read data</em> in custom or tidy format, or parse data from a
+plate reader experiment.</p></li>
 <li><p><em>Run workflow</em>, including fitting of growth curves,
 dose-response analysis, and rendering a report that summarizes the
 results.</p></li>
@@ -282,10 +282,11 @@ information criterion (AIC). This is done using the excellent package
 <p><code>QurvE</code> accepts files with the formats <em>.xls</em>,
 <em>.xlsx</em>, <em>.csv</em>, <em>.tsv</em>, and <em>.txt</em> (tab
 separated). The data in the files should be structured as shown in
-Figure @ref(fig:data-layout). Alternatively, data parsers are available
-that allow direct import of raw data from different culture instruments.
-For a list of currently supported devices, please run
-<code><a href="../reference/parse_data.html">?parse_data</a></code>.</p>
+Figure @ref(fig:data-layout) or in ‘tidy’ format with columns ‘Time’,
+‘Description’, and ‘Values’ (plus <em>optional</em>: ‘Replicate’ and
+‘Concentration’). Alternatively, data parsers are available that allow
+direct import of raw data from different culture instruments. For a list
+of currently supported devices, please run <code><a href="../reference/parse_data.html">?parse_data</a></code>.</p>
 <p><em>Please note: I recommend always converting .xls or .xlsx files to
 an alternate format first to speed up the parsing process. Reading Excel
 files may require orders of magnitude longer processing time.</em></p>
