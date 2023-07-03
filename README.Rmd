@@ -32,6 +32,12 @@ knitr::include_graphics("https://i.imgur.com/aUqBv3S.png", error = F)
 <br/>
 <font size="4">***QurvE* is an open-source, R package and software that provides a fully automated pipeline for fitting time-resolved biological data, including curve fitting, statistical evaluation, model selection, dose-response analysis, and built-in functions for data visualization.**</font>
 
+## Citation
+
+If you uses `QurvE` in your published work, please cite:
+
+Wirth, N.T., Funk, J., Donati, S. et al. *QurvE: user-friendly software for the analysis of biological growth and fluorescence data.* _Nat Protoc_ (2023). https://doi.org/10.1038/s41596-023-00850-7
+
 ## Deployed application
 
 [Download the Windows setup](https://github.com/NicWir/QurvE/releases/download/v.1.0.0/QurvE_1.0.1_setup_windows.exe)

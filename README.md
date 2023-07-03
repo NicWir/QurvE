@@ -7,6 +7,12 @@ biological data, including curve fitting, statistical evaluation, model
 selection, dose-response analysis, and built-in functions for data
 visualization.**</font>
 
+## Citation
+
+If you uses `QurvE` in your published work, please cite:
+
+Wirth, N.T., Funk, J., Donati, S. et al. *QurvE: user-friendly software for the analysis of biological growth and fluorescence data.* _Nat Protoc_ (2023). https://doi.org/10.1038/s41596-023-00850-7
+
 ## Deployed application
 
 [Download the Windows

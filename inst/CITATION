@@ -1,0 +1,11 @@
+citHeader("To cite QurvE in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "QurvE: user-friendly software for the analysis of biological growth and fluorescence data",
+  author   = "Wirth, N.T., Funk, J., Donati, S. et al.",
+  journal  = "Nat Protoc",
+  year     = 2023,
+  url      = "https://doi.org/10.1038/s41596-023-00850-7",
+  textVersion = paste("Wirth, N.T., Funk, J., Donati, S. et al. QurvE: user-friendly software for the analysis of biological growth and fluorescence data. Nat Protoc (2023). https://doi.org/10.1038/s41596-023-00850-7")
+)
