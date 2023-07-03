@@ -27,8 +27,8 @@
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
 #'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
@@ -1013,8 +1013,8 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
 #'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
@@ -1743,8 +1743,8 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #' @examples
 #' \donttest{
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
 #'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
@@ -2486,8 +2486,8 @@ plot.flFitRes <-  function(x,
 #' @return A plot with all curves (raw fluorescence measurements or raw normalized fluorescence over time) in a \code{flFit} object with \code{\link{flFit}}, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
 #'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
@@ -2546,8 +2546,8 @@ plot.flFit <- plot.flFitRes
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
 #'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'
@@ -3179,8 +3179,8 @@ plot.dual <-  function(x,
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
 #'                    sheet.growth = 1,
 #'                    sheet.fl = 2 )
 #'

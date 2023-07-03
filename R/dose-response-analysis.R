@@ -1226,7 +1226,7 @@ growth.drFitModel <- function(
 #' @examples
 #' \donttest{
 #' # Load example dataset
-#' input <- read_data(data.fl = system.file('lac_promoters.xlsx', package = 'QurvE'),
+#' input <- read_data(data.fl = system.file('lac_promoters.xls', package = 'QurvE'),
 #'                    sheet.fl = 2 )
 #'
 #' # Run fluorescence curve analysis workflow

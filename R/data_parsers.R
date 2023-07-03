@@ -55,9 +55,9 @@
 #'                          package = "QurvE"), csvsep = ";" )
 #'
 #' # Load XLSX file containing both growth and fluorescence data
-#' data_growth_fl <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
+#' data_growth_fl <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
 #'                             sheet.growth = "OD",
-#'                             data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+#'                             data.fl = system.file("lac_promoters.xls", package = "QurvE"),
 #'                             sheet.fl = 2)
 read_data <-
   function(data.growth = NA,
