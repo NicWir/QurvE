@@ -9,7 +9,7 @@ visualization.**</font>
 
 ## Citation
 
-If you uses `QurvE` in your published work, please cite:
+If you use `QurvE` in your published work, please cite:
 
 Wirth, N.T., Funk, J., Donati, S. et al. *QurvE: user-friendly software for the analysis of biological growth and fluorescence data.* _Nat Protoc_ (2023). https://doi.org/10.1038/s41596-023-00850-7
 
