@@ -1,3 +1,5 @@
+# Previous submission (version 1.0)
+
 ## Publication LaTeX issue
 
 > Error is:
