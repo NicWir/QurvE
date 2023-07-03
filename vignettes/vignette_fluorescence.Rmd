@@ -4,11 +4,11 @@ author: "Nicolas T. Wirth"
 date: "2022-12-20"
 mainfont: Arial
 output:
-  prettydoc::html_pretty:
+  rmarkdown::html_document:
     fig_caption: yes
     toc: true
-    theme: "cayman"
-    highlight: vignette
+    theme: "spacelab"
+    highlight: default
 vignette: >
   %\VignetteIndexEntry{Quantitiative Fluorescence Curve Evaluation with Package `QurvE`}
   %\VignetteEncoding{UTF-8}
