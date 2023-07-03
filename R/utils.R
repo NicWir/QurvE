@@ -12,9 +12,9 @@ utils::globalVariables(c("shiny"))
     {
     k1 <- paste(
         "QurvE", utils::packageVersion("QurvE"),
-        "initialized Successfully !"
+        "initialized Successfully ! \nPlease cite:\nWirth, N.T., Funk, J., Donati, S. et al. QurvE: user-friendly software for the analysis of biological growth and fluorescence data. Nat Protoc (2023). https://doi.org/10.1038/s41596-023-00850-7"
     )
-    k0 <- "\n"
+    k0 <- "\n\n"
     k2 <- paste("https://github.com/NicWir/QurvE")
     packageStartupMessage(c(k1, k0, k2))
 
