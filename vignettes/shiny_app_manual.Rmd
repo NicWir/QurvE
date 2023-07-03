@@ -7,8 +7,8 @@ output:
   rmarkdown::html_document:
     fig_caption: yes
     toc: true
-    theme: "cayman"
-    highlight: vignette
+    theme: "spacelab"
+    highlight: default
 vignette: >
   %\VignetteIndexEntry{QurvE User Manual v.1.0}
   %\VignetteEncoding{UTF-8}
