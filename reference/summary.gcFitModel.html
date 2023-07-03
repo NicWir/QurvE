@@ -24,7 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.1</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">Q&amp;A and Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
@@ -109,22 +109,22 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Best fitting model: ~baranyi</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestFit</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            mu.model          tD.model     lambda.model          A.model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.791627833870771 0.875597283095402 5.09506928186901 4.82407677488327</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           dY.model     A.orig.model   dY.orig.model   integral.model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.81664809567761 6.31254620363983 6.2658260722116 76.4711204929297</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           mu.model        tD.model     lambda.model          A.model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.79936668889755 0.8671204219379 5.07926762543375 4.80047095159575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           dY.model     A.orig.model    dY.orig.model  integral.model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.79779393217338 6.59365588572367 6.57602814628094 76.335259501623</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   parameter_nu.model parameter_alpha.model parameter_t_shift.model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1               &lt;NA&gt;                  &lt;NA&gt;                    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    parameter_y0.model         stdmu.model   stdlambda.model          stdA.model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.00738988069348587 0.00242294920820728 0.015315936638445 0.00241035192082081</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           RMSE.model reliable_fit.model ci90.mu.model.lo  ci90.mu.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.0150381518785157               TRUE 0.78764208242327 0.795613585318272</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ci90.lambda.model.lo ci90.lambda.model.up  ci90.A.model.lo  ci90.A.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     5.06987456609877     5.12026399763925 4.82011174597352 4.82804180379302</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ci95.mu.model.lo  ci95.mu.model.up ci95.lambda.model.lo ci95.lambda.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.786878853422684 0.796376814318857     5.06505004605766     5.12508851768036</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ci95.A.model.lo  ci95.A.model.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.81935248511846 4.82880106464808</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    parameter_y0.model         stdmu.model    stdlambda.model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.00264454556369608 0.00221070830041641 0.0134382155269755</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            stdA.model         RMSE.model reliable_fit.model  ci90.mu.model.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.00216107578212758 0.0135703403601494               TRUE 0.795730073743365</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ci90.mu.model.up ci90.lambda.model.lo ci90.lambda.model.up  ci90.A.model.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.803003304051735     5.05716176089187     5.10137348997562 4.79691598193414</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ci90.A.model.up  ci95.mu.model.lo  ci95.mu.model.up ci95.lambda.model.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 4.80402592125735 0.795033700628734 0.803699677166366     5.05292872300088</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ci95.lambda.model.up  ci95.A.model.lo  ci95.A.model.up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     5.10560652786662 4.79623524306278 4.80470666012871</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

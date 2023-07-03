@@ -24,7 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.1</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">Q&amp;A and Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
@@ -57,16 +57,20 @@
 <h2 class="pkg-version" data-toc-text="1.1" id="qurve-11">QurvE 1.1<a class="anchor" aria-label="anchor" href="#qurve-11"></a></h2>
 <div class="section level3">
 <h3 id="enhancements-1-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-1"></a></h3>
-<ul><li>read_data() now accepts files or dataframe objects in tidy format</li>
+<ul><li>
+<code><a href="../reference/read_data.html">read_data()</a></code> now accepts files or dataframe objects in tidy format</li>
 <li>the shiny app now allows inspection of code used to run workflows and generate plots</li>
 <li>Parametric fits have Root Mean Squared Error (RMSE) added to the calculated parameters. The RMSE for each model fit has been also added to <code>gcTable</code> and the respective table within the shiny app.</li>
-<li>TinyTeX is only installed from within the shiny app if the user explicitly approves.</li>
+<li>
+<code>TinyTeX</code> is only installed from within the shiny app if the user explicitly approves.</li>
 <li>added a [Q&amp;A and Troubleshooting] vignette</li>
+<li>added citation for publication <em>Wirth et al. (2023)</em>
+</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1"></a></h3>
 <ul><li>the [sort by concentration] button for parameter plots in the shiny app now also is shown for data parsed from raw inputs, not only data parsed in custom format.</li>
-<li>[Select read for fluorescence normalization] is not shown is Fluorescence is <em>ignored</em>.</li>
+<li>[Select read for fluorescence normalization] is not shown if Fluorescence is <em>ignored</em>.</li>
 <li>Data is parsed correctly from CSV files if values are framed by explicit quotes</li>
 </ul></div>
 </div>
