@@ -67,8 +67,8 @@ A plot with the linear fit.
 }
 \examples{
 # load example dataset
-input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xls", package = "QurvE"),
                    sheet.growth = 1,
                    sheet.fl = 2 )
 

@@ -110,8 +110,8 @@ A two-panel plot, showing raw fluorescence (\code{fluorescence = "fl"}) or norma
 }
 \examples{
 # load example dataset
-input <- read_data(data.growth = system.file("lac_promoters.xlsx", package = "QurvE"),
-                   data.fl = system.file("lac_promoters.xlsx", package = "QurvE"),
+input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
+                   data.fl = system.file("lac_promoters.xls", package = "QurvE"),
                    sheet.growth = 1,
                    sheet.fl = 2 )
 
