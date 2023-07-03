@@ -4,7 +4,7 @@ author: "Nicolas T. Wirth and Stefano Donati"
 date: "2022-12-20"
 mainfont: Arial
 output:
-  prettydoc::html_pretty:
+  rmarkdown::html_document:
     fig_caption: yes
     toc: true
     theme: "cayman"
