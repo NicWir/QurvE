@@ -16,14 +16,14 @@ Wirth, N.T., Funk, J., Donati, S. et al. *QurvE: user-friendly software for the 
 ## Deployed application
 
 [Download the Windows
-setup](https://github.com/NicWir/QurvE/releases/download/v.1.0.0/QurvE_1.0.1_setup_windows.exe)
+setup](https://github.com/NicWir/QurvE/releases/download/v.1.0.0/QurvE_1.1.1_setup_windows.exe)
 
 [User manual for *QurvE*
 application](https://nicwir.github.io/QurvE/articles/shiny_app_manual.html)
 
 ## R package
 
-[R package on CRAN](https://cran.r-project.org/web/packages/QurvE/)
+[R package on CRAN](https://cran.r-project.org/package=QurvE)
 
 [User manual for growth curve
 analysis](https://nicwir.github.io/QurvE/articles/vignette_growth.html)
