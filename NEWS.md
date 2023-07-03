@@ -2,16 +2,17 @@
 
 ## Enhancements
 
-* read_data() now accepts files or dataframe objects in tidy format
+* `read_data()` now accepts files or dataframe objects in tidy format
 * the shiny app now allows inspection of code used to run workflows and generate plots
 * Parametric fits have Root Mean Squared Error (RMSE) added to the calculated parameters. The RMSE for each model fit has been also added to `gcTable` and the respective table within the shiny app.
-* TinyTeX is only installed from within the shiny app if the user explicitly approves.
+* `TinyTeX` is only installed from within the shiny app if the user explicitly approves.
 * added a [Q&A and Troubleshooting] vignette
+* added citation for publication *Wirth et al. (2023)*
 
 ## Bug fixes
 
 * the [sort by concentration] button for parameter plots in the shiny app now also is shown for data parsed from raw inputs, not only data parsed in custom format.
-* [Select read for fluorescence normalization] is not shown is Fluorescence is *ignored*.
+* [Select read for fluorescence normalization] is not shown if Fluorescence is *ignored*.
 * Data is parsed correctly from CSV files if values are framed by explicit quotes
 
 # QurvE 1.0.1

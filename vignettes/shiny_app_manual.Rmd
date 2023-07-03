@@ -1,5 +1,5 @@
 ---
-title: QurvE App User Manual v.1.0
+title: QurvE App User Manual v.1.1
 author: "Nicolas T. Wirth and Stefano Donati"
 date: "2022-12-20"
 mainfont: Arial
@@ -70,7 +70,7 @@ knitr::include_graphics("https://i.imgur.com/8iVuDk7.png", dpi=100, error = F)
 
 To load data using the custom QurvE layout, select the `r colorize("[Data] \\> [Custom]", "blue")` window and choose a file in .xls/.xlsx (selecting the appropriate work sheets) or .csv/.tsv/.txt format (define the correct decimal separator and, for .csv, field separator in the target file). The custom QurvE layout includes all data and relative metadata necessary for QurvE to perform the analysis. This custom layout can be used to load both growth and fluorescence data. Data from a second fluorescence channel can be used to normalize the primary fluorescence values in addition to normalization to growth values.
 
-The data must be formatted as displayed in Figure \@ref(fig:custom-layout):
+The data must be formatted as displayed in **Figure 1**:
 
 -   The first row contains 'Time', 'Blank', and the sample identifiers (IDs). The ID needs to be identical for replicates and for samples analyzed together within a dose-response analysis. The 'Time' column must be positioned at the first position, 'Blank' and the samples follow in arbitrary order.
 -   The second row contains replicate numbers for identical conditions. If technical replicates were used in addition to biological replicates, indicate technical replicates with identical replicate numbers. Samples with identical IDs, replicate numbers, and concentration values (if applicable) will be combined by their average values at each time point. Leave the row empty if no replicate information is available.
@@ -93,9 +93,35 @@ All these data processing functions are optional.
 
 <br>
 
-```{r custom-layout, dpi=100, echo = F, fig.cap = "\\label{fig:custom-layout} QurvE custom data layout."}
+```{r custom-layout, dpi=100, echo = F, fig.cap = "\\label{fig:custom-layout} Figure 1: QurvE custom data layout."}
 knitr::include_graphics("https://i.imgur.com/T7LkFDi.png", dpi=100, error = F)
 ```
+
+<br>
+
+## Loading Tidy Data
+
+The `QurvE` Shiny application is not limited to the custom QurvE layout; it also supports the direct loading of tidy data, a widely used format in data science.
+
+Tidy data, also known as 'long' format, is a standardized way of organizing data values within a dataset. It provides a straightforward, flexible structure that is highly suitable for various forms of analysis and visualization in R. 
+
+To upload data in tidy format, navigate to the `r colorize("[Data] \\> [Custom]", "blue")` window and select the appropriate file in .xls/.xlsx format (specifying the relevant worksheets) or .csv/.tsv/.txt format (remembering to set the correct decimal separator and, for .csv, the field separator). 
+
+Columns required in tidy data format:
+
+- **"Time"**: Each row in this column contains the time values for your observations.
+- **"Description"**: Each row in this column contains a sample description. This can be a combination of the organism and condition or any other relevant descriptor.
+- **"Values"**: Each row in this column contains the measured values from your experiment (e.g., optical density, cell count, etc.).
+- **"Replicate"** (optional): If you have multiple replicate measurements for the same condition ("Description" labels), you can indicate the replicate number in this column.
+- **"Concentration"** (optional): If there's a compound added to the sample, you can record its concentration in this column.
+
+Upon uploading, `QurvE` automatically detects if the data is in tidy format and processes it accordingly. 
+
+Note: For `QurvE` to correctly process tidy data, it's crucial to ensure the column headers in your uploaded data match exactly with those specified above.
+
+The same data processing options described in the previous section are available also for tidy data.
+
+Using tidy data allows you to leverage the power of `QurvE` with a wide range of datasets, increasing the versatility of your analysis pipeline.
 
 <br>
 
@@ -105,7 +131,7 @@ knitr::include_graphics("https://i.imgur.com/T7LkFDi.png", dpi=100, error = F)
 
 After loading the file (1), selecting the correct raw data format by choosing one of the available equipments/software (2) and assigning the extracted read channels to growth/fluorescence data (3), the user has to provide mapping information with metadata in tabular format (in a .xls/.xlsx/.csv/.tsv/.txt file) (4).
 
-The mapping file should be formatted as shown in Figure \@ref(fig:mapping-layout):
+The mapping file should be formatted as shown in **Figure 2**:
 
 -   The first column contains the well numbers in the plate and must match sample identifiers in the raw data file.
 -   The second column contains the ID (i.e., organism, condition, etc.) of each sample. The ID needs to be identical for replicates and for samples analyzed together within a dose-response analysis.
@@ -128,7 +154,7 @@ All these data processing functions are optional.
 
 <br>
 
-```{r mapping-layout, echo = F, dpi=100, fig.cap = "\\label{fig:mapping-layout} The [Parse Raw Data] window enables loading raw data exported from a plate reader/bioreactor software. The right panel illustrates the layout of the additional mapping file with metadata that must be supplemented to analyze establish relationships between conditions and replicates."}
+```{r mapping-layout, echo = F, dpi=100, fig.cap = "\\label{fig:mapping-layout} Figure 2: The [Parse Raw Data] window enables loading raw data exported from a plate reader/bioreactor software. The right panel illustrates the layout of the additional mapping file with metadata that must be supplemented to analyze establish relationships between conditions and replicates."}
 knitr::include_graphics("https://i.imgur.com/e5W2GHP.png", dpi=100, error = F)
 ```
 
@@ -136,11 +162,11 @@ knitr::include_graphics("https://i.imgur.com/e5W2GHP.png", dpi=100, error = F)
 
 ## Loading previously processed data
 
-*QurvE* supports exporting processed data and reloading it for further analysis or inspection. Previously saved growth or fluorescence data in .RData format can be loaded in the Data Import window (Figure \@ref(fig:import-data)). 
+*QurvE* supports exporting processed data and reloading it for further analysis or inspection. Previously saved growth or fluorescence data in .RData format can be loaded in the Data Import window (**Figure 3**). 
 
 <br>
 
-```{r import-data, echo = F, dpi=100, fig.cap = "\\label{fig:import-data} The figure illustrates the [Data Import] window, which enables the user to load previously exported QurvE data files."}
+```{r import-data, echo = F, dpi=100, fig.cap = "\\label{fig:import-data} Figure 3: The figure illustrates the [Data Import] window, which enables the user to load previously exported QurvE data files."}
 knitr::include_graphics("https://i.imgur.com/u1DJ6y1.png", dpi=100, error = F)
 ```
 
@@ -153,7 +179,7 @@ Once raw data is loaded, *QurvE* can be used to process the data by fitting curv
 
 ## Run computations
 
-Once the raw data has been successfully parsed, the `r colorize("[Computation]", "blue")` window will unlock, enabling the user to process either `r colorize("Growth", "blue")` or `r colorize("Fluorescence", "blue")` data (Figure \@ref(fig:computation)). The data can be processed using different curve fitting methods, which can be selected in the panel on the left. The default fitting options are the `r colorize("Linear regression", "blue")` fit and `r colorize("Non-parametric fit", "blue")` (smooth spline). By ticking `r colorize("Parametric fit", "blue")` (not available for Fluorescence analysis), parametric growth models models are fit to the data. By ticking `r colorize("Log-transform time", "blue")` the time values are transformed by Ln(1 + time). With `r colorize("Biphasic growth", "blue")` selected, *QurvE* tries to identify a second growth phase while performing *linear regressions* and *non-parametric fits* and extracts corresponding parameters (e.g., growth rate, lag time until second growth phase). 
+Once the raw data has been successfully parsed, the `r colorize("[Computation]", "blue")` window will unlock, enabling the user to process either `r colorize("Growth", "blue")` or `r colorize("Fluorescence", "blue")` data (**Figure 4**). The data can be processed using different curve fitting methods, which can be selected in the panel on the left. The default fitting options are the `r colorize("Linear regression", "blue")` fit and `r colorize("Non-parametric fit", "blue")` (smooth spline). By ticking `r colorize("Parametric fit", "blue")` (not available for Fluorescence analysis), parametric growth models models are fit to the data. By ticking `r colorize("Log-transform time", "blue")` the time values are transformed by Ln(1 + time). With `r colorize("Biphasic growth", "blue")` selected, *QurvE* tries to identify a second growth phase while performing *linear regressions* and *non-parametric fits* and extracts corresponding parameters (e.g., growth rate, lag time until second growth phase). 
 
 Dose-response (EC50) analyses can be performed by either performing a smooth spline fit (`r colorize("response spline fit", "blue")`) on response vs. concentration data and extracting the *EC~50~* as the concentration at the midpoint between the largest and smallest response value, or by applying up to 20 (parametric) `r colorize("dose-response models", "blue")` to choose the best model based on the Akaike information criterion (AIC). Any computed parameter (e.g., growth rates obtained via linear regression, maximum fluorescence obtained via non-parametric fits...) can be chosen as response parameter to quantify adverse or beneficial effects of a substance. The options to `r colorize("Log-transform concentration", "blue")` or `r colorize("Log-transform response", "blue")` are only available for *response spline fits*. In both instances, Ln(x + 1) is applied to the respective values.  
 
@@ -161,7 +187,7 @@ Additional information on all methods and (global or method-specific) fitting op
 
 <br>
 
-```{r computation, echo = F, dpi=100, fig.cap = "\\label{fig:computation} The [Computation] window enables the user to define parameters for data processing and fitting. Growth data and fluorescence data must be processed separately."}
+```{r computation, echo = F, dpi=100, fig.cap = "\\label{fig:computation} Figure 4: The [Computation] window enables the user to define parameters for data processing and fitting. Growth data and fluorescence data must be processed separately."}
 knitr::include_graphics("https://i.imgur.com/8pvJ00n.png", dpi=100, error = F)
 ```
 
@@ -169,11 +195,11 @@ knitr::include_graphics("https://i.imgur.com/8pvJ00n.png", dpi=100, error = F)
 
 ## Visualization and validation of curve fitting
 
-The `r colorize("[Validation]", "blue")` window enables the user to verify the correct fitting of the growth/fluorescence curves (see Figure \@ref(fig:linear) for an example). 
+The `r colorize("[Validation]", "blue")` window enables the user to verify the correct fitting of the growth/fluorescence curves (see **Figure 5** for an example). 
 
 <br>
 
-```{r linear, echo = F, dpi=100, fig.cap = "\\label{fig:linear} Example of a fitted growth curve in the [Validation] window. On the right panel, the figure visualizes the performed fit. In this case, the red dots and dashed line represent the linear regression model used to calculate the maximum growth rate and lag time."}
+```{r linear, echo = F, dpi=100, fig.cap = "\\label{fig:linear} Figure 5: Example of a fitted growth curve in the [Validation] window. On the right panel, the figure visualizes the performed fit. In this case, the red dots and dashed line represent the linear regression model used to calculate the maximum growth rate and lag time."}
 knitr::include_graphics("https://i.imgur.com/oQpLemI.png", dpi=100, error = F)
 ```
 
@@ -184,11 +210,11 @@ In the right pane, the `r colorize("[Re-run with modified parameters]", "blue")`
 
 ## Tabular overview of results
 
-The `r colorize("[Results]", "blue")` window (see Figure \@ref(fig:results)) enables the user to obtain an overview of the fitted parameters for each applied method. By ticking the `r colorize("[Group average]", "blue")` box the user can visualize the **average ± standard deviation** of parameters for replicates. If deselected, the parameters for every single sample are shown. The table can be exported in .csv format by clicking on the `r colorize("[Download table]", "blue")` button.
+The `r colorize("[Results]", "blue")` window (see **Figure 6**) enables the user to obtain an overview of the fitted parameters for each applied method. By ticking the `r colorize("[Group average]", "blue")` box the user can visualize the **average ± standard deviation** of parameters for replicates. If deselected, the parameters for every single sample are shown. The table can be exported in .csv format by clicking on the `r colorize("[Download table]", "blue")` button.
 
 <br>
 
-```{r results, echo = F, dpi=100, fig.cap = "\\label{fig:results} The [Results] window gives a tabular overview of all computed parameters for each applied fit method as well as the results dose-response analyses."}
+```{r results, echo = F, dpi=100, fig.cap = "\\label{fig:results} Figure 6: The [Results] window gives a tabular overview of all computed parameters for each applied fit method as well as the results dose-response analyses."}
 knitr::include_graphics("https://i.imgur.com/20tFagJ.png", dpi=100, error = F)
 ```
 

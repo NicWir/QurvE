@@ -41,7 +41,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.0</a>
+    <a class="dropdown-item" href="../articles/shiny_app_manual.html">QurvE App User Manual v.1.1</a>
     <a class="dropdown-item" href="../articles/troubleshooting.html">Q&amp;A and Troubleshooting</a>
     <a class="dropdown-item" href="../articles/vignette_fluorescence.html">Quantitiative Fluorescence Curve Evaluation with Package `QurvE`</a>
     <a class="dropdown-item" href="../articles/vignette_growth.html">Quantitiative Growth Curve Evaluation with Package `QurvE`</a>
@@ -145,7 +145,8 @@ analyses on fluorescence data:</p>
 and extract the <em>EC<sub>50</sub></em> as the concentration at the
 midpoint between the largest and smallest response value.</p></li>
 <li><p>Apply a biosensor response model to response vs. concentration
-data <span class="citation">(<a href="#ref-meyer2019" role="doc-biblioref">Meyer <em>et al.</em>, 2019</a>)</span>.</p></li>
+data <span class="citation">(<a href="#ref-meyer2019">Meyer <em>et
+al.</em>, 2019</a>)</span>.</p></li>
 </ol>
 </div>
 <div class="section level2">
@@ -157,10 +158,11 @@ data <span class="citation">(<a href="#ref-meyer2019" role="doc-biblioref">Meyer
 <p>Next, load your experimental data. In this example, the dataset being
 used is from a preliminary characterization of different versions of the
 SEVA (Standard European Vector Architecture) plasmid pSEVA634, as
-described in <span class="citation">(<a href="#ref-nikel2022" role="doc-biblioref">Nikel <em>et al.</em>, 2022</a>)</span>. The data
-contains both growth an fluorescence measurements that have been
-converted into the custom <code>QurvE</code> data format and are located
-in different work sheets of the same XLSX file:</p>
+described in <span class="citation">(<a href="#ref-nikel2022">Nikel
+<em>et al.</em>, 2022</a>)</span>. The data contains both growth an
+fluorescence measurements that have been converted into the custom
+<code>QurvE</code> data format and are located in different work sheets
+of the same XLSX file:</p>
 <div class="section level3">
 <h3 id="load-data">Load data<a class="anchor" aria-label="anchor" href="#load-data"></a>
 </h3>

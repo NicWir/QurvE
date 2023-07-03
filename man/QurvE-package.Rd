@@ -6,7 +6,7 @@
 \alias{QurvE-package}
 \title{QurvE: Robust and User-Friendly Analysis of Growth and Fluorescence Curves}
 \description{
-High-throughput analysis of growth curves and fluorescence data using three methods: linear regression, growth model fitting, and smooth spline fit. Analysis of dose-response relationships via smoothing splines or dose-response models. Complete data analysis workflows can be executed in a single step via user-friendly wrapper functions. The results of these workflows are summarized in detailed reports as well as intuitively navigable 'R' data containers. A 'shiny' application provides access to all features without requiring any programming knowledge.
+High-throughput analysis of growth curves and fluorescence data using three methods: linear regression, growth model fitting, and smooth spline fit. Analysis of dose-response relationships via smoothing splines or dose-response models. Complete data analysis workflows can be executed in a single step via user-friendly wrapper functions. The results of these workflows are summarized in detailed reports as well as intuitively navigable 'R' data containers. A 'shiny' application provides access to all features without requiring any programming knowledge. The package is described in further detail in Wirth et al. (2023) \doi{10.1038/s41596-023-00850-7}.
 }
 \seealso{
 Useful links:
