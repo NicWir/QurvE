@@ -11,7 +11,9 @@ visualization.**</font>
 
 If you use `QurvE` in your published work, please cite:
 
-Wirth, N.T., Funk, J., Donati, S. et al. *QurvE: user-friendly software for the analysis of biological growth and fluorescence data.* _Nat Protoc_ (2023). https://doi.org/10.1038/s41596-023-00850-7
+Wirth, N.T., Funk, J., Donati, S. et al. *QurvE: user-friendly software
+for the analysis of biological growth and fluorescence data.* *Nat
+Protoc* (2023). <https://doi.org/10.1038/s41596-023-00850-7>
 
 ## Deployed application
 
@@ -280,13 +282,14 @@ grodata <- read_data(data.growth = 'path_to_data_file',
 
 The <span style="color: red;">`data.growth`</span> argument takes the
 path to the file or the name of an R dataframe object containing
-experimental data in custom format. <span
-style="color: red;">`csvsep`</span> specifies the separator symbol (only
-required for .csv files; default: `';'`). <span
-style="color: red;">`dec`</span> is the decimal separator (only required
-for .csv, .tsv, or .txt files; default: `'.'`). If an Excel file format
-is used, <span style="color: red;">`sheet.growth`</span> specifies the
-number or name (in quotes) of the sheet containing the data.  
+experimental data in custom format.
+<span style="color: red;">`csvsep`</span> specifies the separator symbol
+(only required for .csv files; default: `';'`).
+<span style="color: red;">`dec`</span> is the decimal separator (only
+required for .csv, .tsv, or .txt files; default: `'.'`). If an Excel
+file format is used, <span style="color: red;">`sheet.growth`</span>
+specifies the number or name (in quotes) of the sheet containing the
+data.  
 If <span style="color: red;">`subtract.blank = TRUE`</span>, columns
 with name ‘blank’ will be combined by their row-wise average, and the
 mean values will be subtracted from the measurements of all remaining
@@ -294,6 +297,57 @@ samples. For the <span style="color: red;">`calib.growth`</span>
 argument, a formula can be provided in the form *‘y = function(x)’*
 (e.g., `calib.growth = 'y = x * 2 + 0.5'`) to transform growth
 measurement values.
+
+## Tidy format
+
+The `QurvE` package is designed to be flexible and user-friendly, and it
+is fully compatible with data in ‘tidy’ format. This format, also known
+as ‘long’ format, is a standard way of organizing data that suits many
+types of analyses and visualizations in R.
+
+In tidy format, each row is an observation and each column is a
+variable. In the context of `QurvE`, your data should include the
+following columns:
+
+- **“Time”**: This column should contain the time values for your
+  observations.
+
+- **“Description”**: This column should contain a description of the
+  sample. This could be a combination of organism and condition or any
+  other relevant descriptor.
+
+- **“Values”**: This column should contain the measurement values for
+  your experiment (e.g., optical density, cell count, etc.).
+
+- **“Replicate”** (optional): If you have multiple replicate
+  measurements for the same condition (“Description” labels), you can
+  indicate the replicate number in this column.
+
+- **“Concentration”** (optional): If there’s a compound of interest
+  added to the sample, you can record its concentration in this column.
+
+To load your tidy format data into `QurvE`, use the `read_data` function
+in the following way:
+
+``` r
+grodata <- read_data(data.growth = 'path_to_tidy_data_file',
+                   csvsep = ';', # or ','
+                   dec = '.', # or ','
+                   sheet.growth = 1, # number (or "name") of the EXCEL file sheet containing data
+                   subtract.blank = TRUE,
+                   calib.growth = NULL)
+```
+
+This code block works the same way as for the custom format described
+above; `QurvE` detects automatically if data is in tidy format. Be sure
+to replace `'path_to_tidy_data_file'` with the path to your own data
+file.
+
+Note: Always ensure your data meets the tidy data standard. This means
+that every variable has its own column, every observation has its own
+row, and every value has its own cell. Additionally, make sure that your
+column headers exactly match those specified above, as `QurvE` will look
+for these specific headers when processing your data.
 
 ## Data parser
 
@@ -330,25 +384,25 @@ to the file containing experimental data exported from a culture device,
 <span style="color: red;">`map.file`</span> the path to the file with
 mapping information. With <span style="color: red;">`software`</span>,
 you can specify the device (or software) that was used to generate the
-data. <span style="color: red;">`csvsep.data`</span> and <span
-style="color: red;">`csvsep.map`</span> specify the separator symbol for
-data and mapping file, respectively (only required for .csv files;
-default: `';'`). <span style="color: red;">`dec.data`</span> and <span
-style="color: red;">`dec.map`</span> are the decimal separator used in
-data and mapping file, respectively (only required for .csv, .tsv, or
-.txt files; default: `'.'`). If an Excel file format is used for both or
-one of data or mapping file, <span
-style="color: red;">`sheet.data`</span> and/or <span
-style="color: red;">`sheet.map`</span> specify the number or name (in
-quotes) of the sheet containing the data or mapping information,
+data. <span style="color: red;">`csvsep.data`</span> and
+<span style="color: red;">`csvsep.map`</span> specify the separator
+symbol for data and mapping file, respectively (only required for .csv
+files; default: `';'`). <span style="color: red;">`dec.data`</span> and
+<span style="color: red;">`dec.map`</span> are the decimal separator
+used in data and mapping file, respectively (only required for .csv,
+.tsv, or .txt files; default: `'.'`). If an Excel file format is used
+for both or one of data or mapping file,
+<span style="color: red;">`sheet.data`</span> and/or
+<span style="color: red;">`sheet.map`</span> specify the number or name
+(in quotes) of the sheet containing the data or mapping information,
 respectively. If the same Excel file contains both data and mapping
 information in different worksheets, the file path needs to be specified
-for both `data.file`and `map.file`. If <span
-style="color: red;">`subtract.blank = TRUE`</span>, samples with name
-‘blank’ will be combined by their row-wise average, and the mean values
-will be subtracted from the measurements of all remaining samples. The
-argument <span style="color: red;">`convert.time`</span> accepts a
-function *‘y = function(x)’* to transform time values (e.g.,
+for both `data.file`and `map.file`. If
+<span style="color: red;">`subtract.blank = TRUE`</span>, samples with
+name ‘blank’ will be combined by their row-wise average, and the mean
+values will be subtracted from the measurements of all remaining
+samples. The argument <span style="color: red;">`convert.time`</span>
+accepts a function *‘y = function(x)’* to transform time values (e.g.,
 `convert.time = 'y = x/3600'` to convert seconds to hours).
 
 If more than one read type is identified in the provided data file, the
@@ -431,8 +485,8 @@ object. With <span style="color: red;">`supress.messages = TRUE`</span>,
 we avoid printing information about every sample’s fit in the sample to
 the console. By default, the selected response parameter to perform a
 dose-response analysis is ‘mu.linfit’. To choose a different parameter,
-provide the argument <span
-style="color: red;">`dr.parameter = 'choice'`</span>. A list of
+provide the argument
+<span style="color: red;">`dr.parameter = 'choice'`</span>. A list of
 appropriate parameters is provided within the function documentation
 (`?growth.workflow`).
 
@@ -441,22 +495,22 @@ grofit <- growth.workflow(grodata = grodata, fit.opt = "a", ec50 = TRUE,
     suppress.messages = TRUE, export.res = FALSE)  # Prevent creating TXT table and RData files with results
 ```
 
-If option <span style="color: red;">`export.res`</span> is set to <span
-style="color: red;">`TRUE`</span>, tab-delimited .txt files summarizing
-the computation results are created, as well as the `grofit` object (an
-object of class `grofit`) as .RData file. This object (or the .RData
-file) contains all raw data, fitting options, and computational results.
-Figure @ref(fig:grofit-container) shows the structure of the generated
-`grofit` object. In RStudio, `View(grofit)` allows interactive
+If option <span style="color: red;">`export.res`</span> is set to
+<span style="color: red;">`TRUE`</span>, tab-delimited .txt files
+summarizing the computation results are created, as well as the `grofit`
+object (an object of class `grofit`) as .RData file. This object (or the
+.RData file) contains all raw data, fitting options, and computational
+results. Figure @ref(fig:grofit-container) shows the structure of the
+generated `grofit` object. In RStudio, `View(grofit)` allows interactive
 inspection of the data container.
 
 If you want to create a report summarizing all computational results
 including a graphical representation of every fit, provide the desired
 output format(s) as <span style="color: red;">`report = 'pdf'`</span>,
-<span style="color: red;">`report = 'html'`</span>, or <span
-style="color: red;">`report = c('pdf', 'html')`</span>. The advantage of
-having the report in HTML format is that every figure can be exported as
-(editable) PDF file.
+<span style="color: red;">`report = 'html'`</span>, or
+<span style="color: red;">`report = c('pdf', 'html')`</span>. The
+advantage of having the report in HTML format is that every figure can
+be exported as (editable) PDF file.
 
 *<span style="color: orange;">In the spirit of good scientific practice
 (data transparency), I would encourage anyone using QurvE to attach the
@@ -705,8 +759,8 @@ plot.grid(grofit,
 The results of the dose-response analysis can be visualized by calling
 `plot()` on the `drFit` object that is stored within `grofit`. This
 action calls `plot.drFit()` which in turn runs `plot.drFitSpline()` or
-`plot.drFitModel()` (depending on the choice of <span
-style="color: red;">`dr.method`</span> in the workflow) on every
+`plot.drFitModel()` (depending on the choice of
+<span style="color: red;">`dr.method`</span> in the workflow) on every
 condition for which a dose-response analysis has been performed.
 Alternatively, you can call `plot()` on the list elements in
 `grofit$drFit$drFittedModels` or `grofit$drFit$drFittedSplines`,
