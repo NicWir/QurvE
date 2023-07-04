@@ -1,3 +1,11 @@
+>   Size of tarball: 5209386 bytes
+
+> Pls reduce to less than 5 MB for a CRAN package.
+
+Done! I reduced the filesize of some images and removed lines from example files that are not essential to demonstrate QurvE's functionalities. New size: 4.8 Mb
+
+____________________
+
 # Previous submission (version 1.0)
 
 ## Publication LaTeX issue

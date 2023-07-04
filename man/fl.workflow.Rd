@@ -154,10 +154,10 @@ A \code{flFitRes} object that contains all computation results, compatible with 
 }
 \examples{
 # load example dataset
-input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-                   data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-                   sheet.growth = 1,
-                   sheet.fl = 2 )
+input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+                   data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+                   csvsep = "\t",
+                   csvsep.fl = "\t")
 
 # Run workflow
 res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",

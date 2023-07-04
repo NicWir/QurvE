@@ -92,8 +92,9 @@ data_growth <- read_data(data.growth = system.file("2-FMA_toxicity.csv",
                          package = "QurvE"), csvsep = ";" )
 
 # Load XLS file containing both growth and fluorescence data
-data_growth_fl <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-                            sheet.growth = "OD",
-                            data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-                            sheet.fl = 2)
+data_growth_fl <- read_data(
+                    data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+                    csvsep = "\t",
+                    csvsep.fl = "\t")
 }

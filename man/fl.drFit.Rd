@@ -34,8 +34,8 @@ Common response parameters used in dose-response analysis:\if{html}{\out{<br>}}\
 \examples{
 \donttest{
 # Load example dataset
-input <- read_data(data.fl = system.file('lac_promoters.xls', package = 'QurvE'),
-                   sheet.fl = 2 )
+input <- read_data(data.fl = system.file('lac_promoters_fluorescence.txt', package = 'QurvE'),
+                   csvsep.fl = "\t")
 
 # Run fluorescence curve analysis workflow
 fitres <- flFit(fl_data = input$fluorescence,
