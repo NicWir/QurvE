@@ -84,8 +84,8 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># load example dataset</span></span></span>
-<span class="r-in"><span><span class="va">input</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_data.html">read_data</a></span><span class="op">(</span>data.growth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xlsx'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   data.fl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xlsx'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="va">input</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_data.html">read_data</a></span><span class="op">(</span>data.growth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xls'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                   data.fl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xls'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                   sheet.growth <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>                   sheet.fl <span class="op">=</span> <span class="fl">2</span> <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.</span>
@@ -102,20 +102,20 @@
 <span class="r-in"><span>                       nboot.fl <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestFit</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      max_slope.bt        lambda.bt           A.bt            dY.bt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 242.45786406486 14.9189067476603 7552.370941747 6044.62950906529</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       integral.bt  stdmax_slope.bt     stdlambda.bt          stdA.bt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 148814.41336109 2.56660919123352 0.30755082731928 75.9361845050099</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       max_slope.bt        lambda.bt             A.bt            dY.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 243.378729965324 15.0063655920129 7552.60072785427 6033.64072552686</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        integral.bt  stdmax_slope.bt      stdlambda.bt          stdA.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 148585.461521403 2.87205788255271 0.288437544210935 61.0769137913402</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           stddY.bt   stdintegral.bt reliable_fit.bt    ci90.mu.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 115.808095584413 3881.18187262437            TRUE 238.235791945281</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 95.5688582472562 3216.15444007482            TRUE 238.654194748524</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ci90.mu.bt.up ci90.lambda.bt.lo ci90.lambda.bt.up     ci90.A.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 246.679936184439  14.4129856367201  15.4248278586005 7427.45591823626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ci90.A.bt.up ci90.integral.bt.lo ci90.integral.bt.up    ci95.mu.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7677.28596525774    142429.869180623    155198.957541558 237.427310050043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 248.103265182123  14.5318858317859  15.4808453522399 7452.12920466752</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ci90.A.bt.up ci90.integral.bt.lo ci90.integral.bt.up   ci95.mu.bt.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7653.07225104103     143294.88746748    153876.035575326 237.74949651552</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ci95.mu.bt.up ci95.lambda.bt.lo ci95.lambda.bt.up     ci95.A.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 247.488418079678  14.3161071261145  15.5217063692061 7403.53602011718</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ci95.A.bt.up ci95.integral.bt.lo ci95.integral.bt.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7701.20586337682    141207.296890747    156421.529831434</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 249.007963415127  14.4410280053595  15.5717031786663 7432.88997682324</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      ci95.A.bt.up ci95.integral.bt.lo ci95.integral.bt.up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7672.3114788853    142281.798818856     154889.12422395</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
