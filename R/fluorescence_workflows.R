@@ -35,7 +35,7 @@
 #' @examples
 #' # load example dataset
 #' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
 #'                    csvsep = "\t",
 #'                    csvsep.fl = "\t" )
 #'
