@@ -27,10 +27,10 @@
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    sheet.growth = 1,
-#'                    sheet.fl = 2 )
+#' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+#'                    csvsep = "\t",
+#'                    csvsep.fl = "\t")
 #'
 #' # Extract time and normalized fluorescence data for single sample
 #' time <- input$time[4,]
@@ -324,10 +324,10 @@ plot.flFitLinear <- function(x, log="", which=c("fit", "diagnostics", "fit_diagn
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    sheet.growth = 1,
-#'                    sheet.fl = 2 )
+#' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+#'                    csvsep = "\t",
+#'                    csvsep.fl = "\t")
 #'
 #' # Extract time and normalized fluorescence data for single sample
 #' time <- input$time[4,]
@@ -1013,10 +1013,10 @@ plot.flFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    sheet.growth = 1,
-#'                    sheet.fl = 2 )
+#' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+#'                    csvsep = "\t",
+#'                    csvsep.fl = "\t")
 #'
 #' # Extract time and normalized fluorescence data for single sample
 #' time <- input$time[4,]
@@ -1743,10 +1743,10 @@ plot.drFitFLModel <- function(x, ec50line = TRUE, broken = TRUE,
 #' @examples
 #' \donttest{
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    sheet.growth = 1,
-#'                    sheet.fl = 2 )
+#' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+#'                    csvsep = "\t",
+#'                    csvsep.fl = "\t")
 #'
 #' # Run workflow
 #' res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
@@ -2486,10 +2486,10 @@ plot.flFitRes <-  function(x,
 #' @return A plot with all curves (raw fluorescence measurements or raw normalized fluorescence over time) in a \code{flFit} object with \code{\link{flFit}}, with replicates combined by the group averages (if \code{mean = TRUE}) or not (\code{mean = FALSE}).
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    sheet.growth = 1,
-#'                    sheet.fl = 2 )
+#' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+#'                    csvsep = "\t",
+#'                    csvsep.fl = "\t")
 #'
 #' # Run curve fitting workflow
 #' res <- flFit(fl_data = input$norm.fluorescence,
@@ -2546,10 +2546,10 @@ plot.flFit <- plot.flFitRes
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    sheet.growth = 1,
-#'                    sheet.fl = 2 )
+#' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+#'                    csvsep = "\t",
+#'                    csvsep.fl = "\t")
 #'
 #' # Run workflow
 #' res <- fl.workflow(grodata = input, ec50 = FALSE, fit.opt = "s",
@@ -3179,10 +3179,10 @@ plot.dual <-  function(x,
 #'
 #' @examples
 #' # load example dataset
-#' input <- read_data(data.growth = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    data.fl = system.file("lac_promoters.xls", package = "QurvE"),
-#'                    sheet.growth = 1,
-#'                    sheet.fl = 2 )
+#' input <- read_data(data.growth = system.file("lac_promoters_growth.txt", package = "QurvE"),
+#'                    data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
+#'                    csvsep = "\t",
+#'                    csvsep.fl = "\t")
 #'
 #' # Define fit controls
 #' control <- fl.control(fit.opt = "s",
