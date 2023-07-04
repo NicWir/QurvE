@@ -84,10 +84,10 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># load example dataset</span></span></span>
-<span class="r-in"><span><span class="va">input</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_data.html">read_data</a></span><span class="op">(</span>data.growth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xls'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   data.fl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'lac_promoters.xls'</span>, package <span class="op">=</span> <span class="st">'QurvE'</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   sheet.growth <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>                   sheet.fl <span class="op">=</span> <span class="fl">2</span> <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">input</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_data.html">read_data</a></span><span class="op">(</span>data.growth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"lac_promoters_growth.txt"</span>, package <span class="op">=</span> <span class="st">"QurvE"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                   data.fl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"lac_promoters_fluorescence.txt"</span>, package <span class="op">=</span> <span class="st">"QurvE"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                   csvsep <span class="op">=</span> <span class="st">"\t"</span>,</span></span>
+<span class="r-in"><span>                   csvsep.fl <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract time and normalized fluorescence data for single sample</span></span></span>
@@ -102,20 +102,20 @@
 <span class="r-in"><span>                       nboot.fl <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestFit</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       max_slope.bt        lambda.bt             A.bt           dY.bt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 242.399496582221 15.0325468525071 7556.05370891066 6022.7776109914</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        integral.bt  stdmax_slope.bt      stdlambda.bt         stdA.bt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 148923.524206895 2.64948609397993 0.318668194217956 75.479033883818</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       max_slope.bt        lambda.bt             A.bt            dY.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 242.892466814033 15.0270132766475 7548.21181521401 6019.89280285799</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        integral.bt  stdmax_slope.bt      stdlambda.bt          stdA.bt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 148484.000086164 2.65476134610037 0.293951890340349 80.8337406410522</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           stddY.bt   stdintegral.bt reliable_fit.bt    ci90.mu.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 110.447427812752 3794.81979974456            TRUE 238.041091957624</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 92.0190954123846 4372.43462948814            TRUE 238.525384399698</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ci90.mu.bt.up ci90.lambda.bt.lo ci90.lambda.bt.up     ci90.A.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 246.757901206818  14.5083376730186  15.5567560319957 7431.89069817178</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ci90.A.bt.up ci90.integral.bt.lo ci90.integral.bt.up   ci95.mu.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7680.21671964954    142681.045636315    155166.002777475 237.20650383802</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      ci95.mu.bt.up ci95.lambda.bt.lo ci95.lambda.bt.up     ci95.A.bt.lo</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 247.592489326421  14.4079571918399  15.6571365131743 7408.11480249837</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 247.259549228369  14.5434624170376  15.5105641362574 7415.24031185948</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ci90.A.bt.up ci90.integral.bt.lo ci90.integral.bt.up    ci95.mu.bt.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7681.18331856855    141291.345120656    155676.655051672 237.689134575677</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ci95.mu.bt.up ci95.lambda.bt.lo ci95.lambda.bt.up     ci95.A.bt.lo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 248.09579905239  14.4508675715804  15.6031589817146 7389.77768355755</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       ci95.A.bt.up ci95.integral.bt.lo ci95.integral.bt.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7703.99261532294    141485.677399396    156361.371014394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 7706.64594687048    139914.028212367    157053.971959961</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
