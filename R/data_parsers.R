@@ -1419,7 +1419,7 @@ parse_biolector <- function(input)
   # get index (row,column) for "Time:"
   time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = TRUE)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = TRUE),], ignore.case = TRUE))
   # extract different read data in dataset
-  reads <- unique(input[,time.ndx[2]][grep("Biomass", input[,time.ndx[2]])])
+  reads <- unique(input[,time.ndx[2]][grep("Biomass|GFP|RFP|Fluorescence", input[,time.ndx[2]])])
   reads <- reads[!is.na(reads)]
   read.ndx <- lapply(1:length(reads), function(x) which(input[,time.ndx[2]] %in% reads[x]))
 
