@@ -133,7 +133,7 @@ read_data <-
     }
     # Load fluorescence data
     if((length(data.fl) > 1 ) || !all(is.na(data.fl))){
-      if (!is.character(data.fl)) {
+      if (any(is(data.fl) %in% c("matrix", "list", "array")) || !is.character(data.fl)) {
         fl <- data.fl
       } else {
         # Read table file
@@ -172,7 +172,7 @@ read_data <-
     }
     # Load fluorescence 2 data
     if((length(data.fl2) > 1 ) || !is.na(data.fl2)){
-      if (!is.character(data.fl2)) {
+      if (any(is(data.fl2) %in% c("matrix", "list", "array")) || !is.character(data.fl2)) {
         fl2 <- data.fl2
       } else {
         # Read table file
@@ -884,6 +884,18 @@ parse_data <-
     if(!is.null(map.file)){
       if (file.exists(map.file)) {
         mapping <- read_file(map.file, csvsep=csvsep.map, dec=dec.map, sheet=sheet.map)
+        if(!is.null(mapping)){
+          # Check if the first row of mapping contains the required values
+          required_values <- c("well", "id", "replicate", "concentration")
+          has_required_values <- any(tolower(as.character(unlist(mapping[1,]))) %in% required_values)
+
+          # If not, prepend a row with these values
+          if (!has_required_values) {
+            new_row <- data.frame(well = "well", ID = "ID", replicate = "replicate", concentration = "concentration")
+            colnames(new_row) <- colnames(mapping)[1:4]
+            mapping <- rbind(new_row, mapping)
+          }
+        }
       } else {
         stop(paste0("File \"", map.file, "\" does not exist."), call. = FALSE)
       }
@@ -1409,6 +1421,7 @@ parse_tecan <- function(input)
 #' Extract relevant data from a raw data export file generated from the software of "Biolector" plate readers.
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #'
 #' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
@@ -1461,28 +1474,44 @@ parse_biolector <- function(input)
     }
   }
   names(read.data) <- reads
-  data.ls <- list()
-  if(length(reads)>1){
+  data.ls <- list(NA, NA, NA)
 
-    answer <- readline(paste0("Indicate where the growth data is stored?\n",
-                              paste(unlist(lapply(1:length(reads), function (i)
-                                paste0("[", i, "] ", reads[i]))),
-                                collapse = "\n"), "\n[", length(reads)+1, "] Disregard growth data\n"))
-    if(as.numeric(answer) == length(reads)+1){
-      growth <- NA
-    } else {
-      growth <- read.data[[as.numeric(answer)]]
+  for(i in 1:length(reads)){
+    if(length(reads) == 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              sep = "\n")
+      ))
+
+      if(as.numeric(answer) == 1)
+        data.ls[[1]] <-  read.data[[1]]
+      if(as.numeric(answer) == 2)
+        data.ls[[2]] <-  read.data[[1]]
     }
+    if(length(reads) > 1){
+      answer <- readline(paste0(
+        "Assign data type for read: ",
+        reads[i],
+        "?\n",
+        paste("[1] Growth",
+              "[2] Fluorescence",
+              "[3] Fluorescence 2 (to normalize Fluorescence)",
+              "[4] Ignore",
+              sep = "\n")
+      ))
 
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    data.ls[[3]] <- NA
+      if(as.numeric(answer) < 4){
+        data.ls[[as.numeric(answer)]] <-  read.data[[i]]
 
-  } else {
-    growth <- read.data[[1]]
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    data.ls[[3]] <- NA
+        # replace "OVRFLW" with NA in fluorescence data
+        if(as.numeric(answer) %in% c(2,3))
+          data.ls[[as.numeric(answer)]][which(data.ls[[as.numeric(answer)]] == "OVRFLW", arr.ind = TRUE)] <- NA
+      }
+    }
   }
   invisible(list(data.ls))
 }

@@ -6994,7 +6994,7 @@ server <- function(input, output, session){
             input$parsed_reads_fluorescence2 == input$parsed_reads_growth |
               input$parsed_reads_fluorescence2 == input$parsed_reads_fluorescence,
             NA,
-            input$parsed_reads_fluorescence
+            input$parsed_reads_fluorescence2
           ),
           fl.normtype = fl.normtype
         )

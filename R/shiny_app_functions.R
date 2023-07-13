@@ -258,7 +258,7 @@ parse_data_shiny <-
     }
 
     if(any(grep("Biolector", software, ignore.case = TRUE))){
-      parsed.ls <- parse_biolector_shiny(input, growth.nm = growth.nm)
+      parsed.ls <- parse_biolector_shiny(input, growth.nm = growth.nm, fl.nm = fl.nm, fl2.nm = fl2.nm)
       data.ls <- parsed.ls[[1]]
     }
 
@@ -294,6 +294,18 @@ parse_data_shiny <-
       }
     } else {
       data.ls <-data.ls[noNA.ndx]
+    }
+    if(!is.null(mapping)){
+      # Check if the first row of mapping contains the required values
+      required_values <- c("well", "id", "replicate", "concentration")
+      has_required_values <- any(tolower(as.character(unlist(mapping[1,]))) %in% required_values)
+
+      # If not, prepend a row with these values
+      if (!has_required_values) {
+        new_row <- data.frame(well = "well", ID = "ID", replicate = "replicate", concentration = "concentration")
+        colnames(new_row) <- colnames(mapping)[1:4]
+        mapping <- rbind(new_row, mapping)
+      }
     }
 
     # apply identifiers specified in mapping file
@@ -616,12 +628,13 @@ parse_tecan_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 #'
 #' @param input A dataframe created by reading a table file with \code{\link{read_file}}
 #' @param growth.nm Name of read corresponding to growth rate
+#' @param fl.nm,fl2.nm Name of read corresponding to fluorescence and fluorescence2 data
 #'
 #' @return a list of length two containing a growth dataframe in the first element and \code{NA} in the second. The first column in the dataframe represents a time vector.
 #'
 #' @keywords internal shiny_app
 #' @noRd
-parse_biolector_shiny <- function(input, growth.nm)
+parse_biolector_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
 {
   # get index (row,column) for "Time:"
   time.ndx <- c(grep("^\\bWell\\b", input[,1], ignore.case = TRUE)+2, grep("^\\bChannel\\b", input[grep("^\\bWell\\b", input[,1], ignore.case = TRUE),], ignore.case = TRUE))
@@ -670,18 +683,28 @@ parse_biolector_shiny <- function(input, growth.nm)
   names(read.data) <- reads
   data.ls <- list()
   if(length(reads)>1){
+    if (!is.null(growth.nm) && growth.nm != "Ignore")
+      growth <- read.data[[match(growth.nm, reads)]]
+    else
+      growth  <- NA
 
-    growth <- read.data[[match(growth.nm, reads)]]
+    if(!is.null(fl.nm) && fl.nm != "Ignore"){
+      fluorescence <-  read.data[[match(fl.nm, reads)]]
+      fluorescence[which(fluorescence == "OVER", arr.ind = TRUE)] <- NA
+    }
+    else
+      fluorescence <- NA
+
+    if(!is.null(fl2.nm) && fl2.nm != "Ignore"){
+      fluorescence2 <-  read.data[[match(fl2.nm, reads)]]
+      fluorescence2[which(fluorescence2 == "OVER", arr.ind = TRUE)] <- NA
+    }
+    else
+      fluorescence2 <- NA
 
     data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
-
-  } else {
-    growth <- read.data[[1]]
-    data.ls[[1]] <- growth
-    data.ls[[2]] <- NA
-    # data.ls[[3]] <- NA
+    data.ls[[2]] <- fluorescence
+    data.ls[[3]] <- fluorescence2
   }
   invisible(list(data.ls))
 }
