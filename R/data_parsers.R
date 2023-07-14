@@ -649,6 +649,7 @@ read_data <-
 #' df_formatted <- tidy_to_custom(df)
 #'
 #' @keywords internal
+#' @importFrom purrr map_int map_lgl
 #' @export
 tidy_to_custom <- function(df, data.format = "col"){
   # Check if data is in "tidy" format
