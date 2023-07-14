@@ -682,135 +682,81 @@ tidy_to_custom <- function(df, data.format = "col"){
 
     # Create a unique identifier for each combination of Description, Concentration, and Replicate
     df[["Group"]] <- paste(df$Description, df$Concentration, df$Replicate, sep = "_")
+    df[["Time"]] <- as.numeric(df[["Time"]])
 
-    # Split the 'Time' column based on the unique identifier
-    time_split <- split(df[["Time"]], df[["Group"]])
+    # sort the df based on Time
+    df <- df %>% arrange(Time)
 
-    # Create a list of subsets of 'df' based on the unique identifiers in 'time_split'
-    subsets_list <- lapply(unique(df[["Group"]]), function(x) {
-      subset(df, df[["Group"]] == x)
+    # create a list of unique time vectors
+    time_vectors <- df %>%
+      group_by(Group) %>%
+      summarise(Time = list(sort(unique(Time)))) %>%
+      pull(Time) %>%
+      unique()
+
+    # Create an id for each unique time vector
+    df <- df %>%
+      mutate(time_group = purrr:::map_int(list(Time), ~which(purrr:::map_lgl(time_vectors, ~all(.x == .)))))
+
+    # split the df into subsets based on time_group
+    df_subsets <- split(df, df$time_group)
+
+    # for each subset, create a dataframe in the desired format
+    df_list <- lapply(df_subsets, function(subset) {
+      # extract unique Groups, Descriptions, Replicates, and Concentrations
+      unique_groups <- unique(subset$Group)
+      unique_descriptions <- unique(subset$Description)
+      unique_replicates <- unique(subset$Replicate)
+      unique_concentrations <- unique(subset$Concentration)
+      unique_times <- unique(subset$Time)
+
+      # create a new dataframe
+      new_df <- data.frame(Time = c("Time", NA, NA,  unique_times))
+
+      # for each unique Group, create a column in the new dataframe
+      for (group in unique_groups) {
+        # get the corresponding Description, Replicate, Concentration, and Values
+        description <- subset[subset$Group == group,]$Description[1]
+        replicate <- subset[subset$Group == group,]$Replicate[1]
+        concentration <- subset[subset$Group == group,]$Concentration[1]
+        values <- subset[subset$Group == group,]$Values
+
+        # create a new column for the Group
+        new_df[, group] <- c(description, replicate, concentration, values)
+      }
+      # set the column names using the first row, then remove the first row
+      colnames(new_df) <- new_df[1,]
+      #new_df <- new_df[-1,]
+      return(new_df)
     })
 
-    # Helper function to check if two data frames have identical 'Time' values
-    identical_time <- function(df1, df2) {
-      identical(df1$Time, df2$Time)
-    }
+    # Get the maximum number of rows across all dataframes in df_list
+    max_rows <- max(sapply(df_list, nrow))
 
-    # Initialize an empty list to store combined data frames
-    combined_list <- list()
+    # Add rows filled with NA to the end of all dataframes that have a fewer number of rows than max_rows
+    df_list <- lapply(df_list, function(df) {
+      num_rows_to_add <- max_rows - nrow(df)
 
-    # Initialize a vector to track combined data frames
-    combined_flag <- rep(FALSE, length(subsets_list))
+      # If the dataframe has fewer rows than max_rows, add rows filled with NA
+      if (num_rows_to_add > 0) {
+        df_to_add <- data.frame(matrix(NA, ncol = ncol(df), nrow = num_rows_to_add))
+        colnames(df_to_add) <- colnames(df)
 
-    for (i in seq_along(subsets_list)) {
-      # Skip if the data frame is already combined
-      if (combined_flag[i]) {
-        next
+        df <- rbind(df, df_to_add)
       }
 
-      df1 <- subsets_list[[i]]
-      matching_indices <- c(i)
-
-      # Check for matching 'Time' values in other data frames
-      for (j in (i+1):length(subsets_list)) {
-        if (!combined_flag[j] && identical_time(df1, subsets_list[[j]])) {
-          matching_indices <- c(matching_indices, j)
-          combined_flag[j] <- TRUE
-        }
-      }
-
-      # Combine the matching data frames
-      combined_df <- do.call(rbind, subsets_list[matching_indices])
-
-      # Add the combined data frame to the combined_list
-      combined_list[[length(combined_list) + 1]] <- combined_df
-
-      # Mark the current data frame as combined
-      combined_flag[i] <- TRUE
-    }
-
-    # Define helper function to convert into wide format
-    convert_to_wide <- function(df) {
-      df <- df[!is.na(df$Time), ]
-      # Find unique groups
-      unique_groups <- unique(df[["Group"]])
-
-      # Create an empty data frame with the required structure
-      df_wide <- data.frame(matrix(ncol = length(unique_groups) + 1, nrow = nrow(df)/length(unique_groups) + 2))
-      colnames(df_wide) <- c("Time", unique_groups)
-
-      # Add Time, Replicate, and Concentration values
-      time <- unique(df$Time)
-      time <- time[!is.na(time)]
-      df_wide$Time <- c(NA, NA, time)
-
-      for (group in unique_groups) {
-        group_df <- df[df[["Group"]] == group, ]
-        description <- as.character(unique(group_df$Description))
-        replicate <- as.integer(unique(group_df$Replicate))
-        concentration <- unique(group_df$Concentration)
-
-        # Add Description, Replicate, Concentration, and Values
-        df_wide[[group]] <- c(replicate, concentration, group_df$Values)
-        colnames(df_wide)[colnames(df_wide) == group] <- description
-      }
-
-      return(df_wide)
-    }
-
-
-    wide_list <- lapply(combined_list, convert_to_wide)
-
-    # Combine dataframes into a single dataframe in QurvE custom format
-    # Find the maximum number of rows among the data frames
-    max_rows <- max(sapply(wide_list, nrow))
-
-    # Add NA rows to each data frame to make them equal in length
-    equalize_rows <- function(df, max_rows) {
-      if (nrow(df) < max_rows) {
-        missing_rows <- max_rows - nrow(df)
-        na_rows <- data.frame(matrix(NA, ncol = ncol(df), nrow = missing_rows))
-        colnames(na_rows) <- colnames(df)
-        df <- rbind(df, na_rows)
-      }
       return(df)
+    })
+
+    # Combine the dataframes in df_list into a single dataframe
+    final_df <- do.call(cbind, df_list)
+    colnames_final <- c()
+    for(i in 1:length(df_list)){
+      colnames_final <- c(colnames_final, colnames(df_list[[i]]))
     }
+    colnames(final_df) <- colnames_final
 
-    wide_list_equal_rows <- lapply(wide_list, equalize_rows, max_rows = max_rows)
-
-    # Combine data frames into a single data frame
-    # Custom function to merge two data frames with different column names
-    merge_data_frames <- function(df1, df2) {
-      common_rows <- min(nrow(df1), nrow(df2))
-      missing_rows_df1 <- nrow(df2) - nrow(df1)
-      missing_rows_df2 <- nrow(df1) - nrow(df2)
-
-      # Add NA rows to the shorter data frame
-      if (missing_rows_df1 > 0) {
-        na_rows_df1 <- data.frame(matrix(NA, ncol = ncol(df1), nrow = missing_rows_df1))
-        colnames(na_rows_df1) <- colnames(df1)
-        df1 <- rbind(df1, na_rows_df1)
-      } else if (missing_rows_df2 > 0) {
-        na_rows_df2 <- data.frame(matrix(NA, ncol = ncol(df2), nrow = missing_rows_df2))
-        colnames(na_rows_df2) <- colnames(df2)
-        df2 <- rbind(df2, na_rows_df2)
-      }
-
-      # Combine the data frames
-      combined_df <- cbind(df1, df2)
-
-      return(combined_df)
-    }
-
-    combined_wide_df <- Reduce(merge_data_frames, wide_list_equal_rows)
-
-    # Create a new data frame with the column headers as its first row
-    header_df <- data.frame(matrix(colnames(combined_wide_df), ncol = ncol(combined_wide_df), nrow = 1))
-    colnames(header_df) <- colnames(combined_wide_df)
-
-    # Bind the original data frame below the header data frame
-    df <- rbind(header_df, combined_wide_df)
-
+    df <- final_df
     df <- t(df)
   }
   else if(data.format == "col"){
