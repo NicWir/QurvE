@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,27 +145,27 @@ a <code>drFitSpline</code> object for each bootstrap sample. Use <code><a href="
 <span class="r-out co"><span class="r-pr">#&gt;</span> === Bootstrapping of dose response curve ==========</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- EC 50 -----------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  0.910217533154776 StDev :  0.0828507326564751 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  0.907491744050378 90% CI:  0.912943322259174</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  0.906969784434642 95% CI:  0.91346528187491</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  0.911454685638174 StDev :  0.0667327989013076 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  0.909259176554321 90% CI:  0.913650194722027</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  0.908838759921243 95% CI:  0.914070611355105</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> --- EC 50 in original scale -----------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  1.48486301468716 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  1.47809902494856 90% CI:  1.4916454667861</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  1.47680589484395 95% CI:  1.49294634456979</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mean  :  1.48793907152002 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 90% CI:  1.48248277055932 90% CI:  1.49340736499907</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI:  1.4814393128701 95% CI:  1.49445585531429</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">TestRun</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.meanEC50 drboot.sdEC50 drboot.meanEC50y drboot.sdEC50y</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.9102175    0.08285073        0.5333092     0.09795977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.9114547     0.0667328        0.5261724     0.08950964</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.ci90EC50.lo drboot.ci90EC50.up drboot.ci95EC50.lo drboot.ci95EC50.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          0.7739281           1.046507          0.7478301           1.072605</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          0.8016792            1.02123          0.7806584           1.042251</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.meanEC50.orig drboot.ci90EC50.orig.lo drboot.ci90EC50.orig.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1             1.484863                1.168267                1.847687</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1             1.487939                1.229281                1.776608</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   drboot.ci95EC50.orig.lo drboot.ci95EC50.orig.up</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                1.112411                1.922984</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                1.182909                1.835593</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">TestRun</span>, combine <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="growth.drBootSpline-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

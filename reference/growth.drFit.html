@@ -18,7 +18,7 @@ generate a table with estimates for EC50 and respecting statistics."><!-- mathja
     
     <a class="navbar-brand me-2" href="../index.html">QurvE</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -198,11 +198,11 @@ generate a table with estimates for EC50 and respecting statistics.</p>
 <span class="r-in"><span><span class="co"># Inspect results</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Test log.x log.y Samples EC50.Estimate EC50.Std..Error EC50.Lower EC50.Upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0     0.1575478     0.003271520  0.1508665  0.1642292</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0     0.1165279     0.001857425  0.1127444  0.1203113</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Test1 FALSE FALSE       0      0.158051     0.003008707  0.1519064  0.1641956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Test2 FALSE FALSE       0      0.113804     0.001955529  0.1098207  0.1177873</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       yEC50      test model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3331823 mu.spline  LL.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2356135 mu.spline  W1.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.3274652 mu.spline  LL.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.2380272 mu.spline  W1.3</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">drFit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="growth.drFit-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="growth.drFit-2.png" alt="" width="700" height="433"></span>
