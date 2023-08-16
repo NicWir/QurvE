@@ -273,7 +273,6 @@ parse_data_shiny <-
     }
 
     noNA.ndx <- which(!is.na(data.ls))
-
     # Convert time values
     if(!is.null(convert.time)){
 
@@ -682,7 +681,7 @@ parse_biolector_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
   }
   names(read.data) <- reads
   data.ls <- list()
-  if(length(reads)>1){
+  #if(length(reads)>1){
     if (!is.null(growth.nm) && growth.nm != "Ignore")
       growth <- read.data[[match(growth.nm, reads)]]
     else
@@ -705,7 +704,7 @@ parse_biolector_shiny <- function(input, growth.nm, fl.nm, fl2.nm)
     data.ls[[1]] <- growth
     data.ls[[2]] <- fluorescence
     data.ls[[3]] <- fluorescence2
-  }
+  #}
   invisible(list(data.ls))
 }
 
