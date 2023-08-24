@@ -1390,22 +1390,22 @@ parse_biolector <- function(input)
     read.data <- lapply(1:length(read.ndx), function(x) input[read.ndx[[x]], -(1:time.ndx[2])])
     read.data <- lapply(1:length(read.data), function(x) t(as.data.frame(read.data[[x]])[1:length(read.data[[x]][,1][read.data[[x]][,1]!=0][!is.na(read.data[[x]][,1][read.data[[x]][,1]!=0])]), ]))
     # add Well or Content name
-    read.data <- lapply(1:length(read.data), function(x) if(all(gsub("[[:digit:]]+", "", input[read.ndx[[x]], 2]) == "X")){
-      rbind(t(data.frame(input[read.ndx[[x]], 1])), read.data[[x]])
-    } else {
-      rbind(t(data.frame(input[read.ndx[[x]], 2])), read.data[[x]])
-    }
-    )
+    #read.data <- lapply(1:length(read.data), function(x) if(all(gsub("[[:digit:]]+", "", input[read.ndx[[x]], 2]) == "X")){
+    #  rbind(t(data.frame(input[read.ndx[[x]], 1])), read.data[[x]])
+    #} else {
+    #  rbind(t(data.frame(input[read.ndx[[x]], 2])), read.data[[x]])
+    #}
+    read.data <- lapply(1:length(read.data), function(x) rbind(t(data.frame(input[read.ndx[[x]], 1])), read.data[[x]]))
     # add time column
     read.data <- lapply(1:length(read.data), function(x) cbind(t(data.frame(input[time.ndx[1], -(1:(time.ndx[2]-1))])), read.data[[x]]))
   } else {
     read.data[[1]] <- t(data.frame(input[read.ndx[[1]], -(1:time.ndx[2])]))
     # add Well or Content name
-    if(all(gsub("[[:digit:]]+", "", input[read.ndx[[1]], 2]) == "X")){
-      read.data[[1]] <- rbind(t(data.frame(input[read.ndx[[1]], 1])), read.data[[1]])
-    } else {
-      read.data[[1]] <- rbind(t(data.frame(input[read.ndx[[1]], 2])), read.data[[1]])
-    }
+    #if(all(gsub("[[:digit:]]+", "", input[read.ndx[[1]], 2]) == "X")){
+    read.data[[1]] <- rbind(t(data.frame(input[read.ndx[[1]], 1])), read.data[[1]])
+    #} else {
+    #  read.data[[1]] <- rbind(t(data.frame(input[read.ndx[[1]], 2])), read.data[[1]])
+    #}
     # add time column
     read.data[[1]] <- cbind(t(data.frame(input[time.ndx[1], -(1:(time.ndx[2]-1))])), read.data[[1]])
   }
