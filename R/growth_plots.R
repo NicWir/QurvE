@@ -2893,7 +2893,7 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
         Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"))
       } else {
         message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
-        grDevices::pdf(idth = w, height = h, file = paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"))
+        grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", paste(gcFittedSpline$gcID, collapse = "_"), "_SplineFit.pdf"))
       }
       suppressWarnings(print(p))
       grDevices::dev.off()
