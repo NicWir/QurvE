@@ -728,6 +728,16 @@ tidy_to_custom <- function(df, data.format = "col"){
         concentration <- subset[subset$Group == group,]$Concentration[1]
         values <- subset[subset$Group == group,]$Values
 
+        nreps <- round(length(values)/(nrow(new_df)-3))
+        
+        for (i in 1:nreps) {
+          start_index <- 1 + ((nrow(new_df) - 3) * (i - 1))
+          end_index <- (nrow(new_df) - 3) * i
+          
+          column_name <- paste0(group, "_", i)
+          new_df[, column_name] <- c(description, replicate, concentration, values[start_index:end_index])
+        }
+        
         # create a new column for the Group
         new_df[, group] <- c(description, replicate, concentration, values)
       }
