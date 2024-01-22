@@ -717,7 +717,7 @@ tidy_to_custom <- function(df, data.format = "col"){
       # for each unique Group, create a column in the new dataframe
       for (group in unique_groups) {
         # get the corresponding Description, Replicate, Concentration, and Values
-        description <- subset[subset$Group == group,]$Description[1]
+        description <- as.character(subset[subset$Group == group,]$Description[1])
         replicate <- subset[subset$Group == group,]$Replicate[1]
         concentration <- subset[subset$Group == group,]$Concentration[1]
         values <- subset[subset$Group == group,]$Values
