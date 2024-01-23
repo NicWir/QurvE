@@ -60,7 +60,7 @@
 #'                     data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
 #'                     csvsep = "\t",
 #'                     csvsep.fl = "\t")
-read_data2<-function (data.growth = NA, data.fl = NA, data.fl2 = NA, data.format = "col", 
+read_data<-function (data.growth = NA, data.fl = NA, data.fl2 = NA, data.format = "col", 
   csvsep = ";", dec = ".", csvsep.fl = ";", dec.fl = ".", 
   csvsep.fl2 = ";", dec.fl2 = ".", sheet.growth = 1, sheet.fl = 1, 
   sheet.fl2 = 1, fl.normtype = c("growth", "fl2"), subtract.blank = TRUE, 
@@ -92,7 +92,7 @@ read_data2<-function (data.growth = NA, data.fl = NA, data.fl2 = NA, data.format
   
   if (length(dat) > 1) 
     
-    dat <- tidy_to_custom2(df = dat, data.format = data.format)
+    dat <- tidy_to_custom(df = dat, data.format = data.format)
  
   
   
@@ -127,7 +127,7 @@ read_data2<-function (data.growth = NA, data.fl = NA, data.fl2 = NA, data.format
       fl <- read_file(data.fl, csvsep = csvsep.fl, dec = dec.fl, 
         sheet = sheet.fl)
     }
-    fl <- tidy_to_custom2(df = fl, data.format = data.format)
+    fl <- tidy_to_custom(df = fl, data.format = data.format)
     if (!(any(grepl("time", unlist(fl[, 1]), ignore.case = TRUE)))) {
       if (data.format == "col") {
         stop("Could not find 'time' in column 1 of data.fl")
@@ -159,7 +159,7 @@ read_data2<-function (data.growth = NA, data.fl = NA, data.fl2 = NA, data.format
       fl2 <- read_file(data.fl2, csvsep = csvsep.fl2, 
         dec = dec.fl2, sheet = sheet.fl2)
     }
-    fl2 <- tidy_to_custom2(df = fl2, data.format = data.format)
+    fl2 <- tidy_to_custom(df = fl2, data.format = data.format)
     if (!(any(grepl("time", unlist(fl2[, 1]), ignore.case = TRUE)))) {
       if (data.format == "col") {
         stop("Could not find 'time' in column 1 of data.fl2")
@@ -676,7 +676,7 @@ read_data2<-function (data.growth = NA, data.fl = NA, data.fl2 = NA, data.format
 #' @keywords internal
 #' @importFrom purrr map_int map_lgl
 #' @export
-tidy_to_custom2 <-function (df, data.format = "col") 
+tidy_to_custom <-function (df, data.format = "col") 
 {
     if ((any(grepl("Time", colnames(df), ignore.case = T)) && 
     any(grepl("Description", colnames(df), ignore.case = T)) && 
