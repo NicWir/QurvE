@@ -60,576 +60,589 @@
 #'                     data.fl = system.file("lac_promoters_fluorescence.txt", package = "QurvE"),
 #'                     csvsep = "\t",
 #'                     csvsep.fl = "\t")
-read_data <-
-  function(data.growth = NA,
-           data.fl = NA,
-           data.fl2 = NA,
-           data.format = "col",
-           csvsep = ";",
-           dec = ".",
-           csvsep.fl = ";",
-           dec.fl = ".",
-           csvsep.fl2 = ";",
-           dec.fl2 = ".",
-           sheet.growth = 1,
-           sheet.fl = 1,
-           sheet.fl2 = 1,
-           fl.normtype = c("growth", "fl2"),
-           subtract.blank  = TRUE,
-           convert.time = NULL,
-           calib.growth = NULL,
-           calib.fl = NULL,
-           calib.fl2 = NULL)
-  {
-    if(is.null(data.growth)) data.growth <- NA
-    if(is.null(data.fl)) data.fl <- NA
-    if(is.null(data.fl2)) data.fl2 <- NA
-    if(!is.null(calib.growth) && calib.growth == "") calib.growth <- NULL
-    if(!is.null(calib.fl) && calib.fl == "") calib.fl <- NULL
-    if(!is.null(calib.fl2) && calib.fl2 == "") calib.fl2 <- NULL
-
-    fl.normtype <- match.arg(fl.normtype)
-
-    # Load growth data
-    if (any(is(data.growth) %in% c("matrix", "list", "array")) || !is.character(data.growth)) {
-      dat <- data.growth
-    } else {
-      # Read table file
-      if(!is.na(data.growth))
-        dat <- read_file(data.growth, csvsep=csvsep, dec=dec, sheet=sheet.growth)
-    }
-    # Test if growth data is in tidy format and convert into QurvE custom format
-    if(length(dat) > 1)
-      dat <- tidy_to_custom(df = dat, data.format = data.format)
-    # Remove explicit quotes
-    #dat <- gsub('\"', "", dat)
-
-    # Convert time values
-    if(!is.null(convert.time)){
-
-      conversion <- parse(text = convert.time)
-
-      x <- as.numeric(dat[1, -(1:3)])
-      time_converted <- eval(conversion)
-      dat[1, -(1:3)] <- time_converted
-    }
-    # Remove all-NA data series
-    if(length(dat) > 1){
-      allNA.ndx <- which(unlist(lapply(1:nrow(dat), function(x) all(is.na(dat[x, -(1:3)])))))
-      if(length(allNA.ndx) > 0)
-        dat <- dat[-allNA.ndx, ]
-    }
-
-    #remove leading and trailing zeros
-    if(length(dat)>0 && !all(is.na(dat)))
-      dat[,3] <- suppressWarnings(
-        as.character(as.numeric(dat[,3]))
-      )
-
-    if(data.format == "col"){
-      message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
-    } else {
-      message("Sample data are stored in rows. If they are stored in column format, please run read_data() with data.format = 'col'.")
-    }
-    # Load fluorescence data
-    if((length(data.fl) > 1 ) || !all(is.na(data.fl))){
-      if (any(is(data.fl) %in% c("matrix", "list", "array")) || !is.character(data.fl)) {
-        fl <- data.fl
-      } else {
-        # Read table file
-        fl <- read_file(data.fl, csvsep=csvsep.fl, dec=dec.fl, sheet=sheet.fl)
-      }
-      # Test if fluorescence data is in tidy format and convert into QurvE custom format
-      fl <- tidy_to_custom(df = fl, data.format = data.format)
-
-      if(!(any(grepl("time", unlist(fl[,1]), ignore.case = TRUE)))){
-        if(data.format == "col"){
-          stop("Could not find 'time' in column 1 of data.fl")
-        } else {
-          stop("Could not find 'time' in row 1 of data.fl")
-        }
-      }
-      # Remove all-NA data series
-      allNA.ndx <- which(unlist(lapply(1:nrow(fl), function(x) all(is.na(fl[x, -(1:3)])))))
-      if(length(allNA.ndx) > 0)
-        fl <- fl[-allNA.ndx, ]
-
-      #remove leading and trailing zeros
-      fl[,3] <- as.character(as.numeric(fl[,3]))
-
-      # Convert time values
-      if(!is.null(convert.time)){
-
-        conversion <- parse(text = convert.time)
-
-        x <- as.numeric(fl[1, -(1:3)])
-        time_converted <- eval(conversion)
-        fl[1, -(1:3)] <- time_converted
-      }
-      # add minimum negative value + 1 to all fluorescence data
-    } else {
-      fl <- NA
-    }
-    # Load fluorescence 2 data
-    if((length(data.fl2) > 1 ) || !is.na(data.fl2)){
-      if (any(is(data.fl2) %in% c("matrix", "list", "array")) || !is.character(data.fl2)) {
-        fl2 <- data.fl2
-      } else {
-        # Read table file
-        fl2 <- read_file(data.fl2, csvsep=csvsep.fl2, dec=dec.fl2, sheet=sheet.fl2)
-      }
-      # Test if fluorescence data is in tidy format and convert into QurvE custom format
-      fl2 <- tidy_to_custom(df = fl2, data.format = data.format)
-
-      if(!(any(grepl("time", unlist(fl2[,1]), ignore.case = TRUE)))){
-        if(data.format == "col"){
-          stop("Could not find 'time' in column 1 of data.fl2")
-        } else {
-          stop("Could not find 'time' in row 1 of data.fl2")
-        }
-      }
-    } else {
-      fl2 <- NA
-    }
-    if((length(dat) > 1 && !(any(grepl("time", unlist(dat[,1]), ignore.case = TRUE)))) &&
-       (length(fl) > 1 && !(any(grepl("time", unlist(fl[,1]), ignore.case = TRUE)))) ){ #&& (length(fl2) > 1 && !(any(grepl("time", unlist(fl2[,1]), ignore.case = TRUE))))
-      if(data.format == "col"){
-        stop("Could not find 'time' in column 1 of any provided 'data.growth' or 'data.fl'.")
-      } else {
-        stop("Could not find 'time' in row 1 of any provided 'data.growth' or 'data.fl'.")
-      }
-    }
-
-    if(!is.null(calib.growth)){
-      if(length(dat)>1)
-        dat <- calibrate(dat, calib.growth)
-    }
-    if(!is.null(calib.fl)){
-      if((length(fl) > 1 ) || !is.na(data.fl))
-        fl <- calibrate(fl, calib.fl)
-    }
-    if(!is.null(calib.fl2)){
-      if((length(fl2) > 1 ) || !is.na(data.fl2))
-        fl2 <- calibrate(fl2, calib.fl2)
-    }
-
-    # subtract blank
-    if(subtract.blank){
-      subtract_blank <- function(df){
-        #test if more than one time entity is present
-        time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
-        if(length(time.ndx)==1){
-          blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = TRUE)
-          if(length(blank.ndx)>0){
-            if(length(blank.ndx)>1){
-              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = TRUE)
-            } else {
-              blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
-            }
-            df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- t(sweep(apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
-          }
-        } else { # identify different datasets based on the occurence of multiple 'time' entities
-          # identify additional time entities
-          blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = TRUE)
-          if(length(blank.ndx)>0){
-            if(length(blank.ndx)>1){
-              blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
-            }else {
-              blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
-            }
-            df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)] <-
-              t(sweep(apply(df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
-          }
-          for (i in 2:(length(time.ndx))){
-            blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 1])) {
-              (time.ndx[i] + 1):nrow(df)
-            } else {
-              (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
-            }, 1], ignore.case = TRUE) + time.ndx[i]
-
-            if(length(blank.ndx)>0){
-              if(length(blank.ndx)>1){
-                blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
-              } else {
-                blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
-              }
-              df[if (is.na(time.ndx[i + 1])) {
-                ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
-              } else {
-                ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-              }, 4:ncol(df)] <-
-                t(sweep(apply(df[if (is.na(time.ndx[i + 1])) {
-                  ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 1):nrow(df) %in% blank.ndx)]
-                } else {
-                  ((time.ndx[i] + 1):(time.ndx[i + 1] - 1))[!(((time.ndx[i] + 1):(time.ndx[i + 1] - 1)) %in% blank.ndx)]
-                }, 4:ncol(df)], 1, as.numeric), 1, blank))
-            }
-          } # end of for (i in 2:(length(time.ndx)))
-        } # end of else of if(length(time.ndx)==1)
-        return(df)
-      }
-      if(length(dat)>1)             dat <- subtract_blank(dat)
-      if((length(fl) > 1 ) || !is.na(data.fl))    fl <- subtract_blank(df=fl)
-      if((length(fl2) > 1 ) || !is.na(data.fl2))    fl2 <- subtract_blank(df=fl2)
-    }
-
-    ### Combine technical replicates
-    combine_techrep <- function(df){
-      sample_names <- as.character(paste0(df[2:nrow(df),1], "...", df[2:nrow(df),2], "___", df[2:nrow(df),3]))
-      conditions <-
-        unique(gsub("\\.\\.\\..+___", "___", sample_names))
-      # remove "time" from samples in case of several time entities
-      time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
-      if(length(time.ndx)>1){
-        conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = TRUE)]
-      }
-      # remove blanks from conditions
-      blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
-      if(length(blankcond.ndx)>1){
-        conditions <- conditions[-blankcond.ndx]
-      }
-
-      remove <- c()
-      for(i in 1:length(conditions)){
-        ndx.cond <-  which(gsub("\\.\\.\\..+___", "___", sample_names) %in% conditions[i])
-        name <- df[ndx.cond[1]+1,1]
-        conc <- df[ndx.cond[1]+1,3]
-        tech.rep <- suppressWarnings(as.numeric(unique(gsub("___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
-        tech.rep <- tech.rep[!is.na(tech.rep)]
-        if(length(tech.rep)>1){
-          for(j in 1:length(tech.rep)){
-            ndx.rep <- ndx.cond[which(gsub("___.+", "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% tech.rep[j])]
-            if(length(ndx.rep)>1){
-              values <- apply(df[ndx.rep+1, 4:ncol(df)], 1, as.numeric)
-              means <- rowMeans(values)
-              df[ndx.rep[1]+1, 4:ncol(df)] <- means
-              df[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
-              remove <- c(remove, ndx.rep[-1]+1)
-            } else {
-              df[ndx.rep[1]+1, 2] <- as.numeric(tech.rep[j])
-            }
-          }
-        }
-      }
-      if(length(remove)>1){
-        df <- df[-remove,]
-      }
-      return(df)
-    }
-    if(length(dat)>1)              dat <- combine_techrep(dat)
-    if((length(fl) > 1 ) || !is.na(data.fl))     fl <- combine_techrep(df=fl)
-    if((length(fl2) > 1 ) || !is.na(data.fl2))     fl2 <- combine_techrep(df=fl2)
-
-
-    # remove blank columns from dataset
-    remove_blank <- function(df){
-      blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = TRUE)
-      if(length(blank.ndx)>0){
-        df <- df[-blank.ndx, ]
-      }
-      return(df)
-    }
-    if(length(dat)>1)              dat <- remove_blank(dat)
-    if((length(fl) > 1 ) || !is.na(data.fl))     fl <- remove_blank(df=fl)
-    if((length(fl2) > 1 ) || !is.na(data.fl2))     fl2 <- remove_blank(df=fl2)
-
-    # Remove columns with NA measurements in all samples
-    if(length(dat)>1)              dat <- dat[, c(1:3, which(unlist(lapply(4:ncol(dat), function(x)!all(is.na(dat[2:nrow(dat),x])))))+3)]
-    if((length(fl) > 1 ) || !is.na(data.fl))     fl <- fl[, c(1:3, which(unlist(lapply(4:ncol(fl), function(x)!all(is.na(fl[2:nrow(fl),x])))))+3)]
-    if((length(fl2) > 1 ) || !is.na(data.fl2))     fl2 <- fl2[, c(1:3, which(unlist(lapply(4:ncol(fl2), function(x)!all(is.na(fl2[2:nrow(fl2),x])))))+3)]
-
-    # add minimum negative value + 1 to all fluorescence data
-    if((length(fl) > 1 ) || !is.na(data.fl)){
-      num.fl <- t(apply(fl[2:nrow(fl), 4:ncol(fl)], 1, as.numeric))
-      min.F1 <- unique(num.fl[which(num.fl == min(num.fl, na.rm = TRUE), arr.ind = TRUE)])
-      if(min.F1 <=0){
-        fl[2:nrow(fl), 4:ncol(fl)] <- num.fl+(-min.F1)+1
-      }
-    }
-    if((length(fl2) > 1 ) || !is.na(data.fl2)){
-      num.fl2 <- t(apply(fl2[2:nrow(fl2), 4:ncol(fl2)], 1, as.numeric))
-      min.F2 <- unique(num.fl2[which(num.fl2 == min(num.fl2, na.rm = TRUE), arr.ind = TRUE)])
-      if(min.F2 <=0){
-        fl2[2:nrow(fl2), 4:ncol(fl2)] <- num.fl2+(-min.F2)+1
-      }
-    }
-
-    # normalize fluorescence
-    if(fl.normtype == "growth"){
-      if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){
-        fl.norm <- fl
-        time.ndx <- grep("time", unlist(fl.norm[,1]), ignore.case = TRUE)
-        fl.norm[-time.ndx, 4:ncol(fl.norm)] <-
-          t(apply(fl.norm[-time.ndx, 4:ncol(fl.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
-      }
-    }
-    if(fl.normtype == "fl2"){
-      if(((length(fl) > 1 ) || !is.na(data.fl2)) && length(fl2)>1){
-        fl.norm <- fl
-        time.ndx <- grep("time", unlist(fl.norm[,1]), ignore.case = TRUE)
-        fl.norm[-time.ndx, 4:ncol(fl.norm)] <-
-          t(apply(fl.norm[-time.ndx, 4:ncol(fl.norm)], 1, as.numeric))/t(apply(fl2[-time.ndx, 4:ncol(fl2)], 1, as.numeric))
-      }
-    }
-    # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1){
-    #   fl2.norm <- fl
-    #   time.ndx <- grep("time", unlist(fl2.norm[,1]), ignore.case = TRUE)
-    #   fl2.norm[-time.ndx, 4:ncol(fl2.norm)] <-
-    #     t(apply(fl2.norm[-time.ndx, 4:ncol(fl2.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 4:ncol(dat)], 1, as.numeric))
-    # }
-
-    # Create time matrix
-    if(length(dat) > 1) {
-      time.ndx <- grep("time", unlist(dat[,1]), ignore.case = TRUE)
-      dat.time <- dat
-    } else if(length(fl) > 1){
-      time.ndx <- grep("time", unlist(fl[,1]), ignore.case = TRUE)
-      dat.time <- fl
-    }
-    # else if(length(fl2) > 1){
-    #   time.ndx <- grep("time", unlist(fl2[,1]), ignore.case = TRUE)
-    #   dat.time <- fl2
-    # }
-
-    if(length(time.ndx)==1){
-      time <- as.numeric(unlist(dat.time[time.ndx[1],4:ncol(dat.time)]))
-      t.mat <- data.matrix(data.frame(matrix(
-        data = rep(time, nrow(dat.time)-1),
-        nrow = nrow(dat.time)-1,
-        byrow = T
-      )))
-    } else { # identify different datasets based on the occurence of multiple 'time' entities
-      time <- list()
-      time[[1]] <- as.numeric(unlist(dat.time[time.ndx[1],4:ncol(dat.time)]))
-      t.mat <- data.matrix(data.frame(matrix(
-        data = rep(time[[1]], time.ndx[2]-time.ndx[1]-1),
-        nrow = time.ndx[2]-time.ndx[1]-1,
-        byrow = T
-      )))
-      for (i in 2:(length(time.ndx))){
-        time[[i]] <- as.numeric(unlist(dat.time[time.ndx[i],4:ncol(dat.time)]))
-        t.mat <- rbind(t.mat,
-                       data.matrix(data.frame(
-                         matrix(
-                           data = rep(time[[i]], times = if (is.na(time.ndx[i + 1])) {
-                             nrow(dat.time) - time.ndx[i]
-                           } else {
-                             time.ndx[i + 1] - time.ndx[i] - 1
-                           }),
-                           nrow = if (is.na(time.ndx[i + 1])) {
-                             nrow(dat.time) - time.ndx[i]
-                           } else {
-                             time.ndx[i + 1] - time.ndx[i] - 1
-                           },
-                           byrow = TRUE)
-                       )
-                       )
-        )
-      } # end of for (i in 2:(length(time.ndx)))
-    } # end of else {}
-
-    # Create data matrices for growth and fluorescence values
-    create_datmat <- function(df, time.ndx){
-      if(length(time.ndx)==1){
-        df.mat <- data.frame(df[(time.ndx[1]+1):nrow(df),])
-      } else { # identify different datasets based on the occurence of multiple 'time' entities
-        df.mat <- data.frame(df[(time.ndx[1]+1) : (time.ndx[2]-1), ])
-        for (i in 2:(length(time.ndx))){
-          df.mat <- rbind(df.mat,
-                          data.frame(df[ if (is.na(time.ndx[i + 1])) {
-                            (time.ndx[i]+1) : nrow(df)
-                          } else {
-                            (time.ndx[i]+1) : (time.ndx[i+1] - 1)
-                          } , ])
-          )
-        } # end of for (i in 2:(length(time.ndx)))
-      } # end of else {}
-      return(df.mat)
-    }
-    if(length(dat)>1){
-      dat.mat <- create_datmat(dat, time.ndx=time.ndx)
-      if(ncol(dat.mat) == 1) dat.mat <- t(dat.mat)
-      dat.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[,1])
-    } else{
-      dat.mat <- NA
-    }
-    if((length(fl) > 1 ) || !is.na(data.fl)){fl.mat <- create_datmat(df=fl, time.ndx=time.ndx);  fl.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.mat[,1])}else{fl.mat <- NA}
-    # if((length(fl2) > 1 ) || !is.na(data.fl2)){fl2.mat <- create_datmat(df=fl2, time.ndx=time.ndx);  fl2.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl2.mat[,1])}else{fl2.mat <- NA}
-    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){fl.norm.mat <- create_datmat(df=fl.norm, time.ndx=time.ndx);  fl.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.norm.mat[,1])}else{fl.norm.mat <- NA}
-    # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1){fl2.norm.mat <- create_datmat(df=fl2.norm, time.ndx=time.ndx);  fl2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl2.norm.mat[,1])}else{fl2.norm.mat <- NA}
-
-    if(length(dat)>1) {            
-      colnames(dat.mat) <- rep("", ncol(dat.mat))
-      colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-      }
-    if((length(fl) > 1 ) || !is.na(data.fl)){    
-      colnames(fl.mat) <- rep("", ncol(dat.mat))
-      colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
-      }
-    # if((length(fl2) > 1 ) || !is.na(data.fl2))    colnames(fl2.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1) { 
-      colnames(fl.norm.mat) <- rep("", ncol(dat.mat))
-      colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
-      }
-    # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1)  colnames(fl2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
-
-    if(length(dat) > 1) {
-      label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
-      condition <- dat.mat[, 1]
-      replicate <- dat.mat[, 2]
-      concentration <- dat.mat[, 3]
-    } else if(length(fl) > 1){
-      label <- unlist(lapply(1:nrow(fl.mat), function(x) paste(fl.mat[x,1], fl.mat[x,2], fl.mat[x,3], sep = " | ")))
-      condition <- fl.mat[, 1]
-      replicate <- fl.mat[, 2]
-      concentration <- fl.mat[, 3]
-    }
-    # else if(length(fl2) > 1){
-    #   label <- unlist(lapply(1:nrow(fl2.mat), function(x) paste(fl2.mat[x,1], fl2.mat[x,2], fl2.mat[x,3], sep = " | ")))
-    #   condition <- fl2.mat[, 1]
-    #   replicate <- fl2.mat[, 2]
-    #   concentration <- fl2.mat[, 3]
-    # }
-
-
-    expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
-
-    if(length(dat)>1)             
-      dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
-      colnames(dat.mat)[4:ncol(dat.mat)] <- ""
-                             
-    if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat <- as.data.frame(unclass(fl.mat), stringsAsFactors = TRUE)
-    # if((length(data.fl2) > 1 ) || !is.na(data.fl2))    fl2.mat <- as.data.frame(unclass(fl2.mat), stringsAsFactors = TRUE)
-    if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat <- as.data.frame(unclass(fl.norm.mat), stringsAsFactors = TRUE)
-    # if(((length(data.fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1)  fl2.norm.mat <- as.data.frame(unclass(fl2.norm.mat), stringsAsFactors = TRUE)
-    #convert values from factor to numeric
-    if(length(dat)>1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
-    if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, -(1:3)]))
-    # if((length(data.fl2) > 1 ) || !is.na(data.fl2))    fl2.mat[, -(1:3)] <- as.numeric(as.matrix(fl2.mat[, -(1:3)]))
-    if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, -(1:3)]))
-    # if(((length(data.fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1)  fl2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl2.norm.mat[, -(1:3)]))
-
-    # if identical time values are present, combine the respective measurement as their mean
-    ## create list with unique time values and their frequencies
-    t.mat.freq <- lapply(1:nrow(t.mat), function(i) data.frame(table(t.mat[i,])))
-
-    if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1)){ #does any time value exist more than once in the same sample?
-      ## create list with duplicated time values
-      t.mult <- lapply(1:length(t.mat.freq), function(i) t.mat.freq[[i]][t.mat.freq[[i]]$Freq>1, ])
-      t.mult <- lapply(1:length(t.mult), function(i) t.mat[i,][t.mat[i,] %in% t.mult[[i]]$Var1 ])
-      unique.t.mult <- lapply(1:length(t.mult), function(i) unique(t.mult[[i]]))
-
-      ## combine measurements with duplicated time entries
-      t.ls <- list()
-      dat.ls <- list()
-      f1.ls <- list()
-      f2.ls <- list()
-      f1.norm.ls <- list()
-      f2.norm.ls <- list()
-
-      for(i in 1:length(t.mult)){
-        if(length(t.mult[[i]])>1){
-          col.nm <- lapply(1:length(unique.t.mult[[i]]), function(j)
-            names( t.mult[[i]][which(t.mult[[i]] %in% unique.t.mult[[i]][j]) ] )
-          )
-          col.ndx <- lapply(1:length(col.nm), function(j) which(colnames(t.mat) %in% col.nm[[j]])
-          )
-          # add column with average
-
-          ###### MAKE PER ROW AND ALSO IN TIME MATRIX!!!
-          combine.ndx <- c(1:col.ndx[[1]][1]) # time values of sample up to first duplicated time
-          if(length(col.ndx) == 2){
-            if(col.ndx[[1]][length(col.ndx[[1]])] == length(t.mat[i, ])){
-              combine.ndx <- c(combine.ndx,
-                               (col.ndx[[1]][length(col.ndx[[1]])]+1):col.ndx[[2]][1])
-            } else {
-              combine.ndx <- c(combine.ndx,
-                               (col.ndx[[1]][length(col.ndx[[1]])]+1):col.ndx[[2]][1],
-                               (col.ndx[[2]][length(col.ndx[[2]])]+1):length(t.mat[i, ]))
-            }
-          } else if(length(col.ndx) > 2){
-            for(j in 2:(length(col.ndx)-1)){
-              combine.ndx <- c(combine.ndx,
-                               (col.ndx[[j-1]][length(col.ndx[[j-1]])]+1):col.ndx[[j]][1],
-                               (col.ndx[[j]][length(col.ndx[[j]])]+1):col.ndx[[j+1]][1]
-              )
-            }
-            if(!col.ndx[[length(col.ndx)]][length(col.ndx[[length(col.ndx)]])] == length(t.mat[i, ])){
-              combine.ndx <- c(combine.ndx,
-                               (col.ndx[[length(col.ndx)]][length(col.ndx[[length(col.ndx)]])]+1):length(t.mat[i, ]))
-            }
-          }
-
-          t.ls[[i]] <- t.mat[i, combine.ndx] # time values of sample up to duplicated time
-
-          combine.ndx.dat <- combine.ndx + 3 # account for three identifier columns
-          ndx.average.first <- which(diff(combine.ndx.dat) > 1)+3
-
-          if(length(dat.mat) > 1){
-            dat.ls[[i]] <- c(dat.mat[i, 1:3], dat.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
-            for(j in 1:length(ndx.average.first)){
-              dat.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(dat.mat[i, (col.ndx[[j]]+3)]))
-            }
-          }
-
-          if(length(fl.mat) > 1){
-            f1.ls[[i]] <- c(fl.mat[i, 1:3], fl.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
-            for(j in 1:length(ndx.average.first)){
-              f1.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.mat[i, (col.ndx[[j]]+3)]))
-            }
-          }
-
-          # if(length(fl2.mat) > 1){
-          #   f2.ls[[i]] <- c(fl2.mat[i, 1:3], fl2.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
-          #   for(j in 1:length(ndx.average.first)){
-          #     f2.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl2.mat[i, (col.ndx[[j]]+3)]))
-          #   }
-          # }
-
-          if(length(fl.norm.mat) > 1){
-            f1.norm.ls[[i]] <- c(fl.norm.mat[i, 1:3], fl.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
-            for(j in 1:length(ndx.average.first)){
-              f1.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.norm.mat[i, (col.ndx[[j]]+3)]))
-            }
-          }
-
-          # if(length(fl2.norm.mat) > 1){
-          #   f2.norm.ls[[i]] <- c(fl2.norm.mat[i, 1:3], fl2.norm.mat[i, combine.ndx.dat]) # remove entries with duplicated time values except the first ones
-          #   for(j in 1:length(ndx.average.first)){
-          #     f2.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl2.norm.mat[i, (col.ndx[[j]]+3)]))
-          #   }
-          # }
-        } # if(length(t.mult[[i]])>1)
-      } # for(i in 1:length(t.mult))
-
-      t.mat <- do.call(rbind, t.ls)
-      if(length(dat.mat) > 1) dat.mat <- as.data.frame(unclass(do.call(rbind, dat.ls)), stringsAsFactors = TRUE)
-      if(length(fl.mat) > 1) fl.mat <- as.data.frame(unclass(do.call(rbind, f1.ls)), stringsAsFactors = TRUE)
-      # if(length(fl2.mat) > 1) fl2.mat <- as.data.frame(unclass(do.call(rbind, f2.ls)), stringsAsFactors = TRUE)
-      if(length(fl.norm.mat) > 1) fl.norm.mat <- as.data.frame(unclass(do.call(rbind, f1.norm.ls)), stringsAsFactors = TRUE)
-      # if(length(fl2.norm.mat) > 1) fl2.norm.mat <- as.data.frame(unclass(do.call(rbind, f2.norm.ls)), stringsAsFactors = TRUE)
-
-      #convert values from factor to numeric
-      if(length(dat.mat) > 1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
-      if(length(fl.mat) > 1)    fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, -(1:3)]))
-      # if(length(fl2.mat) > 1)    fl2.mat[, -(1:3)] <- as.numeric(as.matrix(fl2.mat[, -(1:3)]))
-      if(length(fl.norm.mat) > 1)  fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, -(1:3)]))
-      # if(length(fl2.norm.mat) > 1)  fl2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl2.norm.mat[, -(1:3)]))
-
-    } # if(any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq))) ] > 1))
-
-    dataset <- list("time" = t.mat,
-                    "growth" = dat.mat,
-                    "fluorescence" = fl.mat,
-                    # "fluorescence2" = fl2.mat,
-                    "norm.fluorescence" = fl.norm.mat,
-                    # "norm.fluorescence2" = fl2.norm.mat,
-                    "expdesign" = expdesign)
-
-    class(dataset) <- "grodata"
-    invisible(dataset)
+read_data2<-function (data.growth = NA, data.fl = NA, data.fl2 = NA, data.format = "col", 
+  csvsep = ";", dec = ".", csvsep.fl = ";", dec.fl = ".", 
+  csvsep.fl2 = ";", dec.fl2 = ".", sheet.growth = 1, sheet.fl = 1, 
+  sheet.fl2 = 1, fl.normtype = c("growth", "fl2"), subtract.blank = TRUE, 
+  convert.time = NULL, calib.growth = NULL, calib.fl = NULL, 
+  calib.fl2 = NULL) 
+{
+  if (is.null(data.growth)) 
+    data.growth <- NA
+  if (is.null(data.fl)) 
+    data.fl <- NA
+  if (is.null(data.fl2)) 
+    data.fl2 <- NA
+  if (!is.null(calib.growth) && calib.growth == "") 
+    calib.growth <- NULL
+  if (!is.null(calib.fl) && calib.fl == "") 
+    calib.fl <- NULL
+  if (!is.null(calib.fl2) && calib.fl2 == "") 
+    calib.fl2 <- NULL
+  fl.normtype <-match.arg(fl.normtype)
+  if (any(is(data.growth) %in% c("matrix", "list", "array")) || 
+    !is.character(data.growth)) {
+    dat <- data.growth
+  } else {
+    if (!is.na(data.growth)) 
+      dat <- read_file(data.growth, csvsep = csvsep, dec = dec, 
+        sheet = sheet.growth)
   }
-
+  
+  
+  if (length(dat) > 1) 
+    
+    dat <- tidy_to_custom2(df = dat, data.format = data.format)
+ 
+  
+  
+  if (!is.null(convert.time)) {
+    conversion <- parse(text = convert.time)
+    x <- as.numeric(dat[1, -(1:3)])
+    time_converted <- eval(conversion)
+    dat[1, -(1:3)] <- time_converted
+  }
+  if (length(dat) > 1) {
+    allNA.ndx <- which(unlist(lapply(1:nrow(dat), function(x) all(is.na(dat[x, 
+      -(1:3)])))))
+    if (length(allNA.ndx) > 0) 
+      dat <- dat[-allNA.ndx, ]
+  }
+  if (length(dat) > 0 && !all(is.na(dat))) 
+    dat[, 3] <- suppressWarnings(as.character(as.numeric(dat[, 
+      3])))
+  if (data.format == "col") {
+    message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
+  } else {
+    message("Sample data are stored in rows. If they are stored in column format, please run read_data() with data.format = 'col'.")
+  }
+    
+    
+  if ((length(data.fl) > 1) || !all(is.na(data.fl))) {
+    if (any(is(data.fl) %in% c("matrix", "list", "array")) || 
+      !is.character(data.fl)) {
+      fl <- data.fl
+    }
+    else {
+      fl <- read_file(data.fl, csvsep = csvsep.fl, dec = dec.fl, 
+        sheet = sheet.fl)
+    }
+    fl <- tidy_to_custom2(df = fl, data.format = data.format)
+    if (!(any(grepl("time", unlist(fl[, 1]), ignore.case = TRUE)))) {
+      if (data.format == "col") {
+        stop("Could not find 'time' in column 1 of data.fl")
+      }
+      else {
+        stop("Could not find 'time' in row 1 of data.fl")
+      }
+    }
+    allNA.ndx <- which(unlist(lapply(1:nrow(fl), function(x) all(is.na(fl[x, 
+      -(1:3)])))))
+    if (length(allNA.ndx) > 0) 
+      fl <- fl[-allNA.ndx, ]
+    fl[, 3] <- as.character(as.numeric(fl[, 3]))
+    if (!is.null(convert.time)) {
+      conversion <- parse(text = convert.time)
+      x <- as.numeric(fl[1, -(1:3)])
+      time_converted <- eval(conversion)
+      fl[1, -(1:3)] <- time_converted
+    }
+  } else {
+    fl <- NA
+  }
+  if ((length(data.fl2) > 1) || !is.na(data.fl2)) {
+    if (any(is(data.fl2) %in% c("matrix", "list", "array")) || 
+      !is.character(data.fl2)) {
+      fl2 <- data.fl2
+    }
+    else {
+      fl2 <- read_file(data.fl2, csvsep = csvsep.fl2, 
+        dec = dec.fl2, sheet = sheet.fl2)
+    }
+    fl2 <- tidy_to_custom2(df = fl2, data.format = data.format)
+    if (!(any(grepl("time", unlist(fl2[, 1]), ignore.case = TRUE)))) {
+      if (data.format == "col") {
+        stop("Could not find 'time' in column 1 of data.fl2")
+      }
+      else {
+        stop("Could not find 'time' in row 1 of data.fl2")
+      }
+    }
+  } else {
+    fl2 <- NA
+  }
+  
+  if ((length(dat) > 1 && !(any(grepl("time", unlist(dat[, 
+    1]), ignore.case = TRUE)))) && (length(fl) > 1 && !(any(grepl("time", 
+    unlist(fl[, 1]), ignore.case = TRUE))))) {
+    if (data.format == "col") {
+      stop("Could not find 'time' in column 1 of any provided 'data.growth' or 'data.fl'.")
+    }
+    else {
+      stop("Could not find 'time' in row 1 of any provided 'data.growth' or 'data.fl'.")
+    }
+  }
+  if (!is.null(calib.growth)) {
+    if (length(dat) > 1) 
+      dat <- calibrate(dat, calib.growth)
+  }
+  if (!is.null(calib.fl)) {
+    if ((length(fl) > 1) || !is.na(data.fl)) 
+      fl <- calibrate(fl, calib.fl)
+  }
+  if (!is.null(calib.fl2)) {
+    if ((length(fl2) > 1) || !is.na(data.fl2)) 
+      fl2 <- calibrate(fl2, calib.fl2)
+  }
+  if (subtract.blank) {
+    subtract_blank <- function(df) {
+      time.ndx <- grep("time", unlist(df[, 1]), ignore.case = TRUE)
+      if (length(time.ndx) == 1) {
+        blank.ndx <- grep("blank", df[1:nrow(df), 1], 
+          ignore.case = TRUE)
+        if (length(blank.ndx) > 0) {
+          if (length(blank.ndx) > 1) {
+            blank <-rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = TRUE)
+          }
+          else {
+            blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
+          }
+          df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)] <- t(sweep(apply(df[(2:nrow(df))[!((2:nrow(df)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
+          }
+      } else {
+        blank.ndx <- grep("blank", df[(time.ndx[1]):(time.ndx[2] - 
+          1), 1], ignore.case = TRUE)
+        if (length(blank.ndx) > 0) {
+          if (length(blank.ndx) > 1) {
+            blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 
+              1, as.numeric))
+          }
+          else {
+            blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
+          }
+          df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 
+            1):(time.ndx[2] - 1)) %in% blank.ndx)], 
+            4:ncol(df)] <- t(sweep(apply(df[((time.ndx[1] + 
+            1):(time.ndx[2] - 1))[!(((time.ndx[1] + 
+            1):(time.ndx[2] - 1)) %in% blank.ndx)], 
+            4:ncol(df)], 1, as.numeric), 1, blank))
+        }
+        for (i in 2:(length(time.ndx))) {
+          blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 
+            1])) {
+            (time.ndx[i] + 1):nrow(df)
+          }
+          else {
+            (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+          }, 1], ignore.case = TRUE) + time.ndx[i]
+          if (length(blank.ndx) > 0) {
+            if (length(blank.ndx) > 1) {
+              blank <- rowMeans(apply(df[blank.ndx, 
+                4:ncol(df)], 1, as.numeric))
+            }
+            else {
+              blank <- as.numeric(df[blank.ndx, 4:ncol(df)])
+            }
+            df[if (is.na(time.ndx[i + 1])) {
+              ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 
+                1):nrow(df) %in% blank.ndx)]
+            }
+            else {
+              ((time.ndx[i] + 1):(time.ndx[i + 1] - 
+                1))[!(((time.ndx[i] + 1):(time.ndx[i + 
+                1] - 1)) %in% blank.ndx)]
+            }, 4:ncol(df)] <- t(sweep(apply(df[if (is.na(time.ndx[i + 
+              1])) {
+              ((time.ndx[i] + 1):nrow(df))[!((time.ndx[i] + 
+                1):nrow(df) %in% blank.ndx)]
+            }
+            else {
+              ((time.ndx[i] + 1):(time.ndx[i + 1] - 
+                1))[!(((time.ndx[i] + 1):(time.ndx[i + 
+                1] - 1)) %in% blank.ndx)]
+            }, 4:ncol(df)], 1, as.numeric), 1, blank))
+          }
+        }
+      }
+      return(df)
+    }
+    if (length(dat) > 1) 
+      dat <- subtract_blank(dat)
+    if ((length(fl) > 1) || !is.na(data.fl)) 
+      fl <- subtract_blank(df = fl)
+    if ((length(fl2) > 1) || !is.na(data.fl2)) 
+      fl2 <- subtract_blank(df = fl2)
+  }
+  
+  combine_techrep <- function(df) {
+    sample_names <- as.character(paste0(df[2:nrow(df), 1], 
+      "...", df[2:nrow(df), 2], "___", df[2:nrow(df), 
+        3]))
+    conditions <- unique(gsub("\\.\\.\\..+___", "___", sample_names))
+    time.ndx <- grep("time", unlist(df[, 1]), ignore.case = TRUE)
+    if (length(time.ndx) > 1) {
+      conditions <- conditions[-grep("time", gsub("___.+", 
+        "", conditions), ignore.case = TRUE)]
+    }
+    blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), 
+      ignore.case = TRUE)
+    if (length(blankcond.ndx) > 1) {
+      conditions <- conditions[-blankcond.ndx]
+    }
+    
+    #handling missing values I think
+    
+    remove <- c()
+    for (i in 1:length(conditions)) {
+      ndx.cond <- which(gsub("\\.\\.\\..+___", "___", 
+        sample_names) %in% conditions[i])
+      name <- df[ndx.cond[1] + 1, 1]
+      conc <- df[ndx.cond[1] + 1, 3]
+      tech.rep <- suppressWarnings(as.numeric(unique(gsub("___.+", 
+        "", gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])))))
+      tech.rep <- tech.rep[!is.na(tech.rep)]
+      if (length(tech.rep) > 1) {
+        for (j in 1:length(tech.rep)) {
+          ndx.rep <- ndx.cond[which(gsub("___.+", "", 
+            gsub(".+\\.\\.\\.", "", sample_names[ndx.cond])) %in% 
+            tech.rep[j])]
+          if (length(ndx.rep) > 1) {
+            values <- apply(df[ndx.rep + 1, 4:ncol(df)], 
+              1, as.numeric)
+            means <- rowMeans(values)
+            df[ndx.rep[1] + 1, 4:ncol(df)] <- means
+            df[ndx.rep[1] + 1, 2] <- as.numeric(tech.rep[j])
+            remove <- c(remove, ndx.rep[-1] + 1)
+          }
+          else {
+            df[ndx.rep[1] + 1, 2] <- as.numeric(tech.rep[j])
+          }
+        }
+      }
+    }
+    if (length(remove) > 1) {
+      df <- df[-remove, ]
+    }
+    return(df)
+  }
+  
+  if (length(dat) > 1) 
+    dat <- combine_techrep(dat)
+  if ((length(fl) > 1) || !is.na(data.fl)) 
+    fl <- combine_techrep(df = fl)
+  if ((length(fl2) > 1) || !is.na(data.fl2)) 
+    fl2 <- combine_techrep(df = fl2)
+  remove_blank <- function(df) {
+    blank.ndx <- grep("blank", df[1:nrow(df), 1], ignore.case = TRUE)
+    if (length(blank.ndx) > 0) {
+      df <- df[-blank.ndx, ]
+    }
+    return(df)
+  }
+  if (length(dat) > 1) 
+    dat <- remove_blank(dat)
+  if ((length(fl) > 1) || !is.na(data.fl)) 
+    fl <- remove_blank(df = fl)
+  if ((length(fl2) > 1) || !is.na(data.fl2)) 
+    fl2 <- remove_blank(df = fl2)
+  
+  #remove empty vals
+  
+  if (length(dat) > 1) 
+    dat <- dat[, c(1:3, which(unlist(lapply(4:ncol(dat), 
+      function(x) !all(is.na(dat[2:nrow(dat), x]))))) + 
+      3)]
+  if ((length(fl) > 1) || !is.na(data.fl)) 
+    fl <- fl[, c(1:3, which(unlist(lapply(4:ncol(fl), function(x) !all(is.na(fl[2:nrow(fl), 
+      x]))))) + 3)]
+  if ((length(fl2) > 1) || !is.na(data.fl2)) 
+    fl2 <- fl2[, c(1:3, which(unlist(lapply(4:ncol(fl2), 
+      function(x) !all(is.na(fl2[2:nrow(fl2), x]))))) + 
+      3)]
+  
+  
+  if ((length(fl) > 1) || !is.na(data.fl)) {
+    num.fl <- t(apply(fl[2:nrow(fl), 4:ncol(fl)], 1, as.numeric))
+    min.F1 <- unique(num.fl[which(num.fl == min(num.fl, 
+      na.rm = TRUE), arr.ind = TRUE)])
+    if (min.F1 <= 0) {
+      fl[2:nrow(fl), 4:ncol(fl)] <- num.fl + (-min.F1) + 
+        1
+    }
+  }
+  if ((length(fl2) > 1) || !is.na(data.fl2)) {
+    num.fl2 <- t(apply(fl2[2:nrow(fl2), 4:ncol(fl2)], 1, 
+      as.numeric))
+    min.F2 <- unique(num.fl2[which(num.fl2 == min(num.fl2, 
+      na.rm = TRUE), arr.ind = TRUE)])
+    if (min.F2 <= 0) {
+      fl2[2:nrow(fl2), 4:ncol(fl2)] <- num.fl2 + (-min.F2) + 
+        1
+    }
+  }
+  
+  
+  if (fl.normtype == "growth") {
+    if (((length(fl) > 1) || !is.na(data.fl)) && length(dat) > 
+      1) {
+      fl.norm <- fl
+      time.ndx <- grep("time", unlist(fl.norm[, 1]), ignore.case = TRUE)
+      fl.norm[-time.ndx, 4:ncol(fl.norm)] <- t(apply(fl.norm[-time.ndx, 
+        4:ncol(fl.norm)], 1, as.numeric))/t(apply(dat[-time.ndx, 
+        4:ncol(dat)], 1, as.numeric))
+    }
+  }
+  if (fl.normtype == "fl2") {
+    if (((length(fl) > 1) || !is.na(data.fl2)) && length(fl2) > 
+      1) {
+      fl.norm <- fl
+      time.ndx <- grep("time", unlist(fl.norm[, 1]), ignore.case = TRUE)
+      fl.norm[-time.ndx, 4:ncol(fl.norm)] <- t(apply(fl.norm[-time.ndx, 
+        4:ncol(fl.norm)], 1, as.numeric))/t(apply(fl2[-time.ndx, 
+        4:ncol(fl2)], 1, as.numeric))
+    }
+  }
+  if (length(dat) > 1) {
+    time.ndx <- grep("time", unlist(dat[, 1]), ignore.case = TRUE)
+    dat.time <- dat
+  } else if (length(fl) > 1) {
+    time.ndx <- grep("time", unlist(fl[, 1]), ignore.case = TRUE)
+    dat.time <- fl
+  }
+  if (length(time.ndx) == 1) {
+    time <- as.numeric(unlist(dat.time[time.ndx[1], 4:ncol(dat.time)]))
+    t.mat <- data.matrix(data.frame(matrix(data = rep(time, 
+      nrow(dat.time) - 1), nrow = nrow(dat.time) - 1, 
+      byrow = T)))
+  } else {
+    time <- list()
+    time[[1]] <- as.numeric(unlist(dat.time[time.ndx[1], 
+      4:ncol(dat.time)]))
+    t.mat <- data.matrix(data.frame(matrix(data = rep(time[[1]], 
+      time.ndx[2] - time.ndx[1] - 1), nrow = time.ndx[2] - 
+      time.ndx[1] - 1, byrow = T)))
+    for (i in 2:(length(time.ndx))) {
+      time[[i]] <- as.numeric(unlist(dat.time[time.ndx[i], 
+        4:ncol(dat.time)]))
+      t.mat <- rbind(t.mat, data.matrix(data.frame(matrix(data = rep(time[[i]], 
+        times = if (is.na(time.ndx[i + 1])) {
+          nrow(dat.time) - time.ndx[i]
+        } else {
+          time.ndx[i + 1] - time.ndx[i] - 1
+        }), nrow = if (is.na(time.ndx[i + 1])) {
+        nrow(dat.time) - time.ndx[i]
+      }
+      else {
+        time.ndx[i + 1] - time.ndx[i] - 1
+      }, byrow = TRUE))))
+    }
+  }
+  
+  create_datmat <- function(df, time.ndx) {
+    if (length(time.ndx) == 1) {
+      df.mat <- data.frame(df[(time.ndx[1] + 1):nrow(df), 
+        ])
+    } else {
+      df.mat <- data.frame(df[(time.ndx[1] + 1):(time.ndx[2] - 
+        1), ])
+      for (i in 2:(length(time.ndx))) {
+        df.mat <- rbind(df.mat, data.frame(df[if (is.na(time.ndx[i + 
+          1])) {
+          (time.ndx[i] + 1):nrow(df)
+        } else {
+          (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
+        }, ]))
+      }
+    }
+    return(df.mat)
+  }
+  
+  if (length(dat) > 1) {
+    dat.mat <- create_datmat(dat, time.ndx = time.ndx)
+    if (ncol(dat.mat) == 1) 
+      dat.mat <- t(dat.mat)
+    dat.mat[, 1] <- gsub("\\n\\r|\\n|\\r", "", dat.mat[, 
+      1])
+  } else {
+    dat.mat <- NA
+  }
+  
+  if ((length(fl) > 1) || !is.na(data.fl)) {
+    fl.mat <- create_datmat(df = fl, time.ndx = time.ndx)
+    fl.mat[, 1] <- gsub("\\n\\r|\\n|\\r", "", fl.mat[, 1])
+  } else {
+    fl.mat <- NA
+  }
+  
+  if (((length(fl) > 1) || !is.na(data.fl)) && length(dat) > 
+    1) {
+    fl.norm.mat <- create_datmat(df = fl.norm, time.ndx = time.ndx)
+    fl.norm.mat[, 1] <- gsub("\\n\\r|\\n|\\r", "", fl.norm.mat[, 
+      1])
+  } else {
+    fl.norm.mat <- NA
+  }
+  
+  if (length(dat) > 1) {
+    colnames(dat.mat) <- rep("", ncol(dat.mat))
+    colnames(dat.mat)[1:3] <- c("condition", "replicate", 
+      "concentration")
+  }
+  if ((length(fl) > 1) || !is.na(data.fl)) {
+    colnames(fl.mat) <- rep("", ncol(dat.mat))
+    colnames(fl.mat)[1:3] <- c("condition", "replicate", 
+      "concentration")
+  } 
+  if (((length(fl) > 1) || !is.na(data.fl)) && length(dat) > 
+    1){ 
+    colnames(fl.norm.mat) <- rep("", ncol(dat.mat))
+    colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", 
+      "concentration")
+  }
+    
+    
+  if (length(dat) > 1) {
+    label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x, 
+      1], dat.mat[x, 2], dat.mat[x, 3], sep = " | ")))
+    condition <- dat.mat[, 1]
+    replicate <- dat.mat[, 2]
+    concentration <- dat.mat[, 3]
+  } else if (length(fl) > 1) {
+    label <- unlist(lapply(1:nrow(fl.mat), function(x) paste(fl.mat[x, 
+      1], fl.mat[x, 2], fl.mat[x, 3], sep = " | ")))
+    condition <- fl.mat[, 1]
+    replicate <- fl.mat[, 2]
+    concentration <- fl.mat[, 3]
+  }
+    
+  expdesign <- data.frame(label, condition, replicate, concentration, 
+    check.names = FALSE)
+  
+  if (length(dat) > 1) 
+    dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
+    colnames(dat.mat)[4:ncol(dat.mat)] <- ""
+    
+  if ((length(data.fl) > 1) || !is.na(data.fl)) 
+    fl.mat <- as.data.frame(unclass(fl.mat), stringsAsFactors = TRUE)
+  if (((length(data.fl) > 1) || !is.na(data.fl)) && length(dat) > 
+    1) 
+    fl.norm.mat <- as.data.frame(unclass(fl.norm.mat), stringsAsFactors = TRUE)
+  
+  if (length(dat) > 1) 
+    dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, 
+      -(1:3)]))
+  if ((length(data.fl) > 1) || !is.na(data.fl)) 
+    fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, -(1:3)]))
+  if (((length(data.fl) > 1) || !is.na(data.fl)) && length(dat) > 
+    1) 
+    fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, 
+      -(1:3)]))
+  
+  t.mat.freq <- lapply(1:nrow(t.mat), function(i) data.frame(table(t.mat[i, 
+    ])))
+  
+  if (any(unlist(t.mat.freq)[grep("Freq", names(unlist(t.mat.freq)))] > 
+    1)) {
+    t.mult <- lapply(1:length(t.mat.freq), function(i) t.mat.freq[[i]][t.mat.freq[[i]]$Freq > 
+      1, ])
+    t.mult <- lapply(1:length(t.mult), function(i) t.mat[i, 
+      ][t.mat[i, ] %in% t.mult[[i]]$Var1])
+    unique.t.mult <- lapply(1:length(t.mult), function(i) unique(t.mult[[i]]))
+    t.ls <- list()
+    dat.ls <- list()
+    f1.ls <- list()
+    f2.ls <- list()
+    f1.norm.ls <- list()
+    f2.norm.ls <- list()
+    for (i in 1:length(t.mult)) {
+      if (length(t.mult[[i]]) > 1) {
+        col.nm <- lapply(1:length(unique.t.mult[[i]]), 
+          function(j) names(t.mult[[i]][which(t.mult[[i]] %in% 
+            unique.t.mult[[i]][j])]))
+        col.ndx <- lapply(1:length(col.nm), function(j) which(colnames(t.mat) %in% 
+          col.nm[[j]]))
+        combine.ndx <- c(1:col.ndx[[1]][1])
+        if (length(col.ndx) == 2) {
+          if (col.ndx[[1]][length(col.ndx[[1]])] == 
+            length(t.mat[i, ])) {
+            combine.ndx <- c(combine.ndx, (col.ndx[[1]][length(col.ndx[[1]])] + 
+              1):col.ndx[[2]][1])
+          }
+          else {
+            combine.ndx <- c(combine.ndx, (col.ndx[[1]][length(col.ndx[[1]])] + 
+              1):col.ndx[[2]][1], (col.ndx[[2]][length(col.ndx[[2]])] + 
+              1):length(t.mat[i, ]))
+          }
+        }
+        else if (length(col.ndx) > 2) {
+          for (j in 2:(length(col.ndx) - 1)) {
+            combine.ndx <- c(combine.ndx, (col.ndx[[j - 
+              1]][length(col.ndx[[j - 1]])] + 1):col.ndx[[j]][1], 
+              (col.ndx[[j]][length(col.ndx[[j]])] + 
+                1):col.ndx[[j + 1]][1])
+          }
+          if (!col.ndx[[length(col.ndx)]][length(col.ndx[[length(col.ndx)]])] == 
+            length(t.mat[i, ])) {
+            combine.ndx <- c(combine.ndx, (col.ndx[[length(col.ndx)]][length(col.ndx[[length(col.ndx)]])] + 
+              1):length(t.mat[i, ]))
+          }
+        }
+        t.ls[[i]] <- t.mat[i, combine.ndx]
+        combine.ndx.dat <- combine.ndx + 3
+        ndx.average.first <- which(diff(combine.ndx.dat) > 
+          1) + 3
+        if (length(dat.mat) > 1) {
+          dat.ls[[i]] <- c(dat.mat[i, 1:3], dat.mat[i, 
+            combine.ndx.dat])
+          for (j in 1:length(ndx.average.first)) {
+            dat.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(dat.mat[i, 
+              (col.ndx[[j]] + 3)]))
+          }
+        }
+        if (length(fl.mat) > 1) {
+          f1.ls[[i]] <- c(fl.mat[i, 1:3], fl.mat[i, 
+            combine.ndx.dat])
+          for (j in 1:length(ndx.average.first)) {
+            f1.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.mat[i, 
+              (col.ndx[[j]] + 3)]))
+          }
+        }
+        if (length(fl.norm.mat) > 1) {
+          f1.norm.ls[[i]] <- c(fl.norm.mat[i, 1:3], 
+            fl.norm.mat[i, combine.ndx.dat])
+          for (j in 1:length(ndx.average.first)) {
+            f1.norm.ls[[i]][ndx.average.first[j]] <- mean(as.numeric(fl.norm.mat[i, 
+              (col.ndx[[j]] + 3)]))
+          }
+        }
+      }
+    }
+    t.mat <- do.call(rbind, t.ls)
+    if (length(dat.mat) > 1) 
+      dat.mat <- as.data.frame(unclass(do.call(rbind, 
+        dat.ls)), stringsAsFactors = TRUE)
+    if (length(fl.mat) > 1) 
+      fl.mat <- as.data.frame(unclass(do.call(rbind, f1.ls)), 
+        stringsAsFactors = TRUE)
+    if (length(fl.norm.mat) > 1) 
+      fl.norm.mat <- as.data.frame(unclass(do.call(rbind, 
+        f1.norm.ls)), stringsAsFactors = TRUE)
+    if (length(dat.mat) > 1) 
+      dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, 
+        -(1:3)]))
+    if (length(fl.mat) > 1) 
+      fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, 
+        -(1:3)]))
+    if (length(fl.norm.mat) > 1) 
+      fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, 
+        -(1:3)]))
+  }
+  
+  dataset <- list(time = t.mat, growth = dat.mat, fluorescence = fl.mat, 
+    norm.fluorescence = fl.norm.mat, expdesign = expdesign)
+  class(dataset) <- "grodata"
+  invisible(dataset)
+}
 #' Convert a tidy data frame to a custom QurvE format
 #'
 #' This function converts a data frame in "tidy" format into the custom format used by QurvE (row format).
@@ -663,77 +676,64 @@ read_data <-
 #' @keywords internal
 #' @importFrom purrr map_int map_lgl
 #' @export
-tidy_to_custom <- function(df, data.format = "col"){
-  # Check if data is in "tidy" format
-  # Check if data contains the required headers in colnames or the first row
-  if((any(grepl("Time", colnames(df), ignore.case = T)) &&
-      any(grepl("Description", colnames(df), ignore.case = T)) &&
-      any(grepl("Values|Value", colnames(df), ignore.case = T))) ||
-     (any(grepl("Time", df[1,], ignore.case = T)) &&
-      any(grepl("Description", df[1,], ignore.case = T)) &&
-      any(grepl("Values|Value", df[1,], ignore.case = T)))
-  ){
+tidy_to_custom2 <-function (df, data.format = "col") 
+{
+    if ((any(grepl("Time", colnames(df), ignore.case = T)) && 
+    any(grepl("Description", colnames(df), ignore.case = T)) && 
+    any(grepl("Values|Value", colnames(df), ignore.case = T))) || 
+    (any(grepl("Time", df[1, ], ignore.case = T)) && any(grepl("Description", 
+      df[1, ], ignore.case = T)) && any(grepl("Values|Value", 
+      df[1, ], ignore.case = T)))) {
     tidy <- TRUE
-    # If identifiers in first row, convert to colnames
-    if(any(grepl("Time", df[1,], ignore.case = T)) ||
-       any(grepl("Description", df[1,], ignore.case = T)) ||
-       any(grepl("Values|Value", df[1,], ignore.case = T))){
+    if (any(grepl("Time", df[1, ], ignore.case = T)) || 
+      any(grepl("Description", df[1, ], ignore.case = T)) || 
+      any(grepl("Values|Value", df[1, ], ignore.case = T))) {
       colnames(df) <- df[1, ]
       df <- df[-1, ]
     }
+    
     colnames(df)[grep("Value", colnames(df))] <- "Values"
-    # If missing, add columns for "Replicate" and "Concentration"
-    if(!any(grepl("Replicate", colnames(df), ignore.case = T))){
+    
+    
+    if (!any(grepl("Replicate", colnames(df), ignore.case = T))) {
       df[, "Replicate"] <- rep(NA, nrow(df))
     }
-    if(!any(grepl("Concentration", colnames(df), ignore.case = T))){
+    if (!any(grepl("Concentration", colnames(df), ignore.case = T))) {
       df[, "Concentration"] <- rep(NA, nrow(df))
     }
-
-
-    # Convert tidy format to the custom QurvE format
-
-    # Create a unique identifier for each combination of Description, Concentration, and Replicate
-    df[["Group"]] <- paste(df$Description, df$Concentration, df$Replicate, sep = "_")
+    
+    df[["Group"]] <- paste(df$Description, df$Concentration, 
+      df$Replicate, sep = "_")
+    
     df[["Time"]] <- as.numeric(df[["Time"]])
-
-    # sort the df based on Time
+    
     df <- df %>% arrange(Time)
-
-    # create a list of unique time vectors
-    time_vectors <- df %>%
-      group_by(Group) %>%
-      summarise(Time = list(sort(unique(Time)))) %>%
-      pull(Time) %>%
-      unique()
-
-    # Create an id for each unique time vector
-    df <- df %>%
-      mutate(time_group = purrr:::map_int(list(Time), ~which(purrr:::map_lgl(time_vectors, ~all(.x == .)))))
-
-    # split the df into subsets based on time_group
+    time_vectors <- df %>% group_by(Group) %>% summarise(Time = list(sort(unique(Time)))) %>% 
+      pull(Time) %>% unique()
+    
+    df <- df %>% mutate(time_group = purrr:::map_int(list(Time), 
+      ~which(purrr:::map_lgl(time_vectors, ~all(.x == 
+        .)))))
+    
     df_subsets <- split(df, df$time_group)
-
-    # for each subset, create a dataframe in the desired format
+    
     df_list <- lapply(df_subsets, function(subset) {
-      # extract unique Groups, Descriptions, Replicates, and Concentrations
       unique_groups <- unique(subset$Group)
       unique_descriptions <- unique(subset$Description)
       unique_replicates <- unique(subset$Replicate)
       unique_concentrations <- unique(subset$Concentration)
       unique_times <- unique(subset$Time)
-
-      # create a new dataframe
-      new_df <- data.frame(Time = c("Time", NA, NA,  unique_times))
-
-      # for each unique Group, create a column in the new dataframe
+      
+      new_df <- data.frame(Time = c("Time", NA, NA, unique_times))
+      
       for (group in unique_groups) {
-        # get the corresponding Description, Replicate, Concentration, and Values
-        description <- as.character(subset[subset$Group == group,]$Description[1])
-        replicate <- subset[subset$Group == group,]$Replicate[1]
-        concentration <- subset[subset$Group == group,]$Concentration[1]
-        values <- subset[subset$Group == group,]$Values
-
+        description <- as.character(subset[subset$Group == group, 
+          ]$Description[1])
+        replicate <- subset[subset$Group == group, ]$Replicate[1]
+        concentration <- subset[subset$Group == group, 
+          ]$Concentration[1]
+        values <- subset[subset$Group == group, ]$Values
+        
         nreps <- round(length(values)/(nrow(new_df)-3))
         
         for (i in 1:nreps) {
@@ -744,49 +744,39 @@ tidy_to_custom <- function(df, data.format = "col"){
           new_df[, column_name] <- c(description, replicate, concentration, values[start_index:end_index])
         }
         
-        # create a new column for the Group
-        new_df[, group] <- c(description, replicate, concentration, values)
       }
-      # set the column names using the first row, then remove the first row
-      colnames(new_df) <- new_df[1,]
-      #new_df <- new_df[-1,]
+      colnames(new_df) <- new_df[1, ]
       return(new_df)
     })
-
-    # Get the maximum number of rows across all dataframes in df_list
+    
+    
     max_rows <- max(sapply(df_list, nrow))
-
-    # Add rows filled with NA to the end of all dataframes that have a fewer number of rows than max_rows
+    
     df_list <- lapply(df_list, function(df) {
       num_rows_to_add <- max_rows - nrow(df)
-
-      # If the dataframe has fewer rows than max_rows, add rows filled with NA
       if (num_rows_to_add > 0) {
-        df_to_add <- data.frame(matrix(NA, ncol = ncol(df), nrow = num_rows_to_add))
+        df_to_add <- data.frame(matrix(NA, ncol = ncol(df), 
+          nrow = num_rows_to_add))
         colnames(df_to_add) <- colnames(df)
-
         df <- rbind(df, df_to_add)
       }
-
       return(df)
     })
-
-    # Combine the dataframes in df_list into a single dataframe
+    
     final_df <- do.call(cbind, df_list)
     colnames_final <- c()
-    for(i in 1:length(df_list)){
+    
+    for (i in 1:length(df_list)) {
       colnames_final <- c(colnames_final, colnames(df_list[[i]]))
     }
     colnames(final_df) <- colnames_final
-
     df <- final_df
     df <- t(df)
-  }
-  else if(data.format == "col"){
+  } else if (data.format == "col") {
     df <- t(df)
   }
   return(df)
-}
+  } 
 
 #'  Parse raw plate reader data and convert it to a format compatible with QurvE
 #'
