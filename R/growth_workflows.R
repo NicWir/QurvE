@@ -299,8 +299,8 @@ growth.workflow <- function(
     if (export.res)
       dir.create(wd, showWarnings = FALSE)
 
-    if(nrow(grofit1[["gcFit"]][["gcTable"]]) == 1){
-      gcTable <- as.data.frame((grofit1[["gcFit"]][["gcTable"]]))
+    if(nrow(grofit[["gcFit"]][["gcTable"]]) == 1){
+      gcTable <- as.data.frame((grofit[["gcFit"]][["gcTable"]]))
       gcTable <- data.frame(lapply(gcTable, as.character))
     } else {      
     gcTable <- data.frame(
