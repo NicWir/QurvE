@@ -458,16 +458,19 @@ read_data <-
     if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){fl.norm.mat <- create_datmat(df=fl.norm, time.ndx=time.ndx);  fl.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.norm.mat[,1])}else{fl.norm.mat <- NA}
     # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1){fl2.norm.mat <- create_datmat(df=fl2.norm, time.ndx=time.ndx);  fl2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl2.norm.mat[,1])}else{fl2.norm.mat <- NA}
 
-    if(length(dat)>1)             
+    if(length(dat)>1) {            
       colnames(dat.mat) <- rep("", ncol(dat.mat))
       colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if((length(fl) > 1 ) || !is.na(data.fl))    
+      }
+    if((length(fl) > 1 ) || !is.na(data.fl)){    
       colnames(fl.mat) <- rep("", ncol(dat.mat))
       colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
+      }
     # if((length(fl2) > 1 ) || !is.na(data.fl2))    colnames(fl2.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  
+    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1) { 
       colnames(fl.norm.mat) <- rep("", ncol(dat.mat))
       colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+      }
     # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1)  colnames(fl2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
 
     if(length(dat) > 1) {
@@ -491,7 +494,10 @@ read_data <-
 
     expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
 
-    if(length(dat)>1)             dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
+    if(length(dat)>1)             
+      dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
+      colnames(dat.mat)[4:ncol(dat.mat)] <- ""
+                             
     if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat <- as.data.frame(unclass(fl.mat), stringsAsFactors = TRUE)
     # if((length(data.fl2) > 1 ) || !is.na(data.fl2))    fl2.mat <- as.data.frame(unclass(fl2.mat), stringsAsFactors = TRUE)
     if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat <- as.data.frame(unclass(fl.norm.mat), stringsAsFactors = TRUE)
