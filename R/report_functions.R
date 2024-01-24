@@ -200,7 +200,7 @@ growth.report <- function(
         }
     }
     file <- paste0(Report.wd, "/Report_Growth.Rmd")
-    file <- "/Users/ncw/QurvE/inst/Report_Growth.Rmd"
+    #file <- "/Users/ncw/QurvE/inst/Report_Growth.Rmd"
 
     # Copy report files into temp directory
     report_path <- tempfile(fileext = ".Rmd")
