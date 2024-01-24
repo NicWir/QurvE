@@ -702,6 +702,11 @@ tidy_to_custom <- function(df, data.format = "col"){
     # Create a unique identifier for each combination of Description, Concentration, and Replicate
     df[["Group"]] <- paste(df$Description, df$Concentration, df$Replicate, sep = "|")
 
+    df <- df %>%
+      group_by(Group) %>%
+      filter(any(!is.na(Values))) %>%
+      ungroup()
+
     increment_replicate <- function(rep_value, count) {
       if (!is.na(rep_value)) {
         # Attempt to convert to numeric
@@ -746,32 +751,24 @@ tidy_to_custom <- function(df, data.format = "col"){
       pull(Time) %>%
       unique()
 
+    # Function to check if two time vectors are similar
+    are_similar_to_first <- function(vec, first_vec, threshold = 0.05) {
+      if(length(first_vec) != length(vec)) return(FALSE)
+      valid_indices <- which(vec != 0 & first_vec != 0)
+      vec <- vec[valid_indices]
+      first_vec <- first_vec[valid_indices]
+      ratio <- vec / first_vec
+      all(abs(ratio - 1) < threshold)
+    }
 
-    # Check if all vectors are very similar to the first one
+
+    # Check for similarity and combine vectors
     if(length(time_vectors)>1){
-      are_similar_to_first <- function(vec) {
-        first_vec <- time_vectors[[1]]
+      first_vec <- time_vectors[[1]]
+      similar_vectors <- sapply(time_vectors, are_similar_to_first, first_vec)
+      #similar_check <- sapply(time_vectors, are_similar_to_first)
 
-        # Indices where neither vec nor first_vec are zero
-        valid_indices <- which(vec != 0 & first_vec != 0)
-
-        # Subset the vectors based on valid indices
-        vec <- vec[valid_indices]
-        first_vec <- first_vec[valid_indices]
-
-        # If after filtering out zeros, the vectors are of different lengths, return FALSE
-        if(length(vec) != length(first_vec)) {
-          return(FALSE)
-        }
-
-        # Compute ratio for valid (non-zero) values
-        ratio <- vec / first_vec # element-wise division
-        all(ratio > 0.95 & ratio < 1.05)
-      }
-
-      similar_check <- sapply(time_vectors, are_similar_to_first)
-
-      if (all(similar_check)) {
+      if (all(similar_vectors)) {
         # Assign "partners" for each Time value in df
         assign_partner <- function(time_value) {
           first_vec <- time_vectors[[1]]
@@ -786,15 +783,6 @@ tidy_to_custom <- function(df, data.format = "col"){
         # Apply this to df's Time column
         df$Time <- sapply(df$Time, function(t) if (t %in% time_vectors[[1]]) t else assign_partner(t))
 
-        # Reduce time_group to only its first vector element
-        time_vector <- time_vectors[[-(2:length(time_vectors))]]
-
-        find_closest_index <- function(time_value) {
-          first_vec <- time_vectors[[1]]
-          differences <- abs(first_vec - time_value)
-          which.min(differences)
-        }
-
         df$time_group <- rep(1, nrow(df))
 
         df <- df %>%
@@ -802,12 +790,32 @@ tidy_to_custom <- function(df, data.format = "col"){
           mutate(Replicate = row_number(),
                  Group = paste(Description, Replicate, Concentration, sep="|")) %>%
           ungroup()
+      } else {
+        # Function to find the closest matching time vector index
+        find_closest_time_vector_index <- function(time_vec) {
+          sapply(time_vectors, function(tv) {
+            if (length(time_vec) != length(tv)) return(FALSE)
+            all(time_vec == tv)
+          }) %>% which()
+        }
+
+        # Group by "Group", extract unique time vector for each group, and assign time_group
+        df <- df %>%
+          group_by(Group) %>%
+          mutate(
+            unique_time_vector = list(sort(unique(Time))),
+            time_group = map_int(unique_time_vector, find_closest_time_vector_index)
+          ) %>%
+          ungroup()
+
+        # Clean up - remove the temporary column
+        df <- df %>%
+          select(-unique_time_vector)
       }
     } else {
       df <- df %>%
         mutate(time_group = purrr::map_int(list(Time), ~which(purrr::map_lgl(time_vectors, ~all(.x == .)))))
     }
-
 
     # split the df into subsets based on time_group
     df_subsets <- split(df, df$time_group)
@@ -831,7 +839,7 @@ tidy_to_custom <- function(df, data.format = "col"){
         replicate <- subset[subset$Group == group,]$Replicate[1]
         concentration <- subset[subset$Group == group,]$Concentration[1]
         values <- subset[subset$Group == group,]$Values
-        values <- values[!is.na(values)]
+        #values <- values[!is.na(values)]
 
         # create a new column for the Group
         new_df[, group] <- c(description, replicate, concentration, values)
@@ -874,6 +882,7 @@ tidy_to_custom <- function(df, data.format = "col"){
   else if(data.format == "col"){
     df <- t(df)
   }
+  rownames(df) <- rep("", nrow(df))
   return(df)
 }
 
