@@ -1983,7 +1983,7 @@ plot.flFitRes <-  function(x,
         data.deriv <- as.list(lapply(1:length(ndx), function(i) cbind(flFit$flFittedSplines[[ndx[[i]]]]$spline.deriv1$y)))
       }
       # correct for unequal lengths of data series
-      time.all <- Reduce(union, time)
+      time.all <- sort(Reduce(union, time))
       for(i in 1:length(time)){
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
@@ -2003,7 +2003,7 @@ plot.flFitRes <-  function(x,
       }
       if(deriv){
         # correct for unequal lengths of derivative series and harmonize the time values.
-        time.all <- Reduce(union, time.deriv)
+        time.all <- sort(Reduce(union, time.deriv))
         for(i in 1:length(time.deriv)){
           assign(paste0("time.missing_", i), setdiff(time.all, time.deriv[[i]]) )
           if(length(get(paste0("time.missing_", i))) > 0){
@@ -2022,14 +2022,16 @@ plot.flFitRes <-  function(x,
       } # if(deriv)
       time <- time[[1]]
       data <- do.call("cbind", data)
-      avg <- rowMeans(data, na.rm = FALSE)
-      sd <- apply(data, 1, sd, na.rm = FALSE)
+      data <- data[!apply(data, 1, function(x) all(is.na(x))), ]
+      avg <- rowMeans(data, na.rm = TRUE)
+      sd <- apply(data, 1, sd, na.rm = TRUE)
       plotdata.ls[[n]] <- data.frame("name" = name, "time" = time, "mean" = avg, "upper" = avg+sd, "lower" = avg-sd)
       if(deriv){
         time.deriv <- time.deriv[[1]]
         data.deriv <- do.call("cbind", data.deriv)
-        avg.deriv <- rowMeans(data.deriv, na.rm = FALSE)
-        sd.deriv <- apply(data.deriv, 1, sd, na.rm = FALSE)
+        data.deriv <- data.deriv[!apply(data.deriv, 1, function(x) all(is.na(x))), ]
+        avg.deriv <- rowMeans(data.deriv, na.rm = TRUE)
+        sd.deriv <- apply(data.deriv, 1, sd, na.rm = TRUE)
        deriv.ls[[n]] <- data.frame("name" = name, "time" = time.deriv, "mean" = avg.deriv, "upper" = avg.deriv+sd.deriv, "lower" = avg.deriv-sd.deriv)
       }
     } # for(n in 1:length(conditions_unique))
@@ -2038,9 +2040,14 @@ plot.flFitRes <-  function(x,
       names(deriv.ls) <- gsub(" \\| NA", "", conditions_unique)
       deriv.ls <- deriv.ls[!is.na(deriv.ls)]
       df.deriv <- do.call(rbind.data.frame, deriv.ls)
-      df.deriv$name <- gsub(" \\| NA", "", df.deriv$name)
+      all_conc_na <- all(gsub(".+ \\| ", "", df.deriv$name)=="NA")
 
-      df.deriv$concentration <- as.numeric(gsub(".+ \\| ", "", df.deriv$name))
+      if(!all_conc_na){
+        df.deriv$concentration <- as.numeric(gsub(".+ \\| ", "", df.deriv$name))
+      } else {
+        df.deriv$concentration <- rep(NA, length(df.deriv$name))
+      }
+      df.deriv$name <- gsub(" \\| NA", "", df.deriv$name)
       df.deriv$group <- gsub(" \\| .+", "", df.deriv$name)
 
       # sort names
@@ -2051,8 +2058,13 @@ plot.flFitRes <-  function(x,
 
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
     df <- do.call(rbind.data.frame, plotdata.ls)
+    all_conc_na <- all(gsub(".+ \\| ", "", df$name)=="NA")
+    if(!all_conc_na){
+      df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    } else {
+      df$concentration <- rep(NA, length(df$name))
+    }
     df$name <- gsub(" \\| NA", "", df$name)
-    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
     df$group <- gsub(" \\| .+", "", df$name)
     # sort names
     df <- df[order(df$group, df$concentration), ]
@@ -2731,7 +2743,7 @@ plot.dual <-  function(x,
       fl.data <- lapply(1:length(fl.data), function(i) as.numeric(fl.data[[i]]))
 
       # correct for unequal lengths of data series
-      time.all <- Reduce(union, time)
+      time.all <- sort(Reduce(union, time))
       for(i in 1:length(time)){
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
@@ -2756,11 +2768,13 @@ plot.dual <-  function(x,
       }
       time <- time[[1]]
       dens.data <- do.call("cbind", dens.data)
-      dens.avg <- rowMeans(dens.data, na.rm = FALSE)
-      dens.sd <- apply(dens.data, 1, sd, na.rm = FALSE)
+      dens.data <- dens.data[!apply(dens.data, 1, function(x) all(is.na(x))), ]
+      dens.avg <- rowMeans(dens.data, na.rm = TRUE)
+      dens.sd <- apply(dens.data, 1, sd, na.rm = TRUE)
       fl.data <- do.call("cbind", fl.data)
-      fl.avg <- rowMeans(fl.data, na.rm = FALSE)
-      fl.sd <- apply(fl.data, 1, sd, na.rm = FALSE)
+      fl.data <- fl.data[!apply(fl.data, 1, function(x) all(is.na(x))), ]
+      fl.avg <- rowMeans(fl.data, na.rm = TRUE)
+      fl.sd <- apply(fl.data, 1, sd, na.rm = TRUE)
       plotdata.ls[[n]] <- data.frame("name" = name, "time" = time,
                                      "dens.mean" = dens.avg, "dens.upper" = dens.avg+dens.sd, "dens.lower" = dens.avg-dens.sd,
                                      "fl.mean" = fl.avg, "fl.upper" = fl.avg+fl.sd, "fl.lower" = fl.avg-fl.sd)
