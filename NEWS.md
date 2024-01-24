@@ -1,3 +1,9 @@
+# QurvE 1.1.1
+
+## Bug fixes
+
+* fixed bug during the parsing of tidy data if the combinations of Description/Concentration/Replicate were not unique (e.g., multiple 'Blank' samples)
+
 # QurvE 1.1
 
 ## Enhancements

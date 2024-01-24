@@ -219,7 +219,7 @@ read_data <-
         #test if more than one time entity is present
         time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
         if(length(time.ndx)==1){
-          blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = TRUE)
+          blank.ndx <- grep("blank|buffer", df[1:nrow(df),1], ignore.case = TRUE)
           if(length(blank.ndx)>0){
             if(length(blank.ndx)>1){
               blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric), na.rm = TRUE)
@@ -230,7 +230,7 @@ read_data <-
           }
         } else { # identify different datasets based on the occurence of multiple 'time' entities
           # identify additional time entities
-          blank.ndx <- grep("blank", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = TRUE)
+          blank.ndx <- grep("blank|buffer", df[(time.ndx[1]) : (time.ndx[2]-1),1], ignore.case = TRUE)
           if(length(blank.ndx)>0){
             if(length(blank.ndx)>1){
               blank <- rowMeans(apply(df[blank.ndx, 4:ncol(df)], 1, as.numeric))
@@ -241,7 +241,7 @@ read_data <-
               t(sweep(apply(df[((time.ndx[1] + 1):(time.ndx[2] - 1))[!(((time.ndx[1] + 1):(time.ndx[2] - 1)) %in% blank.ndx)], 4:ncol(df)], 1, as.numeric), 1, blank))
           }
           for (i in 2:(length(time.ndx))){
-            blank.ndx <- grep("blank", df[if (is.na(time.ndx[i + 1])) {
+            blank.ndx <- grep("blank|buffer", df[if (is.na(time.ndx[i + 1])) {
               (time.ndx[i] + 1):nrow(df)
             } else {
               (time.ndx[i] + 1):(time.ndx[i + 1] - 1)
@@ -284,7 +284,7 @@ read_data <-
         conditions <- conditions[-grep("time", gsub("___.+", "", conditions), ignore.case = TRUE)]
       }
       # remove blanks from conditions
-      blankcond.ndx <- grep("blank", gsub("___.+", "", conditions), ignore.case = TRUE)
+      blankcond.ndx <- grep("blank|buffer", gsub("___.+", "", conditions), ignore.case = TRUE)
       if(length(blankcond.ndx)>1){
         conditions <- conditions[-blankcond.ndx]
       }
@@ -323,7 +323,7 @@ read_data <-
 
     # remove blank columns from dataset
     remove_blank <- function(df){
-      blank.ndx <- grep("blank", df[1:nrow(df),1], ignore.case = TRUE)
+      blank.ndx <- grep("blank|buffer", df[1:nrow(df),1], ignore.case = TRUE)
       if(length(blank.ndx)>0){
         df <- df[-blank.ndx, ]
       }
@@ -458,11 +458,15 @@ read_data <-
     if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){fl.norm.mat <- create_datmat(df=fl.norm, time.ndx=time.ndx);  fl.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.norm.mat[,1])}else{fl.norm.mat <- NA}
     # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1){fl2.norm.mat <- create_datmat(df=fl2.norm, time.ndx=time.ndx);  fl2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl2.norm.mat[,1])}else{fl2.norm.mat <- NA}
 
-    if(length(dat)>1)             colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if((length(fl) > 1 ) || !is.na(data.fl))    colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
-    # if((length(fl2) > 1 ) || !is.na(data.fl2))    colnames(fl2.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
-    # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1)  colnames(fl2.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+    if(length(dat)>1)
+      colnames(dat.mat) <- rep("", ncol(dat.mat))
+      colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
+    if((length(fl) > 1 ) || !is.na(data.fl))
+      colnames(fl.mat) <- rep("", ncol(dat.mat))
+      colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
+    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)
+      colnames(fl.norm.mat) <- rep("", ncol(dat.mat))
+      colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
 
     if(length(dat) > 1) {
       label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
@@ -682,9 +686,42 @@ tidy_to_custom <- function(df, data.format = "col"){
     # Convert tidy format to the custom QurvE format
 
     # Create a unique identifier for each combination of Description, Concentration, and Replicate
-    df[["Group"]] <- paste(df$Description, df$Concentration, df$Replicate, sep = "_")
-    df[["Time"]] <- as.numeric(df[["Time"]])
+    df[["Group"]] <- paste(df$Description, df$Concentration, df$Replicate, sep = "|")
 
+    increment_replicate <- function(rep_value, count) {
+      if (!is.na(rep_value)) {
+        # Attempt to convert to numeric
+        numeric_value <- as.numeric(rep_value)
+        # Check if conversion was successful
+        if (!is.na(numeric_value)) {
+          # If successful, increment the numeric value
+          return(paste0(numeric_value, LETTERS[count]))
+        } else {
+          # If conversion fails, treat as character and append count
+          return(paste0(rep_value, LETTERS[count]))
+        }
+      } else {
+        # If rep_value is NA, return NA
+        return(as.character(count))
+      }
+    }
+
+    df$Replicate <- as.character(df$Replicate)
+
+    # Detect and adjust duplicates in "Group" values
+    for(i in 1:nrow(df)) {
+      current_group <- as.character(df[i, "Group"])
+      current_time <- as.numeric(df[i, "Time"])
+      duplicates <- which(df$Group == current_group & df$Time == current_time)
+
+      if(length(duplicates) > 1) {
+        for(j in 1:length(duplicates)) {
+          row_index <- duplicates[j]
+          df[row_index, "Replicate"] <- increment_replicate(df[[row_index, "Replicate"]], j)
+          df[row_index, "Group"] <- paste(df[row_index, "Description"], df[row_index, "Concentration"], df[row_index, "Replicate"], sep = "_")
+        }
+      }
+    }
     # sort the df based on Time
     df <- df %>% arrange(Time)
 
@@ -695,9 +732,68 @@ tidy_to_custom <- function(df, data.format = "col"){
       pull(Time) %>%
       unique()
 
-    # Create an id for each unique time vector
-    df <- df %>%
-      mutate(time_group = purrr:::map_int(list(Time), ~which(purrr:::map_lgl(time_vectors, ~all(.x == .)))))
+
+    # Check if all vectors are very similar to the first one
+    if(length(time_vectors)>1){
+      are_similar_to_first <- function(vec) {
+        first_vec <- time_vectors[[1]]
+
+        # Indices where neither vec nor first_vec are zero
+        valid_indices <- which(vec != 0 & first_vec != 0)
+
+        # Subset the vectors based on valid indices
+        vec <- vec[valid_indices]
+        first_vec <- first_vec[valid_indices]
+
+        # If after filtering out zeros, the vectors are of different lengths, return FALSE
+        if(length(vec) != length(first_vec)) {
+          return(FALSE)
+        }
+
+        # Compute ratio for valid (non-zero) values
+        ratio <- vec / first_vec # element-wise division
+        all(ratio > 0.95 & ratio < 1.05)
+      }
+
+      similar_check <- sapply(time_vectors, are_similar_to_first)
+
+      if (all(similar_check)) {
+        # Assign "partners" for each Time value in df
+        assign_partner <- function(time_value) {
+          first_vec <- time_vectors[[1]]
+          # Compute the absolute difference between the time_value and every value in first_vec
+          differences <- abs(first_vec - time_value)
+          # Find the index of the minimum difference
+          index <- which.min(differences)
+          # Return the corresponding value from first_vec
+          return(first_vec[index])
+        }
+
+        # Apply this to df's Time column
+        df$Time <- sapply(df$Time, function(t) if (t %in% time_vectors[[1]]) t else assign_partner(t))
+
+        # Reduce time_group to only its first vector element
+        time_vector <- time_vectors[[-(2:length(time_vectors))]]
+
+        find_closest_index <- function(time_value) {
+          first_vec <- time_vectors[[1]]
+          differences <- abs(first_vec - time_value)
+          which.min(differences)
+        }
+
+        df$time_group <- rep(1, nrow(df))
+
+        df <- df %>%
+          group_by(Group, Time) %>%
+          mutate(Replicate = row_number(),
+                 Group = paste(Description, Replicate, Concentration, sep="|")) %>%
+          ungroup()
+      }
+    } else {
+      df <- df %>%
+        mutate(time_group = purrr:::map_int(list(Time), ~which(purrr:::map_lgl(time_vectors, ~all(.x == .)))))
+    }
+
 
     # split the df into subsets based on time_group
     df_subsets <- split(df, df$time_group)
@@ -709,7 +805,7 @@ tidy_to_custom <- function(df, data.format = "col"){
       unique_descriptions <- unique(subset$Description)
       unique_replicates <- unique(subset$Replicate)
       unique_concentrations <- unique(subset$Concentration)
-      unique_times <- unique(subset$Time)
+      unique_times <- unique(subset$Time)[!is.na(unique(subset$Time))]
 
       # create a new dataframe
       new_df <- data.frame(Time = c("Time", NA, NA,  unique_times))
@@ -721,6 +817,7 @@ tidy_to_custom <- function(df, data.format = "col"){
         replicate <- subset[subset$Group == group,]$Replicate[1]
         concentration <- subset[subset$Group == group,]$Concentration[1]
         values <- subset[subset$Group == group,]$Values
+        values <- values[!is.na(values)]
 
         # create a new column for the Group
         new_df[, group] <- c(description, replicate, concentration, values)
