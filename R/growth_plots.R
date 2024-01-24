@@ -3228,12 +3228,14 @@ plot.grofit <- function(x, ...,
       }
       time <- time[[1]]
       data <- do.call("cbind", data)
+      data <- data[!apply(data, 1, function(x) all(is.na(x))), ]
       avg <- rowMeans(data, na.rm = TRUE)
       sd <- apply(data, 1, sd, na.rm = TRUE)
       plotdata.ls[[n]] <- data.frame("name" = name, "time" = time, "mean" = avg, "upper" = avg+sd, "lower" = avg-sd)
       if(deriv){
         time.deriv <- time.deriv[[1]]
         data.deriv <- do.call("cbind", data.deriv)
+        data.deriv <- data.deriv[!apply(data.deriv, 1, function(x) all(is.na(x))), ]
         avg.deriv <- rowMeans(data.deriv, na.rm = TRUE)
         sd.deriv <- apply(data.deriv, 1, sd, na.rm = TRUE)
         deriv.ls[[n]] <- data.frame("name" = name, "time" = time.deriv, "mean" = avg.deriv, "upper" = avg.deriv+sd.deriv, "lower" = avg.deriv-sd.deriv)
@@ -4707,6 +4709,7 @@ plot.grid <- function(x,
       }
       time <- time[[1]]
       data <- do.call("cbind", data)
+      data <- data[!apply(ddata, 1, function(x) all(is.na(x))), ]
       avg <- rowMeans(data, na.rm = TRUE)
       sd <- apply(data, 1, sd, na.rm = TRUE)
       parameter <- do.call("cbind", parameter)
