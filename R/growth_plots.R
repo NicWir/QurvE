@@ -3189,7 +3189,7 @@ plot.grofit <- function(x, ...,
         data.deriv <- as.list(lapply(1:length(ndx), function(i) cbind(grofit$gcFit$gcFittedSplines[[ndx[[i]]]]$spline.deriv1$y)))
       }
       # correct for unequal lengths of data series
-      time.all <- Reduce(union, time)
+      time.all <- sort(Reduce(union, time))
       for(i in 1:length(time)){
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
@@ -3209,7 +3209,7 @@ plot.grofit <- function(x, ...,
       }
       if(deriv){
         # correct for unequal lengths of derivative series and harmonize the time values.
-        time.all <- Reduce(union, time.deriv)
+        time.all <- sort(Reduce(union, time.deriv))
         for(i in 1:length(time.deriv)){
           assign(paste0("time.missing_", i), setdiff(time.all, time.deriv[[i]]) )
           if(length(get(paste0("time.missing_", i))) > 0){
@@ -3246,9 +3246,14 @@ plot.grofit <- function(x, ...,
       names(deriv.ls) <- gsub(" \\| NA", "", conditions_unique)
       deriv.ls <- deriv.ls[!is.na(deriv.ls)]
       df.deriv <- do.call(rbind.data.frame, deriv.ls)
-      df.deriv$name <- gsub(" \\| NA", "", df.deriv$name)
+      all_conc_na <- all(gsub(".+ \\| ", "", df.deriv$name)=="NA")
 
-      df.deriv$concentration <- as.numeric(gsub(".+ \\| ", "", df.deriv$name))
+      if(!all_conc_na){
+        df.deriv$concentration <- as.numeric(gsub(".+ \\| ", "", df.deriv$name))
+      } else {
+        df.deriv$concentration <- rep(NA, length(df.deriv$name))
+      }
+      df.deriv$name <- gsub(" \\| NA", "", df.deriv$name)
       df.deriv$group <- gsub(" \\| .+", "", df.deriv$name)
 
       # sort names
@@ -3259,8 +3264,13 @@ plot.grofit <- function(x, ...,
 
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
     df <- do.call(rbind.data.frame, plotdata.ls)
+    all_conc_na <- all(gsub(".+ \\| ", "", df$name)=="NA")
+    if(!all_conc_na){
+      df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    } else {
+      df$concentration <- rep(NA, length(df$name))
+    }
     df$name <- gsub(" \\| NA", "", df$name)
-    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
     df$group <- gsub(" \\| .+", "", df$name)
 
     # replace negative lower ribbon boundaries with 0 for log10 transformation
@@ -4684,7 +4694,7 @@ plot.grid <- function(x,
       }
 
       # correct for unequal lengths of data series
-      time.all <- Reduce(union, time)
+      time.all <- sort(Reduce(union, time))
       for(i in 1:length(time)){
         assign(paste0("time.missing_", i), setdiff(time.all, time[[i]]) )
         if(length(get(paste0("time.missing_", i))) > 0){
@@ -4709,7 +4719,7 @@ plot.grid <- function(x,
       }
       time <- time[[1]]
       data <- do.call("cbind", data)
-      data <- data[!apply(ddata, 1, function(x) all(is.na(x))), ]
+      data <- data[!apply(data, 1, function(x) all(is.na(x))), ]
       avg <- rowMeans(data, na.rm = TRUE)
       sd <- apply(data, 1, sd, na.rm = TRUE)
       parameter <- do.call("cbind", parameter)
