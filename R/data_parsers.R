@@ -81,12 +81,18 @@ read_data <-
            calib.fl = NULL,
            calib.fl2 = NULL)
   {
-    if(is.null(data.growth)) data.growth <- NA
-    if(is.null(data.fl)) data.fl <- NA
-    if(is.null(data.fl2)) data.fl2 <- NA
-    if(!is.null(calib.growth) && calib.growth == "") calib.growth <- NULL
-    if(!is.null(calib.fl) && calib.fl == "") calib.fl <- NULL
-    if(!is.null(calib.fl2) && calib.fl2 == "") calib.fl2 <- NULL
+    if(is.null(data.growth))
+      data.growth <- NA
+    if(is.null(data.fl))
+      data.fl <- NA
+    if(is.null(data.fl2))
+      data.fl2 <- NA
+    if(!is.null(calib.growth) && calib.growth == "")
+      calib.growth <- NULL
+    if(!is.null(calib.fl) && calib.fl == "")
+      calib.fl <- NULL
+    if(!is.null(calib.fl2) && calib.fl2 == "")
+      calib.fl2 <- NULL
 
     fl.normtype <- match.arg(fl.normtype)
 
@@ -492,17 +498,22 @@ read_data <-
 
     expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
 
-    if(length(dat)>1)             dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
-    if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat <- as.data.frame(unclass(fl.mat), stringsAsFactors = TRUE)
-    # if((length(data.fl2) > 1 ) || !is.na(data.fl2))    fl2.mat <- as.data.frame(unclass(fl2.mat), stringsAsFactors = TRUE)
-    if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat <- as.data.frame(unclass(fl.norm.mat), stringsAsFactors = TRUE)
-    # if(((length(data.fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1)  fl2.norm.mat <- as.data.frame(unclass(fl2.norm.mat), stringsAsFactors = TRUE)
+    if(length(dat)>1){
+      dat.mat <- as.data.frame(unclass(dat.mat), stringsAsFactors = TRUE)
+      colnames(dat.mat)[4:ncol(dat.mat)] <- ""
+    }
+    if((length(data.fl) > 1 ) || !is.na(data.fl)){
+      fl.mat <- as.data.frame(unclass(fl.mat), stringsAsFactors = TRUE)
+      colnames(fl.mat)[4:ncol(fl.mat)] <- ""
+    }
+    if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){
+      fl.norm.mat <- as.data.frame(unclass(fl.norm.mat), stringsAsFactors = TRUE)
+      colnames(fl.norm.mat)[4:ncol(fl.norm.mat)] <- ""
+    }
     #convert values from factor to numeric
     if(length(dat)>1)             dat.mat[, -(1:3)] <- as.numeric(as.matrix(dat.mat[, -(1:3)]))
     if((length(data.fl) > 1 ) || !is.na(data.fl))    fl.mat[, -(1:3)] <- as.numeric(as.matrix(fl.mat[, -(1:3)]))
-    # if((length(data.fl2) > 1 ) || !is.na(data.fl2))    fl2.mat[, -(1:3)] <- as.numeric(as.matrix(fl2.mat[, -(1:3)]))
     if(((length(data.fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)  fl.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl.norm.mat[, -(1:3)]))
-    # if(((length(data.fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1)  fl2.norm.mat[, -(1:3)] <- as.numeric(as.matrix(fl2.norm.mat[, -(1:3)]))
 
     # if identical time values are present, combine the respective measurement as their mean
     ## create list with unique time values and their frequencies
