@@ -108,9 +108,9 @@ growth.report <- function(
         }
     }
     if (!exists("mean.grp"))
-        mean.grp <- NA
+      mean.grp <- list()
     if (!exists("mean.conc"))
-        mean.conc <- NA
+      mean.conc <- list()
     gcFit <- grofit$gcFit
     drFit <- grofit$drFit
     control <- grofit$control
@@ -200,6 +200,7 @@ growth.report <- function(
         }
     }
     file <- paste0(Report.wd, "/Report_Growth.Rmd")
+    file <- "/Users/ncw/QurvE/inst/Report_Growth.Rmd"
 
     # Copy report files into temp directory
     report_path <- tempfile(fileext = ".Rmd")
@@ -337,9 +338,9 @@ fl.report <- function(
         }
     }
     if (!exists("mean.grp"))
-        mean.grp <- NA
+      mean.grp <- list()
     if (!exists("mean.conc"))
-        mean.conc <- NA
+      mean.conc <- list()
     flFit <- flFitRes$flFit
     drFit <- flFitRes$drFit
     # flFit2 <- flFitRes$flFit2 drFit2 <-
