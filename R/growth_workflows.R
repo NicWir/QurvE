@@ -299,12 +299,17 @@ growth.workflow <- function(
     if (export.res)
       dir.create(wd, showWarnings = FALSE)
 
-    gcTable <- data.frame(
-      apply(
-        grofit[["gcFit"]][["gcTable"]], 2,
-        as.character
+    if(nrow(grofit[["gcFit"]][["gcTable"]]) == 1){
+      gcTable <- as.data.frame((grofit[["gcFit"]][["gcTable"]]))
+      gcTable <- data.frame(lapply(gcTable, as.character))
+    } else {
+      gcTable <- data.frame(
+        apply(
+          grofit[["gcFit"]][["gcTable"]], 2,
+          as.character
+        )
       )
-    )
+    }
     res.table.gc <- cbind(
       gcTable[, 1:3], Filter(
         function(x) !all(is.na(x)),

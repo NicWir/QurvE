@@ -458,15 +458,18 @@ read_data <-
     if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){fl.norm.mat <- create_datmat(df=fl.norm, time.ndx=time.ndx);  fl.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl.norm.mat[,1])}else{fl.norm.mat <- NA}
     # if(((length(fl2) > 1 ) || !is.na(data.fl2)) && length(dat)>1){fl2.norm.mat <- create_datmat(df=fl2.norm, time.ndx=time.ndx);  fl2.norm.mat[,1] <- gsub("\\n\\r|\\n|\\r", "", fl2.norm.mat[,1])}else{fl2.norm.mat <- NA}
 
-    if(length(dat)>1)
+    if(length(dat)>1){
       colnames(dat.mat) <- rep("", ncol(dat.mat))
       colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if((length(fl) > 1 ) || !is.na(data.fl))
+    }
+    if((length(fl) > 1 ) || !is.na(data.fl)){
       colnames(fl.mat) <- rep("", ncol(dat.mat))
       colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
-    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1)
+    }
+    if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){
       colnames(fl.norm.mat) <- rep("", ncol(dat.mat))
       colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
+    }
 
     if(length(dat) > 1) {
       label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
