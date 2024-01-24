@@ -2022,6 +2022,9 @@ plot.flFitRes <-  function(x,
       } # if(deriv)
       time <- time[[1]]
       data <- do.call("cbind", data)
+      na_rows_indices <- which(apply(data, 1, function(x) all(is.na(x))))
+      if(length(na_rows_indices) > 0)
+        time <- time[-na_rows_indices]
       data <- data[!apply(data, 1, function(x) all(is.na(x))), ]
       avg <- rowMeans(data, na.rm = TRUE)
       sd <- apply(data, 1, sd, na.rm = TRUE)
@@ -2029,6 +2032,9 @@ plot.flFitRes <-  function(x,
       if(deriv){
         time.deriv <- time.deriv[[1]]
         data.deriv <- do.call("cbind", data.deriv)
+        na_rows_indices.deriv <- which(apply(data.deriv, 1, function(x) all(is.na(x))))
+        if(length(na_rows_indices.deriv) > 0)
+          time.deriv <- time.deriv[-na_rows_indices.deriv]
         data.deriv <- data.deriv[!apply(data.deriv, 1, function(x) all(is.na(x))), ]
         avg.deriv <- rowMeans(data.deriv, na.rm = TRUE)
         sd.deriv <- apply(data.deriv, 1, sd, na.rm = TRUE)
@@ -2768,11 +2774,14 @@ plot.dual <-  function(x,
       }
       time <- time[[1]]
       dens.data <- do.call("cbind", dens.data)
-      dens.data <- dens.data[!apply(dens.data, 1, function(x) all(is.na(x))), ]
+      # na_rows_indices.dens <- which(apply(dens.data, 1, function(x) all(is.na(x))))
+      # if(length(na_rows_indices.dens) > 0)
+      #   time <- time[-na_rows_indices.dens]
+      # dens.data <- dens.data[!apply(dens.data, 1, function(x) all(is.na(x))), ]
       dens.avg <- rowMeans(dens.data, na.rm = TRUE)
       dens.sd <- apply(dens.data, 1, sd, na.rm = TRUE)
       fl.data <- do.call("cbind", fl.data)
-      fl.data <- fl.data[!apply(fl.data, 1, function(x) all(is.na(x))), ]
+      # fl.data <- fl.data[!apply(fl.data, 1, function(x) all(is.na(x))), ]
       fl.avg <- rowMeans(fl.data, na.rm = TRUE)
       fl.sd <- apply(fl.data, 1, sd, na.rm = TRUE)
       plotdata.ls[[n]] <- data.frame("name" = name, "time" = time,

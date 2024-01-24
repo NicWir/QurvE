@@ -3228,6 +3228,9 @@ plot.grofit <- function(x, ...,
       }
       time <- time[[1]]
       data <- do.call("cbind", data)
+      na_rows_indices <- which(apply(data, 1, function(x) all(is.na(x))))
+      if(length(na_rows_indices) > 0)
+        time <- time[-na_rows_indices]
       data <- data[!apply(data, 1, function(x) all(is.na(x))), ]
       avg <- rowMeans(data, na.rm = TRUE)
       sd <- apply(data, 1, sd, na.rm = TRUE)
@@ -3235,6 +3238,9 @@ plot.grofit <- function(x, ...,
       if(deriv){
         time.deriv <- time.deriv[[1]]
         data.deriv <- do.call("cbind", data.deriv)
+        na_rows_indices.deriv <- which(apply(data.deriv, 1, function(x) all(is.na(x))))
+        if(length(na_rows_indices.deriv) > 0)
+          time.deriv <- time.deriv[-na_rows_indices.deriv]
         data.deriv <- data.deriv[!apply(data.deriv, 1, function(x) all(is.na(x))), ]
         avg.deriv <- rowMeans(data.deriv, na.rm = TRUE)
         sd.deriv <- apply(data.deriv, 1, sd, na.rm = TRUE)
@@ -4719,6 +4725,9 @@ plot.grid <- function(x,
       }
       time <- time[[1]]
       data <- do.call("cbind", data)
+      na_rows_indices <- which(apply(data, 1, function(x) all(is.na(x))))
+      if(length(na_rows_indices) > 0)
+        time <- time[-na_rows_indices]
       data <- data[!apply(data, 1, function(x) all(is.na(x))), ]
       avg <- rowMeans(data, na.rm = TRUE)
       sd <- apply(data, 1, sd, na.rm = TRUE)
