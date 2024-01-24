@@ -469,11 +469,11 @@ read_data <-
       colnames(dat.mat)[1:3] <- c("condition", "replicate", "concentration")
     }
     if((length(fl) > 1 ) || !is.na(data.fl)){
-      colnames(fl.mat) <- rep("", ncol(dat.mat))
+      colnames(fl.mat) <- rep("", ncol(fl.mat))
       colnames(fl.mat)[1:3] <- c("condition", "replicate", "concentration")
     }
     if(((length(fl) > 1 ) || !is.na(data.fl)) && length(dat)>1){
-      colnames(fl.norm.mat) <- rep("", ncol(dat.mat))
+      colnames(fl.norm.mat) <- rep("", ncol(fl.norm.mat))
       colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
     }
 
@@ -805,7 +805,7 @@ tidy_to_custom <- function(df, data.format = "col"){
       }
     } else {
       df <- df %>%
-        mutate(time_group = purrr:::map_int(list(Time), ~which(purrr:::map_lgl(time_vectors, ~all(.x == .)))))
+        mutate(time_group = purrr::map_int(list(Time), ~which(purrr::map_lgl(time_vectors, ~all(.x == .)))))
     }
 
 
