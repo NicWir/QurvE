@@ -700,6 +700,26 @@ tidy_to_custom <- function(df, data.format = "col"){
     # Convert tidy format to the custom QurvE format
 
     # Create a unique identifier for each combination of Description, Concentration, and Replicate
+    revert_factor <- function(x) {
+      if (is.factor(x)) {
+        converted <- suppressWarnings(as.numeric(levels(x))[x])
+        if (anyNA(converted)) {
+          # If NAs were introduced, it wasn't purely numeric, revert to character
+          return(as.character(x))
+        } else {
+          # If no NAs, it was numeric
+          return(converted)
+        }
+      } else {
+        # If it's not a factor, just return the original
+        return(x)
+      }
+    }
+    df[,grep("Description", colnames(df), ignore.case = T)] <- revert_factor(df[,grep("Description", colnames(df), ignore.case = T)])
+    df[,grep("Replicate", colnames(df), ignore.case = T)] <- revert_factor(df[,grep("Replicate", colnames(df), ignore.case = T)])
+    df[,grep("Concentration", colnames(df), ignore.case = T)] <- revert_factor(df[,grep("Concentration", colnames(df), ignore.case = T)])
+
+
     df[["Group"]] <- paste(df$Description, df$Concentration, df$Replicate, sep = "|")
 
     df <- df %>%
