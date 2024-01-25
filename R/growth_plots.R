@@ -1039,7 +1039,7 @@ plot.drBootSpline <- function (x,
 
 #' Generic plot function for \code{drFit} objects.
 #'
-#' code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis
+#' \code{plot.drFit} calls \code{plot.drFitSpline} for each group used in a dose-response analysis
 #'
 #' @param x object of class \code{drFit}, created with \code{\link{growth.drFit}}.
 #' @param combine (Logical) Combine the dose-response analysis results of all conditions into a single plot (\code{TRUE}) or not (\code{FALSE}).
@@ -1349,7 +1349,7 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
 
 #' Generic plot function for \code{drFitSpline} objects.
 #'
-#' code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
+#' \code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
 #'
 #' @param x object of class \code{drFitSpline}, created with \code{\link{growth.drFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.drBootSpline}}.
@@ -2243,7 +2243,7 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
 
 #' Generic plot function for \code{gcFitSpline} objects.
 #'
-#' code{plot.gcFitSpline} generates the spline fit plot for a single sample.
+#' \code{plot.gcFitSpline} generates the spline fit plot for a single sample.
 #'
 #' @param x object of class \code{gcFitSpline}, created with \code{\link{growth.gcFitSpline}}.
 #' @param add (Logical) Shall the fitted spline be added to an existing plot? \code{TRUE} is used internally by \code{\link{plot.gcBootSpline}}.
@@ -4411,7 +4411,7 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
 #'
 #' \code{plot.grid} takes a \code{grofit} or \code{flFitRes} object and returns a facet grid of individual growth and fluorescence plots
 #'
-#' @param x A \code{grofit} or \code{flFitRes} object created with \code{\link{growth.workflow}} or code{\link{fl.workflow}} containing spline fits.
+#' @param x A \code{grofit} or \code{flFitRes} object created with \code{\link{growth.workflow}} or \code{\link{fl.workflow}} containing spline fits.
 #' @param data.type (Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results
 #' @param param (Character) The parameter used to compare different sample groups. Any name of a column containing numeric values in \code{gcTable} (which is stored within \code{grofit} or \code{gcFit} objects) can be used as input. Useful options are:
 #' 'mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit',

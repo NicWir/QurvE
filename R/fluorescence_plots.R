@@ -3196,7 +3196,7 @@ plot.dual <-  function(x,
 
 #' Generic plot function for \code{drFitFL} objects.
 #'
-#' code{drFitfl} calls \code{\link{plot.drFitFLModel}} for each group used in a dose-response analysis with \code{dr.method = "model"}
+#' \code{drFitfl} calls \code{\link{plot.drFitFLModel}} for each group used in a dose-response analysis with \code{dr.method = "model"}
 #'
 #' @param x object of class \code{drFit}, created with \code{\link{growth.drFit}}.
 #' @param pch (Numeric) Shape of the raw data symbols.

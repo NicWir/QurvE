@@ -60,7 +60,7 @@ Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
 \item{gcID}{(Character) Identifies the tested sample.}
 \item{FUN}{Linear \emph{function} used for plotting the tangent at mumax.}
 \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
-\item{par}{List of determined growth parameters.}
+\item{par}{List of determined growth parameters:}
 \itemize{
 \item \code{y0}: {Minimum growth value considered for the heuristic linear method.}
 \item \code{dY}: {Difference in maximum growth and minimum growth.}

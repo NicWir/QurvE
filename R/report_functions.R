@@ -215,8 +215,8 @@ growth.report <- function(
   }
   if(export == T){
     wd.plots <- paste0(wd,"/Plots")
-    dir.create(paste0(tempdir(), "/Plots"), showWarnings = F)
-    dir.create(wd.plots, showWarnings = F)
+    dir.create(paste0(tempdir(), "/Plots"), showWarnings = T)
+    dir.create(wd.plots, showWarnings = T)
   }
 
   rmarkdown::render(
@@ -453,8 +453,8 @@ fl.report <- function(
 
   if(export == T){
     wd.plots <- paste0(wd,"/Plots")
-    dir.create(paste0(tempdir(), "/Plots"), showWarnings = F)
-    dir.create(wd.plots, showWarnings = F)
+    dir.create(paste0(tempdir(), "/Plots"), showWarnings = T)
+    dir.create(wd.plots, showWarnings = T)
   }
 
   rmarkdown::render(

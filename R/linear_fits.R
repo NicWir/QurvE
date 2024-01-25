@@ -52,7 +52,7 @@
 #' \item{gcID}{(Character) Identifies the tested sample.}
 #' \item{FUN}{Linear _function_ used for plotting the tangent at mumax.}
 #' \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
-#' \item{par}{List of determined growth parameters.}
+#' \item{par}{List of determined growth parameters:}
 #' \itemize{
 #' \item \code{y0}: {Minimum growth value considered for the heuristic linear method.}
 #' \item \code{dY}: {Difference in maximum growth and minimum growth.}
@@ -921,7 +921,7 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 #' \item{ID}{(Character) Identifies the tested sample.}
 #' \item{FUN}{Linear _function_ used for plotting the tangent at mumax.}
 #' \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
-#' \item{par}{List of determined fluorescence parameters.}
+#' \item{par}{List of determined fluorescence parameters:}
 #' \itemize{
 #' \item \code{y0}: {Minimum fluorescence value considered for the heuristic linear method.}
 #' \item \code{dY}: {Difference in maximum fluorescence and minimum fluorescence}
