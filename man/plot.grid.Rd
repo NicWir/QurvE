@@ -44,7 +44,7 @@
 )
 }
 \arguments{
-\item{x}{A \code{grofit} or \code{flFitRes} object created with \code{\link{growth.workflow}} or code{\link{fl.workflow}} containing spline fits.}
+\item{x}{A \code{grofit} or \code{flFitRes} object created with \code{\link{growth.workflow}} or \code{\link{fl.workflow}} containing spline fits.}
 
 \item{data.type}{(Character) Plot either raw data (\code{data.type = "raw"}) or the spline fit results}
 

@@ -81,7 +81,7 @@
 One plot per condition tested in the dose-response analysis or a single plot showing all conditions if \code{control = growth.control(dr.method = "spline")} was used in \code{\link{growth.drFit}} and \code{combine = TRUE}.
 }
 \description{
-code{plot.drFit} calls code{plot.drFitSpline} for each group used in a dose-response analysis
+\code{plot.drFit} calls \code{plot.drFitSpline} for each group used in a dose-response analysis
 }
 \examples{
 \donttest{

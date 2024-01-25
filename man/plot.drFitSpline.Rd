@@ -75,7 +75,7 @@
 A plot with the nonparametric dose-response fit.
 }
 \description{
-code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
+\code{plot.drFitSpline} generates the spline fit plot for response-parameter vs. concentration data
 }
 \examples{
 conc <- c(0, rev(unlist(lapply(1:18, function(x) 10*(2/3)^x))),10)

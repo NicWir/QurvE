@@ -40,7 +40,7 @@ Use \code{\link{plot.gcFitSpline}} to visualize the linear fit.
 \item{ID}{(Character) Identifies the tested sample.}
 \item{FUN}{Linear \emph{function} used for plotting the tangent at mumax.}
 \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
-\item{par}{List of determined fluorescence parameters.}
+\item{par}{List of determined fluorescence parameters:}
 \itemize{
 \item \code{y0}: {Minimum fluorescence value considered for the heuristic linear method.}
 \item \code{dY}: {Difference in maximum fluorescence and minimum fluorescence}

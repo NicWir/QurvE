@@ -90,7 +90,7 @@
 A plot with the nonparametric fit.
 }
 \description{
-code{plot.gcFitSpline} generates the spline fit plot for a single sample.
+\code{plot.gcFitSpline} generates the spline fit plot for a single sample.
 }
 \examples{
 # Create random growth dataset
