@@ -25,9 +25,7 @@ output:
 
 dir.create(paste0(tempdir(),"/Plots"), showWarnings = F)
 wd.plots <- paste0(wd,"/Plots")
-if(export == T){
-  dir.create(wd.plots, showWarnings = F)
-}
+
 if(parallelize){
   library(doParallel, quietly =  TRUE)
   library(foreach, quietly =  TRUE)
@@ -102,9 +100,10 @@ if(any(c("a", "l") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
-try(plot.parameter(grofit, param = "mu.linfit", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "mu.linfit", export = export, out.dir = normalizePath(wd.plots)))
+try(plot.parameter(grofit, param = "lambda.linfit", export = export, out.dir = normalizePath(wd.plots)))
+try(plot.parameter(grofit, param = "dY.linfit", export = export, out.dir = normalizePath(wd.plots)))
+ 
 ```
 `r if(any(c("a", "l") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_model_group, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -123,8 +122,9 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_model, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "m") %in% control$fit.opt)}
-try(plot.parameter(grofit, param = "mu.model", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "lambda.model", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "mu.model", export = export, out.dir = normalizePath(wd.plots)))
+try(plot.parameter(grofit, param = "lambda.model", export = export, out.dir = normalizePath(wd.plots)))
+ 
 ```
 `r if(any(c("a", "m") %in% control$fit.opt)){"\\clearpage"}`
 ```{r table_spline_group, echo=F, warning=F, message=F, results='asis', fig.align='center'}
@@ -143,9 +143,10 @@ if(any(c("a", "b", "s") %in% control$fit.opt)){
 }
 ```
 ```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
-try(plot.parameter(grofit, param = "mu.spline", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
-try(plot.parameter(grofit, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
+try(plot.parameter(grofit, param = "mu.spline", export = export, out.dir = normalizePath(wd.plots)))
+try(plot.parameter(grofit, param = "lambda.spline", export = export, out.dir = normalizePath(wd.plots)))
+try(plot.parameter(grofit, param = "dY.spline", export = export, out.dir = normalizePath(wd.plots)))
+ 
 ```
 \clearpage
 
@@ -448,13 +449,13 @@ if(any(c("a", "l") %in% control$fit.opt)){
         foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
                 .packages = "ggplot2") %dopar% {
                   if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                    pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                    pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(grDevices::dev.off())
                   }
                 }
       } else {
         for(i in 1:length(grofit[["gcFit"]][["gcFittedLinear"]])){
           if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+            pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(grDevices::dev.off())
           }
         }
       }
@@ -464,13 +465,13 @@ if(any(c("a", "l") %in% control$fit.opt)){
       foreach(i = 1:length(grofit[["gcFit"]][["gcFittedLinear"]]),
               .packages = "ggplot2") %dopar% {
                 if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+                  pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(grDevices::dev.off())
                 }
               }
     } else {
       for(i in 1:length(grofit[["gcFit"]][["gcFittedLinear"]])){
         if(grofit[["gcFit"]][["gcFittedLinear"]][[i]][["fitFlag"]] == TRUE){
-          pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(dev.off())
+          pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedLinear"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggLinear();   invisible(grDevices::dev.off())
         }
       }
     }
@@ -484,6 +485,7 @@ if(any(c("a", "l") %in% control$fit.opt)){
   
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
+ 
 ```
 `r if(any(c("a", "b", "m") %in% control$fit.opt)){"\\clearpage"}`
 
@@ -649,13 +651,13 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
         foreach(i = 1:length(grofit[["gcFit"]][["gcFittedModels"]]),
                 .packages = "ggplot2") %dopar% {
                   if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-                    pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+                    pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(grDevices::dev.off())
                   }
                 }
       } else {
         for(i in 1:length(grofit[["gcFit"]][["gcFittedModels"]])){
           if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-            pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+            pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(grDevices::dev.off())
           }
         }
       }
@@ -665,13 +667,13 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
       foreach(i = 1:length(grofit[["gcFit"]][["gcFittedModels"]]),
               .packages = "ggplot2") %dopar% {
                 if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-                  pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+                  pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(grDevices::dev.off())
                 }
               }
     } else {
       for(i in 1:length(grofit[["gcFit"]][["gcFittedModels"]])){
         if(grofit[["gcFit"]][["gcFittedModels"]][[i]][["fitFlag"]] == TRUE){
-          pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(dev.off())
+          pdf(file=paste0(plotdir, "/PlotModel_", gsub("∙|\\n|\\r", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedModels"]])[i]))))), ".pdf"), width = 6, height = 4.5);   plot.ggModel();   invisible(grDevices::dev.off())
         }
       }
     }
@@ -685,12 +687,14 @@ if(any(c("a", "b", "m") %in% control$fit.opt)){
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
+ 
 ```
 `r if(any(c("a", "b", "s") %in% control$fit.opt)){"\\clearpage"}`
 
 ### `r if(any(c("a", "b", "s") %in% control$fit.opt)){"Nonparametric Fits"}`
 ```{r figure_spline, out.width = "33%", fig.asp=1.1, fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if(any(c("a", "b", "s") %in% control$fit.opt)) {
+  #__________________ function definition ______________
   plot.ggSpline   <- function() {
     if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
       x <- grofit[["gcFit"]][["gcFittedSplines"]][[i]]
@@ -991,53 +995,49 @@ if(any(c("a", "b", "s") %in% control$fit.opt)) {
       ))
     }
   }
-  plotdir <-
-    ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
+    #__________________ end function definition ______________
+  plot_function <- function(i) {
+        tryCatch({
+          pdf_filename <- paste0(plotdir, "/PlotSpline_", gsub("∙|\\n|\\r", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_",
+                                gsub("\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])))))), ".pdf")
+          pdf(pdf_filename)
+          plot.ggSpline()
+        }, finally = {
+          invisible(grDevices::dev.off()) # Ensure the device is closed
+          })
+      }
+  plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
   if(all(c('pdf', 'html') %in% format)){
     if (knitr::is_latex_output()) {
+      
+      
       if(parallelize){
         foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
                 .packages = "ggplot2") %dopar% {
                   if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                    pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|\\n|\\r", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                      "\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-                    ))))), ".pdf"))
-                    plot.ggSpline()
-                    invisible(dev.off())
+                    plot_function(i)
                   }
                 }
       } else {
         for(i in 1:length(grofit[["gcFit"]][["gcFittedSplines"]])){
           if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-            pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|\\n|\\r", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-              "\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-            ))))), ".pdf"))
-            plot.ggSpline()
-            invisible(dev.off())
+            plot_function(i)
           }
         }
       }
     }
-  } else{
+  } else{ #if(all(c('pdf', 'html') %in% format)){
     if(parallelize){
       foreach(i = 1:length(grofit[["gcFit"]][["gcFittedSplines"]]),
               .packages = "ggplot2") %dopar% {
                 if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                  pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|\\n|\\r", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                    "\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-                  ))))), ".pdf"))
-                  plot.ggSpline()
-                  invisible(dev.off())
+                  plot_function(i)
                 }
               }
     } else {
       for(i in 1:length(grofit[["gcFit"]][["gcFittedSplines"]])){
         if (grofit[["gcFit"]][["gcFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-          pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙|\\n|\\r", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-            "\\/", "_", gsub(" \\| ", "_", names(grofit[["gcFit"]][["gcFittedSplines"]])[i])
-          ))))), ".pdf"))
-          plot.ggSpline()
-          invisible(dev.off())
+          plot_function(i)
         }
       }
     }
@@ -1119,39 +1119,39 @@ knit_table(boot.ec50.df, caption = "Dose-Response Analysis - Bootstrapping")
 ```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(grofit[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(grofit$control$nboot.dr) && grofit$control$nboot.dr > 0)}
 for(i in 1:length(grofit$drFit$drBootSplines)){
   if(grofit$drFit$drBootSplines[[i]]$bootFlag == TRUE){
-    plot.drBootSpline(grofit$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = paste0(wd, "/Plots"))
+    plot.drBootSpline(grofit$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = normalizePath(wd.plots))
   }
 }
 ```
-`r if(length(mean.grp) > 0){"\\clearpage"}`
+`r if((!is.null(mean.grp) | !is.null(mean.conc)) && (!is.na(mean.grp) | !is.na(mean.conc)) ){"\\clearpage"}`
 
-## `r if(length(mean.grp) > 0){"Group average plots"}`
-```{r average_plots, fig.width=10, fig.height = 12, echo=F, warning=F, message=F, results='asis', fig.align='default'}
+## `r if((!is.null(mean.grp) | !is.null(mean.conc)) && (!is.na(mean.grp) | !is.na(mean.conc)) ){"Group average plots"}`
+```{r average_plots, fig.width=10, fig.height = 12, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = ((!is.null(mean.grp) | !is.null(mean.conc)) && (!is.na(mean.grp) | !is.na(mean.conc)) )}
 if("all" %in% mean.grp){
   if("s" %in% grofit$control$fit.opt){
-    plot.grofit(grofit, basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+    plot.grofit(grofit, basesize = 15, export = export, plot = TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
   } else {
-    plot.grofit(grofit, data.type = "raw", basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+    plot.grofit(grofit, data.type = "raw", basesize = 15, export = export, plot = TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
   }
-} else if(length(mean.grp) > 0){
+} else if(!is.null(mean.grp) && !is.na(mean.grp)){
   for(i in 1:length(mean.grp)){
     if("s" %in% grofit$control$fit.opt){
       if(length(grep(mean.grp[i], as.character(names(grofit$gcFit$gcFittedSplines))))>0){
-        plot.grofit(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+        plot.grofit(grofit, names = unlist(mean.grp[i]), basesize = 15, export = export, plot = TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
       }
     } else {
-      plot.grofit(grofit, data.type = "raw", names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+      plot.grofit(grofit, data.type = "raw", names = unlist(mean.grp[i]), basesize = 15, export = export, plot = TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
     }
   }
 }
-if(!all(is.na(mean.conc))){
+if(!is.null(mean.conc) && !is.na(mean.conc)){
   for(i in 1:length(mean.conc)){
     if("s" %in% grofit$control$fit.opt){
       if(length(grep(mean.conc[i], str_extract(names(grofit$gcFit$gcFittedSplines), "[:alnum:]+$")))>0){
-        plot.grofit(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+        plot.grofit(grofit, conc = unlist(mean.conc[i]), basesize = 15, export = export, plot = TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
       }
     } else {
-      plot.grofit(grofit, data.type = "raw", conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+      plot.grofit(grofit, data.type = "raw", conc = unlist(mean.conc[i]), basesize = 15, export = export, plot = TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
     }
   }
 }

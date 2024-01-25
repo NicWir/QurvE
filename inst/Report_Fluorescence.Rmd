@@ -24,9 +24,7 @@ output:
 ```{r setup, include=FALSE}
 dir.create(paste0(tempdir(),"/Plots"), showWarnings = F)
 wd.plots <- paste0(wd,"/Plots")
-if(export == T){
- dir.create(wd.plots, showWarnings = F)
-}
+
 if(parallelize){
   library(doParallel, quietly =  TRUE)
   library(foreach, quietly =  TRUE)
@@ -138,13 +136,13 @@ if(any(c("l") %in% control$fit.opt)){
 ```
 ```{r parameter_plot_linear, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "l") %in% control$fit.opt)}
 try(suppressWarnings(
-  plot.parameter(flFitRes, param = "max_slope.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+  plot.parameter(flFitRes, param = "max_slope.linfit", export = export, out.dir = normalizePath(wd.plots)))
 )
 try(suppressWarnings(
-  plot.parameter(flFitRes, param = "lambda.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+  plot.parameter(flFitRes, param = "lambda.linfit", export = export, out.dir = normalizePath(wd.plots)))
 )
 try(suppressWarnings(
-  plot.parameter(flFitRes, param = "dY.linfit", export = export, out.dir = paste0(wd, "/Plots")))
+  plot.parameter(flFitRes, param = "dY.linfit", export = export, out.dir = normalizePath(wd.plots)))
 )
 ```
 `r if(any(c("l") %in% control$fit.opt)){"\\clearpage"}`
@@ -172,13 +170,13 @@ if(any(c("s") %in% control$fit.opt)){
 ```
 ```{r parameter_plot_spline, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = any(c("a", "s") %in% control$fit.opt)}
 try(suppressWarnings(
-  plot.parameter(flFitRes, param = "max_slope.spline", export = export, out.dir = paste0(wd, "/Plots")))
+  plot.parameter(flFitRes, param = "max_slope.spline", export = export, out.dir = normalizePath(wd.plots)))
 )
 try(suppressWarnings(
-  plot.parameter(flFitRes, param = "lambda.spline", export = export, out.dir = paste0(wd, "/Plots")))
+  plot.parameter(flFitRes, param = "lambda.spline", export = export, out.dir = normalizePath(wd.plots)))
 )
 try(suppressWarnings(
-  plot.parameter(flFitRes, param = "dY.spline", export = export, out.dir = paste0(wd, "/Plots")))
+  plot.parameter(flFitRes, param = "dY.spline", export = export, out.dir = normalizePath(wd.plots)))
 )
 ```
 \clearpage
@@ -371,10 +369,10 @@ if(any(c("l") %in% control$fit.opt)){
     grDevices::png(paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.png"),
                    width = w, height = h, units = 'in', res = 300)
     p()
-    suppressWarnings(grDevices::dev.off())
+    invisible(grDevices::dev.off())
     suppressWarnings(grDevices::pdf(paste0(out.dir, "/", paste(flFittedLinear$gcID, collapse = "_"), "_LinFitPlot.pdf")))
     p()
-    suppressWarnings(grDevices::dev.off())
+    invisible(grDevices::dev.off())
   }
   if (plot == TRUE){
     suppressWarnings(
@@ -402,7 +400,7 @@ if(any(c("l") %in% control$fit.opt)){
         if(length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))>0 && flFitRes[["flFit"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
                   suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
           plot.ggLinear()
-          invisible(dev.off())
+          invisible(grDevices::dev.off())
                  }
       }
     }
@@ -417,7 +415,7 @@ if(any(c("l") %in% control$fit.opt)){
         if(length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))==0 && flFitRes[["flFit"]][["flFittedLinear"]][[i]][["fitFlag"]] == TRUE){
                   suppressWarnings(pdf(file=paste0(plotdir, "/PlotLinear_", gsub("∙|>|<|\\(|\\)", "_", gsub("\\?", "_", gsub(" ", "_", gsub("\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedLinear"]])[i]))))), ".pdf"), width = 8, height = 6))
           plot.ggLinear()
-          invisible(dev.off())
+          invisible(grDevices::dev.off())
                  }
       }
   } 
@@ -430,6 +428,7 @@ if(any(c("l") %in% control$fit.opt)){
   
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
+
 ```
 `r if(any(c("s") %in% control$fit.opt)){"\\clearpage"}`
 
@@ -437,170 +436,212 @@ if(any(c("l") %in% control$fit.opt)){
 ```{r figure_spline, out.width = "33%", fig.asp=1.1, fig.show='hold', echo=F, warning=F, message=F, results='asis', fig.align='default'}
 if(any(c("s") %in% control$fit.opt)) {
   plot.flFitSpline2 <- function(flFitSpline, add=FALSE, raw = TRUE, slope=TRUE, deriv = T, spline = T, log.y = F,
-                             pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
-                             plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
-                             out.dir = NULL, ...)
+                                pch=1, colData=1, colSpline="dodgerblue3", cex=1, lwd = 0.7,
+                                plot = TRUE, export = FALSE, width = 8, height = ifelse(deriv == TRUE, 8, 6),
+                                out.dir = NULL, ...)
   {
-  if(is(flFitSpline) != "flFitSpline") stop("flFitSpline needs to be an object created with flFitSpline().")
-  # /// check input parameters
-  if (is.logical(add)==FALSE)   stop("Need logical value for: add")
-  if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
-  if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
-  if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
-
-  # /// check if a data fit is available
-  if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE)){
-    warning("plot.flFitSpline: no data fit available!")
-  }
-  else{
-    if (add==TRUE){
-      if(spline == TRUE){
-        # /// try to plot data fit
-        if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==FALSE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+    if(is(flFitSpline) != "flFitSpline") stop("flFitSpline needs to be an object created with flFitSpline().")
+    # /// check input parameters
+    if (is.logical(add)==FALSE)   stop("Need logical value for: add")
+    if (is.logical(slope)==FALSE) stop("Need logical value for: slope")
+    if (is.numeric(pch)==FALSE)   stop("Need numeric value for: pch")
+    if (is.numeric(cex)==FALSE)   stop("Need numeric value for: cex")
+    
+    # /// check if a data fit is available
+    if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE)){
+      warning("plot.flFitSpline: no data fit available!")
+    }
+    else{
+      if (add==TRUE){
+        if(spline == TRUE){
+          # /// try to plot data fit
+          if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==FALSE)){
+            try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+          }
+          
+          if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==TRUE)){
+            try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+          }
+          
+          if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==FALSE)){
+            try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
+          }
+          
+          if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==TRUE)){
+            try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+          }
+          # /// add tangent at maximum slope
+          if (slope==TRUE){
+            mu     <- as.numeric(flFitSpline$parameters$max_slope)
+            lambda <- as.numeric(flFitSpline$parameters$lambda)
+            
+            x <- seq(lambda, max(flFitSpline$"fit.x"), length=200)
+            y_tangent <- flFitSpline$parameters["b.tangent"][[1]]+x*mu
+            try(lines(x, y_tangent, lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.85), ...))
+            try(lines(c(min(flFitSpline$"raw.x"[1]), lambda), rep(flFitSpline$"raw.fl"[1], 2), lty=2, lwd=2,   
+                      col=ggplot2::alpha(colSpline, 0.7)))
+          }
         }
-
-        if ((flFitSpline$control$log.x.spline==FALSE) && (flFitSpline$control$log.y.spline==TRUE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+        if (deriv  == TRUE){
+          if ((flFitSpline$control$log.x.spline==FALSE)){
+            try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
+          }
+          if ((flFitSpline$control$log.x.spline==TRUE)){
+            try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
+          }
         }
-
-        if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==FALSE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd ) )
+      } # if (add == TRUE)
+      else {
+        coef <- flFitSpline[["parameters"]]
+        lag <- coef["lambda"][[1]][1]
+        # correct for log transformation
+        if(flFitSpline$control$log.y.spline == TRUE){
+          fit.fl <-
+            c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), exp(flFitSpline[["fit.fl"]]) *
+                flFitSpline[["raw.fl"]][1])
+        } else {
+          fit.fl <- c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), flFitSpline[["fit.fl"]])
         }
-
-        if ((flFitSpline$control$log.x.spline==TRUE)  && (flFitSpline$control$log.y.spline==TRUE)){
-          try( lines(flFitSpline$fit.x, flFitSpline$fit.fl, sub=flFitSpline$name.fit, col=colSpline, type="l", lwd=2.8*lwd) )
+        
+        df.raw <- data.frame("x" = flFitSpline[["x.in"]],
+                             "data" = flFitSpline[["fl.in"]])
+        df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
+                             "fit.fl" = fit.fl)
+        
+        x.label = if(flFitSpline$control$x_type == "density"){
+          "Density"
+        } else {
+          "Time"
         }
+        y.label <- if(flFitSpline$control$norm_fl == TRUE && flFitSpline$control$x_type == "time"){
+          "Norm. fluorescence"
+        } else {
+          "Fluorescence"
+        }
+        p <- ggplot(NULL, aes(x=x, y=data)) +
+          geom_line(aes(x=fit.x, y = fit.fl, color = "spline"), data = df.fit, size = lwd) +
+          xlab(x.label) +
+          ylab(label = y.label) +
+          theme_classic(base_size = 16) +
+          ggtitle(gsub(" \\| NA", "", paste(flFitSpline$ID, collapse=" | "))) +
+          scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+          theme(legend.key = element_blank(),
+                legend.background=element_blank(),
+                legend.title = element_blank(),
+                legend.position = c(0.90, 0.08),
+                plot.title = element_text(size=15),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank()) +
+          scale_color_manual(name='Growth Model',
+                             breaks = "Spline fit",
+                             values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
+        if(raw){
+          p <- p + geom_point(data = df.raw, shape=1, size = 2,alpha = 0.6, stroke=0.15)
+        }
+        
+        
+        p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
+        
+        if(log.y == TRUE){
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
+        } else {
+          p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
+        }
+        
+        
         # /// add tangent at maximum slope
-        if (slope==TRUE){
-          mu     <- as.numeric(flFitSpline$parameters$max_slope)
-          lambda <- as.numeric(flFitSpline$parameters$lambda)
-
-          x <- seq(lambda, max(flFitSpline$"fit.x"), length=200)
-          y_tangent <- flFitSpline$parameters["b.tangent"][[1]]+x*mu
-          try(lines(x, y_tangent, lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.85), ...))
-          try(lines(c(min(flFitSpline$"raw.x"[1]), lambda), rep(flFitSpline$"raw.fl"[1], 2), lty=2, lwd=2, col=ggplot2::alpha(colSpline, 0.7)))
-        }
-      }
-      if (deriv  == TRUE){
-        if ((flFitSpline$control$log.x.spline==FALSE)){
-          try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
-        }
-        if ((flFitSpline$control$log.x.spline==TRUE)){
-          try( lines(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y, xlab="", ylab="", col = colSpline) )
-        }
-      }
-    } # if (add == TRUE)
-    else {
-      coef <- flFitSpline[["parameters"]]
-      lag <- coef["lambda"][[1]][1]
-      # correct for log transformation
-      if(flFitSpline$control$log.y.spline == TRUE){
-        fit.fl <-
-          c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), exp(flFitSpline[["fit.fl"]]) *
-              flFitSpline[["raw.fl"]][1])
-      } else {
-        fit.fl <- c(rep(NA, length(flFitSpline[["raw.fl"]]) - length(flFitSpline[["fit.fl"]])), flFitSpline[["fit.fl"]])
-      }
-
-      df.raw <- data.frame("x" = flFitSpline[["x.in"]],
-                         "data" = flFitSpline[["fl.in"]])
-      df.fit <- data.frame("fit.x" = c(rep(NA, length(flFitSpline[["raw.x"]])-length(flFitSpline[["fit.x"]])), flFitSpline[["fit.x"]]),
-                           "fit.fl" = fit.fl)
-
-      x.label = if(flFitSpline$control$x_type == "density"){
-        "Density"
-      } else {
-        "Time"
-      }
-      y.label <- if(flFitSpline$control$norm_fl == TRUE && flFitSpline$control$x_type == "time"){
-        "Norm. fluorescence"
-      } else {
-        "Fluorescence"
-      }
-      p <- ggplot(NULL, aes(x=x, y=data)) +
-        geom_line(aes(x=fit.x, y = fit.fl, color = "spline"), data = df.fit, size = lwd) +
-        xlab(x.label) +
-        ylab(label = y.label) +
-        theme_classic(base_size = 16) +
-        ggtitle(gsub(" \\| NA", "", paste(flFitSpline$ID, collapse=" | "))) +
-        scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-        theme(legend.key = element_blank(),
-              legend.background=element_blank(),
-              legend.title = element_blank(),
-              legend.position = c(0.90, 0.08),
-              plot.title = element_text(size=15),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank()) +
-        scale_color_manual(name='Growth Model',
-                           breaks = "Spline fit",
-                           values=c("spline" = ggplot2::alpha(colSpline, 0.85), "Spline fit" = ggplot2::alpha(colSpline, 0.85)))
-      if(raw){
-        p <- p + geom_point(data = df.raw, shape=1, size = 2,alpha = 0.6, stroke=0.15)
-      }
-
-
-      p.yrange.end <- ggplot_build(p)$layout$panel_params[[1]]$y.range[2]
-
-      if(log.y == TRUE){
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks(), trans = 'log')
-      } else {
-        p <- p + scale_y_continuous(breaks = scales::pretty_breaks())
-      }
-
-
-      # /// add tangent at maximum slope
-      if(slope == TRUE && (flFitSpline$control$log.y.spline==F && log.y == F) ||
-         (flFitSpline$control$log.y.spline==T && log.y == T)){
-        mu     <- as.numeric(coef$max_slope[1])
-        if(flFitSpline$fitFlag2){
-          lag2 <- coef$lambda2
-          fl.x <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
-          mu2 <- coef$max_slope2
-          if(lag2 < lag){
-            # x values for tangent at µmax
-            x_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*fl.x)))
-            x_start <- flFitSpline$fit.x[x_start.ndx]
-            x <- seq(x_start, max(flFitSpline$fit.x), length=200)
-            # y values for tangent at µmax
-            if(flFitSpline$control$log.y.spline){
-              bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
-            } else {
-              bla <- coef["b.tangent"][[1]] + (mu*x)
+        if(slope == TRUE && (flFitSpline$control$log.y.spline==F && log.y == F) ||
+           (flFitSpline$control$log.y.spline==T && log.y == T)){
+          mu     <- as.numeric(coef$max_slope[1])
+          if(flFitSpline$fitFlag2){
+            lag2 <- coef$lambda2
+            fl.x <- flFitSpline$fit.x[which.max(flFitSpline$fit.fl)]
+            mu2 <- coef$max_slope2
+            if(lag2 < lag){
+              # x values for tangent at µmax
+              x_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max-0.15*fl.x)))
+              x_start <- flFitSpline$fit.x[x_start.ndx]
+              x <- seq(x_start, max(flFitSpline$fit.x), length=200)
+              # y values for tangent at µmax
+              if(flFitSpline$control$log.y.spline){
+                bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
+              } else {
+                bla <- coef["b.tangent"][[1]] + (mu*x)
+              }
+              tangent.df <- data.frame("x" = x,
+                                       "y" = bla)
+              # x values for tangent at µmax2
+              x2 <- seq(ifelse(lag2<0, 0, lag2), max(flFitSpline$"fit.x"), length=200)
+              # y values for tangent at µmax
+              if(flFitSpline$control$log.y.spline){
+                bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
+              } else {
+                bla2 <- coef["b.tangent2"][[1]] + (mu2*x2)
+              }
+              tangent.df2 <- data.frame("x" = x2,
+                                        "y" = bla2)
+              df.horizontal2 <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag2),
+                                           "y" = flFitSpline[["raw.fl"]][1])
+              
+              p <- p + geom_segment(aes(x = x[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                        xend = x[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+              p <- p + geom_segment(aes(x = x[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                        xend = x[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+              
+              if(!(lag2 <0)){
+                p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal2,
+                                      linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+              }
+            } # if(lag2 < lag)
+            else {
+              # x values for tangent at µmax
+              x <- seq(ifelse(lag<0, 0, lag), max(flFitSpline$"fit.x"), length=200)
+              # y values for tangent at µmax
+              if(flFitSpline$control$log.y.spline){
+                bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
+              } else {
+                bla <- coef["b.tangent"][[1]] + (mu*x)
+              }
+              tangent.df <- data.frame("x" = x,
+                                       "y" = bla)
+              df.horizontal <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag),
+                                          "y" = flFitSpline[["raw.fl"]][1])
+              # x values for tangent at µmax2
+              x2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*fl.x)))
+              x2_start <- flFitSpline$fit.x[x2_start.ndx]
+              x2 <- seq(x2_start, max(flFitSpline$"fit.x"), length=200)
+              # y values for tangent at µmax
+              if(flFitSpline$control$log.y.spline){
+                bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
+              } else {
+                bla2 <- coef["b.tangent2"][[1]] + (mu2*x2)
+              }
+              tangent.df2 <- data.frame("x" = x2,
+                                        "y" = bla2)
+              
+              p <- p + geom_segment(aes(x = x[which.min(abs(bla))], y = y[which.min(abs(bla))],
+                                        xend = x[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+              p <- p + geom_segment(aes(x = x[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
+                                        xend = x[which.min(abs(y - 1.1*p.yrange.end))],
+                                        yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
+                                    data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
+              
+              # if(!(lag <0)){
+              #   p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
+              #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
+              # }
             }
-            tangent.df <- data.frame("x" = x,
-                                     "y" = bla)
-            # x values for tangent at µmax2
-            x2 <- seq(ifelse(lag2<0, 0, lag2), max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at µmax
-            if(flFitSpline$control$log.y.spline){
-              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
-            } else {
-              bla2 <- coef["b.tangent2"][[1]] + (mu2*x2)
-            }
-            tangent.df2 <- data.frame("x" = x2,
-                                      "y" = bla2)
-            df.horizontal2 <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag2),
-                                         "y" = flFitSpline[["raw.fl"]][1])
-
-            p <- p + geom_segment(aes(x = x[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                      xend = x[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                  data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-            p <- p + geom_segment(aes(x = x[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                      xend = x[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
-
-            if(!(lag2 <0)){
-              p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal2,
-                                    linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
-            }
-          } # if(lag2 < lag)
+          } # if(flFitSpline$fitFlag2)
           else {
-            # x values for tangent at µmax
+            # x values for tangent
             x <- seq(ifelse(lag<0, 0, lag), max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at µmax
+            # y values for tangent
             if(flFitSpline$control$log.y.spline){
               bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
             } else {
@@ -610,172 +651,114 @@ if(any(c("s") %in% control$fit.opt)) {
                                      "y" = bla)
             df.horizontal <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag),
                                         "y" = flFitSpline[["raw.fl"]][1])
-            # x values for tangent at µmax2
-            x2_start.ndx <- which.min(abs(flFitSpline$fit.x-(coef$x.max2-0.15*fl.x)))
-            x2_start <- flFitSpline$fit.x[x2_start.ndx]
-            x2 <- seq(x2_start, max(flFitSpline$"fit.x"), length=200)
-            # y values for tangent at µmax
-            if(flFitSpline$control$log.y.spline){
-              bla2 <- (exp(coef["b.tangent2"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu2*x2)
-            } else {
-              bla2 <- coef["b.tangent2"][[1]] + (mu2*x2)
-            }
-            tangent.df2 <- data.frame("x" = x2,
-                                      "y" = bla2)
-
             p <- p + geom_segment(aes(x = x[which.min(abs(bla))], y = y[which.min(abs(bla))],
                                       xend = x[which.min(abs(y - 1.1*p.yrange.end))],
                                       yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
                                   data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-            p <- p + geom_segment(aes(x = x[which.min(abs(bla2))], y = y[which.min(abs(bla2))],
-                                      xend = x[which.min(abs(y - 1.1*p.yrange.end))],
-                                      yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                  data = tangent.df2, linetype = "dashed", color = ggplot2::alpha("darkviolet", 0.85), size = 0.5)
-
             # if(!(lag <0)){
             #   p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
             #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
             # }
-          }
-        } # if(flFitSpline$fitFlag2)
-        else {
-          # x values for tangent
-          x <- seq(ifelse(lag<0, 0, lag), max(flFitSpline$"fit.x"), length=200)
-          # y values for tangent
-          if(flFitSpline$control$log.y.spline){
-            bla <- (exp(coef["b.tangent"][[1]])*flFitSpline[["raw.fl"]][1])*exp(mu*x)
+          } # else of if(flFitSpline$fitFlag2)
+        } # if(slope == TRUE && log.y == T)
+        
+        # /// add panel with growth rate over x
+        if(deriv == TRUE){
+          df.mu <- data.frame(spline(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y))
+          #add missing x values due to min.density and t0
+          x.missing <- df.raw[df.raw$x < df.mu$x[1], ]$x
+          df.mu <-
+            dplyr::bind_rows(data.frame(x = x.missing, y = rep(NA, length(x.missing))),
+                             df.mu)
+          
+          y.label.mu = if(flFitSpline$control$log.y.spline == TRUE){
+            paste0("Slope [d(Ln(F/F0))/d",x.label, "]")
           } else {
-            bla <- coef["b.tangent"][[1]] + (mu*x)
+            paste0("Slope [dF/d", x.label,"]")
           }
-          tangent.df <- data.frame("x" = x,
-                                   "y" = bla)
-          df.horizontal <- data.frame("x" = c(flFitSpline[["raw.x"]][1], lag),
-                                      "y" = flFitSpline[["raw.fl"]][1])
-          p <- p + geom_segment(aes(x = x[which.min(abs(bla))], y = y[which.min(abs(bla))],
-                                    xend = x[which.min(abs(y - 1.1*p.yrange.end))],
-                                    yend = y[which.min(abs(y - 1.1*p.yrange.end))]),
-                                data = tangent.df, linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-          # if(!(lag <0)){
-          #   p <- p + geom_segment(aes(x = x[1], y = y[1], xend = x[2], yend = y[2]), data = df.horizontal,
-          #                         linetype = "dashed", color = ggplot2::alpha(colSpline, 0.85), size = 0.5)
-          # }
-        } # else of if(flFitSpline$fitFlag2)
-      } # if(slope == TRUE && log.y == T)
-
-      # /// add panel with growth rate over x
-      if(deriv == TRUE){
-        df.mu <- data.frame(spline(flFitSpline$spline.deriv1$x, flFitSpline$spline.deriv1$y))
-        #add missing x values due to min.density and t0
-        x.missing <- df.raw[df.raw$x < df.mu$x[1], ]$x
-        df.mu <-
-          dplyr::bind_rows(data.frame(x = x.missing, y = rep(NA, length(x.missing))),
-                    df.mu)
-
-        y.label.mu = if(flFitSpline$control$log.y.spline == TRUE){
-          paste0("Slope [d(Ln(F/F0))/d",x.label, "]")
-        } else {
-          paste0("Slope [dF/d", x.label,"]")
+          p.mu <- ggplot(df.mu, aes(x=x, y=y)) +
+            geom_line(color = colSpline, size = lwd) +
+            theme_classic(base_size = 15) +
+            xlab(x.label) +
+            ylab(label = y.label.mu) +
+            scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+            scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+          
+          p <- suppressWarnings(ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1)))
+          
         }
-        p.mu <- ggplot(df.mu, aes(x=x, y=y)) +
-          geom_line(color = colSpline, size = lwd) +
-          theme_classic(base_size = 15) +
-          xlab(x.label) +
-          ylab(label = y.label.mu) +
-          scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-          scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
-
-        p <- suppressWarnings(ggpubr::ggarrange(p, p.mu, ncol = 1, nrow = 2, align = "v", heights = c(2,1.1)))
-
-      }
-
-      if(export == FALSE && plot == FALSE){
-        return(p)
-      }
-      if (export == TRUE){
-        w <- width
-        h <- height
-        out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-        dir.create(out.dir, showWarnings = F)
-        grDevices::png(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.png"),
-                       width = w, height = h, units = 'in', res = 300)
-        print(p)
-        suppressWarnings(grDevices::dev.off())
-        suppressWarnings(grDevices::pdf(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h))
-        print(p)
-        suppressWarnings(suppressWarnings(grDevices::dev.off()))
-      }
-      if (plot == TRUE){
         
+        if(export == FALSE && plot == FALSE){
+          return(p)
+        }
+        if (export == TRUE){
+          w <- width
+          h <- height
+          out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+          dir.create(out.dir, showWarnings = F)
+          grDevices::png(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.png"),
+                         width = w, height = h, units = 'in', res = 300)
           print(p)
-        
-      }
-    } # else of if (add == TRUE)
-  } # else of if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE))
-}
-  plot.ggSpline   <- function() {
-    if (flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-      x <- flFitRes[["flFit"]][["flFittedSplines"]][[i]]
-      plot.flFitSpline2(x)
-    }
+          invisible(grDevices::dev.off())
+          suppressWarnings(grDevices::pdf(paste0(out.dir, "/", paste(flFitSpline$ID, collapse = "_"), "_SplineFit.pdf"), width = w, height = h))
+          print(p)
+          suppressWarnings(invisible(grDevices::dev.off()))
+        }
+        if (plot == TRUE){
+          
+          print(p)
+          
+        }
+      } # else of if (add == TRUE)
+    } # else of if ((is.na(flFitSpline$fitFlag)==TRUE)|(flFitSpline$fitFlag==FALSE))
   }
-  plotdir <-
-    ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
+  #__________________ end function definition ______________
+  plotdir <- ifelse(export == TRUE, wd.plots, paste0(str_replace_all(tempdir(), "\\\\", "/"), "/Plots"))
+  
+  plot.ggSpline   <- function() {
+    tryCatch({
+      if (flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+        pdf_filename <- paste0(plotdir, "/PlotSpline_", gsub("∙|\\n|\\r", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_",
+                                gsub("\\/", "_", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])))))), ".pdf")
+        pdf(file = pdf_filename)
+        plot.flFitSpline2(x)
+      }
+    }, finally = {
+      invisible(grDevices::dev.off()) # Ensure the device is closed
+    })
+  }
   if(all(c('pdf', 'html') %in% format)){
     if (knitr::is_latex_output()) {
       if(parallelize){
-      foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
-            .packages = "ggplot2") %dopar% {
-              if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
-                ))))), ".pdf")))
-                suppressWarnings(
-                  plot.ggSpline()
-                )
-                invisible(dev.off())
-              }
-            }
+        foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
+                .packages = "ggplot2") %dopar% {
+                  if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+                    suppressWarnings( plot.ggSpline() )
+                  }
+                }
       } else {
         for(i in 1:length(flFitRes[["flFit"]][["flFittedSplines"]])){
           if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
-                ))))), ".pdf")))
-                suppressWarnings(
-                  plot.ggSpline()
-                )
-                invisible(dev.off())
-              }
+            suppressWarnings( plot.ggSpline() )
+          }
         }
       }
     }
-  } else{
+  } else { # of if(all(c('pdf', 'html') %in% format))
     if(parallelize){
       foreach(i = 1:length(flFitRes[["flFit"]][["flFittedSplines"]]),
-            .packages = "ggplot2") %dopar% {
-              if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
-                ))))), ".pdf")))
-                suppressWarnings(
-                  plot.ggSpline()
-                )
-                invisible(dev.off())
+              .packages = "ggplot2") %dopar% {
+                if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+                  suppressWarnings( plot.ggSpline() )
+                }
               }
-            }
-      } else {
-        for(i in 1:length(flFitRes[["flFit"]][["flFittedSplines"]])){
-          if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
-                suppressWarnings(pdf(file = paste0(plotdir, "/PlotSpline_", gsub("∙", "_", gsub("%", "_", gsub("\\?", "_", gsub(" ", "_", gsub(
-                  "\\/", "-", gsub(" \\| ", "_", names(flFitRes[["flFit"]][["flFittedSplines"]])[i])
-                ))))), ".pdf")))
-                suppressWarnings(
-                  plot.ggSpline()
-                )
-                invisible(dev.off())
-              }
+    } else {
+      for(i in 1:length(flFitRes[["flFit"]][["flFittedSplines"]])){
+        if (length(grep("^NA ", names(flFitRes[["flFit"]][["flFittedSplines"]])[i]))==0 && flFitRes[["flFit"]][["flFittedSplines"]][[i]][["fitFlag"]] == TRUE) {
+          suppressWarnings( plot.ggSpline() )
         }
       }
+    }
   }
   
   Files_list <- list.files(path = plotdir,
@@ -788,6 +771,7 @@ if(any(c("s") %in% control$fit.opt)) {
   sort.ndx <- sort.ndx[!is.na(sort.ndx)]
   knitr::include_graphics(Files_list[sort.ndx], dpi = 300, error = F)
 }
+
 ```
 `r if(ec50){"\\clearpage"}`
 
@@ -832,7 +816,7 @@ boot.ec50.df <- data.frame()
 ```{r ec50_boot_plots, fig.width=6, fig.height=4.5, echo=F, warning=F, message=F, fig.align='center', eval = ec50 && length(flFitRes[["drFit"]][["drFittedSplines"]]) > 0 && (is.numeric(control$nboot.dr) && control$nboot.dr > 0)}
 for(i in 1:length(flFitRes$drFit$drBootSplines)){
   if(flFitRes$drFit$drBootSplines[[i]]$bootFlag == TRUE){
-    plot.drBootSpline(flFitRes$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = paste0(wd, "/Plots"))
+    plot.drBootSpline(flFitRes$drFit$drBootSplines[[i]], width = 6, height = 4.5, export = export, out.dir = normalizePath(wd.plots))
   }
 }
 ```
@@ -878,31 +862,31 @@ suppressWarnings(
 )
 ```
 
-`r if(!all(is.na(mean.grp))){"\\clearpage"}`
+`r if((!is.null(mean.grp) | !is.null(mean.conc)) && (!is.na(mean.grp) | !is.na(mean.conc)) ){"\\clearpage"}`
 
-## `r if(!all(is.na(mean.grp))){"Group average plots"}`
-```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default'}
+## `r if((!is.null(mean.grp) | !is.null(mean.conc)) && (!is.na(mean.grp) | !is.na(mean.conc)) ){"Group average plots"}`
+```{r average_plots, fig.width=10, fig.height = 6, echo=F, warning=F, message=F, results='asis', fig.align='default', eval = ((!is.null(mean.grp) | !is.null(mean.conc)) && (!is.na(mean.grp) | !is.na(mean.conc)) )}
 if("all" %in% mean.grp){
   if(length(flFitRes$flFit$flFittedSplines[[1]]$spline)>1){
     logy <- control$log.y.spline
     suppressWarnings(
-      plot.flFitRes(flFitRes, basesize = 15, export = export, log.y = logy, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+      plot.flFitRes(flFitRes, basesize = 15, export = export, plot=TRUE, log.y = logy, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
     )
   }
-} else if(!all(is.na(mean.grp))){
+} else if(!is.null(mean.grp) && !is.na(mean.grp)){
   for(i in 1:length(mean.grp)){
     if(length(grep(mean.grp[i], as.character(names(flFitRes$flFit$flFittedSplines))))>0){
       suppressWarnings(
-        plot.flFitRes(flFitRes, names = unlist(mean.grp[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+        plot.flFitRes(flFitRes, names = unlist(mean.grp[i]), basesize = 15, export = export, plot=TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
       )
     }
   }
 }
-if(!all(is.na(mean.conc))){
+if(!is.null(mean.conc) && !is.na(mean.conc)){
   for(i in 1:length(mean.conc)){
     if(length(grep(mean.conc[i], str_extract(names(flFitRes$flFit$flFittedSplines), "[:alnum:]+$")))>0){
       suppressWarnings(
-        plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, log.y = T, mean = T, out.dir = paste0(wd, "/Plots"), legend.position = "bottom", legend.ncol = 4)
+        plot.flFitRes(flFitRes, conc = unlist(mean.conc[i]), basesize = 15, export = export, plot=TRUE, log.y = T, mean = T, out.dir = normalizePath(wd.plots), legend.position = "bottom", legend.ncol = 4)
       )
     }
   }

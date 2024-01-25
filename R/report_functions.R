@@ -57,180 +57,180 @@ growth.report <- function(
     format = c("pdf", "html"),
     export = FALSE, parallelize = TRUE, ...
 )
+{
+  if (any(format %in% "pdf"))
+  {
+    if (!requireNamespace("tinytex", quietly = TRUE))
     {
-    if (any(format %in% "pdf"))
-        {
-        if (!requireNamespace("tinytex", quietly = TRUE))
-            {
-            stop(
-                "Please install package 'tinytex' to render PDF reports."
-            )
-        } else if (!tinytex::is_tinytex())
-        {
-            stop(
-                "TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex()."
-            )
-        }
-    }
-    try(
-        showModal(
-            modalDialog(
-              HTML("Rendering report...<br><br>(This can take up to several minutes)"),
-                footer = NULL
-            )
-        ),
-        silent = TRUE
-    )
-    # results an object of class grofit
-    if (methods::is(grofit) !=
-        "grofit")
-        stop(
-            "grofit needs to be an object created with growth.workflow()."
-        )
-    # Define objects based on additional function
-    # calls
-    call <- match.call()
-    ## remove strictly defined arguments
-    call$grofit <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- call$parallelize <- NULL
-    arglist <- sapply(call, function(x) x)
-    arglist <- unlist(arglist)[-1]
-    ## Assign additional arguments (...) as R
-    ## objects
-    if (length(arglist) >
-        0)
-        {
-        for (i in 1:length(arglist))
-            {
-            assign(
-                names(arglist)[i],
-                arglist[[i]]
-            )
-        }
-    }
-    if (!exists("mean.grp"))
-      mean.grp <- list()
-    if (!exists("mean.conc"))
-      mean.conc <- list()
-    gcFit <- grofit$gcFit
-    drFit <- grofit$drFit
-    control <- grofit$control
-    time <- grofit$gcFit$raw.time
-    data <- grofit$gcFit$raw.data
-    if (!exists("res.table.gc"))
-        {
-        res.table.gc <- grofit$gcFit$gcTable
-    }
-    if (!exists("res.table.dr"))
-        {
-        if (length(grofit$drFit) >
-            1)
-            res.table.dr <- grofit$drFit$drTable
-    }
-    if (any(
-        c("a", "b", "s") %in%
-            grofit$control$fit.opt
-    ))
-        {
-        # find minimum and maximum mu values in
-        # whole dataset to equilibrate derivative
-        # plots for spline fits
-        mu.min <- suppressWarnings(
-            min(
-                sapply(
-                  1:length(grofit$gcFit$gcFittedSplines),
-                  function(x) ifelse(
-                    all(
-                      is.na(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1)
-                  ),
-                    NA, min(
-                      grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y
-                  )
-                )
-              ),
-                na.rm = TRUE
-            )
-        ) *
-            1.05
-        if (mu.min > 0)
-            mu.min <- 0
-        mu.max <- suppressWarnings(
-            max(
-                sapply(
-                  1:length(grofit$gcFit$gcFittedSplines),
-                  function(x) ifelse(
-                    all(
-                      is.na(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1)
-                  ),
-                    NA, max(
-                      grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y
-                  )
-                )
-              ),
-                na.rm = TRUE
-            )
-        ) *
-            1.05
-    }
-    if (!is.null(out.dir))
-        {
-        wd <- out.dir
-    } else
-    {
-        wd <- paste(
-            getwd(), "/Report.growth_", format(Sys.time(), "%Y%m%d_%H%M%S"),
-            sep = ""
-        )
-    }
-    if (is.null(out.nm))
-        {
-        out.nm <- paste(
-            "/GrowthReport_", format(Sys.time(), "%Y%m%d_%H%M%S"),
-            sep = ""
-        )
-    }
-    dir.create(wd, showWarnings = FALSE)
-    message("Render reports...")
-    for (i in 1:length(.libPaths()))
-        {
-        QurvE.ndx <- grep("QurvE", list.files(.libPaths()[i]))
-        if (length(QurvE.ndx) >
-            0)
-            {
-            Report.wd <- paste0(.libPaths()[i], "/QurvE")
-        }
-    }
-    file <- paste0(Report.wd, "/Report_Growth.Rmd")
-    #file <- "/Users/ncw/QurvE/inst/Report_Growth.Rmd"
-
-    # Copy report files into temp directory
-    report_path <- tempfile(fileext = ".Rmd")
-    file.copy(file, report_path, overwrite = TRUE)
-
-    if (all( c("pdf", "html") %in% format )) {
-      format <- c("html_document", "pdf_document")
-    } else if ("pdf" %in% format){
-      format <- "pdf_document"
-    } else if ("html" %in% format){
-      format <- "html_document"
-    } else {
       stop(
-        "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
+        "Please install package 'tinytex' to render PDF reports."
+      )
+    } else if (!tinytex::is_tinytex())
+    {
+      stop(
+        "TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex()."
       )
     }
-
-
-      rmarkdown::render(
-        input = report_path, output_format = format, output_dir = wd,
-        output_file = out.nm, quiet = TRUE
+  }
+  try(
+    showModal(
+      modalDialog(
+        HTML("Rendering report...<br><br>(This can take up to several minutes)"),
+        footer = NULL
       )
-
-    message(paste0("Report files saved in: '/", wd, "'"))
-    unlink(
-        paste0(tempdir(), "/Plots"),
-        recursive = TRUE
+    ),
+    silent = TRUE
+  )
+  # results an object of class grofit
+  if (methods::is(grofit) !=
+      "grofit")
+    stop(
+      "grofit needs to be an object created with growth.workflow()."
     )
-    try(removeModal(), silent = TRUE)
-    invisible(NULL)
+
+  # Capture additional arguments in a list
+  additional_args <- list(...)
+
+  # Check if mean.grp is in the additional arguments and set default if not
+  mean.grp <- if ("mean.grp" %in% names(additional_args)) {
+    additional_args[["mean.grp"]]
+  } else {
+    c()  # Default value
+  }
+  # Check if mean.conc is in the additional arguments and set default if not
+  mean.conc <- if ("mean.conc" %in% names(additional_args)) {
+    additional_args[["mean.conc"]]
+  } else {
+    c()  # Default value
+  }
+
+  gcFit <- grofit$gcFit
+  drFit <- grofit$drFit
+  control <- grofit$control
+  time <- grofit$gcFit$raw.time
+  data <- grofit$gcFit$raw.data
+  res.table.gc <- if ("res.table.gc" %in% names(additional_args)) {
+    additional_args[["res.table.gc"]]
+  } else {
+    grofit$gcFit$gcTable  # Default value from grofit
+  }
+
+  # res.table.dr <- if ( "res.table.dr" %in% names(additional_args) ) {
+  #   additional_args[["res.table.dr"]]
+  # } else if ( length(grofit$drFit) > 1){
+  #     grofit$drFit$drTable  # Default value from grofit
+  # }
+
+
+  if (any(
+    c("a", "b", "s") %in%
+    grofit$control$fit.opt
+  ))
+  {
+    # find minimum and maximum mu values in
+    # whole dataset to equilibrate derivative
+    # plots for spline fits
+    mu.min <- suppressWarnings(
+      min(
+        sapply(
+          1:length(grofit$gcFit$gcFittedSplines),
+          function(x) ifelse(
+            all(
+              is.na(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1)
+            ),
+            NA, min(
+              grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y
+            )
+          )
+        ),
+        na.rm = TRUE
+      )
+    ) *
+      1.05
+    if (mu.min > 0)
+      mu.min <- 0
+    mu.max <- suppressWarnings(
+      max(
+        sapply(
+          1:length(grofit$gcFit$gcFittedSplines),
+          function(x) ifelse(
+            all(
+              is.na(grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1)
+            ),
+            NA, max(
+              grofit$gcFit$gcFittedSplines[[x]]$spline.deriv1$y
+            )
+          )
+        ),
+        na.rm = TRUE
+      )
+    ) *
+      1.05
+  }
+  if (!is.null(out.dir))
+  {
+    wd <- out.dir
+  } else
+  {
+    wd <- paste(
+      getwd(), "/Report.growth_", format(Sys.time(), "%Y%m%d_%H%M%S"),
+      sep = ""
+    )
+  }
+  if (is.null(out.nm))
+  {
+    out.nm <- paste(
+      "/GrowthReport_", format(Sys.time(), "%Y%m%d_%H%M%S"),
+      sep = ""
+    )
+  }
+  dir.create(wd, showWarnings = FALSE)
+  wd <- normalizePath(wd)
+  message("Render reports...")
+  for (i in 1:length(.libPaths()))
+  {
+    QurvE.ndx <- grep("QurvE", list.files(.libPaths()[i]))
+    if (length(QurvE.ndx) >
+        0)
+    {
+      Report.wd <- paste0(.libPaths()[i], "/QurvE")
+    }
+  }
+  file <- paste0(Report.wd, "/Report_Growth.Rmd")
+
+  # Copy report files into temp directory
+  report_path <- tempfile(fileext = ".Rmd")
+  file.copy(file, report_path, overwrite = TRUE)
+
+  if (all( c("pdf", "html") %in% format )) {
+    format <- c("html_document", "pdf_document")
+  } else if ("pdf" %in% format){
+    format <- "pdf_document"
+  } else if ("html" %in% format){
+    format <- "html_document"
+  } else {
+    stop(
+      "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
+    )
+  }
+  if(export == T){
+    wd.plots <- paste0(wd,"/Plots")
+    dir.create(paste0(tempdir(), "/Plots"), showWarnings = F)
+    dir.create(wd.plots, showWarnings = F)
+  }
+
+  rmarkdown::render(
+    input = report_path, output_format = format, output_dir = wd,
+    output_file = out.nm, quiet = TRUE
+  )
+
+  message(paste0("Report files saved in: '/", wd, "'"))
+  unlink(
+    paste0(tempdir(), "/Plots"),
+    recursive = TRUE
+  )
+  try(removeModal(), silent = TRUE)
+  invisible(NULL)
 }
 
 #' Create a PDF and HTML report with results from a fluorescence analysis workflow
@@ -243,7 +243,7 @@ growth.report <- function(
 #' @param ec50 (Logical) Was a dose-response analysis performed in \code{\link{fl.workflow}} \code{TRUE} or not \code{FALSE}?
 #' @param format (Character) Define the file format for the report, PDF (\code{'pdf'}) and/or HTML (\code{'html'}). Default: (\code{c('pdf', 'html')})
 #' @param export (Logical) Shall all plots generated in the report be exported as individual PDF and PNG files \code{TRUE} or not \code{FALSE}?
-#' @param ... Further arguments passed to create a report. Currently required:
+#' @param ... Further arguments passed to create a report. Currently supported:
 #' \itemize{
 #'    \item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{'all'}, a vector of strings, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{'all'} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
 #'    \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
@@ -287,211 +287,188 @@ fl.report <- function(
     format = c("pdf", "html"),
     export = FALSE, parallelize = TRUE, ...
 )
+{
+  if (any(format %in% "pdf"))
+  {
+    if (!requireNamespace("tinytex", quietly = TRUE))
     {
-    if (any(format %in% "pdf"))
-        {
-        if (!requireNamespace("tinytex", quietly = TRUE))
-            {
-            stop(
-                "Please install package 'tinytex' to render PDF reports."
-            )
-        } else if (!tinytex::is_tinytex())
-        {
-            stop(
-                "TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex()."
-            )
-        }
-    }
-    try(
-        showModal(
-            modalDialog(
-                HTML("Rendering report...<br><br>(This can take up to several minutes)"),
-                footer = NULL
-            )
-        ),
-        silent = TRUE
-    )
-    # results an object of class grofit
-    if (is(flFitRes) !=
-        "flFitRes")
-        stop(
-            "flFitRes needs to be an object created with fl.workflow()."
-        )
-    # Define objects based on additional function
-    # calls
-    call <- match.call()
-    ## remove strictly defined arguments
-    call$flFitRes <- call$out.dir <- call$out.nm <- call$ec50 <- call$format <- call$export <- call$parallelize <- NULL
-    arglist <- sapply(call, function(x) x)
-    arglist <- unlist(arglist)[-1]
-    ## Assign additional arguments (...) as R
-    ## objects
-    if (length(arglist) >
-        0)
-        {
-        for (i in 1:length(arglist))
-            {
-            assign(
-                names(arglist)[i],
-                arglist[[i]]
-            )
-        }
-    }
-    if (!exists("mean.grp"))
-      mean.grp <- list()
-    if (!exists("mean.conc"))
-      mean.conc <- list()
-    flFit <- flFitRes$flFit
-    drFit <- flFitRes$drFit
-    # flFit2 <- flFitRes$flFit2 drFit2 <-
-    # flFitRes$drFit2
-    control <- flFitRes$control
-    time <- flFitRes$time
-    data <- flFitRes$data
-    if (!exists("res.table.fl"))
-        {
-        res.table.fl <- flFitRes$flFit$flTable
-    }
-    if (!exists("res.table.dr"))
-        {
-        if (length(flFitRes$drFit) >
-            1 && length(flFitRes$drFit$drTable) >
-            2)
-            res.table.dr <- flFitRes$drFit$drTable
-    }
-    # if(!exists('res.table.gc2')){
-    # if(length(flFit2)>1){ res.table.fl2 <-
-    # flFitRes$flFit2$flTable } }
-    # if(!exists('res.table.dr2')){
-    # if(length(flFitRes$drFit2)>1 &&
-    # !is.na(flFitRes$drFit2$drTable))
-    # res.table.dr2 <- flFitRes$drFit2$drTable }
-    if (any(
-        c("a", "s") %in%
-            flFitRes$control$fit.opt
-    ))
-        {
-        # find minimum and maximum mu values in
-        # whole dataset to equilibrate derivative
-        # plots for spline fits
-        mu.min1 <- suppressWarnings(
-            min(
-                sapply(
-                  1:length(flFitRes$flFit$flFittedSplines),
-                  function(x) ifelse(
-                    all(
-                      is.na(
-                        flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1
-                    )
-                  ),
-                    NA, min(
-                      flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1$y
-                  )
-                )
-              ),
-                na.rm = TRUE
-            )
-        ) *
-            1.05
-        if (mu.min1 > 0)
-            mu.min1 <- 0
-        mu.max1 <- suppressWarnings(
-            max(
-                sapply(
-                  1:length(flFitRes$flFit$flFittedSplines),
-                  function(x) ifelse(
-                    all(
-                      is.na(
-                        flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1
-                    )
-                  ),
-                    NA, max(
-                      flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1$y
-                  )
-                )
-              ),
-                na.rm = TRUE
-            )
-        ) *
-            1.05
-        # if(length(flFit2)>1){ mu.min2 <-
-        # suppressWarnings(min(sapply(1:length(flFitRes$flFit2$flFittedSplines),
-        # function(x)
-        # ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)),
-        # NA,
-        # min(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))),
-        # na.rm = TRUE))*1.05 if(mu.min2 >0)
-        # mu.min2 <- 0 mu.max1 <-
-        # suppressWarnings(max(sapply(1:length(flFitRes$flFit2$flFittedSplines),
-        # function(x)
-        # ifelse(all(is.na(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1)),
-        # NA,
-        # max(flFitRes$flFit2$flFittedSplines[[x]]$spline.deriv1$y))),
-        # na.rm = TRUE))*1.05 }
-    }
-    if (!is.null(out.dir))
-        {
-        wd <- out.dir
-    } else
-    {
-        wd <- paste(
-            getwd(), "/Report.fluorescence_", format(Sys.time(), "%Y%m%d_%H%M%S"),
-            sep = ""
-        )
-    }
-    if (is.null(out.nm))
-        {
-        out.nm <- paste(
-            "/FluorescenceReport_", format(Sys.time(), "%Y%m%d_%H%M%S"),
-            sep = ""
-        )
-    }
-    dir.create(wd, showWarnings = FALSE)
-    message("Render reports...")
-    # for(i in 1:length(.libPaths())){ QurvE.ndx
-    # <- grep('QurvE',
-    # list.files(.libPaths()[i]))
-    # if(length(QurvE.ndx)>0){ Report.wd <-
-    # paste0(.libPaths()[i], '/QurvE') } }
-    Report.wd <- paste0(
-        "C:/Users/nicwir/Documents/DTU_Biosustain/Scripts_and_Modelling/curvE package/QurvE/inst/"
-    )
-    file <- paste0(Report.wd, "/Report_Fluorescence.Rmd")
-
-    # Copy report files into temp directory
-    report_path <- tempfile(fileext = ".Rmd")
-    file.copy(file, report_path, overwrite = TRUE)
-
-    if (all(
-        c("pdf", "html") %in%
-            format
-    ))
-        {
-        format <- c("html_document", "pdf_document")
-    } else if ("pdf" %in% format)
-    {
-        format <- "pdf_document"
-    } else if ("html" %in% format)
-    {
-        format <- "html_document"
-    } else {
       stop(
-        "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
+        "Please install package 'tinytex' to render PDF reports."
+      )
+    } else if (!tinytex::is_tinytex())
+    {
+      stop(
+        "TinyTex was not found on your system. To render PDF reports, please execute tinytex::install_tinytex()."
       )
     }
-
-      rmarkdown::render(
-        report_path, output_format = format, output_dir = wd,
-        output_file = out.nm, quiet = TRUE
+  }
+  try(
+    showModal(
+      modalDialog(
+        HTML("Rendering report...<br><br>(This can take up to several minutes)"),
+        footer = NULL
       )
-
-    message(paste0("Files saved in: '", wd, "'"))
-    unlink(
-        paste0(tempdir(), "/Plots"),
-        recursive = TRUE
+    ),
+    silent = TRUE
+  )
+  # results an object of class grofit
+  if (is(flFitRes) !=
+      "flFitRes")
+    stop(
+      "flFitRes needs to be an object created with fl.workflow()."
     )
-    try(removeModal(), silent = TRUE)
-    invisible(NULL)
+  # Define objects based on additional function
+  # Capture additional arguments in a list
+  additional_args <- list(...)
+
+  # Check if mean.grp is in the additional arguments and set default if not
+  mean.grp <- if ("mean.grp" %in% names(additional_args)) {
+    additional_args[["mean.grp"]]
+  } else {
+    c()  # Default value
+  }
+  # Check if mean.conc is in the additional arguments and set default if not
+  mean.conc <- if ("mean.conc" %in% names(additional_args)) {
+    additional_args[["mean.conc"]]
+  } else {
+    c()  # Default value
+  }
+
+  flFit <- flFitRes$flFit
+  drFit <- flFitRes$drFit
+
+  control <- flFitRes$control
+  time <- flFitRes$time
+  data <- flFitRes$data
+  if (!exists("res.table.fl"))
+  {
+    res.table.fl <- flFitRes$flFit$flTable
+  }
+  if (!exists("res.table.dr"))
+  {
+    if (length(flFitRes$drFit) >
+        1 && length(flFitRes$drFit$drTable) >
+        2)
+      res.table.dr <- flFitRes$drFit$drTable
+  }
+  if (any(
+    c("a", "s") %in%
+    flFitRes$control$fit.opt
+  ))
+  {
+    # find minimum and maximum mu values in
+    # whole dataset to equilibrate derivative
+    # plots for spline fits
+    mu.min1 <- suppressWarnings(
+      min(
+        sapply(
+          1:length(flFitRes$flFit$flFittedSplines),
+          function(x) ifelse(
+            all(
+              is.na(
+                flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1
+              )
+            ),
+            NA, min(
+              flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1$y
+            )
+          )
+        ),
+        na.rm = TRUE
+      )
+    ) *
+      1.05
+    if (mu.min1 > 0)
+      mu.min1 <- 0
+    mu.max1 <- suppressWarnings(
+      max(
+        sapply(
+          1:length(flFitRes$flFit$flFittedSplines),
+          function(x) ifelse(
+            all(
+              is.na(
+                flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1
+              )
+            ),
+            NA, max(
+              flFitRes$flFit$flFittedSplines[[x]]$spline.deriv1$y
+            )
+          )
+        ),
+        na.rm = TRUE
+      )
+    ) *
+      1.05
+  }
+  if (!is.null(out.dir))
+  {
+    wd <- out.dir
+  } else
+  {
+    wd <- paste(
+      getwd(), "/Report.fluorescence_", format(Sys.time(), "%Y%m%d_%H%M%S"),
+      sep = ""
+    )
+  }
+  if (is.null(out.nm))
+  {
+    out.nm <- paste(
+      "/FluorescenceReport_", format(Sys.time(), "%Y%m%d_%H%M%S"),
+      sep = ""
+    )
+  }
+  dir.create(wd, showWarnings = FALSE)
+  wd <- normalizePath(wd)
+  message("Render reports...")
+
+  for (i in 1:length(.libPaths()))
+  {
+    QurvE.ndx <- grep("QurvE", list.files(.libPaths()[i]))
+    if (length(QurvE.ndx) >
+        0)
+    {
+      Report.wd <- paste0(.libPaths()[i], "/QurvE")
+    }
+  }
+  file <- paste0(Report.wd, "/Report_Fluorescence.Rmd")
+
+  # Copy report files into temp directory
+  report_path <- tempfile(fileext = ".Rmd")
+  file.copy(file, report_path, overwrite = TRUE)
+
+  if (all(
+    c("pdf", "html") %in% format)
+    )
+  {
+    format <- c("html_document", "pdf_document")
+  } else if ("pdf" %in% format) {
+    format <- "pdf_document"
+  } else if ("html" %in% format) {
+    format <- "html_document"
+  } else {
+    stop(
+      "Please define a valid report format, either 'pdf', 'html', or c('pdf', 'html')."
+    )
+  }
+
+  if(export == T){
+    wd.plots <- paste0(wd,"/Plots")
+    dir.create(paste0(tempdir(), "/Plots"), showWarnings = F)
+    dir.create(wd.plots, showWarnings = F)
+  }
+
+  rmarkdown::render(
+    report_path, output_format = format, output_dir = wd,
+    output_file = out.nm, quiet = TRUE
+  )
+
+  message(paste0("Files saved in: '", wd, "'"))
+  unlink(
+    paste0(tempdir(), "/Plots"),
+    recursive = TRUE
+  )
+  try(removeModal(), silent = TRUE)
+  invisible(NULL)
 }
 #' Format font color for Markdown reports
 #'

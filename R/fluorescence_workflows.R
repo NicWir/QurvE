@@ -648,6 +648,12 @@ fl.workflow <- function(grodata = NULL,
   }
   if(exists("lin.h") && !is.null(lin.h) && (is.na(lin.h) || lin.h == "")) lin.h <- NULL
 
+  if ( isTRUE(export.fig) && is.null(report) ){
+    message(
+      "The export of plots as separate files (`export.fig = TRUE`) is only valid if `report != NULL`."
+    )
+  }
+
   # Define objects based on additional function calls
   call <- match.call()
 

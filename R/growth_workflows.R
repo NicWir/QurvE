@@ -41,7 +41,7 @@
 #' @param report (Character or NULL) Create a PDF (\code{'pdf'}) and/or HTML (\code{'html'}) report after running all computations. Define \code{NULL} if no report should be created. Default: (\code{c('pdf', 'html')})
 #' @param out.dir {Character or \code{NULL}} Define the name of a folder in which all result files are stored. If \code{NULL}, the folder will be named with a combination of 'GrowthResults_' and the current date and time.
 #' @param out.nm {Character or \code{NULL}} Define the name of the report files. If \code{NULL}, the files will be named with a combination of 'GrowthReport_' and the current date and time.
-#' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}). Only effective if \code{report = TRUE}.
+#' @param export.fig (Logical) Export all figures created in the report as separate PNG and PDF files (\code{TRUE}) or not (\code{FALSE}). Only effective if \code{report != NULL}.
 #' @param export.res (Logical) Create tab-separated TXT files containing calculated growth parameters and dose-response analysis results as well as an .RData file for the resulting `grofit` object.
 #' @param parallelize Run linear fits and bootstrapping operations in parallel using all but one available processor cores
 #' @param ... Further arguments passed to the shiny app.
@@ -149,6 +149,12 @@ growth.workflow <- function(
       (is.na(lin.h) ||
        lin.h == ""))
     lin.h <- NULL
+
+  if ( isTRUE(export.fig) && is.null(report) ){
+    message(
+      "The export of plots as separate files (`export.fig = TRUE`) is only valid if `report != NULL`."
+    )
+  }
   # Define objects based on additional function
   # calls
   call <- match.call()
@@ -172,7 +178,6 @@ growth.workflow <- function(
       )
     }
   }
-
   # Test input
   if (is.null(grodata) ||
       !(is(grodata) ==

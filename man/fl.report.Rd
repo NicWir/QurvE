@@ -30,7 +30,7 @@ fl.report(
 
 \item{parallelize}{(Logical) Create plots using all but one available processor cores (\code{TRUE}) or only a single core (\code{FALSE}).}
 
-\item{...}{Further arguments passed to create a report. Currently required:
+\item{...}{Further arguments passed to create a report. Currently supported:
 \itemize{
 \item \code{mean.grp}: Define groups to combine into common plots in the report based on sample identifiers. Partial matches with sample/group names are accepted. Can be \code{'all'}, a vector of strings, or a list of string vectors. Note: The maximum number of sample groups (with unique condition/concentration indicators) is 50. If you have more than 50 groups, option \code{'all'} will produce the error \code{! Insufficient values in manual scale. [Number] needed but only 50 provided}.
 \item \code{mean.conc}: Define concentrations to combine into common plots in the  report. Can be a numeric vector, or a list of numeric vectors.
