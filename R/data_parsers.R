@@ -680,7 +680,7 @@ tidy_to_custom <- function(df, data.format = "col"){
       any(grepl("Values|Value", df[1,], ignore.case = T)))
   ){
     tidy <- TRUE
-    print("hallo")
+    Concentration <- Description <- Group <- Replicate <- Time <- Values <- unique_time_vector <- NULL
     # If identifiers in first row, convert to colnames
     if(any(grepl("Time", df[1,], ignore.case = T)) ||
        any(grepl("Description", df[1,], ignore.case = T)) ||
