@@ -680,6 +680,7 @@ tidy_to_custom <- function(df, data.format = "col"){
       any(grepl("Values|Value", df[1,], ignore.case = T)))
   ){
     tidy <- TRUE
+    print("hallo")
     # If identifiers in first row, convert to colnames
     if(any(grepl("Time", df[1,], ignore.case = T)) ||
        any(grepl("Description", df[1,], ignore.case = T)) ||
@@ -688,6 +689,7 @@ tidy_to_custom <- function(df, data.format = "col"){
       df <- df[-1, ]
     }
     colnames(df)[grep("Value", colnames(df))] <- "Values"
+
     # If missing, add columns for "Replicate" and "Concentration"
     if(!any(grepl("Replicate", colnames(df), ignore.case = T))){
       df[, "Replicate"] <- rep(NA, nrow(df))
@@ -902,7 +904,7 @@ tidy_to_custom <- function(df, data.format = "col"){
   else if(data.format == "col"){
     df <- t(df)
   }
-  rownames(df) <- rep("", nrow(df))
+  rownames(df) <- seq(1:nrow(df))
   return(df)
 }
 
