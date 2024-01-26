@@ -4,11 +4,11 @@ author: "Nicolas T. Wirth"
 date: "2023-04-04"
 mainfont: Arial
 output:
-  rmarkdown::html_document:
+  prettydoc::html_pretty:
     fig_caption: yes
     toc: true
-    theme: "spacelab"
-    highlight: default
+    theme: "cayman"
+    highlight: vignette
 vignette: >
   %\VignetteIndexEntry{Q&A and Troubleshooting}
   %\VignetteEncoding{UTF-8}

@@ -54,23 +54,23 @@
 #' \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
 #' \item{par}{List of determined growth parameters:}
 #' \itemize{
-#' \item \code{y0}: {Minimum growth value considered for the heuristic linear method.}
-#' \item \code{dY}: {Difference in maximum growth and minimum growth.}
-#' \item \code{A}: {Maximum growth.}
-#' \item \code{y0_lm}: {Intersection of the linear fit with the abscissa.}
-#' \item \code{mumax}: {Maximum growth rate (i.e., slope of the linear fit).}
-#' \item \code{tD}: {Doubling time.}
-#' \item \code{mu.se}: {Standard error of the maximum growth rate.}
-#' \item \code{lag}: {Lag time.}
-#' \item \code{tmax_start}: {Time value of the first data point within the window used for the linear regression.}
-#' \item \code{tmax_end}: {Time value of the last data point within the window used for the linear regression.}
-#' \item \code{t_turn}: {For biphasic growth: Time of the inflection point that separates two growth phases.}
-#' \item \code{mumax2}: {For biphasic growth: Growth rate of the second growth phase.}
-#' \item \code{tD2}: {Doubling time of the second growth phase.}
-#' \item \code{y0_lm2}: {For biphasic growth: Intersection of the linear fit of the second growth phase with the abscissa.}
-#' \item \code{lag2}: {For biphasic growth: Lag time determined for the second growth phase..}
-#' \item \code{tmax2_start}: {For biphasic growth: Time value of the first data point within the window used for the linear regression of the second growth phase.}
-#' \item \code{tmax2_end}: {For biphasic growth: Time value of the last data point within the window used for the linear regression of the second growth phase.}
+#' \item \code{y0}: Minimum growth value considered for the heuristic linear method.
+#' \item \code{dY}: Difference in maximum growth and minimum growth.
+#' \item \code{A}: Maximum growth.
+#' \item \code{y0_lm}: Intersection of the linear fit with the abscissa.
+#' \item \code{mumax}: Maximum growth rate (i.e., slope of the linear fit).
+#' \item \code{tD}: Doubling time.
+#' \item \code{mu.se}: Standard error of the maximum growth rate.
+#' \item \code{lag}: Lag time.
+#' \item \code{tmax_start}: Time value of the first data point within the window used for the linear regression.
+#' \item \code{tmax_end}: Time value of the last data point within the window used for the linear regression.
+#' \item \code{t_turn}: For biphasic growth: Time of the inflection point that separates two growth phases.
+#' \item \code{mumax2}: For biphasic growth: Growth rate of the second growth phase.
+#' \item \code{tD2}: Doubling time of the second growth phase.
+#' \item \code{y0_lm2}: For biphasic growth: Intersection of the linear fit of the second growth phase with the abscissa.
+#' \item \code{lag2}: For biphasic growth: Lag time determined for the second growth phase..
+#' \item \code{tmax2_start}: For biphasic growth: Time value of the first data point within the window used for the linear regression of the second growth phase.
+#' \item \code{tmax2_end}: For biphasic growth: Time value of the last data point within the window used for the linear regression of the second growth phase.
 #' }
 #' \item{ndx}{Index of data points used for the linear regression.}
 #' \item{ndx2}{Index of data points used for the linear regression for the second growth phase.}
@@ -923,23 +923,23 @@ growth.gcFitLinear <- function(time, data, gcID = "undefined", quota = 0.95,
 #' \item{fit}{\code{lm} object; result of the final call of \code{\link{lm}} to perform the linear regression.}
 #' \item{par}{List of determined fluorescence parameters:}
 #' \itemize{
-#' \item \code{y0}: {Minimum fluorescence value considered for the heuristic linear method.}
-#' \item \code{dY}: {Difference in maximum fluorescence and minimum fluorescence}
-#' \item \code{A}: {Maximum fluorescence}
-#' \item \code{y0_lm}: {Intersection of the linear fit with the abscissa.}
-#' \item \code{max_slope}: {Maximum slope of the linear fit.}
-#' \item \code{tD}: {Doubling time.}
-#' \item \code{slope.se}: {Standard error of the maximum slope.}
-#' \item \code{lag}: {Lag X.}
-#' \item \code{x.max_start}: {X value of the first data point within the window used for the linear regression.}
-#' \item \code{x.max_end}: {X value of the last data point within the window used for the linear regression.}
-#' \item \code{x.turn}: {For biphasic: X at the inflection point that separates two phases.}
-#' \item \code{max.slope2}: {For biphasic: Slope of the second phase.}
-#' \item \code{tD2}: {Doubling time of the second phase.}
-#' \item \code{y0_lm2}: {For biphasic: Intersection of the linear fit of the second phase with the abscissa.}
-#' \item \code{lag2}: {For biphasic: Lag time determined for the second phase..}
-#' \item \code{x.max2_start}: {For biphasic: X value of the first data point within the window used for the linear regression of the second phase.}
-#' \item \code{x.max2_end}: {For biphasic: X value of the last data point within the window used for the linear regression of the second phase.}
+#' \item \code{y0}: Minimum fluorescence value considered for the heuristic linear method.
+#' \item \code{dY}: Difference in maximum fluorescence and minimum fluorescence
+#' \item \code{A}: Maximum fluorescence
+#' \item \code{y0_lm}: Intersection of the linear fit with the abscissa.
+#' \item \code{max_slope}: Maximum slope of the linear fit.
+#' \item \code{tD}: Doubling time.
+#' \item \code{slope.se}: Standard error of the maximum slope.
+#' \item \code{lag}: Lag X.
+#' \item \code{x.max_start}: X value of the first data point within the window used for the linear regression.
+#' \item \code{x.max_end}: X value of the last data point within the window used for the linear regression.
+#' \item \code{x.turn}: For biphasic: X at the inflection point that separates two phases.
+#' \item \code{max.slope2}: For biphasic: Slope of the second phase.
+#' \item \code{tD2}: Doubling time of the second phase.
+#' \item \code{y0_lm2}: For biphasic: Intersection of the linear fit of the second phase with the abscissa.
+#' \item \code{lag2}: For biphasic: Lag time determined for the second phase..
+#' \item \code{x.max2_start}: For biphasic: X value of the first data point within the window used for the linear regression of the second phase.
+#' \item \code{x.max2_end}: For biphasic: X value of the last data point within the window used for the linear regression of the second phase.
 #' }
 #' \item{ndx}{Index of data points used for the linear regression.}
 #' \item{ndx2}{Index of data points used for the linear regression for the second phase.}

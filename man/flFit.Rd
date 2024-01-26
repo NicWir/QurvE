@@ -69,15 +69,15 @@ summary(res)
 
 }
 \seealso{
-Other workflows: 
+Other workflows:
 \code{\link{growth.gcFit}()},
 \code{\link{growth.workflow}()}
 
-Other fluorescence fitting functions: 
+Other fluorescence fitting functions:
 \code{\link{flBootSpline}()},
 \code{\link{flFitSpline}()}
 
-Other dose-response analysis functions: 
+Other dose-response analysis functions:
 \code{\link{growth.drBootSpline}()},
 \code{\link{growth.drFitSpline}()},
 \code{\link{growth.gcFit}()},
