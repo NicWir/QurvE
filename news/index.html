@@ -56,6 +56,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.1" id="qurve-111">QurvE 1.1.1<a class="anchor" aria-label="anchor" href="#qurve-111"></a></h2>
 <div class="section level3">
+<h3 id="enhancements-1-1-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-1-1"></a></h3>
+<ul><li>
+<code><a href="../reference/read_data.html">read_data()</a></code> now automatically assigns increasing replicate numbers to sample groups (identical “Description” and “Concentration”) if all of their replicate values are missing or NA</li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-1-1-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-1"></a></h3>
 <ul><li>fixed bug during the parsing of tidy data if the combinations of Description/Concentration/Replicate were not unique (e.g., multiple ‘Blank’ samples, Issue <a href="https://github.com/NicWir/QurvE/issues/11" class="external-link">#11</a>).</li>
 <li>fixed bug that occured in tidy_to_custom() with format=‘row’.</li>
