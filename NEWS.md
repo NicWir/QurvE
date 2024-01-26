@@ -1,5 +1,9 @@
 # QurvE 1.1.1
 
+## Enhancements
+
+* `read_data()` now automatically assigns increasing replicate numbers to sample groups (identical "Description" and "Concentration") if all of their replicate values are missing or NA
+
 ## Bug fixes
 
 * fixed bug during the parsing of tidy data if the combinations of Description/Concentration/Replicate were not unique (e.g., multiple 'Blank' samples, Issue #11).

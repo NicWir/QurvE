@@ -205,7 +205,7 @@ read_data <-
         stop("Could not find 'time' in row 1 of any provided 'data.growth' or 'data.fl'.")
       }
     }
-
+    # Data calibration
     if(!is.null(calib.growth)){
       if(length(dat)>1)
         dat <- calibrate(dat, calib.growth)
@@ -218,7 +218,6 @@ read_data <-
       if((length(fl2) > 1 ) || !is.na(data.fl2))
         fl2 <- calibrate(fl2, calib.fl2)
     }
-
     # subtract blank
     if(subtract.blank){
       subtract_blank <- function(df){
@@ -278,6 +277,35 @@ read_data <-
       if((length(fl) > 1 ) || !is.na(data.fl))    fl <- subtract_blank(df=fl)
       if((length(fl2) > 1 ) || !is.na(data.fl2))    fl2 <- subtract_blank(df=fl2)
     }
+
+    ### Assign increasing "Replicate" values to sample groups (identical "Description" and "Concentration") if all of their replicate values are NA
+    update_replicate_values <- function(df) {
+      # Convert NaN to NA for consistency
+      df[,2][is.nan(df[,2])] <- NA
+      grouping_key <- paste(df[,1], df[,3], sep="_")
+      # Find unique groups
+      unique_groups <- unique(grouping_key)
+      # Iterate over each group
+      for(group in unique_groups) {
+        if(
+          !(
+            (strsplit(group, "_")[[1]][1] == "Time") ||
+            (strsplit(group, "_")[[1]][1] == "time")
+          )
+        ){
+          indices <- which(grouping_key == group)
+          if(all(is.na(df[indices, 2]))) {
+            # Assign increasing numbers starting from 1
+            df[indices, 2] <- 1:length(indices)
+          }
+        }
+      }
+      return(df)
+    }
+    if(length(dat)>1) dat <- update_replicate_values(dat)
+    if((length(fl) > 1 ) || !is.na(data.fl)) fl <- update_replicate_values(fl)
+    if((length(fl2) > 1 ) || !is.na(data.fl2)) fl2 <- update_replicate_values(fl2)
+
 
     ### Combine technical replicates
     combine_techrep <- function(df){
