@@ -57,7 +57,16 @@
 <h2 class="pkg-version" data-toc-text="1.1.1" id="qurve-111">QurvE 1.1.1<a class="anchor" aria-label="anchor" href="#qurve-111"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-1-1-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-1"></a></h3>
-<ul><li>fixed bug during the parsing of tidy data if the combinations of Description/Concentration/Replicate were not unique (e.g., multiple ‘Blank’ samples)</li>
+<ul><li>fixed bug during the parsing of tidy data if the combinations of Description/Concentration/Replicate were not unique (e.g., multiple ‘Blank’ samples, Issue <a href="https://github.com/NicWir/QurvE/issues/11" class="external-link">#11</a>).</li>
+<li>fixed bug that occured in tidy_to_custom() with format=‘row’.</li>
+<li>bug fixes in report creation (Issue <a href="https://github.com/NicWir/QurvE/issues/9" class="external-link">#9</a>); safer handling of image file creation if erros occur.</li>
+<li>fixed missing values in grouped plots with mean=True if some replicates contained missing measurement (Issue <a href="https://github.com/NicWir/QurvE/issues/9" class="external-link">#9</a>).</li>
+<li>In group plots: remove rows in data groups in which all values are NA to avoid gaps in plots.</li>
+<li>bug fix in group plots for data series of unequal lengths.</li>
+<li>Factors are removed from tidy dataframes to prevent incompatibilities.</li>
+<li>fix to correctly assign time vectors to samples during tidy data parsing, if multiple time vectors were present.</li>
+<li>fixed bug while assembling ‘gcTable’ if only a single sample was processed.</li>
+<li>revised roxygen documentation to comply with new CRAN checks</li>
 </ul></div>
 </div>
     <div class="section level2">
