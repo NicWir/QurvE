@@ -2,7 +2,7 @@
 
 ## Enhancements
 
-* `read_data()` now automatically assigns increasing replicate numbers to sample groups (identical "Description" and "Concentration") if all of their replicate values are missing or NA
+* `read_data()` now automatically assigns increasing replicate numbers to sample groups (identical "Description" and "Concentration") if all of their replicate values are missing or NA.
 
 ## Bug fixes
 
