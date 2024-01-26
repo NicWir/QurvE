@@ -2,7 +2,16 @@
 
 ## Bug fixes
 
-* fixed bug during the parsing of tidy data if the combinations of Description/Concentration/Replicate were not unique (e.g., multiple 'Blank' samples)
+* fixed bug during the parsing of tidy data if the combinations of Description/Concentration/Replicate were not unique (e.g., multiple 'Blank' samples, Issue #11).
+* fixed bug that occured in tidy_to_custom() with format='row'.
+* bug fixes in report creation (Issue #9); safer handling of image file creation if erros occur.
+* fixed missing values in grouped plots with mean=True if some replicates contained missing measurement (Issue #9).
+* In group plots: remove rows in data groups in which all values are NA to avoid gaps in plots.
+* bug fix in group plots for data series of unequal lengths.
+* Factors are removed from tidy dataframes to prevent incompatibilities.
+* fix to correctly assign time vectors to samples during tidy data parsing, if multiple time vectors were present.
+* fixed bug while assembling 'gcTable' if only a single sample was processed.
+* revised roxygen documentation to comply with new CRAN checks
 
 # QurvE 1.1
 

@@ -1,3 +1,9 @@
+
+
+____________________
+
+# Previous submission (version 1.1)
+
 >   Size of tarball: 5209386 bytes
 
 > Pls reduce to less than 5 MB for a CRAN package.
