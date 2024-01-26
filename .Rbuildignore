@@ -28,6 +28,9 @@ cran-comments\.md$
 index\.md$
 index\.Rmd$
 ^Meta$
-NULL
+NULL$
+^/NULL$
+^/lastMiKTeXException$
+^/inst/lac_promoters\.xls$
+^vignettes/vigfig.*
 lastMiKTeXException
-^/inst/lac_promoters\.xls

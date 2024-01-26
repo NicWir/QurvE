@@ -107,38 +107,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                   '.modal-dialog.growthdr { width: fit-content !important; }'
                 ),
                 tagList(
-                  # tags$style(type = 'text/css', '.navbar {
-                  #          font-size: 200px;
-                  #          }',
-                  #
-                  #            '.navbar-dropdown { background-color: #262626;
-                  #          font-family: Arial;
-                  #          font-size: 50px;
-                  #          color: #FF0000; }',
-                  #
-                  #            '.navbar-default .navbar-brand {
-                  #            ;
-                  #          }',
-                  #            '.navbar li a {
-                  #            font-size: 50px;
-                  #          }'
-                  #
-                  # ),
-
-                  # # Create object input$dimension as c(width, height) with the app window size
-                  # tags$head(tags$script('
-                  #               var dimension = [0, 0];
-                  #               $(document).on("shiny:connected", function(e) {
-                  #                   dimension[0] = window.innerWidth;
-                  #                   dimension[1] = window.innerHeight;
-                  #                   Shiny.onInputChange("dimension", dimension);
-                  #               });
-                  #               $(window).resize(function(e) {
-                  #                   dimension[0] = window.innerWidth;
-                  #                   dimension[1] = window.innerHeight;
-                  #                   Shiny.onInputChange("dimension", dimension);
-                  #               });
-                  #           ')),
                   useShinyjs(),
                   shinyjs::extendShinyjs(text = jscode, functions = c("disableTab","enableTab")),
                   shinyjs::inlineCSS(css),
@@ -735,11 +703,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             ),
                                                             downloadButton('download_custom_tables_growth_processed',"Download table")
                                                    ),
-                                                   # tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence",
-                                                   #          withSpinner(
-                                                   #            DT::dataTableOutput("custom_table_fluorescence")
-                                                   #          )
-                                                   # ),
                                                    tabPanel(title = "Fluorescence", value = "tabPanel_custom_tables_fluorescence_processed",
                                                             withSpinner(
                                                               DT::dataTableOutput("custom_table_fluorescence_processed")
@@ -752,11 +715,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             ),
                                                             downloadButton('download_custom_tables_norm_fluorescence_processed',"Download table")
                                                    ),
-                                                   # tabPanel(title = "Fluorescence 2", value = "tabPanel_custom_tables_fluorescence2",
-                                                   #          withSpinner(
-                                                   #            DT::dataTableOutput("custom_table_fluorescence2")
-                                                   #          )
-                                                   # ),
                                                    tabPanel(title = "Experimental Design", value = "tabPanel_custom_tables_expdesign",
                                                             DT::dataTableOutput('custom_data_table_expdesign'),
                                                             downloadButton('download_custom_tables_expdesign',"Download table")
@@ -802,9 +760,6 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                             ),
                                                             downloadButton('download_parsed_data_table_norm_fluorescence',"Download table")
                                                    ),
-                                                   # tabPanel(title = "Fluorescence 2", value = "tabPanel_parsed_tables_fluorescence2",
-                                                   #          DT::dataTableOutput('parsed_data_table_fluorescence2')
-                                                   # ),
                                                    tabPanel(title = "Experimental Design", value = "tabPanel_parsed_tables_expdesign",
                                                             DT::dataTableOutput('parsed_data_table_expdesign'),
                                                             downloadButton('download_parsed_tables_expdesign',"Download table")
@@ -6558,9 +6513,6 @@ server <- function(input, output, session){
       # show [Run Computation] button in Computation-Growth
       show("run_growth")
     }
-    # if("growth" %in% names(results$custom_data) && length(results$custom_data$fluorescence2)>1){
-    #   showTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_fluorescence2")
-    # }
 
     # Remove eventually pre-loaded parsed data
     results$parsed_data <- NULL
@@ -7017,9 +6969,7 @@ server <- function(input, output, session){
       showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_plots_fluorescence")
       shinyjs::enable(selector = "#navbar li a[data-value=navbarMenu_Computation]")
     }
-    # if("growth" %in% names(results$parsed_data) && length(results$parsed_data$fluorescence2)>1){
-    #   showTab(inputId = "tabsetPanel_parsed_tables", target = "tabPanel_parsed_tables_fluorescence2")
-    # }
+
     # Remove eventually pre-loaded custom data
     results$custom_data <- NULL
     hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_tables_growth_processed")
@@ -7097,22 +7047,7 @@ server <- function(input, output, session){
                   escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(parsed_data_table_norm_fluorescence())-3)))
 
   })
-  # output$parsed_data_table_fluorescence2 <- DT::renderDT({
-  #
-  #   if(is.null(results$parsed_data) || length(results$parsed_data$fluorescence2)<2) return(NULL)
-  #
-  #   table_fl2 <- t(results$parsed_data$fluorescence2)
-  #   table_fl2[-(1:3), ] <- apply(apply(table_fl2[-(1:3), ], 2, as.numeric), 2, round, digits = 1)
-  #   rownames(table_fl2)[-(1:3)] <- ""
-  #   table_fl2 <- cbind(data.frame("Time" = c("","","", round(as.numeric(results$parsed_data$time[1,]), digits = 2))),
-  #                      table_fl2)
-  #
-  #   table_fl2 <- DT::datatable(table_fl2,
-  #                          options = list(pageLength = 25, info = FALSE, lengthMenu = list(c(15, 25, 50, -1), c("15","25", "50", "All")) ),
-  #                          escape = FALSE, rownames = c("Condition", "Replicate", "Concentration", rep("", nrow(table_fl2)-3)))
-  #
-  #   table_fl2
-  # })
+
   parsed_data_table_expdesign <- reactive({
     if(is.null(results$parsed_data) || length(results$parsed_data$expdesign)<2) return(NULL)
     expdesign <- results$parsed_data$expdesign
@@ -7305,7 +7240,6 @@ server <- function(input, output, session){
 
   observeEvent(input$run_growth,{
     ## Read data
-    # grodata <- read_data(inFile$datapath, sheet.growth = input$custom_growth_sheets, csvsep = input$separator_custom_growth, dec = input$decimal_separator_custom_growth)
     # Choose data input
     if(!is.null(results$custom_data)){
       grodata <- results$custom_data
@@ -11623,16 +11557,13 @@ server <- function(input, output, session){
   observe({
     if (length(results$fluorescence$flFit)>1){
       if(input$data_type_fluorescence_group_plot == "raw") y_axis <- "Fluorescence"
-      # if(input$data_type_fluorescence_group_plot == "raw2") y_axis <- "Fluorescence 2"
       if(input$data_type_fluorescence_group_plot == "spline" && results$fluorescence$control$norm_fl){
         y_axis <- "Normalized fluorescence"
       }
       if(input$data_type_fluorescence_group_plot == "spline" && !results$fluorescence$control$norm_fl){
         y_axis <- "Fluorescence"
       }
-      # if(input$data_type_fluorescence_group_plot == "spline2") y_axis <- "Fluorescence 2"
       if(input$data_type_fluorescence_group_plot == "norm.fl") y_axis <- "Normalized fluorescence"
-      # if(input$data_type_fluorescence_group_plot == "norm.fl2") y_axis <- "Normalized fluorescence 2"
     }
     else {
       y_axis <- ""
@@ -11677,24 +11608,12 @@ server <- function(input, output, session){
     if(length(results$data$fluorescence) > 1){
       selection <- c(selection, "Raw fluorescence" = "raw")
     }
-    # if(length(results$data$fluorescence2) > 1){
-    #   selection <- c(selection, "Raw fluorescence 2")
-    # }
     if(length(results$data$norm.fluorescence) > 1){
       selection <- c(selection, "Normalized FL" = "norm.fl")
     }
-    # if(length(results$data$norm.fluorescence2) > 1){
-    #   selection <- c(selection, "Normalized FL2")
-    # }
-    # if(length(results$data$norm.fluorescence2) > 1){
-    #   selection <- c(selection, "Normalized FL2")
-    # }
     if(length(results$data$fluorescence) > 1 && "s" %in% results$control$fit.opt){
       selection <- c(selection, "Spline fits FL" = "spline")
     }
-    # if(length(results$data$norm.fluorescence2) > 1 && "s" %in% results$control$fit.opt){
-    #   selection <- c(selection, "Spline fits FL2")
-    # }
     selection
   })
 
@@ -13289,14 +13208,6 @@ server <- function(input, output, session){
     })
   }
 
-  # Ensure that the application will stop the websocket server started by shiny::runApp() and the underlying R process when the browser window is closed.
-  # session$onSessionEnded(function() {
-  #   stopApp()
-  # })
-
 }
-
-
-
 
 shinyApp(ui = ui, server = server)
