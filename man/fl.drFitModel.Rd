@@ -26,14 +26,14 @@ A \code{drFitFLModel} object.
 \item{parameters}{List of parameters estimated from dose response curve fit.}
 \itemize{
 \item \code{yEC50}: Response value related to EC50.
-\item \code{y.min}: {Minimum fluorescence ('leakiness', if lowest concentration is 0).}
-\item \code{y.max}: {Maximum fluorescence.}
-\item \code{fc}: {Fold change (\code{y.max} divided by \code{y.min}).}
-\item \code{K}: {Concentration at half-maximal response ('sensitivity').}
-\item \code{n}: {Cooperativity.}
-\item \code{yEC50.orig}: {Response value for EC50 in original scale, if a transformation was applied.}
-\item \code{K.orig}: {K in original scale, if a transformation was applied.}
-\item \code{test.nm}: {Test identifier extracted from \code{test}.}
+\item \code{y.min}: Minimum fluorescence ('leakiness', if lowest concentration is 0).
+\item \code{y.max}: Maximum fluorescence.
+\item \code{fc}: Fold change (\code{y.max} divided by \code{y.min}).
+\item \code{K}: Concentration at half-maximal response ('sensitivity').
+\item \code{n}: Cooperativity.
+\item \code{yEC50.orig}: Response value for EC50 in original scale, if a transformation was applied.
+\item \code{K.orig}: K in original scale, if a transformation was applied.
+\item \code{test.nm}: Test identifier extracted from \code{test}.
 }
 \item{fitFlag}{(Logical) Indicates whether a spline could fitted successfully to data.}
 \item{reliable}{(Logical) Indicates whether the performed fit is reliable (to be set manually).}
