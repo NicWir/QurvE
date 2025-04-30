@@ -63,9 +63,9 @@ Matthias Kahm, Guido Hasenbrink, Hella Lichtenberg-Frate, Jost Ludwig, Maik Ksch
 Other growth fitting functions: 
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFit}()},
 \code{\link{growth.gcFitLinear}()},
 \code{\link{growth.gcFitSpline}()},
-\code{\link{growth.gcFit}()},
 \code{\link{growth.workflow}()}
 }
 \concept{growth fitting functions}

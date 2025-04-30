@@ -195,10 +195,10 @@ Other workflows:
 Other growth fitting functions: 
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFit}()},
 \code{\link{growth.gcFitLinear}()},
 \code{\link{growth.gcFitModel}()},
-\code{\link{growth.gcFitSpline}()},
-\code{\link{growth.gcFit}()}
+\code{\link{growth.gcFitSpline}()}
 
 Other dose-response analysis functions: 
 \code{\link{flFit}()},

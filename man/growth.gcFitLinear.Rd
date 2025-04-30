@@ -140,9 +140,9 @@ Theil, H.(1992). A rank-invariant method of linear and polynomial regression ana
 Other growth fitting functions: 
 \code{\link{growth.drFit}()},
 \code{\link{growth.gcBootSpline}()},
+\code{\link{growth.gcFit}()},
 \code{\link{growth.gcFitModel}()},
 \code{\link{growth.gcFitSpline}()},
-\code{\link{growth.gcFit}()},
 \code{\link{growth.workflow}()}
 }
 \concept{growth fitting functions}

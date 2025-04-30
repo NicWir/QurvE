@@ -66,7 +66,7 @@ plot(TestFit, combine = TRUE, lwd = 0.5)
 }
 \seealso{
 Other fluorescence fitting functions: 
-\code{\link{flFitSpline}()},
-\code{\link{flFit}()}
+\code{\link{flFit}()},
+\code{\link{flFitSpline}()}
 }
 \concept{fluorescence fitting functions}
