@@ -7689,7 +7689,9 @@ server <- function(input, output, session){
                                "y<sub>max</sub>" = round(as.numeric(res.table.gc$A.spline), 3),
                                "ΔY" = round(as.numeric(res.table.gc$dY.spline), 3),
                                "t<sub>max</sub>" = ifelse(is.na(res.table.gc$mu2.spline), round(as.numeric(res.table.gc$tmax.spline), 2), paste0("<strong>", round(as.numeric(res.table.gc$tmax.spline), 2), "</strong>", " (", round(as.numeric(res.table.gc$tmax2.spline), 2), ")")),
-                               "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
+                               "AUC" = ifelse(is.na(res.table.gc$integral.spline), "", paste0(round(as.numeric(res.table.gc$integral.spline), 3))),
+                               "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F
+                               )
     table_spline
   })
 
@@ -7703,7 +7705,7 @@ server <- function(input, output, session){
     gcTable <- results$growth$gcFit$gcTable
     table <- QurvE:::table_group_growth_spline(gcTable)
     colnames(table) <- c("Sample|Conc.", "\u03bc<sub>max</sub>", "t<sub>D</sub>", "\u03bb",
-                         "\u2206Y", "y<sub>max</sub>", "t(\u03bc<sub>max</sub>)")
+                         "\u2206Y", "y<sub>max</sub>", "t(\u03bc<sub>max</sub>)", "AUC")
     table
   })
 
@@ -7752,6 +7754,13 @@ server <- function(input, output, session){
                                                     " \u00B1 ",
                                                     round(as.numeric(res.table.gc$stddY.bt ), 3)
                                              )
+                               ),
+                               "AUC" = ifelse(res.table.gc$integral.bt==0 | is.na(res.table.gc$integral.bt),
+                                            "",
+                                            paste0(round(as.numeric(res.table.gc$integral.bt), 2) ,
+                                                   " \u00B1 ",
+                                                   round(as.numeric(res.table.gc$stdintegral.bt ), 2)
+                                            )
                                ),
                                "smooth.<br>fac" = res.table.gc$smooth.spline, check.names = F)
     table_spline
@@ -8037,7 +8046,9 @@ server <- function(input, output, session){
                                "y<sub>max</sub>" = round(as.numeric(res.table.fl$A.spline), 3),
                                "ΔY" = round(as.numeric(res.table.fl$dY.spline), 3),
                                "x<sub>max</sub>" = ifelse(is.na(res.table.fl$max_slope2.spline), round(as.numeric(res.table.fl$x.max.spline), 2), paste0("<strong>", round(as.numeric(res.table.fl$x.max.spline), 2), "</strong>", " (", round(as.numeric(res.table.fl$x.max2.spline), 2), ")")),
-                               "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F)
+                               "AUC" = ifelse(is.na(res.table.fl$integral.spline), "", paste0(round(as.numeric(res.table.fl$integral.spline), 2))),
+                               "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F
+                               )
     table_spline
   })
 
@@ -8049,9 +8060,10 @@ server <- function(input, output, session){
 
   table_fluorescence_spline_group <- reactive({
     flTable <- results$fluorescence$flFit$flTable
-    QurvE:::table_group_fluorescence_spline(flTable)
+    table <- QurvE:::table_group_fluorescence_spline(flTable)
     colnames(table) <- c("Sample|Conc.", "slope<sub>max</sub>", "\u03bb",
-                         "\u0394Y", "y<sub>max</sub>", "x(slope<sub>max</sub>)")
+                         "\u0394Y", "y<sub>max</sub>", "x(slope<sub>max</sub>)",
+                         "AUC")
     table
   })
 
@@ -8098,6 +8110,13 @@ server <- function(input, output, session){
                                                     " \u00B1 ",
                                                     round(as.numeric(res.table.fl$stddY.bt ), 3)
                                              )
+                               ),
+                               "AUC" = ifelse(res.table.fl$integral.bt==0 | is.na(res.table.fl$integral.bt),
+                                            "",
+                                            paste0(round(as.numeric(res.table.fl$integral.bt), 2) ,
+                                                   " \u00B1 ",
+                                                   round(as.numeric(res.table.fl$stdintegral.bt ), 2)
+                                            )
                                ),
                                "smooth.<br>fac" = res.table.fl$smooth.spline, check.names = F)
     table_spline

@@ -184,16 +184,28 @@ flFit <- function(fl_data, time = NULL, growth = NULL, control= fl.control(), pa
       )
     }
 
-    # Perform spline bootstrappings in parallel
+
     if ((("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ) &&
-        (control$nboot.fl > 10) ){
-      boot.all <- foreach::foreach(i = 1:dim(fl_data)[1]
-      ) %dopar% {
-        if(control$x_type == "growth"){
-          QurvE::flBootSpline(growth = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
-        } else {
-          QurvE::flBootSpline(time = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+        (control$nboot.fl > 0) ){
+      if (control$nboot.fl > 10){
+        # Perform spline bootstrappings in parallel
+        boot.all <- foreach::foreach(i = 1:dim(fl_data)[1]
+        ) %dopar% {
+          if(control$x_type == "growth"){
+            QurvE::flBootSpline(growth = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+          } else {
+            QurvE::flBootSpline(time = x.ls[[i]], fl_data = wells.ls[[i]], ID = IDs.ls[[i]], control = control)
+          }
         }
+      } else {
+        # else run bootstrapping in linear fashion using QurvE::flBootSpline()
+        boot.all <- lapply(1:nrow(fl_data), function(j) {
+          if(control$x_type == "growth"){
+            QurvE::flBootSpline(growth = x.ls[[j]], fl_data = wells.ls[[j]], ID = IDs.ls[[j]], control = control)
+          } else {
+            QurvE::flBootSpline(time = x.ls[[j]], fl_data = wells.ls[[j]], ID = IDs.ls[[j]], control = control)
+          }
+        })
       }
     }
     else{

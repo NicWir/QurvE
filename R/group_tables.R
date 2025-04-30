@@ -200,6 +200,9 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
   tmax.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
   tmax.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "x.max.spline", param2 = "x.max2.spline")
 
+  auc.mean <- get_avg_param(table = flTable, ndx.rep = ndx.filt, param1 = "integral.spline")
+  auc.sd <- get_sd_param(table = flTable, ndx.rep = ndx.filt, param1 = "integral.spline")
+
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_spline_group <- data.frame("Sample | Conc." = labels,
@@ -248,6 +251,15 @@ table_group_fluorescence_spline <- function(flTable, html = FALSE)
                                                              ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                       tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                     "", tmax.sd[x])))),
+                                   "AUC" = paste0(auc.mean,
+                                                 unlist(lapply(1:length(auc.mean), function (x)
+                                                   ifelse(auc.mean[x] == 0 || auc.mean[x] == "" || auc.mean[x] == "" ||
+                                                            auc.sd[x] == 0 || auc.sd[x] == "" || auc.sd[x] == "",
+                                                          "", " \u00B1 ") ) ),
+                                                 unlist(lapply(1:length(auc.mean), function (x)
+                                                   ifelse(auc.mean[x] == 0 || auc.mean[x] == "" || auc.mean[x] == "" ||
+                                                            auc.sd[x] == 0 || auc.sd[x] == "" || auc.sd[x] == "",
+                                                          "", auc.sd[x])))),
                                    check.names = FALSE)
 
   if(html == TRUE){
@@ -476,6 +488,9 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
   tmax.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
   tmax.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "tmax.spline", param2 = "tmax2.spline")
 
+  auc.mean <- get_avg_param(table = gcTable, ndx.rep = ndx.filt, param1 = "integral.spline")
+  auc.sd <- get_sd_param(table = gcTable, ndx.rep = ndx.filt, param1 = "integral.spline")
+
   labels <- gsub(" \\| NA", "", gsub(" \\| [[:digit:]]+ \\| ", " | ", names(ndx.filt))) # condition names
 
   table_spline_group <- data.frame("Sample|Conc." = labels,
@@ -533,6 +548,15 @@ table_group_growth_spline <- function(gcTable, html = FALSE)
                                                          ifelse(tmax.mean[x] == 0 || tmax.mean[x] == "" || tmax.mean[x] == "" ||
                                                                   tmax.sd[x] == 0 || tmax.sd[x] == "" || tmax.sd[x] == "",
                                                                 "", tmax.sd[x])))),
+                                   "AUC" = paste0(auc.mean,
+                                                 unlist(lapply(1:length(auc.mean), function (x)
+                                                   ifelse(auc.mean[x] == 0 || auc.mean[x] == "" || auc.mean[x] == "" ||
+                                                            auc.sd[x] == 0 || auc.sd[x] == "" || auc.sd[x] == "",
+                                                          "", " \u00B1 ") ) ),
+                                                 unlist(lapply(1:length(auc.mean), function (x)
+                                                   ifelse(auc.mean[x] == 0 || auc.mean[x] == "" || auc.mean[x] == "" ||
+                                                            auc.sd[x] == 0 || auc.sd[x] == "" || auc.sd[x] == "",
+                                                          "", auc.sd[x])))),
                                    check.names = FALSE)
 
   if(html == TRUE){

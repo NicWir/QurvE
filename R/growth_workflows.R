@@ -737,7 +737,6 @@ growth.gcFit <- function(
         )
       )
     }
-
     # # Perform model fits in parallel if
     # (('m' %in% control$fit.opt) || ('a'
     # %in% control$fit.opt)){ fitpara.all <-
@@ -781,20 +780,31 @@ growth.gcFit <- function(
     # FALSE, control = control) ) }
 
     # Perform spline bootstrappings in
-    # parallel
+    # parallel if number of bootstraps is
+    # larger  10 and if spline fits are
+    # performed
     if ((("s" %in% control$fit.opt) || ("a" %in%
-                                        control$fit.opt)) && (control$nboot.gc >
-                                                              10))
-    {
-      boot.all <- foreach::foreach(i = 1:dim(data)[1]) %dopar%
-        {
-          QurvE::growth.gcBootSpline(
-            times.ls[[i]], wells.ls[[i]], gcIDs.ls[[i]],
+                                        control$fit.opt)) && (control$nboot.gc > 0)) {
+      # /// run bootstrapping in parallel
+      if (control$nboot.gc > 10) {
+        boot.all <- foreach::foreach(i = 1:dim(data)[1]) %dopar%
+          {
+            QurvE::growth.gcBootSpline(
+              times.ls[[i]], wells.ls[[i]], gcIDs.ls[[i]],
+              control
+            )
+          }
+      } else {
+        # else run bootstrapping in linear fashion using QurvE::growth.gcBootSpline()
+        boot.all <- lapply(
+          1:nrow(data),
+          function(x) QurvE::growth.gcBootSpline(
+            times.ls[[x]], wells.ls[[x]], gcIDs.ls[[x]],
             control
           )
-        }
-    } else
-    {
+        )
+      }
+    } else  {
       # /// create empty gcBootSpline
       # object
       boot.all <- lapply(
