@@ -1,273 +1,93 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://nicwir.github.io/QurvE/404.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/articles/shiny_app_manual.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/articles/troubleshooting.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/articles/vignette_fluorescence.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/articles/vignette_growth.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/QurvE-package.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/biosensor.eq.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/buildTooltipOrPopoverOptionsList.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/export_RData.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/export_Table.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/fl.control.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/fl.drFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/fl.drFitModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/fl.report.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/fl.workflow.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/flBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/flFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/flFitLinear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/flFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.control.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.drBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.drFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.drFitModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.drFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.gcBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.gcFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.gcFitLinear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.gcFitModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.gcFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.report.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/growth.workflow.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/inflect.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/lm_window.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/low.integrate.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_Gen5Gen6.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_data.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_victornivo.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/parse_victorx3.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.drBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.drFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.drFitFLModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.drFitModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.drFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.drFitfl.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.dr_parameter.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.dual.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.flBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.flFitLinear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.flFitRes.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.flFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.gcBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.gcFitLinear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.gcFitModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.gcFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.grid.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.grodata.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.grofit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/plot.parameter.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/rdm.data.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/read_data.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/read_file.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/run_app.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.drBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.drFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.drFitFLModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.drFitModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.drFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.drFitfl.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.flBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.flFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.flFitLinear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.flFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.gcBootSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.gcFit.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.gcFitLinear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.gcFitModel.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/summary.gcFitSpline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/table_group_fluorescence_linear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/table_group_fluorescence_spline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/table_group_growth_linear.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/table_group_growth_model.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/table_group_growth_spline.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/tidy_to_custom.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/updateResistantPopover.html</loc>
-  </url>
-  <url>
-    <loc>https://nicwir.github.io/QurvE/reference/zipFastener.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://nicwir.github.io/QurvE/404.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/articles/index.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/articles/shiny_app_manual.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/articles/troubleshooting.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/articles/vignette_fluorescence.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/articles/vignette_growth.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/authors.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/index.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/news/index.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/QurvE-package.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/biosensor.eq.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/buildTooltipOrPopoverOptionsList.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/export_RData.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/export_Table.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/fl.control.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/fl.drFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/fl.drFitModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/fl.report.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/fl.workflow.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/flBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/flFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/flFitLinear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/flFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.control.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.drBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.drFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.drFitModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.drFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.gcBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.gcFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.gcFitLinear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.gcFitModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.gcFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.report.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/growth.workflow.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/index.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/inflect.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/lm_window.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/low.integrate.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/parse_Gen5Gen6.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/parse_data.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/parse_victornivo.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/parse_victorx3.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.drBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.drFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.drFitFLModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.drFitModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.drFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.drFitfl.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.dr_parameter.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.dual.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.flBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.flFitLinear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.flFitRes.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.flFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.gcBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.gcFitLinear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.gcFitModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.gcFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.grid.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.grodata.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.grofit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/plot.parameter.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/rdm.data.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/read_data.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/read_file.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/run_app.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.drBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.drFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.drFitFLModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.drFitModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.drFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.drFitfl.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.flBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.flFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.flFitLinear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.flFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.gcBootSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.gcFit.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.gcFitLinear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.gcFitModel.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/summary.gcFitSpline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/table_group_fluorescence_linear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/table_group_fluorescence_spline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/table_group_growth_linear.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/table_group_growth_model.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/table_group_growth_spline.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/tidy_to_custom.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/updateResistantPopover.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/zipFastener.html</loc></url>
 </urlset>
+
