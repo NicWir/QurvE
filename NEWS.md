@@ -1,3 +1,13 @@
+# QurvE 1.1.2
+
+## Enhancements
+
+* Added area under the curve (AUC) to the results tables of spline fits (in QurvE functions as well as the app)
+
+## Bug fixes
+
+* fixed bugs that prevented the computation of bootstrapped nonparametric fits when the number of bootstrap samples was set to lower than 10.
+
 # QurvE 1.1.1
 
 ## Enhancements
