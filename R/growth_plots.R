@@ -1,3 +1,6 @@
+#' @include utils.R
+NULL
+
 #' Generic plot function for \code{gcFittedLinear} objects. Plot the results of a linear regression on ln-transformed data
 #'
 #' \code{plot.gcFitLinear} shows the results of a linear regression on log-transformed data and visualizes raw data, data points included in the fit, the tangent obtained by linear regression, and the lag time.
