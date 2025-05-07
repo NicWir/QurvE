@@ -11366,7 +11366,7 @@ server <- function(input, output, session){
         plot.grid(results,
                   data.type = input$data_type_growth_grid_plot,
                   IDs = NULL,
-                  ssort_by_ID = input$order_matters_visualize_growth_grid,
+                  sort_by_ID = input$order_matters_visualize_growth_grid,
                   names = input$select_samples_based_on_string_growth_grid_plot,
                   conc = input$select_samples_based_on_concentration_growth_grid_plot,
                   exclude.nm = input$exclude_samples_based_on_string_growth_grid_plot,
