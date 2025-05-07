@@ -5989,6 +5989,12 @@ server <- function(input, output, session){
   # Read data upon click on [Read data]
   observeEvent(input$read_custom,{
     showModal(modalDialog("Reading data input...", footer=NULL))
+    # Log the event:
+    user_id <- session$token     # shiny’s built-in session identifier
+    ts      <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+    cat(sprintf("%s [INFO] User %s initiated data parsing\n", ts, user_id))
+
+
     growth.file <- input$custom_file_growth
     fl.file <- input$custom_file_fluorescence
     fl2.file <- input$custom_file_fluorescence2
@@ -6517,6 +6523,11 @@ server <- function(input, output, session){
 
   # Generate random dataset
   observeEvent(input$submit.random.data.growth, {
+    # Log the event:
+    user_id <- session$token     # shiny’s built-in session identifier
+    ts      <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+    cat(sprintf("%s [INFO] User %s created randomized dataset\n", ts, user_id))
+
     d <- ifelse(input$d.random.growth == "", 35, as.numeric(input$d.random.growth))
     y0 <- ifelse(input$y0.random.growth == "", 0.05, as.numeric(input$y0.random.growth))
     tmax <- ifelse(input$tmax.random.growth == "", 24, as.numeric(input$tmax.random.growth))
@@ -6880,6 +6891,11 @@ server <- function(input, output, session){
 
   #### Parse data and extract read tabs
   observeEvent(input$parse_data,{
+    # Log the event:
+    user_id <- session$token     # shiny’s built-in session identifier
+    ts      <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+    cat(sprintf("%s [INFO] User %s initiated data parsing\n", ts, user_id))
+
     if(input$norm_type_parse == "fluorescence 2"){
       fl.normtype <- "fl2"
     } else {
