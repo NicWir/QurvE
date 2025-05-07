@@ -127,14 +127,15 @@ read_data <-
     }
 
     #remove leading and trailing zeros
-    if(length(dat)>0 && !all(is.na(dat)))
+    if(length(dat)>0 && !all(is.na(dat))){
       dat[,3] <- suppressWarnings(
         as.character(as.numeric(dat[,3]))
       )
+      # revise values in the second column. Values like "1A" should become 1, "2B" should become 2, etc. Coerce to integer
+      dat[,2] <- gsub("[A-Z]", "", dat[,2], ignore.case = TRUE)
+      dat[,2] <- suppressWarnings(as.integer(dat[,2], na.rm = TRUE))
+    }
 
-    # revise values in the second column. Values like "1A" should become 1, "2B" should become 2, etc. Coerce to integer
-    dat[,2] <- gsub("[A-Z]", "", dat[,2], ignore.case = TRUE)
-    dat[,2] <- suppressWarnings(as.integer(dat[,2], na.rm = TRUE))
 
 
     if(data.format == "col"){

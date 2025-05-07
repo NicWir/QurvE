@@ -3,10 +3,12 @@
 ## Enhancements
 
 * Added area under the curve (AUC) to the results tables of spline fits (in QurvE functions as well as the app)
+* Users now have the ability to drag and drop selected conditions in group plots, controlling the order of the data series in the plot.
 
 ## Bug fixes
 
 * fixed bugs that prevented the computation of bootstrapped nonparametric fits when the number of bootstrap samples was set to lower than 10.
+* fixed bugs that occurred when integer value were used as condition descriptors
 
 # QurvE 1.1.1
 
