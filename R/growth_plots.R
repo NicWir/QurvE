@@ -4705,7 +4705,6 @@ plot.grid <- function(x,
 
   if(!is.null(IDs)){
     # Check if IDs refer to samples or conditions
-
     if(sort_by_ID){
       # preserve order of input IDs
       nm <- nm[unlist(lapply(1:length(IDs), function(x) which(gsub(" | .+", "", nm) %in% IDs[[x]] ) ) )]
