@@ -3179,10 +3179,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                    plugins = list('remove_button', 'drag_drop'),
                                                                                                    placeholder = 'Select and drag to reorder')
                                                                      ),
-                                                                     checkboxInput(inputId = "order_matters_visualize_growth_grid",
-                                                                                   label = "Select order matters",
-                                                                                   value = FALSE
-                                                                                   ),
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "order_matters_visualize_growth_grid",
+                                                                                 label = "Select order matters",
+                                                                                 value = FALSE
                                                                    ),
 
                                                                    conditionalPanel(
@@ -4697,10 +4698,11 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                                    plugins = list('remove_button', 'drag_drop'),
                                                                                                    placeholder = 'Select and drag to reorder')
                                                                      ),
-                                                                     checkboxInput(inputId = "order_matters_visualize_fluorescence_grid",
-                                                                                   label = "Select order matters",
-                                                                                   value = FALSE
-                                                                     ),
+                                                                   ),
+
+                                                                   checkboxInput(inputId = "order_matters_visualize_fluorescence_grid",
+                                                                                 label = "Select order matters",
+                                                                                 value = FALSE
                                                                    ),
 
                                                                    conditionalPanel(
@@ -11364,7 +11366,7 @@ server <- function(input, output, session){
         plot.grid(results,
                   data.type = input$data_type_growth_grid_plot,
                   IDs = NULL,
-                  sort_by_ID = FALSE,
+                  ssort_by_ID = input$order_matters_visualize_growth_grid,
                   names = input$select_samples_based_on_string_growth_grid_plot,
                   conc = input$select_samples_based_on_concentration_growth_grid_plot,
                   exclude.nm = input$exclude_samples_based_on_string_growth_grid_plot,
@@ -12525,7 +12527,7 @@ server <- function(input, output, session){
             plot.grid(results,
                       data.type = input$data_type_fluorescence_grid_plot,
                       IDs = NULL,
-                      sort_by_ID = FALSE,
+                      sort_by_ID = input$order_matters_visualize_fluorescence_grid,
                       names = input$select_samples_based_on_string_fluorescence_grid_plot,
                       conc = input$select_samples_based_on_concentration_fluorescence_grid_plot,
                       exclude.nm = input$exclude_samples_based_on_string_fluorescence_grid_plot,
