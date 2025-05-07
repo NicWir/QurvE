@@ -190,12 +190,12 @@ plot.gcFitLinear <- function(x, log="y", which=c("fit", "diagnostics", "fit_diag
                              side = 4 , adj = 0.55, line = -2.2+log(cex.lab, base = 6), outer = TRUE, cex = cex.lab*0.7, srt = 90)
 
              graphics::mtext(paste("h:", ifelse(is.null(gcFittedLinear$control$lin.h), "NULL", gcFittedLinear$control$lin.h),
-                         "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
-                         "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
-                         "t0:", gcFittedLinear$control$t0,
-                         "  min.growth:", gcFittedLinear$control$min.growth,
-                         "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
-                   cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
+                                   "   R2-thresh.:",  gcFittedLinear$control$lin.R2,
+                                   "   RSD-thresh.:",  gcFittedLinear$control$lin.RSD,
+                                   "t0:", gcFittedLinear$control$t0,
+                                   "  min.growth:", gcFittedLinear$control$min.growth,
+                                   "   dY-thresh.:",  gcFittedLinear$control$lin.dY),
+                             cex = cex.lab*0.7, side = 3, line = -2.5, adj = 0.05, outer = TRUE)
 
              # graphics::mtext(paste("R2:", round(gcFittedLinear$rsquared, digits = 3)), side = 3 , adj = 0.95, line = -1, outer = TRUE)
              # graphics::mtext(paste("h:", gcFittedLinear$control4lin.h,
@@ -417,11 +417,11 @@ plot.gcFitModel <- function(x, raw = TRUE,
     #   p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 10))
     # }
     #
-   if(!is.null(y.lim)){
-     p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks))
-   } else {
-     p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
-   }
+    if(!is.null(y.lim)){
+      p <- p + scale_y_continuous(limits = y.lim, breaks = scales::pretty_breaks(n = n.ybreaks))
+    } else {
+      p <- p + scale_y_continuous(breaks = scales::pretty_breaks(n = n.ybreaks))
+    }
     if(equation == TRUE){
       if(gcFittedModel$model == "logistic"){
         p <- p + annotate(
@@ -432,7 +432,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
           angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
                    label = list(bquote(A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
+                                         lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
                    x = (1 + 0.13+ log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -469,9 +469,9 @@ plot.gcFitModel <- function(x, raw = TRUE,
           angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
                    label = list(bquote(y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ~~~~
-                                    A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~
-                                    mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
+                                         A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~
+                                         mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                         lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
                    x = (1 + 0.25 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -489,7 +489,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
           angle = 90, parse = TRUE, size = 3.4*eq.size) +
           annotate("text",
                    label = list(bquote(A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
+                                         lambda == .(round(gcFittedModel$parameters$lambda[[1]],3)) )),
                    x = (1 + 0.13 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -508,8 +508,8 @@ plot.gcFitModel <- function(x, raw = TRUE,
           angle = 90, parse = TRUE, size = 3.2*eq.size) +
           annotate("text",
                    label = list(bquote(A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~ mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],2)) ~~~~ alpha == .(round(gcFittedModel$parameters$fitpar$alpha[1],3))  ~~~~
-                                    t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[[1]],2)) )),
+                                         lambda == .(round(gcFittedModel$parameters$lambda[[1]],2)) ~~~~ alpha == .(round(gcFittedModel$parameters$fitpar$alpha[1],3))  ~~~~
+                                         t[shift] == .(round(gcFittedModel$parameters$fitpar$t_shift[[1]],2)) )),
                    x = (1 + 0.21 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.5*eq.size) +
@@ -527,9 +527,9 @@ plot.gcFitModel <- function(x, raw = TRUE,
           angle = 90, parse = TRUE, size = 3.0*eq.size) +
           annotate("text",
                    label = list(bquote(y0 == .(round(gcFittedModel$parameters$fitpar$y0[1,1],3)) ~~~~
-                                    A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~
-                                    mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
-                                    lambda == .(round(gcFittedModel$parameters$lambda[[1]],2)))),
+                                         A == .(round(gcFittedModel$parameters$A[[1]],3)) ~~~~
+                                         mu == .(round(gcFittedModel$parameters$mu[[1]],3)) ~~~~
+                                         lambda == .(round(gcFittedModel$parameters$lambda[[1]],2)))),
                    x = (1 + 0.21 + log(eq.size)*0.1) * time[length(time)],
                    y = 0.5 * (ggplot_build(p)$layout$panel_params[[1]]$y.range[2] + ggplot_build(p)$layout$panel_params[[1]]$y.range[1]),
                    angle = 90, parse = TRUE, size = 2.3*eq.size) +
@@ -554,7 +554,7 @@ plot.gcFitModel <- function(x, raw = TRUE,
       }
       if(gcFittedModel$model == "gompertz"){
         p <- p + scale_color_manual(name='Growth Model',
-                             values=c("model" = colModel, "Gompertz" = colModel)) +
+                                    values=c("model" = colModel, "Gompertz" = colModel)) +
           ggplot2::scale_color_discrete(labels="Gompertz", type = colModel)
       }
       if(gcFittedModel$model == "gompertz.exp"){
@@ -709,8 +709,8 @@ plot.drBootSpline <- function (x,
     on.exit(par(opar))
     par(cex.lab = cex.lab, cex.axis = cex.axis)
     plot(c(0, 1, 0, 1, 0), c(0, 1, 1, 0, 0),
-      type = "l", axes = FALSE, xlab = "", ylab = "", lwd = lwd,
-      col = "gray", main = main)
+         type = "l", axes = FALSE, xlab = "", ylab = "", lwd = lwd,
+         col = "gray", main = main)
     lines(c(0, 0), c(0, 1),
           type = "l", lwd = lwd, col = "gray")
     lines(c(1, 1), c(1, 0),
@@ -1123,9 +1123,9 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
       # /// plot all drFitSpline objects
       for (i in 1:n) {
         try(plot.drFitSpline(drFit$drFittedSplines[[i]], ec50line = ec50line, pch = pch,
-                 y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
-                 cex.point = cex.point, export = export, lwd = lwd,
-                 plot = plot, height = 7, width = 9, out.dir = out.dir))
+                             y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL,
+                             cex.point = cex.point, export = export, lwd = lwd,
+                             plot = plot, height = 7, width = 9, out.dir = out.dir))
       }
     } else {
       if ((drFit$control$log.x.dr == TRUE) && (drFit$control$log.y.dr == TRUE)) {
@@ -1352,9 +1352,9 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
     n <- length(drFit$drFittedModels)
     for (i in 1:n) {
       try(plot.drFitModel(drFit$drFittedModels[[i]], ec50line = ec50line, pch = pch,
-               y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL, lwd = lwd,
-               cex.point = cex.point, export = export, cex.axis = basesize/15, cex.lab = basesize*1.2/15,
-               plot = plot, height = 7, width = 9, out.dir = out.dir))
+                          y.lim = y.lim, x.lim = x.lim, y.title = NULL, x.title = NULL, lwd = lwd,
+                          cex.point = cex.point, export = export, cex.axis = basesize/15, cex.lab = basesize*1.2/15,
+                          plot = plot, height = 7, width = 9, out.dir = out.dir))
     }
   }
 }
@@ -1676,25 +1676,25 @@ plot.drFitModel <- function(x,
   }
 
 
-    if(any(grep("y", log))){
-      if(min(test) <= 0){
-        log10cl.y <- round(log10(min(test[test > 0]))) - 2
-        bp.y <- 10^(log10cl.y)
+  if(any(grep("y", log))){
+    if(min(test) <= 0){
+      log10cl.y <- round(log10(min(test[test > 0]))) - 2
+      bp.y <- 10^(log10cl.y)
 
-        yt <- xgx_breaks_log10(c(bp.y, max(test)))
-        yt.minor <- xgx_minor_breaks_log10(c(bp.y, max(test)))[-1]
-      }
-      else{
-        yt <- xgx_breaks_log10(c(min(test), max(test)))
-        yt.minor <- xgx_minor_breaks_log10(c(min(test), max(test)))
-      }
-    } else {
-      if(missing(n.ybreaks) || is.null(n.ybreaks)){
-        yt <- pretty(test)
-      } else {
-        yt <- pretty(test, n.ybreaks)
-      }
+      yt <- xgx_breaks_log10(c(bp.y, max(test)))
+      yt.minor <- xgx_minor_breaks_log10(c(bp.y, max(test)))[-1]
     }
+    else{
+      yt <- xgx_breaks_log10(c(min(test), max(test)))
+      yt.minor <- xgx_minor_breaks_log10(c(min(test), max(test)))
+    }
+  } else {
+    if(missing(n.ybreaks) || is.null(n.ybreaks)){
+      yt <- pretty(test)
+    } else {
+      yt <- pretty(test, n.ybreaks)
+    }
+  }
 
   if(missing(legendText))
     legendText <- drFitModel$parameters$model
@@ -1971,7 +1971,7 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
   }
   else{
     p1 <- function()
-      {
+    {
       par(cex.lab = cex.lab, cex.axis = cex.axis)
       par(mar=c(5.1+cex.lab, 4.1+cex.lab, 4.1, 2.1), mgp=c(3, 1, 0), las=0)
       colSpline <- rep(colSpline, (gcBootSpline$control$nboot.gc%/%length(colSpline))+1)
@@ -2001,8 +2001,8 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
 
       # /// plot all gcFittedSpline objects
       for(i in 1:gcBootSpline$control$nboot.gc){
-       plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = TRUE, lwd=lwd,
-                        deriv = FALSE, plot = FALSE, export = FALSE, pch=0, colSpline=colSpline[i], cex.point = cex.point)
+        plot.gcFitSpline(gcBootSpline$boot.gcSpline[[i]], add = TRUE, slope = FALSE, spline = TRUE, lwd=lwd,
+                         deriv = FALSE, plot = FALSE, export = FALSE, pch=0, colSpline=colSpline[i], cex.point = cex.point)
       }
       # add plot title
       title(paste(gcBootSpline$gcID, collapse = "_"), line = ifelse(deriv==T, 0.8, 1), cex.main = cex.lab)
@@ -2046,7 +2046,7 @@ plot.gcBootSpline <- function(x, pch = 1, colData=1, deriv = TRUE,
       par(mfrow=c(1,1))
     } # p1 <- function()
     p2 <- function()
-      {
+    {
       lambda    <- gcBootSpline$lambda
       mu        <- gcBootSpline$mu
       dY         <- gcBootSpline$dY
@@ -2467,12 +2467,12 @@ plot.gcFitSpline <- function(x, add=FALSE, raw = TRUE, slope=TRUE, deriv = TRUE,
                               "  min.growth:", gcFittedSpline$control$min.growth,
                               "  max.growth:", gcFittedSpline$control$max.growth,
                               "  smoothing:", gcFittedSpline$control$smooth.gc)
-               ) +
+        ) +
         annotate(
           "text",
           label = list(bquote(mu: ~ .(round(gcFittedSpline$parameters$mu, digits = 3))~~~~
-                           lambda: ~ .(round(gcFittedSpline$parameters$lambda, digits = 3))~~~~
-                           t[max]: ~ .(round(gcFittedSpline$parameters$t.max, digits = 2)))),
+                                lambda: ~ .(round(gcFittedSpline$parameters$lambda, digits = 3))~~~~
+                                t[max]: ~ .(round(gcFittedSpline$parameters$t.max, digits = 2)))),
           x = 1.02*x_limit[2],
           y = ifelse(deriv==TRUE, ifelse(log.y == TRUE, 0.5, -0.3), 0.9) * ifelse(!is.null(y.lim) && !is.na(y.lim[1]), y.lim[1], y_limit[1]),
           hjust = 0,
@@ -3117,7 +3117,7 @@ plot.grofit <- function(x, ...,
       nm <- nm[
         grepl(x = nm,
               pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
-        ]
+      ]
     } else {
       nm <- nm[
         grepl(x = gsub(" \\| .+", "", nm),
@@ -3171,9 +3171,9 @@ plot.grofit <- function(x, ...,
   for(j in 1:length(ndx.filt.rep)){
     filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
                                                                                                            gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
-                                                                                                                ".+[[:space:]]",
-                                                                                                                unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                                                                "$"), sample.nm[ndx.filt.rep[[j]]])]))
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(sample.nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), sample.nm[ndx.filt.rep[[j]]])]))
   }
   ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt,length)>0]
@@ -3428,7 +3428,7 @@ plot.grofit <- function(x, ...,
         p <- p + scale_fill_manual(name = "Condition",
                                    values = colors) +
           scale_color_manual(name = "Condition",
-                            values = colors)
+                             values = colors)
       } else {
         if (length(plotdata.ls) <= 8) {
           p <- p + scale_fill_brewer(name = "Condition", palette = "Dark2") + scale_color_brewer(name = "Condition", palette = "Dark2")
@@ -3495,9 +3495,9 @@ plot.grofit <- function(x, ...,
       if(is.null(colors)){
         if(color_groups &&  length(unique(df$concentration)) > 2){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                     values = colors) +
+                                                 values = colors) +
             scale_color_manual(name = "Condition",
-                              values = colors)
+                               values = colors)
         }
         else{
           if (length(plotdata.ls) <= 8) {
@@ -3521,7 +3521,7 @@ plot.grofit <- function(x, ...,
             scale_color_manual(name = "Condition", values = c(colors, RColorBrewer::brewer.pal(12, name = "Set3")[-(1:length(colors))]))
         } else if (length(plotdata.ls) <= 50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                     values = c(colors, big_palette[-(1:length(colors))])) +
+                                                 values = c(colors, big_palette[-(1:length(colors))])) +
             scale_color_manual(name = "Condition",
                                values = c(colors, big_palette[-(1:length(colors))])
             )
@@ -3592,8 +3592,8 @@ plot.grofit <- function(x, ...,
         p <- p + scale_fill_manual(name = "Condition",
                                    values = big_palette) +
           scale_color_manual(name = "Condition",
-                               values = big_palette
-        )
+                             values = big_palette
+          )
       }
     } else if (length(colors) < length(unique(df$name))){
       if (length(ndx.keep) <= 8) {
@@ -3611,7 +3611,7 @@ plot.grofit <- function(x, ...,
       }
     } else {
       p <- p + scale_fill_manual(name = "Condition",
-                                             values = colors) +
+                                 values = colors) +
         scale_color_manual(name = "Condition",
                            values = colors)
     }
@@ -3619,8 +3619,8 @@ plot.grofit <- function(x, ...,
       df.deriv <- data.frame()
       for(i in 1:length(ndx.keep)){
         df.deriv <- plyr::rbind.fill(df.deriv, data.frame("name" = sample.nm[ndx.keep[i]],
-                                              "time" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
-                                              "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
+                                                          "time" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$x,
+                                                          "y" = grofit$gcFit$gcFittedSplines[[ndx.keep[[i]]]]$spline.deriv1$y))
       }
       p.deriv <- ggplot(df.deriv, aes(x=.data$time, y=.data$y, col = .data$name)) +
         geom_line(linewidth=lwd) +
@@ -3655,7 +3655,7 @@ plot.grofit <- function(x, ...,
           p.deriv <- p.deriv + scale_fill_brewer(name = "Condition", palette = "Set3") + scale_color_brewer(name = "Condition", palette = "Set3")
         } else if (length(ndx.keep) <= 50){
           p.deriv <- p.deriv + scale_fill_manual(name = "Condition",
-                                     values = big_palette
+                                                 values = big_palette
           ) + scale_color_manual(name = "Condition",
                                  values = big_palette
           )
@@ -3966,10 +3966,10 @@ plot.grodata <- function(x,
 #'                label.size = 11)
 #'
 plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit', 'A.linfit', 'mu2.linfit', 'lambda2.linfit',
-                                             'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
-                                             'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
-                                             'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
-                                             'max_slope.linfit', 'max_slope.spline'),
+                                        'mu.model', 'lambda.model', 'A.model', "A.orig.model", "dY.model", "dY.orig.model", "tD.linfit", "tD2.linfit", "tD.spline", "tD2.spline",
+                                        'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
+                                        'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
+                                        'max_slope.linfit', 'max_slope.spline'),
                            IDs = NULL,
                            names = NULL,
                            conc = NULL,
@@ -3991,7 +3991,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                            out.dir = NULL,
                            out.nm = NULL,
                            ...)
-  {
+{
   object <- x
   if(!is.null(colors))
     colSpline <- toupper(colors)
@@ -4010,7 +4010,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
                                             'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu2.spline', 'lambda2.spline',
                                             'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt',
                                             'max_slope.linfit', 'max_slope.spline')))
-                                            stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'mu2.linfit', 'lambda2.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'A.orig.model', 'dY.model', 'dY.orig.model',  'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
+    stop("param needs to be a character string and one of:\n 'mu.linfit', 'lambda.linfit', 'mu2.linfit', 'lambda2.linfit', 'dY.linfit', 'A.linfit', 'mu.model', 'lambda.model', 'A.model', 'A.orig.model', 'dY.model', 'dY.orig.model',  'mu.spline', 'lambda.spline', 'A.spline', 'dY.spline', 'integral.spline', 'mu.bt', 'lambda.bt', 'A.bt', 'integral.bt', 'max_slope.linfit', 'max_slope.spline'.")
 
   #extract gcTable
   if(any(methods::is(object) %in% "gcTable")){
@@ -4026,6 +4026,8 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   } else if (methods::is(object)=="flFit"){
     gcTable <- object$flTable
   }
+  # strip whitespace in second columns of gcTable
+  gcTable[,2] <- trimws(gcTable[,2])
   #check if param exists in gcTable and has a valid value
   if(all(is.na(gcTable[[param]])) || all(gcTable[[param]] == 0)){
     if(gsub(".+\\.", "", param)=="linfit") stop(paste0("All values for param = '", param, "' are NA. Please run growth.workflow() with 'fit.opt' containing 'l' or 'a', or growth.gcFit() with a control object with 'fit.opt' containing 'l' or 'a'."))
@@ -4090,18 +4092,18 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   gcTable <- gcTable[match(nm, paste(gcTable[,1], gcTable[,2], gcTable[,3], sep = " | ")), ]
   # get indices of replicates
   # remove conditions with fitFlag = FALSE in all replicates
-    # Store each condition with its replicate indices in list filter.ls
-    ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
-    filter.ls <- list()
-    for(j in 1:length(ndx.filt.rep)){
-      filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
-                                                                                                             gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
-                                                                                                                                      unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
-                                                                                                             ".+[[:space:]]",
-                                                                                                             unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
-                                                                                                             "$"), nm[ndx.filt.rep[[j]]])]))
-    }
-    ndx.filt <- unlist(filter.ls, recursive = FALSE)
+  # Store each condition with its replicate indices in list filter.ls
+  ndx.filt.rep <- unique(lapply(1:length(nm), function(i)which(gsub("\\| ([[:punct:]]|[[:digit:]]|NA)+ \\|", "|", nm) %in% (paste(unlist(str_split(nm[i], " \\| "))[-2], collapse = " | ")))))
+  filter.ls <- list()
+  for(j in 1:length(ndx.filt.rep)){
+    filter.ls[[j]] <- unique(lapply(1:length(ndx.filt.rep[[j]]), function(i) ndx.filt.rep[[j]][grep(paste0("^",
+                                                                                                           gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1",
+                                                                                                                unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[1]),
+                                                                                                           ".+[[:space:]]",
+                                                                                                           unlist(str_split(nm[ndx.filt.rep[[j]][i]], " \\| "))[3],
+                                                                                                           "$"), nm[ndx.filt.rep[[j]]])]))
+  }
+  ndx.filt <- unlist(filter.ls, recursive = FALSE)
   ndx.filt <- ndx.filt[lapply(ndx.filt, length)>0]
 
   names(ndx.filt) <- unlist(lapply(1:length(ndx.filt), function (x) nm[ndx.filt[[x]][1]]) )
@@ -4166,35 +4168,37 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   # df$name <- factor(df$name, levels = unique(factor(df$name)))
 
   # build the base data.frame
+
   df <- data.frame("name" = labels, "mean" = mean, "CI.L" = CI.L, "CI.R" = CI.R)
   # extract grouping and concentration for sorting
   df$group         <- gsub(" \\|.+", "", df$name)
-  df$concentration <- as.numeric(gsub(".+\\| ", "", df$name))
+  df$concentration <- suppressWarnings(as.numeric(gsub(".+\\| ", "", df$name)))
 
   if (order_by_conc) {
     # sort by group, then by concentration
     df <- df[order(df$group, df$concentration), ]
-    df$name <- factor(df$name, levels = unique(as.character(df$name)))
+    df$name <- suppressWarnings(factor(df$name, levels = unique(as.character(df$name))))
 
   } else if (!is.null(IDs)) {
     # respect the drag-and-drop order in IDs
     requested <- gsub(" \\| .+", "", IDs)
     ## ----- ORDER bars -------------------------------------------------------
-    levels_order <- unlist(lapply(requested, function(cond) {
-      fulls <- unique(as.character(df$name[df$group == cond]))
-      nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
-      fulls[order(nums)]
-    }))
-    df$name <- factor(as.character(df$name), levels = levels_order)
+    levels_order <- suppressWarnings(
+      unlist(lapply(requested, function(cond) {
+        fulls <- unique(as.character(df$name[df$group == cond]))
+        nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+        fulls[order(nums)]
+      }))
+    )
+    df$name <- suppressWarnings(factor(as.character(df$name), levels = levels_order))
 
     ## ----- ORDER legend -----------------------------------------------------
-    df$group <- factor(df$group, levels = requested)
+    df$group <- suppressWarnings(factor(df$group, levels = requested))
 
   } else {
     # fallback: original appearance order
-    df$name <- factor(as.character(df$name), levels = unique(as.character(df$name)))
+    df$name <- suppressWarnings(factor(as.character(df$name), levels = unique(as.character(df$name))))
   }
-
   df$mean[is.na(df$mean)] <- 0
   df$CI.L[is.na(df$CI.L)] <- 0
   df$CI.R[is.na(df$CI.R)] <- 0
@@ -4212,7 +4216,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
           # remove the vertical grid lines
           panel.grid.major.x = element_blank() ,
           # explicitly set the horizontal lines (or they will disappear too)
-          ) +
+    ) +
     scale_y_continuous(breaks = scales::pretty_breaks(n = 10))+
     ggplot2::guides(fill=ggplot2::guide_legend(ncol=legend.ncol))
 
@@ -4259,12 +4263,12 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   if (!is.null(IDs)) {
     df_reps$group <- factor(df_reps$group, levels = requested)  # keep legend order
   }
-  df_reps$concentration <- as.numeric(gsub(".+\\| ", "", df_reps$condition))
+  df_reps$concentration <- suppressWarnings(as.numeric(gsub(".+\\| ", "", df_reps$condition)))
 
   if (order_by_conc) {
     # classical sort: group then concentration
     df_reps <- df_reps[order(df_reps$group, df_reps$concentration), ]
-    df_reps$condition <- factor(df_reps$condition, levels = unique(as.character(df_reps$condition)))
+    df_reps$condition <- suppressWarnings(factor(df_reps$condition, levels = unique(as.character(df_reps$condition))))
 
   } else if (!is.null(IDs)) {
     # honor the user’s drag‐and‐drop order
@@ -4274,7 +4278,7 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
       nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
       fulls[order(nums)]
     }))
-    df_reps$condition <- factor(as.character(df_reps$condition), levels = levels_order)
+    df_reps$condition <- suppressWarnings(factor(as.character(df_reps$condition), levels = levels_order))
 
   } else {
     # fallback: original appearance order
@@ -4292,18 +4296,18 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   } else{
     pal <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n=8, name="Greys"))(as.numeric(max(replicates)))
   }
-   p <- p +
-     ggnewscale::new_scale_fill() +
-     geom_point(
-       data = df_reps,
-       aes(x = .data$condition, y = .data$value, fill = .data$replicate),
-       shape = 23,
-       size = shape.size,
-       color = "black",
-       position = position_dodge(width = 0.3),
-       inherit.aes = FALSE
-     ) +
-     scale_fill_manual(values = pal)
+  p <- p +
+    ggnewscale::new_scale_fill() +
+    geom_point(
+      data = df_reps,
+      aes(x = .data$condition, y = .data$value, fill = .data$replicate),
+      shape = 23,
+      size = shape.size,
+      color = "black",
+      position = position_dodge(width = 0.3),
+      inherit.aes = FALSE
+    ) +
+    scale_fill_manual(values = pal)
 
 
 
@@ -4505,31 +4509,31 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
     return(p)
   }
   if (export == TRUE){
-      if(is.null(out.nm)) out.nm <- paste0("drParameterPlot_", param)
-      w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
-      h <- height
-      out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
-      dir.create(out.dir, showWarnings = FALSE)
+    if(is.null(out.nm)) out.nm <- paste0("drParameterPlot_", param)
+    w <- ifelse(is.null(width), 7 + (3*length(nm))/20, width)
+    h <- height
+    out.dir <- ifelse(is.null(out.dir), paste0(getwd(), "/Plots"), out.dir)
+    dir.create(out.dir, showWarnings = FALSE)
 
-      tryCatch({
-        grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
-                       width = w, height = h, units = 'in', res = 300)
-        suppressWarnings(print(p))
-      }, finally = {
-        grDevices::dev.off() # Ensure the device is closed
-      })
+    tryCatch({
+      grDevices::png(paste0(out.dir, "/", out.nm, ".png"),
+                     width = w, height = h, units = 'in', res = 300)
+      suppressWarnings(print(p))
+    }, finally = {
+      grDevices::dev.off() # Ensure the device is closed
+    })
 
-      tryCatch({
-        if (requireNamespace("Cairo", quietly = TRUE)) {
-          Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
-        } else {
-          message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
-          grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
-        }
-        suppressWarnings(print(p))
-      }, finally = {
-        grDevices::dev.off() # Ensure the device is closed
-      })
+    tryCatch({
+      if (requireNamespace("Cairo", quietly = TRUE)) {
+        Cairo::CairoPDF(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+      } else {
+        message("Package 'Cairo' must be installed to preserve special characters in the exported PDF image")
+        grDevices::pdf(width = w, height = h, file = paste0(out.dir, "/", out.nm, ".pdf"))
+      }
+      suppressWarnings(print(p))
+    }, finally = {
+      grDevices::dev.off() # Ensure the device is closed
+    })
   }
   if (plot == TRUE){
     print(p)
@@ -4694,10 +4698,10 @@ plot.grid <- function(x,
 
   # Get name of conditions with multiple replicates; apply selecting arguments
   sample.nm <- nm <- if(methods::is(object) == "grofit"){
-      as.character(names(object$gcFit$gcFittedSplines))
-    } else {
-      as.character(names(object$flFit$flFittedSplines))
-    }
+    as.character(names(object$gcFit$gcFittedSplines))
+  } else {
+    as.character(names(object$flFit$flFittedSplines))
+  }
 
   if(!is.null(IDs)){
     # Check if IDs refer to samples or conditions
@@ -4799,8 +4803,8 @@ plot.grid <- function(x,
   if(length(IDs)>1 && sort_by_ID){
     ndx.keep <- unlist(lapply(1:length(nm), function(x) which(sample.nm %in% nm[x])))
   } else {
-  ndx.keep <- grep(paste0("^",
-                          gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), "$", collapse = "|"), sample.nm)
+    ndx.keep <- grep(paste0("^",
+                            gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm), "$", collapse = "|"), sample.nm)
   }
 
   if(data.type == "spline"){
@@ -4808,8 +4812,8 @@ plot.grid <- function(x,
     if(object$control$log.y.spline == TRUE){
       for(i in 1:length(ndx.keep)){
         if(methods::is(object) == "grofit"){
-        object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
-          exp(object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * object$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
+          object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]] <-
+            exp(object$gcFit$gcFittedSplines[[ndx.keep[i]]][["fit.data"]]) * object$gcFit$gcFittedSplines[[ndx.keep[i]]]$data.in[1]
         } else {
           object$flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]] <-
             exp(object$flFit$flFittedSplines[[ndx.keep[i]]][["fit.fl"]]) * object$flFit$flFittedSplines[[ndx.keep[i]]]$fl.in[1]
@@ -4898,9 +4902,9 @@ plot.grid <- function(x,
                                               time.all) - 1)
             # extract parameter values into a separate list
             parameter[[i]] <- append(parameter[[i]],
-                                values = NA,
-                                after = match(get(paste0("time.missing_", i))[j],
-                                              time.all) - 1)
+                                     values = NA,
+                                     after = match(get(paste0("time.missing_", i))[j],
+                                                   time.all) - 1)
             # extract time values into a separate list
             time[[i]] <-
               append(time[[i]],
@@ -4931,7 +4935,13 @@ plot.grid <- function(x,
     df$name <- gsub(" \\| NA", "", df$name)
 
     df$concentration <- suppressWarnings(as.numeric(gsub(".+ \\| ", "", df$name)))
+    # df$group <- gsub(" \\| .+", "", df$name)
     df$group <- gsub(" \\| .+", "", df$name)
+    # if the user asked to sort by the given IDs, respect that order in the facet strips
+    if (!is.null(IDs) && sort_by_ID) {
+      df$group <- factor(df$group,
+                         levels = gsub(" \\| .+", "", IDs))
+    }
 
 
     # replace negative lower ribbon boundaries with 0 for log10 transformation
@@ -4939,20 +4949,41 @@ plot.grid <- function(x,
       df$lower[df$lower<0] <- 0
     }
 
+    # if(is.null(IDs) || !sort_by_ID){
+    #   # sort names
+    #   df <- df[order(df$group, df$concentration), ]
+    # }
+    #
+    # df$name <- factor(df$name, levels = unique(factor(df$name)))
     if(is.null(IDs) || !sort_by_ID){
-      # sort names
+      # default: sort by group then concentration
       df <- df[order(df$group, df$concentration), ]
     }
 
-    df$name <- factor(df$name, levels = unique(factor(df$name)))
+    # now set the factor levels for df$name
+    if (!is.null(IDs) && sort_by_ID) {
+      # build a level vector by walking through the user-supplied groups in order
+      requested <- gsub(" \\| .+", "", IDs)
+      levels_order <- unlist(lapply(requested, function(cond) {
+        # all full names in df$name that belong to this cond
+        fulls <- unique(as.character(df$name[df$group == cond]))
+        # extract the numeric suffix (the conc) and sort by it
+        nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+        fulls[order(nums)]
+      }))
+      df$name <- factor(df$name, levels = levels_order)
+    } else {
+      # fallback to original grouped sort
+      df$name <- factor(df$name, levels = unique(factor(df$name)))
+    }
 
     p <- ggplot(df, aes(x=.data$time, y=.data$mean, group = .data$name), col = "black")
     if(log.y == TRUE){
       p <- p + ggplot2::geom_rect(aes(fill = .data$mean.param, xmin = -Inf, xmax = Inf,
-                             ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
+                                      ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
     } else {
       p <- p + ggplot2::geom_rect(aes(fill = .data$mean.param), xmin = -Inf, xmax = Inf,
-                         ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
+                                  ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
     }
     p <- p +
       geom_line(linewidth = lwd) +
@@ -5004,16 +5035,16 @@ plot.grid <- function(x,
       }
 
       p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
-                                                        frame.linewidth = basesize/22,
-                                                        title.hjust = 0.5,
-                                                        title.vjust = 0.8,
-                                                        label.theme = element_text(angle = 90, size = 0.8 * basesize),
-                                                        label.vjust = 0.7,
-                                                        title.position = "bottom",
-                                                        title = param,
-                                                        nrow = 1,
-                                                        barwidth = basesize,
-                                                        barheight = basesize/10))
+                                                               frame.linewidth = basesize/22,
+                                                               title.hjust = 0.5,
+                                                               title.vjust = 0.8,
+                                                               label.theme = element_text(angle = 90, size = 0.8 * basesize),
+                                                               label.vjust = 0.7,
+                                                               title.position = "bottom",
+                                                               title = param,
+                                                               nrow = 1,
+                                                               barwidth = basesize,
+                                                               barheight = basesize/10))
     }
     if(length(unique(df$concentration))<2)
       sort_by_conc <- FALSE
@@ -5082,14 +5113,14 @@ plot.grid <- function(x,
                         ])[1]
       # get number of facets in bottom row except the left
       number_bottom <- which(g$layout[grep("panel", g$layout$name), ]["t"] ==
-                        unique(g$layout[grep("panel", g$layout$name), ]["t"])[
-                          nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
-                        ])[-1]
+                               unique(g$layout[grep("panel", g$layout$name), ]["t"])[
+                                 nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+                               ])[-1]
 
       # get number of facets on the left except the bottom one
       number_left <- match(unique(g$layout[grep("panel", g$layout$name), ]["t"])[
-                                 -nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
-                               ], g$layout[grep("panel", g$layout$name), ][,"t"])
+        -nrow(unique(g$layout[grep("panel", g$layout$name), ]["t"])),
+      ], g$layout[grep("panel", g$layout$name), ][,"t"])
 
       p <- p +  ggh4x::facetted_pos_scales(
         x = list(
@@ -5239,14 +5270,14 @@ plot.grid <- function(x,
     p <- ggplot(df, aes(x=.data$time, y=.data$y, group = .data$name), col = "black")
     if(log.y == TRUE){
       p <- p + ggplot2::geom_rect(aes(fill = .data$param, xmin = -Inf, xmax = Inf,
-                             ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
+                                      ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
     } else {
       p <- p + ggplot2::geom_rect(aes(fill = .data$param), xmin = -Inf, xmax = Inf,
-                         ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
+                                  ymin = -Inf, ymax = Inf, alpha = 1, inherit.aes = FALSE, data = df)
     }
-      p <- p +
+    p <- p +
       geom_line(linewidth = lwd) +
-        ggplot2::theme_bw(base_size = basesize) +
+      ggplot2::theme_bw(base_size = basesize) +
       xlab(ifelse(is.null(x.title), xlab.title, x.title)) +
       ylab(ifelse(is.null(y.title), ylab.title, y.title)) +
       theme(strip.text.x = element_text(size = 0.8*basesize),
@@ -5254,9 +5285,9 @@ plot.grid <- function(x,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank(),
             panel.background = ggplot2::element_rect(fill = "white", color = "black",
-                                            linewidth = basesize/22, linetype = "solid"),
+                                                     linewidth = basesize/22, linetype = "solid"),
             strip.background = ggplot2::element_rect(fill = "white", color = "black",
-                                            linewidth = basesize/22, linetype = "solid"))
+                                                     linewidth = basesize/22, linetype = "solid"))
 
     if(!is.null(legend.lim)){
       if(!invert.pal){
@@ -5270,16 +5301,16 @@ plot.grid <- function(x,
       }
 
       p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
-                                                        frame.linewidth = basesize/22,
-                                                        title.hjust = 0.5,
-                                                        title.vjust = 0.8,
-                                                        title.position = "bottom",
-                                                        label.theme = element_text(angle = 90, size = 0.8 * basesize),
-                                                        label.vjust = 0.7,
-                                                        title = param,
-                                                        nrow = 1,
-                                                        barwidth = basesize,
-                                                        barheight = basesize/10))
+                                                               frame.linewidth = basesize/22,
+                                                               title.hjust = 0.5,
+                                                               title.vjust = 0.8,
+                                                               title.position = "bottom",
+                                                               label.theme = element_text(angle = 90, size = 0.8 * basesize),
+                                                               label.vjust = 0.7,
+                                                               title = param,
+                                                               nrow = 1,
+                                                               barwidth = basesize,
+                                                               barheight = basesize/10))
     } else {
       if(!invert.pal){
         p <- p + ggplot2::scale_fill_continuous(low = rev(single_hue_palettes[[pal]])[1],
@@ -5290,16 +5321,16 @@ plot.grid <- function(x,
       }
 
       p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
-                                                        frame.linewidth = basesize/22,
-                                                        title.hjust = 0.5,
-                                                        title.vjust = 0.8,
-                                                        title.position = "bottom",
-                                                        title = param,
-                                                        label.theme = element_text(angle = 90, size = 0.8 * basesize),
-                                                        label.vjust = 0.7,
-                                                        nrow = 1,
-                                                        barwidth = basesize,
-                                                        barheight = basesize/10))
+                                                               frame.linewidth = basesize/22,
+                                                               title.hjust = 0.5,
+                                                               title.vjust = 0.8,
+                                                               title.position = "bottom",
+                                                               title = param,
+                                                               label.theme = element_text(angle = 90, size = 0.8 * basesize),
+                                                               label.vjust = 0.7,
+                                                               nrow = 1,
+                                                               barwidth = basesize,
+                                                               barheight = basesize/10))
     }
 
     if(sort_by_conc){
