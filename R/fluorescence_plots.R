@@ -2718,19 +2718,33 @@ plot.dual <-  function(x,
   if(fluorescence == "norm.fl") fl.nm = "norm.fluorescence"
   # if(fluorescence == "norm.fl2") fl.nm = "norm.fluorescence2"
 
+  # if(!is.null(IDs)){
+  #   # Check if IDs refer to samples or conditions
+  #   if(any(grep(" \\| ", IDs))){
+  #     nm <- nm[
+  #       grepl(x = nm,
+  #             pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+  #     ]
+  #   } else {
+  #     nm <- nm[
+  #       grepl(x = gsub(" \\| .+", "", nm),
+  #             pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
+  #     ]
+  #   }
+  # }
   if(!is.null(IDs)){
-    # Check if IDs refer to samples or conditions
-    if(any(grep(" \\| ", IDs))){
-      nm <- nm[
-        grepl(x = nm,
-              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
-      ]
-    } else {
-      nm <- nm[
-        grepl(x = gsub(" \\| .+", "", nm),
-              pattern = paste0("^", paste(gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", IDs), collapse="$|^"), "$"))
-      ]
-    }
+    # preserve the same order the user provided
+    nm <- unlist(lapply(IDs, function(id){
+      # escape regex metachars in id
+      id_esc <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", id)
+      if (grepl(" \\| ", id, fixed=TRUE)) {
+        # full‐sample match
+        nm[grepl(paste0("^", id_esc, "$"), nm)]
+      } else {
+        # group‐only match
+        nm[grepl(paste0("^", id_esc, " \\|"), nm)]
+      }
+    }))
   }
   else {
     if(!is.null(names)  && length(names) > 0){
@@ -2855,9 +2869,30 @@ plot.dual <-  function(x,
     df$group <- gsub(" \\| .+", "", df$name)
 
     # sort names
-    df <- df[order(df$group, df$concentration), ]
+    # df <- df[order(df$group, df$concentration), ]
+    #
+    # df$name <- factor(df$name, levels = unique(factor(df$name)))
+    df$concentration <- as.numeric(gsub(".+ \\| ", "", df$name))
+    df$group         <- gsub(" \\| .+",     "", df$name)
 
-    df$name <- factor(df$name, levels = unique(factor(df$name)))
+    # if the user passed IDs, respect *that* order in both strips & legend:
+    if(!is.null(IDs)){
+      # first lock in group‐order
+      df$group <- factor(df$group, levels = IDs)
+      # now build the full facet/legend order by walking each ID and sorting
+      levels_order <- suppressWarnings(
+        unlist(lapply(IDs, function(g){
+          fulls <- unique(df$name[df$group == g])
+          nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+          fulls[order(nums)]
+        }))
+      )
+      df$name <- factor(df$name, levels = levels_order)
+    } else {
+      # default: sort within group→conc
+      df <- df[order(df$group, df$concentration), ]
+      df$name <- factor(df$name, levels = unique(df$name))
+    }
     df <- df[df[["dens.mean"]]>0, ]
     df <- df[df[["fl.mean"]]>0, ]
     df <- df[!apply(df, 1, function(x){all(is.na(x))}),]

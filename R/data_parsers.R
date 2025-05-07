@@ -132,6 +132,11 @@ read_data <-
         as.character(as.numeric(dat[,3]))
       )
 
+    # revise values in the second column. Values like "1A" should become 1, "2B" should become 2, etc. Coerce to integer
+    dat[,2] <- gsub("[A-Z]", "", dat[,2], ignore.case = TRUE)
+    dat[,2] <- suppressWarnings(as.integer(dat[,2], na.rm = TRUE))
+
+
     if(data.format == "col"){
       message("Sample data are stored in columns. If they are stored in row format, please run read_data() with data.format = 'row'.")
     } else {
@@ -523,7 +528,6 @@ read_data <-
       df_mat[ , "condition"] <- cond_clean
       df_mat
     }
-
     # apply to your three matrices, if they exist:
     if (length(dat.mat) > 1)            dat.mat   <- prefix_numeric_conditions(dat.mat)
     if ((length(fl) > 1) || !is.na(data.fl))         fl.mat    <- prefix_numeric_conditions(fl.mat)
@@ -550,17 +554,31 @@ read_data <-
     # if (((length(fl) > 1) || !is.na(data.fl)) && length(dat) > 1) {
     #   fl.norm.mat <- prefix_numeric_conditions(fl.norm.mat)
     # }
-
+    if(length(dat) > 1) {
+      dat.mat[, 1] <- trimws(dat.mat[, 1])
+      dat.mat[, 2] <- trimws(dat.mat[, 2])
+      dat.mat[, 3] <- trimws(dat.mat[, 3])
+    }
+    if(length(fl) > 1){
+      fl.mat[, 1] <- trimws(fl.mat[, 1])
+      fl.mat[, 2] <- trimws(fl.mat[, 2])
+      fl.mat[, 3] <- trimws(fl.mat[, 3])
+    }
+    if(length(fl.norm.mat) > 1){
+      fl.norm.mat[, 1] <- trimws(fl.norm.mat[, 1])
+      fl.norm.mat[, 2] <- trimws(fl.norm.mat[, 2])
+      fl.norm.mat[, 3] <- trimws(fl.norm.mat[, 3])
+    }
     if(length(dat) > 1) {
       label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
-      condition <- trimws(dat.mat[, 1])
-      replicate <- trimws(dat.mat[, 2])
-      concentration <- trimws(dat.mat[, 3])
+      condition <- dat.mat[, 1]
+      replicate <- dat.mat[, 2]
+      concentration <- dat.mat[, 3]
     } else if(length(fl) > 1){
       label <- unlist(lapply(1:nrow(fl.mat), function(x) paste(fl.mat[x,1], fl.mat[x,2], fl.mat[x,3], sep = " | ")))
-      condition <- trimws(fl.mat[, 1])
-      replicate <- trimws(fl.mat[, 2])
-      concentration <- trimws(fl.mat[, 3])
+      condition <- fl.mat[, 1]
+      replicate <- fl.mat[, 2]
+      concentration <- fl.mat[, 3]
     }
     # else if(length(fl2) > 1){
     #   label <- unlist(lapply(1:nrow(fl2.mat), function(x) paste(fl2.mat[x,1], fl2.mat[x,2], fl2.mat[x,3], sep = " | ")))
@@ -568,7 +586,6 @@ read_data <-
     #   replicate <- fl2.mat[, 2]
     #   concentration <- fl2.mat[, 3]
     # }
-
 
     expdesign <- data.frame(label, condition, replicate, concentration, check.names = FALSE)
 
