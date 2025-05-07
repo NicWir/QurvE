@@ -5984,6 +5984,7 @@ server <- function(input, output, session){
 
     fl.normtype <- ifelse(input$load_fl2_data_custom, "fl2", "growth")
     ## Read data
+    browser()
     try(
       results$custom_data <- read_data(data.growth = growth.file$datapath,
                                        data.fl = fl.file$datapath,
@@ -6186,9 +6187,13 @@ server <- function(input, output, session){
       hideTab(inputId = "tabsetPanel_custom_tables", target = "tabPanel_custom_plots_norm_fluorescence")
     }
     if(exists("custom_table_fluorescence_processed") && !is.null(custom_table_fluorescence_processed()) &&
-       exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed()) &&
-       all(results$custom_data$growth == results$custom_data$fluorescence, na.rm = T)){
-      showModal(modalDialog("growth and Fluorescence data are identical. Did you assign the correct files and/or sheets?", easyClose = T))
+       exists("growth_data_custom_processed") && !is.null(growth_data_custom_processed())){
+      # Convert to numeric matrices by skipping the metadata columns
+      growth_vals <- as.matrix(sapply(results$custom_data$growth[, -(1:3)], as.numeric))
+      fluorescence_vals <- as.matrix(sapply(results$custom_data$fluorescence[, -(1:3)], as.numeric))
+      if(all(growth_vals == fluorescence_vals, na.rm = TRUE)){
+        showModal(modalDialog("growth and Fluorescence data are identical. Did you assign the correct files and/or sheets?", easyClose = T))
+      }
     }
   })
 
