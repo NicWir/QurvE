@@ -871,6 +871,11 @@ rdm.data <- function(
 
 }
 
+#' Single hue palettes for ggplot2
+#'
+#' These palettes are used in the package for plotting.
+#'
+#' @export
 single_hue_palettes <- list(
     Green = RColorBrewer::brewer.pal(9, "Greens")[c(2:9)],
     Orange = RColorBrewer::brewer.pal(9, "Oranges")[c(2:8)],
@@ -892,6 +897,11 @@ single_hue_palettes <- list(
     Mint = grDevices::hcl.colors(n = 7, palette = "Mint")
 )
 
+#' A palette with 40 colors
+#'
+#' This palette is used in the package for plotting.
+#'
+#' @export
 big_palette <- c(
     "dodgerblue2", "#E31A1C", "green4", "#6A3D9A",
     "#FF7F00", "black", "gold1", "skyblue2", "#FB9A99",
