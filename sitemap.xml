@@ -9,6 +9,7 @@
 <url><loc>https://nicwir.github.io/QurvE/index.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/news/index.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/QurvE-package.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/big_palette.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/biosensor.eq.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/buildTooltipOrPopoverOptionsList.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/export_RData.html</loc></url>
@@ -66,6 +67,7 @@
 <url><loc>https://nicwir.github.io/QurvE/reference/read_data.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/read_file.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/run_app.html</loc></url>
+<url><loc>https://nicwir.github.io/QurvE/reference/single_hue_palettes.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/summary.drBootSpline.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/summary.drFit.html</loc></url>
 <url><loc>https://nicwir.github.io/QurvE/reference/summary.drFitFLModel.html</loc></url>
