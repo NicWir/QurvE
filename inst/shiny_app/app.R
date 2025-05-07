@@ -2748,7 +2748,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -2760,7 +2761,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -2934,7 +2936,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     selected = names(QurvE:::single_hue_palettes),
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      ),
                                                                      bsPopover(id = "color_palettes_group_plot",
                                                                                title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
@@ -3004,7 +3007,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -3172,7 +3176,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      ),
                                                                      checkboxInput(inputId = "order_matters_visualize_growth_grid",
                                                                                    label = "Select order matters",
@@ -3188,7 +3193,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -4021,7 +4027,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -4033,7 +4040,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -4206,7 +4214,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     selected = names(QurvE:::single_hue_palettes),
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      ),
                                                                      bsPopover(id = "color_palettes_fluorescence_group_plot",
                                                                                title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
@@ -4284,7 +4293,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -4450,7 +4460,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     selected = names(QurvE:::single_hue_palettes),
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      ),
                                                                      bsPopover(id = "color_palettes_dual_plot",
                                                                                title = HTML("<em>Define the colors used to display sample groups with identical concentrations</em>"), placement = "top",
@@ -4517,7 +4528,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -4682,7 +4694,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      ),
                                                                      checkboxInput(inputId = "order_matters_visualize_fluorescence_grid",
                                                                                    label = "Select order matters",
@@ -4698,7 +4711,8 @@ ui <- fluidPage(theme = shinythemes::shinytheme(theme = "spacelab"),
                                                                                     choices = "",
                                                                                     multiple = TRUE,
                                                                                     options = list(closeAfterSelect = FALSE,
-                                                                                                   plugins= list('remove_button'))
+                                                                                                   plugins = list('remove_button', 'drag_drop'),
+                                                                                                   placeholder = 'Select and drag to reorder')
                                                                      )
                                                                    ),
 
@@ -5984,7 +5998,6 @@ server <- function(input, output, session){
 
     fl.normtype <- ifelse(input$load_fl2_data_custom, "fl2", "growth")
     ## Read data
-    browser()
     try(
       results$custom_data <- read_data(data.growth = growth.file$datapath,
                                        data.fl = fl.file$datapath,

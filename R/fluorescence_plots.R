@@ -1884,9 +1884,18 @@ plot.flFitRes <-  function(x,
   }
   else {
     if(!is.null(names)  && length(names) > 0){
-      if(!is.na(names) && names != ""){
-        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-        nm <- nm[grep(paste(names, collapse="|"), nm)]
+      if(!all(is.na(names)) && !all(names == "")){
+        # names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+        # nm <- nm[grep(paste(names, collapse="|"), nm)]
+        names_esc <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+
+        ##  ^            ─ anchor at start of string
+        ##  (...)        ─ alternatives of all searched patterns
+        ##  (?=\\s\\|)   ─ *look‑ahead*: assert that what follows is “space |”
+        ##                 (but don’t consume it)
+        pattern <- paste0("^(", paste(names_esc, collapse = "|"), ")(?=\\s\\|)")
+
+        nm <- nm[grepl(pattern, nm, perl = TRUE)]
       }
     }
     if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
@@ -2064,9 +2073,22 @@ plot.flFitRes <-  function(x,
       df.deriv$group <- gsub(" \\| .+", "", df.deriv$name)
 
       # sort names
-      df.deriv <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
-
-      df.deriv$name <- factor(df.deriv$name, levels = unique(factor(df.deriv$name)))
+      # df.deriv <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
+      #
+      # df.deriv$name <- factor(df.deriv$name, levels = unique(factor(df.deriv$name)))
+      if (!is.null(IDs)) {
+        requested <- gsub(" \\| .+", "", IDs)
+        levels_order <- unlist(lapply(requested, function(cond) {
+          fulls <- unique(as.character(df.deriv$name[df.deriv$group == cond]))
+          nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+          fulls[order(nums)]
+        }))
+        df.deriv$name <- factor(as.character(df.deriv$name), levels = levels_order)
+        df.deriv      <- df.deriv[order(df.deriv$name), , drop = FALSE]
+      } else {
+        df.deriv      <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
+        df.deriv$name <- factor(df.deriv$name, levels = unique(as.character(df.deriv$name)))
+      }
     }
 
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
@@ -2079,10 +2101,25 @@ plot.flFitRes <-  function(x,
     }
     df$name <- gsub(" \\| NA", "", df$name)
     df$group <- gsub(" \\| .+", "", df$name)
-    # sort names
-    df <- df[order(df$group, df$concentration), ]
+    # # sort names
+    # df <- df[order(df$group, df$concentration), ]
+    #
+    # df$name <- factor(df$name, levels = unique(factor(df$name)))
 
-    df$name <- factor(df$name, levels = unique(factor(df$name)))
+    # respect drag-and-drop order if provided, else sort by group then concentration
+    if (!is.null(IDs)) {
+      requested <- gsub(" \\| .+", "", IDs)
+      levels_order <- unlist(lapply(requested, function(cond) {
+        fulls <- unique(as.character(df$name[df$group == cond]))
+        nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+        fulls[order(nums)]
+      }))
+      df$name <- factor(as.character(df$name), levels = levels_order)
+      df      <- df[order(df$name), , drop = FALSE]
+    } else {
+      df      <- df[order(df$group, df$concentration), ]
+      df$name <- factor(df$name, levels = unique(as.character(df$name)))
+    }
 
     df <- df[df[["mean"]]>0, ]
     df <- df[!apply(df, 1, function(x){all(is.na(x))}),]

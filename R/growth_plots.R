@@ -1146,9 +1146,18 @@ plot.drFit <- function(x, combine = TRUE, names = NULL, exclude.nm = NULL, pch =
 
       # Get name of conditions with multiple replicates; apply selecting arguments
       if(!is.null(names)  && length(names) > 0){
-        if(!is.na(names) && names != ""){
-          names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-          nm <- nm[grep(paste(names, collapse="|"), nm)]
+        if(!all(is.na(names)) && !all(names == "")){
+          # names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+          # nm <- nm[grep(paste(names, collapse="|"), nm)]
+          names_esc <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+
+          ##  ^            ─ anchor at start of string
+          ##  (...)        ─ alternatives of all searched patterns
+          ##  (?=\\s\\|)   ─ *look‑ahead*: assert that what follows is “space |”
+          ##                 (but don’t consume it)
+          pattern <- paste0("^(", paste(names_esc, collapse = "|"), ")(?=\\s\\|)")
+
+          nm <- nm[grepl(pattern, nm, perl = TRUE)]
         }
       }
       if(!is.null(names)  && !is.na(exclude.nm) && exclude.nm != ""){
@@ -3115,9 +3124,18 @@ plot.grofit <- function(x, ...,
   }
   else {
     if(!is.null(names)  && length(names) > 0){
-      if(!is.na(names) && names != ""){
-        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-        nm <- nm[grep(paste(names, collapse="|"), nm)]
+      if(!all(is.na(names)) && !all(names == "")){
+        # names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+        # nm <- nm[grep(paste(names, collapse="|"), nm)]
+        names_esc <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+
+        ##  ^            ─ anchor at start of string
+        ##  (...)        ─ alternatives of all searched patterns
+        ##  (?=\\s\\|)   ─ *look‑ahead*: assert that what follows is “space |”
+        ##                 (but don’t consume it)
+        pattern <- paste0("^(", paste(names_esc, collapse = "|"), ")(?=\\s\\|)")
+
+        nm <- nm[grepl(pattern, nm, perl = TRUE)]
       }
     }
     if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
@@ -3292,9 +3310,24 @@ plot.grofit <- function(x, ...,
       df.deriv$group <- gsub(" \\| .+", "", df.deriv$name)
 
       # sort names
-      df.deriv <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
+      # df.deriv <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
+      #
+      # df.deriv$name <- factor(df.deriv$name, levels = unique(factor(df.deriv$name)))
 
-      df.deriv$name <- factor(df.deriv$name, levels = unique(factor(df.deriv$name)))
+      # respect drag-and-drop order if provided, else sort by group then concentration
+      if (!is.null(IDs)) {
+        requested <- gsub(" \\| .+", "", IDs)
+        levels_order <- unlist(lapply(requested, function(cond) {
+          fulls <- unique(as.character(df.deriv$name[df.deriv$group == cond]))
+          nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+          fulls[order(nums)]
+        }))
+        df.deriv$name <- factor(as.character(df.deriv$name), levels = levels_order)
+        df.deriv      <- df.deriv[order(df.deriv$name), , drop = FALSE]
+      } else {
+        df.deriv      <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
+        df.deriv$name <- factor(df.deriv$name, levels = unique(as.character(df.deriv$name)))
+      }
     }
 
     plotdata.ls <- plotdata.ls[!is.na(plotdata.ls)]
@@ -3313,10 +3346,25 @@ plot.grofit <- function(x, ...,
       df$lower[df$lower<0] <- 0
     }
 
-    # sort names
-    df <- df[order(df$group, df$concentration), ]
+    # # sort names
+    # df <- df[order(df$group, df$concentration), ]
+    #
+    # df$name <- factor(df$name, levels = unique(factor(df$name)))
 
-    df$name <- factor(df$name, levels = unique(factor(df$name)))
+    # respect drag-and-drop order if provided, else sort by group then concentration
+    if (!is.null(IDs)) {
+      requested <- gsub(" \\| .+", "", IDs)
+      levels_order <- unlist(lapply(requested, function(cond) {
+        fulls <- unique(as.character(df$name[df$group == cond]))
+        nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+        fulls[order(nums)]
+      }))
+      df$name <- factor(as.character(df$name), levels = levels_order)
+      df      <- df[order(df$name), , drop = FALSE]
+    } else {
+      df      <- df[order(df$group, df$concentration), ]
+      df$name <- factor(df$name, levels = unique(as.character(df$name)))
+    }
 
     p <- ggplot(df, aes(x=.data$time, y=.data$mean, col = .data$name)) +
       geom_line(linewidth=lwd) +
@@ -4000,9 +4048,18 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   }
   else {
     if(!is.null(names)  && length(names) > 0){
-      if(!is.na(names) && names != ""){
-        names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-        nm <- nm[grep(paste(names, collapse="|"), nm)]
+      if(!all(is.na(names)) && !all(names == "")){
+        # names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+        # nm <- nm[grep(paste(names, collapse="|"), nm)]
+        names_esc <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+
+        ##  ^            ─ anchor at start of string
+        ##  (...)        ─ alternatives of all searched patterns
+        ##  (?=\\s\\|)   ─ *look‑ahead*: assert that what follows is “space |”
+        ##                 (but don’t consume it)
+        pattern <- paste0("^(", paste(names_esc, collapse = "|"), ")(?=\\s\\|)")
+
+        nm <- nm[grepl(pattern, nm, perl = TRUE)]
       }
     }
     if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
@@ -4089,17 +4146,47 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   CI.L <- mean - error #left confidence interval
   CI.R <- mean + error #right confidence interval
 
-  df <- data.frame("name" = labels, "mean" = mean, "CI.L" = CI.L, "CI.R" = CI.R)
-  df$name <- factor(df$name, levels = df$name)
-  df$group <- gsub(" \\|.+", "", df$name)
-  df$concentration <- as.numeric(gsub(".+\\| ", "", df$name))
-  if (order_by_conc){
-    df <- df[order(df$concentration, df$group), ]
-  } else {
-    df <- df[order(df$group, df$concentration), ]
-  }
+  # df <- data.frame("name" = labels, "mean" = mean, "CI.L" = CI.L, "CI.R" = CI.R)
+  # df$name <- factor(df$name, levels = df$name)
+  # df$group <- gsub(" \\|.+", "", df$name)
+  # df$concentration <- as.numeric(gsub(".+\\| ", "", df$name))
+  # if (order_by_conc){
+  #   df <- df[order(df$concentration, df$group), ]
+  # } else {
+  #   df <- df[order(df$group, df$concentration), ]
+  # }
+  #
+  # df$name <- factor(df$name, levels = unique(factor(df$name)))
 
-  df$name <- factor(df$name, levels = unique(factor(df$name)))
+  # build the base data.frame
+  df <- data.frame("name" = labels, "mean" = mean, "CI.L" = CI.L, "CI.R" = CI.R)
+  # extract grouping and concentration for sorting
+  df$group         <- gsub(" \\|.+", "", df$name)
+  df$concentration <- as.numeric(gsub(".+\\| ", "", df$name))
+
+  if (order_by_conc) {
+    # sort by group, then by concentration
+    df <- df[order(df$group, df$concentration), ]
+    df$name <- factor(df$name, levels = unique(as.character(df$name)))
+
+  } else if (!is.null(IDs)) {
+    # respect the drag-and-drop order in IDs
+    requested <- gsub(" \\| .+", "", IDs)
+    ## ----- ORDER bars -------------------------------------------------------
+    levels_order <- unlist(lapply(requested, function(cond) {
+      fulls <- unique(as.character(df$name[df$group == cond]))
+      nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+      fulls[order(nums)]
+    }))
+    df$name <- factor(as.character(df$name), levels = levels_order)
+
+    ## ----- ORDER legend -----------------------------------------------------
+    df$group <- factor(df$group, levels = requested)
+
+  } else {
+    # fallback: original appearance order
+    df$name <- factor(as.character(df$name), levels = unique(as.character(df$name)))
+  }
 
   df$mean[is.na(df$mean)] <- 0
   df$CI.L[is.na(df$CI.L)] <- 0
@@ -4151,15 +4238,43 @@ plot.parameter <- function(x, param = c('mu.linfit', 'lambda.linfit', 'dY.linfit
   df_reps$condition <- as.factor(df_reps$condition)
   df_reps$replicate <- as.factor(df_reps$replicate)
 
+  # df_reps$group <- gsub(" \\|.+", "", df_reps$condition)
+  # df_reps$concentration <- as.numeric(gsub(".+\\| ", "", df_reps$condition))
+  # if (order_by_conc){
+  #   df_reps <- df_reps[order(df_reps$concentration, df_reps$group), ]
+  # } else {
+  #   df_reps <- df_reps[order(df_reps$group, df_reps$concentration), ]
+  # }
+  # df_reps$condition <- factor(df_reps$condition, levels = unique(factor(df_reps$condition)))
+
+  # extract group and concentration for potential sorting
   df_reps$group <- gsub(" \\|.+", "", df_reps$condition)
+  if (!is.null(IDs)) {
+    df_reps$group <- factor(df_reps$group, levels = requested)  # keep legend order
+  }
   df_reps$concentration <- as.numeric(gsub(".+\\| ", "", df_reps$condition))
-  if (order_by_conc){
-    df_reps <- df_reps[order(df_reps$concentration, df_reps$group), ]
-  } else {
+
+  if (order_by_conc) {
+    # classical sort: group then concentration
     df_reps <- df_reps[order(df_reps$group, df_reps$concentration), ]
+    df_reps$condition <- factor(df_reps$condition, levels = unique(as.character(df_reps$condition)))
+
+  } else if (!is.null(IDs)) {
+    # honor the user’s drag‐and‐drop order
+    requested <- gsub(" \\| .+", "", IDs)
+    levels_order <- unlist(lapply(requested, function(cond) {
+      fulls <- unique(as.character(df_reps$condition[df_reps$group == cond]))
+      nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+      fulls[order(nums)]
+    }))
+    df_reps$condition <- factor(as.character(df_reps$condition), levels = levels_order)
+
+  } else {
+    # fallback: original appearance order
+    df_reps$condition <- factor(as.character(df_reps$condition),
+                                levels = unique(as.character(df_reps$condition)))
   }
 
-  df_reps$condition <- factor(df_reps$condition, levels = unique(factor(df_reps$condition)))
   # apply normalization to reference condition
   if(!is.null(reference.nm)){
     df_reps$value <- df_reps$value/mean.ref
@@ -4311,8 +4426,17 @@ plot.dr_parameter <- function(x, param = c('EC50', 'EC50.Estimate', 'y.max', 'y.
   # Get name of conditions with multiple replicates
   sample.nm <- nm <- as.character(drTable[,1])
   if(!is.null(names)){
-    names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
-    nm <- nm[grep(paste(names, collapse="|"), nm)]
+    # names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+    # nm <- nm[grep(paste(names, collapse="|"), nm)]
+    names_esc <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
+
+    ##  ^            ─ anchor at start of string
+    ##  (...)        ─ alternatives of all searched patterns
+    ##  (?=\\s\\|)   ─ *look‑ahead*: assert that what follows is “space |”
+    ##                 (but don’t consume it)
+    pattern <- paste0("^(", paste(names_esc, collapse = "|"), ")(?=\\s\\|)")
+
+    nm <- nm[grepl(pattern, nm, perl = TRUE)]
   }
   if(!is.null(exclude.nm)  && length(exclude.nm) > 0){
     if(!is.na(exclude.nm) && exclude.nm != ""){
@@ -4591,7 +4715,7 @@ plot.grid <- function(x,
   }
   else {
     if(!is.null(names)  && length(names) > 0){
-      if(!is.na(names) && names != ""){
+      if(!all(is.na(names)) && !all(names == "")){
         names <- gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", names)
         nm <- nm[grep(paste(names, collapse="|"), gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\\1", nm))]
       }
