@@ -504,17 +504,63 @@ read_data <-
       colnames(fl.norm.mat) <- rep("", ncol(fl.norm.mat))
       colnames(fl.norm.mat)[1:3] <- c("condition", "replicate", "concentration")
     }
+    # -------------------------------------------------
+    # fix up the `condition` column so that
+    #  - "1.000" → "1"
+    #  - "2.500" → "2.500"  (left as-is, since not integer)
+    #  - then any pure integer → "Condition<integer>"
+    # -------------------------------------------------
+    prefix_numeric_conditions <- function(df_mat) {
+      # 1) coerce to character
+      cond <- as.character(df_mat[ , "condition"])
+      # 2) strip off any trailing decimal zeros
+      cond_clean <- trimws(sub("\\.0+$", "", cond))
+      # 3) detect which are now only digits
+      is_int <- grepl("^[0-9]+$", cond_clean)
+      # 4) prefix those with "Condition"
+      cond_clean[is_int] <- paste0("Condition", cond_clean[is_int])
+      # 5) write it back
+      df_mat[ , "condition"] <- cond_clean
+      df_mat
+    }
+
+    # apply to your three matrices, if they exist:
+    if (length(dat.mat) > 1)            dat.mat   <- prefix_numeric_conditions(dat.mat)
+    if ((length(fl) > 1) || !is.na(data.fl))         fl.mat    <- prefix_numeric_conditions(fl.mat)
+    if (((length(fl) > 1) || !is.na(data.fl)) && length(dat) > 1)
+      fl.norm.mat <- prefix_numeric_conditions(fl.norm.mat)
+
+    # # Ensure any numeric-only condition IDs get a "Condition" prefix
+    # # (we do it after create_datmat so that it applies equally to growth, fl, and fl.norm)
+    # prefix_numeric_conditions <- function(df_mat) {
+    #   # detect rows where 'condition' is digits only
+    #   is_num_only <- grepl("^[0-9]+(\\.[0-9]+)?$", df_mat[, "condition"])
+    #   if (any(is_num_only)) {
+    #     df_mat[is_num_only, "condition"] <- paste0("Condition", df_mat[is_num_only, "condition"])
+    #   }
+    #   return(df_mat)
+    # }
+    #
+    # if (length(dat.mat) > 1) {
+    #   dat.mat <- prefix_numeric_conditions(dat.mat)
+    # }
+    # if ((length(fl) > 1) || !is.na(data.fl)) {
+    #   fl.mat <- prefix_numeric_conditions(fl.mat)
+    # }
+    # if (((length(fl) > 1) || !is.na(data.fl)) && length(dat) > 1) {
+    #   fl.norm.mat <- prefix_numeric_conditions(fl.norm.mat)
+    # }
 
     if(length(dat) > 1) {
       label <- unlist(lapply(1:nrow(dat.mat), function(x) paste(dat.mat[x,1], dat.mat[x,2], dat.mat[x,3], sep = " | ")))
-      condition <- dat.mat[, 1]
-      replicate <- dat.mat[, 2]
-      concentration <- dat.mat[, 3]
+      condition <- trimws(dat.mat[, 1])
+      replicate <- trimws(dat.mat[, 2])
+      concentration <- trimws(dat.mat[, 3])
     } else if(length(fl) > 1){
       label <- unlist(lapply(1:nrow(fl.mat), function(x) paste(fl.mat[x,1], fl.mat[x,2], fl.mat[x,3], sep = " | ")))
-      condition <- fl.mat[, 1]
-      replicate <- fl.mat[, 2]
-      concentration <- fl.mat[, 3]
+      condition <- trimws(fl.mat[, 1])
+      replicate <- trimws(fl.mat[, 2])
+      concentration <- trimws(fl.mat[, 3])
     }
     # else if(length(fl2) > 1){
     #   label <- unlist(lapply(1:nrow(fl2.mat), function(x) paste(fl2.mat[x,1], fl2.mat[x,2], fl2.mat[x,3], sep = " | ")))

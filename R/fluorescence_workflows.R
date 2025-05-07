@@ -838,8 +838,9 @@ fl.workflow <- function(grodata = NULL,
         if(export.res)
           export_Table(table = table_linear_group, out.dir = wd, out.nm = "grouped_results_fluorescence_linear")
       }
-
       if(("s" %in% control$fit.opt) || ("a"  %in% control$fit.opt) ){
+        # trim whitespace from res.table.fl$AddId
+        res.table.fl$AddId <- trimws(res.table.fl$AddId)
         table_spline_group <- table_group_fluorescence_spline(res.table.fl)
         names <- gsub("<sub>", "_", gsub("</sub>|<sup>|</sup>", "", gsub("<br>", " ", colnames(table_spline_group))))
         table_spline_group <- as.data.frame(lapply(1:ncol(table_spline_group), function(x) gsub("<strong>", "", gsub("</strong>", "", table_spline_group[,x]))))

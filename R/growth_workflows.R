@@ -368,7 +368,7 @@ growth.workflow <- function(
           out.nm = "grouped_results_linear"
         )
     }
-
+    # Export grouped results table
     if (("s" %in% control$fit.opt) || ("a" %in%
                                        control$fit.opt))
     {

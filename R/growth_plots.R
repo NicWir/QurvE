@@ -3320,12 +3320,14 @@ plot.grofit <- function(x, ...,
       # respect drag-and-drop order if provided, else sort by group then concentration
       if (!is.null(IDs)) {
         requested <- gsub(" \\| .+", "", IDs)
-        levels_order <- unlist(lapply(requested, function(cond) {
-          fulls <- unique(as.character(df.deriv$name[df.deriv$group == cond]))
-          nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
-          fulls[order(nums)]
-        }))
-        df.deriv$name <- factor(as.character(df.deriv$name), levels = levels_order)
+        levels_order <- suppressWarnings(
+          unlist(lapply(requested, function(cond) {
+            fulls <- unique(as.character(df.deriv$name[df.deriv$group == cond]))
+            nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+            fulls[order(nums)]
+          }))
+        )
+        df.deriv$name <- suppressWarnings(factor(as.character(df.deriv$name), levels = levels_order))
         df.deriv      <- df.deriv[order(df.deriv$name), , drop = FALSE]
       } else {
         df.deriv      <- df.deriv[order(df.deriv$group, df.deriv$concentration), ]
@@ -3357,11 +3359,13 @@ plot.grofit <- function(x, ...,
     # respect drag-and-drop order if provided, else sort by group then concentration
     if (!is.null(IDs)) {
       requested <- gsub(" \\| .+", "", IDs)
-      levels_order <- unlist(lapply(requested, function(cond) {
-        fulls <- unique(as.character(df$name[df$group == cond]))
-        nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
-        fulls[order(nums)]
-      }))
+      levels_order <- suppressWarnings(
+        unlist(lapply(requested, function(cond) {
+          fulls <- unique(as.character(df$name[df$group == cond]))
+          nums  <- as.numeric(gsub(".+ \\| ", "", fulls))
+          fulls[order(nums)]
+        }))
+      )
       df$name <- factor(as.character(df$name), levels = levels_order)
       df      <- df[order(df$name), , drop = FALSE]
     } else {
