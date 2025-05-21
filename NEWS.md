@@ -4,6 +4,7 @@
 
 * Added area under the curve (AUC) to the results tables of spline fits (in QurvE functions as well as the app)
 * Users now have the ability to drag and drop selected conditions in group plots, controlling the order of the data series in the plot.
+* removed 'NeedsCompilation: yes' from DESCRIPTION file
 
 ## Bug fixes
 
