@@ -4976,7 +4976,8 @@ plot.grid <- function(x,
       df$name <- factor(df$name, levels = unique(factor(df$name)))
     }
 
-    p <- ggplot(df, aes(x=.data$time, y=.data$mean, group = .data$name), col = "black")
+    p <- ggplot(df, aes(x=.data$time, y=.data$mean, group = .data$name)) +
+      geom_point(colour="black")
     if(log.y == TRUE){
       p <- p + ggplot2::geom_rect(aes(fill = .data$mean.param, xmin = -Inf, xmax = Inf,
                                       ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
@@ -5013,7 +5014,7 @@ plot.grid <- function(x,
       }
 
       p <- p +
-        ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+        ggplot2::guides(fill = ggplot2::guide_colourbar(
                                                         frame.linewidth = basesize/22,
                                                         title.hjust = 0.5,
                                                         title.vjust = 0.8,
@@ -5021,7 +5022,7 @@ plot.grid <- function(x,
                                                         label.vjust = 0.7,
                                                         title.position = "bottom",
                                                         title = param,
-                                                        nrow = 1,
+                                                        direction = "horizontal",
                                                         barwidth = basesize,
                                                         barheight = basesize/10))
     } else {
@@ -5033,7 +5034,7 @@ plot.grid <- function(x,
                                                 high = rev(single_hue_palettes[[pal]])[1])
       }
 
-      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(
                                                                frame.linewidth = basesize/22,
                                                                title.hjust = 0.5,
                                                                title.vjust = 0.8,
@@ -5041,7 +5042,7 @@ plot.grid <- function(x,
                                                                label.vjust = 0.7,
                                                                title.position = "bottom",
                                                                title = param,
-                                                               nrow = 1,
+                                                               direction = "horizontal",
                                                                barwidth = basesize,
                                                                barheight = basesize/10))
     }
@@ -5266,7 +5267,8 @@ plot.grid <- function(x,
 
     df$name <- factor(df$name, levels = unique(factor(df$name)))
 
-    p <- ggplot(df, aes(x=.data$time, y=.data$y, group = .data$name), col = "black")
+    p <- ggplot(df, aes(x=.data$time, y=.data$y, group = .data$name)) +
+      geom_point(colour = "black")
     if(log.y == TRUE){
       p <- p + ggplot2::geom_rect(aes(fill = .data$param, xmin = -Inf, xmax = Inf,
                                       ymin = 10^-9, ymax = Inf), alpha = 1, inherit.aes = FALSE, data = df)
@@ -5299,7 +5301,7 @@ plot.grid <- function(x,
                                                 limits = legend.lim)
       }
 
-      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(
                                                                frame.linewidth = basesize/22,
                                                                title.hjust = 0.5,
                                                                title.vjust = 0.8,
@@ -5307,7 +5309,7 @@ plot.grid <- function(x,
                                                                label.theme = element_text(angle = 90, size = 0.8 * basesize),
                                                                label.vjust = 0.7,
                                                                title = param,
-                                                               nrow = 1,
+                                                               direction = "horizontal",
                                                                barwidth = basesize,
                                                                barheight = basesize/10))
     } else {
@@ -5319,7 +5321,7 @@ plot.grid <- function(x,
                                                 high = rev(single_hue_palettes[[pal]])[1])
       }
 
-      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(frame.colour = "black",
+      p <- p + ggplot2::guides(fill = ggplot2::guide_colourbar(
                                                                frame.linewidth = basesize/22,
                                                                title.hjust = 0.5,
                                                                title.vjust = 0.8,
@@ -5327,7 +5329,7 @@ plot.grid <- function(x,
                                                                title = param,
                                                                label.theme = element_text(angle = 90, size = 0.8 * basesize),
                                                                label.vjust = 0.7,
-                                                               nrow = 1,
+                                                               direction = "horizontal",
                                                                barwidth = basesize,
                                                                barheight = basesize/10))
     }
