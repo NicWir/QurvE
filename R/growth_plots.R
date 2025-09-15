@@ -398,7 +398,10 @@ plot.gcFitModel <- function(x, raw = TRUE,
                      "fit.data" = dat.fit)
 
     p <-    ggplot(df, aes(x=.data$time, y=.data$data)) +
-      geom_line(aes_(x=as.name(names(df)[3]), y = as.name(names(df)[4]), color = "model"), linewidth = lwd) +
+      geom_line(aes(x = .data[[names(df)[3]]],
+                    y = .data[[names(df)[4]]],
+                    color = "model"),
+                linewidth = lwd) +
       xlab("Time") +
       ylab(label = ifelse(gcFittedModel$control$log.y.model == TRUE, "Growth [Ln(y(t)/y0)]", "Growth [y(t)]")) +
       theme_classic(base_size = basesize) +
