@@ -1,12 +1,12 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   shiny_app_manual: shiny_app_manual.html
   troubleshooting: troubleshooting.html
   vignette_fluorescence: vignette_fluorescence.html
   vignette_growth: vignette_growth.html
-last_built: 2025-05-21T13:55Z
+last_built: 2025-09-15T13:58Z
 urls:
   reference: https://nicwir.github.io/QurvE/reference
   article: https://nicwir.github.io/QurvE/articles
