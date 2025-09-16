@@ -1,5 +1,13 @@
 # QurvE 1.1.2
 
+## Bug fixes
+
+* fixed deprecation warning for aes_()
+* fixed warnings from plot.grid()
+* removed shinysurveys from Suggests (not available anymore)
+
+# QurvE 1.1.2
+
 ## Enhancements
 
 * Added area under the curve (AUC) to the results tables of spline fits (in QurvE functions as well as the app)
