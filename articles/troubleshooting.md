@@ -1,0 +1,78 @@
+# Q&A and Troubleshooting
+
+  
+This Troubleshooting guide aims to provide assistance and solutions to
+common issues that users may encounter while working with the QurvE
+package or shiny app. As we gather more user feedback, we will continue
+to update this page with additional information and solutions for a
+smooth *QurvE* experience.
+
+## Dealing with Outliers
+
+Outliers can significantly affect the accuracy and reliability of growth
+curve analysis. Identifying and addressing outliers is an essential step
+when using QurvE for high-throughput growth curve experiments. In this
+section, we discuss some strategies to identify and handle outliers in
+your data.
+
+### Identifying Outliers
+
+1.  Visual Inspection: Use the “Validation” window in the Shiny app to
+    visually inspect each growth or fluorescence curve and its
+    corresponding fit. Look for any irregularities or deviations from
+    the expected growth pattern.
+
+2.  Examine Growth Parameters: Plot the computed growth or fluorescence
+    parameters (e.g., growth rate, lag time, and maximum OD,
+    fluorescence increase rate) for each sample to identify any unusual
+    values that may indicate an outlier sample.
+
+3.  Bootstrapping: QurvE offers bootstrapping for spline fitting, which
+    can help estimate uncertainty, validate the model, and identify
+    potential outliers. Use the bootstrapping results to assess the
+    reliability of your curve fits.
+
+### Handling Outliers
+
+1.  Modify Fitting Parameters: Adjust the fitting parameters in the
+    \[Computation\] section of the Shiny app to systematically exclude
+    problematic sections of the measurements (e.g., outside the
+    detection limit of the instrument). In R, this can be achieved by
+    defining values for `t0`, `tmax`, `min.growth`, and `max.growth` in
+    the
+    [`growth.workflow()`](https://nicwir.github.io/QurvE/reference/growth.workflow.md)
+    and
+    [`fl.workflow()`](https://nicwir.github.io/QurvE/reference/fl.workflow.md)
+    functions
+
+2.  Re-run outlier samples: After identifying outliers, re-run their
+    analysis with modified parameters in the \[Validation\] panel of the
+    shiny app. An example for how this can be achieved within R is
+    provided in the [growth curve analysis
+    documentation](https://nicwir.github.io/QurvE/articles/vignette_growth.html#visualize-results)
+
+3.  Data Preprocessing: Before importing your data into QurvE,
+    preprocess it to remove or reduce the impact of outliers. This can
+    be done using various data cleaning techniques, such as filtering,
+    interpolation, or imputation. Please note that such preprocessing
+    methods are outside the scope of QurvE.
+
+## Q: What is the recommended sampling interval for different fitting methods?
+
+**A:** The appropriate measurement interval depends on the organism and
+growth conditions being studied. For instance, fast-growing organisms
+like *Escherichia coli* require shorter sampling intervals of at least
+one hour while slow-growing organisms like plants can be measured up to
+every five days. It’s also important to note that the appropriate
+sampling interval may vary depending on the specific research question
+being addressed. For example, if the goal is to study the effects of a
+particular treatment on growth rates or diauxic shifts, more frequent
+sampling may be necessary to capture the short-term changes in growth.
+Alternatively, if the goal is to assess overall growth patterns over a
+longer time frame, less frequent sampling may be sufficient.  
+For linear fits, we recommend having at least four measurements within
+the mid-log phase of the growth curves to reliably estimate growth
+rates. When using smoothing splines with a low measurement frequency,
+such as in bioreactor fermentations or shaken flask experiments, you can
+increase the smoothing factor to make the fit less susceptible to
+outliers.
