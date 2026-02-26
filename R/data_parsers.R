@@ -229,6 +229,9 @@ read_data <-
       subtract_blank <- function(df){
         #test if more than one time entity is present
         time.ndx <- grep("time", unlist(df[,1]), ignore.case = TRUE)
+        if(length(time.ndx) == 0){
+          return(df)
+        }
         if(length(time.ndx)==1){
           blank.ndx <- grep("blank|buffer", df[1:nrow(df),1], ignore.case = TRUE)
           if(length(blank.ndx)>0){
@@ -994,6 +997,73 @@ tidy_to_custom <- function(df, data.format = "col"){
     df <- t(df)
   }
   else if(data.format == "col"){
+    # Handle a common "simple wide" format:
+    # - a single time column (named like "time")
+    # - remaining columns are samples
+    # - no replicate / concentration identifier rows are present
+    # In this case, build the missing identifier rows from the column names,
+    # then transpose to the internal row format.
+    if(is.data.frame(df) && ncol(df) >= 2 && !is.null(colnames(df))){
+      time_col <- grep("^time$", colnames(df), ignore.case = TRUE)
+      if(length(time_col) == 0){
+        time_col <- grep("time", colnames(df), ignore.case = TRUE)
+      }
+      time_col <- time_col[1]
+
+      if(!is.na(time_col) && length(time_col) == 1){
+        time_vals <- suppressWarnings(as.numeric(df[[time_col]]))
+        # Treat as simple wide only if ALL time values are present numeric (no identifier rows)
+        is_simple_wide <- (length(time_vals) == nrow(df)) && !any(is.na(time_vals))
+
+        if(is_simple_wide){
+          sample_cols <- setdiff(seq_len(ncol(df)), time_col)
+          sample_names <- colnames(df)[sample_cols]
+
+          # Parse replicate number from trailing "_N" if present
+          reps <- suppressWarnings(as.integer(sub(".*_([0-9]+)$", "\\1", sample_names)))
+          reps[grepl(".*_([0-9]+)$", sample_names) == FALSE] <- NA
+
+          # Do NOT auto-extract concentration from sample names.
+          # Numeric tokens like "13" in "B4_13_TZD_ConjNP_1" are treated as part of the condition/Description.
+          base_names <- sub("_([0-9]+)$", "", sample_names)
+          tokens <- strsplit(base_names, "_", fixed = TRUE)
+          well_like <- vapply(tokens, function(x) length(x) >= 1 && grepl("^[A-Ha-h][0-9]{1,2}$", x[1]), logical(1))
+
+          # Derive descriptions: drop leading well token if present
+          desc <- vapply(seq_along(tokens), function(i) {
+            x <- tokens[[i]]
+            if(length(x) == 0) return(base_names[i])
+            if(well_like[i] && length(x) >= 2){
+              x <- x[-1]
+            }
+            if(length(x) == 0) return(base_names[i])
+            paste(x, collapse = "_")
+          }, character(1))
+
+          # Build custom column layout (3 identifier rows), then transpose
+          desc_row <- c("Time", desc)
+          rep_row <- c(NA, reps)
+          conc_row <- c(NA, rep(NA, length(sample_cols)))
+
+          value_mat <- df[, sample_cols, drop = FALSE]
+          value_mat <- apply(value_mat, 2, function(x) suppressWarnings(as.numeric(x)))
+          if(is.null(dim(value_mat))){
+            value_mat <- matrix(value_mat, ncol = length(sample_cols))
+            colnames(value_mat) <- sample_names
+          }
+
+          df <- as.data.frame(
+            rbind(
+              desc_row,
+              rep_row,
+              conc_row,
+              cbind(time_vals, value_mat)
+            ),
+            stringsAsFactors = FALSE
+          )
+        }
+      }
+    }
     df <- t(df)
   }
   rownames(df) <- seq(1:nrow(df))
